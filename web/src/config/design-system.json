@@ -1,0 +1,184 @@
+{
+  "meta": {
+    "systemName": "Geolocation MVP",
+    "version": "1.0.0",
+    "description": "A design system for a geo-location deals and social app targeting a young, modern audience. It blends functional clarity with a vibrant, energetic aesthetic to inspire discovery and action.",
+    "lastUpdated": "2025-07-19T20:19:18+05:30"
+  },
+  "palette": {
+    "brand": {
+      "primary": {
+        "main": "#4A90E2",
+        "dark": "#2E6AB6",
+        "contrastText": "#FFFFFF",
+        "description": "The main brand color for primary CTAs, links, and active states."
+      }
+    },
+    "accent": {
+      "urgent": {
+        "main": "#FF3B5C",
+        "contrastText": "#FFFFFF",
+        "description": "For urgent, time-sensitive elements like countdown timers and 'Hot Deal' tags."
+      },
+      "secondary": {
+        "main": "#F5A623",
+        "contrastText": "#FFFFFF",
+        "description": "For secondary highlights, featured items, and special perks."
+      },
+      "gamification": {
+        "main": "#7ED321",
+        "contrastText": "#FFFFFF",
+        "description": "For positive reinforcement: points, achievements, and success states."
+      }
+    },
+    "neutral": {
+      "background": "#F4F7F9",
+      "surface": "#FFFFFF",
+      "text_primary": "#222222",
+      "text_secondary": "#5E6D77",
+      "border": "#E0E6E8"
+    },
+    "semantic": {
+      "error": "#D32F2F",
+      "success": "#388E3C",
+      "warning": "#FFA000"
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "headings": "'Poppins', 'Helvetica Neue', sans-serif",
+      "body": "'Inter', 'Roboto', 'Arial', sans-serif"
+    },
+    "weights": {
+      "regular": 400,
+      "semiBold": 600,
+      "bold": 700
+    },
+    "scale": {
+      "display": {
+        "fontFamily": "var(--font-headings)",
+        "fontSize": "2.5rem",
+        "fontWeight": 700,
+        "lineHeight": 1.2
+      },
+      "h1": {
+        "fontFamily": "var(--font-headings)",
+        "fontSize": "2rem",
+        "fontWeight": 700,
+        "lineHeight": 1.25
+      },
+      "h2": {
+        "fontFamily": "var(--font-headings)",
+        "fontSize": "1.5rem",
+        "fontWeight": 600,
+        "lineHeight": 1.3
+      },
+      "h3": {
+        "fontFamily": "var(--font-headings)",
+        "fontSize": "1.25rem",
+        "fontWeight": 600,
+        "lineHeight": 1.4
+      },
+      "body_default": {
+        "fontFamily": "var(--font-body)",
+        "fontSize": "1rem",
+        "fontWeight": 400,
+        "lineHeight": 1.5
+      },
+      "body_small": {
+        "fontFamily": "var(--font-body)",
+        "fontSize": "0.875rem",
+        "fontWeight": 400,
+        "lineHeight": 1.5
+      },
+      "label": {
+        "fontFamily": "var(--font-body)",
+        "fontSize": "0.875rem",
+        "fontWeight": 600,
+        "lineHeight": 1.4
+      },
+      "caption": {
+        "fontFamily": "var(--font-body)",
+        "fontSize": "0.75rem",
+        "fontWeight": 400,
+        "lineHeight": 1.4
+      },
+      "overline": {
+        "fontFamily": "var(--font-body)",
+        "fontSize": "0.625rem",
+        "fontWeight": 700,
+        "lineHeight": 1.6,
+        "textTransform": "uppercase"
+      }
+    }
+  },
+  "spacing": {
+    "baseUnit": "4px",
+    "xs": "4px",
+    "sm": "8px",
+    "md": "16px",
+    "lg": "24px",
+    "xl": "32px",
+    "xxl": "48px"
+  },
+  "borders": {
+    "radius": {
+      "sm": "8px",
+      "md": "12px",
+      "lg": "16px",
+      "pill": "9999px",
+      "circle": "50%"
+    },
+    "width": {
+      "default": "1px",
+      "thick": "2px"
+    }
+  },
+  "shadows": {
+    "level1": "0px 2px 4px rgba(0, 0, 0, 0.06)",
+    "level2": "0px 4px 8px rgba(0, 0, 0, 0.08)",
+    "level3": "0px 10px 20px rgba(0, 0, 0, 0.1)",
+    "interactive": "0 0 0 3px rgba(74, 144, 226, 0.3)"
+  },
+  "iconography": {
+    "library": "Phosphor Icons",
+    "style": "Fill",
+    "size": {
+      "sm": "16px",
+      "md": "20px",
+      "lg": "24px"
+    }
+  },
+  "components": {
+    "button": {
+      "height": "48px",
+      "padding": "0 24px",
+      "borderRadius": "var(--radius-pill)",
+      "typography": "var(--typography-label)"
+    },
+    "card": {
+      "backgroundColor": "var(--palette-neutral-surface)",
+      "borderRadius": "var(--borders-radius-lg)",
+      "boxShadow": "var(--shadows-level2)",
+      "padding": "var(--spacing-md)"
+    },
+    "inputField": {
+      "height": "52px",
+      "backgroundColor": "var(--palette-neutral-surface)",
+      "borderColor": "var(--palette-neutral-border)",
+      "borderRadius": "var(--borders-radius-sm)",
+      "padding": "0 16px"
+    },
+    "countdownTimer": {
+      "backgroundColor": "rgba(255, 59, 92, 0.1)",
+      "color": "var(--palette-accent-urgent-main)",
+      "borderRadius": "var(--borders-radius-pill)",
+      "padding": "4px 12px",
+      "typography": "var(--typography-caption)"
+    }
+  },
+  "transitions": {
+    "duration": "200ms",
+    "timingFunction": "ease-in-out"
+  }
+}
