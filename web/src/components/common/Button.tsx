@@ -24,7 +24,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       'inline-flex items-center justify-center whitespace-nowrap rounded-full font-medium ring-offset-white transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-main/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50';
 
     const variantClasses = {
-      primary: 'bg-gradient-to-b from-blue-400 to-blue-600 text-white hover:from-blue-500 hover:to-blue-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200',
+      primary: 'bg-brand-primary-main text-white hover:bg-brand-primary-dark',
       secondary: 'bg-white text-neutral-text-primary border border-neutral-border hover:bg-neutral-subtle-background',
       google: 'bg-white text-neutral-text-primary border border-neutral-border hover:bg-neutral-subtle-background',
       ghost: 'bg-transparent text-neutral-text-secondary hover:text-neutral-text-primary hover:bg-neutral-subtle-background',

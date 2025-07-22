@@ -26,7 +26,10 @@ export const FeaturesSection = () => {
     <section className="w-full bg-neutral-surface py-20 md:py-28">
       <div className="container mx-auto grid max-w-7xl gap-12 px-4 md:grid-cols-3">
         {features.map((feature) => (
-          <div key={feature.title} className="flex flex-col items-center text-center md:items-start md:text-left">
+          <div
+            key={feature.title}
+            className="flex flex-col items-center text-center md:items-start md:text-left"
+          >
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-lg bg-neutral-background">
               {feature.icon}
             </div>

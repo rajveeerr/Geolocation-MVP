@@ -70,7 +70,7 @@ export const HeroIllustration = () => {
               strokeDasharray="5 5"
               opacity="0.5"
             />
-             <path
+            <path
               d="M 200 150 Q 350 80 500 100"
               stroke="#3b82f6"
               strokeWidth="2"
@@ -95,13 +95,7 @@ export const HeroIllustration = () => {
             <g transform="translate(600 180)" filter="url(#shadow)">
               <circle cx="0" cy="0" r="20" fill="white" />
               <circle cx="0" cy="0" r="16" fill="#7ED321" />
-              <ShoppingBag
-                x="-9"
-                y="-9"
-                width="18"
-                height="18"
-                color="white"
-              />
+              <ShoppingBag x="-9" y="-9" width="18" height="18" color="white" />
             </g>
 
             <g transform="translate(500 100)" filter="url(#shadow)">
@@ -110,8 +104,8 @@ export const HeroIllustration = () => {
               <Ticket x="-9" y="-9" width="18" height="18" color="white" />
             </g>
 
-             <g transform="translate(320 280)">
-                <circle cx="0" cy="0" r="40" fill="url(#glow)" />
+            <g transform="translate(320 280)">
+              <circle cx="0" cy="0" r="40" fill="url(#glow)" />
             </g>
           </svg>
         </div>
