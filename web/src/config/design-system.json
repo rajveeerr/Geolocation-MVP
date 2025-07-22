@@ -8,8 +8,9 @@
   "palette": {
     "brand": {
       "primary": {
-        "main": "#4A90E2",
-        "dark": "#2E6AB6",
+        "main": "#2563EB",
+        "dark": "#1D4ED8",
+        "light": "#DBEAFE",
         "contrastText": "#FFFFFF",
         "description": "The main brand color for primary CTAs, links, and active states."
       }
@@ -22,26 +23,54 @@
       },
       "secondary": {
         "main": "#F5A623",
-        "contrastText": "#FFFFFF",
+        "contrastText": "#FFFFFF", 
         "description": "For secondary highlights, featured items, and special perks."
       },
       "gamification": {
         "main": "#7ED321",
         "contrastText": "#FFFFFF",
         "description": "For positive reinforcement: points, achievements, and success states."
+      },
+      "spark": {
+        "main": "#F97316",
+        "contrastText": "#FFFFFF",
+        "description": "Energetic orange for sparking action and discovery."
+      },
+      "claude": {
+        "main": "#F97316",
+        "light": "#FED7AA",
+        "contrastText": "#FFFFFF",
+        "description": "Claude AI brand colors for integrations."
       }
     },
     "neutral": {
       "background": "#F4F7F9",
       "surface": "#FFFFFF",
-      "text_primary": "#222222",
-      "text_secondary": "#5E6D77",
-      "border": "#E0E6E8"
+      "text_primary": "#111827",
+      "text_secondary": "#6B7280",
+      "text_tertiary": "#9CA3AF",
+      "border": "#E5E7EB",
+      "border_light": "#F3F4F6",
+      "subtle_background": "#F9FAFB"
+    },
+    "gradients": {
+      "hero": {
+        "from": "#DBEAFE",
+        "via": "#EFF6FF", 
+        "to": "#FFFFFF",
+        "description": "Hero section gradient background"
+      },
+      "card": {
+        "from": "#FFFFFF",
+        "to": "#F8FAFC",
+        "description": "Subtle card gradient"
+      }
     },
     "semantic": {
-      "error": "#D32F2F",
-      "success": "#388E3C",
-      "warning": "#FFA000"
+      "error": "#DC2626",
+      "success": "#059669",
+      "warning": "#D97706",
+      "info": "#2563EB"
     }
   },
   "typography": {
@@ -151,30 +180,82 @@
   },
   "components": {
     "button": {
-      "height": "48px",
-      "padding": "0 24px",
-      "borderRadius": "var(--radius-pill)",
-      "typography": "var(--typography-label)"
+      "base": {
+        "height": "40px",
+        "padding": "0 16px",
+        "borderRadius": "8px",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "transition": "all 200ms ease-in-out"
+      },
+      "variants": {
+        "primary": {
+          "backgroundColor": "#2563EB",
+          "color": "#FFFFFF",
+          "border": "none",
+          "hoverBackgroundColor": "#1D4ED8"
+        },
+        "secondary": {
+          "backgroundColor": "#FFFFFF",
+          "color": "#111827",
+          "border": "1px solid #E5E7EB",
+          "hoverBackgroundColor": "#F9FAFB"
+        },
+        "google": {
+          "backgroundColor": "#FFFFFF",
+          "color": "#111827",
+          "border": "1px solid #E5E7EB",
+          "hoverBackgroundColor": "#F9FAFB",
+          "icon": "google"
+        },
+        "ghost": {
+          "backgroundColor": "transparent",
+          "color": "#6B7280",
+          "border": "none",
+          "hoverColor": "#111827"
+        }
+      },
+      "sizes": {
+        "sm": {
+          "height": "32px",
+          "padding": "0 12px",
+          "fontSize": "12px"
+        },
+        "md": {
+          "height": "40px", 
+          "padding": "0 16px",
+          "fontSize": "14px"
+        },
+        "lg": {
+          "height": "48px",
+          "padding": "0 24px",
+          "fontSize": "16px"
+        }
+      }
     },
     "card": {
-      "backgroundColor": "var(--palette-neutral-surface)",
-      "borderRadius": "var(--borders-radius-lg)",
-      "boxShadow": "var(--shadows-level2)",
-      "padding": "var(--spacing-md)"
+      "backgroundColor": "#FFFFFF",
+      "borderRadius": "16px",
+      "boxShadow": "0px 4px 8px rgba(0, 0, 0, 0.08)",
+      "padding": "16px"
     },
     "inputField": {
       "height": "52px",
-      "backgroundColor": "var(--palette-neutral-surface)",
-      "borderColor": "var(--palette-neutral-border)",
-      "borderRadius": "var(--borders-radius-sm)",
+      "backgroundColor": "#FFFFFF",
+      "borderColor": "#E5E7EB",
+      "borderRadius": "8px",
       "padding": "0 16px"
     },
-    "countdownTimer": {
-      "backgroundColor": "rgba(255, 59, 92, 0.1)",
-      "color": "var(--palette-accent-urgent-main)",
-      "borderRadius": "var(--borders-radius-pill)",
-      "padding": "4px 12px",
-      "typography": "var(--typography-caption)"
+    "navbar": {
+      "height": "64px",
+      "backgroundColor": "transparent",
+      "backdropFilter": "blur(8px)",
+      "borderBottom": "1px solid #F3F4F6"
+    },
+    "hero": {
+      "background": "linear-gradient(to bottom, #DBEAFE, #EFF6FF, #FFFFFF)",
+      "minHeight": "100vh",
+      "padding": "80px 24px"
     }
   },
   "transitions": {
