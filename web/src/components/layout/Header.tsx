@@ -3,6 +3,52 @@ import { ChevronDown, Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
 import { ArrowRight } from 'lucide-react';
+import { PATHS } from '@/routing/paths';
+import { Logo } from '../common/Logo';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const navigationItems = [
+  {
+    id: 'hotDeals',
+    label: 'Hot Deals',
+    path: PATHS.HOT_DEALS,
+    hasDropdown: true
+  },
+  {
+    id: 'map',
+    label: 'Maps',
+    path: PATHS.MAP,
+    hasDropdown: false
+  },
+  {
+    id: 'pricing',
+    label: 'Pricing', 
+    path: PATHS.PRICING,
+    hasDropdown: false
+  }
+];
+
+// CTA buttons configuration
+const ctaButtons = [
+  {
+    id: 'login',
+    label: 'Login',
+    variant: 'google' as const,
+    path: PATHS.LOGIN,
+    showOnMobile: true,
+    showOnDesktop: true
+  },
+  {
+    id: 'business',
+    label: 'For Businesses',
+    variant: 'primary' as const,
+    path: PATHS.FOR_BUSINESSES,
+    icon: <ArrowRight className="w-4 h-4" />,
+    iconPosition: 'right' as const,
+    showOnMobile: true,
+    showOnDesktop: true
+  }
+];
 
 export const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -19,114 +65,98 @@ export const Header = () => {
 
   return (
     <header className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-      isScrolled 
+      isScrolled || isMobileMenuOpen
         ? 'bg-white/70 backdrop-blur-lg border-b border-neutral-border-light' 
         : 'bg-transparent'
     }`}>
       <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-brand-primary-main rounded flex items-center justify-center">
-              <span className="text-white font-bold text-sm">p</span>
-            </div>
-            <span className="text-xl font-semibold text-neutral-text-primary">
-              promptwatch
-            </span>
-          </div>
+        <Link to={PATHS.HOME}>
+          <Logo/>
         </Link>
         
-        {/* Desktop Navigation */}
         <nav className="hidden items-center gap-8 lg:flex">
-          <div className="flex items-center gap-1 text-neutral-text-secondary hover:text-neutral-text-primary cursor-pointer">
-            <span className="text-sm font-medium">Resources</span>
-            <ChevronDown className="w-4 h-4" />
-          </div>
-          <Link
-            to="/agencies"
-            className="text-sm font-medium text-neutral-text-secondary hover:text-neutral-text-primary transition-colors"
-          >
-            Agencies
-          </Link>
-          <Link
-            to="/book-demo"
-            className="text-sm font-medium text-neutral-text-secondary hover:text-neutral-text-primary transition-colors"
-          >
-            Book a demo
-          </Link>
-          <Link
-            to="/pricing"
-            className="text-sm font-medium text-neutral-text-secondary hover:text-neutral-text-primary transition-colors"
-          >
-            Pricing
-          </Link>
+          {navigationItems.map((item) => (
+            <Link
+              key={item.id}
+              to={item.path}
+              className="flex items-center gap-1 text-sm font-medium text-neutral-text-secondary hover:text-neutral-text-primary transition-colors"
+            >
+              {item.label}
+              {item.hasDropdown && <ChevronDown className="w-4 h-4" />}
+            </Link>
+          ))}
         </nav>
 
-        {/* Desktop CTA Buttons */}
         <div className="hidden items-center gap-3 lg:flex">
-          <Button variant="google" size="md">
-            Join with Google
-          </Button>
-          <Button variant="primary" size="md" icon={<ArrowRight className="w-4 h-4" />} iconPosition="right">
-            Start 7-day trial
-          </Button>
+          {ctaButtons.filter(button => button.showOnDesktop).map((button) => (
+            <Link key={button.id} to={button.path}>
+              <Button 
+                variant={button.variant} 
+                size="md" 
+                icon={button.icon}
+                iconPosition={button.iconPosition}
+              >
+                {button.label}
+              </Button>
+            </Link>
+          ))}
         </div>
 
-        {/* Mobile CTA (condensed) */}
-        <div className="flex items-center gap-2 lg:hidden">
-          <Button variant="primary" size="sm">
-            Try Free
-          </Button>
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 text-neutral-text-secondary hover:text-neutral-text-primary"
-            aria-label="Toggle mobile menu"
-          >
-            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        <div className="lg:hidden">
+          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2">
+            {isMobileMenuOpen ? (
+              <X className="h-6 w-6 text-neutral-text-primary" />
+            ) : (
+              <Menu className="h-6 w-6 text-neutral-text-primary" />
+            )}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden border-t border-neutral-border-light bg-white/95 backdrop-blur-md">
-          <nav className="container mx-auto max-w-6xl px-4 py-4 space-y-3">
-            <div className="flex items-center gap-1 text-neutral-text-secondary hover:text-neutral-text-primary cursor-pointer py-2">
-              <span className="text-sm font-medium">Resources</span>
-              <ChevronDown className="w-4 h-4" />
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="lg:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-md border-b border-neutral-border-light shadow-md"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+              <nav className="flex flex-col gap-6">
+                {navigationItems.map((item) => (
+                  <Link
+                    key={item.id}
+                    to={item.path}
+                    className="flex items-center gap-2 text-lg font-medium text-neutral-text-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {item.label}
+                    {item.hasDropdown && <ChevronDown className="w-4 h-4" />}
+                  </Link>
+                ))}
+              </nav>
+              <div className="mt-6 pt-6 border-t border-neutral-border-light/80 space-y-3">
+                {ctaButtons.filter(button => button.showOnMobile).map((button) => (
+                  <Link key={button.id} to={button.path} className="block">
+                    <Button 
+                      variant={button.variant} 
+                      size="lg" 
+                      className="w-full"
+                      icon={button.icon}
+                      iconPosition={button.iconPosition}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {button.label}
+                    </Button>
+                  </Link>
+                ))}
+              </div>
             </div>
-            <Link
-              to="/agencies"
-              className="block text-sm font-medium text-neutral-text-secondary hover:text-neutral-text-primary transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Agencies
-            </Link>
-            <Link
-              to="/book-demo"
-              className="block text-sm font-medium text-neutral-text-secondary hover:text-neutral-text-primary transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Book a demo
-            </Link>
-            <Link
-              to="/pricing"
-              className="block text-sm font-medium text-neutral-text-secondary hover:text-neutral-text-primary transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Pricing
-            </Link>
-            
-            <div className="pt-4 border-t border-neutral-border-light space-y-3">
-              <Button variant="google" size="md" className="w-full">
-                Join with Google
-              </Button>
-              <Button variant="primary" size="md" icon={<ArrowRight className="w-4 h-4" />} iconPosition="right" className="w-full">
-                Start 7-day trial
-              </Button>
-            </div>
-          </nav>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };

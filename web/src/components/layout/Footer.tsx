@@ -1,30 +1,120 @@
 import { Link } from 'react-router-dom';
-import { Sparkles } from 'lucide-react';
+import { Linkedin } from 'lucide-react';
+import { PATHS } from '@/routing/paths';
+import { Logo } from '../common/Logo';
 
 export const Footer = () => {
   return (
-    <footer className="w-full border-t border-neutral-border bg-neutral-surface py-12">
-      <div className="container mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 md:flex-row">
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-neutral-text-secondary" />
-          <span className="text-sm text-neutral-text-secondary">
-            © {new Date().getFullYear()} CitySpark. All rights reserved.
-          </span>
+    <footer className="w-full bg-white border-t border-neutral-border py-8">
+      <div className="container mx-auto max-w-7xl px-6 md:px-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
+          {/* Logo and Description */}
+          <div className="col-span-2 md:col-span-2">
+            <Logo />
+            <p className="text-neutral-text-secondary text-sm leading-relaxed max-w-sm mt-4">
+              Discover live deals and exclusive experiences from top-rated local businesses. Your real-time map to the city's best moments.
+            </p>
+            <div className="mt-6">
+              <div className="inline-flex items-center gap-2 bg-neutral-100 text-neutral-800 text-xs font-medium px-3 py-2 rounded-md">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                All systems operational
+              </div>
+            </div>
+          </div>
+
+          {/* Product */}
+          <div>
+            <h3 className="font-medium text-neutral-text-primary mb-4">Product</h3>
+            <ul className="space-y-3">
+              <li>
+                <Link to={PATHS.MAP} className="text-sm text-neutral-text-secondary hover:text-neutral-text-primary transition-colors">
+                  Live Map
+                </Link>
+              </li>
+              <li>
+                <Link to={PATHS.HOT_DEALS} className="text-sm text-neutral-text-secondary hover:text-neutral-text-primary transition-colors">
+                  Hot Deals
+                </Link>
+              </li>
+              <li>
+                <Link to={PATHS.PRICING} className="text-sm text-neutral-text-secondary hover:text-neutral-text-primary transition-colors">
+                  Pricing
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Solutions */}
+          <div>
+            <h3 className="font-medium text-neutral-text-primary mb-4">Business</h3>
+            <ul className="space-y-3">
+              <li>
+                <Link to={PATHS.FOR_BUSINESSES} className="text-sm text-neutral-text-secondary hover:text-neutral-text-primary transition-colors">
+                  For Businesses
+                </Link>
+              </li>
+              <li>
+                <Link to={PATHS.BUSINESS_SIGNUP} className="text-sm text-neutral-text-secondary hover:text-neutral-text-primary transition-colors">
+                  Claim Your Business
+                </Link>
+              </li>
+              <li>
+                <Link to={PATHS.BUSINESS_DASHBOARD} className="text-sm text-neutral-text-secondary hover:text-neutral-text-primary transition-colors">
+                  Business Login
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h3 className="font-medium text-neutral-text-primary mb-4">Company</h3>
+            <ul className="space-y-3">
+              <li>
+                <Link to={PATHS.ABOUT} className="text-sm text-neutral-text-secondary hover:text-neutral-text-primary transition-colors">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link to={PATHS.CONTACT} className="text-sm text-neutral-text-secondary hover:text-neutral-text-primary transition-colors">
+                  Contact
+                </Link>
+              </li>
+              <li>
+                <Link to={PATHS.SUPPORT} className="text-sm text-neutral-text-secondary hover:text-neutral-text-primary transition-colors">
+                  Support
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
-        <nav className="flex flex-wrap justify-center gap-4 md:gap-6">
-          <Link to="/about" className="text-sm hover:underline">
-            About
-          </Link>
-          <Link to="/for-business" className="text-sm hover:underline">
-            For Businesses
-          </Link>
-          <Link to="/privacy" className="text-sm hover:underline">
-            Privacy
-          </Link>
-          <Link to="/terms" className="text-sm hover:underline">
-            Terms
-          </Link>
-        </nav>
+
+        <div className="flex flex-col sm:flex-row items-center justify-between pt-8 border-t border-neutral-border">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 sm:mb-0">
+            <span className="text-sm text-neutral-text-secondary text-center sm:text-left">
+              © {new Date().getFullYear()} CitySpark All rights reserved
+            </span>
+            <span className="hidden sm:inline text-neutral-border">·</span>
+            <Link to={PATHS.PRIVACY} className="text-sm text-neutral-text-secondary hover:text-neutral-text-primary transition-colors">
+              Privacy Policy
+            </Link>
+            <span className="hidden sm:inline text-neutral-border">·</span>
+            <Link to={PATHS.TERMS} className="text-sm text-neutral-text-secondary hover:text-neutral-text-primary transition-colors">
+              Terms of Service
+            </Link>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-neutral-text-secondary hover:text-neutral-text-primary transition-colors">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-neutral-text-secondary hover:text-neutral-text-primary transition-colors">
+              <Linkedin className="h-5 w-5" />
+            </a>
+          </div>
+        </div>
       </div>
     </footer>
   );

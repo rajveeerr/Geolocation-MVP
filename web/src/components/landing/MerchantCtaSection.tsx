@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/common/Button';
+import { PATHS } from '@/routing/paths';
 
 export const MerchantCtaSection = () => {
   return (
@@ -13,7 +14,7 @@ export const MerchantCtaSection = () => {
         </p>
         <div className="mt-8">
           <Button asChild>
-            <Link to="/for-business">Put Your Business on the Map</Link>
+            <Link to={PATHS.FOR_BUSINESSES}>Put Your Business on the Map</Link>
           </Button>
         </div>
       </div>
