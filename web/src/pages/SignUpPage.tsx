@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { Eye, EyeOff, Mail, Lock, User, Phone, Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/common/Button';
@@ -15,35 +14,20 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form';
 import { PATHS } from '@/routing/paths';
-import { apiPost } from '@/services/api';
-import { useToast } from '@/hooks/use-toast';
-
-// Validation schema using Zod
-const formSchema = z.object({
-  firstName: z.string().min(2, { message: "First name must be at least 2 characters." }),
-  lastName: z.string().min(2, { message: "Last name must be at least 2 characters." }),
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  phone: z.string().min(10, { message: "Please enter a valid phone number." }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters." }),
-  confirmPassword: z.string()
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
-type SignUpFormValues = z.infer<typeof formSchema>;
+import { signUpSchema, type SignUpFormValues } from '@/lib/validationSchemas'; // Use new schema import
+import { useAuth } from '@/context/AuthContext';
 
 export const SignUpPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { toast } = useToast();
-  const navigate = useNavigate();
+  const { signup, isSigningUp } = useAuth();
 
   const form = useForm<SignUpFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(signUpSchema), // Use the imported schema
+    mode: 'onTouched', // Give feedback as soon as the user navigates away from a field
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -55,31 +39,9 @@ export const SignUpPage = () => {
   });
 
   const onSubmit = async (values: SignUpFormValues) => {
-    setIsLoading(true);
     const { firstName, lastName, email, password } = values;
-    const payload = {
-      name: `${firstName} ${lastName}`,
-      email,
-      password,
-    };
-
-    const response = await apiPost('/auth/register', payload);
-
-    if (response.success) {
-      toast({
-        title: "Account Created!",
-        description: "You've successfully signed up. Please log in.",
-        variant: "default",
-      });
-      navigate(PATHS.LOGIN);
-    } else {
-      toast({
-        title: "Uh oh! Something went wrong.",
-        description: response.error || "There was a problem with your request.",
-        variant: "destructive",
-      });
-    }
-    setIsLoading(false);
+    const payload = { name: `${firstName} ${lastName}`, email, password };
+    await signup(payload);
   };
 
   return (
@@ -158,7 +120,6 @@ export const SignUpPage = () => {
                 )} />
               </div>
               
-              {/* Email Field */}
                             
               <FormField control={form.control} name="email" render={({ field }) => (
                 <FormItem>
@@ -228,6 +189,10 @@ export const SignUpPage = () => {
                       </button>
                     </div>
                   </FormControl>
+                  {/* ADD THIS FOR BETTER UX */}
+                  <FormDescription>
+                    Must be 8+ characters with uppercase, lowercase, number, and special characters.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )} />
@@ -292,8 +257,8 @@ export const SignUpPage = () => {
               </div>
 
               {/* Submit Button */}
-              <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isSigningUp}>
+                {isSigningUp && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Create account
               </Button>
             </form>

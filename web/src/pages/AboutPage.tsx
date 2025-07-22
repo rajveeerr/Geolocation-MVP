@@ -1,6 +1,6 @@
 export const AboutPage = () => {
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-16">
+    <div className="container mx-auto max-w-4xl px-4 py-16 min-h-screen">
       <h1 className="mb-8 text-center text-h1">About CitySpark</h1>
       <div className="prose prose-lg mx-auto">
         <p className="text-lg text-neutral-text-secondary">

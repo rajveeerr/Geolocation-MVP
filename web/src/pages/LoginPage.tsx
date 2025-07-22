@@ -17,9 +17,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { PATHS } from '@/routing/paths';
-import { apiPost } from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { loginSchema } from '@/lib/validationSchemas';
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
@@ -29,35 +28,17 @@ const formSchema = z.object({
 type LoginFormValues = z.infer<typeof formSchema>;
 
 export const LoginPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { toast } = useToast();
-  const { login } = useAuth();
+  const { login, isLoggingIn } = useAuth();
 
   const form = useForm<LoginFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
   });
 
   const onSubmit = async (values: LoginFormValues) => {
-    setIsLoading(true);
-    const response = await apiPost<{ token: string }, LoginFormValues>('/auth/login', values);
-
-    if (response.success && response.data?.token) {
-      toast({
-        title: "Login Successful!",
-        description: "Welcome back to CitySpark.",
-      });
-      login(response.data.token); // This will handle token storage and navigation
-    } else {
-      toast({
-        title: "Login Failed",
-        description: response.error || "Invalid credentials. Please try again.",
-        variant: "destructive",
-      });
-    }
-    setIsLoading(false);
-  };
+    await login(values); 
+};
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-brand-primary-light via-blue-50 to-white px-4 py-24 sm:px-6 lg:px-8">
@@ -91,10 +72,8 @@ export const LoginPage = () => {
             </div>
           </div>
           
-          {/* Login Form */}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* Email Field */}
               <FormField control={form.control} name="email" render={({ field }) => (
                 <FormItem>
                   <FormLabel className="mb-2 block text-sm font-medium text-neutral-text-primary">Email address</FormLabel>
@@ -114,7 +93,6 @@ export const LoginPage = () => {
                   <FormMessage />
                 </FormItem>
               )} />
-              {/* Password Field */}
               <FormField control={form.control} name="password" render={({ field }) => (
                 <FormItem>
                   <FormLabel className="mb-2 block text-sm font-medium text-neutral-text-primary">Password</FormLabel>
@@ -146,7 +124,6 @@ export const LoginPage = () => {
                 </FormItem>
               )} />
 
-              {/* Remember me & Forgot password */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <input
@@ -170,15 +147,13 @@ export const LoginPage = () => {
                 </Link>
               </div>
 
-              {/* Submit Button */}
-              <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isLoggingIn}>
+                {isLoggingIn && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Sign in
               </Button>
             </form>
           </Form>
 
-          {/* Sign up link */}
           <div className="mt-8 text-center">
             <p className="text-sm text-neutral-text-secondary">
               Don't have an account?{' '}
@@ -187,7 +162,7 @@ export const LoginPage = () => {
                 className="font-medium text-brand-primary-main hover:text-brand-primary-dark"
               >
                 Sign up for free
-              </Link>
+              </Link>              
             </p>
           </div>
         </div>

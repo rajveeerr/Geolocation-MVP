@@ -17,10 +17,11 @@ import { useAuth } from '@/context/AuthContext';
 import { PATHS } from '@/routing/paths';
 
 export const ProfileDropDown = () => {
-    const { logout } = useAuth();
+    const { user, logout } = useAuth();
     
-    // In a real app, you'd fetch user data and use their name/initials
-    const userInitials = "CS"; // Placeholder
+    const userInitials = user?.name
+        ? user.name.split(' ').map(n => n[0]).join('').toUpperCase()
+        : user?.email?.[0].toUpperCase() ?? 'U';
 
     return (
         <DropdownMenu>

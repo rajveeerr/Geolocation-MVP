@@ -55,9 +55,8 @@ const ctaButtons = [
 export const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { token, isLoading } = useAuth(); // Use our AuthContext
+  const { user, isLoadingUser } = useAuth(); // Use our AuthContext 
 
-  // The login button from your config
   const loginButton = ctaButtons.find(b => b.id === 'login');
 
   useEffect(() => {
@@ -94,17 +93,10 @@ export const Header = () => {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          {/* For Businesses Button - Always visible on the left */}
-          <Link to={PATHS.FOR_BUSINESSES}>
-            <Button variant="primary" size="md" icon={<ArrowRight className="w-4 h-4" />} iconPosition="right">
-              For Businesses
-            </Button>
-          </Link>
-          
-          {/* Authentication section on the right */}
-          {isLoading ? (
+          {/* Authentication section on the left */}
+          {isLoadingUser ? (
             <div className="h-10 w-24 bg-neutral-200 animate-pulse rounded-full" />
-          ) : token ? (
+          ) : user ? (
             <ProfileDropDown />
           ) : (
             loginButton && (
@@ -115,6 +107,13 @@ export const Header = () => {
               </Link>
             )
           )}
+          
+          {/* For Businesses Button - Always visible on the right */}
+          <Link to={PATHS.FOR_BUSINESSES}>
+            <Button variant="primary" size="md" icon={<ArrowRight className="w-4 h-4" />} iconPosition="right">
+              For Businesses
+            </Button>
+          </Link>
         </div>
 
         <div className="lg:hidden">
@@ -156,9 +155,9 @@ export const Header = () => {
                 ))}
               </nav>
               <div className="mt-6 space-y-3 border-t border-neutral-border-light/80 pt-6">
-                {isLoading ? (
+                {isLoadingUser ? (
                   <div className="h-12 w-full bg-neutral-200 animate-pulse rounded-full" />
-                ) : token ? (
+                ) : user ? (
                   <ProfileDropDown />
                 ) : (
                   loginButton && (
