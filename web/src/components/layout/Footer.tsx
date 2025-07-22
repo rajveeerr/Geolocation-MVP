@@ -18,7 +18,7 @@ export const Footer = () => {
             <div className="mt-6">
               <div className="inline-flex items-center gap-2 rounded-md bg-neutral-100 px-3 py-2 text-xs font-medium text-neutral-800">
                 <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                All systems operational
+                Launching v1 soon
               </div>
             </div>
           </div>

@@ -29,17 +29,18 @@ export const HeroSection = () => {
       <div className="container relative z-10 mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20">
         <div className="mx-auto max-w-4xl">
           <h1 className="text-4xl font-semibold leading-tight tracking-tight text-neutral-text-primary sm:text-5xl md:text-6xl">
-            CitySpark gets you exclusive local
-            {/* <br /> */}
-            <span className="mt-2 inline-flex items-center justify-center gap-3 text-neutral-text-primary transition-all duration-500 ease-in-out">
-              <svg
-                className="h-12 w-12 text-cyan-400"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M12 2L13.09 8.26L19 7L14.74 12L19 17L13.09 15.74L12 22L10.91 15.74L5 17L9.26 12L5 7L10.91 8.26L12 2Z" />
-              </svg>
-              {dynamicWords[currentWordIndex]}
+            CitySpark gets you exclusive local{' '}
+            <span className="mt-2 inline-flex flex-wrap items-center justify-center gap-2 text-neutral-text-primary transition-all duration-500 ease-in-out sm:gap-3">
+              <span className="flex items-center justify-center gap-2 sm:gap-3">
+                <svg
+                  className="h-8 w-8 text-cyan-400 sm:h-12 sm:w-12"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 2L13.09 8.26L19 7L14.74 12L19 17L13.09 15.74L12 22L10.91 15.74L5 17L9.26 12L5 7L10.91 8.26L12 2Z" />
+                </svg>
+                {dynamicWords[currentWordIndex]}
+              </span>
             </span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl px-4 text-lg leading-relaxed text-neutral-text-primary sm:mt-8 sm:px-0 sm:text-xl">
