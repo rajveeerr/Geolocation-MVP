@@ -12,7 +12,7 @@ export const HeroSection = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentWordIndex((prev) => (prev + 1) % dynamicWords.length);
-    }, 2000); // Change word every 2 seconds
+    }, 2000); 
 
     return () => clearInterval(interval);
   }, [dynamicWords.length]);
@@ -28,9 +28,16 @@ export const HeroSection = () => {
       
       <div className="container mx-auto max-w-5xl px-4 sm:px-6 py-16 sm:py-20 text-center relative z-10">
         <div className="mx-auto max-w-4xl">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-neutral-text-primary leading-tight">
-            The Live Map to Your City's Best{' '}
-            <span className="text-brand-primary-main transition-all duration-500 ease-in-out">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-neutral-text-primary leading-tight text-balance">
+            CitySpark gets you exclusive local
+            <span className="text-neutral-text-primary transition-all duration-500 ease-in-out flex items-center justify-center gap-3 mt-2">
+              <span className="relative inline-flex items-center justify-center">
+                {/* Outer ring - Orange */}
+                <span className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
+                  {/* Inner circle - White */}
+                  <span className="w-3 h-3 bg-white rounded-full"></span>
+                </span>
+              </span>
               {dynamicWords[currentWordIndex]}
             </span>
           </h1>
@@ -40,14 +47,14 @@ export const HeroSection = () => {
         </div>
 
         <div className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6 px-4 sm:px-0">
+          <Link to={PATHS.LOGIN}>
+            <Button variant="google" size="lg" className="w-full sm:w-auto">
+              Join in now
+            </Button>
+          </Link>
           <Link to={PATHS.SIGNUP}>
             <Button variant="primary" size="lg" icon={<ArrowRight className="w-4 h-4" />} iconPosition="right" className="w-full sm:w-auto">
               See the Live Map
-            </Button>
-          </Link>
-          <Link to={PATHS.LOGIN}>
-            <Button variant="secondary" size="lg" className="w-full sm:w-auto">
-              Join in now
             </Button>
           </Link>
         </div>
