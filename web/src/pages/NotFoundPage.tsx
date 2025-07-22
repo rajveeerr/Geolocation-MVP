@@ -54,81 +54,141 @@ export const NotFoundPage = () => {
       </div>
 
       <div className="relative z-10 w-full max-w-2xl text-center">
-        {/* Large Floating Logo SVG */}
+        {/* Logo-based 404 Illustration */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="mb-8"
         >
-          <div className="relative mx-auto w-64 h-64 mb-8">
-            {/* Central Floating Logo */}
+          <div className="relative mx-auto w-80 h-80 mb-8 flex items-center justify-center">
+            {/* Large 404 Background */}
             <motion.div
-              animate={{ 
-                y: [0, -15, 0],
-                rotate: [0, 2, 0]
-              }}
-              transition={{ 
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 0.1, scale: 1 }}
+              transition={{ duration: 1, delay: 0.3 }}
               className="absolute inset-0 flex items-center justify-center"
             >
-              <div className="transform scale-[4] text-blue-500">
-                <svg
-                  viewBox="0 0 24 24"
-                  className="w-16 h-16"
-                  fill="currentColor"
-                >
-                  <path d="M12 2L13.09 8.26L19 7L14.74 12L19 17L13.09 15.74L12 22L10.91 15.74L5 17L9.26 12L5 7L10.91 8.26L12 2Z" />
-                </svg>
-                
-                {/* Glow effect */}
-                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-32 h-16 bg-blue-400 rounded-full opacity-30 blur-xl"></div>
-                <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-8 bg-blue-300 rounded-full opacity-50 blur-lg"></div>
-              </div>
+              <span className="text-[200px] font-bold text-neutral-text-secondary select-none">
+                404
+              </span>
+            </motion.div>
+            
+            {/* Animated Logo in Center */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ 
+                duration: 1, 
+                delay: 0.5,
+                type: "spring",
+                stiffness: 100 
+              }}
+              className="relative z-10 transform scale-150"
+            >
+              <motion.div
+                animate={{ 
+                  y: [0, -10, 0],
+                  rotate: [0, 2, -2, 0]
+                }}
+                transition={{ 
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <Logo />
+              </motion.div>
             </motion.div>
 
-            {/* Floating Sparkles */}
+            {/* Floating Sparkles around Logo */}
             <motion.div
               animate={{ 
                 scale: [1, 1.2, 1],
-                opacity: [0.5, 1, 0.5]
-              }}
-              transition={{ 
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-              className="absolute top-4 left-4 w-2 h-2 bg-blue-400 rounded-full"
-            />
-            <motion.div
-              animate={{ 
-                scale: [1, 1.3, 1],
-                opacity: [0.3, 0.8, 0.3]
+                opacity: [0.5, 1, 0.5],
+                rotate: [0, 180, 360]
               }}
               transition={{ 
                 duration: 3,
                 repeat: Infinity,
-                ease: "easeInOut",
-                delay: 0.5
+                ease: "easeInOut"
               }}
-              className="absolute top-12 right-8 w-1.5 h-1.5 bg-orange-400 rounded-full"
+              className="absolute top-8 left-8 w-3 h-3 bg-blue-400 rounded-full"
             />
             <motion.div
               animate={{ 
-                scale: [1, 1.1, 1],
-                opacity: [0.4, 0.9, 0.4]
+                scale: [1, 1.4, 1],
+                opacity: [0.3, 0.8, 0.3],
+                rotate: [360, 180, 0]
               }}
               transition={{ 
-                duration: 2.5,
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.5
+              }}
+              className="absolute top-16 right-12 w-2 h-2 bg-orange-400 rounded-full"
+            />
+            <motion.div
+              animate={{ 
+                scale: [1, 1.3, 1],
+                opacity: [0.4, 0.9, 0.4],
+                rotate: [0, 90, 180]
+              }}
+              transition={{ 
+                duration: 5,
                 repeat: Infinity,
                 ease: "easeInOut",
                 delay: 1
               }}
-              className="absolute bottom-8 left-12 w-2 h-2 bg-purple-400 rounded-full"
+              className="absolute bottom-12 left-16 w-2.5 h-2.5 bg-purple-400 rounded-full"
             />
+            <motion.div
+              animate={{ 
+                scale: [1, 1.1, 1],
+                opacity: [0.6, 1, 0.6],
+                rotate: [180, 360, 540]
+              }}
+              transition={{ 
+                duration: 3.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1.5
+              }}
+              className="absolute bottom-8 right-8 w-2 h-2 bg-green-400 rounded-full"
+            />
+
+            {/* Orbiting Elements */}
+            <motion.div
+              animate={{ 
+                rotate: [0, 360]
+              }}
+              transition={{ 
+                duration: 20,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              className="absolute inset-0"
+            >
+              <div className="relative w-full h-full">
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-blue-500 rounded-full opacity-60"></div>
+              </div>
+            </motion.div>
+            <motion.div
+              animate={{ 
+                rotate: [360, 0]
+              }}
+              transition={{ 
+                duration: 15,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              className="absolute inset-4"
+            >
+              <div className="relative w-full h-full">
+                <div className="absolute bottom-0 right-0 w-2 h-2 bg-orange-500 rounded-full opacity-50"></div>
+              </div>
+            </motion.div>
           </div>
         </motion.div>
 

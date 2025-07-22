@@ -12,58 +12,67 @@ export const HeroSection = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentWordIndex((prev) => (prev + 1) % dynamicWords.length);
-    }, 2000); 
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [dynamicWords.length]);
 
   return (
-    <section className="bg-gradient-to-b from-brand-primary-light via-blue-50 to-white w-full min-h-screen relative overflow-hidden pt-20">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute left-[4%] top-0 bottom-0 w-0.5 bg-blue-200/40"></div>
-        <div className="absolute right-[4%] top-0 bottom-0 w-0.5 bg-blue-200/40"></div>
-        <div className="absolute left-0 right-0 top-[4%] md:top-[5%] h-0.5 bg-blue-200/40"></div>
-        <div className="absolute left-0 right-0 bottom-0 h-0.5 bg-blue-200/40"></div>
+    <section className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-brand-primary-light via-blue-50 to-white pt-20">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute bottom-0 left-[4%] top-0 w-0.5 bg-blue-200/40"></div>
+        <div className="absolute bottom-0 right-[4%] top-0 w-0.5 bg-blue-200/40"></div>
+        <div className="absolute left-0 right-0 top-[4%] h-0.5 bg-blue-200/40 md:top-[5%]"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-200/40"></div>
       </div>
-      
-      <div className="container mx-auto max-w-5xl px-4 sm:px-6 py-16 sm:py-20 text-center relative z-10">
+
+      <div className="container relative z-10 mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20">
         <div className="mx-auto max-w-4xl">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-neutral-text-primary leading-tight text-balance">
+          <h1 className="text-4xl font-semibold leading-tight tracking-tight text-neutral-text-primary sm:text-5xl md:text-6xl">
             CitySpark gets you exclusive local
-            <span className="text-neutral-text-primary transition-all duration-500 ease-in-out flex items-center justify-center gap-3 mt-2">
-              <span className="relative inline-flex items-center justify-center">
-                {/* Outer ring - Orange */}
-                <span className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
-                  {/* Inner circle - White */}
-                  <span className="w-3 h-3 bg-white rounded-full"></span>
-                </span>
-              </span>
+            {/* <br /> */}
+            <span className="mt-2 inline-flex items-center justify-center gap-3 text-neutral-text-primary transition-all duration-500 ease-in-out">
+              <svg
+                className="h-12 w-12 text-cyan-400"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M12 2L13.09 8.26L19 7L14.74 12L19 17L13.09 15.74L12 22L10.91 15.74L5 17L9.26 12L5 7L10.91 8.26L12 2Z" />
+              </svg>
               {dynamicWords[currentWordIndex]}
             </span>
           </h1>
-          <p className="mx-auto mt-6 sm:mt-8 max-w-2xl text-lg sm:text-xl text-neutral-text-secondary leading-relaxed px-4 sm:px-0">
-            Stop scrolling endless review sites. CitySpark shows you a live map of exclusive deals and happy hours from top-rated local spots, ready for you right now.
+          <p className="mx-auto mt-6 max-w-2xl px-4 text-lg leading-relaxed text-neutral-text-primary sm:mt-8 sm:px-0 sm:text-xl">
+            Stop scrolling endless review sites. CitySpark shows you a live map
+            of exclusive deals and happy hours from top-rated local spots, ready
+            for you right now.
           </p>
         </div>
 
-        <div className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6 px-4 sm:px-0">
+        <div className="mt-8 flex flex-col items-center justify-center gap-4 px-4 sm:mt-10 sm:flex-row sm:gap-6 sm:px-0">
           <Link to={PATHS.LOGIN}>
             <Button variant="google" size="lg" className="w-full sm:w-auto">
               Join in now
             </Button>
           </Link>
           <Link to={PATHS.SIGNUP}>
-            <Button variant="primary" size="lg" icon={<ArrowRight className="w-4 h-4" />} iconPosition="right" className="w-full sm:w-auto">
+            <Button
+              variant="primary"
+              size="lg"
+              icon={<ArrowRight className="h-4 w-4" />}
+              iconPosition="right"
+              className="w-full sm:w-auto"
+            >
               See the Live Map
             </Button>
           </Link>
         </div>
 
-        <p className="mt-6 text-sm sm:text-base text-neutral-text-secondary px-4 sm:px-0">
+        <p className="mt-6 px-4 text-sm text-neutral-text-secondary sm:px-0 sm:text-base">
           Are you a business?{' '}
           <Link
             to={PATHS.FOR_BUSINESSES}
-            className="text-brand-primary-main hover:underline font-medium"
+            className="font-medium text-brand-primary-main hover:underline"
           >
             Get on the map in minutes
           </Link>
