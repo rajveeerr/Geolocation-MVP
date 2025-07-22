@@ -53,7 +53,7 @@ export const NotFoundPage = () => {
       </div>
 
       <div className="relative z-10 w-full max-w-2xl text-center">
-        {/* UFO/Lost Illustration */}
+        {/* Large Floating Logo SVG */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -61,7 +61,7 @@ export const NotFoundPage = () => {
           className="mb-8"
         >
           <div className="relative mx-auto w-64 h-64 mb-8">
-            {/* UFO Base */}
+            {/* Central Floating Logo */}
             <motion.div
               animate={{ 
                 y: [0, -15, 0],
@@ -74,13 +74,16 @@ export const NotFoundPage = () => {
               }}
               className="absolute inset-0 flex items-center justify-center"
             >
-              <div className="w-48 h-32 bg-gradient-to-b from-gray-300 to-gray-500 rounded-full relative overflow-hidden shadow-2xl">
-                {/* UFO Details */}
-                <div className="absolute top-2 left-8 w-4 h-4 bg-gray-200 rounded-full opacity-80"></div>
-                <div className="absolute top-2 right-8 w-4 h-4 bg-gray-200 rounded-full opacity-80"></div>
-                <div className="absolute top-6 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-gray-200 rounded-full opacity-80"></div>
+              <div className="transform scale-[4] text-blue-500">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="w-16 h-16"
+                  fill="currentColor"
+                >
+                  <path d="M12 2L13.09 8.26L19 7L14.74 12L19 17L13.09 15.74L12 22L10.91 15.74L5 17L9.26 12L5 7L10.91 8.26L12 2Z" />
+                </svg>
                 
-                {/* UFO Bottom Glow */}
+                {/* Glow effect */}
                 <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-32 h-16 bg-blue-400 rounded-full opacity-30 blur-xl"></div>
                 <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-8 bg-blue-300 rounded-full opacity-50 blur-lg"></div>
               </div>
