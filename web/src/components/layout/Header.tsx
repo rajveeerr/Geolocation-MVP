@@ -94,6 +94,14 @@ export const Header = () => {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
+          {/* For Businesses Button - Always visible on the left */}
+          <Link to={PATHS.FOR_BUSINESSES}>
+            <Button variant="primary" size="md" icon={<ArrowRight className="w-4 h-4" />} iconPosition="right">
+              For Businesses
+            </Button>
+          </Link>
+          
+          {/* Authentication section on the right */}
           {isLoading ? (
             <div className="h-10 w-24 bg-neutral-200 animate-pulse rounded-full" />
           ) : token ? (
@@ -107,12 +115,6 @@ export const Header = () => {
               </Link>
             )
           )}
-          {/* For Businesses Button - Always visible */}
-          <Link to={PATHS.FOR_BUSINESSES}>
-            <Button variant="primary" size="md" icon={<ArrowRight className="w-4 h-4" />} iconPosition="right">
-              For Businesses
-            </Button>
-          </Link>
         </div>
 
         <div className="lg:hidden">
