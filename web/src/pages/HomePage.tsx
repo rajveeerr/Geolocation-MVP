@@ -6,7 +6,6 @@ export const HomePage = () => {
   return (
     <>
       <HeroSection />
-      {/* <CategoryShowcase/> */}
       <FeaturesSection />
       {/* <BentoGridSection/> */}
       {/* <UseCaseSection/> */}
