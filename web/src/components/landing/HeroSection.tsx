@@ -28,17 +28,17 @@ export const HeroSection = () => {
       
       <div className="container mx-auto max-w-5xl px-4 sm:px-6 py-16 sm:py-20 text-center relative z-10">
         <div className="mx-auto max-w-4xl">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-neutral-text-primary leading-tight text-balance">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-neutral-text-primary leading-tight">
             CitySpark gets you exclusive local
-            <br />
+            {/* <br /> */}
             <span className="text-neutral-text-primary transition-all duration-500 ease-in-out inline-flex items-center justify-center gap-3 mt-2">
-              <svg className="w-6 h-6 text-cyan-400" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="w-12 h-12 text-cyan-400" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2L13.09 8.26L19 7L14.74 12L19 17L13.09 15.74L12 22L10.91 15.74L5 17L9.26 12L5 7L10.91 8.26L12 2Z"/>
               </svg>
               {dynamicWords[currentWordIndex]}
             </span>
           </h1>
-          <p className="mx-auto mt-6 sm:mt-8 max-w-2xl text-lg sm:text-xl text-neutral-text-secondary leading-relaxed px-4 sm:px-0">
+          <p className="mx-auto mt-6 sm:mt-8 max-w-2xl text-lg sm:text-xl text-neutral-text-primary leading-relaxed px-4 sm:px-0">
             Stop scrolling endless review sites. CitySpark shows you a live map of exclusive deals and happy hours from top-rated local spots, ready for you right now.
           </p>
         </div>
