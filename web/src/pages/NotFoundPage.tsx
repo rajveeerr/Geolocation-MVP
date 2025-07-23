@@ -22,7 +22,7 @@ export const NotFoundPage = () => {
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute top-20 left-10 w-16 h-16 bg-blue-100 rounded-full opacity-60"
+          className="absolute top-20 left-4 sm:left-10 w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full opacity-60"
         />
         <motion.div
           animate={{ 
@@ -35,7 +35,7 @@ export const NotFoundPage = () => {
             ease: "easeInOut",
             delay: 1
           }}
-          className="absolute top-40 right-16 w-12 h-12 bg-orange-100 rounded-lg opacity-50"
+          className="absolute top-40 right-8 sm:right-16 w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 rounded-lg opacity-50"
         />
         <motion.div
           animate={{ 
@@ -48,7 +48,7 @@ export const NotFoundPage = () => {
             ease: "easeInOut",
             delay: 2
           }}
-          className="absolute bottom-32 left-20 w-8 h-8 bg-blue-200 rounded-full opacity-40"
+          className="absolute bottom-32 left-8 sm:left-20 w-6 h-6 sm:w-8 sm:h-8 bg-blue-200 rounded-full opacity-40"
         />
       </div>
 
@@ -60,7 +60,7 @@ export const NotFoundPage = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="mb-8"
         >
-          <div className="relative mx-auto w-64 h-64 mb-8">
+          <div className="relative mx-auto w-48 h-48 sm:w-64 sm:h-64 mb-8">
             {/* Central Floating Logo */}
             <motion.div
               animate={{ 
@@ -74,18 +74,18 @@ export const NotFoundPage = () => {
               }}
               className="absolute inset-0 flex items-center justify-center"
             >
-              <div className="transform scale-[4] text-blue-500">
+              <div className="transform scale-[2.5] sm:scale-[3] md:scale-[4] text-blue-500">
                 <svg
                   viewBox="0 0 24 24"
-                  className="w-16 h-16"
+                  className="w-12 h-12 sm:w-16 sm:h-16"
                   fill="currentColor"
                 >
                   <path d="M12 2L13.09 8.26L19 7L14.74 12L19 17L13.09 15.74L12 22L10.91 15.74L5 17L9.26 12L5 7L10.91 8.26L12 2Z" />
                 </svg>
                 
                 {/* Glow effect */}
-                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-32 h-16 bg-blue-400 rounded-full opacity-30 blur-xl"></div>
-                <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-8 bg-blue-300 rounded-full opacity-50 blur-lg"></div>
+                <div className="absolute -bottom-6 sm:-bottom-8 left-1/2 transform -translate-x-1/2 w-24 sm:w-32 h-12 sm:h-16 bg-blue-400 rounded-full opacity-30 blur-xl"></div>
+                <div className="absolute -bottom-3 sm:-bottom-4 left-1/2 transform -translate-x-1/2 w-18 sm:w-24 h-6 sm:h-8 bg-blue-300 rounded-full opacity-50 blur-lg"></div>
               </div>
             </motion.div>
 
@@ -100,7 +100,7 @@ export const NotFoundPage = () => {
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
-              className="absolute top-4 left-4 w-2 h-2 bg-blue-400 rounded-full"
+              className="absolute top-2 sm:top-4 left-2 sm:left-4 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-400 rounded-full"
             />
             <motion.div
               animate={{ 
@@ -113,7 +113,7 @@ export const NotFoundPage = () => {
                 ease: "easeInOut",
                 delay: 0.5
               }}
-              className="absolute top-12 right-8 w-1.5 h-1.5 bg-orange-400 rounded-full"
+              className="absolute top-8 sm:top-12 right-4 sm:right-8 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-orange-400 rounded-full"
             />
             <motion.div
               animate={{ 
@@ -126,7 +126,7 @@ export const NotFoundPage = () => {
                 ease: "easeInOut",
                 delay: 1
               }}
-              className="absolute bottom-8 left-12 w-2 h-2 bg-purple-400 rounded-full"
+              className="absolute bottom-4 sm:bottom-8 left-6 sm:left-12 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-purple-400 rounded-full"
             />
           </div>
         </motion.div>
@@ -141,11 +141,11 @@ export const NotFoundPage = () => {
             You look a little lost...
           </p>
           
-          <h1 className="text-4xl md:text-6xl font-bold text-neutral-text-primary mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-neutral-text-primary mb-6 leading-tight">
             Oops! Page not found
           </h1>
           
-          <p className="text-lg text-neutral-text-secondary mb-8 max-w-md mx-auto">
+          <p className="text-base sm:text-lg text-neutral-text-secondary mb-8 max-w-md mx-auto px-4 sm:px-0">
             The page you're looking for doesn't exist. Let's get you back on track to discover amazing deals near you.
           </p>
         </motion.div>
@@ -163,7 +163,7 @@ export const NotFoundPage = () => {
               size="lg"
               icon={<Home className="w-5 h-5" />}
               iconPosition="left"
-              className="min-w-[200px]"
+              className="w-full sm:min-w-[200px]"
             >
               Back to Home
             </Button>
@@ -175,7 +175,7 @@ export const NotFoundPage = () => {
               size="lg"
               icon={<Search className="w-5 h-5" />}
               iconPosition="left"
-              className="min-w-[200px]"
+              className="w-full sm:min-w-[200px]"
             >
               Browse Hot Deals
             </Button>
