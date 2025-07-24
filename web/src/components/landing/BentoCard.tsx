@@ -12,13 +12,9 @@ export const BentoCard = ({ className, children, ...props }: BentoCardProps) => 
       {...props}
       className={cn(
         'group relative flex flex-col justify-between overflow-hidden rounded-xl',
-        // Base styles
         'bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,0.03),0_2px_4px_rgba(0,0,0,0.05),0_12px_24px_rgba(0,0,0,0.05)]',
-        // Dark mode styles
         'dark:bg-black/40 dark:[box-shadow:0_0_0_1px_rgba(255,255,255,0.03),0_2px_4px_rgba(0,0,0,0.05),0_12px_24px_rgba(0,0,0,0.05)]',
-        // Transition
         'transform-gpu transition-all duration-300 ease-in-out',
-        // Hover styles
         'hover:shadow-2xl',
         className
       )}

@@ -13,7 +13,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar"
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 import { PATHS } from '@/routing/paths';
 
 export const ProfileDropDown = () => {

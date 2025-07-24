@@ -32,5 +32,5 @@ export const PATHS = {
   TERMS: '/terms',
   PRIVACY: '/privacy',
 
-  NOT_FOUND: '*',
+  NOT_FOUND: '*'
 } as const;

@@ -3,7 +3,7 @@
     "systemName": "Geolocation MVP",
     "version": "1.0.0",
     "description": "A design system for a geo-location deals and social app targeting a young, modern audience. It blends functional clarity with a vibrant, energetic aesthetic to inspire discovery and action.",
-    "lastUpdated": "2025-07-19T20:19:18+05:30"
+    "lastUpdated": "2025-07-24T10:00:00+00:00"
   },
   "palette": {
     "brand": {
@@ -12,7 +12,17 @@
         "dark": "#1D4ED8",
         "light": "#DBEAFE",
         "contrastText": "#FFFFFF",
-        "description": "The main brand color for primary CTAs, links, and active states."
+        "description": "The main brand color for primary CTAs, links, and active states.",
+        "50": "#EFF6FF",
+        "100": "#DBEAFE",
+        "200": "#BFDBFE",
+        "300": "#93C5FD",
+        "400": "#60A5FA",
+        "500": "#3B82F6",
+        "600": "#2563EB",
+        "700": "#1D4ED8",
+        "800": "#1E40AF",
+        "900": "#1E3A8A"
       }
     },
     "accent": {
@@ -41,6 +51,15 @@
         "light": "#FED7AA",
         "contrastText": "#FFFFFF",
         "description": "Claude AI brand colors for integrations."
+      },
+      "orange": {
+        "100": "#FFEDD5",
+        "200": "#FDBA74",
+        "400": "#FB923C",
+        "600": "#EA580C"
+      },
+      "purple": {
+        "400": "#A78BFA"
       }
     },
     "neutral": {

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/common/Button';
@@ -17,15 +16,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { PATHS } from '@/routing/paths';
-import { useAuth } from '@/context/AuthContext';
-import { loginSchema } from '@/lib/validationSchemas';
-
-const formSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email." }),
-  password: z.string().min(1, { message: "Password is required." }),
-});
-
-type LoginFormValues = z.infer<typeof formSchema>;
+import { useAuth } from '@/context/useAuth';
+import { loginSchema, type LoginFormValues } from '@/lib/validationSchemas';
 
 export const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -41,11 +33,11 @@ export const LoginPage = () => {
 };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-brand-primary-light via-blue-50 to-white px-4 py-24 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-brand-primary-light via-brand-primary-50 to-white px-4 py-24 sm:px-6 lg:px-8">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute bottom-0 left-[4%] top-0 w-0.5 bg-blue-200/40"></div>
-        <div className="absolute bottom-0 right-[4%] top-0 w-0.5 bg-blue-200/40"></div>
-        <div className="absolute left-0 right-0 top-[10%] h-0.5 bg-blue-200/40"></div>
+        <div className="absolute bottom-0 left-[4%] top-0 w-0.5 bg-brand-primary-200/40"></div>
+        <div className="absolute bottom-0 right-[4%] top-0 w-0.5 bg-brand-primary-200/40"></div>
+        <div className="absolute left-0 right-0 top-[10%] h-0.5 bg-brand-primary-200/40"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-md">
@@ -80,7 +72,7 @@ export const LoginPage = () => {
                   <FormControl>
                     <div className="relative">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <Mail className="h-5 w-5 text-blue-500" />
+                        <Mail className="h-5 w-5 text-brand-primary-500" />
                       </div>
                       <Input 
                         type="email" 
@@ -99,7 +91,7 @@ export const LoginPage = () => {
                   <FormControl>
                     <div className="relative">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <Lock className="h-5 w-5 text-blue-500" />
+                        <Lock className="h-5 w-5 text-brand-primary-500" />
                       </div>
                       <Input 
                         type={showPassword ? 'text' : 'password'} 
@@ -113,9 +105,9 @@ export const LoginPage = () => {
                         className="absolute inset-y-0 right-0 flex items-center pr-3"
                       >
                         {showPassword ? (
-                          <EyeOff className="h-5 w-5 text-blue-400 hover:text-blue-600" />
+                          <EyeOff className="h-5 w-5 text-brand-primary-400 hover:text-brand-primary-600" />
                         ) : (
-                          <Eye className="h-5 w-5 text-blue-400 hover:text-blue-600" />
+                          <Eye className="h-5 w-5 text-brand-primary-400 hover:text-brand-primary-600" />
                         )}
                       </button>
                     </div>
@@ -125,19 +117,19 @@ export const LoginPage = () => {
               )} />
 
               <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-neutral-border text-brand-primary-main focus:ring-brand-primary-main/50"
-                  />
-                  <label
-                    htmlFor="remember-me"
-                    className="ml-2 block text-sm text-neutral-text-secondary"
-                  >
-                    Remember me
-                  </label>
+                <div className="flex items-center gap-2">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-neutral-border text-brand-primary-main focus:ring-brand-primary-main/50"
+                />
+                <label
+                  htmlFor="remember-me"
+                  className=" block text-sm text-neutral-text-secondary"
+                >
+                  Remember me
+                </label>
                 </div>
                 <Link
                   to={PATHS.FORGOT_PASSWORD || '#'}

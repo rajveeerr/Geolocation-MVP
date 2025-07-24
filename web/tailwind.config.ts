@@ -1,54 +1,28 @@
 import type { Config } from 'tailwindcss';
 import tailwindcssAnimate from 'tailwindcss-animate';
+import designSystem from './src/config/design-system.json';
 
-const config: Config = {
+const { typography, spacing, borders, shadows } = designSystem;
+
+const tailwindConfig: Config = {
   darkMode: ['class'],
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
+    container: {
+      center: true,
+      padding: '2rem',
+      screens: {
+        '2xl': '1400px',
+      },
+    },
     extend: {
       colors: {
-        brand: {
-          primary: {
-            main: '#2563EB',
-            dark: '#1D4ED8',
-            light: '#DBEAFE',
-          },
-        },
-        accent: {
-          urgent: '#FF3B5C',
-          secondary: '#F5A623',
-          gamification: '#7ED321',
-          spark: '#F97316',
-          claude: '#F97316',
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
-        },
-        neutral: {
-          'subtle-background': '#F9FAFB',
-          background: '#F4F7F9',
-          surface: '#FFFFFF',
-          'text-primary': '#111827',
-          'text-secondary': '#6B7280',
-          'text-tertiary': '#9CA3AF',
-          border: '#E5E7EB',
-          'border-light': '#F3F4F6',
-        },
-        semantic: {
-          error: '#DC2626',
-          success: '#059669',
-          warning: '#D97706',
-          info: '#2563EB',
-        },
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
-        card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
-        },
-        popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
-        },
+
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
@@ -57,120 +31,124 @@ const config: Config = {
           DEFAULT: 'hsl(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',
         },
-        muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
-        },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
         },
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        chart: {
-          '1': 'hsl(var(--chart-1))',
-          '2': 'hsl(var(--chart-2))',
-          '3': 'hsl(var(--chart-3))',
-          '4': 'hsl(var(--chart-4))',
-          '5': 'hsl(var(--chart-5))',
+        muted: {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
+        },
+        popover: {
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
+        },
+        card: {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
+        },
+
+        brand: {
+          primary: {
+            main: 'hsl(var(--brand-primary-main))',
+            dark: 'hsl(var(--brand-primary-dark))',
+            light: 'hsl(var(--brand-primary-light))',
+            50: 'hsl(var(--brand-primary-50))',
+            100: 'hsl(var(--brand-primary-100))',
+            200: 'hsl(var(--brand-primary-200))',
+            300: 'hsl(var(--brand-primary-300))',
+            400: 'hsl(var(--brand-primary-400))',
+            500: 'hsl(var(--brand-primary-500))',
+            600: 'hsl(var(--brand-primary-600))',
+            700: 'hsl(var(--brand-primary-700))',
+            800: 'hsl(var(--brand-primary-800))',
+            900: 'hsl(var(--brand-primary-900))',
+          },
+        },
+        'accent': {
+          urgent: 'hsl(var(--accent-urgent-main))',
+          secondary: 'hsl(var(--accent-secondary-main))',
+          gamification: 'hsl(var(--accent-gamification-main))',
+          spark: 'hsl(var(--accent-spark-main))',
+          claude: {
+            main: 'hsl(var(--accent-claude-main))',
+            light: 'hsl(var(--accent-claude-light))',
+          },
+          orange: {
+            100: 'hsl(var(--accent-orange-100))',
+            200: 'hsl(var(--accent-orange-200))',
+            400: 'hsl(var(--accent-orange-400))',
+            600: 'hsl(var(--accent-orange-600))',
+          },
+          purple: {
+            400: 'hsl(var(--accent-purple-400))',
+          },
+        },
+        neutral: {
+          background: 'hsl(var(--neutral-background))',
+          surface: 'hsl(var(--neutral-surface))',
+          'text-primary': 'hsl(var(--neutral-text-primary))',
+          'text-secondary': 'hsl(var(--neutral-text-secondary))',
+          'text-tertiary': 'hsl(var(--neutral-text-tertiary))',
+          border: 'hsl(var(--neutral-border))',
+          'border-light': 'hsl(var(--neutral-border-light))',
+          'subtle-background': 'hsl(var(--neutral-subtle-background))',
+        },
+        semantic: {
+          error: 'hsl(var(--semantic-error))',
+          success: 'hsl(var(--semantic-success))',
+          warning: 'hsl(var(--semantic-warning))',
+          info: 'hsl(var(--semantic-info))',
         },
       },
+      borderRadius: {
+        lg: `var(--radius)`,
+        md: `calc(var(--radius) - 2px)`,
+        sm: `calc(var(--radius) - 4px)`,
+        ...borders.radius,
+      },
       fontFamily: {
-        heading: ['Poppins', 'Helvetica Neue', 'sans-serif'],
-        body: ['Inter', 'Roboto', 'Arial', 'sans-serif'],
+        heading: typography.fontFamily.headings.split(', '),
+        body: typography.fontFamily.body.split(', '),
       },
       fontSize: {
-        display: [
-          '3.5rem',
-          {
-            lineHeight: '1.1',
-            fontWeight: '700',
-          },
-        ],
-        h1: [
-          '2rem',
-          {
-            lineHeight: '1.25',
-            fontWeight: '700',
-          },
-        ],
-        h2: [
-          '1.5rem',
-          {
-            lineHeight: '1.3',
-            fontWeight: '600',
-          },
-        ],
-        h3: [
-          '1.25rem',
-          {
-            lineHeight: '1.4',
-            fontWeight: '600',
-          },
-        ],
-        body: [
-          '1rem',
-          {
-            lineHeight: '1.5',
-            fontWeight: '400',
-          },
-        ],
-        'body-lg': [
-          '1.125rem',
-          {
-            lineHeight: '1.6',
-            fontWeight: '400',
-          },
-        ],
-        'body-sm': [
-          '0.875rem',
-          {
-            lineHeight: '1.5',
-            fontWeight: '400',
-          },
-        ],
-        label: [
-          '0.875rem',
-          {
-            lineHeight: '1.4',
-            fontWeight: '600',
-          },
-        ],
-        caption: [
-          '0.75rem',
-          {
-            lineHeight: '1.4',
-            fontWeight: '400',
-          },
-        ],
+        ...Object.fromEntries(
+          Object.entries(typography.scale).map(([key, value]) => [
+            key,
+            [value.fontSize, { lineHeight: value.lineHeight, fontWeight: value.fontWeight }],
+          ]),
+        ),
       },
       spacing: {
-        xs: '4px',
-        sm: '8px',
-        md: '16px',
-        lg: '24px',
-        xl: '32px',
-        xxl: '48px',
-      },
-      borderRadius: {
-        sm: 'calc(var(--radius) - 4px)',
-        md: 'calc(var(--radius) - 2px)',
-        lg: 'var(--radius)',
-        pill: '9999px',
+        ...spacing,
       },
       boxShadow: {
-        'level-1': '0px 2px 4px rgba(0, 0, 0, 0.06)',
-        'level-2': '0px 4px 8px rgba(0, 0, 0, 0.08)',
-        'level-3': '0px 10px 20px rgba(0, 0, 0, 0.1)',
-        interactive: '0 0 0 3px rgba(59, 130, 246, 0.3)',
+        'level-1': shadows.level1,
+        'level-2': shadows.level2,
+        'level-3': shadows.level3,
+        'interactive': shadows.interactive,
       },
-      transitionTimingFunction: {
-        'ease-in-out': 'ease-in-out',
+      keyframes: {
+        'accordion-down': {
+          from: { height: '0' },
+          to: { height: 'var(--radix-accordion-content-height)' },
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0' },
+        },
+      },
+      animation: {
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
       },
     },
   },
   plugins: [tailwindcssAnimate],
 };
 
-export default config;
+export default tailwindConfig;

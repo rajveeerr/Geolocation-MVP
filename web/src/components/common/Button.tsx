@@ -9,7 +9,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   iconPosition?: 'left' | 'right';
 }
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+const Button = forwardRef<
+  HTMLButtonElement,
+  ButtonProps
+>(
   (
     {
       className,
@@ -18,7 +21,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       icon,
       iconPosition = 'left',
       children,
-      asChild,
       ...props
     },
     ref,
@@ -28,11 +30,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantClasses = {
       primary:
-        'bg-gradient-to-b from-blue-400 to-blue-600 text-white hover:from-blue-500 hover:to-blue-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200',
+        'bg-gradient-to-b from-brand-primary-400 to-brand-primary-600 text-white hover:from-brand-primary-500 hover:to-brand-primary-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200',
       secondary:
         'bg-white text-neutral-text-primary border border-neutral-border hover:bg-neutral-subtle-background',
       google:
-        'bg-white text-neutral-text-primary border border-neutral-border hover:bg-neutral-subtle-background',
+        'bg-white text-neutral-text-primary border border-neutral-border hover:bg-neutral-subtle-background shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200',
       ghost:
         'bg-transparent text-neutral-text-secondary hover:text-neutral-text-primary hover:bg-neutral-subtle-background',
     };
@@ -75,27 +77,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       return null;
     };
 
-    const renderContent = () => {
-      const iconElement = renderIcon();
-
-      if (!iconElement) return children;
-
-      if (iconPosition === 'right') {
-        return (
-          <>
-            {children}
-            {iconElement}
-          </>
-        );
-      }
-
-      return (
-        <>
-          {iconElement}
-          {children}
-        </>
-      );
-    };
+    const iconElement = renderIcon();
 
     return (
       <button
@@ -108,7 +90,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         {...props}
       >
-        {renderContent()}
+        {iconPosition === 'left' && iconElement}
+        {children}
+        {iconPosition === 'right' && iconElement}
       </button>
     );
   },

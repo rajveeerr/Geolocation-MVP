@@ -6,7 +6,7 @@ import { ArrowRight } from 'lucide-react';
 import { PATHS } from '@/routing/paths';
 import { Logo } from '../common/Logo';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 import { ProfileDropDown } from './ProfileDropDown';
 
 const navigationItems = [
@@ -30,7 +30,6 @@ const navigationItems = [
   },
 ];
 
-// CTA buttons configuration
 const ctaButtons = [
   {
     id: 'login',
@@ -55,7 +54,7 @@ const ctaButtons = [
 export const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, isLoadingUser } = useAuth(); // Use our AuthContext 
+  const { user, isLoadingUser } = useAuth(); 
 
   const loginButton = ctaButtons.find(b => b.id === 'login');
 
@@ -70,11 +69,10 @@ export const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-        isScrolled || isMobileMenuOpen
+      className={`fixed top-0 z-50 w-full transition-all duration-300 ${isScrolled || isMobileMenuOpen
           ? 'border-b border-neutral-border-light bg-white/50 backdrop-blur-lg'
           : 'bg-transparent'
-      }`}
+        }`}
     >
       <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Logo />
@@ -93,7 +91,6 @@ export const Header = () => {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          {/* Authentication section on the left */}
           {isLoadingUser ? (
             <div className="h-10 w-24 bg-neutral-200 animate-pulse rounded-full" />
           ) : user ? (
@@ -108,9 +105,8 @@ export const Header = () => {
             )
           )}
           
-          {/* For Businesses Button - Always visible on the right */}
           <Link to={PATHS.FOR_BUSINESSES}>
-            <Button variant="primary" size="md" icon={<ArrowRight className="w-4 h-4" />} iconPosition="right">
+            <Button variant="primary" size="md" icon={<ArrowRight className="h-4 w-4" />} iconPosition="right">
               For Businesses
             </Button>
           </Link>
@@ -173,7 +169,6 @@ export const Header = () => {
                     </Link>
                   )
                 )}
-                {/* For Businesses Button - Always visible */}
                 <Link to={PATHS.FOR_BUSINESSES} className="block">
                   <Button
                     variant="primary"
@@ -192,5 +187,4 @@ export const Header = () => {
         )}
       </AnimatePresence>
     </header>
-  );
-};
+)}

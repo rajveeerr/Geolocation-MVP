@@ -8,7 +8,6 @@ export const Footer = () => {
     <footer className="w-full border-t border-neutral-border bg-white py-8">
       <div className="container mx-auto max-w-7xl px-6 md:px-8">
         <div className="mb-12 grid grid-cols-2 gap-8 md:grid-cols-5">
-          {/* Logo and Description */}
           <div className="col-span-2 md:col-span-2">
             <Logo />
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-neutral-text-secondary">
@@ -23,7 +22,6 @@ export const Footer = () => {
             </div>
           </div>
 
-          {/* Product */}
           <div>
             <h3 className="mb-4 font-medium text-neutral-text-primary">
               Product
@@ -56,7 +54,6 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Solutions */}
           <div>
             <h3 className="mb-4 font-medium text-neutral-text-primary">
               Business
@@ -89,7 +86,6 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Company */}
           <div>
             <h3 className="mb-4 font-medium text-neutral-text-primary">
               Company

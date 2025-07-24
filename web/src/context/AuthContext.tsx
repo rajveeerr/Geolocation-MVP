@@ -1,28 +1,18 @@
-import { createContext, useContext, type ReactNode,  } from 'react';
+import { type ReactNode } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { apiGet, apiPost } from '@/services/api';
 
 import { PATHS } from '@/routing/paths';
 import { useToast } from '@/hooks/use-toast';
+import type { LoginFormValues, SignUpFormValues } from '@/lib/validationSchemas';
+import { AuthContext, type AuthContextType } from './auth-context-definition';
 
 interface User {
   id: number;
   email: string;
   name: string | null;
 }
-
-interface AuthContextType {
-  user: User | null | undefined;
-  isLoadingUser: boolean;
-  login: (credentials: any) => Promise<any>;
-  isLoggingIn: boolean;
-  signup: (details: any) => Promise<any>;
-  isSigningUp: boolean;
-  logout: () => void;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const hasAuthToken = () => !!localStorage.getItem('authToken');
 
@@ -39,7 +29,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const { mutateAsync: login, isPending: isLoggingIn } = useMutation({
-    mutationFn: (credentials: any) => apiPost<{ token: string }, any>('/auth/login', credentials),
+    mutationFn: (credentials: LoginFormValues) => apiPost<{ token: string }, LoginFormValues>('/auth/login', credentials),
     onSuccess: (response) => {
       if (response.success && response.data?.token) {
         localStorage.setItem('authToken', response.data.token);
@@ -60,7 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const { mutateAsync: signup, isPending: isSigningUp } = useMutation({
-    mutationFn: (details: any) => apiPost('/auth/register', details),
+    mutationFn: (details: SignUpFormValues) => apiPost<unknown, SignUpFormValues>('/auth/register', details),
     onSuccess: (response) => {
       if (response.success) {
         toast({
@@ -87,7 +77,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     navigate(PATHS.HOME);
   };
 
-  const value = {
+  const value: AuthContextType = {
     user,
     isLoadingUser,
     login,
@@ -98,12 +88,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 };

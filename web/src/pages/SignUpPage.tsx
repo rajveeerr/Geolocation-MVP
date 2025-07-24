@@ -17,8 +17,8 @@ import {
   FormDescription,
 } from '@/components/ui/form';
 import { PATHS } from '@/routing/paths';
-import { signUpSchema, type SignUpFormValues } from '@/lib/validationSchemas'; // Use new schema import
-import { useAuth } from '@/context/AuthContext';
+import { signUpSchema, type SignUpFormValues } from '@/lib/validationSchemas';
+import { useAuth } from '@/context/useAuth';
 
 export const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -26,8 +26,8 @@ export const SignUpPage = () => {
   const { signup, isSigningUp } = useAuth();
 
   const form = useForm<SignUpFormValues>({
-    resolver: zodResolver(signUpSchema), // Use the imported schema
-    mode: 'onTouched', // Give feedback as soon as the user navigates away from a field
+    resolver: zodResolver(signUpSchema),
+    mode: 'onTouched',
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -39,17 +39,15 @@ export const SignUpPage = () => {
   });
 
   const onSubmit = async (values: SignUpFormValues) => {
-    const { firstName, lastName, email, password } = values;
-    const payload = { name: `${firstName} ${lastName}`, email, password };
-    await signup(payload);
+    await signup(values);
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-brand-primary-light via-blue-50 to-white px-4 py-24 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-brand-primary-light via-brand-primary-50 to-white px-4 py-24 sm:px-6 lg:px-8">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute bottom-0 left-[4%] top-0 w-0.5 bg-blue-200/40"></div>
-        <div className="absolute bottom-0 right-[4%] top-0 w-0.5 bg-blue-200/40"></div>
-        <div className="absolute left-0 right-0 top-[10%] h-0.5 bg-blue-200/40"></div>
+        <div className="absolute bottom-0 left-[4%] top-0 w-0.5 bg-brand-primary-200/40"></div>
+        <div className="absolute bottom-0 right-[4%] top-0 w-0.5 bg-brand-primary-200/40"></div>
+        <div className="absolute left-0 right-0 top-[10%] h-0.5 bg-brand-primary-200/40"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-md">
@@ -77,10 +75,8 @@ export const SignUpPage = () => {
             </div>
           </div>
 
-          {/* Signup Form */}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* Name Fields */}
                             <div className="grid grid-cols-2 gap-4">
                 <FormField control={form.control} name="firstName" render={({ field }) => (
                   <FormItem>
@@ -88,7 +84,7 @@ export const SignUpPage = () => {
                     <FormControl>
                       <div className="relative">
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                          <User className="h-5 w-5 text-blue-500" />
+                          <User className="h-5 w-5 text-brand-primary-500" />
                         </div>
                         <Input 
                           placeholder="First name" 
@@ -97,7 +93,7 @@ export const SignUpPage = () => {
                         />
                       </div>
                     </FormControl>
-                    <FormMessage />
+                  <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="lastName" render={({ field }) => (
@@ -106,7 +102,7 @@ export const SignUpPage = () => {
                     <FormControl>
                       <div className="relative">
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                          <User className="h-5 w-5 text-blue-500" />
+                          <User className="h-5 w-5 text-brand-primary-500" />
                         </div>
                         <Input 
                           placeholder="Last name" 
@@ -115,7 +111,7 @@ export const SignUpPage = () => {
                         />
                       </div>
                     </FormControl>
-                    <FormMessage />
+                  <FormMessage />
                   </FormItem>
                 )} />
               </div>
@@ -127,7 +123,7 @@ export const SignUpPage = () => {
                   <FormControl>
                     <div className="relative">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <Mail className="h-5 w-5 text-blue-500" />
+                        <Mail className="h-5 w-5 text-brand-primary-500" />
                       </div>
                       <Input 
                         type="email" 
@@ -140,14 +136,13 @@ export const SignUpPage = () => {
                   <FormMessage />
                 </FormItem>
               )} />
-              {/* Phone Field */}
                             <FormField control={form.control} name="phone" render={({ field }) => (
                 <FormItem>
                   <FormLabel className="mb-2 block text-sm font-medium text-neutral-text-primary">Phone number</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <Phone className="h-5 w-5 text-blue-500" />
+                        <Phone className="h-5 w-5 text-brand-primary-500" />
                       </div>
                       <Input 
                         type="tel" 
@@ -161,14 +156,13 @@ export const SignUpPage = () => {
                 </FormItem>
               )} />
 
-              {/* Password Field */}
               <FormField control={form.control} name="password" render={({ field }) => (
                 <FormItem>
                   <FormLabel className="mb-2 block text-sm font-medium text-neutral-text-primary">Password</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <Lock className="h-5 w-5 text-blue-500" />
+                        <Lock className="h-5 w-5 text-brand-primary-500" />
                       </div>
                       <Input 
                         type={showPassword ? 'text' : 'password'} 
@@ -182,14 +176,13 @@ export const SignUpPage = () => {
                         className="absolute inset-y-0 right-0 flex items-center pr-3"
                       >
                         {showPassword ? (
-                          <EyeOff className="h-5 w-5 text-blue-400 hover:text-blue-600" />
+                          <EyeOff className="h-5 w-5 text-brand-primary-400 hover:text-brand-primary-600" />
                         ) : (
-                          <Eye className="h-5 w-5 text-blue-400 hover:text-blue-600" />
+                          <Eye className="h-5 w-5 text-brand-primary-400 hover:text-brand-primary-600" />
                         )}
                       </button>
                     </div>
                   </FormControl>
-                  {/* ADD THIS FOR BETTER UX */}
                   <FormDescription>
                     Must be 8+ characters with uppercase, lowercase, number, and special characters.
                   </FormDescription>
@@ -197,14 +190,13 @@ export const SignUpPage = () => {
                 </FormItem>
               )} />
               
-              {/* Confirm Password Field */}
               <FormField control={form.control} name="confirmPassword" render={({ field }) => (
                 <FormItem>
                   <FormLabel className="mb-2 block text-sm font-medium text-neutral-text-primary">Confirm password</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <Lock className="h-5 w-5 text-blue-500" />
+                        <Lock className="h-5 w-5 text-brand-primary-500" />
                       </div>
                       <Input 
                         type={showConfirmPassword ? 'text' : 'password'} 
@@ -218,9 +210,9 @@ export const SignUpPage = () => {
                         className="absolute inset-y-0 right-0 flex items-center pr-3"
                       >
                         {showConfirmPassword ? (
-                          <EyeOff className="h-5 w-5 text-blue-400 hover:text-blue-600" />
+                          <EyeOff className="h-5 w-5 text-brand-primary-400 hover:text-brand-primary-600" />
                         ) : (
-                          <Eye className="h-5 w-5 text-blue-400 hover:text-blue-600" />
+                          <Eye className="h-5 w-5 text-brand-primary-400 hover:text-brand-primary-600" />
                         )}
                       </button>
                     </div>
@@ -229,7 +221,6 @@ export const SignUpPage = () => {
                 </FormItem>
               )} />
 
-              {/* Terms and Conditions */}
               <div className="flex items-start">
                 <input
                   id="terms"
@@ -256,7 +247,6 @@ export const SignUpPage = () => {
                 </label>
               </div>
 
-              {/* Submit Button */}
               <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isSigningUp}>
                 {isSigningUp && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Create account
@@ -264,7 +254,6 @@ export const SignUpPage = () => {
             </form>
           </Form>
 
-          {/* Login link */}
           <div className="mt-8 text-center">
             <p className="text-sm text-neutral-text-secondary">
               Already have an account?{' '}

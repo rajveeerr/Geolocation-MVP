@@ -32,7 +32,6 @@ function App() {
             />
             <Route path={PATHS.PRIVACY} element={<PrivacyPage />} />
             <Route path={PATHS.TERMS} element={<TermsPage />} />
-            {/* 404 Catch-all route - must be last */}
             <Route path={PATHS.NOT_FOUND} element={<NotFoundPage />} />
           </Routes>
         </main>

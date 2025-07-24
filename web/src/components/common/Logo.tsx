@@ -6,15 +6,11 @@ export const Logo = () => {
     <Link to={PATHS.HOME} className="group flex items-center gap-2">
       <div className="flex items-center gap-3">
         <div className="relative">
-          {/* Animated background glow */}
-          <div className="absolute inset-0 h-8 w-8 rounded-lg bg-gradient-to-br from-blue-400 via-cyan-500 to-purple-600 opacity-0 blur-sm transition-opacity duration-300 group-hover:opacity-60"></div>
+          <div className="absolute inset-0 h-8 w-8 rounded-lg bg-gradient-to-br from-brand-primary-400 via-cyan-500 to-accent-purple-400 opacity-0 blur-sm transition-opacity duration-300 group-hover:opacity-60"></div>
 
-          {/* Main logo container */}
-          <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 via-cyan-500 to-blue-600 shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl">
-            {/* Animated border ring */}
-            <div className="absolute inset-0 animate-pulse rounded-lg border-2 border-transparent bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+          <div className="relative flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-brand-primary-500 via-cyan-500 to-brand-primary-600 shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl aspect-square">
+            <div className="absolute inset-0 animate-pulse rounded-lg border-2 border-transparent bg-gradient-to-r from-cyan-400 to-brand-primary-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
 
-            {/* Logo icon with enhanced effects */}
             <svg
               width="18"
               height="18"
@@ -51,11 +47,10 @@ export const Logo = () => {
               />
             </svg>
 
-            {/* Sparkle effect */}
             <div className="absolute right-1 top-1 h-1 w-1 animate-ping rounded-full bg-white opacity-0 group-hover:opacity-100"></div>
           </div>
         </div>
-        <span className="text-xl font-semibold tracking-tight text-neutral-text-primary transition-colors duration-300 group-hover:text-blue-600">
+        <span className="text-xl font-semibold tracking-tight text-neutral-text-primary transition-colors duration-300 group-hover:text-brand-primary-600">
           CitySpark
         </span>
       </div>
