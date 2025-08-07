@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import { z } from 'zod';
 import prisma from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -7,14 +8,15 @@ const router = Router();
 
 
 // --- Endpoint: POST /api/auth/register ---
+const registerSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(8, { message: "Password must be at least 8 characters long" }),
+  name: z.string().optional(),
+});
+
 router.post('/register', async (req: Request, res: Response) => {
   try {
-    const { email, password, name } = req.body;
-
-    // 1. Validate input
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
+        const { email, password, name } = registerSchema.parse(req.body);
 
     // 2. Check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -43,6 +45,9 @@ router.post('/register', async (req: Request, res: Response) => {
       user: userWithoutPassword,
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ errors: error.issues });
+    }
     console.error('Registration error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -89,14 +94,14 @@ router.get('/me', verifyToken, async (req: Request, res: Response) => {
 
 
 // --- Endpoint: POST /api/auth/login ---
+const loginSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string(),
+});
+
 router.post('/login', async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
-
-    // 1. Validate input
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
+        const { email, password } = loginSchema.parse(req.body);
 
     // 2. Find the user by email
     const user = await prisma.user.findUnique({ where: { email } });
@@ -129,6 +134,9 @@ router.post('/login', async (req: Request, res: Response) => {
       token: token,
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ errors: error.issues });
+    }
     console.error('Login error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
