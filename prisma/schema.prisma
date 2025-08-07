@@ -1,5 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// prisma/schema.prisma
 
 generator client {
   provider = "prisma-client-js"
@@ -10,13 +9,76 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User Model Definition
+// --- ENUMS for controlled values ---
+
+enum UserRole {
+  USER
+  MERCHANT
+  ADMIN
+}
+
+enum MerchantStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+
+// --- CORE MODELS ---
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String?  // The '?' makes this field optional
-  password  String   // This will be the hashed password
-  
+  name      String?
+  password  String
+  role      UserRole @default(USER) // All new users start as a regular USER
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // A User can own one Merchant profile
+  merchant  Merchant?
+}
+
+model Merchant {
+  id            Int      @id @default(autoincrement())
+  businessName  String
+  address       String
+  description   String?
+  logoUrl       String?
+  status        MerchantStatus @default(PENDING) // New merchants are PENDING by default
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // A Merchant must be owned by one User
+  ownerId       Int      @unique
+  owner         User     @relation(fields: [ownerId], references: [id])
+
+  // A Merchant can have many Deals
+  deals         Deal[]
+}
+
+model Deal {
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String
+  imageUrl      String?
+
+  // Basic deal parameters (can be expanded later)
+  discountPercentage Int?
+  discountAmount     Float?
+  
+  // Validity period
+  startTime     DateTime
+  endTime       DateTime
+  
+  redemptionInstructions String
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Each Deal belongs to one Merchant
+  merchantId    Int
+  merchant      Merchant @relation(fields: [merchantId], references: [id])
 }

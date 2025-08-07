@@ -5,24 +5,25 @@ import cors from 'cors';
 
 // Import our new auth routes
 import authRoutes from './routes/auth.routes';
+import merchantRoutes from './routes/merchant.routes'; // For protected merchant actions
+import publicDealRoutes from './routes/deals.public.routes'; // For public deal fetching
 
 dotenv.config();
-
 
 const app: Express = express();
 const PORT = process.env.PORT || 3000;
 
-
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
 app.get('/', (req: Request, res: Response) => {
   res.send('YOHOP Server (TypeScript & Prisma Edition) is alive!');
 });
 
-// Mount the authentication routes under the /api/auth prefix
-// All routes in auth.routes.ts will now be accessible under e.g., /api/auth/register
+// Mount routes
 app.use('/api/auth', authRoutes);
+app.use('/api', merchantRoutes); // e.g., /api/merchants/register, /api/deals
+app.use('/api', publicDealRoutes); // e.g., /api/deals (GET)
 
 // You can keep this for testing or remove it later
 app.get('/users', async (req: Request, res: Response) => {
