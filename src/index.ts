@@ -1,5 +1,5 @@
 import express, { Express, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from './lib/prisma';
 import dotenv from 'dotenv';
 
 // Import our new auth routes
@@ -7,7 +7,7 @@ import authRoutes from './routes/auth.routes';
 
 dotenv.config();
 
-const prisma = new PrismaClient();
+
 const app: Express = express();
 const PORT = process.env.PORT || 3000;
 
