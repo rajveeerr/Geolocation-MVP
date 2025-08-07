@@ -49,6 +49,45 @@ router.post('/register', async (req: Request, res: Response) => {
 });
 
 
+
+const verifyToken = (req: Request, res: Response, next: Function) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; 
+
+  if (token == null) return res.sendStatus(401);
+
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) return res.status(500).json({ error: 'Server configuration error' });
+
+  jwt.verify(token, jwtSecret, (err: any, user: any) => {
+    if (err) return res.sendStatus(403); 
+    (req as any).user = user;
+    next();
+  });
+};
+
+router.get('/me', verifyToken, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.userId;
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, name: true, createdAt: true }, 
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Get me error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+
 // --- Endpoint: POST /api/auth/login ---
 router.post('/login', async (req: Request, res: Response) => {
   try {

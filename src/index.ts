@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import prisma from './lib/prisma';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 // Import our new auth routes
 import authRoutes from './routes/auth.routes';
@@ -11,8 +12,9 @@ dotenv.config();
 const app: Express = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware to parse JSON bodies. THIS IS CRUCIAL for our auth routes to work.
+
 app.use(express.json());
+app.use(cors());
 
 app.get('/', (req: Request, res: Response) => {
   res.send('YOHOP Server (TypeScript & Prisma Edition) is alive!');
