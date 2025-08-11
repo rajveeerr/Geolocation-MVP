@@ -108,7 +108,7 @@ export const happyHourDeals: Deal[] = [
     id: 'hh4',
     name: "The Passenger's Bar",
     image:
-    'https://images.unsplash.com/photo-1543007631-283050bb3e8c?w=500&q=80',
+      'https://images.unsplash.com/photo-1543007631-283050bb3e8c?w=500&q=80',
     rating: 2.9,
     category: 'Bar',
     price: '$$',
@@ -179,7 +179,7 @@ export const topRatedDeals: Deal[] = [
     category: 'Desserts',
     price: '$',
     location: 'Tagore Garden',
-  }
+  },
 ];
 
 export const newDeals: Deal[] = [

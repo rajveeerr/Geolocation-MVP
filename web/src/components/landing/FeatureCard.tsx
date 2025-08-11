@@ -22,7 +22,9 @@ export const FeatureCard = ({ icon, title }: FeatureCardProps) => {
   return (
     <div className="flex h-full flex-col justify-between p-4 sm:p-6">
       <IconComponent icon={icon} />
-      <h3 className="text-neutral-text-primary text-sm font-semibold sm:text-base">{title}</h3>
+      <h3 className="text-neutral-text-primary text-sm font-semibold sm:text-base">
+        {title}
+      </h3>
     </div>
   );
 };

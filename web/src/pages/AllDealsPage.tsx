@@ -26,7 +26,6 @@
 //   );
 // };
 
-
 // web/src/pages/AllDealsPage.tsx
 
 import { useState } from 'react';
@@ -41,12 +40,11 @@ export const AllDealsPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-50/50 pt-20">
       {/* Full-width responsive layout with smart containers */}
       <div className="w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[calc(100vh-5rem)]">
-          
+        <div className="grid min-h-[calc(100vh-5rem)] grid-cols-1 lg:grid-cols-12">
           {/* Left Column: Responsive Sidebar with container */}
-          <div className="lg:col-span-5 xl:col-span-4 2xl:col-span-3 border-r border-neutral-200/80 bg-white/80 backdrop-blur-sm shadow-sm">
-            <div className="h-max lg:h-screen overflow-hidden">
-              <DealsSidebar 
+          <div className="border-r border-neutral-200/80 bg-white/80 shadow-sm backdrop-blur-sm lg:col-span-5 xl:col-span-4 2xl:col-span-3">
+            <div className="h-max overflow-hidden lg:h-screen">
+              <DealsSidebar
                 deals={allDeals}
                 hoveredDealId={hoveredDealId}
                 setHoveredDealId={setHoveredDealId}
@@ -55,11 +53,8 @@ export const AllDealsPage = () => {
           </div>
 
           {/* Right Column: Full-width Map */}
-          <div className="hidden lg:block lg:col-span-7 xl:col-span-8 2xl:col-span-9 h-[calc(100vh-5rem)] relative bg-neutral-100/30">
-            <DealResultsMap 
-              deals={allDeals}
-              hoveredDealId={hoveredDealId}
-            />
+          <div className="relative hidden h-[calc(100vh-5rem)] bg-neutral-100/30 lg:col-span-7 lg:block xl:col-span-8 2xl:col-span-9">
+            <DealResultsMap deals={allDeals} hoveredDealId={hoveredDealId} />
           </div>
         </div>
       </div>

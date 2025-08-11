@@ -44,28 +44,30 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
     >
       <div className="container mx-auto px-3 sm:px-4 lg:px-6">
         {/* Section Header */}
-        <div className="mb-3 sm:mb-4 flex items-center justify-between">
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-800">{title}</h2>
+        <div className="mb-3 flex items-center justify-between sm:mb-4">
+          <h2 className="text-xl font-bold text-neutral-800 sm:text-2xl lg:text-3xl">
+            {title}
+          </h2>
           <div className="flex items-center gap-1 sm:gap-2">
             <Link
               to={PATHS.ALL_DEALS}
-              className="text-xs sm:text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+              className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline sm:text-sm"
             >
               Show all
             </Link>
             <button
               onClick={() => scroll('left')}
-              className="hidden sm:flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full border border-neutral-300 bg-white shadow-sm transition-all hover:bg-neutral-50 hover:shadow-md"
+              className="hidden h-7 w-7 items-center justify-center rounded-full border border-neutral-300 bg-white shadow-sm transition-all hover:bg-neutral-50 hover:shadow-md sm:flex sm:h-8 sm:w-8"
               aria-label="Scroll left"
             >
-              <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-neutral-600" />
+              <ChevronLeft className="h-3.5 w-3.5 text-neutral-600 sm:h-4 sm:w-4" />
             </button>
             <button
               onClick={() => scroll('right')}
-              className="hidden sm:flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full border border-neutral-300 bg-white shadow-sm transition-all hover:bg-neutral-50 hover:shadow-md"
+              className="hidden h-7 w-7 items-center justify-center rounded-full border border-neutral-300 bg-white shadow-sm transition-all hover:bg-neutral-50 hover:shadow-md sm:flex sm:h-8 sm:w-8"
               aria-label="Scroll right"
             >
-              <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-neutral-600" />
+              <ChevronRight className="h-3.5 w-3.5 text-neutral-600 sm:h-4 sm:w-4" />
             </button>
           </div>
         </div>
@@ -73,12 +75,12 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
         {/* Horizontally Scrolling Cards */}
         <div
           ref={scrollContainerRef}
-          className="scrollbar-hide flex gap-3 sm:gap-4 md:gap-5 lg:gap-6 overflow-x-auto pb-2 sm:pb-4"
+          className="scrollbar-hide flex gap-3 overflow-x-auto pb-2 sm:gap-4 sm:pb-4 md:gap-5 lg:gap-6"
         >
           {deals.map((deal) => (
             <div
               key={deal.id}
-              className="w-64 sm:w-72 md:w-80 lg:w-72 xl:w-80 flex-shrink-0"
+              className="w-64 flex-shrink-0 sm:w-72 md:w-80 lg:w-72 xl:w-80"
             >
               <CarouselCard deal={deal} />
             </div>

@@ -39,16 +39,16 @@ export const DealResultsList = ({
         </p>
       </div>
 
-      <div className="my-6 flex items-center gap-3 flex-wrap">
+      <div className="my-6 flex flex-wrap items-center gap-3">
         <Button size="sm" className="rounded-xl">
           Today
         </Button>
         <Button variant="secondary" size="sm" className="rounded-xl">
           All Day
         </Button>
-        <Button 
-          variant="secondary" 
-          size="sm" 
+        <Button
+          variant="secondary"
+          size="sm"
           className="rounded-xl"
           icon={<SlidersHorizontal className="h-4 w-4" />}
           iconPosition="left"
@@ -58,13 +58,13 @@ export const DealResultsList = ({
       </div>
 
       <div className="my-6 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 p-6 shadow-sm">
-        <h3 className="font-bold text-amber-800 text-lg">Today's Daily Drop</h3>
-        <p className="text-sm text-amber-700 mt-1 mb-4">
+        <h3 className="text-lg font-bold text-amber-800">Today's Daily Drop</h3>
+        <p className="mb-4 mt-1 text-sm text-amber-700">
           Unlock a massive, one-time discount. Refreshes every day!
         </p>
-        <Button 
+        <Button
           size="md"
-          className="w-full bg-gradient-to-r from-amber-400 to-yellow-400 text-amber-900 hover:from-amber-500 hover:to-yellow-500 shadow-lg hover:shadow-xl font-bold"
+          className="w-full bg-gradient-to-r from-amber-400 to-yellow-400 font-bold text-amber-900 shadow-lg hover:from-amber-500 hover:to-yellow-500 hover:shadow-xl"
         >
           Click to Unlock
         </Button>

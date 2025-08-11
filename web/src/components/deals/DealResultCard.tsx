@@ -34,7 +34,9 @@ export const DealResultCard = ({
       <div className="min-w-0 flex-grow">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 flex-1">
-            <h3 className="truncate font-bold text-neutral-800 sm:text-lg">{deal.name}</h3>
+            <h3 className="truncate font-bold text-neutral-800 sm:text-lg">
+              {deal.name}
+            </h3>
             <div className="mt-1 flex flex-wrap items-center gap-1 text-sm text-neutral-600 sm:gap-2">
               <div className="flex items-center gap-0.5">
                 <Star className="h-4 w-4 fill-current text-red-500" />
@@ -45,7 +47,9 @@ export const DealResultCard = ({
               <span className="hidden sm:inline">&middot;</span>
               <span className="font-medium text-green-600">{deal.price}</span>
             </div>
-            <p className="mt-1 truncate text-sm text-neutral-500">{deal.location}</p>
+            <p className="mt-1 truncate text-sm text-neutral-500">
+              {deal.location}
+            </p>
           </div>
           <div className="flex items-center gap-2 sm:flex-col sm:items-end">
             <Button

@@ -27,7 +27,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantClasses = {
       primary:
-        'bg-gradient-to-b from-brand-primary-400 to-brand-primary-600 text-white hover:from-brand-primary-500 hover:to-brand-primary-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200',
+        'bg-gradient-to-b from-brand-primary-400 to-brand-primary-600 text-white hover:from-brand-primary-500 hover:to-brand-primary-700  hover:shadow-xl transform hover:scale-105 transition-all duration-200',
       secondary:
         'bg-white text-neutral-text-primary border border-neutral-border hover:bg-neutral-subtle-background',
       google:

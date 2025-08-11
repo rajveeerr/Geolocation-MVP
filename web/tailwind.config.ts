@@ -38,7 +38,7 @@ const tailwindConfig: Config = {
         accent: {
           DEFAULT: 'hsl(var(--accent))',
           foreground: 'hsl(var(--accent-foreground))',
-          orange: '#F97316', 
+          orange: '#F97316',
         },
         popover: {
           DEFAULT: 'hsl(var(--popover))',

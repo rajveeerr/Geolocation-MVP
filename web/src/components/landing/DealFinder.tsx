@@ -81,9 +81,12 @@ export const DealFinder = ({ activeTab, onTabChange }: DealFinderProps) => {
 
       <div className="w-full overflow-hidden rounded-2xl border bg-white shadow-lg sm:rounded-full">
         <div className="flex flex-col sm:flex-row sm:items-center">
-          <div className="flex flex-1 flex-col divide divide-neutral-200 sm:grid sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          <div className="divide flex flex-1 flex-col divide-neutral-200 sm:grid sm:grid-cols-3 sm:divide-x sm:divide-y-0">
             <div className="p-4 sm:p-2 sm:pl-4">
-              <label htmlFor="where" className="block text-xs font-bold text-neutral-700">
+              <label
+                htmlFor="where"
+                className="block text-xs font-bold text-neutral-700"
+              >
                 Where?
               </label>
               <Input
@@ -94,7 +97,10 @@ export const DealFinder = ({ activeTab, onTabChange }: DealFinderProps) => {
               />
             </div>
             <div className="p-4 sm:p-2 sm:pl-4">
-              <label htmlFor="when" className="block text-xs font-bold text-neutral-700">
+              <label
+                htmlFor="when"
+                className="block text-xs font-bold text-neutral-700"
+              >
                 When?
               </label>
               <Input
@@ -105,7 +111,10 @@ export const DealFinder = ({ activeTab, onTabChange }: DealFinderProps) => {
               />
             </div>
             <div className="p-4 sm:p-2 sm:pl-4">
-              <label htmlFor="who" className="block text-xs font-bold text-neutral-700">
+              <label
+                htmlFor="who"
+                className="block text-xs font-bold text-neutral-700"
+              >
                 Who?
               </label>
               <Input
@@ -117,8 +126,8 @@ export const DealFinder = ({ activeTab, onTabChange }: DealFinderProps) => {
             </div>
           </div>
           <div className="p-4 sm:p-2">
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="h-12 w-full rounded-xl sm:h-12 sm:w-12 sm:flex-shrink-0 sm:rounded-full sm:p-0"
             >
               <Search className="h-5 w-5" />

@@ -341,7 +341,10 @@ export const Header = () => {
                 </div>
                 <div className="space-y-6 px-5 py-6">
                   <div>
-                    <Link to={PATHS.LOGIN} className='flex w-full items-center justify-center'>
+                    <Link
+                      to={PATHS.LOGIN}
+                      className="flex w-full items-center justify-center"
+                    >
                       <Button
                         variant="primary"
                         size="md"

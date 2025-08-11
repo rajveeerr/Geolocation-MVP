@@ -63,7 +63,6 @@
 // //   );
 // // };
 
-
 // // web/src/components/deals/DealResultsMap.tsx
 
 // import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
@@ -71,7 +70,6 @@
 // import L from 'leaflet';
 // import type { DealWithLocation } from '@/data/deals';
 // import { cn } from '@/lib/utils';
-
 
 // // --- THE FIX: New premium orange pin ---
 // const createCustomIcon = (isHovered: boolean) => {
@@ -144,8 +142,8 @@ const createCustomIcon = (isHovered: boolean) => {
     className: 'custom-map-marker',
     html: `
       <div class="${cn(
-        "flex items-center justify-center w-10 h-10 rounded-full bg-accent-orange border-2 border-white shadow-lg transition-all duration-200",
-        isHovered && "scale-125 z-10"
+        'flex items-center justify-center w-10 h-10 rounded-full bg-accent-orange border-2 border-white shadow-lg transition-all duration-200',
+        isHovered && 'scale-125 z-10',
       )}">
         <div class="text-white">
           ${iconHtml}
@@ -162,13 +160,21 @@ interface DealResultsMapProps {
   hoveredDealId: string | null;
 }
 
-export const DealResultsMap = ({ deals, hoveredDealId }: DealResultsMapProps) => {
-  const mapCenter: L.LatLngExpression = [40.72, -74.00];
+export const DealResultsMap = ({
+  deals,
+  hoveredDealId,
+}: DealResultsMapProps) => {
+  const mapCenter: L.LatLngExpression = [40.72, -74.0];
 
   return (
-    <div className="h-full w-full sticky top-20">
+    <div className="sticky top-20 h-full w-full">
       {/* --- THE FIX: Removed leaflet-container-dark class --- */}
-      <MapContainer center={mapCenter} zoom={13} scrollWheelZoom={true} className="h-full w-full">
+      <MapContainer
+        center={mapCenter}
+        zoom={13}
+        scrollWheelZoom={true}
+        className="h-full w-full"
+      >
         {/* --- THE FIX: Changed URL to the light map theme --- */}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
@@ -182,7 +188,9 @@ export const DealResultsMap = ({ deals, hoveredDealId }: DealResultsMapProps) =>
           >
             <Popup>
               <div className="font-sans">
-                <b className="text-sm">{deal.name}</b><br />{deal.location}
+                <b className="text-sm">{deal.name}</b>
+                <br />
+                {deal.location}
               </div>
             </Popup>
           </Marker>

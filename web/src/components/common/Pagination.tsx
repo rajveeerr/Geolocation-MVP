@@ -8,28 +8,24 @@ export const Pagination = () => {
         variant="ghost"
         size="sm"
         disabled
-        className="h-9 w-9 p-0 rounded-xl"
+        className="h-9 w-9 rounded-xl p-0"
       >
         <ChevronLeft className="h-4 w-4" />
       </Button>
       <Button
         size="sm"
-        className="h-9 w-9 p-0 rounded-xl text-sm font-semibold"
+        className="h-9 w-9 rounded-xl p-0 text-sm font-semibold"
       >
         1
       </Button>
       <Button
         variant="secondary"
         size="sm"
-        className="h-9 w-9 p-0 rounded-xl text-sm font-semibold"
+        className="h-9 w-9 rounded-xl p-0 text-sm font-semibold"
       >
         2
       </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-9 w-9 p-0 rounded-xl"
-      >
+      <Button variant="ghost" size="sm" className="h-9 w-9 rounded-xl p-0">
         <ChevronRight className="h-4 w-4" />
       </Button>
     </nav>

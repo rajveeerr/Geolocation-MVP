@@ -16,7 +16,9 @@ export const DealCard = ({ deal }: DealCardProps) => {
         className="h-14 w-14 flex-shrink-0 rounded-md object-cover sm:h-16 sm:w-16"
       />
       <div className="min-w-0 flex-grow">
-        <h4 className="truncate font-semibold text-neutral-800 sm:text-base">{deal.name}</h4>
+        <h4 className="truncate font-semibold text-neutral-800 sm:text-base">
+          {deal.name}
+        </h4>
         <div className="mt-1 flex flex-wrap items-center gap-1.5 text-sm text-neutral-600 sm:gap-2">
           <div className="flex items-center gap-0.5">
             <Star className="h-4 w-4 fill-current text-red-500" />
