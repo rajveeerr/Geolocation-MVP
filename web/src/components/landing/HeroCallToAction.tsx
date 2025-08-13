@@ -25,11 +25,11 @@ export const HeroCallToAction = () => {
         </Link>
       </div>
 
-      <p className="mt-6 px-4 text-sm text-neutral-text-secondary sm:px-0 sm:text-base">
+      <p className="text-neutral-text-secondary mt-6 px-4 text-sm sm:px-0 sm:text-base">
         Are you a business?{' '}
         <Link
           to={PATHS.FOR_BUSINESSES}
-          className="font-medium text-brand-primary-main hover:underline"
+          className="text-brand-primary-main font-medium hover:underline"
         >
           Get on the map in minutes
         </Link>

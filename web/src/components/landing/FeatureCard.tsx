@@ -8,11 +8,11 @@ interface FeatureCardProps {
 const IconComponent = ({ icon }: { icon: 'gift' | 'users' | 'zap' }) => {
   switch (icon) {
     case 'gift':
-      return <Gift className="h-6 w-6 text-neutral-text-primary" />;
+      return <Gift className="text-neutral-text-primary h-6 w-6" />;
     case 'users':
-      return <Users className="h-6 w-6 text-neutral-text-primary" />;
+      return <Users className="text-neutral-text-primary h-6 w-6" />;
     case 'zap':
-      return <Zap className="h-6 w-6 text-neutral-text-primary" />;
+      return <Zap className="text-neutral-text-primary h-6 w-6" />;
     default:
       return null;
   }
@@ -22,7 +22,7 @@ export const FeatureCard = ({ icon, title }: FeatureCardProps) => {
   return (
     <div className="flex h-full flex-col justify-between p-6">
       <IconComponent icon={icon} />
-      <h3 className="font-semibold text-neutral-text-primary">{title}</h3>
+      <h3 className="text-neutral-text-primary font-semibold">{title}</h3>
     </div>
   );
 };

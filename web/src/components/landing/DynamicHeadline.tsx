@@ -13,12 +13,12 @@ export const DynamicHeadline = () => {
   }, [dynamicWords.length]);
 
   return (
-    <h1 className="text-4xl font-semibold leading-tight tracking-tight text-neutral-text-primary sm:text-5xl md:text-6xl">
+    <h1 className="text-neutral-text-primary text-4xl font-semibold leading-tight tracking-tight sm:text-5xl md:text-6xl">
       CitySpark gets you exclusive local{' '}
-      <span className="mt-2 inline-flex flex-wrap items-center justify-center gap-2 text-neutral-text-primary transition-all duration-500 ease-in-out sm:gap-3">
+      <span className="text-neutral-text-primary mt-2 inline-flex flex-wrap items-center justify-center gap-2 transition-all duration-500 ease-in-out sm:gap-3">
         <span className="flex items-center justify-center gap-2 sm:gap-3">
           <svg
-            className="h-8 w-8 text-brand-primary-400 sm:h-12 sm:w-12"
+            className="text-brand-primary-400 h-8 w-8 sm:h-12 sm:w-12"
             viewBox="0 0 24 24"
             fill="currentColor"
           >

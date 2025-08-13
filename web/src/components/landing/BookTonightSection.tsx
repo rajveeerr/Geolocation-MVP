@@ -12,7 +12,10 @@ export const BookTonightSection = () => {
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const scrollAmount = direction === 'left' ? -300 : 300;
-      scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      scrollContainerRef.current.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth',
+      });
     }
   };
 
@@ -20,36 +23,38 @@ export const BookTonightSection = () => {
     <section className="bg-white py-20">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <CalendarClock className="w-8 h-8 text-red-500" />
-            <h2 className="text-3xl font-bold text-neutral-800">Book Tonight</h2>
+            <CalendarClock className="h-8 w-8 text-red-500" />
+            <h2 className="text-3xl font-bold text-neutral-800">
+              Book Tonight
+            </h2>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="secondary" size="md" className="font-semibold">
               See All
             </Button>
-            <button 
+            <button
               onClick={() => scroll('left')}
-              className="w-10 h-10 rounded-full border border-neutral-300 flex items-center justify-center hover:bg-neutral-100 transition-colors"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-300 transition-colors hover:bg-neutral-100"
               aria-label="Scroll left"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="h-5 w-5" />
             </button>
-            <button 
+            <button
               onClick={() => scroll('right')}
-              className="w-10 h-10 rounded-full border border-neutral-300 flex items-center justify-center hover:bg-neutral-100 transition-colors"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-300 transition-colors hover:bg-neutral-100"
               aria-label="Scroll right"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="h-5 w-5" />
             </button>
           </div>
         </div>
 
         {/* Horizontally Scrolling Cards */}
-        <div 
+        <div
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto pb-4 -mb-4 scrollbar-hide"
+          className="scrollbar-hide -mb-4 flex gap-6 overflow-x-auto pb-4"
           style={{ scrollbarWidth: 'none' }}
         >
           {bookTonightDeals.map((deal) => (

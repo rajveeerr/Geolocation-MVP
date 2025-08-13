@@ -23,23 +23,27 @@ export const BentoGridSection = () => {
   return (
     <section className="w-full bg-white py-20 md:py-28">
       <div className="container mx-auto max-w-6xl px-4">
-        <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight text-neutral-text-primary sm:text-4xl">
-                Everything You Need to Own Your City
-            </h2>
-            <p className="mt-4 max-w-2xl mx-auto text-lg text-neutral-text-secondary">
-                From real-time maps to gamified rewards, CitySpark is more than just a deals app.
-            </p>
+        <div className="mb-12 text-center">
+          <h2 className="text-neutral-text-primary text-3xl font-bold tracking-tight sm:text-4xl">
+            Everything You Need to Own Your City
+          </h2>
+          <p className="text-neutral-text-secondary mx-auto mt-4 max-w-2xl text-lg">
+            From real-time maps to gamified rewards, CitySpark is more than just
+            a deals app.
+          </p>
         </div>
 
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-4 auto-rows-[220px] gap-4"
+          className="grid auto-rows-[220px] grid-cols-1 gap-4 md:grid-cols-4"
           variants={bentoVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
         >
-          <BentoCard variants={itemVariants} className="md:col-span-2 md:row-span-2">
+          <BentoCard
+            variants={itemVariants}
+            className="md:col-span-2 md:row-span-2"
+          >
             <LiveMapCard />
           </BentoCard>
           <BentoCard variants={itemVariants} className="md:col-span-2">
@@ -57,9 +61,12 @@ export const BentoGridSection = () => {
           <BentoCard variants={itemVariants}>
             <FeatureCard icon="zap" title="Instant Notifications" />
           </BentoCard>
-           <BentoCard variants={itemVariants} className="md:col-span-2 bg-neutral-subtle-background">
-                <CtaCard />
-            </BentoCard>
+          <BentoCard
+            variants={itemVariants}
+            className="bg-neutral-subtle-background md:col-span-2"
+          >
+            <CtaCard />
+          </BentoCard>
         </motion.div>
       </div>
     </section>

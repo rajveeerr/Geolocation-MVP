@@ -11,29 +11,29 @@ interface DealColumnProps {
 
 export const DealColumn = ({ title, icon, deals }: DealColumnProps) => {
   return (
-    <div className="bg-white rounded-2xl border border-neutral-200/80 shadow-md flex-1 min-w-[300px]">
-        <div className="relative text-center py-6">
-            <div className="absolute -top-6 left-1/2 -translate-x-1/2">
-                <div className="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center">
-                    {icon}
-                </div>
-            </div>
-            <h3 className="text-2xl font-bold text-neutral-800">{title}</h3>
+    <div className="min-w-[300px] flex-1 rounded-2xl border border-neutral-200/80 bg-white shadow-md">
+      <div className="relative py-6 text-center">
+        <div className="absolute -top-6 left-1/2 -translate-x-1/2">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-lg">
+            {icon}
+          </div>
         </div>
+        <h3 className="text-2xl font-bold text-neutral-800">{title}</h3>
+      </div>
 
-        <div className="px-4 pb-4">
-            <div className="divide-y divide-neutral-200/60">
-                {deals.map((deal) => (
-                    <DealCard key={deal.id} deal={deal} />
-                ))}
-            </div>
+      <div className="px-4 pb-4">
+        <div className="divide-y divide-neutral-200/60">
+          {deals.map((deal) => (
+            <DealCard key={deal.id} deal={deal} />
+          ))}
         </div>
+      </div>
 
-        <div className="p-4 border-t border-neutral-200/60 text-center">
-            <Button variant="secondary" size="md" className="font-semibold">
-                See All
-            </Button>
-        </div>
+      <div className="border-t border-neutral-200/60 p-4 text-center">
+        <Button variant="secondary" size="md" className="font-semibold">
+          See All
+        </Button>
+      </div>
     </div>
   );
 };

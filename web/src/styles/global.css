@@ -7,55 +7,60 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    
+    --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
- 
+    --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
- 
-    --primary: 346.8 77.2% 49.8%; 
-    --primary-foreground: 355.7 100% 97.3%;
- 
-    --secondary: 220 13% 91%;
-    --secondary-foreground: 220 14.3% 34.1%;
- 
-    --muted: 220 13% 91%;
-    --muted-foreground: 220 8.9% 46.1%;
- 
-    --accent: 220 13% 91%;
-    --accent-foreground: 220 14.3% 34.1%;
- 
+    --popover-foreground: 222.2 84% 4.9%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 215.4 16.3% 46.9%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.75rem;
 
-    --border: 220 13% 89%;
-    --input: 220 13% 89%;
-    --ring: 346.8 77.2% 49.8%;
- 
-    --radius: 0.75rem; 
+    /* YOUR BRAND.PRIMARY PALETTE - THE SINGLE SOURCE OF TRUTH */
+    --brand-primary-main: 221 83.2% 53.3%; /* Corresponds to -600 */
+    --brand-primary-dark: 221 76.8% 47.1%; /* Corresponds to -700 */
+    --brand-primary-light: 220 89.5% 92.7%;
+    
+    --brand-primary-50: 220 89.5% 96.1%;
+    --brand-primary-100: 220 89.5% 92.7%;
+    --brand-primary-200: 220 89.5% 86.1%;
+    --brand-primary-300: 220 89.5% 76.1%;
+    --brand-primary-400: 220 89.5% 66.1%;
+    --brand-primary-500: 220 89.5% 56.1%;
+    --brand-primary-600: 221 83.2% 53.3%;
+    --brand-primary-700: 221 76.8% 47.1%;
+    --brand-primary-800: 220 89.5% 26.1%;
+    --brand-primary-900: 220 89.5% 16.1%;
   }
 
   .dark {
     --background: 222.2222 47.3684% 11.1765%;
-    --foreground: 210.0000 40.0000% 98.0392%;
+    --foreground: 210 40% 98.0392%;
     --card: 222.2222 47.3684% 11.1765%;
-    --card-foreground: 210.0000 40.0000% 98.0392%;
+    --card-foreground: 210 40% 98.0392%;
     --popover: 222.2222 47.3684% 11.1765%;
-    --popover-foreground: 210.0000 40.0000% 98.0392%;
+    --popover-foreground: 210 40% 98.0392%;
     --primary: 217.2193 91.2195% 59.8039%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 217.2414 32.5843% 17.4510%;
-    --secondary-foreground: 210.0000 40.0000% 98.0392%;
-    --muted: 217.2414 32.5843% 17.4510%;
-    --muted-foreground: 215.0000 20.2247% 65.0980%;
-    --accent: 217.2414 32.5843% 17.4510%;
-    --accent-foreground: 210.0000 40.0000% 98.0392%;
+    --secondary: 217.2414 32.5843% 17.451%;
+    --secondary-foreground: 210 40% 98.0392%;
+    --muted: 217.2414 32.5843% 17.451%;
+    --muted-foreground: 215 20.2247% 65.098%;
+    --accent: 217.2414 32.5843% 17.451%;
+    --accent-foreground: 210 40% 98.0392%;
     --destructive: 0 84.2365% 60.1961%;
-    --destructive-foreground: 210.0000 40.0000% 98.0392%;
-    --border: 217.2414 32.5843% 17.4510%;
-    --input: 217.2414 32.5843% 17.4510%;
+    --destructive-foreground: 210 40% 98.0392%;
+    --border: 217.2414 32.5843% 17.451%;
+    --input: 217.2414 32.5843% 17.451%;
     --ring: 217.2193 91.2195% 59.8039%;
     --radius: 0.75rem;
   }
@@ -70,9 +75,10 @@
   } */
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
   }
-  
 }
 
 @layer utilities {

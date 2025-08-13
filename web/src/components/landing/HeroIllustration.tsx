@@ -10,7 +10,7 @@ export const HeroIllustration = () => {
             'radial-gradient(circle at 50% 30%, var(--brand-primary-100), transparent 70%)',
         }}
       >
-        <div className="h-full w-full rounded-md border border-neutral-border/20 bg-white/50 p-4 shadow-inner">
+        <div className="border-neutral-border/20 h-full w-full rounded-md border bg-white/50 p-4 shadow-inner">
           <svg
             viewBox="0 0 800 450"
             xmlns="http://www.w3.org/2000/svg"
@@ -25,8 +25,16 @@ export const HeroIllustration = () => {
                 fx="50%"
                 fy="50%"
               >
-                <stop offset="0%" stopColor="var(--accent-secondary-main)" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="var(--accent-secondary-main)" stopOpacity="0" />
+                <stop
+                  offset="0%"
+                  stopColor="var(--accent-secondary-main)"
+                  stopOpacity="0.6"
+                />
+                <stop
+                  offset="100%"
+                  stopColor="var(--accent-secondary-main)"
+                  stopOpacity="0"
+                />
               </radialGradient>
               <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
@@ -85,13 +93,23 @@ export const HeroIllustration = () => {
 
             <g transform="translate(400 200)" filter="url(#shadow)">
               <circle cx="0" cy="0" r="30" fill="white" />
-              <circle cx="0" cy="0" r="25" fill="var(--accent-secondary-main)" />
+              <circle
+                cx="0"
+                cy="0"
+                r="25"
+                fill="var(--accent-secondary-main)"
+              />
               <Coffee x="-12" y="-12" width="24" height="24" color="white" />
             </g>
 
             <g transform="translate(600 180)" filter="url(#shadow)">
               <circle cx="0" cy="0" r="20" fill="white" />
-              <circle cx="0" cy="0" r="16" fill="var(--accent-gamification-main)" />
+              <circle
+                cx="0"
+                cy="0"
+                r="16"
+                fill="var(--accent-gamification-main)"
+              />
               <ShoppingBag x="-9" y="-9" width="18" height="18" color="white" />
             </g>
 

@@ -15,7 +15,10 @@ class ApiClient {
 
   private getAuthToken = () => localStorage.getItem('authToken');
 
-  private async request<T>(endpoint: string, options: RequestInit): Promise<ApiResponse<T>> {
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit,
+  ): Promise<ApiResponse<T>> {
     const token = this.getAuthToken();
     const headers = new Headers(options.headers || {});
     headers.set('Content-Type', 'application/json');
@@ -24,7 +27,10 @@ class ApiClient {
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, { ...options, headers });
+      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+        ...options,
+        headers,
+      });
       const contentType = response.headers.get('content-type');
 
       if (!response.ok) {
@@ -32,18 +38,25 @@ class ApiClient {
         if (contentType?.includes('application/json')) {
           errorData = await response.json();
         }
-        return { success: false, data: null, error: errorData.error || `HTTP error! status: ${response.status}` };
+        return {
+          success: false,
+          data: null,
+          error: errorData.error || `HTTP error! status: ${response.status}`,
+        };
       }
 
-      if (response.status === 204 || !contentType?.includes('application/json')) {
+      if (
+        response.status === 204 ||
+        !contentType?.includes('application/json')
+      ) {
         return { success: true, data: null, error: null };
       }
 
       const data = await response.json();
       return { success: true, data, error: null };
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'A network error occurred';
+      const errorMessage =
+        error instanceof Error ? error.message : 'A network error occurred';
       return { success: false, data: null, error: errorMessage };
     }
   }
@@ -53,11 +66,17 @@ class ApiClient {
   }
 
   public post<T, U>(endpoint: string, payload: U): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'POST', body: JSON.stringify(payload) });
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
   }
 
   public put<T, U>(endpoint: string, payload: U): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'PUT', body: JSON.stringify(payload) });
+    return this.request<T>(endpoint, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
   }
 
   public delete<T>(endpoint: string): Promise<ApiResponse<T>> {

@@ -38,30 +38,29 @@ import { motion } from 'framer-motion';
 
 export const HeroSection = () => {
   return (
-    <section className="relative w-full h-screen min-h-[700px] flex items-center justify-center text-center overflow-hidden">
+    <section className="relative flex h-screen min-h-[700px] w-full items-center justify-center overflow-hidden text-center">
       {/* Background Image/Video */}
       <div className="absolute inset-0 z-0">
         <img
           src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=2070&auto=format&fit=crop"
           alt="Cozy restaurant interior"
-          className="w-full h-full object-cover"
+          className="h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-black/40"></div>
       </div>
-      
+
       {/* Content */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-        className="relative z-10 container mx-auto px-4"
+        className="container relative z-10 mx-auto px-4"
       >
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white shadow-lg">
+        <h1 className="text-4xl font-extrabold text-white shadow-lg sm:text-5xl md:text-6xl">
           Find your next favorite spot
         </h1>
-        
-        <DealFinder />
 
+        <DealFinder />
       </motion.div>
     </section>
   );

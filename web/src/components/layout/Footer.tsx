@@ -184,79 +184,96 @@ import { Logo } from '../common/Logo';
 import { Twitter, Instagram, Facebook } from 'lucide-react';
 
 const socialLinks = [
-    { href: "#", icon: <Twitter className="w-5 h-5" /> },
-    { href: "#", icon: <Instagram className="w-5 h-5" /> },
-    { href: "#", icon: <Facebook className="w-5 h-5" /> },
+  { href: '#', icon: <Twitter className="h-5 w-5" /> },
+  { href: '#', icon: <Instagram className="h-5 w-5" /> },
+  { href: '#', icon: <Facebook className="h-5 w-5" /> },
 ];
 
 const galleryImages = [
-    "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80",
-    "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&q=80",
-    "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80",
-    "https://images.unsplash.com/photo-1484723051597-659c094ecef9?w=400&q=80",
-    "https://images.unsplash.com/photo-1529042410759-befb1204b468?w=400&q=80",
-    "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=400&q=80",
+  'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80',
+  'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&q=80',
+  'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80',
+  'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=400&q=80',
+  'https://images.unsplash.com/photo-1529042410759-befb1204b468?w=400&q=80',
+  'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=400&q=80',
 ];
 
 export const Footer = () => {
   return (
-    <footer className="bg-[#222222] text-neutral-400 font-sans">
+    <footer className="bg-[#222222] font-sans text-neutral-400">
       <div className="container mx-auto px-6 py-16">
-        {/* Main Footer Content */}
-        <div className="grid md:grid-cols-3 gap-12 text-center md:text-left">
-          
-          {/* Column 1: Latest News */}
+        <div className="grid gap-12 text-center md:grid-cols-3 md:text-left">
           <div className="flex flex-col items-center md:items-start">
-            <h3 className="text-sm font-bold tracking-widest text-white uppercase mb-4">Latest News</h3>
-            <p>For all the latest deals and app updates, follow us on Twitter: <a href="#" className="text-white hover:text-red-400 transition-colors">@CitySparkApp</a></p>
+            <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-white">
+              Latest News
+            </h3>
+            <p>
+              For all the latest deals and app updates, follow us on Twitter:{' '}
+              <a
+                href="#"
+                className="text-white transition-colors hover:text-red-400"
+              >
+                @CitySparkApp
+              </a>
+            </p>
           </div>
 
-          {/* Column 2: Logo and Contact Info */}
           <div className="flex flex-col items-center">
             <div className="mb-4">
               {/* Note: The original logo component is complex. For a dark background, a simpler one might be needed. */}
               {/* For now, we use the existing one. */}
               <Logo />
             </div>
-            <p className="max-w-xs text-center mb-4">
-                Your real-time guide to the best deals and hidden gems in your city.
+            <p className="mb-4 max-w-xs text-center">
+              Your real-time guide to the best deals and hidden gems in your
+              city.
             </p>
             <div className="text-center">
-                <p>+1 (234) 567-890</p>
-                <p>hello@cityspark.app</p>
-                <p>123 Spark Avenue, New York</p>
+              <p>+1 (234) 567-890</p>
+              <p>hello@cityspark.app</p>
+              <p>123 Spark Avenue, New York</p>
             </div>
-            <div className="flex justify-center gap-5 mt-6">
-                {socialLinks.map((link, index) => (
-                    <a key={index} href={link.href} className="text-neutral-400 hover:text-white transition-colors">
-                        {link.icon}
-                    </a>
-                ))}
+            <div className="mt-6 flex justify-center gap-5">
+              {socialLinks.map((link, index) => (
+                <a
+                  key={index}
+                  href={link.href}
+                  className="text-neutral-400 transition-colors hover:text-white"
+                >
+                  {link.icon}
+                </a>
+              ))}
             </div>
           </div>
 
-          {/* Column 3: Image Gallery */}
           <div className="flex flex-col items-center md:items-start">
-            <h3 className="text-sm font-bold tracking-widest text-white uppercase mb-4">Discover Your City</h3>
-            <div className="grid grid-cols-3 gap-2 w-full max-w-xs">
-                {galleryImages.map((src, index) => (
-                    <div key={index} className="aspect-square bg-neutral-700 overflow-hidden">
-                        <img src={src} alt={`Gallery image ${index + 1}`} className="w-full h-full object-cover" />
-                    </div>
-                ))}
+            <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-white">
+              Discover Your City
+            </h3>
+            <div className="grid w-full max-w-xs grid-cols-3 gap-2">
+              {galleryImages.map((src, index) => (
+                <div
+                  key={index}
+                  className="aspect-square overflow-hidden bg-neutral-700"
+                >
+                  <img
+                    src={src}
+                    alt={`Gallery image ${index + 1}`}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ))}
             </div>
           </div>
-
         </div>
       </div>
 
-      {/* Sub-Footer */}
       <div className="border-t border-neutral-700">
-          <div className="container mx-auto px-6 py-4">
-            <p className="text-center text-sm text-neutral-500">
-                © {new Date().getFullYear()} CitySpark. All Rights Reserved.
-            </p>
-          </div>
+        <div className="container mx-auto px-6 py-4">
+          <p className="text-center text-sm text-neutral-500">
+            © {new Date().getFullYear()} CitySpark. All Rights Reserved.
+          </p>
+        </div>
       </div>
     </footer>
   );

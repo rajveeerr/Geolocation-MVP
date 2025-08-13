@@ -5,9 +5,9 @@ import { PATHS } from '@/routing/paths';
 export const MerchantCtaSection = () => {
   return (
     <section className="w-full py-20 md:py-28">
-      <div className="container mx-auto max-w-5xl rounded-lg bg-neutral-surface p-10 text-center shadow-level-2 md:p-16">
+      <div className="bg-neutral-surface shadow-level-2 container mx-auto max-w-5xl rounded-lg p-10 text-center md:p-16">
         <h2 className="text-h2">Are You a Business Owner?</h2>
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-neutral-text-secondary">
+        <p className="text-neutral-text-secondary mx-auto mt-4 max-w-2xl text-lg">
           Turn passing foot traffic into loyal customers. CitySpark puts your
           business on the map, connecting you with a community of eager locals
           ready to discover you.
