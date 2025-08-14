@@ -61,7 +61,7 @@ interface DealFinderProps {
 
 export const DealFinder = ({ activeTab, onTabChange }: DealFinderProps) => {
   return (
-    <div className="mx-auto w-full max-w-4xl">
+    <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 lg:px-0">
       <div className="mb-2 flex justify-center">
         {tabs.map((tab) => (
           <button
@@ -79,45 +79,53 @@ export const DealFinder = ({ activeTab, onTabChange }: DealFinderProps) => {
         ))}
       </div>
 
-      <div className="flex w-full items-center gap-2 rounded-full border bg-white p-2 shadow-lg">
-        <div className="grid flex-1 grid-cols-1 divide-x divide-neutral-200 md:grid-cols-3">
-          <div className="p-2 pl-4">
-            <label htmlFor="where" className="block text-xs font-bold">
-              Where?
-            </label>
-            <Input
-              id="where"
-              type="text"
-              placeholder="Search destinations"
-              className="h-auto border-none p-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
-            />
+      <div className="w-full overflow-hidden rounded-2xl border bg-white shadow-lg sm:rounded-full">
+        <div className="flex flex-col sm:flex-row sm:items-center">
+          <div className="flex flex-1 flex-col divide divide-neutral-200 sm:grid sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+            <div className="p-4 sm:p-2 sm:pl-4">
+              <label htmlFor="where" className="block text-xs font-bold text-neutral-700">
+                Where?
+              </label>
+              <Input
+                id="where"
+                type="text"
+                placeholder="Search destinations"
+                className="mt-1 h-auto border-none bg-transparent p-0 text-sm placeholder:text-neutral-500 focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
+            </div>
+            <div className="p-4 sm:p-2 sm:pl-4">
+              <label htmlFor="when" className="block text-xs font-bold text-neutral-700">
+                When?
+              </label>
+              <Input
+                id="when"
+                type="text"
+                placeholder="Add dates"
+                className="mt-1 h-auto border-none bg-transparent p-0 text-sm placeholder:text-neutral-500 focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
+            </div>
+            <div className="p-4 sm:p-2 sm:pl-4">
+              <label htmlFor="who" className="block text-xs font-bold text-neutral-700">
+                Who?
+              </label>
+              <Input
+                id="who"
+                type="text"
+                placeholder="Add guests"
+                className="mt-1 h-auto border-none bg-transparent p-0 text-sm placeholder:text-neutral-500 focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
+            </div>
           </div>
-          <div className="p-2 pl-4">
-            <label htmlFor="when" className="block text-xs font-bold">
-              When?
-            </label>
-            <Input
-              id="when"
-              type="text"
-              placeholder="Add dates"
-              className="h-auto border-none p-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
-            />
-          </div>
-          <div className="p-2 pl-4">
-            <label htmlFor="who" className="block text-xs font-bold">
-              Who?
-            </label>
-            <Input
-              id="who"
-              type="text"
-              placeholder="Add guests"
-              className="h-auto border-none p-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
-            />
+          <div className="p-4 sm:p-2">
+            <Button 
+              size="lg" 
+              className="h-12 w-full rounded-xl sm:h-12 sm:w-12 sm:flex-shrink-0 sm:rounded-full sm:p-0"
+            >
+              <Search className="h-5 w-5" />
+              <span className="ml-2 sm:hidden">Search</span>
+            </Button>
           </div>
         </div>
-        <Button size="lg" className="h-12 w-12 flex-shrink-0 rounded-full p-0">
-          <Search className="h-5 w-5" />
-        </Button>
       </div>
     </div>
   );
