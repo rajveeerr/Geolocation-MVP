@@ -1,16 +1,8 @@
 // web/src/components/landing/DealCard.tsx
 
+import type { Deal } from '@/data/deals';
 import { Heart, MapPin, Star } from 'lucide-react';
 
-export interface Deal {
-  id: string;
-  name: string;
-  image: string;
-  rating: number;
-  category: string;
-  price: '$$' | '$$$' | '$';
-  location: string;
-}
 
 interface DealCardProps {
   deal: Deal;

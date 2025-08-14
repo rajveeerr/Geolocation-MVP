@@ -217,7 +217,7 @@ export const Header = () => {
   const closeSearchModal = () => setIsSearchModalOpen(false);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 30);
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -227,19 +227,22 @@ export const Header = () => {
     animate: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] },
+      transition: { duration: 0.3, ease: "easeInOut" },
     },
     exit: {
       opacity: 0,
       y: -20,
-      transition: { duration: 0.2, ease: [0.4, 0, 0.2, 1] },
+      transition: { duration: 0.2, ease: "easeInOut" },
     },
   };
 
   return (
     <>
-      <header
+      {/* <header
         className={`fixed top-0 z-40 w-full border-b border-neutral-200/70 bg-white/80 backdrop-blur-lg transition-colors duration-300`}
+      > */}
+      <header
+        className={`fixed top-0 z-40 w-full bg-white/95 border-b border-neutral-200/80 backdrop-blur-lg`}
       >
         <div className="container mx-auto flex h-20 max-w-screen-xl items-center justify-between px-6 lg:grid lg:grid-cols-3">
           <div className="flex justify-start">

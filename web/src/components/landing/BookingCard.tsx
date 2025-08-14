@@ -1,6 +1,6 @@
 // web/src/components/landing/BookingCard.tsx
 
-import type { Deal } from './DealCard';
+import type { Deal } from '@/data/deals';
 import { Heart, MapPin, Star } from 'lucide-react';
 
 interface BookingCardProps {

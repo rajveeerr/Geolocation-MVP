@@ -1,9 +1,10 @@
 // web/src/components/landing/DealColumn.tsx
 
 import { Link } from 'react-router-dom';
-import { DealCard, type Deal } from './DealCard';
+import { DealCard } from './DealCard';
 import { Button } from '@/components/common/Button';
 import { PATHS } from '@/routing/paths';
+import type { Deal } from '@/data/deals';
 
 interface DealColumnProps {
   title: string;

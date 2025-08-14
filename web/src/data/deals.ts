@@ -1,36 +1,98 @@
-// web/src/data/deals.ts
-import type { Deal } from '@/components/landing/DealCard';
+export interface Deal {
+  id: string;
+  name: string;
+  image: string;
+  rating: number;
+  category: string;
+  price: '$$' | '$$$' | '$';
+  location: string;
+  tag?: string; 
+}
+
+export const experiencesData: Deal[] = [
+    {
+        id: 'exp1',
+        name: 'Create seasonal ikebana with Watara Toru',
+        image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500&q=80', // Ikebana/flowers
+        rating: 5.0,
+        category: 'Workshop',
+        price: '$$',
+        location: 'Kamakura, Japan',
+    },
+    {
+        id: 'exp2',
+        name: 'Hit the ice with Paralympian Andrea Macrì',
+        image: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=500&q=80', // Ice skating
+        rating: 4.9,
+        category: 'Sports',
+        price: '$$$',
+        location: 'Turin, Italy',
+        },
+        {
+        id: 'exp3',
+        name: 'Indulge in sushi and sound at a Lautner house',
+        image: 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80', // Sushi
+        rating: 4.8,
+        category: 'Music & Food',
+        price: '$$$',
+        location: 'Los Angeles, United States',
+        },
+        {
+        id: 'exp4',
+        name: 'Stylish vintage car photo shoot Tour',
+        image: 'https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?w=500&q=80', // Vintage car
+        rating: 5.0,
+        category: 'Photography',
+        price: '$$',
+        location: 'Rome, Italy',
+    },
+    {
+        id: 'exp5',
+        name: 'Neapolitan memories of Giovanni',
+        image: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=500&q=80', // Naples/Italy
+        rating: 5.0,
+        category: 'Photo Shoot',
+        price: '$$',
+        location: 'Fort Lauderdale, United States',
+    },
+    {
+        id: 'exp6',
+        name: 'Authentic, inclusive photography by Ashley',
+        image: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=500&q=80', // Portrait photography
+        rating: 5.0,
+        category: 'Photography',
+        price: '$$',
+        location: 'Saint Paul, United States',
+    },
+];
+
 
 export const happyHourDeals: Deal[] = [
   {
     id: 'hh1',
     name: 'Brat House',
-    image:
-      'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80',
-    rating: 3.7,
-    category: 'Indian',
-    price: '$',
-    location: 'Rajinder Nagar',
+    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80',
+    rating: 3.7, category: 'Indian', price: '$', location: 'Rajinder Nagar',
+    tag: 'Happy Hour Special',
   },
   {
     id: 'hh2',
     name: 'Xpose Lounge',
-    image:
-      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80',
-    rating: 4.2,
-    category: 'Indian',
-    price: '$$',
-    location: 'Netaji Subhash Place',
+    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80',
+    rating: 4.2, category: 'Indian', price: '$$', location: 'Netaji Subhash Place',
   },
   {
     id: 'hh3',
     name: 'Yo! China',
-    image:
-      'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=400&q=80',
-    rating: 3.9,
-    category: 'Indian',
-    price: '$',
-    location: 'Janakpuri',
+    image: 'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=400&q=80',
+    rating: 3.9, category: 'Indian', price: '$', location: 'Janakpuri',
+  },
+  {
+    id: 'hh4',
+    name: 'The Passenger\'s Bar',
+    image: 'https://images.unsplash.com/photo-1543007631-283050bb3e8c?w=500&q=80',
+    rating: 2.9, category: 'Bar', price: '$$', location: 'Kailash Colony',
+    tag: 'Live Music',
   },
 ];
 
@@ -38,32 +100,28 @@ export const topRatedDeals: Deal[] = [
   {
     id: 'tr1',
     name: 'You Mee - Greater Kailash',
-    image:
-      'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&q=80',
-    rating: 4.5,
-    category: 'Indian',
-    price: '$',
-    location: 'Greater Kailash',
+    image: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&q=80',
+    rating: 4.5, category: 'Indian', price: '$', location: 'Greater Kailash',
+    tag: 'Guest Favourite',
   },
   {
     id: 'tr2',
     name: 'The Belgian Waffle Co',
-    image:
-      'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=400&q=80',
-    rating: 3.7,
-    category: 'Indian',
-    price: '$',
-    location: 'Tagore Garden',
+    image: 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
+    rating: 3.7, category: 'Desserts', price: '$', location: 'Tagore Garden',
   },
   {
     id: 'tr3',
     name: 'Thyme - The Umrao',
-    image:
-      'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&q=80',
-    rating: 4.0,
-    category: 'Indian',
-    price: '$$',
-    location: 'Kapashera',
+    image: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&q=80',
+    rating: 4.0, category: 'Indian', price: '$$', location: 'Kapashera',
+  },
+  {
+    id: 'tr4',
+    name: 'Echoes Living Room',
+    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&q=80',
+    rating: 4.6, category: 'Lounge', price: '$$$', location: 'GTB Nagar',
+    tag: 'Guest Favourite',
   },
 ];
 

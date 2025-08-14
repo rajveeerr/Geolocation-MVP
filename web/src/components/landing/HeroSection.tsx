@@ -33,7 +33,6 @@
 
 // web/src/components/landing/HeroSection.tsx
 
-import { DealFinder } from './DealFinder';
 import { motion } from 'framer-motion';
 
 export const HeroSection = () => {
@@ -60,7 +59,7 @@ export const HeroSection = () => {
           Find your next favorite spot
         </h1>
 
-        <DealFinder />
+        {/* <DealFinder /> */}
       </motion.div>
     </section>
   );
