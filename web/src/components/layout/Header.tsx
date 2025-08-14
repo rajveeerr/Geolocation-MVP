@@ -274,12 +274,8 @@ export const Header = () => {
         {/* Mobile Menu Panel */}
         <AnimatePresence>
           {isMobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="absolute top-0 inset-x-0 p-2 transition origin-top-right lg:hidden"
+            <div              
+              className="absolute top-0 inset-x-0 p-2 transition origin-top-right lg:hidden z-50"
             >
               <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white divide-y-2 divide-gray-50">
                 <div className="px-5 pt-5 pb-6">
@@ -326,7 +322,7 @@ export const Header = () => {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           )}
         </AnimatePresence>
       </header>
