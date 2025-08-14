@@ -1,4 +1,3 @@
-// web/src/components/landing/DealResultCard.tsx
 import { motion } from 'framer-motion';
 import { Heart, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';

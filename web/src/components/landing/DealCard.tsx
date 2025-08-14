@@ -3,7 +3,6 @@
 import type { Deal } from '@/data/deals';
 import { Heart, MapPin, Star } from 'lucide-react';
 
-
 interface DealCardProps {
   deal: Deal;
 }

@@ -227,12 +227,12 @@ export const Header = () => {
     animate: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.3, ease: "easeInOut" },
+      transition: { duration: 0.3, ease: 'easeInOut' },
     },
     exit: {
       opacity: 0,
       y: -20,
-      transition: { duration: 0.2, ease: "easeInOut" },
+      transition: { duration: 0.2, ease: 'easeInOut' },
     },
   };
 
@@ -242,7 +242,7 @@ export const Header = () => {
         className={`fixed top-0 z-40 w-full border-b border-neutral-200/70 bg-white/80 backdrop-blur-lg transition-colors duration-300`}
       > */}
       <header
-        className={`fixed top-0 z-40 w-full bg-white/95 border-b border-neutral-200/80 backdrop-blur-lg`}
+        className={`fixed top-0 z-40 w-full border-b border-neutral-200/80 bg-white/95 backdrop-blur-lg`}
       >
         <div className="container mx-auto flex h-20 max-w-screen-xl items-center justify-between px-6 lg:grid lg:grid-cols-3">
           <div className="flex justify-start">
@@ -341,11 +341,14 @@ export const Header = () => {
                 </div>
                 <div className="space-y-6 px-5 py-6">
                   <div>
-                    <Link
-                      to={PATHS.LOGIN}
-                      className="flex w-full items-center justify-center rounded-md border border-transparent bg-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-primary/90"
-                    >
-                      Sign up / Log in
+                    <Link to={PATHS.LOGIN} className='flex w-full items-center justify-center'>
+                      <Button
+                        variant="primary"
+                        size="md"
+                        className="rounded-full"
+                      >
+                        Sign up / Log in
+                      </Button>
                     </Link>
                     <p className="mt-6 text-center text-base font-medium text-gray-500">
                       Are you a business owner?{' '}

@@ -2,7 +2,7 @@
 import { ArrowLeft, SlidersHorizontal } from 'lucide-react';
 import { DealResultCard } from './DealResultCard';
 import type { DealWithLocation } from '@/data/deals';
-import { useNavigate } from 'react-router-dom'; // <-- THE FIX: Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 interface DealResultsListProps {
   deals: DealWithLocation[];
@@ -15,7 +15,7 @@ export const DealResultsList = ({
   hoveredDealId,
   setHoveredDealId,
 }: DealResultsListProps) => {
-  const navigate = useNavigate(); // <-- THE FIX: Initialize the navigate function
+  const navigate = useNavigate();
 
   return (
     <div className="pr-4">

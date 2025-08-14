@@ -38,7 +38,6 @@
 //   );
 // };
 
-
 // web/src/components/landing/DealFinder.tsx
 
 import { Input } from '@/components/ui/input';
@@ -47,11 +46,14 @@ import { Search, MapPin, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const tabs = [
-  { id: 'deals', label: 'Deals', icon: <MapPin className="w-5 h-5 mr-2" /> },
-  { id: 'experiences', label: 'Experiences', icon: <Briefcase className="w-5 h-5 mr-2" /> },
+  { id: 'deals', label: 'Deals', icon: <MapPin className="mr-2 h-5 w-5" /> },
+  {
+    id: 'experiences',
+    label: 'Experiences',
+    icon: <Briefcase className="mr-2 h-5 w-5" />,
+  },
 ];
 
-// --- THE FIX: Props for state management ---
 interface DealFinderProps {
   activeTab: string;
   onTabChange: (tabId: string) => void;
@@ -59,16 +61,17 @@ interface DealFinderProps {
 
 export const DealFinder = ({ activeTab, onTabChange }: DealFinderProps) => {
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      {/* Tab Navigation */}
-      <div className="flex justify-center mb-2">
-        {tabs.map(tab => (
+    <div className="mx-auto w-full max-w-4xl">
+      <div className="mb-2 flex justify-center">
+        {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => onTabChange(tab.id)} // Use the passed-in function
+            onClick={() => onTabChange(tab.id)}
             className={cn(
-              "px-4 py-3 flex items-center font-semibold text-neutral-600 border-b-2 transition-all",
-              activeTab === tab.id ? 'border-primary text-primary' : 'border-transparent hover:border-neutral-300'
+              'flex items-center border-b-2 px-4 py-3 font-semibold text-neutral-600 transition-all',
+              activeTab === tab.id
+                ? 'border-primary text-primary'
+                : 'border-transparent hover:border-neutral-300',
             )}
           >
             {tab.icon} {tab.label}
@@ -76,22 +79,41 @@ export const DealFinder = ({ activeTab, onTabChange }: DealFinderProps) => {
         ))}
       </div>
 
-      {/* Search Bar */}
-      <div className="flex items-center gap-2 rounded-full border bg-white p-2 shadow-lg w-full">
-        {/* ... (Search Bar JSX remains the same) ... */}
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-3 divide-x divide-neutral-200">
-            <div className="p-2 pl-4">
-                <label htmlFor="where" className="text-xs font-bold block">Where?</label>
-                <Input id="where" type="text" placeholder="Search destinations" className="border-none h-auto p-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0" />
-            </div>
-            <div className="p-2 pl-4">
-                <label htmlFor="when" className="text-xs font-bold block">When?</label>
-                <Input id="when" type="text" placeholder="Add dates" className="border-none h-auto p-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0" />
-            </div>
-            <div className="p-2 pl-4">
-                <label htmlFor="who" className="text-xs font-bold block">Who?</label>
-                <Input id="who" type="text" placeholder="Add guests" className="border-none h-auto p-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0" />
-            </div>
+      <div className="flex w-full items-center gap-2 rounded-full border bg-white p-2 shadow-lg">
+        <div className="grid flex-1 grid-cols-1 divide-x divide-neutral-200 md:grid-cols-3">
+          <div className="p-2 pl-4">
+            <label htmlFor="where" className="block text-xs font-bold">
+              Where?
+            </label>
+            <Input
+              id="where"
+              type="text"
+              placeholder="Search destinations"
+              className="h-auto border-none p-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+          </div>
+          <div className="p-2 pl-4">
+            <label htmlFor="when" className="block text-xs font-bold">
+              When?
+            </label>
+            <Input
+              id="when"
+              type="text"
+              placeholder="Add dates"
+              className="h-auto border-none p-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+          </div>
+          <div className="p-2 pl-4">
+            <label htmlFor="who" className="block text-xs font-bold">
+              Who?
+            </label>
+            <Input
+              id="who"
+              type="text"
+              placeholder="Add guests"
+              className="h-auto border-none p-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+          </div>
         </div>
         <Button size="lg" className="h-12 w-12 flex-shrink-0 rounded-full p-0">
           <Search className="h-5 w-5" />
