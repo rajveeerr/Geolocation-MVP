@@ -21,8 +21,9 @@ import { SectionDivider } from '@/components/common/SectionDivider';
 
 import { topRatedDeals, happyHourDeals, experiencesData } from '@/data/deals';
 import { AnimatePresence } from 'framer-motion';
-import { ContentCarousel } from '@/components/landing/ContentCarousel';
+
 import { DiscoverSection } from '@/components/landing/DiscoverSection';
+import { ContentCarousel } from '@/components/common/ContentCarousel';
 
 export const HomePage = () => {
   const [activeTab, setActiveTab] = useState('deals');
