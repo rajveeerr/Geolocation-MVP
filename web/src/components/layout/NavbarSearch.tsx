@@ -25,8 +25,8 @@ export const NavbarSearch = ({ onClick }: NavbarSearchProps) => {
             <p className="text-sm text-neutral-500">Add guests</p>
           </div>
         </div>
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary">
-          <Search className="h-4 w-4 text-primary-foreground" />
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-brand-primary-400 to-brand-primary-600 shadow-md hover:from-brand-primary-500 hover:to-brand-primary-700 hover:shadow-lg transition-all duration-200">
+          <Search className="h-4 w-4 text-white" />
         </div>
       </div>
     </button>
