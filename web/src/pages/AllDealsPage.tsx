@@ -39,24 +39,28 @@ export const AllDealsPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-50/50 pt-20">
-      {/* Consistent grid layout with premium styling */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 xl:grid-cols-3 min-h-[calc(100vh-5rem)]">
-        
-        {/* Left Column: Premium Sidebar */}
-        <div className="lg:col-span-2 xl:col-span-1 h-[calc(100vh-5rem)] border-r border-neutral-200/80 bg-white/80 backdrop-blur-sm shadow-sm">
-          <DealsSidebar 
-            deals={allDeals}
-            hoveredDealId={hoveredDealId}
-            setHoveredDealId={setHoveredDealId}
-          />
-        </div>
+      {/* Full-width responsive layout with smart containers */}
+      <div className="w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[calc(100vh-5rem)]">
+          
+          {/* Left Column: Responsive Sidebar with container */}
+          <div className="lg:col-span-5 xl:col-span-4 2xl:col-span-3 border-r border-neutral-200/80 bg-white/80 backdrop-blur-sm shadow-sm">
+            <div className="h-max lg:h-screen overflow-hidden">
+              <DealsSidebar 
+                deals={allDeals}
+                hoveredDealId={hoveredDealId}
+                setHoveredDealId={setHoveredDealId}
+              />
+            </div>
+          </div>
 
-        {/* Right Column: Map with consistent styling */}
-        <div className="hidden lg:block lg:col-span-3 xl:col-span-2 h-[calc(100vh-5rem)] relative bg-neutral-100/30">
-          <DealResultsMap 
-            deals={allDeals}
-            hoveredDealId={hoveredDealId}
-          />
+          {/* Right Column: Full-width Map */}
+          <div className="hidden lg:block lg:col-span-7 xl:col-span-8 2xl:col-span-9 h-[calc(100vh-5rem)] relative bg-neutral-100/30">
+            <DealResultsMap 
+              deals={allDeals}
+              hoveredDealId={hoveredDealId}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -29,9 +29,9 @@ export const HomePage = () => {
   const [activeTab, setActiveTab] = useState('deals');
 
   return (
-    <div className="bg-white pt-20">
-      <section className="border-b border-neutral-200 bg-white pb-4 pt-8">
-        <div className="container mx-auto px-4">
+    <div className="bg-white pt-16 sm:pt-20">
+      <section className="border-b border-neutral-200 bg-white pb-3 sm:pb-4 pt-4 sm:pt-6 lg:pt-8">
+        <div className="container mx-auto px-3 sm:px-4 lg:px-6">
           <DealFinder activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
       </section>

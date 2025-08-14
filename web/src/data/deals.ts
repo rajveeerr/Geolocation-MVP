@@ -108,12 +108,22 @@ export const happyHourDeals: Deal[] = [
     id: 'hh4',
     name: "The Passenger's Bar",
     image:
-      'https://images.unsplash.com/photo-1543007631-283050bb3e8c?w=500&q=80',
+    'https://images.unsplash.com/photo-1543007631-283050bb3e8c?w=500&q=80',
     rating: 2.9,
     category: 'Bar',
     price: '$$',
     location: 'Kailash Colony',
     tag: 'Live Music',
+  },
+  {
+    id: 'hh5',
+    name: 'Yo! China',
+    image:
+      'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=400&q=80',
+    rating: 3.9,
+    category: 'Indian',
+    price: '$',
+    location: 'Janakpuri',
   },
 ];
 
@@ -160,6 +170,16 @@ export const topRatedDeals: Deal[] = [
     location: 'GTB Nagar',
     tag: 'Guest Favourite',
   },
+  {
+    id: 'tr5',
+    name: 'The Belgian Waffle Co',
+    image:
+      'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
+    rating: 3.7,
+    category: 'Desserts',
+    price: '$',
+    location: 'Tagore Garden',
+  }
 ];
 
 export const newDeals: Deal[] = [

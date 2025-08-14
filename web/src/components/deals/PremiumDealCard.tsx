@@ -59,7 +59,7 @@ export const PremiumDealCard = ({
       transition={{ duration: 0.2 }}
     >
       {/* Image Carousel Section */}
-      <div className="relative h-56 overflow-hidden bg-neutral-100">
+      <div className="relative h-40 sm:h-44 md:h-48 lg:h-56 overflow-hidden bg-neutral-100">
         {/* Images */}
         <div className="relative h-full w-full">
           {images.map((image, index) => (
@@ -76,31 +76,31 @@ export const PremiumDealCard = ({
         </div>
         
         {/* Navigation Buttons */}
-        <div className="absolute inset-0 flex items-center justify-between p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <div className="absolute inset-0 flex items-center justify-between p-2 sm:p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <button
             onClick={prevImage}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white transition-all"
+            className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white transition-all"
           >
-            <ChevronLeft className="h-4 w-4 text-neutral-700" />
+            <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-neutral-700" />
           </button>
           <button
             onClick={nextImage}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white transition-all"
+            className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white transition-all"
           >
-            <ChevronRight className="h-4 w-4 text-neutral-700" />
+            <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-neutral-700" />
           </button>
         </div>
 
         {/* Image Indicators */}
-        <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+        <div className="absolute bottom-2 sm:bottom-3 left-1/2 flex -translate-x-1/2 gap-1">
           {images.map((_, index) => (
             <button
               key={index}
               onClick={() => goToImage(index)}
               className={cn(
-                "h-1.5 w-1.5 rounded-full transition-all duration-200",
+                "h-1 w-1 sm:h-1.5 sm:w-1.5 rounded-full transition-all duration-200",
                 index === currentImageIndex 
-                  ? "bg-white w-6" 
+                  ? "bg-white w-4 sm:w-6" 
                   : "bg-white/60 hover:bg-white/80"
               )}
             />
@@ -113,20 +113,20 @@ export const PremiumDealCard = ({
             e.stopPropagation();
             setIsLiked(!isLiked);
           }}
-          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-lg transition-all hover:bg-white hover:scale-110"
+          className="absolute right-2 sm:right-3 top-2 sm:top-3 flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-lg transition-all hover:bg-white hover:scale-110"
         >
           <Heart 
             className={cn(
-              "h-4 w-4 transition-colors",
+              "h-3.5 w-3.5 sm:h-4 sm:w-4 transition-colors",
               isLiked ? "fill-red-500 text-red-500" : "text-neutral-600"
             )} 
           />
         </button>
 
         {/* Status Badge */}
-        <div className="absolute left-3 top-3">
+        <div className="absolute left-2 sm:left-3 top-2 sm:top-3">
           <span className={cn(
-            "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold backdrop-blur-sm border",
+            "inline-flex items-center px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-xs font-semibold backdrop-blur-sm border",
             isOpen 
               ? "bg-green-100/80 text-green-700 border-green-200/80" 
               : "bg-red-100/80 text-red-700 border-red-200/80"
@@ -137,48 +137,48 @@ export const PremiumDealCard = ({
       </div>
 
       {/* Content Section */}
-      <div className="p-5">
+      <div className="p-3 sm:p-4 lg:p-5">
         {/* Header */}
-        <div className="mb-3">
-          <div className="mb-2 flex items-start justify-between">
-            <h3 className="text-lg font-bold text-neutral-900 leading-tight pr-2 line-clamp-2">
+        <div className="mb-2 sm:mb-3">
+          <div className="mb-1 sm:mb-2 flex items-start justify-between">
+            <h3 className="text-base sm:text-lg font-bold text-neutral-900 leading-tight pr-2 line-clamp-2">
               {deal.name}
             </h3>
-            <div className="flex items-center gap-1 rounded-lg bg-amber-50 px-2.5 py-1 border border-amber-100">
-              <Star className="h-3.5 w-3.5 text-amber-500 fill-current" />
-              <span className="text-sm font-semibold text-amber-700">{deal.rating}</span>
+            <div className="flex items-center gap-1 rounded-lg bg-amber-50 px-2 sm:px-2.5 py-0.5 sm:py-1 border border-amber-100 flex-shrink-0">
+              <Star className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-500 fill-current" />
+              <span className="text-xs sm:text-sm font-semibold text-amber-700">{deal.rating}</span>
             </div>
           </div>
           
-          <p className="text-sm font-medium text-neutral-600 mb-1">{deal.category}</p>
-          <div className="flex items-center gap-1 text-sm text-neutral-500">
-            <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+          <p className="text-xs sm:text-sm font-medium text-neutral-600 mb-1">{deal.category}</p>
+          <div className="flex items-center gap-1 text-xs sm:text-sm text-neutral-500">
+            <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
             <span className="truncate">{deal.location}</span>
           </div>
         </div>
 
         {/* Details Section */}
-        <div className="mb-4 space-y-2">
-          <div className="flex items-center gap-4 text-sm text-neutral-600">
+        <div className="mb-3 sm:mb-4 space-y-1 sm:space-y-2">
+          <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-neutral-600">
             <div className="flex items-center gap-1">
-              <Clock className="h-3.5 w-3.5" />
+              <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               <span>5-10 min</span>
             </div>
             <div className="flex items-center gap-1">
-              <Users className="h-3.5 w-3.5" />
+              <Users className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               <span>2-8 people</span>
             </div>
           </div>
         </div>
 
         {/* Deal Highlight */}
-        <div className="mb-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 p-3 border border-green-100">
+        <div className="mb-3 sm:mb-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 p-2.5 sm:p-3 border border-green-100">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-sm font-semibold text-green-700">Deal Available</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-xs sm:text-sm font-semibold text-green-700">Deal Available</span>
             </div>
-            <span className="text-lg font-bold text-primary">{deal.price}</span>
+            <span className="text-base sm:text-lg font-bold text-primary">{deal.price}</span>
           </div>
           <p className="text-xs text-green-600 mt-1">Save up to 30% on your visit</p>
         </div>
@@ -186,8 +186,8 @@ export const PremiumDealCard = ({
         {/* Action Button */}
         <Button 
           variant="primary" 
-          size="md" 
-          className="w-full rounded-xl font-semibold"
+          size="sm" 
+          className="w-full rounded-xl font-semibold text-sm sm:text-base h-9 sm:h-10"
           onClick={(e) => e.stopPropagation()}
         >
           View Deal
