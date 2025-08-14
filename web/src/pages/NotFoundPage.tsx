@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 
 export const NotFoundPage = () => {
   return (
-    <div className="from-brand-primary-light flex min-h-screen items-center justify-center bg-gradient-to-b via-blue-50 to-white px-4 py-24 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-brand-primary-light via-blue-50 to-white px-4 py-24 sm:px-6 lg:px-8">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute bottom-0 left-[4%] top-0 w-0.5 bg-blue-200/40"></div>
         <div className="absolute bottom-0 right-[4%] top-0 w-0.5 bg-blue-200/40"></div>
@@ -22,7 +22,7 @@ export const NotFoundPage = () => {
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          className="bg-brand-primary-200 absolute left-4 top-20 h-12 w-12 rounded-full opacity-60 sm:left-10 sm:h-16 sm:w-16"
+          className="absolute left-4 top-20 h-12 w-12 rounded-full bg-brand-primary-200 opacity-60 sm:left-10 sm:h-16 sm:w-16"
         />
         <motion.div
           animate={{
@@ -48,7 +48,7 @@ export const NotFoundPage = () => {
             ease: 'easeInOut',
             delay: 2,
           }}
-          className="bg-brand-primary-200 absolute bottom-32 left-8 h-6 w-6 rounded-full opacity-40 sm:left-20 sm:h-8 sm:w-8"
+          className="absolute bottom-32 left-8 h-6 w-6 rounded-full bg-brand-primary-200 opacity-40 sm:left-20 sm:h-8 sm:w-8"
         />
       </div>
 
@@ -72,7 +72,7 @@ export const NotFoundPage = () => {
               }}
               className="absolute inset-0 flex items-center justify-center"
             >
-              <div className="text-brand-primary-500 scale-[2.5] transform sm:scale-[3] md:scale-[4]">
+              <div className="scale-[2.5] transform text-brand-primary-500 sm:scale-[3] md:scale-[4]">
                 <svg
                   viewBox="0 0 24 24"
                   className="h-12 w-12 sm:h-16 sm:w-16"
@@ -81,8 +81,8 @@ export const NotFoundPage = () => {
                   <path d="M12 2L13.09 8.26L19 7L14.74 12L19 17L13.09 15.74L12 22L10.91 15.74L5 17L9.26 12L5 7L10.91 8.26L12 2Z" />
                 </svg>
 
-                <div className="bg-brand-primary-400 absolute -bottom-6 left-1/2 h-12 w-24 -translate-x-1/2 transform rounded-full opacity-30 blur-xl sm:-bottom-8 sm:h-16 sm:w-32"></div>
-                <div className="w-18 bg-brand-primary-300 absolute -bottom-3 left-1/2 h-6 -translate-x-1/2 transform rounded-full opacity-50 blur-lg sm:-bottom-4 sm:h-8 sm:w-24"></div>
+                <div className="absolute -bottom-6 left-1/2 h-12 w-24 -translate-x-1/2 transform rounded-full bg-brand-primary-400 opacity-30 blur-xl sm:-bottom-8 sm:h-16 sm:w-32"></div>
+                <div className="w-18 absolute -bottom-3 left-1/2 h-6 -translate-x-1/2 transform rounded-full bg-brand-primary-300 opacity-50 blur-lg sm:-bottom-4 sm:h-8 sm:w-24"></div>
               </div>
             </motion.div>
 
@@ -96,7 +96,7 @@ export const NotFoundPage = () => {
                 repeat: Infinity,
                 ease: 'easeInOut',
               }}
-              className="bg-brand-primary-400 absolute left-2 top-2 h-1.5 w-1.5 rounded-full sm:left-4 sm:top-4 sm:h-2 sm:w-2"
+              className="absolute left-2 top-2 h-1.5 w-1.5 rounded-full bg-brand-primary-400 sm:left-4 sm:top-4 sm:h-2 sm:w-2"
             />
             <motion.div
               animate={{
@@ -188,8 +188,8 @@ export const NotFoundPage = () => {
             className="border-neutral-border/20 group rounded-xl border bg-white/60 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/80 hover:shadow-lg"
           >
             <div className="mb-3 flex items-center gap-3">
-              <div className="bg-brand-primary-100 group-hover:bg-brand-primary-200 flex h-10 w-10 items-center justify-center rounded-lg transition-colors">
-                <Home className="text-brand-primary-600 h-5 w-5" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary-100 transition-colors group-hover:bg-brand-primary-200">
+                <Home className="h-5 w-5 text-brand-primary-600" />
               </div>
               <div className="text-left">
                 <h3 className="text-neutral-text-primary font-semibold">

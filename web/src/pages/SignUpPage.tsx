@@ -43,11 +43,11 @@ export const SignUpPage = () => {
   };
 
   return (
-    <div className="from-brand-primary-light via-brand-primary-50 flex min-h-screen items-center justify-center bg-gradient-to-b to-white px-4 py-24 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-brand-primary-light via-brand-primary-50 to-white px-4 py-24 sm:px-6 lg:px-8">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="bg-brand-primary-200/40 absolute bottom-0 left-[4%] top-0 w-0.5"></div>
-        <div className="bg-brand-primary-200/40 absolute bottom-0 right-[4%] top-0 w-0.5"></div>
-        <div className="bg-brand-primary-200/40 absolute left-0 right-0 top-[10%] h-0.5"></div>
+        <div className="absolute bottom-0 left-[4%] top-0 w-0.5 bg-brand-primary-200/40"></div>
+        <div className="absolute bottom-0 right-[4%] top-0 w-0.5 bg-brand-primary-200/40"></div>
+        <div className="absolute left-0 right-0 top-[10%] h-0.5 bg-brand-primary-200/40"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-md">
@@ -89,12 +89,12 @@ export const SignUpPage = () => {
                       <FormControl>
                         <div className="relative">
                           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                            <User className="text-brand-primary-500 h-5 w-5" />
+                            <User className="h-5 w-5 text-brand-primary-500" />
                           </div>
                           <Input
                             placeholder="First name"
                             {...field}
-                            className="border-neutral-border focus:border-brand-primary-main focus:ring-brand-primary-main/50 w-full rounded-lg border bg-white/50 py-3 pl-10 pr-4 backdrop-blur-sm transition-colors focus:ring-2"
+                            className="border-neutral-border w-full rounded-lg border bg-white/50 py-3 pl-10 pr-4 backdrop-blur-sm transition-colors focus:border-brand-primary-main focus:ring-2 focus:ring-brand-primary-main/50"
                           />
                         </div>
                       </FormControl>
@@ -113,12 +113,12 @@ export const SignUpPage = () => {
                       <FormControl>
                         <div className="relative">
                           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                            <User className="text-brand-primary-500 h-5 w-5" />
+                            <User className="h-5 w-5 text-brand-primary-500" />
                           </div>
                           <Input
                             placeholder="Last name"
                             {...field}
-                            className="border-neutral-border focus:border-brand-primary-main focus:ring-brand-primary-main/50 w-full rounded-lg border bg-white/50 py-3 pl-10 pr-4 backdrop-blur-sm transition-colors focus:ring-2"
+                            className="border-neutral-border w-full rounded-lg border bg-white/50 py-3 pl-10 pr-4 backdrop-blur-sm transition-colors focus:border-brand-primary-main focus:ring-2 focus:ring-brand-primary-main/50"
                           />
                         </div>
                       </FormControl>
@@ -139,13 +139,13 @@ export const SignUpPage = () => {
                     <FormControl>
                       <div className="relative">
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                          <Mail className="text-brand-primary-500 h-5 w-5" />
+                          <Mail className="h-5 w-5 text-brand-primary-500" />
                         </div>
                         <Input
                           type="email"
                           placeholder="Enter your email"
                           {...field}
-                          className="border-neutral-border focus:border-brand-primary-main focus:ring-brand-primary-main/50 w-full rounded-lg border bg-white/50 py-3 pl-10 pr-4 backdrop-blur-sm transition-colors focus:ring-2"
+                          className="border-neutral-border w-full rounded-lg border bg-white/50 py-3 pl-10 pr-4 backdrop-blur-sm transition-colors focus:border-brand-primary-main focus:ring-2 focus:ring-brand-primary-main/50"
                         />
                       </div>
                     </FormControl>
@@ -164,13 +164,13 @@ export const SignUpPage = () => {
                     <FormControl>
                       <div className="relative">
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                          <Phone className="text-brand-primary-500 h-5 w-5" />
+                          <Phone className="h-5 w-5 text-brand-primary-500" />
                         </div>
                         <Input
                           type="tel"
                           placeholder="Enter your phone number"
                           {...field}
-                          className="border-neutral-border focus:border-brand-primary-main focus:ring-brand-primary-main/50 w-full rounded-lg border bg-white/50 py-3 pl-10 pr-4 backdrop-blur-sm transition-colors focus:ring-2"
+                          className="border-neutral-border w-full rounded-lg border bg-white/50 py-3 pl-10 pr-4 backdrop-blur-sm transition-colors focus:border-brand-primary-main focus:ring-2 focus:ring-brand-primary-main/50"
                         />
                       </div>
                     </FormControl>
@@ -190,13 +190,13 @@ export const SignUpPage = () => {
                     <FormControl>
                       <div className="relative">
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                          <Lock className="text-brand-primary-500 h-5 w-5" />
+                          <Lock className="h-5 w-5 text-brand-primary-500" />
                         </div>
                         <Input
                           type={showPassword ? 'text' : 'password'}
                           placeholder="Create a password"
                           {...field}
-                          className="border-neutral-border focus:border-brand-primary-main focus:ring-brand-primary-main/50 w-full rounded-lg border bg-white/50 py-3 pl-10 pr-12 backdrop-blur-sm transition-colors focus:ring-2"
+                          className="border-neutral-border w-full rounded-lg border bg-white/50 py-3 pl-10 pr-12 backdrop-blur-sm transition-colors focus:border-brand-primary-main focus:ring-2 focus:ring-brand-primary-main/50"
                         />
                         <button
                           type="button"
@@ -204,9 +204,9 @@ export const SignUpPage = () => {
                           className="absolute inset-y-0 right-0 flex items-center pr-3"
                         >
                           {showPassword ? (
-                            <EyeOff className="text-brand-primary-400 hover:text-brand-primary-600 h-5 w-5" />
+                            <EyeOff className="h-5 w-5 text-brand-primary-400 hover:text-brand-primary-600" />
                           ) : (
-                            <Eye className="text-brand-primary-400 hover:text-brand-primary-600 h-5 w-5" />
+                            <Eye className="h-5 w-5 text-brand-primary-400 hover:text-brand-primary-600" />
                           )}
                         </button>
                       </div>
@@ -231,13 +231,13 @@ export const SignUpPage = () => {
                     <FormControl>
                       <div className="relative">
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                          <Lock className="text-brand-primary-500 h-5 w-5" />
+                          <Lock className="h-5 w-5 text-brand-primary-500" />
                         </div>
                         <Input
                           type={showConfirmPassword ? 'text' : 'password'}
                           placeholder="Confirm your password"
                           {...field}
-                          className="border-neutral-border focus:border-brand-primary-main focus:ring-brand-primary-main/50 w-full rounded-lg border bg-white/50 py-3 pl-10 pr-12 backdrop-blur-sm transition-colors focus:ring-2"
+                          className="border-neutral-border w-full rounded-lg border bg-white/50 py-3 pl-10 pr-12 backdrop-blur-sm transition-colors focus:border-brand-primary-main focus:ring-2 focus:ring-brand-primary-main/50"
                         />
                         <button
                           type="button"
@@ -247,9 +247,9 @@ export const SignUpPage = () => {
                           className="absolute inset-y-0 right-0 flex items-center pr-3"
                         >
                           {showConfirmPassword ? (
-                            <EyeOff className="text-brand-primary-400 hover:text-brand-primary-600 h-5 w-5" />
+                            <EyeOff className="h-5 w-5 text-brand-primary-400 hover:text-brand-primary-600" />
                           ) : (
-                            <Eye className="text-brand-primary-400 hover:text-brand-primary-600 h-5 w-5" />
+                            <Eye className="h-5 w-5 text-brand-primary-400 hover:text-brand-primary-600" />
                           )}
                         </button>
                       </div>
@@ -265,7 +265,7 @@ export const SignUpPage = () => {
                   name="terms"
                   type="checkbox"
                   required
-                  className="border-neutral-border text-brand-primary-main focus:ring-brand-primary-main/50 mt-1 h-4 w-4 rounded"
+                  className="border-neutral-border mt-1 h-4 w-4 rounded text-brand-primary-main focus:ring-brand-primary-main/50"
                 />
                 <label
                   htmlFor="terms"
@@ -274,14 +274,14 @@ export const SignUpPage = () => {
                   I agree to the{' '}
                   <Link
                     to={PATHS.TERMS}
-                    className="text-brand-primary-main hover:text-brand-primary-dark font-medium"
+                    className="font-medium text-brand-primary-main hover:text-brand-primary-dark"
                   >
                     Terms of Service
                   </Link>{' '}
                   and{' '}
                   <Link
                     to={PATHS.PRIVACY}
-                    className="text-brand-primary-main hover:text-brand-primary-dark font-medium"
+                    className="font-medium text-brand-primary-main hover:text-brand-primary-dark"
                   >
                     Privacy Policy
                   </Link>
@@ -308,7 +308,7 @@ export const SignUpPage = () => {
               Already have an account?{' '}
               <Link
                 to={PATHS.LOGIN}
-                className="text-brand-primary-main hover:text-brand-primary-dark font-medium"
+                className="font-medium text-brand-primary-main hover:text-brand-primary-dark"
               >
                 Sign in
               </Link>

@@ -27,7 +27,7 @@ function App() {
             <Route path={PATHS.SIGNUP} element={<SignUpPage />} />
             <Route path={PATHS.PROFILE} element={<ProfilePage />} />
             <Route path={PATHS.ABOUT} element={<AboutPage />} />
-            <Route path={PATHS.ALL_DEALS} element={<AllDealsPage />} /> 
+            <Route path={PATHS.ALL_DEALS} element={<AllDealsPage />} />
             <Route
               path={PATHS.FOR_BUSINESSES}
               element={<ForBusinessesPage />}

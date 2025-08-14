@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 const features = [
   {
-    icon: <MapPin className="text-brand-primary-main h-8 w-8" />,
+    icon: <MapPin className="h-8 w-8 text-brand-primary-main" />,
     title: 'See Your City, Live.',
     description:
       "Ditch the outdated lists. Our live map shows you what's happening *right now*, with deals and hot spots popping up in real-time.",

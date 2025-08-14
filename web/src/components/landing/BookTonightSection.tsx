@@ -34,7 +34,11 @@ export const BookTonightSection = () => {
           </div>
           <div className="flex items-center gap-2">
             <Link to={PATHS.ALL_DEALS}>
-              <Button variant="secondary" size="md" className="font-semibold rounded-full">
+              <Button
+                variant="secondary"
+                size="md"
+                className="rounded-full font-semibold"
+              >
                 See All
               </Button>
             </Link>

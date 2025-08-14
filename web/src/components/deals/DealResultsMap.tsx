@@ -10,8 +10,8 @@ const createCustomIcon = (isHovered: boolean) => {
     className: 'custom-map-marker',
     html: `
       <div class="${cn(
-        "flex items-center justify-center w-8 h-8 rounded-full bg-primary shadow-lg transition-all duration-200",
-        isHovered && "scale-125 z-10"
+        'flex items-center justify-center w-8 h-8 rounded-full bg-primary shadow-lg transition-all duration-200',
+        isHovered && 'scale-125 z-10',
       )}">
         <div class="w-3 h-3 rounded-full bg-white"></div>
       </div>
@@ -26,12 +26,20 @@ interface DealResultsMapProps {
   hoveredDealId: string | null;
 }
 
-export const DealResultsMap = ({ deals, hoveredDealId }: DealResultsMapProps) => {
-  const mapCenter: L.LatLngExpression = [40.72, -74.00]; // Centered on NYC
+export const DealResultsMap = ({
+  deals,
+  hoveredDealId,
+}: DealResultsMapProps) => {
+  const mapCenter: L.LatLngExpression = [40.72, -74.0]; // Centered on NYC
 
   return (
-    <div className="h-full w-full sticky top-20">
-      <MapContainer center={mapCenter} zoom={13} scrollWheelZoom={true} className="h-full w-full">
+    <div className="sticky top-20 h-full w-full">
+      <MapContainer
+        center={mapCenter}
+        zoom={13}
+        scrollWheelZoom={true}
+        className="h-full w-full"
+      >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -44,7 +52,9 @@ export const DealResultsMap = ({ deals, hoveredDealId }: DealResultsMapProps) =>
           >
             <Popup>
               <div className="font-sans">
-                <b className="text-sm">{deal.name}</b><br />{deal.location}
+                <b className="text-sm">{deal.name}</b>
+                <br />
+                {deal.location}
               </div>
             </Popup>
           </Marker>

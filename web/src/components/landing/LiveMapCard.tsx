@@ -2,7 +2,7 @@ import { Map } from 'lucide-react';
 
 export const LiveMapCard = () => (
   <div className="relative flex h-full w-full flex-col items-start justify-end gap-2 p-6">
-    <div className="from-brand-primary-900 absolute inset-0 bg-gradient-to-br to-gray-900" />
+    <div className="absolute inset-0 bg-gradient-to-br from-brand-primary-900 to-gray-900" />
     <Map className="absolute right-4 top-4 h-8 w-8 text-white/30" />
     <div className="bg-accent-urgent absolute left-1/4 top-1/4 h-2 w-2 animate-ping rounded-full" />
     <div className="bg-accent-secondary absolute left-1/3 top-2/3 h-1 w-1 animate-ping rounded-full" />

@@ -9,10 +9,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   iconPosition?: 'left' | 'right';
 }
 
-const Button = forwardRef<
-  HTMLButtonElement,
-  ButtonProps
->(
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       className,

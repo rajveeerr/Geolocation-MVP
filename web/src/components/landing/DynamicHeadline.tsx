@@ -18,7 +18,7 @@ export const DynamicHeadline = () => {
       <span className="text-neutral-text-primary mt-2 inline-flex flex-wrap items-center justify-center gap-2 transition-all duration-500 ease-in-out sm:gap-3">
         <span className="flex items-center justify-center gap-2 sm:gap-3">
           <svg
-            className="text-brand-primary-400 h-8 w-8 sm:h-12 sm:w-12"
+            className="h-8 w-8 text-brand-primary-400 sm:h-12 sm:w-12"
             viewBox="0 0 24 24"
             fill="currentColor"
           >

@@ -9,7 +9,7 @@ export const UseCaseContent = () => {
       viewport={{ once: true, amount: 0.5 }}
       transition={{ duration: 0.7, ease: 'easeOut' }}
     >
-      <div className="bg-brand-primary-light text-brand-primary-main inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium">
+      <div className="inline-flex items-center gap-2 rounded-full bg-brand-primary-light px-3 py-1 text-sm font-medium text-brand-primary-main">
         <Bell className="h-4 w-4" />
         <span>Real-time Alerts</span>
       </div>

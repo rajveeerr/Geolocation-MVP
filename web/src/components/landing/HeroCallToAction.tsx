@@ -29,7 +29,7 @@ export const HeroCallToAction = () => {
         Are you a business?{' '}
         <Link
           to={PATHS.FOR_BUSINESSES}
-          className="text-brand-primary-main font-medium hover:underline"
+          className="font-medium text-brand-primary-main hover:underline"
         >
           Get on the map in minutes
         </Link>

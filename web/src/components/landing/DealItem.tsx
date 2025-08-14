@@ -27,15 +27,15 @@ export const DealItem = ({
       onMouseLeave={onMouseLeave}
       whileHover={{ scale: 1.02, x: 5 }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-      className={`flex cursor-pointer items-center gap-3 rounded-xl border p-2 transition-all duration-200 sm:gap-4 sm:p-3 ${isHovered ? 'border-brand-primary-200/80 ring-brand-primary-400/20 bg-white/90 shadow-lg ring-1 backdrop-blur-sm' : 'border-brand-primary-100/50 bg-white/60 backdrop-blur-sm'}`}
+      className={`flex cursor-pointer items-center gap-3 rounded-xl border p-2 transition-all duration-200 sm:gap-4 sm:p-3 ${isHovered ? 'border-brand-primary-200/80 bg-white/90 shadow-lg ring-1 ring-brand-primary-400/20 backdrop-blur-sm' : 'border-brand-primary-100/50 bg-white/60 backdrop-blur-sm'}`}
     >
       <div
-        className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg sm:h-14 sm:w-14 ${deal.category === 'Food' ? 'from-accent-orange-100 to-accent-orange-200 bg-gradient-to-br' : 'to-brand-primary-200 bg-gradient-to-br from-cyan-100'}`}
+        className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg sm:h-14 sm:w-14 ${deal.category === 'Food' ? 'from-accent-orange-100 to-accent-orange-200 bg-gradient-to-br' : 'bg-gradient-to-br from-cyan-100 to-brand-primary-200'}`}
       >
         {deal.category === 'Food' ? (
           <Utensils className="text-accent-orange-600 h-6 w-6 sm:h-7 sm:w-7" />
         ) : (
-          <Coffee className="text-brand-primary-600 h-6 w-6 sm:h-7 sm:w-7" />
+          <Coffee className="h-6 w-6 text-brand-primary-600 sm:h-7 sm:w-7" />
         )}
       </div>
       <div className="flex-grow">

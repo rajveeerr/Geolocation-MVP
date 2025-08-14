@@ -1,8 +1,5 @@
 import type { Config } from 'tailwindcss';
 import tailwindcssAnimate from 'tailwindcss-animate';
-import designSystem from './src/config/design-system.json';
-
-const { typography, spacing, borders, shadows } = designSystem;
 
 const tailwindConfig: Config = {
   darkMode: ['class'],

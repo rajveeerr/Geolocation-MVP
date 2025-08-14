@@ -189,7 +189,6 @@
 //     </header>
 // )}
 
-
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -225,29 +224,44 @@ export const Header = () => {
 
   const motionVariants = {
     initial: { opacity: 0, y: -20 },
-    animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] } },
-    exit: { opacity: 0, y: -20, transition: { duration: 0.2, ease: [0.4, 0, 0.2, 1] } },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] },
+    },
+    exit: {
+      opacity: 0,
+      y: -20,
+      transition: { duration: 0.2, ease: [0.4, 0, 0.2, 1] },
+    },
   };
 
   return (
     <>
       <header
-        className={`fixed top-0 z-40 w-full transition-colors duration-300 bg-white/80 border-b border-neutral-200/70 backdrop-blur-lg`}
+        className={`fixed top-0 z-40 w-full border-b border-neutral-200/70 bg-white/80 backdrop-blur-lg transition-colors duration-300`}
       >
-        <div className="container mx-auto max-w-screen-xl px-6 h-20 flex lg:grid lg:grid-cols-3 items-center justify-between">
-          <div className="flex justify-start"><Logo /></div>
-          
-          <div className="hidden lg:flex justify-center">
+        <div className="container mx-auto flex h-20 max-w-screen-xl items-center justify-between px-6 lg:grid lg:grid-cols-3">
+          <div className="flex justify-start">
+            <Logo />
+          </div>
+
+          <div className="hidden justify-center lg:flex">
             <AnimatePresence mode="wait">
               {isScrolled ? (
                 <motion.div key="search" {...motionVariants}>
-                  <NavbarSearch onClick={openSearchModal} /> {/* <-- PASS ONCLICK */}
+                  <NavbarSearch onClick={openSearchModal} />{' '}
+                  {/* <-- PASS ONCLICK */}
                 </motion.div>
               ) : (
                 <motion.nav key="tabs" {...motionVariants}>
-                  <div className="flex items-center gap-2 p-1 bg-white/50 border border-neutral-200/90 rounded-full shadow-sm">
+                  <div className="flex items-center gap-2 rounded-full border border-neutral-200/90 bg-white/50 p-1 shadow-sm">
                     {navigationItems.map((item) => (
-                      <Link key={item.id} to={item.path} className="px-4 py-2 rounded-full text-sm font-semibold text-neutral-700 hover:bg-neutral-100 transition-colors">
+                      <Link
+                        key={item.id}
+                        to={item.path}
+                        className="rounded-full px-4 py-2 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-100"
+                      >
                         {item.label}
                       </Link>
                     ))}
@@ -256,35 +270,50 @@ export const Header = () => {
               )}
             </AnimatePresence>
           </div>
-          
-          <div className="hidden lg:flex items-center justify-end gap-2">
-            <Link to={PATHS.FOR_BUSINESSES} className="px-4 py-2 rounded-full text-sm font-semibold text-neutral-800 hover:bg-neutral-100/80 transition-colors">
+
+          <div className="hidden items-center justify-end gap-2 lg:flex">
+            <Link
+              to={PATHS.FOR_BUSINESSES}
+              className="rounded-full px-4 py-2 text-sm font-semibold text-neutral-800 transition-colors hover:bg-neutral-100/80"
+            >
               CitySpark for Business
             </Link>
-            {isLoadingUser ? <div className="h-10 w-24 bg-neutral-200 animate-pulse rounded-full" /> : user ? <ProfileDropDown /> : (
-              <Link to={PATHS.LOGIN}><Button variant="primary" size="md" className="rounded-full">Log in</Button></Link>
+            {isLoadingUser ? (
+              <div className="h-10 w-24 animate-pulse rounded-full bg-neutral-200" />
+            ) : user ? (
+              <ProfileDropDown />
+            ) : (
+              <Link to={PATHS.LOGIN}>
+                <Button variant="primary" size="md" className="rounded-full">
+                  Log in
+                </Button>
+              </Link>
             )}
           </div>
-          
-          <div className="lg:hidden flex justify-end">
-            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 -mr-2" aria-label="Open menu"><Menu className="h-6 w-6" /></button>
+
+          <div className="flex justify-end lg:hidden">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="-mr-2 p-2"
+              aria-label="Open menu"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
           </div>
         </div>
 
         {/* Mobile Menu Panel */}
         <AnimatePresence>
           {isMobileMenuOpen && (
-            <div              
-              className="absolute top-0 inset-x-0 p-2 transition origin-top-right lg:hidden z-50"
-            >
-              <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white divide-y-2 divide-gray-50">
-                <div className="px-5 pt-5 pb-6">
+            <div className="absolute inset-x-0 top-0 z-50 origin-top-right p-2 transition lg:hidden">
+              <div className="divide-y-2 divide-gray-50 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+                <div className="px-5 pb-6 pt-5">
                   <div className="flex items-center justify-between">
                     <Logo />
                     <div className="-mr-2">
                       <button
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
+                        className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
                         aria-label="Close menu"
                       >
                         <X className="h-6 w-6" />
@@ -297,28 +326,33 @@ export const Header = () => {
                         <Link
                           key={item.id}
                           to={item.path}
-                          className="-m-3 p-3 flex items-center rounded-md hover:bg-gray-50"
+                          className="-m-3 flex items-center rounded-md p-3 hover:bg-gray-50"
                         >
-                          <span className="ml-3 text-base font-medium text-gray-900">{item.label}</span>
+                          <span className="ml-3 text-base font-medium text-gray-900">
+                            {item.label}
+                          </span>
                         </Link>
                       ))}
                     </nav>
                   </div>
                 </div>
-                <div className="py-6 px-5 space-y-6">
+                <div className="space-y-6 px-5 py-6">
                   <div>
-                     <Link
-                        to={PATHS.LOGIN}
-                        className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-primary hover:bg-primary/90"
+                    <Link
+                      to={PATHS.LOGIN}
+                      className="flex w-full items-center justify-center rounded-md border border-transparent bg-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-primary/90"
+                    >
+                      Sign up / Log in
+                    </Link>
+                    <p className="mt-6 text-center text-base font-medium text-gray-500">
+                      Are you a business owner?{' '}
+                      <Link
+                        to={PATHS.FOR_BUSINESSES}
+                        className="text-primary hover:text-primary/90"
                       >
-                        Sign up / Log in
+                        Get on the map
                       </Link>
-                      <p className="mt-6 text-center text-base font-medium text-gray-500">
-                        Are you a business owner?{' '}
-                        <Link to={PATHS.FOR_BUSINESSES} className="text-primary hover:text-primary/90">
-                          Get on the map
-                        </Link>
-                      </p>
+                    </p>
                   </div>
                 </div>
               </div>

@@ -15,9 +15,9 @@ export const LeaderboardCard = () => (
         </span>
         <span className="text-accent-secondary font-bold">12,450 pts</span>
       </div>
-      <div className="bg-brand-primary-light flex items-center justify-between rounded-md p-2 text-sm">
-        <span className="text-brand-primary-main font-semibold">2. You</span>
-        <span className="text-brand-primary-main font-bold">9,800 pts</span>
+      <div className="flex items-center justify-between rounded-md bg-brand-primary-light p-2 text-sm">
+        <span className="font-semibold text-brand-primary-main">2. You</span>
+        <span className="font-bold text-brand-primary-main">9,800 pts</span>
       </div>
       <div className="flex items-center justify-between text-sm">
         <span className="text-neutral-text-secondary font-medium">

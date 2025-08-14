@@ -165,10 +165,15 @@ export const allDeals: DealWithLocation[] = [
   {
     id: 'ad1',
     name: 'Cafe Hawkers',
-    image: 'https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=500&q=80',
-    rating: 4.1, category: 'Cafe', price: '$$', location: 'Connaught Place',
-    position: [40.7128, -74.0060],
-    description: "Today's special brew is 50% off until 4 PM. Unlock to reveal!",
+    image:
+      'https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=500&q=80',
+    rating: 4.1,
+    category: 'Cafe',
+    price: '$$',
+    location: 'Connaught Place',
+    position: [40.7128, -74.006],
+    description:
+      "Today's special brew is 50% off until 4 PM. Unlock to reveal!",
     originalPrice: 12559,
     discountedPrice: 11659,
     bookingInfo: "Sorry, we don't currently have any tables available for 2.",
@@ -176,10 +181,15 @@ export const allDeals: DealWithLocation[] = [
   {
     id: 'ad2',
     name: 'Out Of The Box Courtyard',
-    image: 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
-    rating: 4.3, category: 'Multi-cuisine', price: '$$$', location: 'Connaught Place',
+    image:
+      'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
+    rating: 4.3,
+    category: 'Multi-cuisine',
+    price: '$$$',
+    location: 'Connaught Place',
     position: [40.7145, -74.0082],
-    description: "Enjoy a free dessert with any main course. Perfect for a sunny afternoon.",
+    description:
+      'Enjoy a free dessert with any main course. Perfect for a sunny afternoon.',
     originalPrice: 11659,
     discountedPrice: 10659,
     bookingInfo: "Sorry, we don't currently have any tables available for 2.",
@@ -187,10 +197,15 @@ export const allDeals: DealWithLocation[] = [
   {
     id: 'ad3',
     name: 'Echoes Living Room',
-    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&q=80',
-    rating: 4.6, category: 'Lounge', price: '$$$', location: 'GTB Nagar',
+    image:
+      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&q=80',
+    rating: 4.6,
+    category: 'Lounge',
+    price: '$$$',
+    location: 'GTB Nagar',
     position: [40.7295, -73.9965],
-    description: "Happy Hour specials on all imported drinks from 5 PM to 7 PM.",
+    description:
+      'Happy Hour specials on all imported drinks from 5 PM to 7 PM.',
     originalPrice: 11659,
     discountedPrice: 10659,
     bookingInfo: "Sorry, we don't currently have any tables available for 2.",
@@ -198,10 +213,14 @@ export const allDeals: DealWithLocation[] = [
   {
     id: 'ad4',
     name: 'Mai Bao',
-    image: 'https://images.unsplash.com/photo-1585518419759-7fe2e0fbf8a6?w=500&q=80',
-    rating: 4.0, category: 'Asian', price: '$', location: 'Saket',
-    position: [40.7230, -73.9930],
-    description: "Quick lunch deal: Get a bao trio for the price of two.",
+    image:
+      'https://images.unsplash.com/photo-1585518419759-7fe2e0fbf8a6?w=500&q=80',
+    rating: 4.0,
+    category: 'Asian',
+    price: '$',
+    location: 'Saket',
+    position: [40.723, -73.993],
+    description: 'Quick lunch deal: Get a bao trio for the price of two.',
     originalPrice: 11659,
     discountedPrice: 10659,
     bookingInfo: "Sorry, we don't currently have any tables available for 2.",
@@ -209,10 +228,15 @@ export const allDeals: DealWithLocation[] = [
   {
     id: 'ad5',
     name: "The Passenger's Bar",
-    image: 'https://images.unsplash.com/photo-1543007631-283050bb3e8c?w=500&q=80',
-    rating: 2.9, category: 'Bar', price: '$$', location: 'Kailash Colony',
-    position: [40.7310, -74.0055],
-    description: "Live music tonight! No cover charge. Check in for a complimentary shooter.",
+    image:
+      'https://images.unsplash.com/photo-1543007631-283050bb3e8c?w=500&q=80',
+    rating: 2.9,
+    category: 'Bar',
+    price: '$$',
+    location: 'Kailash Colony',
+    position: [40.731, -74.0055],
+    description:
+      'Live music tonight! No cover charge. Check in for a complimentary shooter.',
     originalPrice: 11659,
     discountedPrice: 10659,
     bookingInfo: "Sorry, we don't currently have any tables available for 2.",

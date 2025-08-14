@@ -26,7 +26,7 @@ export const ProfileDropDown = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="focus:ring-brand-primary-main rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2">
+        <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-brand-primary-main focus:ring-offset-2">
           <Avatar>
             <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
             <AvatarFallback>{userInitials}</AvatarFallback>
