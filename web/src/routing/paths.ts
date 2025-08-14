@@ -1,6 +1,6 @@
 export const PATHS = {
   HOME: '/',
-  HOT_DEALS: '/deals',
+  ALL_DEALS: '/deals',
   MAP: '/map',
   PRICING: '/pricing',
 

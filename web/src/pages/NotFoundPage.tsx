@@ -164,7 +164,7 @@ export const NotFoundPage = () => {
             </Button>
           </Link>
 
-          <Link to={PATHS.HOT_DEALS}>
+          <Link to={PATHS.ALL_DEALS}>
             <Button
               variant="secondary"
               size="lg"
@@ -204,7 +204,7 @@ export const NotFoundPage = () => {
           </Link>
 
           <Link
-            to={PATHS.HOT_DEALS}
+            to={PATHS.ALL_DEALS}
             className="border-neutral-border/20 group rounded-xl border bg-white/60 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/80 hover:shadow-lg"
           >
             <div className="mb-3 flex items-center gap-3">

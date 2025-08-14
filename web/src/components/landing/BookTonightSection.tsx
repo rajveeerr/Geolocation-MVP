@@ -5,6 +5,8 @@ import { BookingCard } from './BookingCard';
 import { bookTonightDeals } from '@/data/deals';
 import { ChevronLeft, ChevronRight, CalendarClock } from 'lucide-react';
 import { Button } from '@/components/common/Button';
+import { Link } from 'react-router-dom';
+import { PATHS } from '@/routing/paths';
 
 export const BookTonightSection = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -31,9 +33,11 @@ export const BookTonightSection = () => {
             </h2>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="secondary" size="md" className="font-semibold">
-              See All
-            </Button>
+            <Link to={PATHS.ALL_DEALS}>
+              <Button variant="secondary" size="md" className="font-semibold rounded-full">
+                See All
+              </Button>
+            </Link>
             <button
               onClick={() => scroll('left')}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-300 transition-colors hover:bg-neutral-100"

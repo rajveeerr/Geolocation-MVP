@@ -1,7 +1,9 @@
 // web/src/components/landing/DealColumn.tsx
 
+import { Link } from 'react-router-dom';
 import { DealCard, type Deal } from './DealCard';
 import { Button } from '@/components/common/Button';
+import { PATHS } from '@/routing/paths';
 
 interface DealColumnProps {
   title: string;
@@ -30,9 +32,11 @@ export const DealColumn = ({ title, icon, deals }: DealColumnProps) => {
       </div>
 
       <div className="border-t border-neutral-200/60 p-4 text-center">
-        <Button variant="secondary" size="md" className="font-semibold">
-          See All
-        </Button>
+        <Link to={PATHS.ALL_DEALS}>
+          <Button variant="secondary" size="md" className="font-semibold">
+              See All
+          </Button>
+        </Link>
       </div>
     </div>
   );

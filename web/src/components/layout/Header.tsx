@@ -189,7 +189,6 @@
 //     </header>
 // )}
 
-// web/src/components/layout/Header.tsx
 
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
@@ -201,9 +200,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/useAuth';
 import { ProfileDropDown } from './ProfileDropDown';
 import { NavbarSearch } from './NavbarSearch';
+import { SearchModal } from './SearchModal';
 
 const navigationItems = [
-  { id: 'deals', label: 'Hot Deals', path: PATHS.HOT_DEALS },
+  { id: 'deals', label: 'Hot Deals', path: PATHS.ALL_DEALS },
   { id: 'map', label: 'Map', path: PATHS.MAP },
   { id: 'pricing', label: 'Pricing', path: PATHS.PRICING },
 ];
@@ -211,51 +211,43 @@ const navigationItems = [
 export const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, isLoadingUser } = useAuth(); 
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false); // <-- NEW STATE
+  const { user, isLoadingUser } = useAuth();
+
+  const openSearchModal = () => setIsSearchModalOpen(true);
+  const closeSearchModal = () => setIsSearchModalOpen(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 30);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 30);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const motionVariants = {
     initial: { opacity: 0, y: -20 },
-    animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeInOut' } },
-    exit: { opacity: 0, y: -20, transition: { duration: 0.2, ease: 'easeInOut' } },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] } },
+    exit: { opacity: 0, y: -20, transition: { duration: 0.2, ease: [0.4, 0, 0.2, 1] } },
   };
 
   return (
     <>
-      {/* <div className="h-20" /> */}
       <header
-        className={`fixed top-0 z-50 w-full transition-colors duration-300 bg-white/80 border-b border-neutral-200/70 backdrop-blur-lg`}
+        className={`fixed top-0 z-40 w-full transition-colors duration-300 bg-white/80 border-b border-neutral-200/70 backdrop-blur-lg`}
       >
-        <div className="container mx-auto max-w-screen-xl px-6 h-20 grid grid-cols-3 items-center">
+        <div className="container mx-auto max-w-screen-xl px-6 h-20 flex lg:grid lg:grid-cols-3 items-center justify-between">
+          <div className="flex justify-start"><Logo /></div>
           
-          {/* Left: Logo */}
-          <div className="flex justify-start">
-            <Logo />
-          </div>
-
-          {/* Center: Dynamic Navigation/Search */}
-          <div className="flex justify-center">
+          <div className="hidden lg:flex justify-center">
             <AnimatePresence mode="wait">
               {isScrolled ? (
                 <motion.div key="search" {...motionVariants}>
-                  <NavbarSearch />
+                  <NavbarSearch onClick={openSearchModal} /> {/* <-- PASS ONCLICK */}
                 </motion.div>
               ) : (
                 <motion.nav key="tabs" {...motionVariants}>
-                  <div className="hidden lg:flex items-center gap-2 p-1 bg-white/50 border border-neutral-200/90 rounded-full shadow-sm">
+                  <div className="flex items-center gap-2 p-1 bg-white/50 border border-neutral-200/90 rounded-full shadow-sm">
                     {navigationItems.map((item) => (
-                      <Link
-                        key={item.id}
-                        to={item.path}
-                        className="px-4 py-2 rounded-full text-sm font-semibold text-neutral-700 hover:bg-neutral-100 transition-colors"
-                      >
+                      <Link key={item.id} to={item.path} className="px-4 py-2 rounded-full text-sm font-semibold text-neutral-700 hover:bg-neutral-100 transition-colors">
                         {item.label}
                       </Link>
                     ))}
@@ -265,33 +257,17 @@ export const Header = () => {
             </AnimatePresence>
           </div>
           
-          {/* Right: Actions */}
           <div className="hidden lg:flex items-center justify-end gap-2">
             <Link to={PATHS.FOR_BUSINESSES} className="px-4 py-2 rounded-full text-sm font-semibold text-neutral-800 hover:bg-neutral-100/80 transition-colors">
-                CitySpark for Business
+              CitySpark for Business
             </Link>
-            {isLoadingUser ? (
-              <div className="h-10 w-24 bg-neutral-200 animate-pulse rounded-full" />
-            ) : user ? (
-              <ProfileDropDown />
-            ) : (
-              <Link to={PATHS.LOGIN}>
-                <Button variant="primary" size="md" className="rounded-full">
-                  Log in
-                </Button>
-              </Link>
+            {isLoadingUser ? <div className="h-10 w-24 bg-neutral-200 animate-pulse rounded-full" /> : user ? <ProfileDropDown /> : (
+              <Link to={PATHS.LOGIN}><Button variant="primary" size="md" className="rounded-full">Log in</Button></Link>
             )}
           </div>
           
-          {/* Mobile Menu Button */}
           <div className="lg:hidden flex justify-end">
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 -mr-2"
-              aria-label="Open menu"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
+            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 -mr-2" aria-label="Open menu"><Menu className="h-6 w-6" /></button>
           </div>
         </div>
 
@@ -354,6 +330,8 @@ export const Header = () => {
           )}
         </AnimatePresence>
       </header>
+
+      <SearchModal isOpen={isSearchModalOpen} onClose={closeSearchModal} />
     </>
   );
 };
