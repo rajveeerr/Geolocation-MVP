@@ -79,22 +79,43 @@ export const DealFinder = ({ activeTab, onTabChange }: DealFinderProps) => {
         ))}
       </div>
 
-      <div className="w-full overflow-hidden rounded-2xl border bg-white shadow-lg lg:rounded-full p-2">
+      <div className="w-full overflow-hidden rounded-2xl border bg-white p-2 shadow-lg lg:rounded-full">
         <div className="flex flex-col sm:flex-row sm:items-center">
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 md:divide-x md:divide-neutral-200">
+          <div className="grid flex-1 grid-cols-1 md:grid-cols-3 md:divide-x md:divide-neutral-200">
             <div className="p-2 pl-4">
-                <label htmlFor="where" className="text-xs font-bold block">Where?</label>
-                <Input id="where" type="text" placeholder="Search destinations" className="border-none h-auto p-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0" />
+              <label htmlFor="where" className="block text-xs font-bold">
+                Where?
+              </label>
+              <Input
+                id="where"
+                type="text"
+                placeholder="Search destinations"
+                className="h-auto border-none p-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
             </div>
             <div className="p-2 pl-4">
-                <label htmlFor="when" className="text-xs font-bold block">When?</label>
-                <Input id="when" type="text" placeholder="Add dates" className="border-none h-auto p-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0" />
+              <label htmlFor="when" className="block text-xs font-bold">
+                When?
+              </label>
+              <Input
+                id="when"
+                type="text"
+                placeholder="Add dates"
+                className="h-auto border-none p-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
             </div>
             <div className="p-2 pl-4">
-                <label htmlFor="who" className="text-xs font-bold block">Who?</label>
-                <Input id="who" type="text" placeholder="Add guests" className="border-none h-auto p-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0" />
+              <label htmlFor="who" className="block text-xs font-bold">
+                Who?
+              </label>
+              <Input
+                id="who"
+                type="text"
+                placeholder="Add guests"
+                className="h-auto border-none p-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
             </div>
-            </div>
+          </div>
           <div className="p-4 sm:p-2">
             <Button
               size="lg"

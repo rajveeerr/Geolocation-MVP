@@ -116,49 +116,52 @@ export const happyHourDeals: Deal[] = [
     tag: 'Live Music',
   },
   {
-    id: 'hh5',
-    name: 'Yo! China',
+    id: 'hh6',
+    name: 'The Irish House',
     image:
-      'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=400&q=80',
-    rating: 3.9,
-    category: 'Indian',
-    price: '$',
-    location: 'Janakpuri',
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80',
+    rating: 4.4,
+    category: 'Bar',
+    price: '$$',
+    location: 'Cyber Hub',
+    tag: 'Happy Hour Special',
+  },
+  {
+    id: 'hh7',
+    name: 'Social',
+    image:
+      'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=400&q=80',
+    rating: 4.1,
+    category: 'Cafe',
+    price: '$$',
+    location: 'Hauz Khas',
+    tag: '2-for-1 Drinks',
+  },
+  {
+    id: 'hh8',
+    name: 'Lord of the Drinks',
+    image:
+      'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=400&q=80',
+    rating: 4.0,
+    category: 'Bar',
+    price: '$$$',
+    location: 'Connaught Place',
+    tag: 'Happy Hour Special',
+  },
+  {
+    id: 'hh9',
+    name: 'Summer House Cafe',
+    image:
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&q=80',
+    rating: 4.2,
+    category: 'Cafe',
+    price: '$$',
+    location: 'Aurobindo Market',
+    tag: 'Live DJ',
   },
 ];
 
 export const topRatedDeals: Deal[] = [
-  {
-    id: 'tr1',
-    name: 'You Mee - Greater Kailash',
-    image:
-      'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&q=80',
-    rating: 4.5,
-    category: 'Indian',
-    price: '$',
-    location: 'Greater Kailash',
-    tag: 'Guest Favourite',
-  },
-  {
-    id: 'tr2',
-    name: 'The Belgian Waffle Co',
-    image:
-      'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
-    rating: 3.7,
-    category: 'Desserts',
-    price: '$',
-    location: 'Tagore Garden',
-  },
-  {
-    id: 'tr3',
-    name: 'Thyme - The Umrao',
-    image:
-      'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&q=80',
-    rating: 4.0,
-    category: 'Indian',
-    price: '$$',
-    location: 'Kapashera',
-  },
   {
     id: 'tr4',
     name: 'Echoes Living Room',
@@ -171,7 +174,61 @@ export const topRatedDeals: Deal[] = [
     tag: 'Guest Favourite',
   },
   {
-    id: 'tr5',
+    id: 'tr6',
+    name: 'Cafe Hawkers',
+    image:
+      'https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=500&q=80',
+    rating: 4.1,
+    category: 'Cafe',
+    price: '$$',
+    location: 'Connaught Place',
+    tag: 'Top Rated',
+  },
+  {
+    id: 'tr9',
+    name: 'The Irish House',
+    image:
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80',
+    rating: 4.4,
+    category: 'Bar',
+    price: '$$',
+    location: 'Cyber Hub',
+    tag: 'Guest Favourite',
+  },
+  {
+    id: 'tr1',
+    name: 'You Mee - Greater Kailash',
+    image:
+      'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&q=80',
+    rating: 4.5,
+    category: 'Indian',
+    price: '$',
+    location: 'Greater Kailash',
+    tag: 'Guest Favourite',
+  },
+  {
+    id: 'tr3',
+    name: 'Thyme - The Umrao',
+    image:
+      'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&q=80',
+    rating: 4.0,
+    category: 'Indian',
+    price: '$$',
+    location: 'Kapashera',
+  },
+  {
+    id: 'tr8',
+    name: 'Mai Bao',
+    image:
+      'https://images.unsplash.com/photo-1585518419759-7fe2e0fbf8a6?w=500&q=80',
+    rating: 4.0,
+    category: 'Asian',
+    price: '$',
+    location: 'Saket',
+    tag: 'Top Rated',
+  },
+  {
+    id: 'tr2',
     name: 'The Belgian Waffle Co',
     image:
       'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',

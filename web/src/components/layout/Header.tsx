@@ -276,11 +276,7 @@ export const Header = () => {
 
           <div className="hidden items-center justify-end gap-2 lg:flex">
             <Link to={PATHS.FOR_BUSINESSES}>
-              <Button 
-                variant="secondary" 
-                size="md" 
-                className="rounded-full"
-              >
+              <Button variant="secondary" size="md" className="rounded-full">
                 CitySpark for Business
               </Button>
             </Link>

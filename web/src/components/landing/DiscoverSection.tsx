@@ -6,10 +6,12 @@ import { Award, Sparkles, GlassWater } from 'lucide-react';
 
 export const DiscoverSection = () => {
   return (
-    <section className="bg-neutral-50 py-12 sm:py-16 lg:py-20">
+    <section className="bg-neutral-50 py-8 sm:py-10 lg:py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-6 sm:mb-8 flex items-center justify-between">
-          <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">Leaderboard</h2>
+        <div className="mb-6 flex items-center justify-between sm:mb-8">
+          <h2 className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
+            Leaderboard
+          </h2>
         </div>
         <div className="flex flex-wrap justify-center gap-6 sm:gap-8 lg:gap-12">
           <DealColumn

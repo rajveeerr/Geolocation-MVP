@@ -45,16 +45,16 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="mb-4 sm:mb-6 flex items-center justify-between">
-          <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">
+        <div className="mb-4 flex items-center justify-between sm:mb-6">
+          <h2 className="text-xl font-bold tracking-tight text-neutral-900 sm:text-2xl">
             {title}
           </h2>
           <div className="flex items-center gap-1 sm:gap-2">
             <Link to={PATHS.ALL_DEALS}>
-              <Button 
-                variant="secondary" 
-                size="sm" 
-                className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold"
+              <Button
+                variant="secondary"
+                size="sm"
+                className="rounded-full px-3 py-1.5 text-xs font-semibold sm:px-4 sm:py-2 sm:text-sm"
               >
                 Show all
               </Button>
@@ -82,10 +82,7 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
           className="scrollbar-hide flex gap-3 overflow-x-auto pb-2 sm:gap-4 sm:pb-4 md:gap-5 lg:gap-6"
         >
           {deals.map((deal) => (
-            <div
-              key={deal.id}
-              className="w-44 lg:w-56 flex-shrink-0 xl:w-52"
-            >
+            <div key={deal.id} className="w-44 flex-shrink-0 lg:w-56 xl:w-52">
               <CarouselCard deal={deal} />
             </div>
           ))}

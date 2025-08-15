@@ -30,7 +30,7 @@ export const HomePage = () => {
 
   return (
     <div className="bg-white pt-16 sm:pt-20">
-      <section className="border-b border-neutral-200 bg-white pb-6 pt-6 sm:pb-8 sm:pt-8 lg:pt-12 lg:pb-10">
+      <section className="border-b border-neutral-200 bg-white pb-6 pt-6 sm:pb-8 sm:pt-8 lg:pb-10 lg:pt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <DealFinder activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
