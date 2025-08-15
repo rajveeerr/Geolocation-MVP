@@ -37,16 +37,16 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
 
   return (
     <motion.div
-      className="bg-white py-4 sm:py-6 lg:py-8"
+      className="bg-white py-6 sm:py-8 lg:py-12"
       variants={carouselVariants}
       initial="hidden"
       animate="visible"
       exit="hidden"
     >
-      <div className="container mx-auto px-3 sm:px-4 lg:px-6">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="mb-3 flex items-center justify-between sm:mb-4">
-          <h2 className="text-xl font-bold text-neutral-800 sm:text-2xl lg:text-3xl">
+        <div className="mb-4 sm:mb-6 flex items-center justify-between">
+          <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">
             {title}
           </h2>
           <div className="flex items-center gap-1 sm:gap-2">

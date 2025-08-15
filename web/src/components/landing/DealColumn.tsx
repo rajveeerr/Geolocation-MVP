@@ -21,7 +21,7 @@ export const DealColumn = ({ title, icon, deals }: DealColumnProps) => {
             {icon}
           </div>
         </div>
-        <h3 className="text-2xl font-bold text-neutral-800">{title}</h3>
+        <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">{title}</h3>
       </div>
 
       <div className="px-4 pb-4">

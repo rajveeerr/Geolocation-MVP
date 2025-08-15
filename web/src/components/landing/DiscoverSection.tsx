@@ -6,12 +6,12 @@ import { Award, Sparkles, GlassWater } from 'lucide-react';
 
 export const DiscoverSection = () => {
   return (
-    <section className="bg-neutral-100/70 py-20">
-      <div className="container mx-auto px-4">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-neutral-800">Leaderboard</h2>
+    <section className="bg-neutral-50 py-12 sm:py-16 lg:py-20">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-6 sm:mb-8 flex items-center justify-between">
+          <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">Leaderboard</h2>
         </div>
-        <div className="flex flex-wrap justify-center gap-8 lg:gap-6">
+        <div className="flex flex-wrap justify-center gap-6 sm:gap-8 lg:gap-12">
           <DealColumn
             title="Happy Hours"
             icon={<GlassWater className="h-6 w-6 text-red-500" />}
