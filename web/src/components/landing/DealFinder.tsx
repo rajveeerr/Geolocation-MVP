@@ -79,9 +79,9 @@ export const DealFinder = ({ activeTab, onTabChange }: DealFinderProps) => {
         ))}
       </div>
 
-      <div className="w-full overflow-hidden rounded-2xl border bg-white shadow-lg sm:rounded-full p-2">
+      <div className="w-full overflow-hidden rounded-2xl border bg-white shadow-lg lg:rounded-full p-2">
         <div className="flex flex-col sm:flex-row sm:items-center">
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 divide-x divide-neutral-200">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 md:divide-x md:divide-neutral-200">
             <div className="p-2 pl-4">
                 <label htmlFor="where" className="text-xs font-bold block">Where?</label>
                 <Input id="where" type="text" placeholder="Search destinations" className="border-none h-auto p-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0" />

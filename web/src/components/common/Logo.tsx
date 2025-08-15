@@ -8,7 +8,7 @@ export const Logo = () => {
         <div className="relative">
           <div className="to-accent-purple-400 absolute inset-0 h-8 w-8 rounded-lg bg-gradient-to-br from-brand-primary-400 via-cyan-500 opacity-0 blur-sm transition-opacity duration-300 group-hover:opacity-60"></div>
 
-          <div className="relative flex aspect-square h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-brand-primary-500 via-cyan-500 to-brand-primary-600 shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl">
+          <div className="relative flex aspect-square h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-brand-primary-500 via-cyan-500 to-brand-primary-600 shadow-lg transition-all duration-300  group-hover:shadow-xl">
             <div className="absolute inset-0 animate-pulse rounded-lg border-2 border-transparent bg-gradient-to-r from-cyan-400 to-brand-primary-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
 
             <svg
@@ -50,7 +50,7 @@ export const Logo = () => {
             <div className="absolute right-1 top-1 h-1 w-1 animate-ping rounded-full bg-white opacity-0 group-hover:opacity-100"></div>
           </div>
         </div>
-        <span className="text-neutral-text-primary text-xl font-semibold tracking-tight transition-colors duration-300 group-hover:text-brand-primary-600">
+        <span className="text-neutral-text-primary text-xl font-semibold tracking-tight transition-colors duration-300">
           CitySpark
         </span>
       </div>

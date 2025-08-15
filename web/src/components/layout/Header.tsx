@@ -275,11 +275,14 @@ export const Header = () => {
           </div>
 
           <div className="hidden items-center justify-end gap-2 lg:flex">
-            <Link
-              to={PATHS.FOR_BUSINESSES}
-              className="rounded-full px-4 py-2 text-sm font-semibold text-neutral-800 transition-colors hover:bg-neutral-100/80"
-            >
-              CitySpark for Business
+            <Link to={PATHS.FOR_BUSINESSES}>
+              <Button 
+                variant="secondary" 
+                size="md" 
+                className="rounded-full"
+              >
+                CitySpark for Business
+              </Button>
             </Link>
             {isLoadingUser ? (
               <div className="h-10 w-24 animate-pulse rounded-full bg-neutral-200" />

@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { CarouselCard } from '@/components/landing/CarouselCard';
+import { Button } from '@/components/common/Button';
 import { type Deal } from '@/data/deals';
 import { PATHS } from '@/routing/paths';
 import { motion } from 'framer-motion';
@@ -49,11 +50,14 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
             {title}
           </h2>
           <div className="flex items-center gap-1 sm:gap-2">
-            <Link
-              to={PATHS.ALL_DEALS}
-              className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline sm:text-sm"
-            >
-              Show all
+            <Link to={PATHS.ALL_DEALS}>
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold"
+              >
+                Show all
+              </Button>
             </Link>
             <button
               onClick={() => scroll('left')}
