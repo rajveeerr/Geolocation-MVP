@@ -75,7 +75,7 @@ export const DealCardV2 = ({
                 Deal Available
               </span>
             </div>
-            <span className="text-sm font-bold text-primary">{deal.price}</span>
+            <span className="text-sm font-bold text-sky-600">{deal.price}</span>
           </div>
         </div>
       </div>

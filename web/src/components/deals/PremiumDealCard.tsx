@@ -196,7 +196,7 @@ export const PremiumDealCard = ({
                 Deal Available
               </span>
             </div>
-            <span className="text-base font-bold text-primary sm:text-lg">
+            <span className="text-base font-bold text-sky-600 sm:text-lg">
               {deal.price}
             </span>
           </div>

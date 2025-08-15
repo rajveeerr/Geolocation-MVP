@@ -45,7 +45,7 @@ export const DealResultCard = ({
               <span className="hidden sm:inline">&middot;</span>
               <span className="truncate">{deal.category}</span>
               <span className="hidden sm:inline">&middot;</span>
-              <span className="font-medium text-green-600">{deal.price}</span>
+              <span className="font-medium text-sky-600">{deal.price}</span>
             </div>
             <p className="mt-1 truncate text-sm text-neutral-500">
               {deal.location}

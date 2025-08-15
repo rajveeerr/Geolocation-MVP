@@ -27,7 +27,7 @@ export const DealCard = ({ deal }: DealCardProps) => {
           <span className="hidden sm:inline">&middot;</span>
           <span className="truncate">{deal.category}</span>
           <span className="hidden sm:inline">&middot;</span>
-          <span className="font-medium text-green-600">{deal.price}</span>
+          <span className="font-medium text-sky-600">{deal.price}</span>
         </div>
         <div className="mt-1 flex items-center gap-1.5 text-sm text-neutral-500">
           <MapPin className="h-4 w-4 flex-shrink-0" />
