@@ -2,7 +2,7 @@
 
 import { DealColumn } from './DealColumn';
 import { happyHourDeals, topRatedDeals, newDeals } from '@/data/deals';
-import { Award, Sparkles, GlassWater } from 'lucide-react';
+import { TrendingUp, Trophy, Sparkles } from 'lucide-react';
 
 export const DiscoverSection = () => {
   return (
@@ -16,17 +16,17 @@ export const DiscoverSection = () => {
         <div className="flex flex-wrap justify-center gap-6 sm:gap-8 lg:gap-12">
           <DealColumn
             title="Happy Hours"
-            icon={<GlassWater className="h-6 w-6 text-red-500" />}
+            icon={<TrendingUp className="h-6 w-6 text-brand-primary-600" />}
             deals={happyHourDeals}
           />
           <DealColumn
             title="Top Rated"
-            icon={<Award className="h-6 w-6 text-amber-500" />}
+            icon={<Trophy className="h-6 w-6 text-brand-primary-600" />}
             deals={topRatedDeals}
           />
           <DealColumn
             title="New on CitySpark"
-            icon={<Sparkles className="h-6 w-6 text-sky-500" />}
+            icon={<Sparkles className="h-6 w-6 text-brand-primary-600" />}
             deals={newDeals}
           />
         </div>
