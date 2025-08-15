@@ -80,7 +80,7 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
           {deals.map((deal) => (
             <div
               key={deal.id}
-              className="w-64 flex-shrink-0 sm:w-72 md:w-80 lg:w-72 xl:w-80"
+              className="w-44 lg:w-56 flex-shrink-0 xl:w-52"
             >
               <CarouselCard deal={deal} />
             </div>
