@@ -275,7 +275,7 @@ export const Header = () => {
           </div>
 
           <div className="hidden items-center justify-end gap-2 lg:flex">
-            <Link to={PATHS.FOR_BUSINESSES}>
+            <Link to={PATHS.MERCHANT_ONBOARDING}>
               <Button variant="secondary" size="md" className="rounded-full">
                 CitySpark for Business
               </Button>
@@ -355,7 +355,7 @@ export const Header = () => {
                     <p className="mt-6 text-center text-base font-medium text-gray-500">
                       Are you a business owner?{' '}
                       <Link
-                        to={PATHS.FOR_BUSINESSES}
+                        to={PATHS.MERCHANT_ONBOARDING}
                         className="text-primary hover:text-primary/90"
                       >
                         Get on the map

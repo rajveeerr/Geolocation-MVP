@@ -28,7 +28,7 @@ export const HeroCallToAction = () => {
       <p className="text-neutral-text-secondary mt-6 px-4 text-sm sm:px-0 sm:text-base">
         Are you a business?{' '}
         <Link
-          to={PATHS.FOR_BUSINESSES}
+          to={PATHS.MERCHANT_ONBOARDING}
           className="font-medium text-brand-primary-main hover:underline"
         >
           Get on the map in minutes

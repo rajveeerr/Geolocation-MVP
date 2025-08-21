@@ -8,6 +8,11 @@ export const PATHS = {
   BUSINESS_SIGNUP: '/business/signup',
   BUSINESS_DASHBOARD: '/business/dashboard',
 
+  // Merchant paths
+  MERCHANT_DASHBOARD: '/merchant/dashboard',
+  MERCHANT_ONBOARDING: '/merchant/onboarding',
+  MERCHANT_DEALS_CREATE: '/merchant/deals/create',
+
   LOGIN: '/login',
   SIGNUP: '/signup',
   VERIFY_OTP: '/verify-otp',
