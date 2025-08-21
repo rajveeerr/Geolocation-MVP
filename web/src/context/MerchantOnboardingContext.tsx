@@ -1,4 +1,5 @@
 // src/context/MerchantOnboardingContext.tsx
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useReducer } from 'react';
 import type { ReactNode } from 'react';
 

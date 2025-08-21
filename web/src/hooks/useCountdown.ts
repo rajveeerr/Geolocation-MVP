@@ -4,17 +4,18 @@ import { useEffect, useState } from 'react';
 export const useCountdown = (targetDate: string) => {
   // Validate the target date
   const countDownDate = new Date(targetDate).getTime();
+  const isValidDate = !isNaN(countDownDate);
   
-  // If invalid date, return zeros
-  if (isNaN(countDownDate)) {
-    return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-  }
-
   const [countDown, setCountDown] = useState(
-    Math.max(0, countDownDate - new Date().getTime())
+    isValidDate ? Math.max(0, countDownDate - new Date().getTime()) : 0
   );
 
   useEffect(() => {
+    // If invalid date, don't set up interval
+    if (!isValidDate) {
+      return;
+    }
+
     const interval = setInterval(() => {
       const newCountDown = Math.max(0, countDownDate - new Date().getTime());
       setCountDown(newCountDown);
@@ -26,7 +27,12 @@ export const useCountdown = (targetDate: string) => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [countDownDate]);
+  }, [countDownDate, isValidDate]);
+
+  // If invalid date, return zeros
+  if (!isValidDate) {
+    return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+  }
 
   return getReturnValues(countDown);
 };

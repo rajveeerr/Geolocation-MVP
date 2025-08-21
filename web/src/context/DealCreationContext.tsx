@@ -1,4 +1,5 @@
 // src/context/DealCreationContext.tsx
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useReducer } from 'react';
 import type { ReactNode } from 'react';
 
@@ -14,7 +15,7 @@ interface State {
 }
 
 type Action = 
-  | { type: 'UPDATE_FIELD'; field: keyof State; value: any }
+  | { type: 'UPDATE_FIELD'; field: keyof State; value: string | number | null }
   | { type: 'SET_DEAL_TYPE'; dealType: 'percentage' | 'amount' };
 
 const initialState: State = {

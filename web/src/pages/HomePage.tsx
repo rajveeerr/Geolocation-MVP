@@ -22,6 +22,7 @@ import { SectionDivider } from '@/components/common/SectionDivider';
 import { premiumDeals, happyHourDeals, experiencesData } from '@/data/deals'; // <-- THE FIX
 import { AnimatePresence } from 'framer-motion';
 
+import { DiscoverSection } from '@/components/landing/DiscoverSection';
 import { ContentCarousel } from '@/components/common/ContentCarousel';
 
 export const HomePage = () => {
@@ -64,7 +65,7 @@ export const HomePage = () => {
 
       <SectionDivider />
 
-      {/* DiscoverSection temporarily removed during refactor */}
+      <DiscoverSection />
     </div>
   );
 };

@@ -42,6 +42,7 @@ export const BusinessInfoStep = () => {
           });
       }
     } catch (error) {
+      console.error('Network error:', error);
       toast({ 
         title: "Network Error", 
         description: "Please check your connection and try again.", 
