@@ -1,8 +1,11 @@
 // src/pages/merchant/CreateDealPage.tsx
 import { Routes, Route } from 'react-router-dom';
 import { DealCreationProvider } from '@/context/DealCreationContext';
-import { DealBasicsStep, DealOfferStep } from '@/components/merchant/create-deal';
-// We will create the other steps next
+import { DealBasicsStep } from '@/components/merchant/create-deal/DealBasicsStep';
+import { DealOfferStep } from '@/components/merchant/create-deal/DealOfferStep';
+import { DealScheduleStep } from '@/components/merchant/create-deal/DealScheduleStep';
+import { DealInstructionsStep } from '@/components/merchant/create-deal/DealInstructionsStep';
+import { DealReviewStep } from '@/components/merchant/create-deal/DealReviewStep';
 
 export const CreateDealPage = () => {
   return (
@@ -10,7 +13,9 @@ export const CreateDealPage = () => {
       <Routes>
         <Route index element={<DealBasicsStep />} />
         <Route path="offer" element={<DealOfferStep />} />
-        {/* Routes for schedule, instructions, and review will be added here */}
+        <Route path="schedule" element={<DealScheduleStep />} />
+        <Route path="instructions" element={<DealInstructionsStep />} />
+        <Route path="review" element={<DealReviewStep />} />
       </Routes>
     </DealCreationProvider>
   );
