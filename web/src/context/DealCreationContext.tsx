@@ -1,128 +1,58 @@
 // src/context/DealCreationContext.tsx
-import React, { createContext, useContext, useReducer } from 'react';
+import { createContext, useContext, useReducer } from 'react';
 import type { ReactNode } from 'react';
 
-// Define the shape of our deal creation state
-export interface DealCreationState {
-  // Basic Info Step
+interface State {
   title: string;
   description: string;
-  
-  // Offer Details Step
-  discountType: 'percentage' | 'fixed_amount';
-  discountPercentage: number;
-  discountAmount: number;
-  originalPrice: number;
-  
-  // Timing Step
+  dealType: 'percentage' | 'amount' | null;
+  discountPercentage: number | null;
+  discountAmount: number | null;
   startTime: string;
   endTime: string;
-  availableDays: string[];
-  
-  // Advanced Settings Step
-  maxRedemptions: number;
-  minSpend: number;
-  terms: string;
-  
-  // UI State
-  currentStep: number;
-  isLoading: boolean;
+  redemptionInstructions: string;
 }
 
-// Define the possible actions
-export type DealCreationAction =
-  | { type: 'UPDATE_FIELD'; field: keyof DealCreationState; value: any }
-  | { type: 'SET_LOADING'; isLoading: boolean }
-  | { type: 'NEXT_STEP' }
-  | { type: 'PREV_STEP' }
-  | { type: 'RESET_FORM' };
+type Action = 
+  | { type: 'UPDATE_FIELD'; field: keyof State; value: any }
+  | { type: 'SET_DEAL_TYPE'; dealType: 'percentage' | 'amount' };
 
-// Initial state
-const initialState: DealCreationState = {
-  // Basic Info
+const initialState: State = {
   title: '',
   description: '',
-  
-  // Offer Details
-  discountType: 'percentage',
-  discountPercentage: 0,
-  discountAmount: 0,
-  originalPrice: 0,
-  
-  // Timing
+  dealType: null,
+  discountPercentage: null,
+  discountAmount: null,
   startTime: '',
   endTime: '',
-  availableDays: [],
-  
-  // Advanced Settings
-  maxRedemptions: 0,
-  minSpend: 0,
-  terms: '',
-  
-  // UI State
-  currentStep: 1,
-  isLoading: false,
+  redemptionInstructions: 'Show this screen at the counter to redeem your deal.',
 };
 
-// Reducer function
-function dealCreationReducer(state: DealCreationState, action: DealCreationAction): DealCreationState {
+function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'UPDATE_FIELD':
-      return {
-        ...state,
-        [action.field]: action.value,
+      return { ...state, [action.field]: action.value };
+    case 'SET_DEAL_TYPE':
+      return { 
+        ...state, 
+        dealType: action.dealType,
+        // Reset the other value to ensure data integrity
+        discountPercentage: action.dealType === 'amount' ? null : state.discountPercentage,
+        discountAmount: action.dealType === 'percentage' ? null : state.discountAmount,
       };
-    case 'SET_LOADING':
-      return {
-        ...state,
-        isLoading: action.isLoading,
-      };
-    case 'NEXT_STEP':
-      return {
-        ...state,
-        currentStep: state.currentStep + 1,
-      };
-    case 'PREV_STEP':
-      return {
-        ...state,
-        currentStep: Math.max(1, state.currentStep - 1),
-      };
-    case 'RESET_FORM':
-      return initialState;
     default:
       return state;
   }
 }
 
-// Context type
-interface DealCreationContextType {
-  state: DealCreationState;
-  dispatch: React.Dispatch<DealCreationAction>;
-}
+const DealCreationContext = createContext<{
+  state: State;
+  dispatch: React.Dispatch<Action>;
+}>({ state: initialState, dispatch: () => null });
 
-// Create the context
-const DealCreationContext = createContext<DealCreationContextType | undefined>(undefined);
-
-// Provider component
-interface DealCreationProviderProps {
-  children: ReactNode;
-}
-
-export const DealCreationProvider: React.FC<DealCreationProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(dealCreationReducer, initialState);
-
-  return (
-    <DealCreationContext.Provider value={{ state, dispatch }}>
-      {children}
-    </DealCreationContext.Provider>
-  );
+export const DealCreationProvider = ({ children }: { children: ReactNode }) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return <DealCreationContext.Provider value={{ state, dispatch }}>{children}</DealCreationContext.Provider>;
 };
 
-// Custom hook to use the context
-export const useDealCreation = () => {
-  const context = useContext(DealCreationContext);
-  if (context === undefined) {
-    throw new Error('useDealCreation must be used within a DealCreationProvider');
-  }
-  return context;
-};
+export const useDealCreation = () => useContext(DealCreationContext);

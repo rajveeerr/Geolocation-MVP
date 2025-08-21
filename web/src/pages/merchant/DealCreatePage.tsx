@@ -1,22 +1,16 @@
 // src/pages/merchant/CreateDealPage.tsx
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { DealCreationProvider } from '@/context/DealCreationContext';
-import { DealInfoStep } from '@/components/merchant/create-deal';
+import { DealBasicsStep, DealOfferStep } from '@/components/merchant/create-deal';
+// We will create the other steps next
 
-export const DealCreatePage = () => {
+export const CreateDealPage = () => {
   return (
     <DealCreationProvider>
       <Routes>
-        {/* Default redirect to the first step */}
-        <Route index element={<Navigate to="info" replace />} />
-        
-        {/* Step 1: Basic deal information */}
-        <Route path="info" element={<DealInfoStep />} />
-        
-        {/* Future steps will be added here */}
-        {/* <Route path="offer" element={<DealOfferStep />} /> */}
-        {/* <Route path="timing" element={<DealTimingStep />} /> */}
-        {/* <Route path="review" element={<DealReviewStep />} /> */}
+        <Route index element={<DealBasicsStep />} />
+        <Route path="offer" element={<DealOfferStep />} />
+        {/* Routes for schedule, instructions, and review will be added here */}
       </Routes>
     </DealCreationProvider>
   );

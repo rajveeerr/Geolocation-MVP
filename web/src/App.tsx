@@ -18,7 +18,7 @@ import { AuthProvider } from './context/AuthContext';
 import { AllDealsPage } from './pages/AllDealsPage';
 import { MerchantOnboardingPage } from './pages/merchant/MerchantOnboardingPage';
 import { MerchantDashboardPage } from './pages/merchant/MerchantDashboardPage';
-import { DealCreatePage } from './pages/merchant/DealCreatePage';
+import { CreateDealPage } from './pages/merchant/DealCreatePage';
 
 // Helper for default layout
 const DefaultLayout = () => (
@@ -54,7 +54,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<MerchantLayout />}>
               <Route path={PATHS.MERCHANT_DASHBOARD} element={<MerchantDashboardPage />} />
-              <Route path="/merchant/deals/create/*" element={<DealCreatePage />} />
+              <Route path="/merchant/deals/create/*" element={<CreateDealPage />} />
               <Route path="/merchant/onboarding/*" element={<MerchantOnboardingPage />} />
             </Route>
           </Route>

@@ -1,5 +1,5 @@
 import { bookTonightDeals, experiencesData } from '@/data/deals';
-import { BookingCard } from './BookingCard';
+import { CarouselCard } from './CarouselCard';
 import { motion } from 'framer-motion';
 
 interface HomepageContentGridProps {
@@ -28,7 +28,7 @@ export const HomepageContentGrid = ({
             (
               item, // Show up to 12 items (2 rows)
             ) => (
-              <BookingCard key={item.id} deal={item} />
+              <CarouselCard key={item.id} deal={item} />
             ),
           )}
         </motion.div>
