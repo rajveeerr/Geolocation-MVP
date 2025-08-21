@@ -11,12 +11,16 @@ export const DealOfferStep = () => {
   const { state, dispatch } = useDealCreation();
   const navigate = useNavigate();
 
+  const isNextDisabled = !state.dealType || 
+    (state.dealType === 'percentage' && !state.discountPercentage) ||
+    (state.dealType === 'amount' && !state.discountAmount);
+
   return (
     <OnboardingStepLayout
       title="What kind of offer is it?"
-      onNext={() => { /* Navigate to the next step */ }}
+      onNext={() => navigate('/merchant/deals/create/schedule')}
       onBack={() => navigate(-1)}
-      isNextDisabled={!state.dealType || (!state.discountPercentage && !state.discountAmount)}
+      isNextDisabled={isNextDisabled}
       progress={40}
     >
       <div className="space-y-6">
