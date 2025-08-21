@@ -1,4 +1,5 @@
 // src/components/merchant/create-deal/DealReviewStep.tsx
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDealCreation } from '@/context/DealCreationContext';
 import { OnboardingStepLayout } from '../onboarding/OnboardingStepLayout';
@@ -17,28 +18,51 @@ export const DealReviewStep = () => {
   const { state } = useDealCreation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const handlePublish = async () => {
-    // 1. Prepare payload for the API
-    const payload = {
-        title: state.title,
-        description: state.description,
-        discountPercentage: state.dealType === 'percentage' ? state.discountPercentage : null,
-        discountAmount: state.dealType === 'amount' ? state.discountAmount : null,
-        startTime: new Date(state.startTime).toISOString(),
-        endTime: new Date(state.endTime).toISOString(),
-        redemptionInstructions: state.redemptionInstructions,
-    };
+    if (isPublishing) return; // Prevent double-clicks
+    
+    try {
+      setIsPublishing(true);
+      console.log('Starting deal publication...', state);
+      
+      // Validate required fields
+      if (!state.startTime || !state.endTime) {
+        toast({ title: "Error", description: "Start time and end time are required.", variant: 'destructive' });
+        return;
+      }
 
-    // 2. Make the API call
-    const response = await apiPost('/deals', payload);
+      // 1. Prepare payload for the API
+      const payload = {
+          title: state.title,
+          description: state.description,
+          discountPercentage: state.dealType === 'percentage' ? state.discountPercentage : null,
+          discountAmount: state.dealType === 'amount' ? state.discountAmount : null,
+          startTime: new Date(state.startTime).toISOString(),
+          endTime: new Date(state.endTime).toISOString(),
+          redemptionInstructions: state.redemptionInstructions,
+      };
 
-    // 3. Handle the response
-    if (response.success) {
-        toast({ title: "Deal Published!", description: "Your new deal is now live for customers to see." });
-        navigate(PATHS.MERCHANT_DASHBOARD);
-    } else {
-        toast({ title: "Error Publishing Deal", description: response.error, variant: 'destructive' });
+      console.log('API Payload:', payload);
+
+      // 2. Make the API call
+      const response = await apiPost('/deals', payload);
+
+      console.log('API Response:', response);
+
+      // 3. Handle the response
+      if (response.success) {
+          toast({ title: "Deal Published!", description: "Your new deal is now live for customers to see." });
+          navigate(PATHS.MERCHANT_DASHBOARD);
+      } else {
+          toast({ title: "Error Publishing Deal", description: response.error || 'Unknown error occurred', variant: 'destructive' });
+      }
+    } catch (error) {
+      console.error('Error in handlePublish:', error);
+      toast({ title: "Error", description: "Failed to publish deal. Please try again.", variant: 'destructive' });
+    } finally {
+      setIsPublishing(false);
     }
   };
 
@@ -48,6 +72,7 @@ export const DealReviewStep = () => {
       onNext={handlePublish}
       onBack={() => navigate(-1)}
       progress={100}
+      isNextDisabled={isPublishing}
     >
       <div className="space-y-4">
         <p className="text-neutral-600">Review the details of your deal below. Once you publish, it will be visible to all CitySpark users.</p>

@@ -2,8 +2,14 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/common/Button';
 import { ArrowRight } from 'lucide-react';
 import { PATHS } from '@/routing/paths';
+import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 
 export const HeroCallToAction = () => {
+  const { data: merchantData } = useMerchantStatus();
+  
+  // Check if user has a merchant profile (any status)
+  const hasMerchantProfile = !!merchantData?.data?.merchant;
+
   return (
     <>
       <div className="mt-8 flex flex-col items-center justify-center gap-4 px-4 sm:mt-10 sm:flex-row sm:gap-6 sm:px-0">
@@ -25,15 +31,17 @@ export const HeroCallToAction = () => {
         </Link>
       </div>
 
-      <p className="text-neutral-text-secondary mt-6 px-4 text-sm sm:px-0 sm:text-base">
-        Are you a business?{' '}
-        <Link
-          to={PATHS.MERCHANT_ONBOARDING}
-          className="font-medium text-brand-primary-main hover:underline"
-        >
-          Get on the map in minutes
-        </Link>
-      </p>
+      {!hasMerchantProfile && (
+        <p className="text-neutral-text-secondary mt-6 px-4 text-sm sm:px-0 sm:text-base">
+          Are you a business?{' '}
+          <Link
+            to={PATHS.MERCHANT_ONBOARDING}
+            className="font-medium text-brand-primary-main hover:underline"
+          >
+            Get on the map in minutes
+          </Link>
+        </p>
+      )}
     </>
   );
 };

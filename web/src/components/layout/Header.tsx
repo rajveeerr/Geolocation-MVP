@@ -200,6 +200,7 @@ import { useAuth } from '@/context/useAuth';
 import { ProfileDropDown } from './ProfileDropDown';
 import { NavbarSearch } from './NavbarSearch';
 import { SearchModal } from './SearchModal';
+import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 
 const navigationItems = [
   { id: 'deals', label: 'Hot Deals', path: PATHS.ALL_DEALS },
@@ -212,6 +213,10 @@ export const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false); // <-- NEW STATE
   const { user, isLoadingUser } = useAuth();
+  const { data: merchantData } = useMerchantStatus();
+  
+  // Check if user has a merchant profile (any status)
+  const hasMerchantProfile = !!merchantData?.data?.merchant;
 
   const openSearchModal = () => setIsSearchModalOpen(true);
   const closeSearchModal = () => setIsSearchModalOpen(false);
@@ -275,9 +280,9 @@ export const Header = () => {
           </div>
 
           <div className="hidden items-center justify-end gap-2 lg:flex">
-            <Link to={PATHS.MERCHANT_ONBOARDING}>
+            <Link to={hasMerchantProfile ? PATHS.MERCHANT_DASHBOARD : PATHS.MERCHANT_ONBOARDING}>
               <Button variant="secondary" size="md" className="rounded-full">
-                CitySpark for Business
+                {hasMerchantProfile ? "Business Dashboard" : "CitySpark for Business"}
               </Button>
             </Link>
             {isLoadingUser ? (
@@ -353,13 +358,27 @@ export const Header = () => {
                       </Button>
                     </Link>
                     <p className="mt-6 text-center text-base font-medium text-gray-500">
-                      Are you a business owner?{' '}
-                      <Link
-                        to={PATHS.MERCHANT_ONBOARDING}
-                        className="text-primary hover:text-primary/90"
-                      >
-                        Get on the map
-                      </Link>
+                      {hasMerchantProfile ? (
+                        <>
+                          Manage your business{' '}
+                          <Link
+                            to={PATHS.MERCHANT_DASHBOARD}
+                            className="text-primary hover:text-primary/90"
+                          >
+                            Go to Dashboard
+                          </Link>
+                        </>
+                      ) : (
+                        <>
+                          Are you a business owner?{' '}
+                          <Link
+                            to={PATHS.MERCHANT_ONBOARDING}
+                            className="text-primary hover:text-primary/90"
+                          >
+                            Get on the map
+                          </Link>
+                        </>
+                      )}
                     </p>
                   </div>
                 </div>
