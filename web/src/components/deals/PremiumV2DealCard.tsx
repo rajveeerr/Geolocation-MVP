@@ -1,11 +1,12 @@
 // web/src/components/deals/PremiumV2DealCard.tsx
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Phone, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Heart, Phone, ChevronDown, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/common/Button';
 import type { Deal } from '@/data/deals';
 import { AvatarStack } from '@/components/common/AvatarStack';
+import { useSavedDeals } from '@/hooks/useSavedDeals';
 
 // A small, reusable component for colored tags
 const DealTag = ({ children }: { children: React.ReactNode }) => (
@@ -29,12 +30,10 @@ const mockOffers = [
 ];
 
 export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
-  const [isLiked, setIsLiked] = useState(false);
   const [offersVisible, setOffersVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
   // Smartly handle single or multiple images.
-  // If `deal.images` exists use it, otherwise create an array from the single `deal.image`.
   const imagesToShow = (deal.images && deal.images.length > 0) ? deal.images : [deal.image];
 
   // --- NEW: state & helpers for Framer Motion image slider ---
@@ -43,6 +42,22 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
 
   // Autoplay settings
   const AUTOPLAY_INTERVAL = 3500; // ms
+
+  // --- useSavedDeals hook integration ---
+  const { savedDealIds, saveDeal, unsaveDeal, isSaving, isUnsaving } = useSavedDeals();
+  const isSaved = savedDealIds.has(deal.id);
+  const isLikeButtonLoading = isSaving || isUnsaving;
+
+  const handleLikeClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isLikeButtonLoading) return;
+
+    if (isSaved) {
+      unsaveDeal(deal.id);
+    } else {
+      saveDeal(deal.id);
+    }
+  };
 
   // Autoplay effect with pause-on-hover
   useEffect(() => {
@@ -123,8 +138,8 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
               <div
                 key={idx}
                 className={cn(
-                  "h-1.5 w-1.5 rounded-full transition-all duration-300",
-                  currentImageIndex === idx ? "w-4 bg-white" : "bg-white/50"
+                  'h-1.5 w-1.5 rounded-full transition-all duration-300',
+                  currentImageIndex === idx ? 'w-4 bg-white' : 'bg-white/50'
                 )}
               />
             ))}
@@ -135,11 +150,18 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
         <Button variant="ghost" size="sm" className="absolute left-3 top-3 h-9 w-9 bg-black/30 text-white hover:bg-black/50 hover:text-white rounded-full">
           <Phone className="h-5 w-5" />
         </Button>
-        <Button 
-      onClick={() => setIsLiked(!isLiked)}
-      variant="ghost" size="sm" 
-            className="absolute right-3 top-3 h-9 w-9 bg-black/30 text-white hover:bg-red-500/80 hover:text-white rounded-full">
-          <Heart className={cn("h-5 w-5 transition-all", isLiked && "fill-current text-red-500")} />
+        <Button
+          onClick={handleLikeClick}
+          variant="ghost"
+          size="sm"
+          disabled={isLikeButtonLoading}
+          className="absolute right-3 top-3 h-9 w-9 bg-black/30 text-white hover:bg-red-500/80 hover:text-white rounded-full flex items-center justify-center"
+        >
+          {isLikeButtonLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Heart className={cn('h-5 w-5 transition-all', isSaved && 'fill-current text-red-500')} />
+          )}
         </Button>
       </div>
 
