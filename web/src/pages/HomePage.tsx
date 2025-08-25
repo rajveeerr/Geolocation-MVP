@@ -19,7 +19,7 @@ import { useState } from 'react';
 import { DealFinder } from '@/components/landing/DealFinder';
 import { SectionDivider } from '@/components/common/SectionDivider';
 
-import { topRatedDeals, happyHourDeals, experiencesData } from '@/data/deals';
+import { premiumDeals, happyHourDeals, experiencesData } from '@/data/deals'; // <-- THE FIX
 import { AnimatePresence } from 'framer-motion';
 
 import { DiscoverSection } from '@/components/landing/DiscoverSection';
@@ -36,12 +36,17 @@ export const HomePage = () => {
         </div>
       </section>
 
+      {/* --- THE FIX: Use premiumDeals for the main carousel --- */}
+      <ContentCarousel title="Today's Top Deals" deals={premiumDeals} />
+
+      <SectionDivider />
+
       <AnimatePresence mode="wait">
         {activeTab === 'deals' && (
           <ContentCarousel
             key="deals-carousel"
             title="Popular Deals Near You"
-            deals={topRatedDeals}
+            deals={premiumDeals}
           />
         )}
 

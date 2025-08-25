@@ -13,7 +13,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { PremiumDealCard } from './PremiumDealCard';
+import PremiumDealCard from './PremiumDealCard';
 import type { DealWithLocation } from '@/data/deals';
 import { Pagination } from '../common/Pagination';
 
@@ -110,13 +110,17 @@ export const DealsSidebar = ({
       <div className="flex-grow overflow-y-auto">
         <div className="space-y-4 p-3 sm:space-y-6 sm:p-4 lg:space-y-8 lg:p-6 xl:p-8">
           {deals.map((deal) => (
-            <PremiumDealCard
+            <div
               key={deal.id}
-              deal={deal}
-              isHovered={hoveredDealId === deal.id}
-              onMouseEnter={setHoveredDealId}
+              onMouseEnter={() => setHoveredDealId(deal.id)}
               onMouseLeave={() => setHoveredDealId(null)}
-            />
+              className={cn(
+                "transition-all duration-200",
+                hoveredDealId === deal.id && "ring-2 ring-primary/20 rounded-2xl"
+              )}
+            >
+              <PremiumDealCard deal={deal} />
+            </div>
           ))}
         </div>
 

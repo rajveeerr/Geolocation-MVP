@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { CarouselCard } from '@/components/landing/CarouselCard';
+import PremiumDealCard from '@/components/deals/PremiumDealCard'; // <-- THE FIX
 import { Button } from '@/components/common/Button';
 import { type Deal } from '@/data/deals';
 import { PATHS } from '@/routing/paths';
@@ -76,14 +76,14 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
           </div>
         </div>
 
-        {/* Horizontally Scrolling Cards */}
-        <div
-          ref={scrollContainerRef}
-          className="scrollbar-hide flex gap-3 overflow-x-auto pb-2 sm:gap-4 sm:pb-4 md:gap-5 lg:gap-6"
+        {/* --- THE FIX: Use PremiumDealCard and adjust widths --- */}
+        <div 
+          ref={scrollContainerRef} 
+          className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide"
         >
           {deals.map((deal) => (
-            <div key={deal.id} className="w-44 flex-shrink-0 lg:w-56 xl:w-52">
-              <CarouselCard deal={deal} />
+            <div key={deal.id} className="w-[320px] sm:w-[350px] flex-shrink-0">
+              <PremiumDealCard deal={deal} />
             </div>
           ))}
         </div>
