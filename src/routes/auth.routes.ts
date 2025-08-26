@@ -17,9 +17,12 @@ const registerSchema = z.object({
 router.post('/register', async (req: Request, res: Response) => {
   try {
         const { email, password, name } = registerSchema.parse(req.body);
+        
+        // Normalize email to lowercase to prevent case sensitivity issues
+        const normalizedEmail = email.toLowerCase().trim();
 
     // 2. Check if user already exists
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const existingUser = await prisma.user.findUnique({ where: { email: normalizedEmail } });
     if (existingUser) {
       return res.status(409).json({ error: 'Email is already in use' });
     }
@@ -30,7 +33,7 @@ router.post('/register', async (req: Request, res: Response) => {
     // 4. Create the new user in the database
     const newUser = await prisma.user.create({
       data: {
-        email,
+        email: normalizedEmail,
         name,
         password: hashedPassword,
       },
@@ -102,9 +105,12 @@ const loginSchema = z.object({
 router.post('/login', async (req: Request, res: Response) => {
   try {
         const { email, password } = loginSchema.parse(req.body);
+        
+        // Normalize email to lowercase to prevent case sensitivity issues
+        const normalizedEmail = email.toLowerCase().trim();
 
     // 2. Find the user by email
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
     if (!user) {
       // Use a generic error message for security
       return res.status(401).json({ error: 'Invalid credentials' });

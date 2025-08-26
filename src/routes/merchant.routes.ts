@@ -79,6 +79,42 @@ router.post('/merchants/register', protect, async (req: AuthRequest, res) => {
   }
 });
 
+// --- Endpoint: GET /api/merchants/status ---
+// Returns the merchant status for the authenticated user
+router.get('/merchants/status', protect, async (req: AuthRequest, res) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const merchant = await prisma.merchant.findUnique({
+      where: { ownerId: userId },
+      select: {
+        id: true,
+        status: true,
+        businessName: true,
+        address: true,
+        description: true,
+        logoUrl: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    });
+
+    if (!merchant) {
+      return res.status(404).json({ error: 'No merchant profile found' });
+    }
+
+    res.status(200).json({ merchant });
+
+  } catch (error) {
+    console.error('Fetch merchant status error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // --- Endpoint: POST /api/deals ---
 // Allows an APPROVED merchant to create a new deal.
 router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res) => {
