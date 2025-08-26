@@ -23,6 +23,20 @@ enum MerchantStatus {
   REJECTED
 }
 
+enum DealCategory {
+  FOOD_AND_BEVERAGE
+  RETAIL
+  ENTERTAINMENT
+  HEALTH_AND_FITNESS
+  BEAUTY_AND_SPA
+  AUTOMOTIVE
+  TRAVEL
+  EDUCATION
+  TECHNOLOGY
+  HOME_AND_GARDEN
+  OTHER
+}
+
 
 // --- CORE MODELS ---
 
@@ -47,6 +61,10 @@ model Merchant {
   description   String?
   logoUrl       String?
   status        MerchantStatus @default(PENDING) // New merchants are PENDING by default
+  
+  // Geolocation fields
+  latitude      Float?
+  longitude     Float?
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -68,6 +86,9 @@ model Deal {
   // Basic deal parameters (can be expanded later)
   discountPercentage Int?
   discountAmount     Float?
+  
+  // Category for filtering and organization
+  category      DealCategory @default(OTHER)
   
   // Validity period
   startTime     DateTime
