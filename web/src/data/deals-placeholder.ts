@@ -72,15 +72,15 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => ({
 
 // Merge backend data into placeholders: replace existing ids, otherwise append.
 export const mergeBackendDeals = (apiDeals: ApiDeal[] | undefined): DealWithLocation[] => {
+  // If no backend deals provided, just return placeholders
   if (!Array.isArray(apiDeals) || apiDeals.length === 0) return placeholderDeals;
 
   const adapted = apiDeals.map(adaptApiDealToUi);
-  const map = new Map<string, DealWithLocation>();
 
-  // start with placeholders
-  for (const p of placeholderDeals) map.set(p.id, p);
-  // overlay backend adapted deals (replace or add)
-  for (const a of adapted) map.set(a.id, a);
+  // We want backend deals to render on top, so put adapted backend deals first
+  // and then append placeholders that weren't replaced by backend entries.
+  const backendIds = new Set(adapted.map((d) => d.id));
+  const remainingPlaceholders = placeholderDeals.filter((p) => !backendIds.has(p.id));
 
-  return Array.from(map.values());
+  return [...adapted, ...remainingPlaceholders];
 };

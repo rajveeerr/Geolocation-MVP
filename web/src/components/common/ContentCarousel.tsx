@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import PremiumDealCard from '@/components/deals/PremiumDealCard'; // <-- THE FIX
+import { PremiumV2DealCard } from '@/components/deals/PremiumV2DealCard'; // <-- Import the NEW card
 import { Button } from '@/components/common/Button';
 import { type Deal } from '@/data/deals';
 import { PATHS } from '@/routing/paths';
@@ -19,10 +19,8 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const scrollAmount =
-        direction === 'left'
-          ? -scrollContainerRef.current.clientWidth
-          : scrollContainerRef.current.clientWidth;
+  // Scroll by a little less than the card width for a better feel
+  const scrollAmount = (direction === 'left' ? -1 : 1) * 350; 
       scrollContainerRef.current.scrollBy({
         left: scrollAmount,
         behavior: 'smooth',
@@ -76,14 +74,14 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
           </div>
         </div>
 
-        {/* --- THE FIX: Use PremiumDealCard and adjust widths --- */}
+        {/* --- MODIFIED: Use PremiumV2DealCard and adjust widths for the bigger card --- */}
         <div
           ref={scrollContainerRef}
-          className="scrollbar-hide flex gap-6 overflow-x-auto pb-4"
+          className="scrollbar-hide flex gap-6 overflow-x-auto pb-4 -mx-4 px-4" // Add padding to view shadows
         >
           {deals.map((deal) => (
-            <div key={deal.id} className="w-[320px] flex-shrink-0 sm:w-[350px]">
-              <PremiumDealCard deal={deal} />
+            <div key={deal.id} className="w-[340px] flex-shrink-0 sm:w-[360px]">
+              <PremiumV2DealCard deal={deal} />
             </div>
           ))}
         </div>
