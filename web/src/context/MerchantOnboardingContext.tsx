@@ -8,15 +8,22 @@ interface State {
   address: string;
   description: string;
   logoUrl: string;
+  // --- NEW: Add fields for coordinates ---
+  latitude: number | null;
+  longitude: number | null;
 }
 
-type Action = { type: 'UPDATE_FIELD'; field: keyof State; value: string };
+// --- MODIFIED: Update the action type to handle numbers and nulls ---
+type Action = { type: 'UPDATE_FIELD'; field: keyof State; value: string | number | null };
 
 const initialState: State = {
   businessName: '',
   address: '',
   description: '',
   logoUrl: '',
+  // --- NEW: Initialize coordinates as null ---
+  latitude: null,
+  longitude: null,
 };
 
 function reducer(state: State, action: Action): State {

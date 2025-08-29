@@ -128,12 +128,13 @@
 
 // web/src/components/deals/DealResultsMap.tsx
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
 import { cn } from '@/lib/utils';
 import type { DealWithLocation } from '@/data/deals';
+import { useEffect } from 'react';
 
 const createCustomIcon = (isHovered: boolean) => {
   const iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-utensils"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3z"/></svg>`;
@@ -158,34 +159,86 @@ const createCustomIcon = (isHovered: boolean) => {
 interface DealResultsMapProps {
   deals: DealWithLocation[];
   hoveredDealId: string | null;
+  userLocation?: { lat: number; lng: number } | null;
 }
+// --- NEW: Helper component to change the map's view smoothly ---
+const ChangeView = ({ center, zoom }: { center: L.LatLngExpression; zoom: number }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (!map) return;
+    // flyTo provides a smooth animated transition
+    map.flyTo(center, zoom, { animate: true, duration: 0.8 });
+  }, [map, center, zoom]);
+  return null;
+};
 
-export const DealResultsMap = ({
-  deals,
-  hoveredDealId,
-}: DealResultsMapProps) => {
-  const mapCenter: L.LatLngExpression = [40.72, -74.0];
+// Ensure the leaflet map invalidates its size when the container becomes visible
+const EnsureMapVisible = ({ deps }: { deps?: any[] }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (!map) return;
+    // Invalidate size after a tick to allow layout to settle
+    const t = setTimeout(() => map.invalidateSize({ animate: true }), 200);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps || []);
+  return null;
+};
+
+// Fit map bounds to include deals and user location when appropriate
+const FitBoundsToFeatures = ({ deals, userLocation }: { deals: DealWithLocation[]; userLocation?: { lat: number; lng: number } | null }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (!map) return;
+    try {
+      const points: L.LatLngExpression[] = [];
+      for (const d of deals) {
+        if (Array.isArray(d.position) && d.position.length === 2) points.push(d.position as L.LatLngExpression);
+      }
+      if (userLocation) points.push([userLocation.lat, userLocation.lng]);
+      if (points.length === 0) return;
+      const bounds = L.latLngBounds(points as L.LatLngExpression[]);
+      map.fitBounds(bounds, { padding: [80, 80], maxZoom: 15 });
+    } catch (err) {
+      // ignore
+    }
+  }, [map, deals, userLocation]);
+  return null;
+};
+
+export const DealResultsMap = ({ deals, hoveredDealId, userLocation }: DealResultsMapProps) => {
+  // Center the map on the first deal, or a default location if empty
+  const mapCenter: L.LatLngExpression = deals.length > 0 ? deals[0].position : [40.72, -74.0];
+  const hoveredDeal = deals.find((d) => d.id === hoveredDealId);
+
+  // Small user location icon
+  const createUserIcon = () =>
+    L.divIcon({
+      className: 'user-map-marker',
+      html: `<div style="width:14px;height:14px;border-radius:50%;background:#2563eb;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>`,
+      iconSize: [14, 14],
+      iconAnchor: [7, 7],
+    });
 
   return (
     <div className="sticky top-20 h-full w-full">
-      {/* --- THE FIX: Removed leaflet-container-dark class --- */}
-      <MapContainer
-        center={mapCenter}
-        zoom={13}
-        scrollWheelZoom={true}
-        className="h-full w-full"
-      >
-        {/* --- THE FIX: Changed URL to the light map theme --- */}
+      <MapContainer center={mapCenter} zoom={13} scrollWheelZoom={true} className="h-full w-full">
+        {/* Ensure map paints correctly when visible */}
+        <EnsureMapVisible deps={[deals.length, !!userLocation, hoveredDealId]} />
+
+        {/* Fit bounds to include features (will be overridden by ChangeView on hover) */}
+        <FitBoundsToFeatures deals={deals} userLocation={userLocation} />
+
+        {/* Pan/zoom when a deal is hovered */}
+        {hoveredDeal && <ChangeView center={hoveredDeal.position} zoom={15} />}
+
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
+
         {deals.map((deal) => (
-          <Marker
-            key={deal.id}
-            position={deal.position}
-            icon={createCustomIcon(hoveredDealId === deal.id)}
-          >
+          <Marker key={deal.id} position={deal.position} icon={createCustomIcon(hoveredDealId === deal.id)}>
             <Popup>
               <div className="font-sans">
                 <b className="text-sm">{deal.name}</b>
@@ -195,6 +248,17 @@ export const DealResultsMap = ({
             </Popup>
           </Marker>
         ))}
+
+        {/* User location marker */}
+        {userLocation && (
+          <Marker position={[userLocation.lat, userLocation.lng]} icon={createUserIcon()}>
+            <Popup>
+              <div className="font-sans">
+                <b className="text-sm">You are here</b>
+              </div>
+            </Popup>
+          </Marker>
+        )}
       </MapContainer>
     </div>
   );

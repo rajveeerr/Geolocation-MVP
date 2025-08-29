@@ -1,6 +1,6 @@
 // web/src/components/deals/DealsSidebar.tsx
 
-import { useState } from 'react';
+ 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/common/Button';
 import {
@@ -11,6 +11,7 @@ import {
   Coffee,
   Filter,
   MapPin,
+  Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import PremiumDealCard from './PremiumDealCard';
@@ -18,32 +19,49 @@ import type { DealWithLocation } from '@/data/deals';
 import { Pagination } from '../common/Pagination';
 
 const categoryFilters = [
-  {
-    id: 'restaurant',
-    label: 'Restaurants',
-    icon: <Utensils className="h-4 w-4" />,
-  },
-  { id: 'hotel', label: 'Hotels', icon: <Hotel className="h-4 w-4" /> },
-  { id: 'gas', label: 'Gas Stations', icon: <Fuel className="h-4 w-4" /> },
-  { id: 'coffee', label: 'Cafés', icon: <Coffee className="h-4 w-4" /> },
+  { id: 'FOOD_AND_BEVERAGE', label: 'Restaurants', icon: <Utensils className="h-4 w-4" /> },
+  { id: 'TRAVEL', label: 'Hotels', icon: <Hotel className="h-4 w-4" /> },
+  { id: 'RETAIL', label: 'Retail', icon: <Fuel className="h-4 w-4" /> }, // Example, adjust as needed
+  { id: 'OTHER', label: 'Cafés', icon: <Coffee className="h-4 w-4" /> }, // Example
+];
+
+// --- NEW: Define radius options ---
+const radiusOptions = [
+  { value: 5, label: '5 km' },
+  { value: 10, label: '10 km' },
+  { value: 25, label: '25 km' },
 ];
 
 interface DealsSidebarProps {
   deals: DealWithLocation[];
   hoveredDealId: string | null;
   setHoveredDealId: (id: string | null) => void;
+  // --- NEW: Props for filters ---
+  activeCategory: string;
+  setActiveCategory: (category: string) => void;
+  searchRadius: number;
+  setSearchRadius: (radius: number) => void;
+  isLoading: boolean;
+  // --- NEW: Props for search (lifted to parent) ---
+  searchTerm?: string;
+  setSearchTerm?: (term: string) => void;
 }
 
 export const DealsSidebar = ({
   deals,
   hoveredDealId,
   setHoveredDealId,
+  activeCategory,
+  setActiveCategory,
+  searchRadius,
+  setSearchRadius,
+  isLoading,
+  searchTerm = '',
+  setSearchTerm = () => {},
 }: DealsSidebarProps) => {
-  const [activeCategory, setActiveCategory] = useState('restaurant');
 
   return (
     <div className="flex h-full flex-col bg-neutral-50/50">
-      {/* Header with responsive premium styling */}
       <div className="flex-shrink-0 border-b border-neutral-200/80 bg-white">
         <div className="p-4 pb-3 sm:p-6 sm:pb-4 lg:p-8 lg:pb-6">
           <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center lg:mb-6">
@@ -53,12 +71,12 @@ export const DealsSidebar = ({
               </h1>
               <div className="mt-1 flex items-center gap-1.5 text-sm text-neutral-600">
                 <MapPin className="h-4 w-4 flex-shrink-0 text-neutral-500" />
-                <span className="truncate">San Francisco, CA</span>
+                <span className="truncate">Deals Near You</span>
               </div>
             </div>
-            <div className="flex-shrink-0 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 px-3 py-2">
+            <div className="relative flex-shrink-0 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 px-3 py-2">
               <span className="whitespace-nowrap text-sm font-semibold text-primary">
-                {deals.length} deals
+                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : `${deals.length} deals found`}
               </span>
             </div>
           </div>
@@ -70,6 +88,8 @@ export const DealsSidebar = ({
                 style={{ color: 'hsl(var(--brand-primary-600))' }}
               />
               <Input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm?.(e.target.value)}
                 placeholder="Search restaurants, cuisines, areas..."
                 className="h-11 rounded-xl border-neutral-200/80 bg-white/80 pl-12 text-sm font-medium backdrop-blur-sm placeholder:text-neutral-400 focus:border-primary/50 focus:ring-primary/10 sm:h-12 sm:text-base"
               />
@@ -81,7 +101,6 @@ export const DealsSidebar = ({
           </div>
         </div>
 
-        {/* Category Filters with responsive design */}
         <div className="px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8">
           <div className="scrollbar-hide flex items-center gap-2 overflow-x-auto p-2 pb-2">
             {categoryFilters.map((cat) => (
@@ -93,7 +112,7 @@ export const DealsSidebar = ({
                 className={cn(
                   'flex flex-shrink-0 items-center gap-2 whitespace-nowrap rounded-xl border px-3 py-2 text-xs font-semibold transition-all sm:px-4 sm:py-2.5 sm:text-sm',
                   activeCategory === cat.id
-                    ? 'scale-105'
+                    ? 'scale-105 shadow-md'
                     : 'border-neutral-200/80 bg-white/80 text-neutral-700 hover:border-primary/30 hover:bg-white hover:text-primary',
                 )}
               >
@@ -103,32 +122,63 @@ export const DealsSidebar = ({
               </Button>
             ))}
           </div>
+
+          {/* --- NEW: Radius Filter UI --- */}
+          <div className="mt-4 flex items-center gap-2 rounded-xl border border-neutral-200/80 bg-white/50 p-2">
+            <span className="pl-2 text-xs font-bold text-neutral-600">Radius:</span>
+            {radiusOptions.map((opt) => (
+              <Button
+                key={opt.value}
+                onClick={() => setSearchRadius(opt.value)}
+                variant={searchRadius === opt.value ? 'secondary' : 'ghost'}
+                size="sm"
+                className={cn(
+                  'flex-1 rounded-lg text-xs',
+                  searchRadius === opt.value && 'font-bold shadow-sm'
+                )}
+              >
+                {opt.label}
+              </Button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Content List with responsive spacing */}
+      {/* --- MODIFIED: Content List with Empty State --- */}
       <div className="flex-grow overflow-y-auto">
         <div className="space-y-4 p-3 sm:space-y-6 sm:p-4 lg:space-y-8 lg:p-6 xl:p-8">
-          {deals.map((deal) => (
-            <div
-              key={deal.id}
-              onMouseEnter={() => setHoveredDealId(deal.id)}
-              onMouseLeave={() => setHoveredDealId(null)}
-              className={cn(
-                'transition-all duration-200',
-                hoveredDealId === deal.id &&
-                  'rounded-2xl ring-2 ring-primary/20',
-              )}
-            >
-              <PremiumDealCard deal={deal} />
+          {/* Conditional rendering based on loading and deals count */}
+          {!isLoading && deals.length === 0 ? (
+            <div className="py-12 text-center">
+              <h3 className="text-lg font-semibold text-neutral-800">No Deals Found</h3>
+              <p className="mt-2 text-sm text-neutral-500">
+                Try adjusting your search or filters to find what you're looking for.
+              </p>
             </div>
-          ))}
+          ) : (
+            deals.map((deal) => (
+              <div
+                key={deal.id}
+                onMouseEnter={() => setHoveredDealId(deal.id)}
+                onMouseLeave={() => setHoveredDealId(null)}
+                className={cn(
+                  'transition-all duration-200',
+                  hoveredDealId === deal.id &&
+                    'rounded-2xl ring-2 ring-primary/20',
+                )}
+              >
+                <PremiumDealCard deal={deal} />
+              </div>
+            ))
+          )}
         </div>
 
-        {/* Pagination with responsive spacing */}
-        <div className="border-t border-neutral-200/80 bg-white/80 p-4 backdrop-blur-sm sm:p-6 lg:p-8">
-          <Pagination />
-        </div>
+        {/* Pagination: Only show if there are deals to paginate */}
+        {deals.length > 0 && (
+          <div className="border-t border-neutral-200/80 bg-white/80 p-4 backdrop-blur-sm sm:p-6 lg:p-8">
+            <Pagination />
+          </div>
+        )}
       </div>
     </div>
   );
