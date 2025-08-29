@@ -7,7 +7,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 interface Props {
   title: string;
   children: ReactNode;
-  onNext: () => void;
+  onNext: () => void | Promise<void>;
   onBack: () => void;
   isNextDisabled?: boolean;
   isLoading?: boolean;

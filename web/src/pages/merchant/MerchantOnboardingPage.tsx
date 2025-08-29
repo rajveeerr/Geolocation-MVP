@@ -1,16 +1,29 @@
 // src/pages/merchant/MerchantOnboardingPage.tsx
-import { OnboardingProvider } from '@/context/MerchantOnboardingContext';
-import { Routes, Route } from 'react-router-dom';
+import { OnboardingProvider, useOnboarding } from '@/context/MerchantOnboardingContext';
 import { BusinessInfoStep } from '@/components/merchant/onboarding/BusinessInfoStep';
+import { AddressStep } from '@/components/merchant/onboarding/AddressStep';
+import { MapConfirmationStep } from '@/components/merchant/onboarding/MapConfirmationStep';
+
+// A new component to render the current step
+const OnboardingFlow = () => {
+    const { state } = useOnboarding();
+
+    switch (state.step) {
+        case 1:
+            return <BusinessInfoStep />;
+        case 2:
+            return <AddressStep />;
+        case 3:
+            return <MapConfirmationStep />;
+        default:
+            return <BusinessInfoStep />; // Default to first step
+    }
+};
 
 export const MerchantOnboardingPage = () => {
   return (
     <OnboardingProvider>
-      {/* Here we can have nested routes for each step of the form */}
-      <Routes>
-        <Route index element={<BusinessInfoStep />} />
-        {/* Add routes for Step 2, Step 3 etc. here */}
-      </Routes>
+      <OnboardingFlow />
     </OnboardingProvider>
   );
 };
