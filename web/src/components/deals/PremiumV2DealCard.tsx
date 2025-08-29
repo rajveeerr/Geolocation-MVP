@@ -1,7 +1,7 @@
 // web/src/components/deals/PremiumV2DealCard.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Phone, ChevronDown } from 'lucide-react';
+import { Heart, Phone, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/common/Button';
 import type { Deal } from '@/data/deals';
@@ -31,36 +31,115 @@ const mockOffers = [
 export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [offersVisible, setOffersVisible] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Smartly handle single or multiple images.
   // If `deal.images` exists use it, otherwise create an array from the single `deal.image`.
   const imagesToShow = (deal.images && deal.images.length > 0) ? deal.images : [deal.image];
 
+  // --- NEW: state & helpers for Framer Motion image slider ---
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const hasMultipleImages = imagesToShow.length > 1;
+
+  // Autoplay settings
+  const AUTOPLAY_INTERVAL = 3500; // ms
+
+  // Autoplay effect with pause-on-hover
+  useEffect(() => {
+    if (!hasMultipleImages) return;
+    if (isHovered) return; // pause when hovered
+
+    const timer = window.setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % imagesToShow.length);
+    }, AUTOPLAY_INTERVAL);
+
+    return () => window.clearInterval(timer);
+  }, [isHovered, hasMultipleImages, imagesToShow.length]);
+
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev + 1) % imagesToShow.length);
+  };
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev - 1 + imagesToShow.length) % imagesToShow.length);
+  };
+
+  const imageVariants = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+  };
+
   return (
     <div className="group w-full max-w-sm cursor-pointer overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-2xl">
-      {/* --- Image Slider & Overlays --- */}
-      <div className="relative aspect-[4/3]">
-        <div className="scrollbar-hide absolute inset-0 flex overflow-x-auto snap-x snap-mandatory">
-          {imagesToShow.map((imgSrc, index) => (
-            <img
-              key={index}
-              src={imgSrc}
-              alt={`${deal.name} view ${index + 1}`}
-              className="h-full w-full flex-shrink-0 snap-center object-cover"
-            />
-          ))}
-        </div>
+      {/* --- Image Slider & Overlays (Framer Motion) --- */}
+      <div
+        className="relative aspect-[4/3]"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <AnimatePresence initial={false} mode="wait">
+          <motion.img
+            key={currentImageIndex}
+            src={imagesToShow[currentImageIndex]}
+            alt={`${deal.name} view ${currentImageIndex + 1}`}
+            variants={imageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="absolute h-full w-full object-cover"
+          />
+        </AnimatePresence>
+
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent pointer-events-none" />
         
-    <Button variant="ghost" size="sm" className="absolute left-3 top-3 h-9 w-9 bg-black/30 text-white hover:bg-black/50 hover:text-white rounded-full">
-          <Phone className="h-4 w-4" />
+        {/* Arrow navigation */}
+        {hasMultipleImages && (
+          <>
+            <Button
+              onClick={prevImage}
+              variant="ghost" size="sm"
+              className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/60"
+            >
+              <ChevronLeft className="w-6" />
+            </Button>
+            <Button
+              onClick={nextImage}
+              variant="ghost" size="sm"
+              className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/60"
+            >
+              <ChevronRight className="h-6 w-6" />
+            </Button>
+          </>
+        )}
+
+        {/* Indicator dots */}
+        {hasMultipleImages && (
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+            {imagesToShow.map((_, idx) => (
+              <div
+                key={idx}
+                className={cn(
+                  "h-1.5 w-1.5 rounded-full transition-all duration-300",
+                  currentImageIndex === idx ? "w-4 bg-white" : "bg-white/50"
+                )}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Overlay Buttons (Call & Like) */}
+        <Button variant="ghost" size="sm" className="absolute left-3 top-3 h-9 w-9 bg-black/30 text-white hover:bg-black/50 hover:text-white rounded-full">
+          <Phone className="h-5 w-5" />
         </Button>
         <Button 
-            onClick={() => setIsLiked(!isLiked)}
-            variant="ghost" 
-      size="sm" 
+      onClick={() => setIsLiked(!isLiked)}
+      variant="ghost" size="sm" 
             className="absolute right-3 top-3 h-9 w-9 bg-black/30 text-white hover:bg-red-500/80 hover:text-white rounded-full">
-          <Heart className={cn("h-4 w-4 transition-all", isLiked && "fill-current text-red-500")} />
+          <Heart className={cn("h-5 w-5 transition-all", isLiked && "fill-current text-red-500")} />
         </Button>
       </div>
 
@@ -89,7 +168,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
             className="flex items-center justify-center w-full mb-3 text-sm font-semibold text-brand-primary-600 hover:text-brand-primary-800"
         >
             <span>View All Offers</span>
-            <ChevronDown className={cn("h-4 w-4 ml-1 transition-transform", offersVisible && "rotate-180")} />
+            <ChevronDown className={cn("h-5 w-5 ml-1 transition-transform", offersVisible && "rotate-180")} />
         </button>
         <AnimatePresence>
         {offersVisible && (

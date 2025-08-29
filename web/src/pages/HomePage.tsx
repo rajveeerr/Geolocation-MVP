@@ -29,6 +29,12 @@ const adaptApiDealToUi = (apiDeal: ApiDeal): Deal => ({
   image:
     apiDeal.imageUrl ||
     'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
+  // Add a mock images array for local testing of the new slider. Keep single `image` for compatibility.
+  images: [
+    apiDeal.imageUrl || 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
+    'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80',
+    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&q=80',
+  ],
   rating: 4.5,
   category: apiDeal.merchant?.businessName || 'Restaurant',
   price: '$$',

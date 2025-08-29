@@ -59,6 +59,11 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => ({
   id: apiDeal.id,
   name: apiDeal.title,
   image: apiDeal.imageUrl || 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
+  images: [
+    apiDeal.imageUrl || 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
+    'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80',
+    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&q=80',
+  ],
   rating: apiDeal.rating ?? 4.2,
   category: apiDeal.category || 'Restaurant',
   price: apiDeal.price || '$$',
