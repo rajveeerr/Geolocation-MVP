@@ -77,12 +77,12 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
         </div>
 
         {/* --- THE FIX: Use PremiumDealCard and adjust widths --- */}
-        <div 
-          ref={scrollContainerRef} 
-          className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide"
+        <div
+          ref={scrollContainerRef}
+          className="scrollbar-hide flex gap-6 overflow-x-auto pb-4"
         >
           {deals.map((deal) => (
-            <div key={deal.id} className="w-[320px] sm:w-[350px] flex-shrink-0">
+            <div key={deal.id} className="w-[320px] flex-shrink-0 sm:w-[350px]">
               <PremiumDealCard deal={deal} />
             </div>
           ))}

@@ -4,7 +4,7 @@ import { MerchantHeader } from './MerchantHeader'; // <-- THE FIX
 
 export const MerchantLayout = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-neutral-50">
+    <div className="flex min-h-screen flex-col bg-neutral-50">
       <MerchantHeader /> {/* <-- THE FIX */}
       <main className="flex-grow">
         <Outlet />

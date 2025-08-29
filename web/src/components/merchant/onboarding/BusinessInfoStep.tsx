@@ -17,36 +17,37 @@ export const BusinessInfoStep = () => {
 
   const handleNext = async () => {
     if (isSubmitting) return;
-    
+
     setIsSubmitting(true);
     try {
       const response = await apiPost('/merchants/register', {
-          businessName: state.businessName,
-          address: state.address,
-          description: 'Default description', // Add these to your form later
-          logoUrl: '',
+        businessName: state.businessName,
+        address: state.address,
+        description: 'Default description', // Add these to your form later
+        logoUrl: '',
       });
 
       if (response.success) {
-          toast({ 
-            title: "Application Submitted!", 
-            description: "Your merchant profile is now pending approval.",
-            duration: 5000
-          });
-          navigate(PATHS.MERCHANT_DASHBOARD);
+        toast({
+          title: 'Application Submitted!',
+          description: 'Your merchant profile is now pending approval.',
+          duration: 5000,
+        });
+        navigate(PATHS.MERCHANT_DASHBOARD);
       } else {
-          toast({ 
-            title: "Error", 
-            description: response.error || "Something went wrong. Please try again.", 
-            variant: 'destructive' 
-          });
+        toast({
+          title: 'Error',
+          description:
+            response.error || 'Something went wrong. Please try again.',
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       console.error('Network error:', error);
-      toast({ 
-        title: "Network Error", 
-        description: "Please check your connection and try again.", 
-        variant: 'destructive' 
+      toast({
+        title: 'Network Error',
+        description: 'Please check your connection and try again.',
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
@@ -63,23 +64,43 @@ export const BusinessInfoStep = () => {
     >
       <div className="space-y-6">
         <div>
-          <Label htmlFor="businessName" className="text-lg font-semibold">Business Name</Label>
-          <p className="text-neutral-500 mb-2">This will be your public name on CitySpark.</p>
-          <Input 
+          <Label htmlFor="businessName" className="text-lg font-semibold">
+            Business Name
+          </Label>
+          <p className="mb-2 text-neutral-500">
+            This will be your public name on CitySpark.
+          </p>
+          <Input
             id="businessName"
             value={state.businessName}
-            onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'businessName', value: e.target.value })}
+            onChange={(e) =>
+              dispatch({
+                type: 'UPDATE_FIELD',
+                field: 'businessName',
+                value: e.target.value,
+              })
+            }
             className="h-14 text-lg"
             disabled={isSubmitting}
           />
         </div>
         <div>
-          <Label htmlFor="address" className="text-lg font-semibold">Business Address</Label>
-          <p className="text-neutral-500 mb-2">This helps users find you on the map.</p>
-          <Input 
+          <Label htmlFor="address" className="text-lg font-semibold">
+            Business Address
+          </Label>
+          <p className="mb-2 text-neutral-500">
+            This helps users find you on the map.
+          </p>
+          <Input
             id="address"
             value={state.address}
-            onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'address', value: e.target.value })}
+            onChange={(e) =>
+              dispatch({
+                type: 'UPDATE_FIELD',
+                field: 'address',
+                value: e.target.value,
+              })
+            }
             className="h-14 text-lg"
             disabled={isSubmitting}
           />

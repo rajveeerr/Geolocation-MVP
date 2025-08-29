@@ -18,15 +18,23 @@ export const DealInstructionsStep = () => {
       progress={80}
     >
       <div>
-        <Label htmlFor="instructions" className="text-lg font-semibold">Redemption Instructions</Label>
-        <p className="text-neutral-500 mb-2">
+        <Label htmlFor="instructions" className="text-lg font-semibold">
+          Redemption Instructions
+        </Label>
+        <p className="mb-2 text-neutral-500">
           Keep it simple. e.g., "Show this screen to the cashier."
         </p>
         <Textarea
           id="instructions"
           value={state.redemptionInstructions}
-          onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'redemptionInstructions', value: e.target.value })}
-          className="text-base min-h-[120px]"
+          onChange={(e) =>
+            dispatch({
+              type: 'UPDATE_FIELD',
+              field: 'redemptionInstructions',
+              value: e.target.value,
+            })
+          }
+          className="min-h-[120px] text-base"
           rows={4}
         />
       </div>

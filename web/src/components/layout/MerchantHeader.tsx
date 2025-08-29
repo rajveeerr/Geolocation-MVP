@@ -9,19 +9,27 @@ import { cn } from '@/lib/utils';
 export const MerchantHeader = () => {
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "px-3 py-2 rounded-md text-sm font-semibold transition-colors",
-      isActive ? "bg-brand-primary-500/10 text-brand-primary-600" : "text-neutral-600 hover:bg-neutral-100"
+      'px-3 py-2 rounded-md text-sm font-semibold transition-colors',
+      isActive
+        ? 'bg-brand-primary-500/10 text-brand-primary-600'
+        : 'text-neutral-600 hover:bg-neutral-100',
     );
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-neutral-200">
-      <div className="container mx-auto max-w-screen-xl px-6 h-20 flex items-center justify-between">
+    <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white">
+      <div className="container mx-auto flex h-20 max-w-screen-xl items-center justify-between px-6">
         <div className="flex items-center gap-8">
           <Logo />
-          <nav className="hidden md:flex items-center gap-2">
-            <NavLink to={PATHS.MERCHANT_DASHBOARD} className={navLinkClass}>Dashboard</NavLink>
-            <NavLink to="/merchant/deals" className={navLinkClass}>My Deals</NavLink>
-            <NavLink to="/merchant/analytics" className={navLinkClass}>Analytics</NavLink>
+          <nav className="hidden items-center gap-2 md:flex">
+            <NavLink to={PATHS.MERCHANT_DASHBOARD} className={navLinkClass}>
+              Dashboard
+            </NavLink>
+            <NavLink to="/merchant/deals" className={navLinkClass}>
+              My Deals
+            </NavLink>
+            <NavLink to="/merchant/analytics" className={navLinkClass}>
+              Analytics
+            </NavLink>
           </nav>
         </div>
         <div className="flex items-center gap-3">
@@ -32,7 +40,7 @@ export const MerchantHeader = () => {
           </Link>
           <Link to={PATHS.MERCHANT_DEALS_CREATE}>
             <Button size="md" className="rounded-full">
-              <PlusCircle className="w-4 h-4 mr-2" />
+              <PlusCircle className="mr-2 h-4 w-4" />
               Create Deal
             </Button>
           </Link>

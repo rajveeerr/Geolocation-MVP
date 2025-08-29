@@ -6,11 +6,11 @@ import { BusinessInfoStep } from '@/components/merchant/onboarding/BusinessInfoS
 export const MerchantOnboardingPage = () => {
   return (
     <OnboardingProvider>
-        {/* Here we can have nested routes for each step of the form */}
-        <Routes>
-            <Route index element={<BusinessInfoStep />} />
-            {/* Add routes for Step 2, Step 3 etc. here */}
-        </Routes>
+      {/* Here we can have nested routes for each step of the form */}
+      <Routes>
+        <Route index element={<BusinessInfoStep />} />
+        {/* Add routes for Step 2, Step 3 etc. here */}
+      </Routes>
     </OnboardingProvider>
   );
 };

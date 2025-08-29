@@ -6,7 +6,7 @@ import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 
 export const HeroCallToAction = () => {
   const { data: merchantData } = useMerchantStatus();
-  
+
   // Check if user has a merchant profile (any status)
   const hasMerchantProfile = !!merchantData?.data?.merchant;
 

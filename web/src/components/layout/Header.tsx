@@ -214,7 +214,7 @@ export const Header = () => {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false); // <-- NEW STATE
   const { user, isLoadingUser } = useAuth();
   const { data: merchantData } = useMerchantStatus();
-  
+
   // Check if user has a merchant profile (any status)
   const hasMerchantProfile = !!merchantData?.data?.merchant;
 
@@ -280,9 +280,17 @@ export const Header = () => {
           </div>
 
           <div className="hidden items-center justify-end gap-2 lg:flex">
-            <Link to={hasMerchantProfile ? PATHS.MERCHANT_DASHBOARD : PATHS.MERCHANT_ONBOARDING}>
+            <Link
+              to={
+                hasMerchantProfile
+                  ? PATHS.MERCHANT_DASHBOARD
+                  : PATHS.MERCHANT_ONBOARDING
+              }
+            >
               <Button variant="secondary" size="md" className="rounded-full">
-                {hasMerchantProfile ? "Business Dashboard" : "CitySpark for Business"}
+                {hasMerchantProfile
+                  ? 'Business Dashboard'
+                  : 'CitySpark for Business'}
               </Button>
             </Link>
             {isLoadingUser ? (

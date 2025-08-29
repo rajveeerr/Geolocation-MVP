@@ -24,7 +24,9 @@ import { CreateDealPage } from './pages/merchant/DealCreatePage';
 const DefaultLayout = () => (
   <>
     <Header />
-    <main><Outlet /></main>
+    <main>
+      <Outlet />
+    </main>
     <Footer />
   </>
 );
@@ -53,9 +55,18 @@ function App() {
           {/* Merchant Protected Routes */}
           <Route element={<ProtectedRoute />}>
             <Route element={<MerchantLayout />}>
-              <Route path={PATHS.MERCHANT_DASHBOARD} element={<MerchantDashboardPage />} />
-              <Route path="/merchant/deals/create/*" element={<CreateDealPage />} />
-              <Route path="/merchant/onboarding/*" element={<MerchantOnboardingPage />} />
+              <Route
+                path={PATHS.MERCHANT_DASHBOARD}
+                element={<MerchantDashboardPage />}
+              />
+              <Route
+                path="/merchant/deals/create/*"
+                element={<CreateDealPage />}
+              />
+              <Route
+                path="/merchant/onboarding/*"
+                element={<MerchantOnboardingPage />}
+              />
             </Route>
           </Route>
 

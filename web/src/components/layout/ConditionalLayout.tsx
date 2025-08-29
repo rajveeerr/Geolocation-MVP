@@ -12,13 +12,14 @@ interface ConditionalLayoutProps {
 export const ConditionalLayout = ({ children }: ConditionalLayoutProps) => {
   const location = useLocation();
   const { data: merchantData } = useMerchantStatus();
-  
+
   // Check if user is on merchant pages
   const isMerchantPage = location.pathname.startsWith('/merchant');
-  
+
   // Check if user is an approved merchant
-  const isApprovedMerchant = merchantData?.data?.merchant?.status === 'APPROVED';
-  
+  const isApprovedMerchant =
+    merchantData?.data?.merchant?.status === 'APPROVED';
+
   // Show MerchantHeader if:
   // 1. User is on merchant pages AND
   // 2. User is an approved merchant
@@ -27,9 +28,7 @@ export const ConditionalLayout = ({ children }: ConditionalLayoutProps) => {
   return (
     <>
       {showMerchantHeader ? <MerchantHeader /> : <Header />}
-      <main className="min-h-screen">
-        {children}
-      </main>
+      <main className="min-h-screen">{children}</main>
     </>
   );
 };

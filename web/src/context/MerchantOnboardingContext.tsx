@@ -13,7 +13,10 @@ interface State {
 type Action = { type: 'UPDATE_FIELD'; field: keyof State; value: string };
 
 const initialState: State = {
-  businessName: '', address: '', description: '', logoUrl: ''
+  businessName: '',
+  address: '',
+  description: '',
+  logoUrl: '',
 };
 
 function reducer(state: State, action: Action): State {
@@ -32,7 +35,11 @@ const OnboardingContext = createContext<{
 
 export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  return <OnboardingContext.Provider value={{ state, dispatch }}>{children}</OnboardingContext.Provider>;
+  return (
+    <OnboardingContext.Provider value={{ state, dispatch }}>
+      {children}
+    </OnboardingContext.Provider>
+  );
 };
 
 export const useOnboarding = () => useContext(OnboardingContext);

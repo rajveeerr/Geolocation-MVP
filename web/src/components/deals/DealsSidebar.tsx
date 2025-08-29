@@ -65,8 +65,8 @@ export const DealsSidebar = ({
 
           <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
             <div className="relative flex-grow">
-              <Search 
-                className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 z-10" 
+              <Search
+                className="absolute left-4 top-1/2 z-10 h-5 w-5 -translate-y-1/2"
                 style={{ color: 'hsl(var(--brand-primary-600))' }}
               />
               <Input
@@ -74,7 +74,7 @@ export const DealsSidebar = ({
                 className="h-11 rounded-xl border-neutral-200/80 bg-white/80 pl-12 text-sm font-medium backdrop-blur-sm placeholder:text-neutral-400 focus:border-primary/50 focus:ring-primary/10 sm:h-12 sm:text-base"
               />
             </div>
-            <button className="flex h-11 w-full items-center justify-center rounded-xl border border-neutral-200/80 bg-white/80 backdrop-blur-sm hover:border-primary/30 hover:bg-white sm:h-12 sm:w-12 transition-colors">
+            <button className="flex h-11 w-full items-center justify-center rounded-xl border border-neutral-200/80 bg-white/80 backdrop-blur-sm transition-colors hover:border-primary/30 hover:bg-white sm:h-12 sm:w-12">
               <Filter className="h-5 w-5 text-brand-primary-600" />
               <span className="ml-2 sm:hidden">Filters</span>
             </button>
@@ -115,8 +115,9 @@ export const DealsSidebar = ({
               onMouseEnter={() => setHoveredDealId(deal.id)}
               onMouseLeave={() => setHoveredDealId(null)}
               className={cn(
-                "transition-all duration-200",
-                hoveredDealId === deal.id && "ring-2 ring-primary/20 rounded-2xl"
+                'transition-all duration-200',
+                hoveredDealId === deal.id &&
+                  'rounded-2xl ring-2 ring-primary/20',
               )}
             >
               <PremiumDealCard deal={deal} />

@@ -5,9 +5,9 @@ export const useCountdown = (targetDate: string) => {
   // Validate the target date
   const countDownDate = new Date(targetDate).getTime();
   const isValidDate = !isNaN(countDownDate);
-  
+
   const [countDown, setCountDown] = useState(
-    isValidDate ? Math.max(0, countDownDate - new Date().getTime()) : 0
+    isValidDate ? Math.max(0, countDownDate - new Date().getTime()) : 0,
   );
 
   useEffect(() => {
@@ -19,7 +19,7 @@ export const useCountdown = (targetDate: string) => {
     const interval = setInterval(() => {
       const newCountDown = Math.max(0, countDownDate - new Date().getTime());
       setCountDown(newCountDown);
-      
+
       // Clear interval if countdown reaches zero
       if (newCountDown <= 0) {
         clearInterval(interval);
@@ -40,10 +40,10 @@ export const useCountdown = (targetDate: string) => {
 const getReturnValues = (countDown: number) => {
   // Ensure countDown is not negative
   const safeCountDown = Math.max(0, countDown);
-  
+
   const days = Math.floor(safeCountDown / (1000 * 60 * 60 * 24));
   const hours = Math.floor(
-    (safeCountDown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    (safeCountDown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
   );
   const minutes = Math.floor((safeCountDown % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((safeCountDown % (1000 * 60)) / 1000);

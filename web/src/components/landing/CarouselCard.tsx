@@ -40,7 +40,9 @@ export const CarouselCard = ({ deal }: CarouselCardProps) => {
           <span className="truncate">{deal.location}</span>
         </p>
         <p className="mt-1 text-xs text-neutral-800 sm:text-sm">
-          <span className="font-bold">From <span className="text-sky-600">{deal.price}</span></span>
+          <span className="font-bold">
+            From <span className="text-sky-600">{deal.price}</span>
+          </span>
           <span className="ml-1 text-neutral-500">/ guest</span>
         </p>
       </div>

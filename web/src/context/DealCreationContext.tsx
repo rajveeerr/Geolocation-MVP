@@ -14,7 +14,7 @@ interface State {
   redemptionInstructions: string;
 }
 
-type Action = 
+type Action =
   | { type: 'UPDATE_FIELD'; field: keyof State; value: string | number | null }
   | { type: 'SET_DEAL_TYPE'; dealType: 'percentage' | 'amount' };
 
@@ -26,7 +26,8 @@ const initialState: State = {
   discountAmount: null,
   startTime: '',
   endTime: '',
-  redemptionInstructions: 'Show this screen at the counter to redeem your deal.',
+  redemptionInstructions:
+    'Show this screen at the counter to redeem your deal.',
 };
 
 function reducer(state: State, action: Action): State {
@@ -34,12 +35,14 @@ function reducer(state: State, action: Action): State {
     case 'UPDATE_FIELD':
       return { ...state, [action.field]: action.value };
     case 'SET_DEAL_TYPE':
-      return { 
-        ...state, 
+      return {
+        ...state,
         dealType: action.dealType,
         // Reset the other value to ensure data integrity
-        discountPercentage: action.dealType === 'amount' ? null : state.discountPercentage,
-        discountAmount: action.dealType === 'percentage' ? null : state.discountAmount,
+        discountPercentage:
+          action.dealType === 'amount' ? null : state.discountPercentage,
+        discountAmount:
+          action.dealType === 'percentage' ? null : state.discountAmount,
       };
     default:
       return state;
@@ -53,7 +56,11 @@ const DealCreationContext = createContext<{
 
 export const DealCreationProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  return <DealCreationContext.Provider value={{ state, dispatch }}>{children}</DealCreationContext.Provider>;
+  return (
+    <DealCreationContext.Provider value={{ state, dispatch }}>
+      {children}
+    </DealCreationContext.Provider>
+  );
 };
 
 export const useDealCreation = () => useContext(DealCreationContext);

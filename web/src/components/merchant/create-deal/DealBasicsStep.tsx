@@ -20,24 +20,44 @@ export const DealBasicsStep = () => {
     >
       <div className="space-y-6">
         <div>
-          <Label htmlFor="title" className="text-lg font-semibold">Deal Title</Label>
-          <p className="text-neutral-500 mb-2">Make it catchy and clear, like "2-for-1 Happy Hour".</p>
-          <Input 
+          <Label htmlFor="title" className="text-lg font-semibold">
+            Deal Title
+          </Label>
+          <p className="mb-2 text-neutral-500">
+            Make it catchy and clear, like "2-for-1 Happy Hour".
+          </p>
+          <Input
             id="title"
             value={state.title}
-            onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'title', value: e.target.value })}
+            onChange={(e) =>
+              dispatch({
+                type: 'UPDATE_FIELD',
+                field: 'title',
+                value: e.target.value,
+              })
+            }
             className="h-14 text-lg"
             placeholder="Enter your deal title..."
           />
         </div>
         <div>
-          <Label htmlFor="description" className="text-lg font-semibold">Description</Label>
-          <p className="text-neutral-500 mb-2">Provide more details about what's included.</p>
+          <Label htmlFor="description" className="text-lg font-semibold">
+            Description
+          </Label>
+          <p className="mb-2 text-neutral-500">
+            Provide more details about what's included.
+          </p>
           <Textarea
             id="description"
             value={state.description}
-            onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'description', value: e.target.value })}
-            className="text-base min-h-[120px]"
+            onChange={(e) =>
+              dispatch({
+                type: 'UPDATE_FIELD',
+                field: 'description',
+                value: e.target.value,
+              })
+            }
+            className="min-h-[120px] text-base"
             rows={4}
             placeholder="Describe your deal in detail..."
           />
