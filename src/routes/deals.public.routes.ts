@@ -28,6 +28,8 @@ function formatDealForFrontend(deal: any, distance?: number) {
     discountPercentage: deal.discountPercentage || null,
     discountAmount: deal.discountAmount || null,
     category: deal.category || 'OTHER',
+    dealType: deal.dealType || 'STANDARD',
+    recurringDays: deal.recurringDays || null,
     startTime: deal.startTime?.toISOString() || null,
     endTime: deal.endTime?.toISOString() || null,
     redemptionInstructions: deal.redemptionInstructions || '',

@@ -37,6 +37,12 @@ enum DealCategory {
   OTHER
 }
 
+enum DealType {
+  STANDARD
+  HAPPY_HOUR
+  RECURRING
+}
+
 
 // --- CORE MODELS ---
 
@@ -92,6 +98,13 @@ model Deal {
   
   // Category for filtering and organization
   category      DealCategory @default(OTHER)
+  
+  // Deal type for different deal behaviors
+  dealType      DealType @default(STANDARD)
+  
+  // Recurring days for recurring deals (e.g., "Taco Tuesday")
+  // Stored as comma-separated values: "MONDAY,TUESDAY,WEDNESDAY"
+  recurringDays String?
   
   // Validity period
   startTime     DateTime

@@ -119,7 +119,7 @@ router.get('/merchants/status', protect, async (req: AuthRequest, res) => {
 // Allows an APPROVED merchant to create a new deal.
 router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res) => {
   try {
-    const { title, description, startTime, endTime, redemptionInstructions, discountPercentage, discountAmount, category } = req.body;
+    const { title, description, startTime, endTime, redemptionInstructions, discountPercentage, discountAmount, category, dealType, recurringDays } = req.body;
     const merchantId = req.merchant?.id; // Get merchantId from our middleware
 
     // Input validation
@@ -142,6 +142,37 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
       }
     }
 
+    // Validate dealType if provided
+    if (dealType) {
+      const validDealTypes = ['STANDARD', 'HAPPY_HOUR', 'RECURRING'];
+      
+      if (!validDealTypes.includes(dealType)) {
+        return res.status(400).json({
+          error: `Invalid deal type. Must be one of: ${validDealTypes.join(', ')}`
+        });
+      }
+    }
+
+    // Validate recurringDays for RECURRING deals
+    if (dealType === 'RECURRING' && !recurringDays) {
+      return res.status(400).json({
+        error: 'Recurring days are required for RECURRING deal type'
+      });
+    }
+
+    // Validate recurringDays format if provided
+    if (recurringDays) {
+      const validDays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+      const days = recurringDays.split(',').map((day: string) => day.trim().toUpperCase());
+      
+      const invalidDays = days.filter((day: string) => !validDays.includes(day));
+      if (invalidDays.length > 0) {
+        return res.status(400).json({
+          error: `Invalid recurring days: ${invalidDays.join(', ')}. Must be one of: ${validDays.join(', ')}`
+        });
+      }
+    }
+
     const newDeal = await prisma.deal.create({
         data: {
             title,
@@ -152,6 +183,8 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
             discountPercentage: discountPercentage ? parseInt(discountPercentage, 10) : null,
             discountAmount: discountAmount ? parseFloat(discountAmount) : null,
             category: category || 'OTHER',
+            dealType: dealType || 'STANDARD',
+            recurringDays: recurringDays || null,
             merchant: {
                 connect: { id: merchantId }
             }

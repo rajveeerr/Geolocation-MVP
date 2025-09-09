@@ -100,6 +100,8 @@ router.post('/save-deal', protect, async (req: AuthRequest, res: Response) => {
           discountPercentage: savedDeal.deal.discountPercentage,
           discountAmount: savedDeal.deal.discountAmount,
           category: savedDeal.deal.category,
+          dealType: savedDeal.deal.dealType,
+          recurringDays: savedDeal.deal.recurringDays,
           startTime: savedDeal.deal.startTime,
           endTime: savedDeal.deal.endTime,
           redemptionInstructions: savedDeal.deal.redemptionInstructions,
