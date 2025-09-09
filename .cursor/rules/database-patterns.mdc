@@ -1,0 +1,69 @@
+---
+globs: prisma/*.prisma,src/lib/prisma.ts
+description: Database patterns and Prisma best practices
+---
+
+# Database and Prisma Patterns
+
+## Schema Design
+
+- **Enums**: Use for controlled values (UserRole, MerchantStatus, DealCategory)
+- **Relationships**: Clear foreign key relationships with proper constraints
+- **Indexes**: Performance indexes for frequently queried fields
+- **Timestamps**: Always include `createdAt` and `updatedAt` fields
+
+## Prisma Client Usage
+
+```typescript
+// Singleton pattern for Prisma client
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
+export default prisma;
+```
+
+## Query Patterns
+
+- **Selective Fields**: Use `select` to limit returned fields
+- **Include Relations**: Use `include` for related data
+- **Transactions**: Use `$transaction` for multi-step operations
+- **Error Handling**: Wrap Prisma operations in try-catch blocks
+
+## Common Query Patterns
+
+```typescript
+// Find with relations
+const deals = await prisma.deal.findMany({
+  where: { /* conditions */ },
+  include: {
+    merchant: {
+      select: { id: true, businessName: true, /* other fields */ }
+    }
+  }
+});
+
+// Update with transaction
+const [merchant, user] = await prisma.$transaction([
+  prisma.merchant.create({ data: merchantData }),
+  prisma.user.update({ where: { id }, data: { role: 'MERCHANT' } })
+]);
+```
+
+## Data Validation
+
+- **Required Fields**: Enforce at schema level with `@id`, `@unique`
+- **Optional Fields**: Use `?` for nullable fields
+- **Defaults**: Use `@default()` for sensible defaults
+- **Constraints**: Use database-level constraints for data integrity
+
+## Performance Optimization
+
+- **Indexes**: Create indexes for frequently queried fields
+- **Query Optimization**: Use `select` to limit data transfer
+- **Connection Management**: Use singleton Prisma client
+- **Error Logging**: Log slow queries for optimization
+
+## Migration Patterns
+
+- **Incremental Changes**: Small, focused migrations
+- **Backward Compatibility**: Consider data migration strategies
+- **Index Creation**: Add indexes in separate migrations for large tables

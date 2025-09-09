@@ -223,4 +223,80 @@ router.put('/merchants/coordinates', protect, isApprovedMerchant, async (req: Au
   }
 });
 
+// --- Endpoint: GET /api/merchants/deals ---
+// Returns all deals created by the authenticated (approved) merchant.
+// Optional query params:
+//   activeOnly=true  -> only deals currently active (start <= now <= end)
+//   includeExpired=false (alias; if provided and false, expired filtered out)
+router.get('/merchants/deals', protect, isApprovedMerchant, async (req: AuthRequest, res) => {
+  try {
+    const merchantId = req.merchant?.id;
+
+    if (!merchantId) {
+      return res.status(401).json({ error: 'Merchant authentication required' });
+    }
+
+    const { activeOnly, includeExpired } = req.query;
+    const now = new Date();
+
+    // Fetch all deals for this merchant (dashboard view)
+    const deals = await prisma.deal.findMany({
+      where: { merchantId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        category: true,
+        discountPercentage: true,
+        discountAmount: true,
+        startTime: true,
+        endTime: true,
+        redemptionInstructions: true,
+        createdAt: true,
+        updatedAt: true,
+      }
+    });
+
+    // Derive status flags
+    const enriched = deals.map(d => {
+      const isActive = d.startTime <= now && d.endTime >= now;
+      const isExpired = d.endTime < now;
+      const isUpcoming = d.startTime > now;
+      return { ...d, isActive, isExpired, isUpcoming };
+    });
+
+    // Filtering logic
+    let filtered = enriched;
+    const activeOnlyFlag = (typeof activeOnly === 'string' && activeOnly.toLowerCase() === 'true');
+    const includeExpiredFlag = (typeof includeExpired === 'string') ? includeExpired.toLowerCase() === 'true' : true; // default include
+
+    if (activeOnlyFlag) {
+      filtered = filtered.filter(d => d.isActive);
+    } else if (!includeExpiredFlag) {
+      filtered = filtered.filter(d => !d.isExpired);
+    }
+
+    const counts = {
+      total: enriched.length,
+      active: enriched.filter(d => d.isActive).length,
+      expired: enriched.filter(d => d.isExpired).length,
+      upcoming: enriched.filter(d => d.isUpcoming).length
+    };
+
+    res.status(200).json({
+      deals: filtered,
+      counts,
+      filters: {
+        activeOnly: activeOnlyFlag,
+        includeExpired: includeExpiredFlag
+      }
+    });
+
+  } catch (error) {
+    console.error('Merchant deals fetch error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;

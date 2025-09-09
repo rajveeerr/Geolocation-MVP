@@ -1,0 +1,58 @@
+---
+globs: *.ts,*.tsx
+description: TypeScript coding standards and best practices
+---
+
+# TypeScript Standards
+
+## Code Style
+
+- **Semicolons**: Always use semicolons at the end of statements
+- **Quotes**: Use single quotes for strings, double quotes for JSON properties
+- **Indentation**: 2 spaces for indentation
+- **Line Length**: Keep lines under 100 characters when possible
+
+## Type Safety
+
+- **Strict Mode**: Always use strict TypeScript configuration
+- **Explicit Types**: Define interfaces for request/response objects
+- **No Any**: Avoid `any` type - use proper typing or `unknown`
+- **Null Safety**: Use optional chaining (`?.`) and nullish coalescing (`??`)
+
+## Interface Patterns
+
+```typescript
+// Extend Express Request for custom properties
+export interface AuthRequest extends Request {
+  user?: { id: number; email: string; };
+  merchant?: { id: number; status: 'PENDING' | 'APPROVED' | 'REJECTED' };
+}
+
+// Use Zod for runtime validation
+const registerSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(8, { message: "Password must be at least 8 characters long" }),
+  name: z.string().optional(),
+});
+```
+
+## Import Organization
+
+1. Node.js built-ins
+2. Third-party packages
+3. Local imports (relative paths)
+4. Type-only imports last
+
+```typescript
+import express, { Express, Request, Response } from 'express';
+import prisma from './lib/prisma';
+import dotenv from 'dotenv';
+import cors from 'cors';
+```
+
+## Error Handling
+
+- Use try-catch blocks for async operations
+- Return appropriate HTTP status codes
+- Log errors with context
+- Use Zod for input validation with descriptive error messages

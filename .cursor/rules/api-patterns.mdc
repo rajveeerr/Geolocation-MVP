@@ -1,0 +1,65 @@
+---
+globs: src/routes/*.ts
+description: API patterns and conventions for Express routes
+---
+
+# API Patterns and Conventions
+
+## Route Structure
+
+- **Base Path**: All API routes use `/api` prefix
+- **Resource Naming**: Use plural nouns (e.g., `/api/deals`, `/api/merchants`)
+- **Nested Resources**: Use clear hierarchy (e.g., `/api/merchants/register`)
+
+## HTTP Methods and Status Codes
+
+- **GET**: Retrieve data (200, 404)
+- **POST**: Create resources (201, 400, 409)
+- **PUT**: Update resources (200, 400, 404)
+- **DELETE**: Remove resources (204, 404)
+
+## Response Format
+
+```typescript
+// Success responses
+res.status(201).json({
+  message: 'Resource created successfully',
+  data: resourceData
+});
+
+// Error responses
+res.status(400).json({ 
+  error: 'Descriptive error message' 
+});
+
+// Validation errors
+res.status(400).json({ 
+  errors: zodError.issues 
+});
+```
+
+## Authentication Patterns
+
+- **Public Routes**: No authentication required (e.g., deal discovery)
+- **Protected Routes**: Use `protect` middleware for user authentication
+- **Merchant Routes**: Use `isApprovedMerchant` middleware for merchant-only operations
+
+## Input Validation
+
+- Use Zod schemas for request validation
+- Validate all required fields
+- Sanitize and validate geolocation coordinates
+- Check enum values against defined constants
+
+## Query Parameters
+
+- **Geolocation**: `latitude`, `longitude`, `radius` for location-based filtering
+- **Filtering**: `category`, `search` for content filtering
+- **Pagination**: Consider adding `limit`, `offset` for large datasets
+
+## Performance Considerations
+
+- Log query performance for optimization
+- Use database indexes efficiently
+- Implement proper error boundaries
+- Consider caching for frequently accessed data

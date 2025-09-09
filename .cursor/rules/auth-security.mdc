@@ -1,0 +1,76 @@
+---
+globs: src/middleware/auth.middleware.ts,src/routes/auth.routes.ts
+description: Authentication and security patterns
+---
+
+# Authentication and Security Patterns
+
+## JWT Implementation
+
+- **Secret Management**: Store JWT_SECRET in environment variables
+- **Token Expiration**: Use reasonable expiration times (24h for this project)
+- **Payload Structure**: Include minimal necessary data (userId, email)
+
+```typescript
+const token = jwt.sign(
+  { userId: user.id, email: user.email },
+  jwtSecret,
+  { expiresIn: '24h' }
+);
+```
+
+## Password Security
+
+- **Hashing**: Use bcrypt with salt rounds (10 for this project)
+- **Validation**: Minimum 8 characters, proper email format
+- **Never Store Plaintext**: Always hash passwords before storage
+
+```typescript
+const hashedPassword = await bcrypt.hash(password, 10);
+const isPasswordValid = await bcrypt.compare(password, user.password);
+```
+
+## Middleware Patterns
+
+- **Protect Middleware**: Verify JWT tokens for authenticated routes
+- **Role-based Access**: Check user roles and merchant status
+- **Request Extension**: Extend Request type with user/merchant data
+
+```typescript
+export interface AuthRequest extends Request {
+  user?: { id: number; email: string; };
+  merchant?: { id: number; status: 'PENDING' | 'APPROVED' | 'REJECTED' };
+}
+```
+
+## Authorization Levels
+
+1. **Public**: No authentication required (deal discovery)
+2. **User**: Basic authentication required (profile access)
+3. **Merchant**: User must have approved merchant status (deal creation)
+
+## Security Best Practices
+
+- **Input Validation**: Use Zod schemas for all inputs
+- **Error Messages**: Generic error messages for security (don't reveal user existence)
+- **CORS**: Configure CORS for cross-origin requests
+- **Environment Variables**: Never commit secrets to version control
+
+## Route Protection Examples
+
+```typescript
+// Public route
+router.get('/deals', async (req, res) => { /* no auth */ });
+
+// Protected route
+router.get('/me', protect, async (req: AuthRequest, res) => { /* user auth */ });
+
+// Merchant-only route
+router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res) => { /* merchant auth */ });
+```
+
+## Error Handling
+
+- **401 Unauthorized**: Missing or invalid token
+- **403 Forbidden**: Valid token but insufficient permissions
+- **409 Conflict**: Resource already exists (duplicate email/merchant)

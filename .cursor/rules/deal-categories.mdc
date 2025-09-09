@@ -1,0 +1,46 @@
+---
+description: Deal categories and business logic patterns
+globs: src/routes/*.ts
+---
+
+# Deal Categories and Business Logic
+
+## Category Management
+
+- **Enum Values**: Use predefined enum values from Prisma schema
+- **Validation**: Always validate category against allowed values
+- **Default Category**: Use 'OTHER' as fallback for unspecified categories
+
+```typescript
+const validCategories = [
+  'FOOD_AND_BEVERAGE', 'RETAIL', 'ENTERTAINMENT', 'HEALTH_AND_FITNESS',
+  'BEAUTY_AND_SPA', 'AUTOMOTIVE', 'TRAVEL', 'EDUCATION', 'TECHNOLOGY',
+  'HOME_AND_GARDEN', 'OTHER'
+];
+```
+
+## Category API Endpoints
+
+- **Categories List**: Provide user-friendly category information
+- **Metadata**: Include labels, descriptions, and icons for frontend
+- **Versioning**: Track category metadata version for API compatibility
+
+## Deal Validation
+
+- **Time Validation**: Ensure startTime < endTime
+- **Required Fields**: Title, description, start time, end time are mandatory
+- **Optional Fields**: Image URL, discount values, redemption instructions
+- **Merchant Association**: All deals must be associated with approved merchants
+
+## Business Rules
+
+- **Active Deals**: Only show deals where current time is between start and end time
+- **Merchant Status**: Only show deals from approved merchants
+- **Geolocation**: Optional coordinate filtering with radius validation
+- **Search**: Case-insensitive search across title and description
+
+## Performance Considerations
+
+- **Index Usage**: Leverage database indexes for time-based and status filtering
+- **Query Optimization**: Filter by merchant status before other operations
+- **Caching**: Consider caching category lists and frequently accessed data

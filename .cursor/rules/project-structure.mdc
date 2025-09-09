@@ -1,0 +1,41 @@
+---
+alwaysApply: true
+description: Project structure and architecture guide for GeolocationMVPBackend
+---
+
+# GeolocationMVPBackend Project Structure
+
+This is a Node.js/TypeScript backend for a geolocation-based deals platform using Express, Prisma, and PostgreSQL.
+
+## Core Architecture
+
+- **Entry Point**: [src/index.ts](mdc:src/index.ts) - Main Express server setup
+- **Database**: PostgreSQL with Prisma ORM - Schema defined in [prisma/schema.prisma](mdc:prisma/schema.prisma)
+- **Authentication**: JWT-based with bcrypt password hashing
+- **API Routes**: Organized by feature in [src/routes/](mdc:src/routes/)
+
+## Key Models
+
+- **User**: Base user accounts with roles (USER, MERCHANT, ADMIN)
+- **Merchant**: Business profiles with geolocation data (latitude/longitude)
+- **Deal**: Promotional offers with categories, time validity, and merchant association
+
+## Route Organization
+
+- **Auth Routes**: [src/routes/auth.routes.ts](mdc:src/routes/auth.routes.ts) - Registration, login, profile
+- **Merchant Routes**: [src/routes/merchant.routes.ts](mdc:src/routes/merchant.routes.ts) - Protected merchant operations
+- **Public Deal Routes**: [src/routes/deals.public.routes.ts](mdc:src/routes/deals.public.routes.ts) - Public deal discovery with geolocation
+
+## Middleware
+
+- **Auth Middleware**: [src/middleware/auth.middleware.ts](mdc:src/middleware/auth.middleware.ts) - JWT verification and merchant status checks
+
+## Database Client
+
+- **Prisma Client**: [src/lib/prisma.ts](mdc:src/lib/prisma.ts) - Singleton database connection
+
+## Configuration
+
+- **TypeScript**: [tsconfig.json](mdc:tsconfig.json) - ES2020 target, strict mode enabled
+- **Package Management**: [package.json](mdc:package.json) - Express 5.x, Prisma 6.x, Zod validation
+- **Development**: [nodemon.json](mdc:nodemon.json) - TypeScript file watching

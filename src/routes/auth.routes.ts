@@ -3,6 +3,7 @@ import { z } from 'zod';
 import prisma from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { protect, AuthRequest } from '../middleware/auth.middleware';
 
 const router = Router();
 
@@ -58,25 +59,9 @@ router.post('/register', async (req: Request, res: Response) => {
 
 
 
-const verifyToken = (req: Request, res: Response, next: Function) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; 
-
-  if (token == null) return res.sendStatus(401);
-
-  const jwtSecret = process.env.JWT_SECRET;
-  if (!jwtSecret) return res.status(500).json({ error: 'Server configuration error' });
-
-  jwt.verify(token, jwtSecret, (err: any, user: any) => {
-    if (err) return res.sendStatus(403); 
-    (req as any).user = user;
-    next();
-  });
-};
-
-router.get('/me', verifyToken, async (req: Request, res: Response) => {
+router.get('/me', protect, async (req: AuthRequest, res: Response) => {
   try {
-    const userId = (req as any).user.userId;
+  const userId = req.user?.id;
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { id: true, email: true, name: true, createdAt: true }, 

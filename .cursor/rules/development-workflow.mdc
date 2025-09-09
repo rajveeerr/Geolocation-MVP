@@ -1,0 +1,46 @@
+---
+alwaysApply: true
+description: Development workflow and best practices
+---
+
+# Development Workflow
+
+## Environment Setup
+
+- **Environment Variables**: Use `.env` file for configuration
+- **Required Variables**: `DATABASE_URL`, `JWT_SECRET`, `PORT`
+- **Development Server**: Use `npm run dev` with nodemon for auto-reload
+
+## Database Management
+
+- **Migrations**: Use Prisma migrations for schema changes
+- **Schema Updates**: Modify [prisma/schema.prisma](mdc:prisma/schema.prisma) and run `npx prisma migrate dev`
+- **Client Generation**: Run `npx prisma generate` after schema changes
+
+## Code Organization
+
+- **Route Separation**: Keep routes organized by feature
+- **Middleware Reuse**: Create reusable middleware functions
+- **Type Safety**: Use TypeScript interfaces for request/response objects
+- **Validation**: Use Zod schemas for all input validation
+
+## Testing Considerations
+
+- **API Testing**: Test all endpoints with proper authentication
+- **Error Scenarios**: Test validation errors and edge cases
+- **Geolocation Testing**: Test with various coordinate combinations
+- **Performance Testing**: Monitor query performance and optimization
+
+## Deployment Preparation
+
+- **Build Process**: Use `npm run build` to compile TypeScript
+- **Production Start**: Use `npm start` to run compiled JavaScript
+- **Environment Configuration**: Ensure production environment variables are set
+- **Database Migration**: Run migrations in production environment
+
+## Code Quality
+
+- **Linting**: Use TypeScript strict mode for type safety
+- **Error Handling**: Implement comprehensive error handling
+- **Logging**: Add appropriate logging for debugging and monitoring
+- **Documentation**: Comment complex business logic and algorithms

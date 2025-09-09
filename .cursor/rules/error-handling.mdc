@@ -1,0 +1,96 @@
+---
+globs: src/**/*.ts
+description: Error handling and validation patterns
+---
+
+# Error Handling and Validation Patterns
+
+## Input Validation with Zod
+
+- **Schema Definition**: Define schemas for all request bodies
+- **Runtime Validation**: Parse and validate all inputs
+- **Error Messages**: Provide descriptive validation error messages
+
+```typescript
+const registerSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(8, { message: "Password must be at least 8 characters long" }),
+  name: z.string().optional(),
+});
+
+// Usage
+const { email, password, name } = registerSchema.parse(req.body);
+```
+
+## Error Response Patterns
+
+```typescript
+// Validation errors
+if (error instanceof z.ZodError) {
+  return res.status(400).json({ errors: error.issues });
+}
+
+// Business logic errors
+if (existingUser) {
+  return res.status(409).json({ error: 'Email is already in use' });
+}
+
+// Server errors
+console.error('Registration error:', error);
+res.status(500).json({ error: 'Internal server error' });
+```
+
+## Geolocation Validation
+
+- **Coordinate Bounds**: Validate latitude (-90 to 90) and longitude (-180 to 180)
+- **Required Pairs**: Both latitude and longitude must be provided together
+- **Number Validation**: Ensure coordinates are valid numbers
+
+```typescript
+if (lat < -90 || lat > 90) {
+  return res.status(400).json({ error: 'Latitude must be between -90 and 90 degrees' });
+}
+```
+
+## Try-Catch Patterns
+
+- **Async Operations**: Always wrap async operations in try-catch
+- **Error Logging**: Log errors with context for debugging
+- **Graceful Degradation**: Return appropriate HTTP status codes
+
+```typescript
+try {
+  const result = await prisma.operation();
+  res.status(200).json({ data: result });
+} catch (error) {
+  console.error('Operation error:', error);
+  res.status(500).json({ error: 'Internal server error' });
+}
+```
+
+## Business Logic Validation
+
+- **Required Fields**: Check for required fields before processing
+- **Data Integrity**: Validate business rules (e.g., deal time ranges)
+- **Enum Validation**: Check against valid enum values
+
+```typescript
+if (!title || !description || !startTime || !endTime) {
+  return res.status(400).json({ error: 'Title, description, start time, and end time are required.' });
+}
+```
+
+## Performance Monitoring
+
+- **Query Timing**: Log slow database queries
+- **Performance Metrics**: Track operation duration
+- **Optimization Alerts**: Warn about queries taking > 1000ms
+
+```typescript
+const startTime = Date.now();
+const result = await prisma.query();
+const duration = Date.now() - startTime;
+if (duration > 1000) {
+  console.warn(`[SLOW QUERY] Operation took ${duration}ms`);
+}
+```
