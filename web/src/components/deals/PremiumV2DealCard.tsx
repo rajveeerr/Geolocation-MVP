@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Phone, ChevronDown, ChevronLeft, ChevronRight, Loader2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/common/Button';
 import type { Deal } from '@/data/deals';
 import { AvatarStack } from '@/components/common/AvatarStack';
@@ -95,7 +96,8 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   };
 
   return (
-    <div className="group w-full max-w-sm cursor-pointer overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-2xl">
+    <div className="block">
+      <div className="group w-full max-w-sm cursor-pointer overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-2xl">
       {/* --- Image Slider & Overlays (Framer Motion) --- */}
       <div
         className="relative aspect-[4/3]"
@@ -259,10 +261,13 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
         )}
         </AnimatePresence>
 
-        {/* Primary CTA with new text and color */}
-        <Button size="lg" className="w-full bg-accent-resy-orange font-bold text-white hover:bg-accent-resy-orange/90">
-          Tap in
-        </Button>
+        {/* Primary CTA with new text and color - only this navigates */}
+        <Link to={`/deals/${deal.id}`} className="block w-full">
+          <Button size="lg" className="w-full bg-accent-resy-orange font-bold text-white hover:bg-accent-resy-orange/90">
+            Tap in
+          </Button>
+        </Link>
+      </div>
       </div>
     </div>
   );
