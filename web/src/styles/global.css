@@ -25,22 +25,21 @@
     --ring: 222.2 84% 4.9%;
     --radius: 0.75rem;
 
-  /* --- THIS IS THE CHANGE: Replaced Blue with Orange Palette --- */
-  /* Resy-inspired Orange: HSL(7, 82%, 64%) */
-  --brand-primary-main: 7 82% 64%; /* Corresponds to -600 */
-  --brand-primary-dark: 7 82% 58%; /* Corresponds to -700 */
-  --brand-primary-light: 7 85% 95%;
+    /* Resy-inspired Orange: HSL(7, 99%, 59%) */
+    --brand-primary-50: 7 99% 97%;
+    --brand-primary-100: 7 99% 95%;
+    --brand-primary-200: 7 99% 90%;
+    --brand-primary-300: 7 99% 83%;
+    --brand-primary-400: 7 99% 65%;
+    --brand-primary-500: 7 99% 68%;
+    --brand-primary-600: 7 99% 60%;
+    --brand-primary-700: 7 99% 58%;
+    --brand-primary-800: 7 99% 48%;
+    --brand-primary-900: 7 99% 40%;
+    --brand-primary-main: 7 99% 59%; 
+    --brand-primary-dark: 7 99% 58%;
+    --brand-primary-light: 7 99% 95%;
 
-  --brand-primary-50: 7 85% 97%;
-  --brand-primary-100: 7 85% 95%;
-  --brand-primary-200: 7 84% 90%;
-  --brand-primary-300: 7 83% 83%;
-  --brand-primary-400: 7 83% 75%;
-  --brand-primary-500: 7 82% 68%;
-  --brand-primary-600: 7 82% 64%; /* Main Resy Orange */
-  --brand-primary-700: 7 82% 58%;
-  --brand-primary-800: 7 80% 48%;
-  --brand-primary-900: 7 78% 40%;
   }
 
   .dark {
@@ -71,9 +70,6 @@
   * {
     @apply border-border;
   }
-  /* h1, h2, h3, h4, h5, h6 {
-    @apply font-heading;
-  } */
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings:
