@@ -16,13 +16,22 @@ export const ProfilePage = () => {
 	const { user } = useAuth();
 	const [activeTab, setActiveTab] = useState<'saved' | 'created'>('saved');
   
+<<<<<<< HEAD
 		const { data: merchantStatusData } = useMerchantStatus();
+=======
+	const { data: merchantStatusData } = useMerchantStatus();
+>>>>>>> 7515aa094b28d7b10ca7e1e5cfb1e8fe3c45cf04
 	const isMerchant = !!merchantStatusData?.data?.merchant;
   
 	// These hooks now correctly talk to your new backend endpoints
 	const { savedDeals, isLoading: isLoadingSaved } = useSavedDeals();
+<<<<<<< HEAD
 		const { data: merchantDeals = [], isLoading: isLoadingCreated } = useMerchantDeals();
 		// merchantDeals is now MerchantDeal[]
+=======
+	const { data: merchantDealsResponse, isLoading: isLoadingCreated } = useMerchantDeals();
+	const merchantDeals = merchantDealsResponse?.deals || [];
+>>>>>>> 7515aa094b28d7b10ca7e1e5cfb1e8fe3c45cf04
 
 	const userInitials = user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : user?.email[0].toUpperCase() ?? 'U';
 
@@ -70,7 +79,11 @@ export const ProfilePage = () => {
 							{isLoadingCreated ? <LoadingState /> :
 							merchantDeals.length === 0 ? <EmptyState icon={<Tag/>} title="You haven't created any deals" message="Go to your Merchant Dashboard to create a new deal." cta={{ text: "Create a Deal", path: PATHS.MERCHANT_DEALS_CREATE }} /> :
 							<div className="grid grid-cols-1 gap-6">
+<<<<<<< HEAD
 								{merchantDeals.map((deal: any) => <MerchantDealCard key={deal.id} deal={deal} />)}
+=======
+								{merchantDeals.map(deal => <MerchantDealCard key={deal.id} deal={deal} />)}
+>>>>>>> 7515aa094b28d7b10ca7e1e5cfb1e8fe3c45cf04
 							</div>}
 						</div>
 					)}
