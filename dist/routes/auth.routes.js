@@ -8,6 +8,7 @@ const zod_1 = require("zod");
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const auth_middleware_1 = require("../middleware/auth.middleware");
 const router = (0, express_1.Router)();
 // --- Endpoint: POST /api/auth/register ---
 const registerSchema = zod_1.z.object({
@@ -51,24 +52,9 @@ router.post('/register', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-const verifyToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-    if (token == null)
-        return res.sendStatus(401);
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret)
-        return res.status(500).json({ error: 'Server configuration error' });
-    jsonwebtoken_1.default.verify(token, jwtSecret, (err, user) => {
-        if (err)
-            return res.sendStatus(403);
-        req.user = user;
-        next();
-    });
-};
-router.get('/me', verifyToken, async (req, res) => {
+router.get('/me', auth_middleware_1.protect, async (req, res) => {
     try {
-        const userId = req.user.userId;
+        const userId = req.user?.id;
         const user = await prisma_1.default.user.findUnique({
             where: { id: userId },
             select: { id: true, email: true, name: true, createdAt: true },

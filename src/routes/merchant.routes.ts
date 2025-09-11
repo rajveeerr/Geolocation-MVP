@@ -119,12 +119,39 @@ router.get('/merchants/status', protect, async (req: AuthRequest, res) => {
 // Allows an APPROVED merchant to create a new deal.
 router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res) => {
   try {
-    const { title, description, startTime, endTime, redemptionInstructions, discountPercentage, discountAmount, category, dealType, recurringDays } = req.body;
-    const merchantId = req.merchant?.id; // Get merchantId from our middleware
+    const {
+      title,
+      description,
+      startTime,
+      endTime,
+      redemptionInstructions,
+      discountPercentage,
+      discountAmount,
+      category,
+      dealType: rawDealType,
+      recurringDays: rawRecurringDays
+    } = req.body;
+    const merchantId = req.merchant?.id; // from middleware
 
-    // Input validation
+    // Basic required fields
     if (!title || !description || !startTime || !endTime) {
-        return res.status(400).json({ error: 'Title, description, start time, and end time are required.'});
+      return res.status(400).json({ error: 'Title, description, startTime, endTime are required.' });
+    }
+
+    // Normalize deal type (allow human friendly input like "Happy Hour", case-insensitive)
+    const validDealTypes = ['STANDARD', 'HAPPY_HOUR', 'RECURRING'] as const;
+    let dealType: string = 'STANDARD';
+    if (rawDealType) {
+      const normalized = String(rawDealType)
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, '_'); // "Happy Hour" -> "HAPPY_HOUR"
+      if (!validDealTypes.includes(normalized as any)) {
+        return res.status(400).json({
+          error: `Invalid dealType. Must be one of: ${validDealTypes.join(', ')}`
+        });
+      }
+      dealType = normalized;
     }
 
     // Validate category if provided
@@ -134,7 +161,6 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
         'BEAUTY_AND_SPA', 'AUTOMOTIVE', 'TRAVEL', 'EDUCATION', 'TECHNOLOGY',
         'HOME_AND_GARDEN', 'OTHER'
       ];
-      
       if (!validCategories.includes(category)) {
         return res.status(400).json({
           error: `Invalid category. Must be one of: ${validCategories.join(', ')}`
@@ -142,57 +168,66 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
       }
     }
 
-    // Validate dealType if provided
-    if (dealType) {
-      const validDealTypes = ['STANDARD', 'HAPPY_HOUR', 'RECURRING'];
-      
-      if (!validDealTypes.includes(dealType)) {
-        return res.status(400).json({
-          error: `Invalid deal type. Must be one of: ${validDealTypes.join(', ')}`
-        });
+    // Normalize recurringDays: accept array ["MONDAY", "TUESDAY"] OR comma separated string
+    const validDays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+    let recurringDays: string | null = null;
+    if (rawRecurringDays !== undefined && rawRecurringDays !== null && rawRecurringDays !== '') {
+      let daysArray: string[] = [];
+      if (Array.isArray(rawRecurringDays)) {
+        daysArray = rawRecurringDays.map(d => String(d).trim().toUpperCase());
+      } else if (typeof rawRecurringDays === 'string') {
+        daysArray = rawRecurringDays.split(',').map(d => d.trim().toUpperCase()).filter(Boolean);
+      } else {
+        return res.status(400).json({ error: 'recurringDays must be an array of days or a comma-separated string.' });
       }
+
+      // Remove duplicates while preserving order
+      const seen = new Set<string>();
+      daysArray = daysArray.filter(d => { if (!seen.has(d)) { seen.add(d); return true; } return false; });
+
+      const invalidDays = daysArray.filter(d => !validDays.includes(d));
+      if (invalidDays.length) {
+        return res.status(400).json({ error: `Invalid recurringDays: ${invalidDays.join(', ')}. Must be within ${validDays.join(', ')}` });
+      }
+      if (daysArray.length === 0) {
+        return res.status(400).json({ error: 'recurringDays cannot be empty if provided.' });
+      }
+      recurringDays = daysArray.join(',');
     }
 
-    // Validate recurringDays for RECURRING deals
+    // Enforce recurringDays presence only when dealType=RECURRING
     if (dealType === 'RECURRING' && !recurringDays) {
-      return res.status(400).json({
-        error: 'Recurring days are required for RECURRING deal type'
-      });
+      return res.status(400).json({ error: 'recurringDays are required when dealType is RECURRING.' });
+    }
+    if (dealType !== 'RECURRING') {
+      recurringDays = null; // ignore any provided days for non-recurring deals
     }
 
-    // Validate recurringDays format if provided
-    if (recurringDays) {
-      const validDays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
-      const days = recurringDays.split(',').map((day: string) => day.trim().toUpperCase());
-      
-      const invalidDays = days.filter((day: string) => !validDays.includes(day));
-      if (invalidDays.length > 0) {
-        return res.status(400).json({
-          error: `Invalid recurring days: ${invalidDays.join(', ')}. Must be one of: ${validDays.join(', ')}`
-        });
-      }
-    }
-
+    // Persist
     const newDeal = await prisma.deal.create({
-        data: {
-            title,
-            description,
-            startTime: new Date(startTime),
-            endTime: new Date(endTime),
-            redemptionInstructions,
-            discountPercentage: discountPercentage ? parseInt(discountPercentage, 10) : null,
-            discountAmount: discountAmount ? parseFloat(discountAmount) : null,
-            category: category || 'OTHER',
-            dealType: dealType || 'STANDARD',
-            recurringDays: recurringDays || null,
-            merchant: {
-                connect: { id: merchantId }
-            }
-        }
+      data: {
+        title,
+        description,
+        startTime: new Date(startTime),
+        endTime: new Date(endTime),
+        redemptionInstructions,
+        discountPercentage: discountPercentage ? parseInt(discountPercentage, 10) : null,
+        discountAmount: discountAmount ? parseFloat(discountAmount) : null,
+        category: category || 'OTHER',
+        dealType: dealType as any,
+        recurringDays,
+        merchant: { connect: { id: merchantId } }
+      }
     });
 
-    res.status(201).json({ message: 'Deal created successfully', deal: newDeal });
-
+    res.status(201).json({
+      message: 'Deal created successfully',
+      deal: newDeal,
+      normalization: {
+        dealType,
+        recurringDays: recurringDays ? recurringDays.split(',') : null
+      }
+    });
   } catch (error) {
     console.error('Deal creation error:', error);
     res.status(500).json({ error: 'Internal server error' });
