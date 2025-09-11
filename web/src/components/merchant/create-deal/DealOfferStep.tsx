@@ -28,8 +28,7 @@ export const DealOfferStep = () => {
         <div className="grid grid-cols-2 gap-4">
           <button
             onClick={() => {
-              // Standard percentage-based offer
-              dispatch({ type: 'SET_DEAL_TYPE', dealType: 'STANDARD' });
+              // Percentage-based offer; do NOT overwrite the selected dealType.
               dispatch({ type: 'SET_STANDARD_OFFER_KIND', kind: 'percentage' });
             }}
             className={cn(
@@ -47,8 +46,7 @@ export const DealOfferStep = () => {
           </button>
           <button
             onClick={() => {
-              // Standard fixed amount offer
-              dispatch({ type: 'SET_DEAL_TYPE', dealType: 'STANDARD' });
+              // Fixed amount offer; do NOT overwrite the selected dealType.
               dispatch({ type: 'SET_STANDARD_OFFER_KIND', kind: 'amount' });
             }}
             className={cn(

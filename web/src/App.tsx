@@ -25,6 +25,7 @@ const MerchantDashboardPage = React.lazy(() => import('./pages/merchant/Merchant
 const CreateDealPage = React.lazy(() => import('./pages/merchant/DealCreatePage').then((m) => ({ default: m.CreateDealPage })));
 const DealDetailPage = React.lazy(() => import('./pages/DealDetailPage').then((m) => ({ default: m.DealDetailPage })));
 const LeaderboardPage = React.lazy(() => import('./pages/LeaderboardPage').then((m) => ({ default: m.LeaderboardPage })));
+const ReferralPage = React.lazy(() => import('./pages/ReferralPage').then((m) => ({ default: m.ReferralPage })));
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 
 // Helper for default layout
@@ -67,6 +68,13 @@ function App() {
               </Suspense>
             } />
             <Route path={PATHS.ALL_DEALS} element={<AllDealsPage />} />
+            <Route path={PATHS.REFERRALS} element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingOverlay />}>
+                  <ReferralPage />
+                </Suspense>
+              </ProtectedRoute>
+            } />
             <Route path={PATHS.DEAL_DETAIL} element={
               <Suspense fallback={<LoadingOverlay />}>
                 <DealDetailPage />

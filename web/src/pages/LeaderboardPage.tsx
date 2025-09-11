@@ -17,7 +17,7 @@ export const LeaderboardPage = () => {
   }
   
   // Combine the top list and the current user's rank (if they aren't in the top list)
-  let displayUsers = [...(leaderboardData?.top || [])];
+  const displayUsers = [...(leaderboardData?.top || [])];
   if (leaderboardData?.me && !leaderboardData.me.inTop) {
     displayUsers.push(leaderboardData.me);
   }

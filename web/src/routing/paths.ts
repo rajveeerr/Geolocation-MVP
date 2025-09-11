@@ -20,6 +20,7 @@ export const PATHS = {
   RESET_PASSWORD: '/reset-password',
 
   PROFILE: '/profile',
+  REFERRALS: '/referrals',
   PROFILE_EDIT: '/profile/edit',
   SETTINGS: '/settings',
   LEADERBOARD: '/leaderboard',

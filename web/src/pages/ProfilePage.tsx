@@ -85,6 +85,19 @@ export const ProfilePage = () => {
 					)}
 				</div>
 			</div>
+
+			{/* --- Invite Friends Card --- */}
+			<Link to={PATHS.REFERRALS} className="block mt-8 group">
+				<div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 flex items-center justify-between hover:border-brand-primary-300 hover:shadow-lg transition-all">
+					<div>
+						<h3 className="font-bold text-lg text-neutral-800">Invite Friends</h3>
+						<p className="text-neutral-500 text-sm mt-1">Earn points for every friend who joins!</p>
+					</div>
+					<svg className="h-6 w-6 text-brand-primary-500 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M16 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM8 11c1.657 0 3-1.343 3-3S9.657 5 8 5 5 6.343 5 8s1.343 3 3 3zM8 13c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4zM16 13c-.29 0-.62.02-.97.05 1.16.84 1.97 1.99 1.97 3.45v2h6v-2c0-2.66-5.33-4-7-4z" fill="currentColor" />
+					</svg>
+				</div>
+			</Link>
 		</div>
 	);
 };

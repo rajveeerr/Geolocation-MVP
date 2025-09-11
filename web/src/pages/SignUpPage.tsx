@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -35,12 +35,22 @@ export const SignUpPage = () => {
       phone: '',
       password: '',
       confirmPassword: '',
+  referralCode: '',
     },
   });
 
   const onSubmit = async (values: SignUpFormValues) => {
     await signup(values);
   };
+
+  // Check for referral code in URL on page load and set in form
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    if (refCode) {
+      form.setValue('referralCode', refCode);
+    }
+  }, [form]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-brand-primary-light via-brand-primary-50 to-white px-4 py-24 sm:px-6 lg:px-8">
@@ -258,6 +268,34 @@ export const SignUpPage = () => {
                   </FormItem>
                 )}
               />
+
+                {/* Referral Code Field */}
+                <FormField
+                  control={form.control}
+                  name="referralCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-neutral-text-primary mb-2 block text-sm font-medium">
+                        Referral Code (Optional)
+                      </FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <svg className="h-5 w-5 text-brand-primary-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M12 2L15 8H9L12 2Z" fill="currentColor" />
+                            </svg>
+                          </div>
+                          <Input
+                            placeholder="Enter referral code"
+                            {...field}
+                            className="border-neutral-border w-full rounded-lg border bg-white/50 py-3 pl-10 pr-4 backdrop-blur-sm transition-colors focus:border-brand-primary-main focus:ring-2 focus:ring-brand-primary-main/50"
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
               <div className="flex items-start">
                 <input

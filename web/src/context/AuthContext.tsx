@@ -71,6 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email: details.email,
         password: details.password,
         name,
+        referralCode: (details as any).referralCode || undefined,
       };
   return apiPost<unknown, any>('/auth/register', payload);
     },
