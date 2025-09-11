@@ -3,7 +3,7 @@ import { useAuth } from '@/context/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { cn } from '@/lib/utils';
-import { Heart, Tag, Loader2, Settings } from 'lucide-react';
+import { Heart, Tag, Loader2, Settings, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useSavedDeals } from '@/hooks/useSavedDeals';
 import { useMerchantDeals } from '@/hooks/useMerchantDeals';
@@ -44,6 +44,15 @@ export const ProfilePage = () => {
 					<div className="text-center sm:text-left">
 						<h1 className="text-3xl font-bold text-neutral-900">{user?.name || 'CitySpark User'}</h1>
 						<p className="text-neutral-600 mt-1">{user?.email}</p>
+
+						{/* --- NEW: Points Display --- */}
+						{user?.points !== undefined && (
+							<div className="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2 border border-amber-200">
+								<Star className="h-5 w-5 text-amber-500 fill-current" />
+								<span className="font-bold text-lg text-amber-700">{user.points.toLocaleString()}</span>
+								<span className="text-sm text-amber-600">Points</span>
+							</div>
+						)}
 					</div>
 					<div className="sm:ml-auto"><Button variant="secondary" size="md"><Settings className="mr-2 h-4 w-4" />Edit Profile</Button></div>
 				</div>

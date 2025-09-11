@@ -16,6 +16,8 @@ interface User {
   id: number;
   email: string;
   name: string | null;
+  profilePictureUrl?: string | null;
+  points?: number;
 }
 
 const hasAuthToken = () => !!localStorage.getItem('authToken');

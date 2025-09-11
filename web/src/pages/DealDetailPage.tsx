@@ -7,11 +7,12 @@ import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { Button } from '@/components/common/Button';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import { Heart, Navigation, Clock, Tag, Info, XCircle } from 'lucide-react';
+import { Heart, Navigation, Clock, Tag, Info, XCircle, MapPin, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PATHS } from '@/routing/paths';
 import { useSavedDeals } from '@/hooks/useSavedDeals';
 import { cn } from '@/lib/utils';
+import { useCheckIn } from '@/hooks/useCheckIn';
 
 // Fix for default Leaflet icon
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -45,6 +46,8 @@ export const DealDetailPage = () => {
     },
     enabled: !!dealId,
   });
+
+  const { isCheckingIn, checkIn } = useCheckIn();
 
   // Not found / error UI
   const NotFoundDeal = ({ id, message }: { id?: string | undefined; message?: unknown }) => {
@@ -101,11 +104,19 @@ export const DealDetailPage = () => {
 
           {/* Action Buttons */}
           <div className="mt-6 flex flex-col sm:flex-row gap-4">
-            <Button asChild size="lg" className="w-full bg-accent-resy-orange text-white hover:bg-opacity-90">
-                <a href={`https://maps.google.com/?q=${encodeURIComponent(deal.location)}`} target="_blank" rel="noopener noreferrer">
-                    <Navigation className="mr-2 h-5 w-5" />
-                    Get Directions
-                </a>
+            <Button onClick={() => checkIn(dealId!)} disabled={isCheckingIn} size="lg" className="w-full">
+              {isCheckingIn ? (
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              ) : (
+                <MapPin className="mr-2 h-5 w-5" />
+              )}
+              {isCheckingIn ? 'Checking In...' : 'Check-in & Earn Points'}
+            </Button>
+            <Button asChild size="lg" variant="secondary" className="w-full">
+              <a href={`https://maps.google.com/?q=${encodeURIComponent(deal.location)}`} target="_blank" rel="noopener noreferrer">
+                <Navigation className="mr-2 h-5 w-5" />
+                Get Directions
+              </a>
             </Button>
           </div>
           

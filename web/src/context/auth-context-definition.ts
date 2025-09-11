@@ -10,6 +10,7 @@ interface User {
   email: string;
   name: string | null;
   profilePictureUrl?: string | null; // <-- Add this optional field
+  points?: number; // <-- Add points field
 }
 
 export interface AuthContextType {

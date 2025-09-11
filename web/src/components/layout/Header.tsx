@@ -204,7 +204,7 @@ import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 
 const navigationItems = [
   { id: 'deals', label: 'Hot Deals', path: PATHS.ALL_DEALS },
-  { id: 'map', label: 'Map', path: PATHS.MAP },
+  { id: 'leaderboard', label: 'Leaderboard', path: PATHS.LEADERBOARD },
   { id: 'pricing', label: 'Pricing', path: PATHS.PRICING },
 ];
 

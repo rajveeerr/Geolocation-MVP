@@ -22,6 +22,7 @@ export const PATHS = {
   PROFILE: '/profile',
   PROFILE_EDIT: '/profile/edit',
   SETTINGS: '/settings',
+  LEADERBOARD: '/leaderboard',
 
   DEAL_DETAIL: '/deals/:dealId',
   LOCATION_DETAIL: '/locations/:locationId',
