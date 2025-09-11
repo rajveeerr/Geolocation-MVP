@@ -3,14 +3,24 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useAuth } from '@/context/useAuth';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { LeaderboardSkeleton } from '@/components/common/LeaderboardSkeleton';
 
 export const LeaderboardPage = () => {
   const { user: currentUser } = useAuth();
   const { data: leaderboardData, isLoading, error } = useLeaderboard();
 
   if (isLoading) {
-    return <div className="flex justify-center py-20"><LoadingSpinner size="lg" /></div>;
+    return (
+      <div className="bg-neutral-50 min-h-screen pt-24">
+        <div className="container mx-auto max-w-2xl px-4 py-8">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-neutral-900">This Month's Leaderboard</h1>
+            <p className="text-neutral-600 mt-2">Check in to deals to climb the ranks and earn rewards!</p>
+          </div>
+          <LeaderboardSkeleton />
+        </div>
+      </div>
+    );
   }
   if (error) {
     return <div className="text-center py-20 text-red-600">Failed to load leaderboard.</div>;

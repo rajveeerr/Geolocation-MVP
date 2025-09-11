@@ -51,8 +51,8 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
 
   // --- NEW: More specific booleans for UI logic ---
   // deal.dealType may be 'HAPPY_HOUR' from backend or 'Happy Hour' from mock data — normalize safely
-  const isHappyHour = typeof deal.dealType === 'string' && 
-    (deal.dealType.toLowerCase().includes('happy') || deal.dealType === 'HAPPY_HOUR');
+  const normalizedDealType = String(deal.dealType).toLowerCase();
+  const isHappyHour = normalizedDealType.includes('happy') || normalizedDealType.includes('happy_hour') || normalizedDealType.includes('happy-hour');
   const showCountdown = isHappyHour && deal.expiresAt && (days > 0 || hours > 0 || minutes > 0 || seconds > 0);
   const isExpiringSoon = isHappyHour && days === 0 && hours < 1; // Highlight when under 1 hour
 

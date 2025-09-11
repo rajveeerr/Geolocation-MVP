@@ -27,6 +27,7 @@ const DealDetailPage = React.lazy(() => import('./pages/DealDetailPage').then((m
 const LeaderboardPage = React.lazy(() => import('./pages/LeaderboardPage').then((m) => ({ default: m.LeaderboardPage })));
 const ReferralPage = React.lazy(() => import('./pages/ReferralPage').then((m) => ({ default: m.ReferralPage })));
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
+import { ScrollToTop } from '@/components/common/ScrollToTop';
 
 // Helper for default layout
 const DefaultLayout = () => (
@@ -42,6 +43,7 @@ const DefaultLayout = () => (
 function App() {
   return (
     <BrowserRouter>
+  <ScrollToTop />
       <RedirectProvider>
         <AuthProvider>
           <ModalProvider>
