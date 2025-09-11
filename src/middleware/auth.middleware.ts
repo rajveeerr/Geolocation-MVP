@@ -62,3 +62,23 @@ export const isApprovedMerchant = async (req: AuthRequest, res: Response, next: 
     res.status(500).json({ error: 'Failed to verify merchant status' });
   }
 };
+
+// Middleware: require ADMIN role
+export const requireAdmin = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    if (user.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    return next();
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to authorize admin' });
+  }
+};
