@@ -12,6 +12,7 @@ interface Props {
   isNextDisabled?: boolean;
   isLoading?: boolean;
   progress: number; // e.g., 33 for 33%
+  nextButtonText?: string;
 }
 
 export const OnboardingStepLayout = ({
@@ -22,6 +23,7 @@ export const OnboardingStepLayout = ({
   isNextDisabled,
   isLoading = false,
   progress,
+  nextButtonText,
 }: Props) => {
   return (
     <div className="flex h-full min-h-[calc(100vh-5rem)] flex-col">
@@ -82,7 +84,7 @@ export const OnboardingStepLayout = ({
                   <span>Submitting...</span>
                 </>
               ) : (
-                'Next'
+                nextButtonText || 'Next'
               )}
             </Button>
           </div>

@@ -6,6 +6,7 @@ import { DealOfferStep } from '@/components/merchant/create-deal/DealOfferStep';
 import { DealScheduleStep } from '@/components/merchant/create-deal/DealScheduleStep';
 import { DealInstructionsStep } from '@/components/merchant/create-deal/DealInstructionsStep';
 import { DealReviewStep } from '@/components/merchant/create-deal/DealReviewStep';
+import { DealTypeStep } from '@/components/merchant/create-deal/DealTypeStep';
 
 // --- NEW: Import hooks and components for status checking ---
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
@@ -18,7 +19,8 @@ import { PATHS } from '@/routing/paths';
 const DealCreationFlow = () => (
   <DealCreationProvider>
     <Routes>
-      <Route index element={<DealBasicsStep />} />
+      <Route index element={<DealTypeStep />} />
+      <Route path="basics" element={<DealBasicsStep />} />
       <Route path="offer" element={<DealOfferStep />} />
       <Route path="schedule" element={<DealScheduleStep />} />
       <Route path="instructions" element={<DealInstructionsStep />} />

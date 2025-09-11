@@ -100,7 +100,8 @@ export const DealReviewStep = () => {
       title="Ready to publish?"
       onNext={handlePublish}
       onBack={() => navigate(-1)}
-      progress={100}
+  progress={100}
+  nextButtonText="Publish Deal"
       isNextDisabled={isPublishing}
     >
       <div className="space-y-4">
