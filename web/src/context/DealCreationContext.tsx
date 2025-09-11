@@ -65,4 +65,6 @@ export const DealCreationProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useDealCreation = () => useContext(DealCreationContext);
+export function useDealCreation() {
+  return useContext(DealCreationContext);
+}
