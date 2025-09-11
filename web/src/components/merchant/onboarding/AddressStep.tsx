@@ -10,7 +10,7 @@ async function geocodeAddress(address: string): Promise<{ lat: number; lng: numb
   // Replace with actual geocoding API call
   // Use the provided address variable to avoid unused param lint errors while
   // this placeholder simulates a network call.
-  // eslint-disable-next-line no-console
+   
   console.log('Geocoding address:', address);
   await new Promise(resolve => setTimeout(resolve, 800));
   return { lat: 40.7128, lng: -74.0060 };

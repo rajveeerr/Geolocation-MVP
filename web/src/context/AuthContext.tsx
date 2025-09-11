@@ -5,6 +5,7 @@ import { apiGet, apiPost } from '@/services/api';
 
 import { PATHS } from '@/routing/paths';
 import { useToast } from '@/hooks/use-toast';
+import { useRedirect } from './RedirectContext'; // <-- new
 import type {
   LoginFormValues,
   SignUpFormValues,
@@ -23,6 +24,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { consumeRedirectPath } = useRedirect(); // <-- new
 
   const { data: user, isLoading: isLoadingUser } = useQuery({
     queryKey: ['user'],
@@ -42,7 +44,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           title: 'Login Successful!',
           description: 'Welcome back to CitySpark.',
         });
-        navigate(PATHS.HOME);
+
+        // Check for a stored redirect path. If it exists, go there. Otherwise, go home.
+        const redirectTo = consumeRedirectPath() || PATHS.HOME;
+        navigate(redirectTo, { replace: true });
       } else {
         throw new Error(response.error || 'Login failed');
       }

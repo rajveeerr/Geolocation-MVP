@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiPost, apiDelete } from '@/services/api';
 import type { ApiResponse } from '@/services/api';
 import { useAuth } from '@/context/useAuth';
+import { useModal } from '@/context/ModalContext';
 import { useToast } from './use-toast';
 import type { Deal } from '@/data/deals';
 
@@ -34,6 +35,8 @@ export const useSavedDeals = () => {
 
 	const savedDealIds = getSavedDealIds(savedDealsData);
 
+		const { openModal } = useModal();
+
 		const saveDealMutation = useMutation({
 			mutationFn: (dealId: number) => apiPost('/users/save-deal', { dealId }),
 			onSuccess: (response: ApiResponse<any>) => {
@@ -62,13 +65,29 @@ export const useSavedDeals = () => {
 		},
 	});
 
+	const handleSaveAction = (dealId: string) => {
+		if (!user) {
+			openModal(); // Trigger the login modal
+			return;
+		}
+		saveDealMutation.mutate(parseInt(dealId, 10));
+	};
+
+	const handleUnsaveAction = (dealId: string) => {
+		if (!user) {
+			openModal();
+			return;
+		}
+		unsaveDealMutation.mutate(parseInt(dealId, 10));
+	};
+
 	return {
 		savedDeals: savedDealsData?.savedDeals || [],
 		savedDealIds,
 		isLoading,
 		error,
-		saveDeal: (dealId: string) => saveDealMutation.mutate(parseInt(dealId, 10)),
-		unsaveDeal: (dealId: string) => unsaveDealMutation.mutate(parseInt(dealId, 10)),
+	saveDeal: handleSaveAction,
+	unsaveDeal: handleUnsaveAction,
 		isSaving: saveDealMutation.isPending,
 		isUnsaving: unsaveDealMutation.isPending,
 	};

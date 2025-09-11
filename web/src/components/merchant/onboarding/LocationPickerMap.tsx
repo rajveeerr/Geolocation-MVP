@@ -59,11 +59,11 @@ export const LocationPickerMap = ({ center, onLocationChange }: Props) => {
         }
       } else {
         // no results
-        // eslint-disable-next-line no-console
+         
         console.warn('No search results for', query);
       }
     } catch (err) {
-      // eslint-disable-next-line no-console
+       
       console.error('Search error', err);
     } finally {
       setIsSearching(false);
@@ -80,7 +80,7 @@ export const LocationPickerMap = ({ center, onLocationChange }: Props) => {
         if (mapRef.current) mapRef.current.flyTo([lat, lng], 15);
       },
       (err) => {
-        // eslint-disable-next-line no-console
+         
         console.error('Geolocation error', err);
       },
       { enableHighAccuracy: true, timeout: 10000 },

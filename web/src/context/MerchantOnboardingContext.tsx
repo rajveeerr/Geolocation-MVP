@@ -80,7 +80,7 @@ export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (err) {
       // If parse fails, ignore and start fresh
-      // eslint-disable-next-line no-console
+       
       console.warn('Failed to hydrate onboarding state from localStorage', err);
     }
   }, []);
@@ -91,7 +91,7 @@ export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem(ONBOARDING_STATE_KEY, JSON.stringify(state));
     } catch (err) {
       // ignore quota errors
-      // eslint-disable-next-line no-console
+       
       console.warn('Failed to persist onboarding state to localStorage', err);
     }
   }, [state]);

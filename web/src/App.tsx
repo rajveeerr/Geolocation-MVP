@@ -15,6 +15,8 @@ import { ProtectedRoute } from './routing/ProtectedRoute';
 import { PATHS } from './routing/paths';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from './context/AuthContext';
+import { RedirectProvider } from './context/RedirectContext';
+import { ModalProvider } from './context/ModalContext';
 import { AllDealsPage } from './pages/AllDealsPage';
 import { MerchantOnboardingPage } from './pages/merchant/MerchantOnboardingPage';
 import { MerchantDashboardPage } from './pages/merchant/MerchantDashboardPage';
@@ -34,14 +36,16 @@ const DefaultLayout = () => (
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
+      <RedirectProvider>
+        <AuthProvider>
+          <ModalProvider>
+            <Routes>
           {/* Public Routes */}
           <Route element={<DefaultLayout />}>
             <Route path={PATHS.HOME} element={<HomePage />} />
             <Route path={PATHS.LOGIN} element={<LoginPage />} />
             <Route path={PATHS.SIGNUP} element={<SignUpPage />} />
-            <Route path={PATHS.PROFILE} element={<ProfilePage />} />
+            <Route path={PATHS.PROFILE} element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path={PATHS.ABOUT} element={<AboutPage />} />
             <Route path={PATHS.ALL_DEALS} element={<AllDealsPage />} />
             <Route
@@ -53,28 +57,44 @@ function App() {
           </Route>
 
           {/* Merchant Protected Routes */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<MerchantLayout />}>
-              <Route
-                path={PATHS.MERCHANT_DASHBOARD}
-                element={<MerchantDashboardPage />}
-              />
-              <Route
-                path="/merchant/deals/create/*"
-                element={<CreateDealPage />}
-              />
-              <Route
-                path="/merchant/onboarding/*"
-                element={<MerchantOnboardingPage />}
-              />
-            </Route>
-          </Route>
+          <Route
+            path={PATHS.MERCHANT_DASHBOARD}
+            element={
+              <ProtectedRoute>
+                <MerchantLayout>
+                  <MerchantDashboardPage />
+                </MerchantLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/merchant/deals/create/*"
+            element={
+              <ProtectedRoute>
+                <MerchantLayout>
+                  <CreateDealPage />
+                </MerchantLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/merchant/onboarding/*"
+            element={
+              <ProtectedRoute>
+                <MerchantLayout>
+                  <MerchantOnboardingPage />
+                </MerchantLayout>
+              </ProtectedRoute>
+            }
+          />
 
           {/* Catch-all route for 404 */}
           <Route path={PATHS.NOT_FOUND} element={<NotFoundPage />} />
-        </Routes>
-        <Toaster />
-      </AuthProvider>
+            </Routes>
+            <Toaster />
+          </ModalProvider>
+        </AuthProvider>
+      </RedirectProvider>
     </BrowserRouter>
   );
 }
