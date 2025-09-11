@@ -79,35 +79,42 @@ export const DealsSidebar = ({
                 <span className="truncate">Deals Near You</span>
               </div>
             </div>
-            {/* Toggle: Nearby vs All Deals */}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  console.debug('[DealsSidebar] toggle Nearby clicked');
-                  setShowAllDeals?.(false);
-                }}
-                aria-pressed={!showAllDeals}
-                className={cn('rounded-lg px-3 py-2 text-sm font-semibold', !showAllDeals ? 'bg-primary/10 text-primary' : 'bg-white/80 text-neutral-700')}
-              >
-                Nearby
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  console.debug('[DealsSidebar] toggle All clicked');
-                  setShowAllDeals?.(true);
-                }}
-                aria-pressed={!!showAllDeals}
-                className={cn('rounded-lg px-3 py-2 text-sm font-semibold', showAllDeals ? 'bg-primary/10 text-primary' : 'bg-white/80 text-neutral-700')}
-              >
-                All
-              </button>
-            </div>
-            <div className="relative flex-shrink-0 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 px-3 py-2">
-              <span className="whitespace-nowrap text-sm font-semibold text-primary">
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : `${deals.length} deals found`}
-              </span>
+
+            {/* Right column: Toggle buttons above the count banner */}
+            <div className="flex flex-col items-end gap-2">
+              <div className="inline-flex items-center rounded-full bg-neutral-100/60 p-1">
+                <Button
+                  size="sm"
+                  variant={showAllDeals ? 'ghost' : 'primary'}
+                  onClick={() => setShowAllDeals?.(false)}
+                  aria-pressed={!showAllDeals}
+                  className={cn('rounded-full px-4 py-1 text-sm font-semibold', !showAllDeals ? 'shadow-sm' : '')}
+                >
+                  Nearby
+                </Button>
+                <Button
+                  size="sm"
+                  variant={showAllDeals ? 'primary' : 'ghost'}
+                  onClick={() => setShowAllDeals?.(true)}
+                  aria-pressed={!!showAllDeals}
+                  className={cn('rounded-full px-4 py-1 text-sm font-semibold', showAllDeals ? 'shadow-sm' : '')}
+                >
+                  All
+                </Button>
+              </div>
+
+              <div className="relative rounded-md bg-white/90 border border-neutral-200 px-2 py-1">
+                <div className="flex items-center gap-2">
+                  {isLoading ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                  ) : (
+                    <>
+                      <span className="text-sm font-bold text-primary">{deals.length}</span>
+                      <span className="text-xs font-medium text-neutral-500">results</span>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -192,9 +199,9 @@ export const DealsSidebar = ({
                 onMouseEnter={() => setHoveredDealId(deal.id)}
                 onMouseLeave={() => setHoveredDealId(null)}
                 className={cn(
-                  'transition-all duration-200 flex justify-center',
-                  hoveredDealId === deal.id &&
-                    'rounded-2xl ring-2 ring-primary/20',
+                  // allow the card to take full available width and give a little horizontal padding
+                  'transition-all duration-200 w-full px-2',
+                  hoveredDealId === deal.id && 'rounded-2xl ring-2 ring-primary/20',
                 )}
               >
                 <PremiumV2DealCard deal={deal} />

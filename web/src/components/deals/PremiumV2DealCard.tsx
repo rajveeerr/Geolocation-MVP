@@ -100,11 +100,12 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   };
 
   return (
-  <div className="block">
-    {/* --- MODIFIED: Add a conditional class for a glowing effect on urgent happy hours --- */}
+    <div className="block">
+    {/* --- MODIFIED: Make card fluid width and add gentler shadow + spacing --- */}
     <div className={cn(
-      "group w-full max-w-sm cursor-pointer overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-2xl",
-      isExpiringSoon && "ring-2 ring-offset-2 ring-red-500 shadow-red-500/20"
+      "group w-full cursor-pointer overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:shadow-lg",
+      // add subtle hover lift and ensure urgent cards still get emphasis
+      isExpiringSoon && "ring-2 ring-offset-2 ring-red-500 shadow-red-500/10"
     )}>
       {/* --- Image Slider & Overlays (Framer Motion) --- */}
       <div
@@ -199,9 +200,9 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
       </div>
 
       {/* --- Main Content --- */}
-      <div className="p-4">
+      <div className="p-5 sm:p-6">
         <h3 className="text-xl font-bold text-neutral-900 line-clamp-2">{deal.name}</h3>
-        <p className="mt-1 text-base text-neutral-600">{deal.location}</p>
+        <p className="mt-1 text-sm text-neutral-600">{deal.location}</p>
 
           {/* Countdown moved to absolute overlay above the image to keep card heights uniform */}
 
@@ -218,7 +219,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
       </div>
       
       {/* --- Actions & Expandable Offers --- */}
-      <div className="px-4 pb-4">
+  <div className="px-5 pb-5 sm:px-6 sm:pb-6">
         <button 
             onClick={() => setOffersVisible(!offersVisible)}
             className="flex items-center justify-center w-full mb-3 text-sm font-semibold text-brand-primary-600 hover:text-brand-primary-800"
@@ -267,7 +268,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
 
         {/* Primary CTA with new text and color - only this navigates */}
         <Link to={`/deals/${deal.id}`} className="block w-full">
-          <Button size="lg" className="w-full bg-accent-resy-orange font-bold text-white hover:bg-accent-resy-orange/90">
+          <Button size="lg" className="w-full bg-accent-resy-orange font-bold text-white hover:bg-accent-resy-orange/90 py-3">
             Tap in
           </Button>
         </Link>
