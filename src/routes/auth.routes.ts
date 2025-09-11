@@ -15,11 +15,12 @@ const registerSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   password: z.string().min(8, { message: "Password must be at least 8 characters long" }),
   name: z.string().optional(),
+  referralCode: z.string().length(8).optional() // code used during signup
 });
 
 router.post('/register', async (req: Request, res: Response) => {
   try {
-        const { email, password, name } = registerSchema.parse(req.body);
+  const { email, password, name, referralCode } = registerSchema.parse(req.body);
         
         // Normalize email to lowercase to prevent case sensitivity issues
         const normalizedEmail = email.toLowerCase().trim();
@@ -36,7 +37,37 @@ router.post('/register', async (req: Request, res: Response) => {
     // 4. Create the new user in the database
     const { signupPoints } = getPointConfig();
 
+    function generateReferralCode(): string {
+      // 8-char base36 (excluding easily confusable chars) random code
+      const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+      let code = '';
+      for (let i = 0; i < 8; i++) {
+        code = code + alphabet[Math.floor(Math.random() * alphabet.length)];
+      }
+      return code;
+    }
+
+  async function getUniqueReferralCode(tx: any): Promise<string> {
+      // Retry a few times in the unlikely event of collision
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const code = generateReferralCode();
+    // @ts-ignore referralCode pending prisma generate
+    const existing = await tx.user.findFirst({ where: { referralCode: code }, select: { id: true } });
+        if (!existing) return code;
+      }
+      throw new Error('Failed to generate unique referral code after 5 attempts');
+    }
+
     const newUser = await prisma.$transaction(async (tx) => {
+      const referralCode = await getUniqueReferralCode(tx);
+      // If user supplied a referral code, fetch referrer
+      let referredByUserId: number | undefined = undefined;
+      if (req.body.referralCode) {
+        const referrer = await tx.user.findFirst({ where: { referralCode: req.body.referralCode }, select: { id: true } });
+        if (referrer) {
+          referredByUserId = referrer.id;
+        }
+      }
       const created = await tx.user.create({
         data: {
           email: normalizedEmail,
@@ -44,7 +75,11 @@ router.post('/register', async (req: Request, res: Response) => {
           password: hashedPassword,
           points: signupPoints,
           // @ts-ignore new field added in migration; prisma generate pending
-          monthlyPoints: signupPoints
+          monthlyPoints: signupPoints,
+          // @ts-ignore new field added in migration; prisma generate pending
+          referralCode,
+          // @ts-ignore new field added in migration; prisma generate pending
+          referredByUserId
         } as any,
       });
       await tx.userPointEvent.create({
@@ -84,7 +119,8 @@ router.get('/me', protect, async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, name: true, createdAt: true, points: true }, 
+      // @ts-ignore new field added in migration; prisma generate pending
+      select: { id: true, email: true, name: true, createdAt: true, points: true, referralCode: true }, 
     });
 
     if (!user) {

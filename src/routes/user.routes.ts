@@ -417,4 +417,30 @@ router.get('/saved-deals/:dealId', protect, async (req: AuthRequest, res: Respon
   }
 });
 
+// --- Endpoint: GET /api/users/referrals ---
+// Returns how many users have signed up using the authenticated user's referral code
+router.get('/referrals', protect, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    // Fetch the user's referral code and count referred users
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      // @ts-ignore new field referralCode already in schema
+      select: { referralCode: true }
+    });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    // @ts-ignore new field referredByUserId added in migration pending generate
+    const referralCount = await prisma.user.count({ where: { referredByUserId: userId } });
+    return res.status(200).json({
+      referralCode: (user as any).referralCode,
+      referralCount
+    });
+  } catch (err) {
+    console.error('Get referrals error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;

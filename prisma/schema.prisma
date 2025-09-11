@@ -63,6 +63,13 @@ model User {
   points    Int      @default(0)
   // Points accumulated in the current calendar month (UTC) and reset via scheduled job
   monthlyPoints Int  @default(0)
+  // Unique, shareable referral code for inviting other users
+  referralCode String? @unique
+  // The user who referred this user (if any)
+  referredByUserId Int?
+  referredBy User? @relation("UserReferrals", fields: [referredByUserId], references: [id])
+  // Users that this user has referred
+  referrals  User[]   @relation("UserReferrals")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -78,6 +85,8 @@ model User {
 
   // Check-ins
   checkIns   CheckIn[]
+
+  @@index([referredByUserId])
 }
 
 model Merchant {
