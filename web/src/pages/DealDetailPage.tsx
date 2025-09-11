@@ -14,14 +14,12 @@ import { useSavedDeals } from '@/hooks/useSavedDeals';
 import { cn } from '@/lib/utils';
 import { useCheckIn } from '@/hooks/useCheckIn';
 
-// Fix for default Leaflet icon
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 const DefaultIcon = L.icon({ iconUrl: icon, shadowUrl: iconShadow, iconAnchor: [12, 41] });
 L.Marker.prototype.options.icon = DefaultIcon;
 
 
-// A small reusable component for detail sections
 const DetailSection = ({ icon, title, children }: { icon: React.ReactNode, title: string, children: React.ReactNode }) => (
     <div className="border-t border-neutral-200 py-6">
         <div className="flex items-center gap-3">

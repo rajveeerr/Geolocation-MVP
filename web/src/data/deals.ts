@@ -39,7 +39,7 @@ export const premiumDeals: Deal[] = [
     tag: 'Guest Favourite',
     dealType: 'Happy Hour',
     dealValue: '2-for-1 Drinks',
-    expiresAt: getFutureDate(3),
+    expiresAt: getFutureDate(1),
   },
   {
     id: 'pd2',
