@@ -10,6 +10,24 @@ const saveDealSchema = z.object({
   dealId: z.number().int().positive({ message: "Deal ID must be a positive integer" }),
 });
 
+// Validation schema for check-in
+const checkInSchema = z.object({
+  dealId: z.number().int().positive(),
+  latitude: z.number().refine(v => v >= -90 && v <= 90, { message: 'Latitude must be between -90 and 90.' }),
+  longitude: z.number().refine(v => v >= -180 && v <= 180, { message: 'Longitude must be between -180 and 180.' })
+});
+
+// Simple Haversine distance (meters)
+function haversineMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371000; // meters
+  const toRad = (d: number) => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 // --- Endpoint: POST /api/users/save-deal ---
 // Save a deal for the authenticated user
 router.post('/save-deal', protect, async (req: AuthRequest, res: Response) => {
@@ -116,6 +134,77 @@ router.post('/save-deal', protect, async (req: AuthRequest, res: Response) => {
     }
     console.error('Save deal error:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// --- Endpoint: POST /api/users/check-in ---
+// Verifies that an authenticated user is physically near the merchant location for a given deal.
+// Body: { dealId: number, latitude: number, longitude: number }
+// Response: { dealId, merchantId, distanceMeters, withinRange, thresholdMeters, dealActive }
+router.post('/check-in', protect, async (req: AuthRequest, res: Response) => {
+  try {
+    // Parse & validate input
+    const parsed = checkInSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ errors: parsed.error.issues });
+    }
+    const { dealId, latitude, longitude } = parsed.data;
+    const userId = req.user!.id;
+
+    // Fetch deal with merchant location
+    const deal = await prisma.deal.findUnique({
+      where: { id: dealId },
+      include: {
+        merchant: { select: { id: true, status: true, latitude: true, longitude: true } }
+      }
+    });
+
+    if (!deal) {
+      return res.status(404).json({ error: 'Deal not found' });
+    }
+
+    if (deal.merchant.status !== 'APPROVED') {
+      return res.status(400).json({ error: 'Deal merchant is not approved' });
+    }
+
+    if (deal.merchant.latitude == null || deal.merchant.longitude == null) {
+      return res.status(400).json({ error: 'Merchant location not set; cannot perform check-in.' });
+    }
+
+    const now = new Date();
+    const dealActive = deal.startTime <= now && deal.endTime >= now;
+    if (!dealActive) {
+      return res.status(400).json({ error: 'Deal is not currently active.' });
+    }
+
+    // Distance calculation
+    const distanceMeters = haversineMeters(latitude, longitude, deal.merchant.latitude, deal.merchant.longitude);
+
+    // Threshold (default 100m) configurable via env CHECKIN_RADIUS_METERS
+    const thresholdMeters = (() => {
+      const envVal = process.env.CHECKIN_RADIUS_METERS;
+      if (!envVal) return 100; // default
+      const parsed = parseInt(envVal, 10);
+      return isNaN(parsed) || parsed <= 0 ? 100 : parsed;
+    })();
+
+    const withinRange = distanceMeters <= thresholdMeters;
+
+    // (Optional future enhancement): persist a check-in record & award points
+    // Skipped here because schema lacks a CheckIn model. Suggested next step.
+
+    return res.status(200).json({
+      dealId: deal.id,
+      merchantId: deal.merchant.id,
+      userId,
+      distanceMeters: Math.round(distanceMeters * 100) / 100,
+      withinRange,
+      thresholdMeters,
+      dealActive
+    });
+  } catch (error) {
+    console.error('Check-in error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
