@@ -1,6 +1,7 @@
-import { Router, Response } from 'express';
+import { Router, Response, Request } from 'express';
 import prisma from '../lib/prisma';
 import { protect, requireAdmin, AuthRequest } from '../middleware/auth.middleware';
+import { sendEmail } from '../lib/email';
 
 // Admin router for internal tooling (minimal for now)
 const router = Router();
@@ -106,6 +107,27 @@ router.get('/referrals', protect, requireAdmin, async (req: AuthRequest, res: Re
   } catch (err) {
     console.error('Admin referrals fetch failed', err);
     res.status(500).json({ error: 'Failed to fetch referrals' });
+  }
+});
+
+// POST /api/admin/test-email
+// Body: { to: string, subject?: string }
+// Sends a simple test email to verify Brevo integration (admin only)
+router.post('/test-email', protect, requireAdmin, async (req: AuthRequest, res: Response) => {
+  try {
+    const { to, subject } = req.body || {};
+    if (!to || typeof to !== 'string') {
+      return res.status(400).json({ error: 'Missing required field: to' });
+    }
+    await sendEmail({
+      to,
+      subject: subject || 'Test Email - YOHOP',
+      html: '<p>This is a test email confirming Brevo integration is working.</p>'
+    });
+    res.status(200).json({ message: 'Email dispatched (check logs for delivery status)' });
+  } catch (e) {
+    console.error('Test email send failed', e);
+    res.status(500).json({ error: 'Failed to send test email' });
   }
 });
 

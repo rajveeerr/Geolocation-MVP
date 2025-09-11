@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { protect, AuthRequest } from '../middleware/auth.middleware';
 import { getPointConfig } from '../lib/points';
+import { sendWelcomeEmail } from '../lib/email';
 import { invalidateLeaderboardCache } from '../lib/leaderboard/cache';
 
 const router = Router();
@@ -97,6 +98,11 @@ router.post('/register', async (req: Request, res: Response) => {
 
     // We don't want to send the password back, even the hashed one
     const { password: _, ...userWithoutPassword } = newUser;
+
+    // Fire & forget welcome email (non-blocking)
+  sendWelcomeEmail(userWithoutPassword.email, userWithoutPassword.name || undefined).catch(err => {
+      console.error('[email] welcome send error', err);
+    });
 
     // 5. Send back a success response
     res.status(201).json({
