@@ -73,6 +73,7 @@ export const AllDealsPage = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>('FOOD_AND_BEVERAGE');
   const [searchRadius, setSearchRadius] = useState<number>(10); // Default radius in km
+  const [showAllDeals, setShowAllDeals] = useState<boolean>(false);
 
   // --- NEW: State for search term and debounced search term ---
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -103,8 +104,9 @@ export const AllDealsPage = () => {
 
   // --- MODIFIED: Effect to fetch deals based on location AND filters ---
   useEffect(() => {
-    // Don't fetch until we have the user's location
-    if (!userLocation) {
+    // Don't fetch until we have the user's location unless the user explicitly
+    // asked for ALL deals (no geo filtering).
+    if (!userLocation && !showAllDeals) {
       return;
     }
 
@@ -121,20 +123,26 @@ export const AllDealsPage = () => {
           return;
         }
 
-        // Build query parameters dynamically
-        const params = new URLSearchParams({
-          latitude: userLocation.lat.toString(),
-          longitude: userLocation.lng.toString(),
-          radius: searchRadius.toString(),
-          category: activeCategory,
-        });
-
-        // Conditionally add the search parameter if it's not empty
-        if (trimmed) {
-          params.append('search', trimmed);
+        // Build query parameters depending on whether user requested ALL deals
+        let response;
+        if (showAllDeals) {
+          const params = new URLSearchParams({ category: 'OTHER' });
+          if (trimmed) params.append('search', trimmed);
+          response = await apiGet<{ deals: ApiDeal[] }>(`/deals?${params}`);
+        } else {
+          // Geo-filtered request. At this point we guarantee userLocation exists
+          // because the hook returns early when !userLocation && !showAllDeals.
+          const lat = userLocation!.lat.toString();
+          const lng = userLocation!.lng.toString();
+          const params = new URLSearchParams({
+            latitude: lat,
+            longitude: lng,
+            radius: searchRadius.toString(),
+            category: activeCategory,
+          });
+          if (trimmed) params.append('search', trimmed);
+          response = await apiGet<{ deals: ApiDeal[] }>(`/deals?${params}`);
         }
-
-        const response = await apiGet<{ deals: ApiDeal[] }>(`/deals?${params}`);
         
         if (response.success && Array.isArray(response.data?.deals)) {
           // Merge backend deals on top of placeholder data so UI always has friendly content
@@ -166,7 +174,7 @@ export const AllDealsPage = () => {
     };
 
     fetchFilteredDeals();
-  }, [userLocation, activeCategory, searchRadius, debouncedSearchTerm]); // Re-run when location, filters, or debounced search change
+  }, [userLocation, activeCategory, searchRadius, debouncedSearchTerm, showAllDeals]); // Re-run when location, filters, debounced search, or toggle change
 
 
   // --- NEW: Debouncing effect for the search term ---
@@ -209,6 +217,8 @@ export const AllDealsPage = () => {
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 isLoading={isLoading} // Pass loading state for UI feedback
+                showAllDeals={showAllDeals}
+                setShowAllDeals={setShowAllDeals}
               />
             </div>
           </div>

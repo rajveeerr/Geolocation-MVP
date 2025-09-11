@@ -14,7 +14,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import PremiumDealCard from './PremiumDealCard';
+import { PremiumV2DealCard } from './PremiumV2DealCard';
 import type { DealWithLocation } from '@/data/deals';
 import { Pagination } from '../common/Pagination';
 
@@ -45,6 +45,9 @@ interface DealsSidebarProps {
   // --- NEW: Props for search (lifted to parent) ---
   searchTerm?: string;
   setSearchTerm?: (term: string) => void;
+  // Toggle to show all deals (no geo filter) vs nearby
+  showAllDeals?: boolean;
+  setShowAllDeals?: (v: boolean) => void;
 }
 
 export const DealsSidebar = ({
@@ -58,6 +61,8 @@ export const DealsSidebar = ({
   isLoading,
   searchTerm = '',
   setSearchTerm = () => {},
+  showAllDeals = false,
+  setShowAllDeals = () => {},
 }: DealsSidebarProps) => {
 
   return (
@@ -73,6 +78,31 @@ export const DealsSidebar = ({
                 <MapPin className="h-4 w-4 flex-shrink-0 text-neutral-500" />
                 <span className="truncate">Deals Near You</span>
               </div>
+            </div>
+            {/* Toggle: Nearby vs All Deals */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  console.debug('[DealsSidebar] toggle Nearby clicked');
+                  setShowAllDeals?.(false);
+                }}
+                aria-pressed={!showAllDeals}
+                className={cn('rounded-lg px-3 py-2 text-sm font-semibold', !showAllDeals ? 'bg-primary/10 text-primary' : 'bg-white/80 text-neutral-700')}
+              >
+                Nearby
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  console.debug('[DealsSidebar] toggle All clicked');
+                  setShowAllDeals?.(true);
+                }}
+                aria-pressed={!!showAllDeals}
+                className={cn('rounded-lg px-3 py-2 text-sm font-semibold', showAllDeals ? 'bg-primary/10 text-primary' : 'bg-white/80 text-neutral-700')}
+              >
+                All
+              </button>
             </div>
             <div className="relative flex-shrink-0 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 px-3 py-2">
               <span className="whitespace-nowrap text-sm font-semibold text-primary">
@@ -155,19 +185,19 @@ export const DealsSidebar = ({
                 Try adjusting your search or filters to find what you're looking for.
               </p>
             </div>
-          ) : (
+            ) : (
             deals.map((deal) => (
               <div
                 key={deal.id}
                 onMouseEnter={() => setHoveredDealId(deal.id)}
                 onMouseLeave={() => setHoveredDealId(null)}
                 className={cn(
-                  'transition-all duration-200',
+                  'transition-all duration-200 flex justify-center',
                   hoveredDealId === deal.id &&
                     'rounded-2xl ring-2 ring-primary/20',
                 )}
               >
-                <PremiumDealCard deal={deal} />
+                <PremiumV2DealCard deal={deal} />
               </div>
             ))
           )}

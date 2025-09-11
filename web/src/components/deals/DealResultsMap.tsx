@@ -166,8 +166,16 @@ const ChangeView = ({ center, zoom }: { center: L.LatLngExpression; zoom: number
   const map = useMap();
   useEffect(() => {
     if (!map) return;
-    // flyTo provides a smooth animated transition
-    map.flyTo(center, zoom, { animate: true, duration: 0.8 });
+    // Validate center is a valid lat/lng pair before calling flyTo
+    try {
+      const [lat, lng] = center as [number, number];
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        // flyTo provides a smooth animated transition
+        map.flyTo(center, zoom, { animate: true, duration: 0.8 });
+      }
+    } catch (err) {
+      // ignore invalid centers
+    }
   }, [map, center, zoom]);
   return null;
 };
@@ -193,9 +201,12 @@ const FitBoundsToFeatures = ({ deals, userLocation }: { deals: DealWithLocation[
     try {
       const points: L.LatLngExpression[] = [];
       for (const d of deals) {
-        if (Array.isArray(d.position) && d.position.length === 2) points.push(d.position as L.LatLngExpression);
+        if (Array.isArray(d.position) && d.position.length === 2) {
+          const [lat, lng] = d.position as [number, number];
+          if (Number.isFinite(lat) && Number.isFinite(lng)) points.push(d.position as L.LatLngExpression);
+        }
       }
-      if (userLocation) points.push([userLocation.lat, userLocation.lng]);
+      if (userLocation && Number.isFinite(userLocation.lat) && Number.isFinite(userLocation.lng)) points.push([userLocation.lat, userLocation.lng]);
       if (points.length === 0) return;
       const bounds = L.latLngBounds(points as L.LatLngExpression[]);
       map.fitBounds(bounds, { padding: [80, 80], maxZoom: 15 });

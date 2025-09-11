@@ -1,6 +1,7 @@
+// web/src/data/deals-placeholder.ts
 import type { DealWithLocation } from './deals';
 
-// ApiDeal shape mirrors the backend payload used elsewhere in the app
+// This ApiDeal shape mirrors the backend payload used elsewhere in the app
 export type ApiDeal = {
   id: string;
   title: string;
@@ -22,56 +23,56 @@ export type ApiDeal = {
   bookingInfo?: string;
 };
 
-// A small set of placeholder deals (lightweight copy of existing app mock data)
+// A small set of high-quality placeholder deals
 export const placeholderDeals: DealWithLocation[] = [
   {
     id: 'ph1',
-    name: 'Placeholder Cafe',
+    name: 'The Corner Bistro (Sample)',
     image: 'https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=500&q=80',
-    rating: 4.1,
+    rating: 4.5,
     category: 'Cafe',
     price: '$$',
-    location: 'Sample Neighborhood',
-    position: [40.7128, -74.006],
-    description: "Today's sample deal: 20% off",
+    location: 'Sample Neighborhood, USA',
+    position: [40.7128, -74.006], // Centered on a default location
+    description: "This is a sample deal. Try searching for 'pizza' or changing your category to find live deals near you!",
     originalPrice: 100,
     discountedPrice: 80,
     bookingInfo: "Call to reserve",
   },
   {
     id: 'ph2',
-    name: 'Placeholder Bistro',
+    name: 'Downtown Grille (Sample)',
     image: 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
-    rating: 4.3,
+    rating: 4.8,
     category: 'Restaurant',
     price: '$$$',
-    location: 'Sample Street',
+    location: 'Main Street, USA',
     position: [40.7145, -74.0082],
-    description: 'Sample happy hour special',
+    description: 'A placeholder for a great happy hour special. Real deals will appear here when available.',
     originalPrice: 150,
     discountedPrice: 120,
     bookingInfo: "Online booking available",
   },
 ];
 
-// Adapter reused to convert ApiDeal -> DealWithLocation
+// Adapter function to convert an API deal into the format our components expect
 export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => ({
   id: apiDeal.id,
   name: apiDeal.title,
   image: apiDeal.imageUrl || 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
-  images: [
-    apiDeal.imageUrl || 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
-    'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80',
-    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&q=80',
-  ],
   rating: apiDeal.rating ?? 4.2,
   category: apiDeal.category || 'Restaurant',
+
+  // Map required DealWithLocation fields
   price: apiDeal.price || '$$',
   location: apiDeal.merchant.address,
-  description: apiDeal.description,
+  description: apiDeal.description || '',
   position: [apiDeal.merchant.latitude ?? 40.7128, apiDeal.merchant.longitude ?? -74.006],
+
+  // Pricing fallbacks: if backend provides discountAmount/percentage try to use it
   originalPrice: 100,
-  discountedPrice: 80,
+  discountedPrice:
+    apiDeal.discountAmount ?? (apiDeal.discountPercentage ? Math.round(100 * (1 - apiDeal.discountPercentage / 100)) : 80),
   bookingInfo: apiDeal.bookingInfo || 'Reservations available',
 });
 

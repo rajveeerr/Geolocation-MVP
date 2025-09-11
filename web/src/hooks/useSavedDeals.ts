@@ -30,6 +30,8 @@ export const useSavedDeals = () => {
 		>({
 			queryKey: ['savedDeals', user?.id],
 			queryFn: () => apiGet<SavedDealsResponse>('/users/saved-deals'),
+			// Only run this query when a user is available to avoid 401s for anonymous requests
+			enabled: !!user?.id,
 			select: (response) => response.data as SavedDealsResponse,
 		});
 
