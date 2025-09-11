@@ -4,16 +4,10 @@ import type { ApiResponse } from '@/services/api';
 import { useAuth } from '@/context/useAuth';
 import { useModal } from '@/context/ModalContext';
 import { useToast } from './use-toast';
-import type { Deal } from '@/data/deals';
+import { adaptApiDealToFrontend } from '@/data/deals-placeholder';
 
 type SavedDealsResponse = {
-	savedDeals: { deal: Deal }[]; // backend returns relations with a nested `deal` object
-};
-
-const getSavedDealIds = (data: SavedDealsResponse | undefined): Set<string> => {
-	if (!data?.savedDeals) return new Set();
-	// Each item is a relation { deal: Deal }
-	return new Set(data.savedDeals.map((item) => item.deal.id));
+	savedDeals: [] | any[]; // after select this will be adapted frontend deals
 };
 
 export const useSavedDeals = () => {
@@ -32,10 +26,16 @@ export const useSavedDeals = () => {
 			queryFn: () => apiGet<SavedDealsResponse>('/users/saved-deals'),
 			// Only run this query when a user is available to avoid 401s for anonymous requests
 			enabled: !!user?.id,
-			select: (response) => response.data as SavedDealsResponse,
+			select: (response) => {
+				const relations = (response.data as SavedDealsResponse | undefined)?.savedDeals || [];
+				// Map nested ApiDeal to frontend Deal shape
+				const adapted = relations.map(r => adaptApiDealToFrontend(r.deal));
+				return { savedDeals: adapted } as unknown as SavedDealsResponse;
+			},
 		});
 
-	const savedDealIds = getSavedDealIds(savedDealsData);
+		// savedDealsData.savedDeals now contains adapted frontend deals when available
+		const savedDealIds = new Set(savedDealsData?.savedDeals.map((d: any) => d.id) || []);
 
 		const { openModal } = useModal();
 

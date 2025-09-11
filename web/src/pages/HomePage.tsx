@@ -5,49 +5,13 @@ import { ContentCarousel } from '@/components/common/ContentCarousel';
 import { CarouselSkeleton } from '@/components/common/DealCardSkeleton';
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
-import type { Deal } from '@/data/deals'; 
+// import type { Deal } from '@/data/deals'; 
 import { DiscoverSection } from '@/components/landing/DiscoverSection';
 import { premiumDeals, happyHourDeals, experiencesData } from '@/data/deals'; // Keep existing mock data
 import { AnimatePresence } from 'framer-motion';
 import { useFeaturedDeals } from '@/hooks/useFeaturedDeals'; // <-- Import the new hook
-
-type ApiDeal = {
-  id: string;
-  title: string;
-  imageUrl?: string | null;
-  merchant?: {
-    businessName?: string | null;
-    address?: string | null;
-  } | null;
-  discountPercentage?: number | null;
-  discountAmount?: number | null;
-  endTime?: string | null;
-};
-
-const adaptApiDealToUi = (apiDeal: ApiDeal): Deal => ({
-  id: apiDeal.id,
-  name: apiDeal.title,
-  image:
-    apiDeal.imageUrl ||
-    'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
-  // Add a mock images array for local testing of the new slider. Keep single `image` for compatibility.
-  images: [
-    apiDeal.imageUrl || 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
-    'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80',
-    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&q=80',
-  ],
-  rating: 4.5,
-  category: apiDeal.merchant?.businessName || 'Restaurant',
-  price: '$$',
-  location: apiDeal.merchant?.address || 'Location TBD',
-  dealType: apiDeal.discountPercentage ? 'Discount' : 'Happy Hour', 
-  dealValue: apiDeal.discountPercentage
-    ? `${apiDeal.discountPercentage}% OFF`
-    : `$${apiDeal.discountAmount ?? 0} OFF`,
-  expiresAt: apiDeal.endTime ?? undefined,
-  originalValue: 50, 
-  discountValue: 25, 
-});
+import type { ApiDeal } from '@/data/deals-placeholder';
+import { adaptApiDealToFrontend } from '@/data/deals-placeholder';
 
 export const HomePage = () => {
   const [activeTab, setActiveTab] = useState('deals');
@@ -75,7 +39,7 @@ export const HomePage = () => {
     return [];
   };
 
-  const liveDeals = normalizeDealsArray(rawDeals?.data).map(adaptApiDealToUi);
+  const liveDeals = normalizeDealsArray(rawDeals?.data).map((d) => adaptApiDealToFrontend(d as ApiDeal));
 
   return (
     <div className="bg-white pt-16 sm:pt-20">

@@ -76,12 +76,16 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => ({
   bookingInfo: apiDeal.bookingInfo || 'Reservations available',
 });
 
+// New universal adapter name for clarity across the app. Keep the old name for
+// backwards compatibility.
+export const adaptApiDealToFrontend = adaptApiDealToUi;
+
 // Merge backend data into placeholders: replace existing ids, otherwise append.
 export const mergeBackendDeals = (apiDeals: ApiDeal[] | undefined): DealWithLocation[] => {
   // If no backend deals provided, just return placeholders
   if (!Array.isArray(apiDeals) || apiDeals.length === 0) return placeholderDeals;
 
-  const adapted = apiDeals.map(adaptApiDealToUi);
+  const adapted = apiDeals.map(adaptApiDealToFrontend);
 
   // We want backend deals to render on top, so put adapted backend deals first
   // and then append placeholders that weren't replaced by backend entries.

@@ -45,7 +45,7 @@ export const premiumDeals: Deal[] = [
     id: 'pd2',
     name: 'The Irish House',
     image:
-      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80',
+      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80',
     images: [
       'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900&q=80',
       'https://images.unsplash.com/photo-1464375117522-1311d56a6e8d?w=900&q=80',
@@ -66,7 +66,7 @@ export const premiumDeals: Deal[] = [
     id: 'pd3',
     name: 'Social',
     image:
-      'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=400&q=80',
+      'https://images.unsplash.com/photo-1562059392-096320bccc7e?w=500&q=80',
     images: [
       'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=900&q=80',
       'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=900&q=80',

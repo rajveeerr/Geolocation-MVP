@@ -60,7 +60,7 @@ export const ProfilePage = () => {
 							savedDeals.length === 0 ? <EmptyState icon={<Heart/>} title="No Deals Saved Yet" message="Tap the heart on any deal to save it for later." cta={{ text: "Find Deals to Save", path: PATHS.ALL_DEALS }} /> :
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 								{/* --- Data Display: This mapping is correct for your backend response --- */}
-								{savedDeals.map(savedRelation => <PremiumV2DealCard key={savedRelation.deal.id} deal={savedRelation.deal} />)}
+								{savedDeals.map((deal: any) => <PremiumV2DealCard key={deal.id} deal={deal} />)}
 							</div>}
 						</div>
 					)}
