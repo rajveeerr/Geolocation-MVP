@@ -10,6 +10,7 @@ import authRoutes from './routes/auth.routes';
 import merchantRoutes from './routes/merchant.routes';
 import publicDealRoutes from './routes/deals.public.routes';
 import userRoutes from './routes/user.routes';
+import leaderboardRoutes from './routes/leaderboard.routes';
 
 // Load env (tests can set process.env before importing this file)
 dotenv.config();
@@ -40,6 +41,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api', merchantRoutes);
 app.use('/api', publicDealRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
 
 export default app;
 

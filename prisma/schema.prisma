@@ -173,6 +173,9 @@ model UserPointEvent {
 
   @@index([userId, type])
   @@index([userId, dealId])
+  // Added for efficient time-bounded leaderboard queries
+  @@index([createdAt])
+  @@index([createdAt, userId])
 }
 
 // Individual physical proximity confirmations
