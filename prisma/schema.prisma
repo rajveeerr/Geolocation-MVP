@@ -43,6 +43,13 @@ enum DealType {
   RECURRING
 }
 
+// --- GAMIFICATION ---
+enum PointEventType {
+  SIGNUP
+  FIRST_CHECKIN_DEAL
+  CHECKIN
+}
+
 
 // --- CORE MODELS ---
 
@@ -63,6 +70,12 @@ model User {
 
   // A User can save many Deals
   savedDeals UserDeal[]
+
+  // Point events log
+  pointEvents UserPointEvent[]
+
+  // Check-ins
+  checkIns   CheckIn[]
 }
 
 model Merchant {
@@ -123,6 +136,12 @@ model Deal {
 
   // A Deal can be saved by many Users
   savedByUsers  UserDeal[]
+
+  // Point events
+  pointEvents UserPointEvent[]
+
+  // Check-ins
+  checkIns  CheckIn[]
 }
 
 // Junction table for User-Deal relationship (saved deals)
@@ -138,4 +157,38 @@ model UserDeal {
 
   // Ensure a user can only save a deal once
   @@unique([userId, dealId])
+}
+
+// Log of points awarded to users for various actions
+model UserPointEvent {
+  id        Int            @id @default(autoincrement())
+  userId    Int
+  dealId    Int?
+  type      PointEventType
+  points    Int
+  createdAt DateTime       @default(now())
+
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deal      Deal?          @relation(fields: [dealId], references: [id])
+
+  @@index([userId, type])
+  @@index([userId, dealId])
+}
+
+// Individual physical proximity confirmations
+model CheckIn {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  dealId        Int
+  merchantId    Int
+  latitude      Float
+  longitude     Float
+  distanceMeters Float
+  createdAt     DateTime @default(now())
+
+  user    User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deal    Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  @@index([userId, dealId])
+  @@index([merchantId])
 }

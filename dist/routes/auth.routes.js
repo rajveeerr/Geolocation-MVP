@@ -29,12 +29,31 @@ router.post('/register', async (req, res) => {
         // 3. Hash the password
         const hashedPassword = await bcryptjs_1.default.hash(password, 10); // 10 is the salt rounds
         // 4. Create the new user in the database
-        const newUser = await prisma_1.default.user.create({
-            data: {
-                email: normalizedEmail,
-                name,
-                password: hashedPassword,
-            },
+        // Award signup points (from env or default 50)
+        const signupPoints = (() => {
+            const val = process.env.SIGNUP_POINTS;
+            if (!val)
+                return 50;
+            const n = parseInt(val, 10);
+            return isNaN(n) || n <= 0 ? 50 : n;
+        })();
+        const newUser = await prisma_1.default.$transaction(async (tx) => {
+            const created = await tx.user.create({
+                data: {
+                    email: normalizedEmail,
+                    name,
+                    password: hashedPassword,
+                    points: signupPoints
+                },
+            });
+            await tx.userPointEvent.create({
+                data: {
+                    userId: created.id,
+                    type: 'SIGNUP',
+                    points: signupPoints
+                }
+            });
+            return created;
         });
         // We don't want to send the password back, even the hashed one
         const { password: _, ...userWithoutPassword } = newUser;

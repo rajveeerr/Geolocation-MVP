@@ -190,17 +190,97 @@ router.post('/check-in', protect, async (req: AuthRequest, res: Response) => {
 
     const withinRange = distanceMeters <= thresholdMeters;
 
-    // (Optional future enhancement): persist a check-in record & award points
-    // Skipped here because schema lacks a CheckIn model. Suggested next step.
+    if (!withinRange) {
+      return res.status(200).json({
+        dealId: deal.id,
+        merchantId: deal.merchant.id,
+        userId,
+        distanceMeters: Math.round(distanceMeters * 100) / 100,
+        withinRange,
+        thresholdMeters,
+        dealActive,
+        pointsAwarded: 0,
+        pointEvents: []
+      });
+    }
+
+    // Determine point values
+    const baseCheckInPoints = (() => {
+      const v = process.env.CHECKIN_POINTS;
+      if (!v) return 10;
+      const n = parseInt(v, 10); return isNaN(n) || n <= 0 ? 10 : n;
+    })();
+    const firstCheckInBonus = (() => {
+      const v = process.env.FIRST_CHECKIN_BONUS_POINTS;
+      if (!v) return 25;
+      const n = parseInt(v, 10); return isNaN(n) || n <= 0 ? 25 : n;
+    })();
+
+    const result = await prisma.$transaction(async (tx) => {
+      // Check if user has an existing check-in for this deal
+      const priorCheckIn = await tx.checkIn.findFirst({
+        where: { userId, dealId: deal.id },
+        select: { id: true }
+      });
+
+      // Create check-in record
+      const checkIn = await tx.checkIn.create({
+        data: {
+          userId,
+          dealId: deal.id,
+          merchantId: deal.merchant.id,
+          latitude,
+          longitude,
+          distanceMeters
+        }
+      });
+
+      let totalAward = baseCheckInPoints;
+      const events: any[] = [];
+
+      // Award first-checkin bonus if none exists
+      if (!priorCheckIn) {
+        totalAward += firstCheckInBonus;
+        events.push(await tx.userPointEvent.create({
+          data: {
+            userId,
+            dealId: deal.id,
+            type: 'FIRST_CHECKIN_DEAL',
+            points: firstCheckInBonus
+          }
+        }));
+      }
+
+      // Always log generic check-in points
+      events.push(await tx.userPointEvent.create({
+        data: {
+          userId,
+          dealId: deal.id,
+          type: 'CHECKIN',
+          points: baseCheckInPoints
+        }
+      }));
+
+      // Increment user total points
+      await tx.user.update({
+        where: { id: userId },
+        data: { points: { increment: totalAward } }
+      });
+
+      return { checkIn, totalAward, events, prior: !!priorCheckIn };
+    });
 
     return res.status(200).json({
       dealId: deal.id,
       merchantId: deal.merchant.id,
       userId,
       distanceMeters: Math.round(distanceMeters * 100) / 100,
-      withinRange,
+      withinRange: true,
       thresholdMeters,
-      dealActive
+      dealActive,
+      pointsAwarded: result.totalAward,
+      firstCheckIn: !result.prior,
+      pointEvents: result.events.map(e => ({ id: e.id, type: e.type, points: e.points }))
     });
   } catch (error) {
     console.error('Check-in error:', error);
