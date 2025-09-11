@@ -193,7 +193,6 @@ import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
-import { BusinessCTA } from '@/components/common/BusinessCTA';
 import { PATHS } from '@/routing/paths';
 import { Logo } from '../common/Logo';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -284,19 +283,11 @@ export const Header = () => {
           </div>
 
           <div className="hidden items-center justify-end gap-2 lg:flex">
-<<<<<<< HEAD
             <Link to={businessLink}>
               <Button variant="secondary" size="md" className="rounded-full">
                 {hasMerchantProfile ? 'Business Dashboard' : 'CitySpark for Business'}
               </Button>
             </Link>
-=======
-              <BusinessCTA>
-                <Button variant="secondary" size="md" className="rounded-full">
-                  {hasMerchantProfile ? 'Business Dashboard' : 'CitySpark for Business'}
-                </Button>
-              </BusinessCTA>
->>>>>>> 7515aa094b28d7b10ca7e1e5cfb1e8fe3c45cf04
             {isLoadingUser ? (
               <div className="h-10 w-24 animate-pulse rounded-full bg-neutral-200" />
             ) : user ? (
