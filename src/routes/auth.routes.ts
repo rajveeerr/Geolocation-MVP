@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { protect, AuthRequest } from '../middleware/auth.middleware';
 import { getPointConfig } from '../lib/points';
+import { invalidateLeaderboardCache } from '../lib/leaderboard/cache';
 
 const router = Router();
 
@@ -53,6 +54,9 @@ router.post('/register', async (req: Request, res: Response) => {
           points: signupPoints
         }
       });
+  // Invalidate monthly & day caches (signup only affects current period aggregates)
+  invalidateLeaderboardCache('month');
+  invalidateLeaderboardCache('day');
       return created;
     });
 

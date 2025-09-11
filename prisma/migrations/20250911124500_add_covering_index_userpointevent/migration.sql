@@ -1,0 +1,2 @@
+-- Composite index to speed up range aggregations and HAVING filters
+CREATE INDEX IF NOT EXISTS "UserPointEvent_createdAt_userId_points_idx" ON "UserPointEvent" ("createdAt","userId") INCLUDE ("points");

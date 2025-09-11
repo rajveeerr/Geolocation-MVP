@@ -3,6 +3,7 @@ import { z } from 'zod';
 import prisma from '../lib/prisma';
 import { protect, AuthRequest } from '../middleware/auth.middleware';
 import { getPointConfig } from '../lib/points';
+import { invalidateLeaderboardCache } from '../lib/leaderboard/cache';
 
 const router = Router();
 
@@ -253,6 +254,11 @@ router.post('/check-in', protect, async (req: AuthRequest, res: Response) => {
 
       return { checkIn, totalAward, events, prior: !!priorCheckIn };
     });
+
+  // Invalidate relevant caches (current month/day/week)
+  invalidateLeaderboardCache('day');
+  invalidateLeaderboardCache('month');
+  invalidateLeaderboardCache('week');
 
     return res.status(200).json({
       dealId: deal.id,
