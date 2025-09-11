@@ -1,7 +1,7 @@
 // web/src/components/deals/PremiumV2DealCard.tsx
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Phone, ChevronDown, ChevronLeft, ChevronRight, Loader2, Clock } from 'lucide-react';
+import { Heart, ChevronDown, ChevronLeft, ChevronRight, Loader2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/common/Button';
@@ -48,8 +48,12 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   // --- Countdown functionality ---
   const countdown = useCountdown(deal.expiresAt || '');
   const { days, hours, minutes, seconds } = countdown;
-  const showCountdown = deal.expiresAt && (days > 0 || hours > 0 || minutes > 0 || seconds > 0);
-  const isExpiringSoon = days === 0 && hours < 2;
+
+  // --- NEW: More specific booleans for UI logic ---
+  // deal.dealType may be a display string like 'Happy Hour' — normalize safely
+  const isHappyHour = typeof deal.dealType === 'string' && deal.dealType.toLowerCase().includes('happy');
+  const showCountdown = isHappyHour && deal.expiresAt && (days > 0 || hours > 0 || minutes > 0 || seconds > 0);
+  const isExpiringSoon = isHappyHour && days === 0 && hours < 1; // Highlight when under 1 hour
 
   // --- useSavedDeals hook integration ---
   const { savedDealIds, saveDeal, unsaveDeal, isSaving, isUnsaving } = useSavedDeals();
@@ -96,14 +100,36 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   };
 
   return (
-    <div className="block">
-      <div className="group w-full max-w-sm cursor-pointer overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-2xl">
+  <div className="block">
+    {/* --- MODIFIED: Add a conditional class for a glowing effect on urgent happy hours --- */}
+    <div className={cn(
+      "group w-full max-w-sm cursor-pointer overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-2xl",
+      isExpiringSoon && "ring-2 ring-offset-2 ring-red-500 shadow-red-500/20"
+    )}>
       {/* --- Image Slider & Overlays (Framer Motion) --- */}
       <div
         className="relative aspect-[4/3]"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
+        {/* Absolute top-center countdown to keep all cards same height */}
+        {showCountdown && (
+          <div className="absolute left-1/2 top-3 -translate-x-1/2 z-20">
+            <div className={cn(
+                "mx-auto flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold justify-center",
+                isExpiringSoon 
+                  ? "bg-red-50 text-red-700 border border-red-200 animate-pulse" 
+                  : "bg-amber-50 text-amber-700 border border-amber-200"
+            )}>
+              <Clock className="h-4 w-4" />
+              <span>
+                {days > 0 && `${days}d `}
+                {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+                {isExpiringSoon && " left!"}
+              </span>
+            </div>
+          </div>
+        )}
         <AnimatePresence initial={false} mode="wait">
           <motion.img
             key={currentImageIndex}
@@ -155,10 +181,6 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
           </div>
         )}
 
-        {/* Overlay Buttons (Call & Like) */}
-        <Button variant="ghost" size="sm" className="absolute left-3 top-3 h-9 w-9 bg-black/30 text-white hover:bg-black/50 hover:text-white rounded-full">
-          <Phone className="h-5 w-5" />
-        </Button>
         <Button
           title={isSaved ? 'Unsave Deal' : 'Save Deal'}
           aria-label={isSaved ? 'Unsave this deal' : 'Save this deal'}
@@ -169,9 +191,9 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
           className="absolute right-3 top-3 h-9 w-9 bg-black/30 text-white hover:bg-red-500/80 hover:text-white rounded-full flex items-center justify-center"
         >
           {isLikeButtonLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-5 w-5 animate-spin" />
           ) : (
-            <Heart className={cn('h-4 w-4 transition-all', isSaved && 'fill-current text-red-500')} />
+            <Heart className={cn('h-5 w-5 transition-all', isSaved && 'fill-current text-red-500')} />
           )}
         </Button>
       </div>
@@ -181,31 +203,13 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
         <h3 className="text-xl font-bold text-neutral-900 line-clamp-2">{deal.name}</h3>
         <p className="mt-1 text-base text-neutral-600">{deal.location}</p>
 
-        {/* Countdown Timer - Display at top center */}
-        {showCountdown && (
-          <div className="mt-3 flex items-center justify-center">
-            <div className={cn(
-              "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold",
-              isExpiringSoon 
-                ? "bg-red-50 text-red-700 border border-red-200" 
-                : "bg-amber-50 text-amber-700 border border-amber-200"
-            )}>
-              <Clock className="h-4 w-4" />
-              <span>
-                {days > 0 && `${days}d `}
-                {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
-                {isExpiringSoon && " left"}
-              </span>
-            </div>
-          </div>
-        )}
+          {/* Countdown moved to absolute overlay above the image to keep card heights uniform */}
 
-        {/* Dynamic Tags from deal data */}
-        <div className="mt-3 flex items-center gap-2">
-            {deal.dealType && <DealTag>{deal.dealType}</DealTag>}
-            {deal.dealValue && <DealTag>{deal.dealValue}</DealTag>}
-            <DealTag>$5 Kickback</DealTag> 
-        </div>
+      {/* Dynamic Tags from deal data */}
+      <div className="mt-3 flex items-center gap-2">
+        {isHappyHour && <DealTag>Happy Hour</DealTag>}
+        {deal.dealValue && <DealTag>{deal.dealValue}</DealTag>}
+      </div>
 
         {/* Social Proof with AvatarStack */}
         <div className="mt-4">

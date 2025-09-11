@@ -9,6 +9,7 @@ import type { Deal } from '@/data/deals';
 import { DiscoverSection } from '@/components/landing/DiscoverSection';
 import { premiumDeals, happyHourDeals, experiencesData } from '@/data/deals'; // Keep existing mock data
 import { AnimatePresence } from 'framer-motion';
+import { useFeaturedDeals } from '@/hooks/useFeaturedDeals'; // <-- Import the new hook
 
 type ApiDeal = {
   id: string;
@@ -50,6 +51,7 @@ const adaptApiDealToUi = (apiDeal: ApiDeal): Deal => ({
 
 export const HomePage = () => {
   const [activeTab, setActiveTab] = useState('deals');
+  const { data: featuredDeals, isLoading: isLoadingFeatured } = useFeaturedDeals();
 
   const {
     data: rawDeals,
@@ -84,6 +86,15 @@ export const HomePage = () => {
       </section>
 
       <ContentCarousel title="Today's Top Deals" deals={premiumDeals} />
+
+      {/* --- NEW: Featured Deals Section --- */}
+      {isLoadingFeatured ? (
+        <CarouselSkeleton title="Featured Deals" />
+      ) : (
+        featuredDeals && featuredDeals.length > 0 && (
+          <ContentCarousel title="Featured Deals" deals={featuredDeals} />
+        )
+      )}
 
       <SectionDivider />
 

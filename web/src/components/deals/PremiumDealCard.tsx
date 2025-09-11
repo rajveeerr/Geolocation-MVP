@@ -11,21 +11,6 @@ interface PremiumDealCardProps {
   deal: Deal;
 }
 
-const CountdownSegment = ({
-  value,
-  label,
-}: {
-  value: number;
-  label: string;
-}) => (
-  <div className="flex flex-col items-center">
-    <span className="text-xl font-bold text-neutral-800 sm:text-2xl">
-      {String(value).padStart(2, '0')}
-    </span>
-    <span className="text-[10px] text-neutral-500 sm:text-xs">{label}</span>
-  </div>
-);
-
 export const PremiumDealCard = ({ deal }: PremiumDealCardProps) => {
   // Always call useCountdown, but with a fallback date if not provided
   const targetDate =
@@ -64,7 +49,22 @@ export const PremiumDealCard = ({ deal }: PremiumDealCardProps) => {
       )}
 
       {/* Image */}
-      <div className="aspect-[4/3] overflow-hidden bg-neutral-100">
+      <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
+        {/* Absolute countdown - keeps card heights consistent */}
+        {shouldShowCountdown && (
+          <div className={cn(
+            'absolute left-1/2 top-3 -translate-x-1/2 z-10 w-minw',
+            isExpiringSoon ? '': ''
+          )}>
+            <div className={cn('mx-auto flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold justify-center', isExpiringSoon ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200')}>
+              <Clock4 className="h-4 w-4" />
+              <span>
+                {days > 0 && `${days}d `}
+                {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}
+              </span>
+            </div>
+          </div>
+        )}
         <img
           src={deal.image}
           alt={deal.name}
@@ -79,7 +79,7 @@ export const PremiumDealCard = ({ deal }: PremiumDealCardProps) => {
             {deal.name}
           </h3>
           <div className="flex flex-shrink-0 items-center gap-1">
-            <Star className="h-4 w-4 fill-current text-amber-500" />
+            <Star className="h-5 w-5 fill-current text-amber-500" />
             <span className="text-sm font-semibold">{deal.rating}</span>
           </div>
         </div>
@@ -120,25 +120,7 @@ export const PremiumDealCard = ({ deal }: PremiumDealCardProps) => {
           </div>
         )}
 
-        {/* Countdown - Only show if deal has expiration */}
-        {shouldShowCountdown && (
-          <div>
-            <div
-              className={cn(
-                'mb-2 flex items-center gap-1 text-xs sm:text-sm',
-                isExpiringSoon ? 'font-bold text-red-600' : 'text-neutral-600',
-              )}
-            >
-              <Clock4 className="h-3.5 w-3.5" />
-              <span>Time left to buy:</span>
-            </div>
-            <div className="grid grid-cols-3 divide-x divide-neutral-200 rounded-lg bg-neutral-100/70 p-2">
-              <CountdownSegment value={days} label="Days" />
-              <CountdownSegment value={hours} label="Hours" />
-              <CountdownSegment value={minutes} label="Min" />
-            </div>
-          </div>
-        )}
+  {/* Countdown moved above image as an absolute overlay for consistent card heights */}
       </div>
     </motion.div>
   );

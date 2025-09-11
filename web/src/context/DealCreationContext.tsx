@@ -56,11 +56,11 @@ function reducer(state: State, action: Action): State {
         discountAmount: state.discountAmount,
       };
     case 'SET_STANDARD_OFFER_KIND':
+      // This action should ONLY affect the `standardOfferKind`.
+      // It should NOT change the `dealType`. A "Happy Hour" can also have a percentage discount.
       return {
         ...state,
         standardOfferKind: action.kind,
-        // ensure dealType is STANDARD when choosing a standard offer kind
-        dealType: action.kind ? 'STANDARD' : state.dealType,
       };
     default:
       return state;

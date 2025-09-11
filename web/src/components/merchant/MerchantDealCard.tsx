@@ -61,11 +61,22 @@ export const MerchantDealCard = ({ deal }: { deal: MerchantDeal | Deal }) => {
 
   return (
     <div className="group flex flex-col sm:flex-row overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lg">
-      <img
-        src={imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&q=80'}
-        alt={title}
-        className="h-48 w-full object-cover sm:h-auto sm:w-56"
-      />
+      <div className="relative h-48 w-full sm:h-auto sm:w-56 overflow-hidden">
+        <img
+          src={imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&q=80'}
+          alt={title}
+          className="h-full w-full object-cover"
+        />
+        {/* Top-center time badge to keep cards uniform */}
+        <div className="absolute left-1/2 top-3 -translate-x-1/2 z-10">
+          <div className="rounded-lg bg-white/95 px-3 py-1 text-sm font-semibold shadow-md backdrop-blur-sm">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-neutral-600" />
+              <span className="text-sm text-neutral-700">Runs until {new Date(endTime).toLocaleDateString()}</span>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <div className="flex flex-grow flex-col p-6">
         <div className="flex items-start justify-between mb-2">

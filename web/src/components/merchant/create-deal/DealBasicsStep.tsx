@@ -1,11 +1,33 @@
-// src/components/merchant/create-deal/DealBasicsStep.tsx
+// web/src/components/merchant/create-deal/DealBasicsStep.tsx
 import { useNavigate } from 'react-router-dom';
 import { useDealCreation } from '@/context/DealCreationContext';
 import { OnboardingStepLayout } from '../onboarding/OnboardingStepLayout';
 import { Input } from '@/components/ui/input';
-import { ChevronDown } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Tag, Clock, Repeat } from 'lucide-react'; // Import icons for the cards
+import { cn } from '@/lib/utils';
+
+// --- NEW: A reusable component for the selection cards ---
+const DealTypeCard = ({ icon, title, description, isSelected, onClick }: any) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      'rounded-lg border-2 p-6 text-left transition-all w-full flex items-center gap-4',
+      isSelected
+        ? 'border-brand-primary-500 bg-brand-primary-50 shadow-md'
+        : 'border-neutral-200 bg-white hover:border-neutral-300'
+    )}
+  >
+    <div className={cn("flex-shrink-0 h-12 w-12 rounded-lg flex items-center justify-center", isSelected ? "bg-gradient-to-b from-brand-primary-400 to-brand-primary-600 text-white" : "bg-neutral-100 text-brand-primary-600")}>
+      {icon}
+    </div>
+    <div>
+      <p className="font-bold text-neutral-800">{title}</p>
+      <p className="mt-1 text-sm text-neutral-500">{description}</p>
+    </div>
+  </button>
+);
 
 export const DealBasicsStep = () => {
   const { state, dispatch } = useDealCreation();
@@ -13,103 +35,52 @@ export const DealBasicsStep = () => {
 
   return (
     <OnboardingStepLayout
-      title="First, let's describe your deal"
+      title="First, what kind of deal is it?"
       onNext={() => navigate('/merchant/deals/create/offer')}
-      onBack={() => navigate(-1)}
-      isNextDisabled={!state.title || !state.description}
+      onBack={() => navigate(-1)} // Or to merchant dashboard
+      isNextDisabled={!state.title || !state.dealType}
       progress={20}
     >
-      <div className="space-y-6">
+      <div className="space-y-8">
+        {/* --- NEW: Deal Type Selection --- */}
         <div>
-          <Label htmlFor="dealType" className="text-lg font-semibold">
-            Deal Type
-          </Label>
-          <p className="mb-2 text-neutral-500">Choose how this deal behaves.</p>
-          <div className="relative">
-            <select
-              id="dealType"
-              value={state.dealType ?? 'STANDARD'}
-              onChange={(e) =>
-                dispatch({ type: 'SET_DEAL_TYPE', dealType: e.target.value as any })
-              }
-              className="h-14 w-full rounded-md border border-input bg-transparent px-3 pr-10 text-base appearance-none"
-            >
-              <option value="STANDARD">Standard</option>
-              <option value="HAPPY_HOUR">Happy Hour</option>
-              <option value="RECURRING">Recurring (weekly)</option>
-            </select>
-            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-              <ChevronDown className="h-4 w-4 text-neutral-500" />
-            </span>
+          <Label className="text-lg font-semibold">Deal Type</Label>
+          <p className="mb-3 text-neutral-500">Choose the behavior of your deal.</p>
+          <div className="space-y-3">
+            <DealTypeCard
+              icon={<Tag className="h-6 w-6" />}
+              title="Standard Deal"
+              description="A classic offer valid for a specific period."
+              isSelected={state.dealType === 'STANDARD'}
+              onClick={() => dispatch({ type: 'SET_DEAL_TYPE', dealType: 'STANDARD' })}
+            />
+            <DealTypeCard
+              icon={<Clock className="h-6 w-6" />}
+              title="Happy Hour"
+              description="A time-sensitive deal to create urgency."
+              isSelected={state.dealType === 'HAPPY_HOUR'}
+              onClick={() => dispatch({ type: 'SET_DEAL_TYPE', dealType: 'HAPPY_HOUR' })}
+            />
+            <DealTypeCard
+              icon={<Repeat className="h-6 w-6" />}
+              title="Recurring Deal"
+              description="Repeats on the same day(s) every week."
+              isSelected={state.dealType === 'RECURRING'}
+              onClick={() => dispatch({ type: 'SET_DEAL_TYPE', dealType: 'RECURRING' })}
+            />
           </div>
         </div>
+
+        {/* --- Title and Description Inputs (No Changes) --- */}
         <div>
-          <Label htmlFor="title" className="text-lg font-semibold">
-            Deal Title
-          </Label>
-          <p className="mb-2 text-neutral-500">
-            Make it catchy and clear, like "2-for-1 Happy Hour".
-          </p>
-          <Input
-            id="title"
-            value={state.title}
-            onChange={(e) =>
-              dispatch({
-                type: 'UPDATE_FIELD',
-                field: 'title',
-                value: e.target.value,
-              })
-            }
-            className="h-14 text-lg"
-            placeholder="Enter your deal title..."
-          />
+          <Label htmlFor="title" className="text-lg font-semibold">Deal Title</Label>
+          <p className="mb-2 text-neutral-500">Make it catchy, like "2-for-1 Tacos".</p>
+          <Input id="title" value={state.title} onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'title', value: e.target.value })} className="h-14 text-lg" />
         </div>
         <div>
-          <Label htmlFor="category" className="text-lg font-semibold">
-            Category
-          </Label>
-          <p className="mb-2 text-neutral-500">Select the category that best fits your deal.</p>
-          <div className="relative">
-            <select
-              id="category"
-              value={state.category}
-              onChange={(e) =>
-                dispatch({ type: 'UPDATE_FIELD', field: 'category', value: e.target.value })
-              }
-              className="h-14 w-full rounded-md border border-input bg-transparent px-3 pr-10 text-base appearance-none"
-            >
-              <option value="FOOD_AND_BEVERAGE">Food &amp; Beverage</option>
-              <option value="RETAIL">Retail</option>
-              <option value="ENTERTAINMENT">Entertainment</option>
-              <option value="SERVICES">Services</option>
-              <option value="OTHER">Other</option>
-            </select>
-            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-              <ChevronDown className="h-4 w-4 text-neutral-500" />
-            </span>
-          </div>
-        </div>
-        <div>
-          <Label htmlFor="description" className="text-lg font-semibold">
-            Description
-          </Label>
-          <p className="mb-2 text-neutral-500">
-            Provide more details about what's included.
-          </p>
-          <Textarea
-            id="description"
-            value={state.description}
-            onChange={(e) =>
-              dispatch({
-                type: 'UPDATE_FIELD',
-                field: 'description',
-                value: e.target.value,
-              })
-            }
-            className="min-h-[120px] text-base"
-            rows={4}
-            placeholder="Describe your deal in detail..."
-          />
+          <Label htmlFor="description" className="text-lg font-semibold">Description</Label>
+          <p className="mb-2 text-neutral-500">Provide more details about what's included.</p>
+          <Textarea id="description" value={state.description} onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'description', value: e.target.value })} className="min-h-[120px] text-base" />
         </div>
       </div>
     </OnboardingStepLayout>

@@ -37,18 +37,20 @@ export const CompactDealCard = ({ deal }: CompactDealCardProps) => {
           <Heart className="h-4.5 w-4.5" />
         </button>
 
-        {/* Countdown Badge */}
+        {/* Countdown Badge - positioned top-center to keep card heights consistent */}
         {showCountdown && (
-          <div className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-lg bg-white/95 px-2.5 py-1.5 shadow-lg backdrop-blur-sm">
-            <Clock className="h-3.5 w-3.5 text-red-500" />
-            <span
-              className={cn(
-                'text-xs font-bold',
-                hours < 1 ? 'text-red-600' : 'text-neutral-700',
-              )}
-            >
-              {hours}h {minutes}m
-            </span>
+          <div className="absolute left-1/2 top-3 -translate-x-1/2 z-20">
+            <div className="flex items-center gap-1.5 rounded-lg bg-white/95 px-2.5 py-1.5 shadow-lg backdrop-blur-sm">
+              <Clock className="h-3.5 w-3.5 text-red-500" />
+              <span
+                className={cn(
+                  'text-xs font-bold',
+                  hours < 1 ? 'text-red-600' : 'text-neutral-700',
+                )}
+              >
+                {hours}h {minutes}m
+              </span>
+            </div>
           </div>
         )}
       </div>
