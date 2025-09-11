@@ -2,6 +2,8 @@ import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useMemo, useRef, useState, useEffect } from 'react';
+import { Search } from 'lucide-react';
+import { Button } from '@/components/common/Button';
 
 // Fix for default Leaflet icon issue with bundlers
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -102,48 +104,52 @@ export const LocationPickerMap = ({ center, onLocationChange }: Props) => {
   }
 
   return (
-    <div className="h-96 w-full rounded-lg overflow-hidden border relative">
-      <div className="absolute top-3 left-3 z-20 flex items-center gap-2 bg-white/90 rounded-md p-2 shadow">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search for address or place"
-          className="rounded-md border px-3 py-2 text-sm w-64"
-        />
-        <button
-          onClick={handleSearch}
-          disabled={isSearching}
-          className="rounded-md bg-brand-primary-500 px-3 py-2 text-sm text-white disabled:opacity-60"
-        >
-          {isSearching ? 'Searching...' : 'Search'}
-        </button>
-        <button
-          onClick={handleUseMyLocation}
-          className="rounded-md bg-neutral-100 px-3 py-2 text-sm"
-        >
-          Use my location
-        </button>
+    <div className="w-full">
+      {/* Search UI rendered above the map to avoid flicker when map re-renders */}
+      <div className="mb-3 flex flex-col sm:flex-row sm:items-center gap-3 bg-white rounded-lg p-3 shadow-sm border border-neutral-200 max-w-full">
+        <div className="flex items-center flex-1 min-w-0">
+          <label htmlFor="map-search" className="sr-only">Search address or place</label>
+          <input
+            id="map-search"
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search for address or place"
+            className="rounded-md border px-3 py-2 text-sm w-full sm:w-64 md:w-80 min-w-0"
+          />
+        </div>
+
+        <div className="flex items-center gap-2 flex-none">
+          <Button onClick={handleSearch} variant="primary" size="md" className="rounded-md" aria-label="Search">
+            <Search className="mr-2 h-4 w-4" />
+            {isSearching ? 'Searching...' : 'Search'}
+          </Button>
+          <Button onClick={handleUseMyLocation} variant="secondary" size="md" className="rounded-md">
+            Use my location
+          </Button>
+        </div>
       </div>
 
-      <MapContainer
-        center={[center.lat, center.lng]}
-        zoom={15}
-        scrollWheelZoom={true}
-        className="h-full w-full"
-      >
-        <MapRefSetter />
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <Marker
-          draggable={true}
-          eventHandlers={eventHandlers}
-          position={[center.lat, center.lng]}
-          ref={markerRef}
-        />
-      </MapContainer>
+      <div className="h-96 w-full rounded-lg overflow-hidden border relative">
+        <MapContainer
+          center={[center.lat, center.lng]}
+          zoom={15}
+          scrollWheelZoom={true}
+          className="h-full w-full"
+        >
+          <MapRefSetter />
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <Marker
+            draggable={true}
+            eventHandlers={eventHandlers}
+            position={[center.lat, center.lng]}
+            ref={markerRef}
+          />
+        </MapContainer>
+      </div>
     </div>
   );
 };

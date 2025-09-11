@@ -9,6 +9,7 @@ interface User {
   id: number;
   email: string;
   name: string | null;
+  profilePictureUrl?: string | null; // <-- Add this optional field
 }
 
 export interface AuthContextType {

@@ -193,6 +193,7 @@ import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
+import { BusinessCTA } from '@/components/common/BusinessCTA';
 import { PATHS } from '@/routing/paths';
 import { Logo } from '../common/Logo';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -280,23 +281,15 @@ export const Header = () => {
           </div>
 
           <div className="hidden items-center justify-end gap-2 lg:flex">
-            <Link
-              to={
-                hasMerchantProfile
-                  ? PATHS.MERCHANT_DASHBOARD
-                  : PATHS.MERCHANT_ONBOARDING
-              }
-            >
-              <Button variant="secondary" size="md" className="rounded-full">
-                {hasMerchantProfile
-                  ? 'Business Dashboard'
-                  : 'CitySpark for Business'}
-              </Button>
-            </Link>
+              <BusinessCTA>
+                <Button variant="secondary" size="md" className="rounded-full">
+                  {hasMerchantProfile ? 'Business Dashboard' : 'CitySpark for Business'}
+                </Button>
+              </BusinessCTA>
             {isLoadingUser ? (
               <div className="h-10 w-24 animate-pulse rounded-full bg-neutral-200" />
             ) : user ? (
-              <ProfileDropDown />
+              <ProfileDropDown isMerchant={hasMerchantProfile} />
             ) : (
               <Link to={PATHS.LOGIN}>
                 <Button variant="primary" size="md" className="rounded-full">
@@ -364,27 +357,17 @@ export const Header = () => {
                       >
                         Sign up / Log in
                       </Button>
-                    </Link>
+        </Link>
                     <p className="mt-6 text-center text-base font-medium text-gray-500">
                       {hasMerchantProfile ? (
                         <>
                           Manage your business{' '}
-                          <Link
-                            to={PATHS.MERCHANT_DASHBOARD}
-                            className="text-primary hover:text-primary/90"
-                          >
-                            Go to Dashboard
-                          </Link>
+          <Link to={PATHS.MERCHANT_DASHBOARD} className="text-primary hover:text-primary/90">Go to Dashboard</Link>
                         </>
                       ) : (
                         <>
                           Are you a business owner?{' '}
-                          <Link
-                            to={PATHS.MERCHANT_ONBOARDING}
-                            className="text-primary hover:text-primary/90"
-                          >
-                            Get on the map
-                          </Link>
+          <Link to={PATHS.MERCHANT_ONBOARDING} className="text-primary hover:text-primary/90">Get on the map</Link>
                         </>
                       )}
                     </p>

@@ -1,12 +1,13 @@
 // web/src/components/deals/PremiumV2DealCard.tsx
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Phone, ChevronDown, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { Heart, Phone, ChevronDown, ChevronLeft, ChevronRight, Loader2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/common/Button';
 import type { Deal } from '@/data/deals';
 import { AvatarStack } from '@/components/common/AvatarStack';
 import { useSavedDeals } from '@/hooks/useSavedDeals';
+import { useCountdown } from '@/hooks/useCountdown';
 
 // A small, reusable component for colored tags
 const DealTag = ({ children }: { children: React.ReactNode }) => (
@@ -42,6 +43,12 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
 
   // Autoplay settings
   const AUTOPLAY_INTERVAL = 3500; // ms
+
+  // --- Countdown functionality ---
+  const countdown = useCountdown(deal.expiresAt || '');
+  const { days, hours, minutes, seconds } = countdown;
+  const showCountdown = deal.expiresAt && (days > 0 || hours > 0 || minutes > 0 || seconds > 0);
+  const isExpiringSoon = days === 0 && hours < 2;
 
   // --- useSavedDeals hook integration ---
   const { savedDealIds, saveDeal, unsaveDeal, isSaving, isUnsaving } = useSavedDeals();
@@ -151,16 +158,18 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
           <Phone className="h-5 w-5" />
         </Button>
         <Button
+          title={isSaved ? 'Unsave Deal' : 'Save Deal'}
+          aria-label={isSaved ? 'Unsave this deal' : 'Save this deal'}
           onClick={handleLikeClick}
+          disabled={isLikeButtonLoading}
           variant="ghost"
           size="sm"
-          disabled={isLikeButtonLoading}
           className="absolute right-3 top-3 h-9 w-9 bg-black/30 text-white hover:bg-red-500/80 hover:text-white rounded-full flex items-center justify-center"
         >
           {isLikeButtonLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <Heart className={cn('h-5 w-5 transition-all', isSaved && 'fill-current text-red-500')} />
+            <Heart className={cn('h-4 w-4 transition-all', isSaved && 'fill-current text-red-500')} />
           )}
         </Button>
       </div>
@@ -169,6 +178,25 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
       <div className="p-4">
         <h3 className="text-xl font-bold text-neutral-900 line-clamp-2">{deal.name}</h3>
         <p className="mt-1 text-base text-neutral-600">{deal.location}</p>
+
+        {/* Countdown Timer - Display at top center */}
+        {showCountdown && (
+          <div className="mt-3 flex items-center justify-center">
+            <div className={cn(
+              "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold",
+              isExpiringSoon 
+                ? "bg-red-50 text-red-700 border border-red-200" 
+                : "bg-amber-50 text-amber-700 border border-amber-200"
+            )}>
+              <Clock className="h-4 w-4" />
+              <span>
+                {days > 0 && `${days}d `}
+                {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+                {isExpiringSoon && " left"}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Dynamic Tags from deal data */}
         <div className="mt-3 flex items-center gap-2">
@@ -200,6 +228,25 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                 exit={{ height: 0, opacity: 0 }}
                 className="overflow-hidden mb-3"
             >
+                {/* Countdown in dropdown */}
+                {showCountdown && (
+                  <div className="mb-3 p-3 rounded-lg bg-gradient-to-r from-red-50 to-amber-50 border border-amber-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-amber-600" />
+                        <span className="text-sm font-semibold text-amber-800">Deal Expires In:</span>
+                      </div>
+                      <div className={cn(
+                        "text-sm font-bold",
+                        isExpiringSoon ? "text-red-700" : "text-amber-700"
+                      )}>
+                        {days > 0 && `${days}d `}
+                        {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="scrollbar-hide flex gap-3 pb-2 overflow-x-auto">
                     {(deal.offers || mockOffers).map(offer => (
                         <div key={offer.title} className="flex-shrink-0 w-36 rounded-lg border p-3 text-center bg-neutral-50">

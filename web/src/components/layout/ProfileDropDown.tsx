@@ -12,46 +12,38 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/context/useAuth';
 import { PATHS } from '@/routing/paths';
-import { useMerchantStatus } from '@/hooks/useMerchantStatus'; // <-- THE FIX
+import { cn } from '@/lib/utils'; // Import cn utility
 
-export const ProfileDropDown = () => {
+export const ProfileDropDown = ({ isMerchant }: { isMerchant: boolean }) => {
   const { user, logout } = useAuth();
-  const { data: merchantStatus } = useMerchantStatus(); // <-- THE FIX
-  const isApprovedMerchant =
-    merchantStatus?.data?.merchant?.status === 'APPROVED';
-
+  
   const userInitials = user?.name
-    ? user.name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
+    ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase()
     : (user?.email?.[0].toUpperCase() ?? 'U');
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-brand-primary-main focus:ring-offset-2">
-          <Avatar>
-            <AvatarImage
-              src="https://github.com/shadcn.png"
-              alt={user?.name || ''}
-            />
+          {/* --- MODIFIED: Add conditional ring for merchants --- */}
+          <Avatar className={cn(isMerchant && "ring-2 ring-brand-primary-500 ring-offset-2")}>
+            <AvatarImage src="https://github.com/shadcn.png" alt={user?.name || ''} />
             <AvatarFallback>{userInitials}</AvatarFallback>
           </Avatar>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        {/* --- NEW: Add label for merchants --- */}
+        {isMerchant && <DropdownMenuLabel className="!py-0 !px-2 text-xs font-normal text-brand-primary-600">Merchant Profile</DropdownMenuLabel>}
         <DropdownMenuSeparator />
 
-        {/* --- THE FIX: Conditional Merchant Link --- */}
-        {isApprovedMerchant && (
+        {isMerchant && (
           <>
             <DropdownMenuItem asChild>
               <Link to={PATHS.MERCHANT_DASHBOARD}>
                 <LayoutDashboard className="mr-2 h-4 w-4" />
-                <span>Switch to Merchant View</span>
+                <span>Merchant Dashboard</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -71,7 +63,7 @@ export const ProfileDropDown = () => {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={logout}>
+        <DropdownMenuItem onClick={logout} className="text-red-600 focus:text-red-600">
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>
