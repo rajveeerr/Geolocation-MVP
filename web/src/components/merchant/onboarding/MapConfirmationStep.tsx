@@ -36,6 +36,8 @@ export const MapConfirmationStep = () => {
               address: fullAddress,
               latitude: state.coordinates.lat,
               longitude: state.coordinates.lng,
+              description: state.description || undefined,
+              logoUrl: state.logoUrl || undefined,
           });
 
           if (response.success) {

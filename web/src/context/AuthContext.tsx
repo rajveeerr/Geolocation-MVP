@@ -57,8 +57,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const { mutateAsync: signup, isPending: isSigningUp } = useMutation({
-    mutationFn: (details: SignUpFormValues) =>
-      apiPost<unknown, SignUpFormValues>('/auth/register', details),
+    mutationFn: (details: SignUpFormValues) => {
+      // Combine firstName and lastName into `name` for backend
+      const name = `${details.firstName || ''} ${details.lastName || ''}`.trim();
+      const payload = {
+        email: details.email,
+        password: details.password,
+        name,
+      };
+  return apiPost<unknown, any>('/auth/register', payload);
+    },
     onSuccess: (response) => {
       if (response.success) {
         toast({

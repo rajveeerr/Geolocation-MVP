@@ -46,9 +46,9 @@ export const AddressStep = () => {
       title="Confirm your address"
       onNext={handleNext}
       onBack={() => dispatch({ type: 'SET_STEP', payload: state.step - 1 })}
-      isNextDisabled={isNextDisabled || isGeocoding}
-      isLoading={isGeocoding}
-      progress={66}
+  isNextDisabled={isNextDisabled || isGeocoding}
+  isLoading={isGeocoding}
+  progress={50}
     /* OnboardingStepLayout handles button label internally; pass through loading state */
     >
       <div className="space-y-4">

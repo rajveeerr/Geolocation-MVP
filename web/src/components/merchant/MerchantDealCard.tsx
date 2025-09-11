@@ -3,6 +3,8 @@ import { Button } from '@/components/common/Button';
 import { Edit, Clock, Tag, BarChart2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Deal } from '@/data/deals';
+import { Link } from 'react-router-dom';
+import { PATHS } from '@/routing/paths';
 
 // Define the shape of the deal object as it comes from the /merchants/my-deals API
 interface MerchantDeal {
@@ -89,10 +91,12 @@ export const MerchantDealCard = ({ deal }: { deal: MerchantDeal | Deal }) => {
         </div>
 
         <div className="mt-4 flex items-center gap-3">
-             <Button variant="secondary" size="sm" className="rounded-lg">
+            <Link to={PATHS.MERCHANT_DASHBOARD} className="inline-block">
+              <Button variant="secondary" size="sm" className="rounded-lg">
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
-            </Button>
+              </Button>
+            </Link>
             <Button variant="ghost" size="sm" className="rounded-lg text-neutral-600">
                 <BarChart2 className="mr-2 h-4 w-4" />
                 View Analytics

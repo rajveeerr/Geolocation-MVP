@@ -1,4 +1,3 @@
-// src/components/layout/MerchantHeader.tsx
 import { Link, NavLink } from 'react-router-dom';
 import { Logo } from '../common/Logo';
 import { Button } from '../common/Button';

@@ -26,6 +26,8 @@ type Action =
   | { type: 'SET_BUSINESS_NAME'; payload: string }
   | { type: 'SET_ADDRESS_FIELD'; payload: { field: keyof State['address']; value: string } }
   | { type: 'SET_COORDINATES'; payload: { lat: number; lng: number } }
+  | { type: 'SET_DESCRIPTION'; payload: string }
+  | { type: 'SET_LOGO_URL'; payload: string }
   | { type: 'HYDRATE_STATE'; payload: State };
 
 const initialState: State = {
@@ -49,6 +51,10 @@ function reducer(state: State, action: Action): State {
       return { ...state, address: { ...state.address, [action.payload.field]: action.payload.value } };
     case 'SET_COORDINATES':
       return { ...state, coordinates: action.payload };
+    case 'SET_DESCRIPTION':
+      return { ...state, description: action.payload };
+    case 'SET_LOGO_URL':
+      return { ...state, logoUrl: action.payload };
     case 'HYDRATE_STATE':
       return { ...action.payload };
     default:

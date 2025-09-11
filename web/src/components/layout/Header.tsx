@@ -218,6 +218,9 @@ export const Header = () => {
   // Check if user has a merchant profile (any status)
   const hasMerchantProfile = !!merchantData?.data?.merchant;
 
+  // Where the business CTA should navigate
+  const businessLink = hasMerchantProfile ? PATHS.MERCHANT_DASHBOARD : PATHS.MERCHANT_ONBOARDING;
+
   const openSearchModal = () => setIsSearchModalOpen(true);
   const closeSearchModal = () => setIsSearchModalOpen(false);
 
@@ -280,23 +283,15 @@ export const Header = () => {
           </div>
 
           <div className="hidden items-center justify-end gap-2 lg:flex">
-            <Link
-              to={
-                hasMerchantProfile
-                  ? PATHS.MERCHANT_DASHBOARD
-                  : PATHS.MERCHANT_ONBOARDING
-              }
-            >
+            <Link to={businessLink}>
               <Button variant="secondary" size="md" className="rounded-full">
-                {hasMerchantProfile
-                  ? 'Business Dashboard'
-                  : 'CitySpark for Business'}
+                {hasMerchantProfile ? 'Business Dashboard' : 'CitySpark for Business'}
               </Button>
             </Link>
             {isLoadingUser ? (
               <div className="h-10 w-24 animate-pulse rounded-full bg-neutral-200" />
             ) : user ? (
-              <ProfileDropDown />
+              <ProfileDropDown isMerchant={hasMerchantProfile} />
             ) : (
               <Link to={PATHS.LOGIN}>
                 <Button variant="primary" size="md" className="rounded-full">
@@ -364,27 +359,17 @@ export const Header = () => {
                       >
                         Sign up / Log in
                       </Button>
-                    </Link>
+        </Link>
                     <p className="mt-6 text-center text-base font-medium text-gray-500">
                       {hasMerchantProfile ? (
                         <>
                           Manage your business{' '}
-                          <Link
-                            to={PATHS.MERCHANT_DASHBOARD}
-                            className="text-primary hover:text-primary/90"
-                          >
-                            Go to Dashboard
-                          </Link>
+          <Link to={PATHS.MERCHANT_DASHBOARD} className="text-primary hover:text-primary/90">Go to Dashboard</Link>
                         </>
                       ) : (
                         <>
                           Are you a business owner?{' '}
-                          <Link
-                            to={PATHS.MERCHANT_ONBOARDING}
-                            className="text-primary hover:text-primary/90"
-                          >
-                            Get on the map
-                          </Link>
+          <Link to={PATHS.MERCHANT_ONBOARDING} className="text-primary hover:text-primary/90">Get on the map</Link>
                         </>
                       )}
                     </p>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDealCreation } from '@/context/DealCreationContext';
 import { OnboardingStepLayout } from '../onboarding/OnboardingStepLayout';
 import { Input } from '@/components/ui/input';
+import { ChevronDown } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -39,6 +40,31 @@ export const DealBasicsStep = () => {
             className="h-14 text-lg"
             placeholder="Enter your deal title..."
           />
+        </div>
+        <div>
+          <Label htmlFor="category" className="text-lg font-semibold">
+            Category
+          </Label>
+          <p className="mb-2 text-neutral-500">Select the category that best fits your deal.</p>
+          <div className="relative">
+            <select
+              id="category"
+              value={state.category}
+              onChange={(e) =>
+                dispatch({ type: 'UPDATE_FIELD', field: 'category', value: e.target.value })
+              }
+              className="h-14 w-full rounded-md border border-input bg-transparent px-3 pr-10 text-base appearance-none"
+            >
+              <option value="FOOD_AND_BEVERAGE">Food &amp; Beverage</option>
+              <option value="RETAIL">Retail</option>
+              <option value="ENTERTAINMENT">Entertainment</option>
+              <option value="SERVICES">Services</option>
+              <option value="OTHER">Other</option>
+            </select>
+            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+              <ChevronDown className="h-4 w-4 text-neutral-500" />
+            </span>
+          </div>
         </div>
         <div>
           <Label htmlFor="description" className="text-lg font-semibold">

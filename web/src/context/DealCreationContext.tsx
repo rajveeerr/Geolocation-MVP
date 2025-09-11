@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 interface State {
   title: string;
   description: string;
+  category: string;
   dealType: 'percentage' | 'amount' | null;
   discountPercentage: number | null;
   discountAmount: number | null;
@@ -21,6 +22,7 @@ type Action =
 const initialState: State = {
   title: '',
   description: '',
+  category: 'FOOD_AND_BEVERAGE',
   dealType: null,
   discountPercentage: null,
   discountAmount: null,
