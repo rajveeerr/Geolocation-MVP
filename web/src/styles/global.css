@@ -25,21 +25,22 @@
     --ring: 222.2 84% 4.9%;
     --radius: 0.75rem;
 
-    /* YOUR BRAND.PRIMARY PALETTE - THE SINGLE SOURCE OF TRUTH */
-    --brand-primary-main: 221 83.2% 53.3%; /* Corresponds to -600 */
-    --brand-primary-dark: 221 76.8% 47.1%; /* Corresponds to -700 */
-    --brand-primary-light: 220 89.5% 92.7%;
+  /* --- THIS IS THE CHANGE: Replaced Blue with Orange Palette --- */
+  /* Resy-inspired Orange: HSL(7, 82%, 64%) */
+  --brand-primary-main: 7 82% 64%; /* Corresponds to -600 */
+  --brand-primary-dark: 7 82% 58%; /* Corresponds to -700 */
+  --brand-primary-light: 7 85% 95%;
 
-    --brand-primary-50: 220 89.5% 96.1%;
-    --brand-primary-100: 220 89.5% 92.7%;
-    --brand-primary-200: 220 89.5% 86.1%;
-    --brand-primary-300: 220 89.5% 76.1%;
-    --brand-primary-400: 220 89.5% 66.1%;
-    --brand-primary-500: 220 89.5% 56.1%;
-    --brand-primary-600: 221 83.2% 53.3%;
-    --brand-primary-700: 221 76.8% 47.1%;
-    --brand-primary-800: 220 89.5% 26.1%;
-    --brand-primary-900: 220 89.5% 16.1%;
+  --brand-primary-50: 7 85% 97%;
+  --brand-primary-100: 7 85% 95%;
+  --brand-primary-200: 7 84% 90%;
+  --brand-primary-300: 7 83% 83%;
+  --brand-primary-400: 7 83% 75%;
+  --brand-primary-500: 7 82% 68%;
+  --brand-primary-600: 7 82% 64%; /* Main Resy Orange */
+  --brand-primary-700: 7 82% 58%;
+  --brand-primary-800: 7 80% 48%;
+  --brand-primary-900: 7 78% 40%;
   }
 
   .dark {

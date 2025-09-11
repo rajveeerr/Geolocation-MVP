@@ -25,12 +25,12 @@ export const premiumDeals: Deal[] = [
   {
     id: 'pd1',
     name: 'Echoes Living Room',
-    image:
-      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&q=80',
+    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&q=80',
+    // --- IMAGES ADDED ---
     images: [
-      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=900&q=80',
-      'https://images.unsplash.com/photo-1541542684-7f8b1d4b7b0a?w=900&q=80',
-      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900&q=80',
+      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80',
+      'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80',
+      'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&q=80',
     ],
     rating: 4.6,
     category: 'Lounge',
@@ -39,17 +39,17 @@ export const premiumDeals: Deal[] = [
     tag: 'Guest Favourite',
     dealType: 'Happy Hour',
     dealValue: '2-for-1 Drinks',
-    expiresAt: getFutureDate(3), // Expires in 3 hours
+    expiresAt: getFutureDate(3),
   },
   {
     id: 'pd2',
     name: 'The Irish House',
-    image:
-      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80',
+    image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80',
+    // --- IMAGES ADDED ---
     images: [
-      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900&q=80',
-      'https://images.unsplash.com/photo-1464375117522-1311d56a6e8d?w=900&q=80',
-      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=900&q=80',
+      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80',
+      'https://images.unsplash.com/photo-1543007631-283050bb3e8c?w=800&q=80',
+      'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=800&q=80',
     ],
     rating: 4.4,
     category: 'Bar',
@@ -60,17 +60,17 @@ export const premiumDeals: Deal[] = [
     dealValue: '50% OFF',
     originalValue: 50,
     discountValue: 25,
-    expiresAt: getFutureDate(26), // Expires in 26 hours
+    expiresAt: getFutureDate(26),
   },
   {
     id: 'pd3',
     name: 'Social',
-    image:
-      'https://images.unsplash.com/photo-1562059392-096320bccc7e?w=500&q=80',
+    image: 'https://images.unsplash.com/photo-1562059392-096320bccc7e?w=500&q=80',
+    // --- IMAGES ADDED ---
     images: [
-      'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=900&q=80',
-      'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=900&q=80',
-      'https://images.unsplash.com/photo-1541542684-7f8b1d4b7b0a?w=900&q=80',
+        'https://images.unsplash.com/photo-1562059392-096320bccc7e?w=800&q=80',
+        'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&q=80',
+        'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80',
     ],
     rating: 4.1,
     category: 'Cafe',
@@ -78,18 +78,18 @@ export const premiumDeals: Deal[] = [
     location: 'Hauz Khas',
     dealType: 'Kickback',
     dealValue: '$5 Per Friend',
-    expiresAt: getFutureDate(72), // Expires in 3 days
+    expiresAt: getFutureDate(72),
   },
   {
     id: 'pd4',
     name: 'Mai Bao',
-    image:
-      'https://images.unsplash.com/photo-1585518419759-7fe2e0fbf8a6?w=500&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1585518419759-7fe2e0fbf8a6?w=900&q=80',
-      'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=900&q=80',
-      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=900&q=80',
-    ],
+    image: 'https://images.unsplash.com/photo-1585518419759-7fe2e0fbf8a6?w=500&q=80',
+    // --- IMAGES ADDED ---
+  images: [
+    'https://images.unsplash.com/photo-1585518419759-7fe2e0fbf8a6?w=800&q=80',
+    'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&q=80',
+    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80',
+  ],
     rating: 4.0,
     category: 'Asian',
     price: '$',
