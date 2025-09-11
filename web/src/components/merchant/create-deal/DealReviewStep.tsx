@@ -6,6 +6,8 @@ import { OnboardingStepLayout } from '../onboarding/OnboardingStepLayout';
 import { apiPost } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 import { PATHS } from '@/routing/paths';
+import { useCountdown } from '@/hooks/useCountdown';
+import { Sparkles } from 'lucide-react';
 
 const ReviewItem = ({
   label,
@@ -22,6 +24,8 @@ const ReviewItem = ({
 
 export const DealReviewStep = () => {
   const { state } = useDealCreation();
+  const countdown = useCountdown(state.endTime || '');
+  const { days = 0, hours = 0, minutes = 0, seconds = 0 } = countdown || {};
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isPublishing, setIsPublishing] = useState(false);
@@ -128,6 +132,20 @@ export const DealReviewStep = () => {
             label="Ends"
             value={new Date(state.endTime).toLocaleString()}
           />
+          {/* Live countdown display */}
+          {state.endTime && (
+            <div className="mt-4 flex items-center gap-3 rounded-md bg-amber-50 p-3">
+              <div className="rounded-md bg-amber-100 p-2 text-amber-700">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-neutral-900">Time left</p>
+                <p className="text-sm text-neutral-700">
+                  {days > 0 ? `${days}d ` : ''}{hours.toString().padStart(2,'0')}h {minutes.toString().padStart(2,'0')}m {seconds.toString().padStart(2,'0')}s
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </OnboardingStepLayout>
