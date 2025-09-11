@@ -70,6 +70,9 @@ router.get('/deals', async (req, res) => {
   try {
     const { latitude, longitude, radius, category, search } = req.query;
     const now = new Date();
+  // Determine today's weekday name for recurring deal filtering (server local time)
+  const dayNames = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+  const todayName = dayNames[now.getDay()];
     
     // Build the where clause for filtering
     const whereClause: any = {
@@ -161,6 +164,17 @@ router.get('/deals', async (req, res) => {
       // Add query hints for better performance
       // This helps PostgreSQL choose the right indexes
     });
+
+    // Filter recurring deals so they only appear on their specified day(s)
+    // recurringDays stored as comma-separated list of day names (MONDAY,...)
+    if (deals.length) {
+      deals = deals.filter(d => {
+        if (d.dealType !== 'RECURRING') return true;
+        if (!d.recurringDays) return false; // malformed recurring deal, hide
+        const days = d.recurringDays.split(',').map(s => s.trim().toUpperCase());
+        return days.includes(todayName);
+      });
+    }
 
     // Log query performance
     logQueryPerformance('Deals Query', queryStartTime, deals.length, {
@@ -265,6 +279,16 @@ router.get('/deals', async (req, res) => {
       deals = deals.map(deal => formatDealForFrontend(deal));
     }
 
+    // Prioritize active HAPPY_HOUR deals at the top while preserving distance or createdAt ordering within groups
+    if (Array.isArray(deals) && deals.length) {
+      const isFormatted = !('merchant' in deals[0] && !(deals[0] as any).merchant.businessName); // naive check
+      // deals are already formatted above (or include distance) at this point
+      const happyHourDeals = (deals as any[]).filter(d => d.dealType === 'HAPPY_HOUR');
+      const otherDeals = (deals as any[]).filter(d => d.dealType !== 'HAPPY_HOUR');
+      // Preserve existing sort inside each group (distance or createdAt formatting kept earlier)
+      deals = [...happyHourDeals, ...otherDeals];
+    }
+
     res.status(200).json({
       deals,
       total: deals.length,
@@ -274,6 +298,7 @@ router.get('/deals', async (req, res) => {
         radius: radius ? parseFloat(radius as string) : null,
         category: category ? category as string : null,
         search: search ? search as string : null,
+        today: todayName
       }
     });
   } catch (error) {
@@ -365,6 +390,98 @@ router.get('/deals/categories', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching categories:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// --- Endpoint: GET /api/deals/featured ---
+// Returns a small set of "hottest" deals for homepage hero sections.
+// Strategy:
+//  1. Active HAPPY_HOUR deals ending soon (soonest first)
+//  2. Then other active deals (RECURRING filtered to today) by higher discount, sooner end
+//  3. Limit configurable (?limit=8, default 8, max 20)
+router.get('/deals/featured', async (req, res) => {
+  try {
+    const now = new Date();
+    const dayNames = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+    const todayName = dayNames[now.getDay()];
+    const limitParam = parseInt(String(req.query.limit || ''), 10);
+    const limit = (!isNaN(limitParam) && limitParam > 0) ? Math.min(limitParam, 20) : 8;
+
+    // Fetch a candidate pool (cap to 100 for performance) of currently active deals
+    // Only from approved merchants.
+    let candidates = await prisma.deal.findMany({
+      where: {
+        startTime: { lte: now },
+        endTime: { gte: now },
+        merchant: { status: 'APPROVED' }
+      },
+      include: {
+        merchant: {
+          select: {
+            id: true,
+            businessName: true,
+            address: true,
+            description: true,
+            logoUrl: true,
+            latitude: true,
+            longitude: true,
+            status: true,
+            createdAt: true,
+            updatedAt: true,
+          }
+        }
+      },
+      orderBy: { endTime: 'asc' }, // early ending first to bias candidate set
+      take: 100
+    });
+
+    // Filter recurring deals to correct day
+    candidates = candidates.filter(d => {
+      if (d.dealType !== 'RECURRING') return true;
+      if (!d.recurringDays) return false;
+      const days = d.recurringDays.split(',').map(s => s.trim().toUpperCase());
+      return days.includes(todayName);
+    });
+
+    // Compute ranking comparator
+    const scored = candidates.map(d => {
+      const timeRemainingMs = d.endTime.getTime() - now.getTime();
+      const timeRemainingMinutes = timeRemainingMs / 60000;
+      const discountPct = d.discountPercentage || 0;
+      const discountValue = d.discountAmount || 0;
+      // Basic priority groups by deal type
+      const typePriority = d.dealType === 'HAPPY_HOUR' ? 3 : (d.dealType === 'RECURRING' ? 2 : 1);
+      return { d, timeRemainingMinutes, discountPct, discountValue, typePriority };
+    });
+
+    scored.sort((a, b) => {
+      // 1. Higher typePriority first (Happy Hour > Recurring > Standard)
+      if (b.typePriority !== a.typePriority) return b.typePriority - a.typePriority;
+      // 2. For same type: earlier ending first
+      if (a.timeRemainingMinutes !== b.timeRemainingMinutes) return a.timeRemainingMinutes - b.timeRemainingMinutes;
+      // 3. Higher percentage discount
+      if (b.discountPct !== a.discountPct) return b.discountPct - a.discountPct;
+      // 4. Higher absolute discount amount
+      if (b.discountValue !== a.discountValue) return b.discountValue - a.discountValue;
+      // 5. Newer createdAt last tiebreak (newer first)
+  return b.d.createdAt.getTime() - a.d.createdAt.getTime();
+    });
+
+    const selected = scored.slice(0, limit).map(s => formatDealForFrontend(s.d));
+
+    res.status(200).json({
+      deals: selected,
+      total: selected.length,
+      limit,
+      generatedAt: now.toISOString(),
+      criteria: {
+        prioritized: ['HAPPY_HOUR ending soon', 'RECURRING (today)', 'Others by discount & end time'],
+        weekday: todayName
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching featured deals:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
