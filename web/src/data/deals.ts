@@ -10,7 +10,7 @@ export interface Deal {
   tag?: string;
 
   // --- NEW DEAL-SPECIFIC FIELDS ---
-  dealType?: 'Discount' | 'Happy Hour' | 'Kickback';
+  dealType?: 'Discount' | 'Happy Hour' | 'Kickback' | 'Recurring';
   dealValue?: string; // e.g., "50% OFF", "$5 Per Friend"
   originalValue?: number;
   discountValue?: number;

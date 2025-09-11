@@ -16,6 +16,7 @@ export type ApiDeal = {
   discountPercentage?: number | null;
   discountAmount?: number | null;
   category: string;
+  dealType?: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING'; // Backend enum values
   startTime?: string;
   endTime?: string;
   rating?: number;
@@ -68,6 +69,17 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => ({
   location: apiDeal.merchant.address,
   description: apiDeal.description || '',
   position: [apiDeal.merchant.latitude ?? 40.7128, apiDeal.merchant.longitude ?? -74.006],
+
+  // Map deal type from backend enum to frontend format
+  dealType: apiDeal.dealType === 'HAPPY_HOUR' ? 'Happy Hour' : 
+            apiDeal.dealType === 'RECURRING' ? 'Recurring' : 'Discount',
+  
+  // Set expiration for happy hour deals - use endTime if it's a happy hour deal
+  expiresAt: apiDeal.dealType === 'HAPPY_HOUR' && apiDeal.endTime ? apiDeal.endTime : undefined,
+  
+  // Map discount value for display
+  dealValue: apiDeal.discountPercentage ? `${apiDeal.discountPercentage}% OFF` :
+            apiDeal.discountAmount ? `$${apiDeal.discountAmount} OFF` : undefined,
 
   // Pricing fallbacks: if backend provides discountAmount/percentage try to use it
   originalPrice: 100,
