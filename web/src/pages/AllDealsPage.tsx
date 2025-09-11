@@ -36,6 +36,7 @@ import { mergeBackendDeals } from '@/data/deals-placeholder';
 import type { ApiDeal as PlaceholderApiDeal } from '@/data/deals-placeholder';
 import { apiGet } from '@/services/api';
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
+import { useToast } from '@/hooks/use-toast';
 
 // Define the shape of a deal object as it comes from your backend API
 type ApiDeal = {
@@ -64,6 +65,7 @@ type ApiDeal = {
 
 
 export const AllDealsPage = () => {
+  const { toast } = useToast();
   const [hoveredDealId, setHoveredDealId] = useState<string | null>(null);
   const [deals, setDeals] = useState<DealWithLocation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -113,7 +115,7 @@ export const AllDealsPage = () => {
     const fetchFilteredDeals = async () => {
       setIsLoading(true);
       setError(null);
-      try {
+  try {
         // Short-circuit: some backend endpoints require >=2 chars for search.
         const trimmed = debouncedSearchTerm.trim();
         if (trimmed && trimmed.length < 2) {
@@ -162,12 +164,11 @@ export const AllDealsPage = () => {
           throw new Error(errMsg);
         }
       } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'An error occurred.';
         console.error("Fetch filtered deals error:", err);
-  // When the backend fails, fall back to friendly placeholder data so the
-  // UI remains useful instead of showing a blocking error page.
-  setDeals(mergeBackendDeals(undefined));
-  // Clear the blocking error so the page will render the placeholders.
-  setError(null);
+        setError(errorMessage); // keep the error so we can show a banner/page when appropriate
+        toast({ title: 'Could Not Fetch Live Deals', description: 'Showing sample data instead.', variant: 'destructive' });
+        setDeals(mergeBackendDeals(undefined));
       } finally {
         setIsLoading(false);
       }

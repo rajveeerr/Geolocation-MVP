@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { ChevronDown } from 'lucide-react';
+// no additional hooks required
 
 export const DealScheduleStep = () => {
   const { state, dispatch } = useDealCreation();
@@ -168,6 +169,32 @@ export const DealScheduleStep = () => {
           </div>
         </div>
       </div>
+
+      {/* Recurring days chooser - only visible for RECURRING deals */}
+      {state.dealType === 'RECURRING' && (
+        <div className="mt-4 rounded-lg border bg-white p-4">
+          <Label className="text-lg font-semibold">Recurring Days</Label>
+          <p className="mb-2 text-neutral-500">Select the weekdays this deal should repeat on.</p>
+          <div className="grid grid-cols-2 gap-2">
+            {['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'].map((day) => (
+              <label key={day} className="inline-flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  checked={state.recurringDays.includes(day)}
+                  onChange={(e) => {
+                    const next = e.target.checked
+                      ? [...state.recurringDays, day]
+                      : state.recurringDays.filter((d) => d !== day);
+                    dispatch({ type: 'UPDATE_FIELD', field: 'recurringDays', value: next as any });
+                  }}
+                  className="h-4 w-4 rounded border-neutral-200"
+                />
+                <span className="text-neutral-700">{day.charAt(0) + day.slice(1).toLowerCase()}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
     </OnboardingStepLayout>
   );
 };

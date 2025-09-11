@@ -47,10 +47,12 @@ export const DealReviewStep = () => {
       const payload = {
         title: state.title,
         description: state.description,
-        discountPercentage:
-          state.dealType === 'percentage' ? state.discountPercentage : null,
-        discountAmount:
-          state.dealType === 'amount' ? state.discountAmount : null,
+        // Send whatever discount fields the merchant provided
+        discountPercentage: state.discountPercentage ?? null,
+        discountAmount: state.discountAmount ?? null,
+  // New fields expected by the backend
+  dealType: state.dealType ?? 'STANDARD',
+  recurringDays: state.recurringDays?.length ? state.recurringDays : undefined,
         startTime: new Date(state.startTime).toISOString(),
         endTime: new Date(state.endTime).toISOString(),
         redemptionInstructions: state.redemptionInstructions,
@@ -107,11 +109,17 @@ export const DealReviewStep = () => {
           <ReviewItem
             label="Offer"
             value={
-              state.dealType === 'percentage'
+              state.discountPercentage
                 ? `${state.discountPercentage}% off`
-                : `$${state.discountAmount} off`
+                : state.discountAmount
+                ? `$${state.discountAmount} off`
+                : 'Not set'
             }
           />
+          <ReviewItem label="Deal Type" value={state.dealType} />
+          {state.dealType === 'RECURRING' && (
+            <ReviewItem label="Recurring Days" value={state.recurringDays.join(', ')} />
+          )}
           <ReviewItem
             label="Starts"
             value={new Date(state.startTime).toLocaleString()}

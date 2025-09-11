@@ -21,6 +21,29 @@ export const DealBasicsStep = () => {
     >
       <div className="space-y-6">
         <div>
+          <Label htmlFor="dealType" className="text-lg font-semibold">
+            Deal Type
+          </Label>
+          <p className="mb-2 text-neutral-500">Choose how this deal behaves.</p>
+          <div className="relative">
+            <select
+              id="dealType"
+              value={state.dealType ?? 'STANDARD'}
+              onChange={(e) =>
+                dispatch({ type: 'SET_DEAL_TYPE', dealType: e.target.value as any })
+              }
+              className="h-14 w-full rounded-md border border-input bg-transparent px-3 pr-10 text-base appearance-none"
+            >
+              <option value="STANDARD">Standard</option>
+              <option value="HAPPY_HOUR">Happy Hour</option>
+              <option value="RECURRING">Recurring (weekly)</option>
+            </select>
+            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+              <ChevronDown className="h-4 w-4 text-neutral-500" />
+            </span>
+          </div>
+        </div>
+        <div>
           <Label htmlFor="title" className="text-lg font-semibold">
             Deal Title
           </Label>

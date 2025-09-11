@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { SignUpPage } from './pages/SignUpPage';
-import { ProfilePage } from './pages/ProfilePage';
+import React, { Suspense } from 'react';
 import { AboutPage } from './pages/AboutPage';
 import { ForBusinessesPage } from './pages/ForBusinessesPage';
 import { PrivacyPage } from './pages/PrivacyPage';
@@ -18,9 +18,12 @@ import { AuthProvider } from './context/AuthContext';
 import { RedirectProvider } from './context/RedirectContext';
 import { ModalProvider } from './context/ModalContext';
 import { AllDealsPage } from './pages/AllDealsPage';
-import { MerchantOnboardingPage } from './pages/merchant/MerchantOnboardingPage';
-import { MerchantDashboardPage } from './pages/merchant/MerchantDashboardPage';
-import { CreateDealPage } from './pages/merchant/DealCreatePage';
+// Lazy-load less-frequently-used pages to split bundles
+const ProfilePage = React.lazy(() => import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
+const MerchantOnboardingPage = React.lazy(() => import('./pages/merchant/MerchantOnboardingPage').then((m) => ({ default: m.MerchantOnboardingPage })));
+const MerchantDashboardPage = React.lazy(() => import('./pages/merchant/MerchantDashboardPage').then((m) => ({ default: m.MerchantDashboardPage })));
+const CreateDealPage = React.lazy(() => import('./pages/merchant/DealCreatePage').then((m) => ({ default: m.CreateDealPage })));
+import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 
 // Helper for default layout
 const DefaultLayout = () => (
@@ -45,7 +48,16 @@ function App() {
             <Route path={PATHS.HOME} element={<HomePage />} />
             <Route path={PATHS.LOGIN} element={<LoginPage />} />
             <Route path={PATHS.SIGNUP} element={<SignUpPage />} />
-            <Route path={PATHS.PROFILE} element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route
+              path={PATHS.PROFILE}
+              element={
+                <ProtectedRoute>
+                  <Suspense fallback={<LoadingOverlay />}>
+                    <ProfilePage />
+                  </Suspense>
+                </ProtectedRoute>
+              }
+            />
             <Route path={PATHS.ABOUT} element={<AboutPage />} />
             <Route path={PATHS.ALL_DEALS} element={<AllDealsPage />} />
             <Route
@@ -62,7 +74,9 @@ function App() {
             element={
               <ProtectedRoute>
                 <MerchantLayout>
-                  <MerchantDashboardPage />
+                  <Suspense fallback={<LoadingOverlay />}>
+                    <MerchantDashboardPage />
+                  </Suspense>
                 </MerchantLayout>
               </ProtectedRoute>
             }
@@ -72,7 +86,9 @@ function App() {
             element={
               <ProtectedRoute>
                 <MerchantLayout>
-                  <CreateDealPage />
+                  <Suspense fallback={<LoadingOverlay />}>
+                    <CreateDealPage />
+                  </Suspense>
                 </MerchantLayout>
               </ProtectedRoute>
             }
@@ -82,7 +98,9 @@ function App() {
             element={
               <ProtectedRoute>
                 <MerchantLayout>
-                  <MerchantOnboardingPage />
+                  <Suspense fallback={<LoadingOverlay />}>
+                    <MerchantOnboardingPage />
+                  </Suspense>
                 </MerchantLayout>
               </ProtectedRoute>
             }

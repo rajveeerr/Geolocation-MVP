@@ -7,9 +7,14 @@ interface State {
   title: string;
   description: string;
   category: string;
-  dealType: 'percentage' | 'amount' | null;
+  // New: align with backend deal types
+  dealType: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' | null;
   discountPercentage: number | null;
   discountAmount: number | null;
+  // New: for recurring deals, which weekdays the deal repeats on (e.g. ['MONDAY','WEDNESDAY'])
+  recurringDays: string[];
+  // New: within STANDARD deals, whether the merchant picked percentage vs amount
+  standardOfferKind: 'percentage' | 'amount' | null;
   startTime: string;
   endTime: string;
   redemptionInstructions: string;
@@ -17,15 +22,19 @@ interface State {
 
 type Action =
   | { type: 'UPDATE_FIELD'; field: keyof State; value: string | number | null }
-  | { type: 'SET_DEAL_TYPE'; dealType: 'percentage' | 'amount' };
+  | { type: 'SET_DEAL_TYPE'; dealType: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' }
+  | { type: 'SET_STANDARD_OFFER_KIND'; kind: 'percentage' | 'amount' | null };
 
 const initialState: State = {
   title: '',
   description: '',
   category: 'FOOD_AND_BEVERAGE',
-  dealType: null,
+  // Default to STANDARD so created deals without explicit choice still work
+  dealType: 'STANDARD',
   discountPercentage: null,
   discountAmount: null,
+  recurringDays: [],
+  standardOfferKind: null,
   startTime: '',
   endTime: '',
   redemptionInstructions:
@@ -40,11 +49,18 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         dealType: action.dealType,
-        // Reset the other value to ensure data integrity
-        discountPercentage:
-          action.dealType === 'amount' ? null : state.discountPercentage,
-        discountAmount:
-          action.dealType === 'percentage' ? null : state.discountAmount,
+        // When switching to RECURRING, keep recurringDays; when switching away, clear them
+        recurringDays: action.dealType === 'RECURRING' ? state.recurringDays : [],
+        // Keep existing discount fields; the Offer step can still set them as needed
+        discountPercentage: state.discountPercentage,
+        discountAmount: state.discountAmount,
+      };
+    case 'SET_STANDARD_OFFER_KIND':
+      return {
+        ...state,
+        standardOfferKind: action.kind,
+        // ensure dealType is STANDARD when choosing a standard offer kind
+        dealType: action.kind ? 'STANDARD' : state.dealType,
       };
     default:
       return state;

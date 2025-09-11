@@ -11,10 +11,10 @@ export const DealOfferStep = () => {
   const { state, dispatch } = useDealCreation();
   const navigate = useNavigate();
 
+  // If choosing a STANDARD offer, require either discountPercentage or discountAmount
   const isNextDisabled =
     !state.dealType ||
-    (state.dealType === 'percentage' && !state.discountPercentage) ||
-    (state.dealType === 'amount' && !state.discountAmount);
+    (state.dealType === 'STANDARD' && !state.discountPercentage && !state.discountAmount);
 
   return (
     <OnboardingStepLayout
@@ -27,12 +27,14 @@ export const DealOfferStep = () => {
       <div className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <button
-            onClick={() =>
-              dispatch({ type: 'SET_DEAL_TYPE', dealType: 'percentage' })
-            }
+            onClick={() => {
+              // Standard percentage-based offer
+              dispatch({ type: 'SET_DEAL_TYPE', dealType: 'STANDARD' });
+              dispatch({ type: 'SET_STANDARD_OFFER_KIND', kind: 'percentage' });
+            }}
             className={cn(
               'rounded-lg border-2 p-6 text-left transition-all',
-              state.dealType === 'percentage'
+              state.standardOfferKind === 'percentage'
                 ? 'border-brand-primary-500 bg-brand-primary-50'
                 : 'border-neutral-200 bg-white hover:border-neutral-300',
             )}
@@ -44,12 +46,14 @@ export const DealOfferStep = () => {
             </p>
           </button>
           <button
-            onClick={() =>
-              dispatch({ type: 'SET_DEAL_TYPE', dealType: 'amount' })
-            }
+            onClick={() => {
+              // Standard fixed amount offer
+              dispatch({ type: 'SET_DEAL_TYPE', dealType: 'STANDARD' });
+              dispatch({ type: 'SET_STANDARD_OFFER_KIND', kind: 'amount' });
+            }}
             className={cn(
               'rounded-lg border-2 p-6 text-left transition-all',
-              state.dealType === 'amount'
+              state.standardOfferKind === 'amount'
                 ? 'border-brand-primary-500 bg-brand-primary-50'
                 : 'border-neutral-200 bg-white hover:border-neutral-300',
             )}
@@ -62,7 +66,11 @@ export const DealOfferStep = () => {
           </button>
         </div>
 
-        {state.dealType === 'percentage' && (
+        {/* Always allow setting discounts; visualized when values are set */}
+        {(
+          // Show percentage input if merchant selected percentage or a value exists
+          state.standardOfferKind === 'percentage' || state.discountPercentage !== null
+        ) && (
           <div>
             <Label htmlFor="percentage" className="text-lg font-semibold">
               Discount Percentage (%)
@@ -84,7 +92,9 @@ export const DealOfferStep = () => {
           </div>
         )}
 
-        {state.dealType === 'amount' && (
+        {(
+          state.standardOfferKind === 'amount' || state.discountAmount !== null
+        ) && (
           <div>
             <Label htmlFor="amount" className="text-lg font-semibold">
               Discount Amount ($)
