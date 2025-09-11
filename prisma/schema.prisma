@@ -71,6 +71,9 @@ model User {
   // Users that this user has referred
   referrals  User[]   @relation("UserReferrals")
 
+  // Birthday (UTC date). Used for sending a simple greeting email. Optional.
+  birthday   DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

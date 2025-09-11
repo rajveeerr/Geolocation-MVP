@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { protect, AuthRequest } from '../middleware/auth.middleware';
 import { getPointConfig } from '../lib/points';
-import { sendWelcomeEmail } from '../lib/email';
+import { sendWelcomeEmail, sendReferralSuccessEmail } from '../lib/email';
 import { invalidateLeaderboardCache } from '../lib/leaderboard/cache';
 
 const router = Router();
@@ -59,15 +59,16 @@ router.post('/register', async (req: Request, res: Response) => {
       throw new Error('Failed to generate unique referral code after 5 attempts');
     }
 
-    const newUser = await prisma.$transaction(async (tx) => {
+  // Using any because generated Prisma types may be stale during migration application
+  // and we only need a few selected fields for the email notification.
+  let referrerForEmail: any = null;
+  const newUser = await prisma.$transaction(async (tx) => {
       const referralCode = await getUniqueReferralCode(tx);
       // If user supplied a referral code, fetch referrer
       let referredByUserId: number | undefined = undefined;
       if (req.body.referralCode) {
-        const referrer = await tx.user.findFirst({ where: { referralCode: req.body.referralCode }, select: { id: true } });
-        if (referrer) {
-          referredByUserId = referrer.id;
-        }
+    referrerForEmail = await tx.user.findFirst({ where: { referralCode: req.body.referralCode }, select: { id: true, email: true, name: true, referralCode: true } });
+    if (referrerForEmail) referredByUserId = referrerForEmail.id;
       }
       const created = await tx.user.create({
         data: {
@@ -100,9 +101,20 @@ router.post('/register', async (req: Request, res: Response) => {
     const { password: _, ...userWithoutPassword } = newUser;
 
     // Fire & forget welcome email (non-blocking)
-  sendWelcomeEmail(userWithoutPassword.email, userWithoutPassword.name || undefined).catch(err => {
+    sendWelcomeEmail(userWithoutPassword.email, userWithoutPassword.name || undefined).catch(err => {
       console.error('[email] welcome send error', err);
     });
+
+    // Fire & forget referral success email to referrer (if any)
+    if (referrerForEmail) {
+      const r = referrerForEmail; // narrow for TS
+      sendReferralSuccessEmail({
+        to: r.email,
+        referrerName: r.name || undefined,
+        referredEmail: userWithoutPassword.email,
+        referralCode: r.referralCode || 'UNKNOWN'
+      }).catch(err => console.error('[email] referral-success send error', err));
+    }
 
     // 5. Send back a success response
     res.status(201).json({
