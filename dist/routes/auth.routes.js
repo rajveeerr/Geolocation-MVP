@@ -9,6 +9,7 @@ const prisma_1 = __importDefault(require("../lib/prisma"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const auth_middleware_1 = require("../middleware/auth.middleware");
+const points_1 = require("../lib/points");
 const router = (0, express_1.Router)();
 // --- Endpoint: POST /api/auth/register ---
 const registerSchema = zod_1.z.object({
@@ -29,14 +30,7 @@ router.post('/register', async (req, res) => {
         // 3. Hash the password
         const hashedPassword = await bcryptjs_1.default.hash(password, 10); // 10 is the salt rounds
         // 4. Create the new user in the database
-        // Award signup points (from env or default 50)
-        const signupPoints = (() => {
-            const val = process.env.SIGNUP_POINTS;
-            if (!val)
-                return 50;
-            const n = parseInt(val, 10);
-            return isNaN(n) || n <= 0 ? 50 : n;
-        })();
+        const { signupPoints } = (0, points_1.getPointConfig)();
         const newUser = await prisma_1.default.$transaction(async (tx) => {
             const created = await tx.user.create({
                 data: {

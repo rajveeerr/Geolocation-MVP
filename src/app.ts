@@ -1,0 +1,55 @@
+import express, { Express, Request, Response } from 'express';
+import prisma from './lib/prisma';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+
+// Routes
+import authRoutes from './routes/auth.routes';
+import merchantRoutes from './routes/merchant.routes';
+import publicDealRoutes from './routes/deals.public.routes';
+import userRoutes from './routes/user.routes';
+
+// Load env (tests can set process.env before importing this file)
+dotenv.config();
+
+const app: Express = express();
+
+app.use(cors());
+app.use(express.json());
+app.use(helmet());
+
+// Basic rate limiting (disabled in test for speed)
+if (process.env.NODE_ENV !== 'test') {
+  const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 200,
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  app.use('/api/', apiLimiter);
+}
+
+app.get('/', (req: Request, res: Response) => {
+  res.send('YOHOP Server (TypeScript & Prisma Edition) is alive!');
+});
+
+// Mount routes
+app.use('/api/auth', authRoutes);
+app.use('/api', merchantRoutes);
+app.use('/api', publicDealRoutes);
+app.use('/api/users', userRoutes);
+
+export default app;
+
+// Utility to help tests clean DB safely
+export async function resetDatabase() {
+  // Ensure we are not pointing at production DB
+  const url = process.env.DATABASE_URL || '';
+  if (!url || /prod|production/i.test(url)) {
+    throw new Error('Refusing to reset database: DATABASE_URL appears to be production.');
+  }
+  // Truncate in dependency-safe order using CASCADE
+  await prisma.$executeRawUnsafe('TRUNCATE TABLE "UserPointEvent","CheckIn","UserDeal","Deal","Merchant","User" RESTART IDENTITY CASCADE;');
+}

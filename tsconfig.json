@@ -2,12 +2,14 @@
   "compilerOptions": {
     "target": "es2020", // Compile to a modern ECMAScript version
     "module": "commonjs", // Use the standard Node.js module system
-    "rootDir": "./src", // Where your TS source code lives
+  "rootDir": "./", // Include src and tests
     "outDir": "./dist", // Where the compiled JS output will go
     "esModuleInterop": true, // Allows for better interoperability between module systems
     "forceConsistentCasingInFileNames": true,
     "strict": true, // Enforces all strict type-checking options
-    "skipLibCheck": true // Speeds up compilation by skipping type checks on declaration files
+    "skipLibCheck": true, // Speeds up compilation by skipping type checks on declaration files
+    "types": ["node", "jest"]
   },
-  "include": ["src/**/*"] // Tells TypeScript to only check files in the src directory
+  "include": ["src/**/*", "tests/**/*", "jest.config.ts"],
+  "exclude": ["dist", "node_modules"]
 }

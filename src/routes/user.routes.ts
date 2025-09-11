@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import prisma from '../lib/prisma';
 import { protect, AuthRequest } from '../middleware/auth.middleware';
+import { getPointConfig } from '../lib/points';
 
 const router = Router();
 
@@ -180,14 +181,9 @@ router.post('/check-in', protect, async (req: AuthRequest, res: Response) => {
     // Distance calculation
     const distanceMeters = haversineMeters(latitude, longitude, deal.merchant.latitude, deal.merchant.longitude);
 
-    // Threshold (default 100m) configurable via env CHECKIN_RADIUS_METERS
-    const thresholdMeters = (() => {
-      const envVal = process.env.CHECKIN_RADIUS_METERS;
-      if (!envVal) return 100; // default
-      const parsed = parseInt(envVal, 10);
-      return isNaN(parsed) || parsed <= 0 ? 100 : parsed;
-    })();
+    const { checkInRadiusMeters, checkInPoints, firstCheckInBonus } = getPointConfig();
 
+    const thresholdMeters = checkInRadiusMeters;
     const withinRange = distanceMeters <= thresholdMeters;
 
     if (!withinRange) {
@@ -203,18 +199,6 @@ router.post('/check-in', protect, async (req: AuthRequest, res: Response) => {
         pointEvents: []
       });
     }
-
-    // Determine point values
-    const baseCheckInPoints = (() => {
-      const v = process.env.CHECKIN_POINTS;
-      if (!v) return 10;
-      const n = parseInt(v, 10); return isNaN(n) || n <= 0 ? 10 : n;
-    })();
-    const firstCheckInBonus = (() => {
-      const v = process.env.FIRST_CHECKIN_BONUS_POINTS;
-      if (!v) return 25;
-      const n = parseInt(v, 10); return isNaN(n) || n <= 0 ? 25 : n;
-    })();
 
     const result = await prisma.$transaction(async (tx) => {
       // Check if user has an existing check-in for this deal
@@ -235,7 +219,7 @@ router.post('/check-in', protect, async (req: AuthRequest, res: Response) => {
         }
       });
 
-      let totalAward = baseCheckInPoints;
+      let totalAward = checkInPoints;
       const events: any[] = [];
 
       // Award first-checkin bonus if none exists
@@ -257,7 +241,7 @@ router.post('/check-in', protect, async (req: AuthRequest, res: Response) => {
           userId,
           dealId: deal.id,
           type: 'CHECKIN',
-          points: baseCheckInPoints
+          points: checkInPoints
         }
       }));
 

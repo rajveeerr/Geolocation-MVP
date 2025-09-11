@@ -4,6 +4,7 @@ import prisma from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { protect, AuthRequest } from '../middleware/auth.middleware';
+import { getPointConfig } from '../lib/points';
 
 const router = Router();
 
@@ -32,13 +33,7 @@ router.post('/register', async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
 
     // 4. Create the new user in the database
-    // Award signup points (from env or default 50)
-    const signupPoints = (() => {
-      const val = process.env.SIGNUP_POINTS;
-      if (!val) return 50;
-      const n = parseInt(val, 10);
-      return isNaN(n) || n <= 0 ? 50 : n;
-    })();
+    const { signupPoints } = getPointConfig();
 
     const newUser = await prisma.$transaction(async (tx) => {
       const created = await tx.user.create({
