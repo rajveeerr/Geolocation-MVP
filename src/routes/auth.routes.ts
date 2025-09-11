@@ -39,10 +39,12 @@ router.post('/register', async (req: Request, res: Response) => {
       const created = await tx.user.create({
         data: {
           email: normalizedEmail,
-            name,
-            password: hashedPassword,
-            points: signupPoints
-        },
+          name,
+          password: hashedPassword,
+          points: signupPoints,
+          // @ts-ignore new field added in migration; prisma generate pending
+          monthlyPoints: signupPoints
+        } as any,
       });
       await tx.userPointEvent.create({
         data: {

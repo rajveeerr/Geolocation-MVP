@@ -31,20 +31,30 @@ export async function getLeaderboard(args: GetLeaderboardArgs): Promise<Leaderbo
   const period = resolvePeriod(args);
 
   // Raw period aggregation for top users
-  const topRaw = await prisma.$queryRawUnsafe<{
-    id: number; name: string | null; period_points: bigint | number; total_points: number; 
-  }[]>(
-    `SELECT u.id, u.name, SUM(e.points) AS period_points, u.points as total_points
-     FROM "UserPointEvent" e
-     JOIN "User" u ON u.id = e."userId"
-     WHERE e."createdAt" >= $1 AND e."createdAt" < $2
-     GROUP BY u.id
-     ORDER BY period_points DESC, u.id ASC
-     LIMIT $3`,
-    period.start,
-    period.endExclusive,
-    limit
-  );
+  let topRaw: { id: number; name: string | null; period_points: bigint | number; total_points: number; }[];
+  if (period.granularity === 'month' && period.start.getUTCDate() === 1 && period.start.toISOString().endsWith('T00:00:00.000Z')) {
+    // Fast path: current month uses live monthlyPoints
+    topRaw = await prisma.$queryRawUnsafe(
+      `SELECT id, name, "monthlyPoints" AS period_points, points as total_points
+       FROM "User" WHERE "monthlyPoints" > 0
+       ORDER BY "monthlyPoints" DESC, id ASC
+       LIMIT $1`,
+      limit
+    );
+  } else {
+    topRaw = await prisma.$queryRawUnsafe(
+      `SELECT u.id, u.name, SUM(e.points) AS period_points, u.points as total_points
+       FROM "UserPointEvent" e
+       JOIN "User" u ON u.id = e."userId"
+       WHERE e."createdAt" >= $1 AND e."createdAt" < $2
+       GROUP BY u.id
+       ORDER BY period_points DESC, u.id ASC
+       LIMIT $3`,
+      period.start,
+      period.endExclusive,
+      limit
+    );
+  }
 
   // Convert to rows and later assign ranks
   const topPreRank: LeaderboardRow[] = topRaw.map((r) => ({
@@ -74,16 +84,23 @@ export async function getLeaderboard(args: GetLeaderboardArgs): Promise<Leaderbo
       const row = topPreRank.find((r: LeaderboardRow) => r.userId === selfUserId)!;
       me = { ...row, inTop: true };
     } else {
-      // Need personal points this period
-      const personal = await prisma.$queryRawUnsafe<{ me_points: bigint | number }[]>(
-        `SELECT COALESCE(SUM(points),0) as me_points
-         FROM "UserPointEvent"
-         WHERE "userId" = $1 AND "createdAt" >= $2 AND "createdAt" < $3`,
-        selfUserId,
-        period.start,
-        period.endExclusive
-      );
-      const myPoints = Number(personal[0]?.me_points || 0);
+      let myPoints: number;
+      if (period.granularity === 'month' && period.start.getUTCDate() === 1) {
+  const user = await prisma.user.findUnique({ where: { id: selfUserId }, select: { id: true } });
+  // @ts-ignore monthlyPoints added in migration
+  const mp = (user as any)?.monthlyPoints;
+  myPoints = mp || 0;
+      } else {
+        const personal = await prisma.$queryRawUnsafe<{ me_points: bigint | number }[]>(
+          `SELECT COALESCE(SUM(points),0) as me_points
+           FROM "UserPointEvent"
+           WHERE "userId" = $1 AND "createdAt" >= $2 AND "createdAt" < $3`,
+          selfUserId,
+          period.start,
+          period.endExclusive
+        );
+        myPoints = Number(personal[0]?.me_points || 0);
+      }
 
       if (myPoints > 0) {
         // Count users strictly above

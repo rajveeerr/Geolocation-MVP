@@ -248,7 +248,7 @@ router.post('/check-in', protect, async (req: AuthRequest, res: Response) => {
       // Increment user total points
       await tx.user.update({
         where: { id: userId },
-        data: { points: { increment: totalAward } }
+        data: ({ points: { increment: totalAward }, monthlyPoints: { increment: totalAward } } as any)
       });
 
       return { checkIn, totalAward, events, prior: !!priorCheckIn };
