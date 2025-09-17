@@ -7,7 +7,8 @@ import { Heart, Tag, Loader2, Settings, Star, Gift, ChevronRight } from 'lucide-
 import { Link } from 'react-router-dom';
 import { useSavedDeals } from '@/hooks/useSavedDeals';
 import { useMerchantDeals } from '@/hooks/useMerchantDeals';
-import { PremiumV2DealCard } from '@/components/deals/PremiumV2DealCard';
+// --- MODIFICATION: Import the list-style card ---
+import { DealResultCard } from '@/components/deals/DealResultCard';
 import { MerchantDealCard } from '@/components/merchant/MerchantDealCard';
 import { Button } from '@/components/common/Button';
 import { PATHS } from '@/routing/paths';
@@ -15,8 +16,10 @@ import { PATHS } from '@/routing/paths';
 export const ProfilePage = () => {
 	const { user } = useAuth();
 	const [activeTab, setActiveTab] = useState<'saved' | 'created'>('saved');
+    // State to handle hover effects for the list items
+    const [hoveredDealId, setHoveredDealId] = useState<string | null>(null);
   
-		const { data: merchantStatusData } = useMerchantStatus();
+	const { data: merchantStatusData } = useMerchantStatus();
 	const isMerchant = !!merchantStatusData?.data?.merchant;
   
 	// These hooks now correctly talk to your new backend endpoints
@@ -67,9 +70,17 @@ export const ProfilePage = () => {
 						<div className="animate-fade-in">
 							{isLoadingSaved ? <LoadingState /> :
 							savedDeals.length === 0 ? <EmptyState icon={<Heart/>} title="No Deals Saved Yet" message="Tap the heart on any deal to save it for later." cta={{ text: "Find Deals to Save", path: PATHS.ALL_DEALS }} /> :
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-								{/* --- Data Display: This mapping is correct for your backend response --- */}
-								{savedDeals.map((deal: any) => <PremiumV2DealCard key={deal.id} deal={deal} />)}
+							// --- MODIFICATION: Changed from a grid to a vertical list ---
+							<div className="rounded-2xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
+								{savedDeals.map((deal: any) => (
+									<DealResultCard 
+										key={deal.id} 
+										deal={deal} 
+										isHovered={hoveredDealId === deal.id}
+										onMouseEnter={() => setHoveredDealId(deal.id)}
+										onMouseLeave={() => setHoveredDealId(null)}
+									/>
+								))}
 							</div>}
 						</div>
 					)}
@@ -84,28 +95,28 @@ export const ProfilePage = () => {
 						</div>
 					)}
 				</div>
+                
+                {/* --- Referral Link (No Changes) --- */}
+                <Link to={PATHS.REFERRALS} className="block mt-8 group">
+                  <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 flex items-center justify-between hover:border-brand-primary-300 hover:shadow-lg transition-all transform hover:-translate-y-1">
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary-100/80">
+                            <Gift className="h-6 w-6 text-brand-primary-600" />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-lg text-neutral-800">Invite Friends</h3>
+                            <p className="text-neutral-500 text-sm mt-1">Earn points for every friend who joins!</p>
+                        </div>
+                    </div>
+                    <ChevronRight className="h-6 w-6 text-neutral-400 group-hover:text-brand-primary-500 transition-colors" />
+                  </div>
+                </Link>
 			</div>
-
-			{/* --- MODIFIED: Link to Referral Page --- */}
-			<Link to={PATHS.REFERRALS} className="block mt-8 group">
-			  <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 flex items-center justify-between hover:border-brand-primary-300 hover:shadow-lg transition-all transform hover:-translate-y-1">
-				<div className="flex items-center gap-4">
-					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary-100/80">
-						<Gift className="h-6 w-6 text-brand-primary-600" />
-					</div>
-					<div>
-						<h3 className="font-bold text-lg text-neutral-800">Invite Friends</h3>
-						<p className="text-neutral-500 text-sm mt-1">Earn points for every friend who joins!</p>
-					</div>
-				</div>
-				<ChevronRight className="h-6 w-6 text-neutral-400 group-hover:text-brand-primary-500 transition-colors" />
-			  </div>
-			</Link>
 		</div>
 	);
 };
 
-// --- Reusable Helper Components for a clean UI ---
+// --- Reusable Helper Components for a clean UI (No Changes) ---
 const LoadingState = () => <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-brand-primary-500" /></div>;
 
 const EmptyState = ({icon, title, message, cta}: {icon: React.ReactNode, title: string, message: string, cta?: { text: string, path: string }}) => (
