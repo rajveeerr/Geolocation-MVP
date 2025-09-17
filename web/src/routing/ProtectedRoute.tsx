@@ -29,14 +29,17 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     // If user is logged in, show the actual page content
     return children as any;
   }
-  
+
   // If not logged in, show the blurred background (current page) and the modal on top
   return (
     <>
-        <div className="filter blur-sm">
-            {/* Render a placeholder of the previous page or home page */}
-        </div>
-        <LoginPromptModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <div className="blur-sm filter">
+        {/* Render a placeholder of the previous page or home page */}
+      </div>
+      <LoginPromptModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </>
   );
 };

@@ -25,7 +25,8 @@ export const premiumDeals: Deal[] = [
   {
     id: 'pd1',
     name: 'Echoes Living Room',
-    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&q=80',
+    image:
+      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&q=80',
     // --- IMAGES ADDED ---
     images: [
       'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80',
@@ -44,7 +45,8 @@ export const premiumDeals: Deal[] = [
   {
     id: 'pd2',
     name: 'The Irish House',
-    image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80',
+    image:
+      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80',
     // --- IMAGES ADDED ---
     images: [
       'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80',
@@ -65,12 +67,13 @@ export const premiumDeals: Deal[] = [
   {
     id: 'pd3',
     name: 'Social',
-    image: 'https://images.unsplash.com/photo-1562059392-096320bccc7e?w=500&q=80',
+    image:
+      'https://images.unsplash.com/photo-1562059392-096320bccc7e?w=500&q=80',
     // --- IMAGES ADDED ---
     images: [
-        'https://images.unsplash.com/photo-1562059392-096320bccc7e?w=800&q=80',
-        'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&q=80',
-        'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80',
+      'https://images.unsplash.com/photo-1562059392-096320bccc7e?w=800&q=80',
+      'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&q=80',
+      'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80',
     ],
     rating: 4.1,
     category: 'Cafe',
@@ -83,13 +86,14 @@ export const premiumDeals: Deal[] = [
   {
     id: 'pd4',
     name: 'Mai Bao',
-    image: 'https://images.unsplash.com/photo-1585518419759-7fe2e0fbf8a6?w=500&q=80',
+    image:
+      'https://images.unsplash.com/photo-1585518419759-7fe2e0fbf8a6?w=500&q=80',
     // --- IMAGES ADDED ---
-  images: [
-    'https://images.unsplash.com/photo-1585518419759-7fe2e0fbf8a6?w=800&q=80',
-    'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&q=80',
-    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80',
-  ],
+    images: [
+      'https://images.unsplash.com/photo-1585518419759-7fe2e0fbf8a6?w=800&q=80',
+      'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&q=80',
+      'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80',
+    ],
     rating: 4.0,
     category: 'Asian',
     price: '$',

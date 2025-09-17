@@ -109,7 +109,8 @@ export const MerchantDashboardPage = () => {
   type DealStatusFilter = 'all' | 'active' | 'scheduled' | 'expired';
   const [activeFilter, setActiveFilter] = useState<DealStatusFilter>('all');
 
-  const { data: merchantData, isLoading: merchantLoading } = useMerchantStatus();
+  const { data: merchantData, isLoading: merchantLoading } =
+    useMerchantStatus();
   const merchantStatus = merchantData?.data?.merchant?.status;
 
   const {
@@ -131,7 +132,7 @@ export const MerchantDashboardPage = () => {
       return deals;
     }
     const now = new Date();
-    return deals.filter(deal => {
+    return deals.filter((deal) => {
       const start = new Date(deal.startTime);
       const end = new Date(deal.endTime);
       switch (activeFilter) {
@@ -167,8 +168,12 @@ export const MerchantDashboardPage = () => {
       <div className="container mx-auto max-w-4xl px-4 py-12">
         <div className="text-center">
           <h1 className="mb-4 text-4xl font-bold">Join as a Merchant</h1>
-          <p className="mb-8 text-neutral-600">Start creating deals and reach new customers</p>
-          <Link to={PATHS.MERCHANT_ONBOARDING}><Button size="lg">Become a Merchant</Button></Link>
+          <p className="mb-8 text-neutral-600">
+            Start creating deals and reach new customers
+          </p>
+          <Link to={PATHS.MERCHANT_ONBOARDING}>
+            <Button size="lg">Become a Merchant</Button>
+          </Link>
         </div>
       </div>
     );
@@ -179,40 +184,93 @@ export const MerchantDashboardPage = () => {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-4xl font-bold">Your Dashboard</h1>
-          <p className="mt-2 text-neutral-600">Manage your deals and track performance</p>
+          <p className="mt-2 text-neutral-600">
+            Manage your deals and track performance
+          </p>
         </div>
         {merchantStatus === 'APPROVED' && (
-          <Link to={PATHS.MERCHANT_DEALS_CREATE}><Button size="lg" className="rounded-lg">Create New Deal</Button></Link>
+          <Link to={PATHS.MERCHANT_DEALS_CREATE}>
+            <Button size="lg" className="rounded-lg">
+              Create New Deal
+            </Button>
+          </Link>
         )}
       </div>
 
       {merchantStatus === 'PENDING' && (
         <div className="rounded-lg border border-amber-200 bg-amber-100 p-6">
-          <h2 className="text-xl font-bold text-amber-800">Application Pending</h2>
-          <p className="mt-2 text-amber-700">Your application to become a merchant is currently under review. We'll notify you via email once it's approved. This usually takes 1-2 business days.</p>
+          <h2 className="text-xl font-bold text-amber-800">
+            Application Pending
+          </h2>
+          <p className="mt-2 text-amber-700">
+            Your application to become a merchant is currently under review.
+            We'll notify you via email once it's approved. This usually takes
+            1-2 business days.
+          </p>
         </div>
       )}
 
       {merchantStatus === 'APPROVED' && (
         <>
           <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-4">
-            <div className="rounded-lg border border-neutral-200 bg-white p-6"><h3 className="text-sm font-medium text-neutral-500">Total Deals</h3><p className="text-3xl font-bold text-neutral-800">{deals.length}</p></div>
-            <div className="rounded-lg border border-neutral-200 bg-white p-6"><h3 className="text-sm font-medium text-neutral-500">Active Deals</h3><p className="text-3xl font-bold text-green-600">{deals.filter(d => new Date() >= new Date(d.startTime) && new Date() <= new Date(d.endTime)).length}</p></div>
-            <div className="rounded-lg border border-neutral-200 bg-white p-6"><h3 className="text-sm font-medium text-neutral-500">Scheduled</h3><p className="text-3xl font-bold text-amber-600">{deals.filter(d => new Date() < new Date(d.startTime)).length}</p></div>
-            <div className="rounded-lg border border-neutral-200 bg-white p-6"><h3 className="text-sm font-medium text-neutral-500">Expired</h3><p className="text-3xl font-bold text-red-600">{deals.filter(d => new Date() > new Date(d.endTime)).length}</p></div>
+            <div className="rounded-lg border border-neutral-200 bg-white p-6">
+              <h3 className="text-sm font-medium text-neutral-500">
+                Total Deals
+              </h3>
+              <p className="text-3xl font-bold text-neutral-800">
+                {deals.length}
+              </p>
+            </div>
+            <div className="rounded-lg border border-neutral-200 bg-white p-6">
+              <h3 className="text-sm font-medium text-neutral-500">
+                Active Deals
+              </h3>
+              <p className="text-3xl font-bold text-green-600">
+                {
+                  deals.filter(
+                    (d) =>
+                      new Date() >= new Date(d.startTime) &&
+                      new Date() <= new Date(d.endTime),
+                  ).length
+                }
+              </p>
+            </div>
+            <div className="rounded-lg border border-neutral-200 bg-white p-6">
+              <h3 className="text-sm font-medium text-neutral-500">
+                Scheduled
+              </h3>
+              <p className="text-3xl font-bold text-amber-600">
+                {deals.filter((d) => new Date() < new Date(d.startTime)).length}
+              </p>
+            </div>
+            <div className="rounded-lg border border-neutral-200 bg-white p-6">
+              <h3 className="text-sm font-medium text-neutral-500">Expired</h3>
+              <p className="text-3xl font-bold text-red-600">
+                {deals.filter((d) => new Date() > new Date(d.endTime)).length}
+              </p>
+            </div>
           </div>
 
           <div className="mb-6">
-            <div className="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
               <h2 className="text-2xl font-bold">Your Deals</h2>
               <div className="flex items-center gap-2 rounded-full border bg-neutral-100 p-1">
-                {(['all', 'active', 'scheduled', 'expired'] as DealStatusFilter[]).map(filter => (
+                {(
+                  [
+                    'all',
+                    'active',
+                    'scheduled',
+                    'expired',
+                  ] as DealStatusFilter[]
+                ).map((filter) => (
                   <button
                     key={filter}
                     onClick={() => setActiveFilter(filter)}
                     className={cn(
                       'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
-                      activeFilter === filter ? 'bg-white text-brand-primary-600 shadow-sm' : 'text-neutral-600 hover:bg-neutral-200/50'
+                      activeFilter === filter
+                        ? 'bg-white text-brand-primary-600 shadow-sm'
+                        : 'text-neutral-600 hover:bg-neutral-200/50',
                     )}
                   >
                     {filter.charAt(0).toUpperCase() + filter.slice(1)}
@@ -221,17 +279,37 @@ export const MerchantDashboardPage = () => {
               </div>
             </div>
 
-            {isLoading ? <DealsSkeleton /> : error ? (
-              <div className="rounded-lg border border-red-200 bg-red-100 p-6"><p className="text-red-800">Error loading deals. Please try again later.</p></div>
+            {isLoading ? (
+              <DealsSkeleton />
+            ) : error ? (
+              <div className="rounded-lg border border-red-200 bg-red-100 p-6">
+                <p className="text-red-800">
+                  Error loading deals. Please try again later.
+                </p>
+              </div>
             ) : filteredDeals.length === 0 ? (
               <div className="rounded-lg border border-neutral-200 bg-white py-12 text-center">
-                <h3 className="mb-2 text-xl font-semibold text-neutral-800">{activeFilter === 'all' ? 'No deals yet' : `No ${activeFilter} deals found`}</h3>
-                <p className="mb-6 text-neutral-600">{activeFilter === 'all' ? 'Create your first deal to start attracting customers' : 'Try selecting a different filter to see your other deals.'}</p>
-                {activeFilter === 'all' && (<Link to={PATHS.MERCHANT_DEALS_CREATE}><Button>Create Your First Deal</Button></Link>)}
+                <h3 className="mb-2 text-xl font-semibold text-neutral-800">
+                  {activeFilter === 'all'
+                    ? 'No deals yet'
+                    : `No ${activeFilter} deals found`}
+                </h3>
+                <p className="mb-6 text-neutral-600">
+                  {activeFilter === 'all'
+                    ? 'Create your first deal to start attracting customers'
+                    : 'Try selecting a different filter to see your other deals.'}
+                </p>
+                {activeFilter === 'all' && (
+                  <Link to={PATHS.MERCHANT_DEALS_CREATE}>
+                    <Button>Create Your First Deal</Button>
+                  </Link>
+                )}
               </div>
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {filteredDeals.map((deal) => (<DealCard key={deal.id} deal={deal} />))}
+                {filteredDeals.map((deal) => (
+                  <DealCard key={deal.id} deal={deal} />
+                ))}
               </div>
             )}
           </div>
@@ -240,11 +318,21 @@ export const MerchantDashboardPage = () => {
 
       {merchantStatus === 'REJECTED' && (
         <div className="rounded-lg border border-red-200 bg-red-100 p-6">
-          <h2 className="text-xl font-bold text-red-800">Application Not Approved</h2>
-          <p className="mt-2 text-red-700">Unfortunately, your merchant application was not approved at this time. Please contact our support team if you have any questions or would like to reapply.</p>
+          <h2 className="text-xl font-bold text-red-800">
+            Application Not Approved
+          </h2>
+          <p className="mt-2 text-red-700">
+            Unfortunately, your merchant application was not approved at this
+            time. Please contact our support team if you have any questions or
+            would like to reapply.
+          </p>
           <div className="mt-4 space-x-3">
-            <Link to="/contact"><Button variant="secondary">Contact Support</Button></Link>
-            <Link to={PATHS.MERCHANT_ONBOARDING}><Button>Reapply</Button></Link>
+            <Link to="/contact">
+              <Button variant="secondary">Contact Support</Button>
+            </Link>
+            <Link to={PATHS.MERCHANT_ONBOARDING}>
+              <Button>Reapply</Button>
+            </Link>
           </div>
         </div>
       )}

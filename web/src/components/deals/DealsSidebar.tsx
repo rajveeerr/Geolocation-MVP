@@ -1,6 +1,5 @@
 // web/src/components/deals/DealsSidebar.tsx
 
- 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/common/Button';
 import {
@@ -19,7 +18,11 @@ import type { DealWithLocation } from '@/data/deals';
 import { Pagination } from '../common/Pagination';
 
 const categoryFilters = [
-  { id: 'FOOD_AND_BEVERAGE', label: 'Restaurants', icon: <Utensils className="h-4 w-4" /> },
+  {
+    id: 'FOOD_AND_BEVERAGE',
+    label: 'Restaurants',
+    icon: <Utensils className="h-4 w-4" />,
+  },
   { id: 'TRAVEL', label: 'Hotels', icon: <Hotel className="h-4 w-4" /> },
   { id: 'RETAIL', label: 'Retail', icon: <Fuel className="h-4 w-4" /> }, // Example, adjust as needed
   { id: 'OTHER', label: 'Cafés', icon: <Coffee className="h-4 w-4" /> }, // Example
@@ -64,7 +67,6 @@ export const DealsSidebar = ({
   showAllDeals = false,
   setShowAllDeals = () => {},
 }: DealsSidebarProps) => {
-
   return (
     <div className="flex h-full flex-col bg-neutral-50/50">
       <div className="flex-shrink-0 border-b border-neutral-200/80 bg-white">
@@ -88,7 +90,10 @@ export const DealsSidebar = ({
                   variant={showAllDeals ? 'ghost' : 'primary'}
                   onClick={() => setShowAllDeals?.(false)}
                   aria-pressed={!showAllDeals}
-                  className={cn('rounded-full px-4 py-1 text-sm font-semibold', !showAllDeals ? 'shadow-sm' : '')}
+                  className={cn(
+                    'rounded-full px-4 py-1 text-sm font-semibold',
+                    !showAllDeals ? 'shadow-sm' : '',
+                  )}
                 >
                   Nearby
                 </Button>
@@ -97,20 +102,27 @@ export const DealsSidebar = ({
                   variant={showAllDeals ? 'primary' : 'ghost'}
                   onClick={() => setShowAllDeals?.(true)}
                   aria-pressed={!!showAllDeals}
-                  className={cn('rounded-full px-4 py-1 text-sm font-semibold', showAllDeals ? 'shadow-sm' : '')}
+                  className={cn(
+                    'rounded-full px-4 py-1 text-sm font-semibold',
+                    showAllDeals ? 'shadow-sm' : '',
+                  )}
                 >
                   All
                 </Button>
               </div>
 
-              <div className="relative rounded-md bg-white/90 border border-neutral-200 px-2 py-1">
+              <div className="relative rounded-md border border-neutral-200 bg-white/90 px-2 py-1">
                 <div className="flex items-center gap-2">
                   {isLoading ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
                   ) : (
                     <>
-                      <span className="text-sm font-bold text-primary">{deals.length}</span>
-                      <span className="text-xs font-medium text-neutral-500">results</span>
+                      <span className="text-sm font-bold text-primary">
+                        {deals.length}
+                      </span>
+                      <span className="text-xs font-medium text-neutral-500">
+                        results
+                      </span>
                     </>
                   )}
                 </div>
@@ -162,7 +174,9 @@ export const DealsSidebar = ({
 
           {/* --- NEW: Radius Filter UI --- */}
           <div className="mt-4 flex items-center gap-2 rounded-xl border border-neutral-200/80 bg-white/50 p-2">
-            <span className="pl-2 text-xs font-bold text-neutral-600">Radius:</span>
+            <span className="pl-2 text-xs font-bold text-neutral-600">
+              Radius:
+            </span>
             {radiusOptions.map((opt) => (
               <Button
                 key={opt.value}
@@ -171,7 +185,7 @@ export const DealsSidebar = ({
                 size="sm"
                 className={cn(
                   'flex-1 rounded-lg text-xs',
-                  searchRadius === opt.value && 'font-bold shadow-sm'
+                  searchRadius === opt.value && 'font-bold shadow-sm',
                 )}
               >
                 {opt.label}
@@ -187,12 +201,15 @@ export const DealsSidebar = ({
           {/* Conditional rendering based on loading and deals count */}
           {!isLoading && deals.length === 0 ? (
             <div className="py-12 text-center">
-              <h3 className="text-lg font-semibold text-neutral-800">No Deals Found</h3>
+              <h3 className="text-lg font-semibold text-neutral-800">
+                No Deals Found
+              </h3>
               <p className="mt-2 text-sm text-neutral-500">
-                Try adjusting your search or filters to find what you're looking for.
+                Try adjusting your search or filters to find what you're looking
+                for.
               </p>
             </div>
-            ) : (
+          ) : (
             deals.map((deal) => (
               <div
                 key={deal.id}
@@ -200,8 +217,9 @@ export const DealsSidebar = ({
                 onMouseLeave={() => setHoveredDealId(null)}
                 className={cn(
                   // allow the card to take full available width and give a little horizontal padding
-                  'transition-all duration-200 w-full px-2',
-                  hoveredDealId === deal.id && 'rounded-2xl ring-2 ring-primary/20',
+                  'w-full px-2 transition-all duration-200',
+                  hoveredDealId === deal.id &&
+                    'rounded-2xl ring-2 ring-primary/20',
                 )}
               >
                 <PremiumV2DealCard deal={deal} />

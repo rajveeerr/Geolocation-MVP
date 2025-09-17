@@ -9,9 +9,9 @@ import { Button } from '@/components/common/Button';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 const DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconAnchor: [12, 41]
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconAnchor: [12, 41],
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
@@ -59,11 +59,10 @@ export const LocationPickerMap = ({ center, onLocationChange }: Props) => {
         }
       } else {
         // no results
-         
+
         console.warn('No search results for', query);
       }
     } catch (err) {
-       
       console.error('Search error', err);
     } finally {
       setIsSearching(false);
@@ -80,7 +79,6 @@ export const LocationPickerMap = ({ center, onLocationChange }: Props) => {
         if (mapRef.current) mapRef.current.flyTo([lat, lng], 15);
       },
       (err) => {
-         
         console.error('Geolocation error', err);
       },
       { enableHighAccuracy: true, timeout: 10000 },
@@ -106,31 +104,44 @@ export const LocationPickerMap = ({ center, onLocationChange }: Props) => {
   return (
     <div className="w-full">
       {/* Search UI rendered above the map to avoid flicker when map re-renders */}
-      <div className="mb-3 flex flex-col sm:flex-row sm:items-center gap-3 bg-white rounded-lg p-3 shadow-sm border border-neutral-200 max-w-full">
-        <div className="flex items-center flex-1 min-w-0">
-          <label htmlFor="map-search" className="sr-only">Search address or place</label>
+      <div className="mb-3 flex max-w-full flex-col gap-3 rounded-lg border border-neutral-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center">
+        <div className="flex min-w-0 flex-1 items-center">
+          <label htmlFor="map-search" className="sr-only">
+            Search address or place
+          </label>
           <input
             id="map-search"
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for address or place"
-            className="rounded-md border px-3 py-2 text-sm w-full sm:w-64 md:w-80 min-w-0"
+            className="w-full min-w-0 rounded-md border px-3 py-2 text-sm sm:w-64 md:w-80"
           />
         </div>
 
-        <div className="flex items-center gap-2 flex-none">
-          <Button onClick={handleSearch} variant="primary" size="md" className="rounded-md" aria-label="Search">
+        <div className="flex flex-none items-center gap-2">
+          <Button
+            onClick={handleSearch}
+            variant="primary"
+            size="md"
+            className="rounded-md"
+            aria-label="Search"
+          >
             <Search className="mr-2 h-4 w-4" />
             {isSearching ? 'Searching...' : 'Search'}
           </Button>
-          <Button onClick={handleUseMyLocation} variant="secondary" size="md" className="rounded-md">
+          <Button
+            onClick={handleUseMyLocation}
+            variant="secondary"
+            size="md"
+            className="rounded-md"
+          >
             Use my location
           </Button>
         </div>
       </div>
 
-      <div className="h-96 w-full rounded-lg overflow-hidden border relative">
+      <div className="relative h-96 w-full overflow-hidden rounded-lg border">
         <MapContainer
           center={[center.lat, center.lng]}
           zoom={15}

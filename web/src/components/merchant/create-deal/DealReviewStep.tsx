@@ -54,9 +54,11 @@ export const DealReviewStep = () => {
         // Send whatever discount fields the merchant provided
         discountPercentage: state.discountPercentage ?? null,
         discountAmount: state.discountAmount ?? null,
-  // New fields expected by the backend
-  dealType: state.dealType ?? 'STANDARD',
-  recurringDays: state.recurringDays?.length ? state.recurringDays : undefined,
+        // New fields expected by the backend
+        dealType: state.dealType ?? 'STANDARD',
+        recurringDays: state.recurringDays?.length
+          ? state.recurringDays
+          : undefined,
         startTime: new Date(state.startTime).toISOString(),
         endTime: new Date(state.endTime).toISOString(),
         redemptionInstructions: state.redemptionInstructions,
@@ -100,8 +102,8 @@ export const DealReviewStep = () => {
       title="Ready to publish?"
       onNext={handlePublish}
       onBack={() => navigate(-1)}
-  progress={100}
-  nextButtonText="Publish Deal"
+      progress={100}
+      nextButtonText="Publish Deal"
       isNextDisabled={isPublishing}
     >
       <div className="space-y-4">
@@ -117,13 +119,16 @@ export const DealReviewStep = () => {
               state.discountPercentage
                 ? `${state.discountPercentage}% off`
                 : state.discountAmount
-                ? `$${state.discountAmount} off`
-                : 'Not set'
+                  ? `$${state.discountAmount} off`
+                  : 'Not set'
             }
           />
           <ReviewItem label="Deal Type" value={state.dealType} />
           {state.dealType === 'RECURRING' && (
-            <ReviewItem label="Recurring Days" value={state.recurringDays.join(', ')} />
+            <ReviewItem
+              label="Recurring Days"
+              value={state.recurringDays.join(', ')}
+            />
           )}
           <ReviewItem
             label="Starts"
@@ -140,9 +145,14 @@ export const DealReviewStep = () => {
                 <Sparkles className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-neutral-900">Time left</p>
+                <p className="text-sm font-semibold text-neutral-900">
+                  Time left
+                </p>
                 <p className="text-sm text-neutral-700">
-                  {days > 0 ? `${days}d ` : ''}{hours.toString().padStart(2,'0')}h {minutes.toString().padStart(2,'0')}m {seconds.toString().padStart(2,'0')}s
+                  {days > 0 ? `${days}d ` : ''}
+                  {hours.toString().padStart(2, '0')}h{' '}
+                  {minutes.toString().padStart(2, '0')}m{' '}
+                  {seconds.toString().padStart(2, '0')}s
                 </p>
               </div>
             </div>

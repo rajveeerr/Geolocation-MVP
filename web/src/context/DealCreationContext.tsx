@@ -50,7 +50,8 @@ function reducer(state: State, action: Action): State {
         ...state,
         dealType: action.dealType,
         // When switching to RECURRING, keep recurringDays; when switching away, clear them
-        recurringDays: action.dealType === 'RECURRING' ? state.recurringDays : [],
+        recurringDays:
+          action.dealType === 'RECURRING' ? state.recurringDays : [],
         // Keep existing discount fields; the Offer step can still set them as needed
         discountPercentage: state.discountPercentage,
         discountAmount: state.discountAmount,

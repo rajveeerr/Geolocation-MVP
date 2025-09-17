@@ -24,7 +24,10 @@ interface State {
 type Action =
   | { type: 'SET_STEP'; payload: number }
   | { type: 'SET_BUSINESS_NAME'; payload: string }
-  | { type: 'SET_ADDRESS_FIELD'; payload: { field: keyof State['address']; value: string } }
+  | {
+      type: 'SET_ADDRESS_FIELD';
+      payload: { field: keyof State['address']; value: string };
+    }
   | { type: 'SET_COORDINATES'; payload: { lat: number; lng: number } }
   | { type: 'SET_DESCRIPTION'; payload: string }
   | { type: 'SET_LOGO_URL'; payload: string }
@@ -48,7 +51,13 @@ function reducer(state: State, action: Action): State {
     case 'SET_BUSINESS_NAME':
       return { ...state, businessName: action.payload };
     case 'SET_ADDRESS_FIELD':
-      return { ...state, address: { ...state.address, [action.payload.field]: action.payload.value } };
+      return {
+        ...state,
+        address: {
+          ...state.address,
+          [action.payload.field]: action.payload.value,
+        },
+      };
     case 'SET_COORDINATES':
       return { ...state, coordinates: action.payload };
     case 'SET_DESCRIPTION':
@@ -80,7 +89,7 @@ export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (err) {
       // If parse fails, ignore and start fresh
-       
+
       console.warn('Failed to hydrate onboarding state from localStorage', err);
     }
   }, []);
@@ -91,7 +100,7 @@ export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem(ONBOARDING_STATE_KEY, JSON.stringify(state));
     } catch (err) {
       // ignore quota errors
-       
+
       console.warn('Failed to persist onboarding state to localStorage', err);
     }
   }, [state]);

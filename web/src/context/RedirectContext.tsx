@@ -8,7 +8,9 @@ interface RedirectContextType {
   consumeRedirectPath: () => string | null;
 }
 
-const RedirectContext = createContext<RedirectContextType | undefined>(undefined);
+const RedirectContext = createContext<RedirectContextType | undefined>(
+  undefined,
+);
 
 export const RedirectProvider = ({ children }: { children: ReactNode }) => {
   const [redirectPath, setRedirectPath] = useState<string | null>(null);
@@ -21,7 +23,9 @@ export const RedirectProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <RedirectContext.Provider value={{ redirectPath, setRedirectPath, consumeRedirectPath }}>
+    <RedirectContext.Provider
+      value={{ redirectPath, setRedirectPath, consumeRedirectPath }}
+    >
       {children}
     </RedirectContext.Provider>
   );

@@ -25,7 +25,8 @@ export const useCheckIn = () => {
   const [isCheckingIn, setIsCheckingIn] = useState(false);
 
   const checkInMutation = useMutation({
-    mutationFn: (payload: CheckInPayload) => apiPost<CheckInResponse, CheckInPayload>('/users/check-in', payload),
+    mutationFn: (payload: CheckInPayload) =>
+      apiPost<CheckInResponse, CheckInPayload>('/users/check-in', payload),
     onSuccess: (response: any) => {
       if (response.success && response.data) {
         if (response.data.withinRange) {
@@ -48,11 +49,15 @@ export const useCheckIn = () => {
       }
     },
     onError: (error: Error) => {
-      toast({ title: 'Check-in Error', description: error.message, variant: 'destructive' });
+      toast({
+        title: 'Check-in Error',
+        description: error.message,
+        variant: 'destructive',
+      });
     },
     onSettled: () => {
       setIsCheckingIn(false);
-    }
+    },
   });
 
   const performCheckIn = (dealId: string) => {
@@ -72,10 +77,14 @@ export const useCheckIn = () => {
         });
       },
       (error) => {
-        toast({ title: 'Geolocation Error', description: error.message, variant: 'destructive' });
+        toast({
+          title: 'Geolocation Error',
+          description: error.message,
+          variant: 'destructive',
+        });
         setIsCheckingIn(false);
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 10000 },
     );
   };
 

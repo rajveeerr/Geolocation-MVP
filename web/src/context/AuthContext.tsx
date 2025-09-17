@@ -66,14 +66,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { mutateAsync: signup, isPending: isSigningUp } = useMutation({
     mutationFn: (details: SignUpFormValues) => {
       // Combine firstName and lastName into `name` for backend
-      const name = `${details.firstName || ''} ${details.lastName || ''}`.trim();
+      const name =
+        `${details.firstName || ''} ${details.lastName || ''}`.trim();
       const payload = {
         email: details.email,
         password: details.password,
         name,
         referralCode: (details as any).referralCode || undefined,
       };
-  return apiPost<unknown, any>('/auth/register', payload);
+      return apiPost<unknown, any>('/auth/register', payload);
     },
     onSuccess: (response) => {
       if (response.success) {

@@ -63,7 +63,6 @@ type ApiDeal = {
 
 // NOTE: adapting logic now lives in `deals-placeholder.ts` via `mergeBackendDeals`.
 
-
 export const AllDealsPage = () => {
   const { toast } = useToast();
   const [hoveredDealId, setHoveredDealId] = useState<string | null>(null);
@@ -72,8 +71,12 @@ export const AllDealsPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   // --- NEW: State for location and filters ---
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [activeCategory, setActiveCategory] = useState<string>('FOOD_AND_BEVERAGE');
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const [activeCategory, setActiveCategory] =
+    useState<string>('FOOD_AND_BEVERAGE');
   const [searchRadius, setSearchRadius] = useState<number>(10); // Default radius in km
   const [showAllDeals, setShowAllDeals] = useState<boolean>(false);
 
@@ -92,14 +95,16 @@ export const AllDealsPage = () => {
           });
         },
         (geoError) => {
-          console.error("Geolocation error:", geoError);
-          setError("Could not get your location. Please enable location services and refresh.");
+          console.error('Geolocation error:', geoError);
+          setError(
+            'Could not get your location. Please enable location services and refresh.',
+          );
           // Fallback to a default location to still show some deals
-          setUserLocation({ lat: 40.7128, lng: -74.006 }); 
-        }
+          setUserLocation({ lat: 40.7128, lng: -74.006 });
+        },
       );
     } else {
-      setError("Geolocation is not supported by your browser.");
+      setError('Geolocation is not supported by your browser.');
       setUserLocation({ lat: 40.7128, lng: -74.006 }); // Fallback
     }
   }, []); // Empty array ensures this runs only once.
@@ -115,7 +120,7 @@ export const AllDealsPage = () => {
     const fetchFilteredDeals = async () => {
       setIsLoading(true);
       setError(null);
-  try {
+      try {
         // Short-circuit: some backend endpoints require >=2 chars for search.
         const trimmed = debouncedSearchTerm.trim();
         if (trimmed && trimmed.length < 2) {
@@ -145,15 +150,20 @@ export const AllDealsPage = () => {
           if (trimmed) params.append('search', trimmed);
           response = await apiGet<{ deals: ApiDeal[] }>(`/deals?${params}`);
         }
-        
+
         if (response.success && Array.isArray(response.data?.deals)) {
           // Merge backend deals on top of placeholder data so UI always has friendly content
-          const merged = mergeBackendDeals(response.data.deals as PlaceholderApiDeal[]);
+          const merged = mergeBackendDeals(
+            response.data.deals as PlaceholderApiDeal[],
+          );
           setDeals(merged);
         } else {
           // Handle known backend validation for short search terms gracefully
           const errMsg = response.error || 'Failed to fetch filtered deals.';
-          if (errMsg.toLowerCase().includes('at least') && errMsg.toLowerCase().includes('character')) {
+          if (
+            errMsg.toLowerCase().includes('at least') &&
+            errMsg.toLowerCase().includes('character')
+          ) {
             // Show placeholders instead of a blocking error for short searches
             setDeals(mergeBackendDeals(undefined));
             setError(null);
@@ -164,10 +174,15 @@ export const AllDealsPage = () => {
           throw new Error(errMsg);
         }
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'An error occurred.';
-        console.error("Fetch filtered deals error:", err);
+        const errorMessage =
+          err instanceof Error ? err.message : 'An error occurred.';
+        console.error('Fetch filtered deals error:', err);
         setError(errorMessage); // keep the error so we can show a banner/page when appropriate
-        toast({ title: 'Could Not Fetch Live Deals', description: 'Showing sample data instead.', variant: 'destructive' });
+        toast({
+          title: 'Could Not Fetch Live Deals',
+          description: 'Showing sample data instead.',
+          variant: 'destructive',
+        });
         setDeals(mergeBackendDeals(undefined));
       } finally {
         setIsLoading(false);
@@ -175,8 +190,13 @@ export const AllDealsPage = () => {
     };
 
     fetchFilteredDeals();
-  }, [userLocation, activeCategory, searchRadius, debouncedSearchTerm, showAllDeals]); // Re-run when location, filters, debounced search, or toggle change
-
+  }, [
+    userLocation,
+    activeCategory,
+    searchRadius,
+    debouncedSearchTerm,
+    showAllDeals,
+  ]); // Re-run when location, filters, debounced search, or toggle change
 
   // --- NEW: Debouncing effect for the search term ---
   useEffect(() => {
@@ -185,7 +205,8 @@ export const AllDealsPage = () => {
   }, [searchTerm]);
 
   // Loading and error UI remains the same...
-  if (isLoading && deals.length === 0) { // Only show full overlay on initial load
+  if (isLoading && deals.length === 0) {
+    // Only show full overlay on initial load
     return <LoadingOverlay message="Finding deals near you..." />;
   }
 
@@ -193,7 +214,9 @@ export const AllDealsPage = () => {
     return (
       <div className="flex min-h-screen items-center justify-center pt-20 text-center">
         <div>
-          <h2 className="text-2xl font-bold text-red-600">Failed to Load Deals</h2>
+          <h2 className="text-2xl font-bold text-red-600">
+            Failed to Load Deals
+          </h2>
           <p className="mt-2 text-neutral-600">{error}</p>
         </div>
       </div>
@@ -226,7 +249,11 @@ export const AllDealsPage = () => {
 
           {/* Right Column: Map */}
           <div className="relative hidden h-[calc(100vh-5rem)] bg-neutral-100/30 lg:col-span-7 lg:block xl:col-span-8 2xl:col-span-9">
-            <DealResultsMap deals={deals} hoveredDealId={hoveredDealId} userLocation={userLocation} />
+            <DealResultsMap
+              deals={deals}
+              hoveredDealId={hoveredDealId}
+              userLocation={userLocation}
+            />
           </div>
         </div>
       </div>

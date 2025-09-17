@@ -22,11 +22,15 @@ export const BusinessDetailsStep = () => {
       <div className="space-y-4">
         <div>
           <Label htmlFor="description">Business Description</Label>
-          <p className="mb-2 text-neutral-500">Tell customers what makes your business special.</p>
+          <p className="mb-2 text-neutral-500">
+            Tell customers what makes your business special.
+          </p>
           <Textarea
             id="description"
             value={state.description}
-            onChange={(e) => dispatch({ type: 'SET_DESCRIPTION', payload: e.target.value })}
+            onChange={(e) =>
+              dispatch({ type: 'SET_DESCRIPTION', payload: e.target.value })
+            }
             placeholder="A short description customers will see on your profile"
             className="min-h-[120px]"
           />
@@ -36,7 +40,9 @@ export const BusinessDetailsStep = () => {
           <Input
             id="logoUrl"
             value={state.logoUrl}
-            onChange={(e) => dispatch({ type: 'SET_LOGO_URL', payload: e.target.value })}
+            onChange={(e) =>
+              dispatch({ type: 'SET_LOGO_URL', payload: e.target.value })
+            }
             placeholder="https://example.com/logo.png"
           />
         </div>

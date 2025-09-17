@@ -21,28 +21,35 @@ interface PremiumDeal extends Deal {
 export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   const { user } = useAuth();
   const { openModal } = useModal();
-  const { savedDealIds, saveDeal, unsaveDeal, isSaving, isUnsaving } = useSavedDeals();
+  const { savedDealIds, saveDeal, unsaveDeal, isSaving, isUnsaving } =
+    useSavedDeals();
 
   const [isHovered, setIsHovered] = useState(false);
   const isSaved = savedDealIds.has(deal.id);
   const isLikeButtonLoading = isSaving || isUnsaving;
 
-  const imagesToShow = deal.images && deal.images.length > 0 ? deal.images : [deal.image];
+  const imagesToShow =
+    deal.images && deal.images.length > 0 ? deal.images : [deal.image];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const countdown = useCountdown(deal.expiresAt || '');
   // Format countdown to show HH.MM.SS format like 06.45.22
   const formattedCountdown = `${String(countdown.hours).padStart(2, '0')}.${String(countdown.minutes).padStart(2, '0')}.${String(countdown.seconds).padStart(2, '0')}`;
-  
+
   const normalizedDealType = String(deal.dealType).toLowerCase();
   const isHappyHour = normalizedDealType.includes('happy');
-  const showCountdown = isHappyHour && deal.expiresAt && (countdown.hours > 0 || countdown.minutes > 0 || countdown.seconds > 0);
+  const showCountdown =
+    isHappyHour &&
+    deal.expiresAt &&
+    (countdown.hours > 0 || countdown.minutes > 0 || countdown.seconds > 0);
 
   // Auto-scrolling image carousel effect
   useEffect(() => {
     if (isHovered && imagesToShow.length > 1) {
       const timer = setInterval(() => {
-        setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imagesToShow.length);
+        setCurrentImageIndex(
+          (prevIndex) => (prevIndex + 1) % imagesToShow.length,
+        );
       }, 3000); // Change image every 3 seconds
       return () => clearInterval(timer);
     }
@@ -65,7 +72,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   };
 
   return (
-    <div 
+    <div
       className="w-full max-w-[340px] flex-shrink-0 font-sans"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -88,28 +95,35 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
               />
             </AnimatePresence>
             {/* Gradient overlay always present but stronger on hover */}
-            <div className={cn(
-              "absolute inset-0 bg-gradient-to-t transition-opacity duration-300",
-              isHovered 
-                ? "from-black/80 via-black/30 to-transparent opacity-100" 
-                : "from-black/40 via-transparent to-transparent opacity-80"
-            )} />
+            <div
+              className={cn(
+                'absolute inset-0 bg-gradient-to-t transition-opacity duration-300',
+                isHovered
+                  ? 'from-black/80 via-black/30 to-transparent opacity-100'
+                  : 'from-black/40 via-transparent to-transparent opacity-80',
+              )}
+            />
           </div>
 
           {/* Conditional Overlays: Revealed on Hover */}
           <AnimatePresence>
             {isHovered && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
                 {/* Timer - Top Center */}
                 {showCountdown && (
                   <div className="absolute left-1/2 top-0 -translate-x-1/2">
-                    <div className="flex items-center gap-2 rounded-b-full bg-brand-primary-main px-8 py-2 text-md font-bold text-white shadow-lg">
+                    <div className="text-md flex items-center gap-2 rounded-b-full bg-brand-primary-main px-8 py-2 font-bold text-white shadow-lg">
                       <Clock className="h-6 w-6" />
                       <span>{formattedCountdown}</span>
                     </div>
                   </div>
                 )}
-                
+
                 {/* Deal Type - Top Left */}
                 {/* <div className="absolute left-6 top-6">
                   {deal.name && (
@@ -118,7 +132,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                     </div>
                   )}
                 </div> */}
-                
+
                 {/* Discount Percentage - Top Right */}
                 <div className="absolute right-0 top-[50%]">
                   {deal.dealValue && (
@@ -127,25 +141,38 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                     </div>
                   )}
                 </div>
-                
+
                 {/* Restaurant Info - Bottom Left */}
                 <div className="absolute bottom-6 left-6 right-20 text-white">
-                  <h3 className="text-3xl font-bold leading-tight">{deal.name}</h3>
-                  <p className="mt-1.5 text-base text-neutral-300">{deal.subtitle || 'Cyber Hub sdfsv sdsd'}</p>
+                  <h3 className="text-3xl font-bold leading-tight">
+                    {deal.name}
+                  </h3>
+                  <p className="mt-1.5 text-base text-neutral-300">
+                    {deal.subtitle || 'Cyber Hub sdfsv sdsd'}
+                  </p>
                   <p className="mt-4 font-semibold text-brand-primary-400">
-                    <span className="text-brand-primary-400">{deal.tapInCount || 340}</span>
+                    <span className="text-brand-primary-400">
+                      {deal.tapInCount || 340}
+                    </span>
                     <span className="text-white"> people claimed</span>
                   </p>
                 </div>
-                
+
                 {/* Heart Button - Bottom Right */}
                 <button
                   onClick={handleLikeClick}
                   disabled={isLikeButtonLoading}
-                  className="absolute bottom-6 right-6 flex h-16 w-16 items-center justify-center rounded-full bg-white/25 backdrop-blur-sm shadow-lg transition-transform hover:scale-110"
+                  className="absolute bottom-6 right-6 flex h-16 w-16 items-center justify-center rounded-full bg-white/25 shadow-lg backdrop-blur-sm transition-transform hover:scale-110"
                   aria-label={isSaved ? 'Unsave deal' : 'Save deal'}
                 >
-                  <Heart className={cn("h-8 w-8 transition-colors", isSaved ? "fill-brand-primary-400 text-brand-primary-400" : "text-white/80")} />
+                  <Heart
+                    className={cn(
+                      'h-8 w-8 transition-colors',
+                      isSaved
+                        ? 'fill-brand-primary-400 text-brand-primary-400'
+                        : 'text-white/80',
+                    )}
+                  />
                 </button>
               </motion.div>
             )}
@@ -187,8 +214,8 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
             </motion.div>
           )}
         </AnimatePresence>
-        
-        <div className="flex h-14 flex-shrink-0 items-center justify-center rounded-full bg-neutral-100 px-6 font-bold text-lg text-neutral-900 shadow-lg">
+
+        <div className="flex h-14 flex-shrink-0 items-center justify-center rounded-full bg-neutral-100 px-6 text-lg font-bold text-neutral-900 shadow-lg">
           ${deal.priceValue || 50}
         </div>
       </div>

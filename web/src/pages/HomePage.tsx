@@ -5,7 +5,7 @@ import { ContentCarousel } from '@/components/common/ContentCarousel';
 import { CarouselSkeleton } from '@/components/common/DealCardSkeleton';
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
-// import type { Deal } from '@/data/deals'; 
+// import type { Deal } from '@/data/deals';
 import { DiscoverSection } from '@/components/landing/DiscoverSection';
 import { premiumDeals, happyHourDeals, experiencesData } from '@/data/deals'; // Keep existing mock data
 import { AnimatePresence } from 'framer-motion';
@@ -15,7 +15,8 @@ import { adaptApiDealToFrontend } from '@/data/deals-placeholder';
 
 export const HomePage = () => {
   const [activeTab, setActiveTab] = useState('deals');
-  const { data: featuredDeals, isLoading: isLoadingFeatured } = useFeaturedDeals();
+  const { data: featuredDeals, isLoading: isLoadingFeatured } =
+    useFeaturedDeals();
 
   const {
     data: rawDeals,
@@ -39,7 +40,9 @@ export const HomePage = () => {
     return [];
   };
 
-  const liveDeals = normalizeDealsArray(rawDeals?.data).map((d) => adaptApiDealToFrontend(d as ApiDeal));
+  const liveDeals = normalizeDealsArray(rawDeals?.data).map((d) =>
+    adaptApiDealToFrontend(d as ApiDeal),
+  );
 
   return (
     <div className="bg-white pt-16 sm:pt-20">
@@ -55,7 +58,8 @@ export const HomePage = () => {
       {isLoadingFeatured ? (
         <CarouselSkeleton title="Featured Deals" />
       ) : (
-        featuredDeals && featuredDeals.length > 0 && (
+        featuredDeals &&
+        featuredDeals.length > 0 && (
           <ContentCarousel title="Featured Deals" deals={featuredDeals} />
         )
       )}

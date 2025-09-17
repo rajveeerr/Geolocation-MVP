@@ -9,7 +9,7 @@ export const Logo = () => {
           {/* subtle glow using brand primary on hover */}
           <div className="absolute inset-0 h-8 w-8 rounded-lg bg-gradient-to-br from-brand-primary-500 to-brand-primary-600 opacity-0 blur-sm transition-opacity duration-300 group-hover:opacity-60"></div>
 
-          <div className="relative flex aspect-square h-8 w-8 items-center justify-center rounded-md bg-brand-primary-600 shadow-lg transition-all duration-300 group-hover:shadow-xl group-hover:bg-brand-primary-700">
+          <div className="relative flex aspect-square h-8 w-8 items-center justify-center rounded-md bg-brand-primary-600 shadow-lg transition-all duration-300 group-hover:bg-brand-primary-700 group-hover:shadow-xl">
             <svg
               width="18"
               height="18"
@@ -23,12 +23,7 @@ export const Logo = () => {
                 fill="white"
                 className="drop-shadow-sm"
               />
-              <circle
-                cx="14"
-                cy="4"
-                r="2"
-                fill="white"
-              />
+              <circle cx="14" cy="4" r="2" fill="white" />
             </svg>
           </div>
         </div>

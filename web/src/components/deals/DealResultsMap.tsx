@@ -162,7 +162,13 @@ interface DealResultsMapProps {
   userLocation?: { lat: number; lng: number } | null;
 }
 // --- NEW: Helper component to change the map's view smoothly ---
-const ChangeView = ({ center, zoom }: { center: L.LatLngExpression; zoom: number }) => {
+const ChangeView = ({
+  center,
+  zoom,
+}: {
+  center: L.LatLngExpression;
+  zoom: number;
+}) => {
   const map = useMap();
   useEffect(() => {
     if (!map) return;
@@ -194,7 +200,13 @@ const EnsureMapVisible = ({ deps }: { deps?: any[] }) => {
 };
 
 // Fit map bounds to include deals and user location when appropriate
-const FitBoundsToFeatures = ({ deals, userLocation }: { deals: DealWithLocation[]; userLocation?: { lat: number; lng: number } | null }) => {
+const FitBoundsToFeatures = ({
+  deals,
+  userLocation,
+}: {
+  deals: DealWithLocation[];
+  userLocation?: { lat: number; lng: number } | null;
+}) => {
   const map = useMap();
   useEffect(() => {
     if (!map) return;
@@ -203,10 +215,16 @@ const FitBoundsToFeatures = ({ deals, userLocation }: { deals: DealWithLocation[
       for (const d of deals) {
         if (Array.isArray(d.position) && d.position.length === 2) {
           const [lat, lng] = d.position as [number, number];
-          if (Number.isFinite(lat) && Number.isFinite(lng)) points.push(d.position as L.LatLngExpression);
+          if (Number.isFinite(lat) && Number.isFinite(lng))
+            points.push(d.position as L.LatLngExpression);
         }
       }
-      if (userLocation && Number.isFinite(userLocation.lat) && Number.isFinite(userLocation.lng)) points.push([userLocation.lat, userLocation.lng]);
+      if (
+        userLocation &&
+        Number.isFinite(userLocation.lat) &&
+        Number.isFinite(userLocation.lng)
+      )
+        points.push([userLocation.lat, userLocation.lng]);
       if (points.length === 0) return;
       const bounds = L.latLngBounds(points as L.LatLngExpression[]);
       map.fitBounds(bounds, { padding: [80, 80], maxZoom: 15 });
@@ -217,9 +235,14 @@ const FitBoundsToFeatures = ({ deals, userLocation }: { deals: DealWithLocation[
   return null;
 };
 
-export const DealResultsMap = ({ deals, hoveredDealId, userLocation }: DealResultsMapProps) => {
+export const DealResultsMap = ({
+  deals,
+  hoveredDealId,
+  userLocation,
+}: DealResultsMapProps) => {
   // Center the map on the first deal, or a default location if empty
-  const mapCenter: L.LatLngExpression = deals.length > 0 ? deals[0].position : [40.72, -74.0];
+  const mapCenter: L.LatLngExpression =
+    deals.length > 0 ? deals[0].position : [40.72, -74.0];
   const hoveredDeal = deals.find((d) => d.id === hoveredDealId);
 
   // Small user location icon
@@ -233,9 +256,16 @@ export const DealResultsMap = ({ deals, hoveredDealId, userLocation }: DealResul
 
   return (
     <div className="sticky top-20 h-full w-full">
-      <MapContainer center={mapCenter} zoom={13} scrollWheelZoom={true} className="h-full w-full">
+      <MapContainer
+        center={mapCenter}
+        zoom={13}
+        scrollWheelZoom={true}
+        className="h-full w-full"
+      >
         {/* Ensure map paints correctly when visible */}
-        <EnsureMapVisible deps={[deals.length, !!userLocation, hoveredDealId]} />
+        <EnsureMapVisible
+          deps={[deals.length, !!userLocation, hoveredDealId]}
+        />
 
         {/* Fit bounds to include features (will be overridden by ChangeView on hover) */}
         <FitBoundsToFeatures deals={deals} userLocation={userLocation} />
@@ -249,7 +279,11 @@ export const DealResultsMap = ({ deals, hoveredDealId, userLocation }: DealResul
         />
 
         {deals.map((deal) => (
-          <Marker key={deal.id} position={deal.position} icon={createCustomIcon(hoveredDealId === deal.id)}>
+          <Marker
+            key={deal.id}
+            position={deal.position}
+            icon={createCustomIcon(hoveredDealId === deal.id)}
+          >
             <Popup>
               <div className="font-sans">
                 <b className="text-sm">{deal.name}</b>
@@ -262,7 +296,10 @@ export const DealResultsMap = ({ deals, hoveredDealId, userLocation }: DealResul
 
         {/* User location marker */}
         {userLocation && (
-          <Marker position={[userLocation.lat, userLocation.lng]} icon={createUserIcon()}>
+          <Marker
+            position={[userLocation.lat, userLocation.lng]}
+            icon={createUserIcon()}
+          >
             <Popup>
               <div className="font-sans">
                 <b className="text-sm">You are here</b>

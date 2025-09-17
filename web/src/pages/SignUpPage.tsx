@@ -35,7 +35,7 @@ export const SignUpPage = () => {
       phone: '',
       password: '',
       confirmPassword: '',
-  referralCode: '',
+      referralCode: '',
     },
   });
 
@@ -269,33 +269,38 @@ export const SignUpPage = () => {
                 )}
               />
 
-                {/* Referral Code Field */}
-                <FormField
-                  control={form.control}
-                  name="referralCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-neutral-text-primary mb-2 block text-sm font-medium">
-                        Referral Code (Optional)
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                            <svg className="h-5 w-5 text-brand-primary-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M12 2L15 8H9L12 2Z" fill="currentColor" />
-                            </svg>
-                          </div>
-                          <Input
-                            placeholder="Enter referral code"
-                            {...field}
-                            className="border-neutral-border w-full rounded-lg border bg-white/50 py-3 pl-10 pr-4 backdrop-blur-sm transition-colors focus:border-brand-primary-main focus:ring-2 focus:ring-brand-primary-main/50"
-                          />
+              {/* Referral Code Field */}
+              <FormField
+                control={form.control}
+                name="referralCode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-neutral-text-primary mb-2 block text-sm font-medium">
+                      Referral Code (Optional)
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                          <svg
+                            className="h-5 w-5 text-brand-primary-500"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M12 2L15 8H9L12 2Z" fill="currentColor" />
+                          </svg>
                         </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        <Input
+                          placeholder="Enter referral code"
+                          {...field}
+                          className="border-neutral-border w-full rounded-lg border bg-white/50 py-3 pl-10 pr-4 backdrop-blur-sm transition-colors focus:border-brand-primary-main focus:ring-2 focus:ring-brand-primary-main/50"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <div className="flex items-start">
                 <input

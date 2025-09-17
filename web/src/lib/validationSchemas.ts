@@ -32,7 +32,7 @@ export const signUpSchema = z
         message: 'Must contain at least one special character.',
       }),
     confirmPassword: z.string(),
-  referralCode: z.string().optional(),
+    referralCode: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match.",

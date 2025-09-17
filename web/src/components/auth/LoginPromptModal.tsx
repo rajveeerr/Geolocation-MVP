@@ -10,7 +10,10 @@ interface LoginPromptModalProps {
   onClose: () => void;
 }
 
-export const LoginPromptModal = ({ isOpen, onClose }: LoginPromptModalProps) => {
+export const LoginPromptModal = ({
+  isOpen,
+  onClose,
+}: LoginPromptModalProps) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -52,7 +55,7 @@ export const LoginPromptModal = ({ isOpen, onClose }: LoginPromptModalProps) => 
               variant="ghost"
               size="sm"
               icon={<ArrowLeft className="h-4 w-4" />}
-              className="absolute top-4 left-4"
+              className="absolute left-4 top-4"
               aria-label="Go back"
             >
               Back
@@ -66,21 +69,34 @@ export const LoginPromptModal = ({ isOpen, onClose }: LoginPromptModalProps) => 
               Log in to continue
             </h2>
             <p className="mt-2 text-neutral-600">
-              You need to be logged in to save deals, view your profile, and access other personalized features.
+              You need to be logged in to save deals, view your profile, and
+              access other personalized features.
             </p>
 
             <div className="mt-8 space-y-4">
-              <Button size="lg" className="w-full bg-accent-resy-orange text-white hover:bg-opacity-90">
+              <Button
+                size="lg"
+                className="bg-accent-resy-orange w-full text-white hover:bg-opacity-90"
+              >
                 Continue with Google
               </Button>
-              <Button onClick={handleNavigateToLogin} variant="secondary" size="lg" className="w-full">
+              <Button
+                onClick={handleNavigateToLogin}
+                variant="secondary"
+                size="lg"
+                className="w-full"
+              >
                 Login with Email
               </Button>
             </div>
-            
+
             <p className="mt-6 text-sm text-neutral-500">
               Don't have an account?{' '}
-              <Link to={PATHS.SIGNUP} onClick={onClose} className="font-semibold text-brand-primary-600 hover:underline">
+              <Link
+                to={PATHS.SIGNUP}
+                onClick={onClose}
+                className="font-semibold text-brand-primary-600 hover:underline"
+              >
                 Sign up
               </Link>
             </p>

@@ -52,15 +52,25 @@ export const PremiumDealCard = ({ deal }: PremiumDealCardProps) => {
       <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
         {/* Absolute countdown - keeps card heights consistent */}
         {shouldShowCountdown && (
-          <div className={cn(
-            'absolute left-1/2 top-3 -translate-x-1/2 z-10 w-minw',
-            isExpiringSoon ? '': ''
-          )}>
-            <div className={cn('mx-auto flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold justify-center', isExpiringSoon ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200')}>
+          <div
+            className={cn(
+              'w-minw absolute left-1/2 top-3 z-10 -translate-x-1/2',
+              isExpiringSoon ? '' : '',
+            )}
+          >
+            <div
+              className={cn(
+                'mx-auto flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold',
+                isExpiringSoon
+                  ? 'border border-red-200 bg-red-50 text-red-700'
+                  : 'border border-amber-200 bg-amber-50 text-amber-700',
+              )}
+            >
               <Clock4 className="h-4 w-4" />
               <span>
                 {days > 0 && `${days}d `}
-                {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}
+                {String(hours).padStart(2, '0')}:
+                {String(minutes).padStart(2, '0')}
               </span>
             </div>
           </div>
@@ -120,7 +130,7 @@ export const PremiumDealCard = ({ deal }: PremiumDealCardProps) => {
           </div>
         )}
 
-  {/* Countdown moved above image as an absolute overlay for consistent card heights */}
+        {/* Countdown moved above image as an absolute overlay for consistent card heights */}
       </div>
     </motion.div>
   );

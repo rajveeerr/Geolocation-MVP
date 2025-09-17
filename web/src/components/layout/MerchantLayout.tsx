@@ -7,9 +7,7 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
   return (
     <div className="flex min-h-screen flex-col bg-neutral-50">
       <MerchantHeader />
-      <main className="flex-grow">
-        {children ?? <Outlet />}
-      </main>
+      <main className="flex-grow">{children ?? <Outlet />}</main>
       {/* Optionally add a simple merchant footer here */}
     </div>
   );

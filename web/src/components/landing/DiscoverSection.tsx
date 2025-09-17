@@ -7,7 +7,7 @@ export const DiscoverSection = () => {
   return (
     <section className="bg-neutral-50 py-16 sm:py-20 lg:py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="mb-6 flex items-center justify-between sm:mb-8">
+        <div className="mb-6 flex items-center justify-between sm:mb-8">
           <h2 className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
             Leaderboard
           </h2>

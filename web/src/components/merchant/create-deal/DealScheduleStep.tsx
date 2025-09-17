@@ -10,7 +10,15 @@ export const DealScheduleStep = () => {
   const navigate = useNavigate();
 
   // The days of the week for the recurring selection
-  const weekdays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+  const weekdays = [
+    'MONDAY',
+    'TUESDAY',
+    'WEDNESDAY',
+    'THURSDAY',
+    'FRIDAY',
+    'SATURDAY',
+    'SUNDAY',
+  ];
 
   return (
     <OnboardingStepLayout
@@ -23,24 +31,44 @@ export const DealScheduleStep = () => {
       <div className="space-y-6">
         {/* Start Time and End Time Inputs (No Changes Here) */}
         <div>
-          <Label htmlFor="startTime" className="text-lg font-semibold">Start Time</Label>
-          <p className="mb-2 text-neutral-500">When customers can start claiming this deal.</p>
+          <Label htmlFor="startTime" className="text-lg font-semibold">
+            Start Time
+          </Label>
+          <p className="mb-2 text-neutral-500">
+            When customers can start claiming this deal.
+          </p>
           <Input
             id="startTime"
             type="datetime-local"
             value={state.startTime}
-            onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'startTime', value: e.target.value })}
+            onChange={(e) =>
+              dispatch({
+                type: 'UPDATE_FIELD',
+                field: 'startTime',
+                value: e.target.value,
+              })
+            }
             className="h-14 text-lg"
           />
         </div>
         <div>
-          <Label htmlFor="endTime" className="text-lg font-semibold">End Time</Label>
-          <p className="mb-2 text-neutral-500">The deal will no longer be visible after this time.</p>
+          <Label htmlFor="endTime" className="text-lg font-semibold">
+            End Time
+          </Label>
+          <p className="mb-2 text-neutral-500">
+            The deal will no longer be visible after this time.
+          </p>
           <Input
             id="endTime"
             type="datetime-local"
             value={state.endTime}
-            onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'endTime', value: e.target.value })}
+            onChange={(e) =>
+              dispatch({
+                type: 'UPDATE_FIELD',
+                field: 'endTime',
+                value: e.target.value,
+              })
+            }
             className="h-14 text-lg"
           />
         </div>
@@ -48,12 +76,17 @@ export const DealScheduleStep = () => {
         {/* --- THIS IS THE CHANGE --- */}
         {/* Conditionally render the recurring days selector only if the deal type is 'RECURRING' */}
         {state.dealType === 'RECURRING' && (
-          <div className="mt-4 rounded-lg border bg-white p-4 animate-fade-in">
+          <div className="animate-fade-in mt-4 rounded-lg border bg-white p-4">
             <Label className="text-lg font-semibold">Recurring Days</Label>
-            <p className="mb-3 text-neutral-500">Select the weekdays this deal should repeat on.</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <p className="mb-3 text-neutral-500">
+              Select the weekdays this deal should repeat on.
+            </p>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {weekdays.map((day) => (
-                <label key={day} className="inline-flex items-center space-x-3 cursor-pointer p-2 rounded-md hover:bg-neutral-50">
+                <label
+                  key={day}
+                  className="inline-flex cursor-pointer items-center space-x-3 rounded-md p-2 hover:bg-neutral-50"
+                >
                   <input
                     type="checkbox"
                     checked={state.recurringDays.includes(day)}
@@ -61,11 +94,17 @@ export const DealScheduleStep = () => {
                       const updatedDays = e.target.checked
                         ? [...state.recurringDays, day]
                         : state.recurringDays.filter((d) => d !== day);
-                      dispatch({ type: 'UPDATE_FIELD', field: 'recurringDays', value: updatedDays as any });
+                      dispatch({
+                        type: 'UPDATE_FIELD',
+                        field: 'recurringDays',
+                        value: updatedDays as any,
+                      });
                     }}
                     className="h-5 w-5 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
                   />
-                  <span className="text-neutral-700 font-medium">{day.charAt(0) + day.slice(1).toLowerCase()}</span>
+                  <span className="font-medium text-neutral-700">
+                    {day.charAt(0) + day.slice(1).toLowerCase()}
+                  </span>
                 </label>
               ))}
             </div>

@@ -15,8 +15,8 @@ export const BusinessInfoStep = () => {
       title="Tell us about your business"
       onNext={() => dispatch({ type: 'SET_STEP', payload: state.step + 1 })}
       onBack={() => navigate(PATHS.HOME)}
-  isNextDisabled={!state.businessName}
-  progress={25}
+      isNextDisabled={!state.businessName}
+      progress={25}
     >
       <div className="space-y-6">
         <div>
@@ -29,7 +29,9 @@ export const BusinessInfoStep = () => {
           <Input
             id="businessName"
             value={state.businessName}
-            onChange={(e) => dispatch({ type: 'SET_BUSINESS_NAME', payload: e.target.value })}
+            onChange={(e) =>
+              dispatch({ type: 'SET_BUSINESS_NAME', payload: e.target.value })
+            }
             className="h-14 text-lg"
           />
         </div>

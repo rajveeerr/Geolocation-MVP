@@ -16,7 +16,10 @@ interface LeaderboardResponse {
 export const useLeaderboard = () => {
   return useQuery<LeaderboardResponse | null, Error>({
     queryKey: ['leaderboard'],
-    queryFn: () => apiGet<LeaderboardResponse>('/leaderboard?period=month&includeSelf=true').then(res => res.data),
+    queryFn: () =>
+      apiGet<LeaderboardResponse>(
+        '/leaderboard?period=month&includeSelf=true',
+      ).then((res) => res.data),
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 };

@@ -19,8 +19,8 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-  // Scroll by a little less than the card width for a better feel
-  const scrollAmount = (direction === 'left' ? -1 : 1) * 350; 
+      // Scroll by a little less than the card width for a better feel
+      const scrollAmount = (direction === 'left' ? -1 : 1) * 350;
       scrollContainerRef.current.scrollBy({
         left: scrollAmount,
         behavior: 'smooth',
@@ -77,7 +77,7 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
         {/* --- MODIFIED: Use PremiumV2DealCard and adjust widths for the bigger card --- */}
         <div
           ref={scrollContainerRef}
-          className="scrollbar-hide flex gap-6 overflow-x-auto pb-4 -mx-4 px-4" // Add padding to view shadows
+          className="scrollbar-hide -mx-4 flex gap-6 overflow-x-auto px-4 pb-4" // Add padding to view shadows
         >
           {deals.map((deal) => (
             <div key={deal.id} className="w-[340px] flex-shrink-0 sm:w-[360px]">

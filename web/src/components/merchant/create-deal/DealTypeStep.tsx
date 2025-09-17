@@ -6,17 +6,30 @@ import { Tag, Clock, Repeat } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routing/paths';
 
-const DealTypeCard = ({ icon, title, description, isSelected, onClick }: any) => (
+const DealTypeCard = ({
+  icon,
+  title,
+  description,
+  isSelected,
+  onClick,
+}: any) => (
   <button
     onClick={onClick}
     className={cn(
-      'rounded-lg border-2 p-6 text-left transition-all w-full flex items-center gap-4',
+      'flex w-full items-center gap-4 rounded-lg border-2 p-6 text-left transition-all',
       isSelected
         ? 'border-brand-primary-500 bg-brand-primary-50 shadow-md'
-        : 'border-neutral-200 bg-white hover:border-neutral-300'
+        : 'border-neutral-200 bg-white hover:border-neutral-300',
     )}
   >
-    <div className={cn("flex-shrink-0 h-12 w-12 rounded-lg flex items-center justify-center", isSelected ? "bg-brand-primary-500 text-white" : "bg-neutral-100 text-brand-primary-600")}>
+    <div
+      className={cn(
+        'flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg',
+        isSelected
+          ? 'bg-brand-primary-500 text-white'
+          : 'bg-neutral-100 text-brand-primary-600',
+      )}
+    >
       {icon}
     </div>
     <div>
@@ -44,21 +57,27 @@ export const DealTypeStep = () => {
           title="Standard Deal"
           description="A classic offer valid for a specific period."
           isSelected={state.dealType === 'STANDARD'}
-          onClick={() => dispatch({ type: 'SET_DEAL_TYPE', dealType: 'STANDARD' })}
+          onClick={() =>
+            dispatch({ type: 'SET_DEAL_TYPE', dealType: 'STANDARD' })
+          }
         />
         <DealTypeCard
           icon={<Clock className="h-6 w-6" />}
           title="Happy Hour"
           description="A time-sensitive deal to create urgency."
           isSelected={state.dealType === 'HAPPY_HOUR'}
-          onClick={() => dispatch({ type: 'SET_DEAL_TYPE', dealType: 'HAPPY_HOUR' })}
+          onClick={() =>
+            dispatch({ type: 'SET_DEAL_TYPE', dealType: 'HAPPY_HOUR' })
+          }
         />
         <DealTypeCard
           icon={<Repeat className="h-6 w-6" />}
           title="Recurring Deal"
           description="Repeats on the same day(s) every week."
           isSelected={state.dealType === 'RECURRING'}
-          onClick={() => dispatch({ type: 'SET_DEAL_TYPE', dealType: 'RECURRING' })}
+          onClick={() =>
+            dispatch({ type: 'SET_DEAL_TYPE', dealType: 'RECURRING' })
+          }
         />
       </div>
     </OnboardingStepLayout>
