@@ -1,6 +1,6 @@
 // web/src/components/deals/PremiumV2DealCard.tsx
 import { useState, useEffect } from 'react';
-import { Heart, Clock, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Heart, Clock, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import type { Deal } from '@/data/deals';
