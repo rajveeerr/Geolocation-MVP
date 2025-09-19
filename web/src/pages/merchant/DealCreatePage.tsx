@@ -1,25 +1,43 @@
-// web/src/pages/merchant/DealCreatePage.tsx
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import { DealCreationProvider } from '@/context/DealCreationContext';
+import {
+  DealCreationProvider,
+  useDealCreation,
+} from '@/context/DealCreationContext';
+import { HappyHourProvider } from '@/context/HappyHourContext';
+
+// Import all necessary step and page components
+import { DealTypeStep } from '@/components/merchant/create-deal/DealTypeStep';
 import { DealBasicsStep } from '@/components/merchant/create-deal/DealBasicsStep';
 import { DealOfferStep } from '@/components/merchant/create-deal/DealOfferStep';
 import { DealScheduleStep } from '@/components/merchant/create-deal/DealScheduleStep';
 import { DealInstructionsStep } from '@/components/merchant/create-deal/DealInstructionsStep';
 import { DealReviewStep } from '@/components/merchant/create-deal/DealReviewStep';
-import { DealTypeStep } from '@/components/merchant/create-deal/DealTypeStep';
+import { HappyHourEditorPage } from './HappyHourEditorPage';
+import { AddMenuItemPage } from './AddMenuItemPage';
 
-// --- NEW: Import hooks and components for status checking ---
-import { useMerchantStatus } from '@/hooks/useMerchantStatus';
-import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
-import { Button } from '@/components/common/Button';
-import { Clock } from 'lucide-react';
-import { PATHS } from '@/routing/paths';
+// This is the component for the first step. It contains the navigation logic.
+const DealTypeSelector = () => {
+  const navigate = useNavigate();
+  const { state } = useDealCreation();
 
-// The actual deal creation form flow
-const DealCreationFlow = () => (
+  const handleNext = () => {
+    // Based on the state, navigate to the correct subsequent route
+    if (state.dealType === 'HAPPY_HOUR') {
+      navigate('/merchant/deals/create/happy-hour/edit');
+    } else {
+      // For both 'STANDARD' and 'RECURRING', start the simple flow
+      navigate('/merchant/deals/create/standard/basics');
+    }
+  };
+
+  return <DealTypeStep onNext={handleNext} />;
+};
+
+// This is the simple, multi-step flow for Standard and Recurring deals
+const StandardDealFlow = () => (
   <DealCreationProvider>
     <Routes>
-      <Route index element={<DealTypeStep />} />
+      {/* This flow now has its own nested routes */}
       <Route path="basics" element={<DealBasicsStep />} />
       <Route path="offer" element={<DealOfferStep />} />
       <Route path="schedule" element={<DealScheduleStep />} />
@@ -29,81 +47,37 @@ const DealCreationFlow = () => (
   </DealCreationProvider>
 );
 
-// A new component to display the pending status message
-const PendingApprovalMessage = () => {
-  const navigate = useNavigate();
-  return (
-    <div className="flex min-h-[calc(100vh-5rem)] items-center justify-center bg-neutral-50">
-      <div className="mx-auto max-w-lg rounded-2xl border bg-white p-8 text-center shadow-sm">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-100">
-          <Clock className="h-8 w-8 text-amber-600" />
-        </div>
-        <h1 className="mt-6 text-2xl font-bold text-neutral-900">
-          Your Merchant Profile is Pending Approval
-        </h1>
-        <p className="mt-4 text-neutral-600">
-          Our team is currently reviewing your application. This usually takes
-          1-2 business days. You will be able to create deals as soon as your
-          profile is approved. We'll notify you via email.
-        </p>
-        <Button
-          onClick={() => navigate(PATHS.MERCHANT_DASHBOARD)}
-          className="mt-8"
-          variant="secondary"
-        >
-          Back to Dashboard
-        </Button>
-      </div>
-    </div>
-  );
-};
+// This is the new, advanced flow for Happy Hour deals
+const HappyHourDealFlow = () => (
+  <HappyHourProvider>
+    <Routes>
+      <Route path="edit" element={<HappyHourEditorPage />} />
+      <Route path="add-menu" element={<AddMenuItemPage />} />
+    </Routes>
+  </HappyHourProvider>
+);
 
-// --- MODIFIED: The main page component now acts as a gatekeeper ---
+// The main export is now the top-level router for the entire creation process
 export const CreateDealPage = () => {
-  const { data: merchantData, isLoading, error } = useMerchantStatus();
-
-  if (isLoading) {
-    return <LoadingOverlay message="Checking your merchant status..." />;
-  }
-
-  if (error) {
-    // This could happen if the API fails or if the user is not a merchant at all
-    return (
-      <div className="py-20 text-center">
-        <h2 className="text-xl text-red-600">
-          Could not verify your merchant status.
-        </h2>
-        <p className="text-neutral-500">
-          Please try again later or contact support.
-        </p>
-      </div>
-    );
-  }
-
-  const status = merchantData?.data?.merchant?.status;
-
-  if (status === 'PENDING') {
-    return <PendingApprovalMessage />;
-  }
-
-  if (status === 'APPROVED') {
-    // If approved, show the normal deal creation flow
-    return <DealCreationFlow />;
-  }
-
-  // Handle other statuses like REJECTED or if no status is found
   return (
-    <div className="py-20 text-center">
-      <h2 className="text-xl font-bold text-neutral-800">
-        Unable to Create Deal
-      </h2>
-      <p className="mt-2 text-neutral-500">
-        Your merchant profile is not approved for deal creation.
-      </p>
-      <p className="text-neutral-500">
-        Current status:{' '}
-        <span className="font-semibold">{status || 'Not Found'}</span>
-      </p>
-    </div>
+    <Routes>
+      {/* The initial route always shows the type selector, wrapped in the basic context */}
+      <Route
+        index
+        element={
+          <DealCreationProvider>
+            <DealTypeSelector />
+          </DealCreationProvider>
+        }
+      />
+      
+      {/* Route group for the standard/recurring flow */}
+      <Route path="standard/*" element={<StandardDealFlow />} />
+
+      {/* Route group for the happy hour flow */}
+      <Route path="happy-hour/*" element={<HappyHourDealFlow />} />
+    </Routes>
   );
 };
+
+export default CreateDealPage;

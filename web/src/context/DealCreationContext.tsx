@@ -1,87 +1,124 @@
-// src/context/DealCreationContext.tsx
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useReducer } from 'react';
 import type { ReactNode } from 'react';
 
-interface State {
+export interface TimeRange {
+  id: number;
+  start: string;
+  end: string;
+  day?: string; // e.g. 'All' or 'Mon', 'Tue'
+}
+
+
+export interface MenuItem {
+  id: number;
+  name: string;
+  price: number;
+  category: 'Bites' | 'Drinks';
+  imageUrl: string;
+}
+
+export interface SelectedMenuItem extends MenuItem {
+  isHidden: boolean;
+}
+
+export interface DealCreationState {
+  dealType: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' | null;
+  happyHourPeriod: 'Mornings' | 'Midday' | 'Late night';
+  timeRanges: TimeRange[];
+  activeStartDate: string;
+  activeEndDate: string;
+  periodType: 'Single day' | 'Recurring';
+  recurringDays: string[];
+  selectedMenuItems: SelectedMenuItem[];
+  kickbackEnabled: boolean;
   title: string;
   description: string;
   category: string;
-  // New: align with backend deal types
-  dealType: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' | null;
   discountPercentage: number | null;
   discountAmount: number | null;
-  // New: for recurring deals, which weekdays the deal repeats on (e.g. ['MONDAY','WEDNESDAY'])
-  recurringDays: string[];
-  // New: within STANDARD deals, whether the merchant picked percentage vs amount
-  standardOfferKind: 'percentage' | 'amount' | null;
+  redemptionInstructions: string;
+  // Legacy fields used by existing steps — keep for compatibility
   startTime: string;
   endTime: string;
-  redemptionInstructions: string;
+  standardOfferKind: 'percentage' | 'amount' | null;
 }
 
 type Action =
-  | { type: 'UPDATE_FIELD'; field: keyof State; value: string | number | null }
+  | { type: 'SET_FIELD'; field: keyof DealCreationState; value: any }
+  | { type: 'UPDATE_FIELD'; field: keyof DealCreationState; value: any }
+  | { type: 'ADD_TIME_RANGE' }
+  | { type: 'UPDATE_TIME_RANGE'; payload: { id: number; field: 'start' | 'end' | 'day'; value: string } }
+  | { type: 'REMOVE_TIME_RANGE'; payload: { id: number } }
+  | { type: 'SET_SELECTED_ITEMS'; payload: SelectedMenuItem[] }
+  | { type: 'TOGGLE_RECURRING_DAY'; payload: string }
   | { type: 'SET_DEAL_TYPE'; dealType: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' }
   | { type: 'SET_STANDARD_OFFER_KIND'; kind: 'percentage' | 'amount' | null };
 
-const initialState: State = {
+const initialState: DealCreationState = {
+  dealType: null,
+  happyHourPeriod: 'Midday',
+  timeRanges: [{ id: Date.now(), start: '17:00', end: '19:00', day: 'All' }],
+  activeStartDate: '',
+  activeEndDate: '',
+  periodType: 'Recurring',
+  recurringDays: [],
+  selectedMenuItems: [],
+  kickbackEnabled: false,
   title: '',
   description: '',
   category: 'FOOD_AND_BEVERAGE',
-  // Default to STANDARD so created deals without explicit choice still work
-  dealType: 'STANDARD',
   discountPercentage: null,
   discountAmount: null,
-  recurringDays: [],
-  standardOfferKind: null,
+  redemptionInstructions: 'Show this screen to redeem.',
+  // Provide defaults for legacy fields so consumers can read them safely
   startTime: '',
   endTime: '',
-  redemptionInstructions:
-    'Show this screen at the counter to redeem your deal.',
+  standardOfferKind: null,
 };
 
-function reducer(state: State, action: Action): State {
+function reducer(state: DealCreationState, action: Action): DealCreationState {
   switch (action.type) {
+    case 'SET_FIELD':
+      return { ...state, [action.field]: action.value };
     case 'UPDATE_FIELD':
       return { ...state, [action.field]: action.value };
     case 'SET_DEAL_TYPE':
       return {
         ...state,
         dealType: action.dealType,
-        // When switching to RECURRING, keep recurringDays; when switching away, clear them
-        recurringDays:
-          action.dealType === 'RECURRING' ? state.recurringDays : [],
-        // Keep existing discount fields; the Offer step can still set them as needed
-        discountPercentage: state.discountPercentage,
-        discountAmount: state.discountAmount,
+        recurringDays: action.dealType === 'RECURRING' ? state.recurringDays : [],
       };
     case 'SET_STANDARD_OFFER_KIND':
-      // This action should ONLY affect the `standardOfferKind`.
-      // It should NOT change the `dealType`. A "Happy Hour" can also have a percentage discount.
-      return {
-        ...state,
-        standardOfferKind: action.kind,
-      };
+      return { ...state, standardOfferKind: action.kind };
+    case 'ADD_TIME_RANGE':
+      return { ...state, timeRanges: [...state.timeRanges, { id: Date.now(), start: '17:00', end: '19:00' }] };
+    case 'UPDATE_TIME_RANGE':
+      return { ...state, timeRanges: state.timeRanges.map(tr => (tr.id === action.payload.id ? { ...tr, [action.payload.field]: action.payload.value } : tr)) };
+    case 'REMOVE_TIME_RANGE':
+      return { ...state, timeRanges: state.timeRanges.filter(tr => tr.id !== action.payload.id) };
+    case 'SET_SELECTED_ITEMS':
+      return { ...state, selectedMenuItems: action.payload };
+    case 'TOGGLE_RECURRING_DAY': {
+      const day = action.payload;
+      const newDays = state.recurringDays.includes(day) ? state.recurringDays.filter(d => d !== day) : [...state.recurringDays, day];
+      return { ...state, recurringDays: newDays };
+    }
     default:
       return state;
   }
 }
 
-const DealCreationContext = createContext<{
-  state: State;
-  dispatch: React.Dispatch<Action>;
-}>({ state: initialState, dispatch: () => null });
+const DealCreationContext = createContext<{ state: DealCreationState; dispatch: React.Dispatch<Action> } | undefined>(undefined);
+export { DealCreationContext };
 
 export const DealCreationProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  return (
-    <DealCreationContext.Provider value={{ state, dispatch }}>
-      {children}
-    </DealCreationContext.Provider>
-  );
+  return <DealCreationContext.Provider value={{ state, dispatch }}>{children}</DealCreationContext.Provider>;
 };
 
-export function useDealCreation() {
-  return useContext(DealCreationContext);
-}
+export const useDealCreation = () => {
+  const context = useContext(DealCreationContext);
+  if (!context) throw new Error('useDealCreation must be used within a DealCreationProvider');
+  return context;
+};

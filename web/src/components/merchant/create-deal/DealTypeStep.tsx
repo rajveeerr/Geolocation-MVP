@@ -39,14 +39,14 @@ const DealTypeCard = ({
   </button>
 );
 
-export const DealTypeStep = () => {
+export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
   const { state, dispatch } = useDealCreation();
   const navigate = useNavigate();
 
   return (
     <OnboardingStepLayout
       title="What kind of deal are you creating?"
-      onNext={() => navigate('/merchant/deals/create/basics')}
+      onNext={onNext}
       onBack={() => navigate(PATHS.MERCHANT_DASHBOARD)}
       isNextDisabled={!state.dealType}
       progress={15}
@@ -58,7 +58,7 @@ export const DealTypeStep = () => {
           description="A classic offer valid for a specific period."
           isSelected={state.dealType === 'STANDARD'}
           onClick={() =>
-            dispatch({ type: 'SET_DEAL_TYPE', dealType: 'STANDARD' })
+            dispatch({ type: 'SET_FIELD', field: 'dealType', value: 'STANDARD' })
           }
         />
         <DealTypeCard
@@ -67,7 +67,7 @@ export const DealTypeStep = () => {
           description="A time-sensitive deal to create urgency."
           isSelected={state.dealType === 'HAPPY_HOUR'}
           onClick={() =>
-            dispatch({ type: 'SET_DEAL_TYPE', dealType: 'HAPPY_HOUR' })
+            dispatch({ type: 'SET_FIELD', field: 'dealType', value: 'HAPPY_HOUR' })
           }
         />
         <DealTypeCard
@@ -76,7 +76,7 @@ export const DealTypeStep = () => {
           description="Repeats on the same day(s) every week."
           isSelected={state.dealType === 'RECURRING'}
           onClick={() =>
-            dispatch({ type: 'SET_DEAL_TYPE', dealType: 'RECURRING' })
+            dispatch({ type: 'SET_FIELD', field: 'dealType', value: 'RECURRING' })
           }
         />
       </div>
