@@ -1,4 +1,3 @@
-// src/components/merchant/onboarding/BusinessInfoStep.tsx
 import { useOnboarding } from '@/context/MerchantOnboardingContext';
 import { OnboardingStepLayout } from './OnboardingStepLayout';
 import { Input } from '@/components/ui/input';
@@ -16,7 +15,7 @@ export const BusinessInfoStep = () => {
       onNext={() => dispatch({ type: 'SET_STEP', payload: state.step + 1 })}
       onBack={() => navigate(PATHS.HOME)}
       isNextDisabled={!state.businessName}
-      progress={25}
+      progress={20}
     >
       <div className="space-y-6">
         <div>

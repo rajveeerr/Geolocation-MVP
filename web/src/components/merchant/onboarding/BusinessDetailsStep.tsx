@@ -8,7 +8,6 @@ export const BusinessDetailsStep = () => {
   const { state, dispatch } = useOnboarding();
 
   const handleNext = () => {
-    // Move to next step which should be the MapConfirmationStep
     dispatch({ type: 'SET_STEP', payload: state.step + 1 });
   };
 
@@ -17,7 +16,7 @@ export const BusinessDetailsStep = () => {
       title="Add a few more details"
       onNext={handleNext}
       onBack={() => dispatch({ type: 'SET_STEP', payload: state.step - 1 })}
-      progress={75}
+      progress={60}
     >
       <div className="space-y-4">
         <div>

@@ -1,28 +1,19 @@
-// src/pages/merchant/MerchantOnboardingPage.tsx
-import {
-  OnboardingProvider,
-  useOnboarding,
-} from '@/context/MerchantOnboardingContext';
+import { OnboardingProvider, useOnboarding } from '@/context/MerchantOnboardingContext';
 import { BusinessInfoStep } from '@/components/merchant/onboarding/BusinessInfoStep';
-import { AddressStep } from '@/components/merchant/onboarding/AddressStep';
-import { MapConfirmationStep } from '@/components/merchant/onboarding/MapConfirmationStep';
+import { BusinessCategoryStep } from '@/components/merchant/onboarding/BusinessCategoryStep';
+import { MapAddressStep } from '@/components/merchant/onboarding/MapAddressStep';
+import { FinalReviewStep } from '@/components/merchant/onboarding/FinalReviewStep';
 import { BusinessDetailsStep } from '@/components/merchant/onboarding/BusinessDetailsStep';
 
-// A new component to render the current step
 const OnboardingFlow = () => {
   const { state } = useOnboarding();
-
   switch (state.step) {
-    case 1:
-      return <BusinessInfoStep />;
-    case 2:
-      return <AddressStep />;
-    case 3:
-      return <BusinessDetailsStep />;
-    case 4:
-      return <MapConfirmationStep />;
-    default:
-      return <BusinessInfoStep />; // Default to first step
+    case 1: return <BusinessInfoStep />;      
+    case 2: return <BusinessCategoryStep />;  
+    case 3: return <BusinessDetailsStep />;   
+    case 4: return <MapAddressStep />;        
+    case 5: return <FinalReviewStep />;       
+    default: return <BusinessInfoStep />;
   }
 };
 
