@@ -97,3 +97,20 @@ Uses the same email gating (`EMAIL_ENABLED`) and provider credentials as other t
 * Batch queue and retry logic.
 * Local timezone handling (currently strict UTC midnight).
 
+---
+
+## Cities and Stores
+
+This version introduces normalized Cities and Stores for city-wise listings and multiple merchant locations.
+
+Data models:
+- City: id, name, state, active, createdAt, updatedAt
+- Store: id, merchantId, cityId, address, latitude, longitude, active, timestamps
+
+Key endpoints:
+- GET `/api/cities?active=true&q=seattle` – list cities (filter by active and search).
+- POST `/api/cities/toggle` (admin) – body `{ cityId, active }`.
+- POST `/api/merchants/register` – accepts optional `cityId` OR `cityName`+`state` to create the first Store; if omitted, legacy `city` string is stored on `Merchant`.
+
+Seeding 20+ US cities: run the seed script after migrations to pre-populate cities. Some cities are marked active by default: Florida (Miami, Orlando, Tampa), Atlanta (GA), New York (NY), Texas (Dallas, Houston, Austin), and Seattle (WA).
+

@@ -12,6 +12,7 @@ import publicDealRoutes from './routes/deals.public.routes';
 import userRoutes from './routes/user.routes';
 import leaderboardRoutes from './routes/leaderboard.routes';
 import adminRoutes from './routes/admin.routes';
+import cityRoutes from './routes/cities.routes';
 
 // Load env (tests can set process.env before importing this file)
 dotenv.config();
@@ -44,6 +45,7 @@ app.use('/api', publicDealRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api', cityRoutes);
 
 export default app;
 

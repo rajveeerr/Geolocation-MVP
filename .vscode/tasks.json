@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Prisma migrate: add City/Store",
+			"type": "shell",
+			"command": "npx prisma migrate dev --name add_city_and_store_models",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		}
+	]
+}

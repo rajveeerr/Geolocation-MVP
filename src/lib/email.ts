@@ -1,4 +1,6 @@
-import axios from 'axios';
+// Switched from Brevo API to direct SMTP via Nodemailer. Previous Brevo implementation retained in comments for easy revert.
+// import axios from 'axios';
+import nodemailer from 'nodemailer';
 import logger from './logging/logger';
 
 export interface SendEmailOptions {
@@ -14,43 +16,64 @@ function normalizeRecipients(to: SendEmailOptions['to']) {
   return arr.map(r => (typeof r === 'string' ? { email: r } : r));
 }
 
+// Environment variables for SMTP:
+// SMTP_HOST, SMTP_PORT, SMTP_SECURE (true/false), SMTP_USER, SMTP_PASS
+let _transporter: nodemailer.Transporter | null = null;
+
+function getTransporter() {
+  if (_transporter) return _transporter;
+  let host = process.env.SMTP_HOST || '';
+  let port = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 587;
+  let secure = (process.env.SMTP_SECURE || 'false').toLowerCase() === 'true';
+  // Convenience Gmail support
+  const provider = (process.env.EMAIL_PROVIDER || '').toLowerCase();
+  // Allow alternate var names for ease of config
+  let user = process.env.SMTP_USER || process.env.GMAIL_USER;
+  let pass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD || process.env.GMAIL_PASS;
+
+  if (!host && provider === 'gmail') {
+    host = 'smtp.gmail.com';
+    port = 465; // recommended implicit TLS
+    secure = true;
+  }
+
+  if (!host) {
+    throw new Error('SMTP_HOST not configured (set SMTP_HOST or EMAIL_PROVIDER=gmail)');
+  }
+  if (user && pass) {
+    _transporter = nodemailer.createTransport({ host, port, secure, auth: { user, pass } });
+  } else {
+    _transporter = nodemailer.createTransport({ host, port, secure });
+  }
+  return _transporter;
+}
+
 export async function sendEmail(options: SendEmailOptions): Promise<void> {
   const enabled = (process.env.EMAIL_ENABLED || 'false').toLowerCase() === 'true';
-  const apiKey = process.env.BREVO_API_KEY;
-  const fromEmail = process.env.EMAIL_FROM_ADDRESS;
-  const fromName = process.env.EMAIL_FROM_NAME || 'NoReply';
-
   if (!enabled) {
     logger.debug('[email] EMAIL_ENABLED not true – skipping send.');
     return;
   }
-  if (!apiKey || !fromEmail) {
-    logger.warn('[email] Missing BREVO_API_KEY or EMAIL_FROM_ADDRESS – email disabled.');
+  const fromEmail = process.env.EMAIL_FROM_ADDRESS;
+  const fromName = process.env.EMAIL_FROM_NAME || 'NoReply';
+  if (!fromEmail) {
+    logger.warn('[email] Missing EMAIL_FROM_ADDRESS – email disabled.');
     return;
   }
-
   try {
-    const payload = {
-      sender: { email: fromEmail, name: fromName },
-      to: normalizeRecipients(options.to),
+    const toList = normalizeRecipients(options.to);
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: `${fromName} <${fromEmail}>`,
+      to: toList.map(t => (t.name ? `${t.name} <${t.email}>` : t.email)).join(', '),
       subject: options.subject,
-      htmlContent: options.html,
-      textContent: options.text || options.html.replace(/<[^>]+>/g, ''),
-      tags: options.tags,
-    };
-
-    await axios.post('https://api.brevo.com/v3/smtp/email', payload, {
-      headers: {
-        'Content-Type': 'application/json',
-        'api-key': apiKey,
-      },
-      timeout: 10000,
+      html: options.html,
+      text: options.text || options.html.replace(/<[^>]+>/g, ''),
+      headers: options.tags ? { 'X-Tags': options.tags.join(',') } : undefined,
     });
-    logger.info(`[email] Sent email to ${payload.to.map((t: any)=>t.email).join(', ')} subject="${options.subject}"`);
+    logger.info(`[email] Sent email to ${toList.map(t=>t.email).join(', ')} subject="${options.subject}"`);
   } catch (err: any) {
-    const status = err?.response?.status;
-    const data = err?.response?.data;
-    logger.error(`[email] Failed to send email: status=${status} err=${err.message} body=${JSON.stringify(data)}`);
+    logger.error(`[email] SMTP send failed: err=${err.message}`);
   }
 }
 

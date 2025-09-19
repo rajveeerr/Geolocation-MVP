@@ -68,7 +68,7 @@ function logQueryPerformance(operation: string, startTime: number, resultCount: 
 // Optional query parameters: latitude, longitude, radius (in kilometers), category, search
 router.get('/deals', async (req, res) => {
   try {
-    const { latitude, longitude, radius, category, search } = req.query;
+    const { latitude, longitude, radius, category, search, cityId } = req.query as any;
     const now = new Date();
   // Determine today's weekday name for recurring deal filtering (server local time)
   const dayNames = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
@@ -140,23 +140,12 @@ router.get('/deals', async (req, res) => {
     // Base query for active deals from approved merchants
     // Optimized to use database indexes efficiently
     const queryStartTime = Date.now();
-    let deals = await prisma.deal.findMany({
+    // @ts-ignore: Prisma types will include merchant.stores after generate
+    let deals: any[] = await prisma.deal.findMany({
       where: whereClause,
       include: {
-        merchant: {
-          select: {
-            id: true,
-            businessName: true,
-            address: true,
-            description: true,
-            logoUrl: true,
-            latitude: true,
-            longitude: true,
-            status: true,
-            createdAt: true,
-            updatedAt: true,
-          },
-        },
+        // @ts-ignore
+        merchant: { include: { stores: { include: { city: true } } } },
       },
       orderBy: {
         createdAt: 'desc',
@@ -171,7 +160,7 @@ router.get('/deals', async (req, res) => {
       deals = deals.filter(d => {
         if (d.dealType !== 'RECURRING') return true;
         if (!d.recurringDays) return false; // malformed recurring deal, hide
-        const days = d.recurringDays.split(',').map(s => s.trim().toUpperCase());
+  const days = d.recurringDays.split(',').map((s: string) => s.trim().toUpperCase());
         return days.includes(todayName);
       });
     }
@@ -182,6 +171,15 @@ router.get('/deals', async (req, res) => {
       search: search ? 'yes' : 'no',
       geolocation: (latitude && longitude && radius) ? 'yes' : 'no'
     });
+
+    // If a cityId filter is provided, filter deals by merchant's stores in that city
+    if (cityId) {
+      const cid = Number(cityId);
+      if (!Number.isFinite(cid)) {
+        return res.status(400).json({ error: 'cityId must be a number' });
+      }
+      deals = deals.filter(d => Array.isArray((d as any).merchant.stores) && (d as any).merchant.stores.some((s: any) => s.cityId === cid));
+    }
 
     // If coordinates and radius are provided, filter by distance
     if (latitude && longitude && radius) {
@@ -247,9 +245,9 @@ router.get('/deals', async (req, res) => {
       });
 
       // Filter by distance and add distance information
-      const dealsWithDistance = deals
+      const dealsWithDistance = (deals as any[])
         .filter(deal => {
-          if (!deal.merchant.latitude || !deal.merchant.longitude) {
+          if (!deal.merchant?.latitude || !deal.merchant?.longitude) {
             return false;
           }
 
@@ -298,6 +296,7 @@ router.get('/deals', async (req, res) => {
         radius: radius ? parseFloat(radius as string) : null,
         category: category ? category as string : null,
         search: search ? search as string : null,
+        cityId: cityId ? Number(cityId) : null,
         today: todayName
       }
     });

@@ -9,7 +9,7 @@ const router = Router();
 // Allows a user to register as a merchant.
 router.post('/merchants/register', protect, async (req: AuthRequest, res) => {
   try {
-    const { businessName, address, description, logoUrl, latitude, longitude } = req.body;
+  const { businessName, address, description, logoUrl, latitude, longitude, cityId } = req.body;
     const userId = req.user?.id;
 
     if (!userId) {
@@ -50,6 +50,20 @@ router.post('/merchants/register', protect, async (req: AuthRequest, res) => {
       return res.status(409).json({ error: 'You have already registered as a merchant.' });
     }
 
+    // Enforce selection of an existing ACTIVE city (no on-the-fly creation anymore)
+    if (!cityId) {
+      return res.status(400).json({ error: 'cityId is required. Only pre-approved active cities may be selected.' });
+    }
+    // @ts-ignore - available after Prisma generate
+    const existingCity = await prisma.city.findUnique({ where: { id: Number(cityId) } });
+    if (!existingCity) {
+      return res.status(400).json({ error: 'Invalid cityId provided.' });
+    }
+    if (!existingCity.active) {
+      return res.status(400).json({ error: 'Selected city is not active for merchant onboarding.' });
+    }
+    const resolvedCityId: number = existingCity.id;
+
     const [merchant] = await prisma.$transaction([
       prisma.merchant.create({
         data: {
@@ -59,6 +73,8 @@ router.post('/merchants/register', protect, async (req: AuthRequest, res) => {
           logoUrl,
           latitude: latitude ? parseFloat(latitude) : null,
           longitude: longitude ? parseFloat(longitude) : null,
+          // legacy free-form city usage disabled for new merchants
+          city: null,
           owner: { connect: { id: userId } },
         },
       }),
@@ -68,9 +84,23 @@ router.post('/merchants/register', protect, async (req: AuthRequest, res) => {
       }),
     ]);
 
+    // If a city was resolved, create a Store for this merchant
+    let store = null as any;
+    // @ts-ignore - available after Prisma generate
+    store = await prisma.store.create({
+      data: {
+        merchantId: merchant.id,
+        cityId: resolvedCityId,
+        address,
+        latitude: latitude ? parseFloat(latitude) : null,
+        longitude: longitude ? parseFloat(longitude) : null,
+      }
+    });
+
     res.status(201).json({
       message: 'Merchant application submitted successfully. It is now pending approval.',
       merchant,
+      store,
     });
 
   } catch (error) {
@@ -98,6 +128,7 @@ router.get('/merchants/status', protect, async (req: AuthRequest, res) => {
         address: true,
         description: true,
         logoUrl: true,
+        city: true,
         createdAt: true,
         updatedAt: true
       }
@@ -368,3 +399,59 @@ router.get('/merchants/deals', protect, isApprovedMerchant, async (req: AuthRequ
 });
 
 export default router;
+
+// --- Endpoint: GET /api/merchants/stores ---
+// List stores for the authenticated approved merchant
+router.get('/merchants/stores', protect, isApprovedMerchant, async (req: AuthRequest, res) => {
+  try {
+    const merchantId = req.merchant?.id;
+    if (!merchantId) return res.status(401).json({ error: 'Merchant authentication required' });
+    // @ts-ignore
+    const stores = await prisma.store.findMany({ where: { merchantId }, include: { city: true } });
+    res.status(200).json({ total: stores.length, stores });
+  } catch (e) {
+    console.error('List stores failed', e);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// --- Endpoint: POST /api/merchants/stores ---
+// Create a new store for the authenticated approved merchant
+// Body: { address, latitude?, longitude?, cityId? OR (cityName & state), active? }
+router.post('/merchants/stores', protect, isApprovedMerchant, async (req: AuthRequest, res) => {
+  try {
+    const merchantId = req.merchant?.id;
+    if (!merchantId) return res.status(401).json({ error: 'Merchant authentication required' });
+
+    const { address, latitude, longitude, cityId, active } = req.body || {};
+    if (!address) return res.status(400).json({ error: 'address is required' });
+    if (!cityId) return res.status(400).json({ error: 'cityId is required. Only existing active cities may be used.' });
+    // @ts-ignore
+    const existing = await prisma.city.findUnique({ where: { id: Number(cityId) } });
+    if (!existing) return res.status(400).json({ error: 'Invalid cityId' });
+    if (!existing.active) return res.status(400).json({ error: 'City is not active.' });
+    const resolvedCityId: number = existing.id;
+
+    const lat = latitude !== undefined && latitude !== null && String(latitude) !== '' ? parseFloat(latitude) : null;
+    const lon = longitude !== undefined && longitude !== null && String(longitude) !== '' ? parseFloat(longitude) : null;
+    if (lat !== null && (isNaN(lat) || lat < -90 || lat > 90)) return res.status(400).json({ error: 'Latitude must be a number between -90 and 90' });
+    if (lon !== null && (isNaN(lon) || lon < -180 || lon > 180)) return res.status(400).json({ error: 'Longitude must be a number between -180 and 180' });
+
+    // @ts-ignore
+    const store = await prisma.store.create({
+      data: {
+        merchantId,
+  cityId: resolvedCityId,
+        address,
+        latitude: lat,
+        longitude: lon,
+        active: typeof active === 'boolean' ? active : true,
+      },
+      include: { city: true }
+    });
+    res.status(201).json({ message: 'Store created', store });
+  } catch (e) {
+    console.error('Create store failed', e);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});

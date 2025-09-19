@@ -103,6 +103,8 @@ model Merchant {
   // Geolocation fields
   latitude      Float?
   longitude     Float?
+  // Deprecated: use Store.city -> City relation instead
+  city          String?
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -113,6 +115,9 @@ model Merchant {
 
   // A Merchant can have many Deals
   deals         Deal[]
+
+  // A Merchant can have multiple physical stores/locations
+  stores        Store[]
 }
 
 model Deal {
@@ -208,4 +213,42 @@ model CheckIn {
 
   @@index([userId, dealId])
   @@index([merchantId])
+}
+
+// --- LOCATIONS ---
+
+// Normalized list of cities in the US with state and active flag
+model City {
+  id        Int       @id @default(autoincrement())
+  name      String
+  state     String
+  active    Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  stores    Store[]
+
+  @@unique([name, state])
+  @@index([active, name])
+}
+
+// Individual merchant store locations tied to a City
+model Store {
+  id         Int       @id @default(autoincrement())
+  merchantId Int
+  cityId     Int
+  address    String
+  latitude   Float?
+  longitude  Float?
+  active     Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  merchant   Merchant  @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  city       City      @relation(fields: [cityId], references: [id])
+
+  @@index([merchantId])
+  @@index([cityId])
+  @@index([active, cityId])
 }
