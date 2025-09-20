@@ -32,7 +32,12 @@ async function reverseGeocode(coords: { lat: number; lng: number }): Promise<Par
 
 export const FinalReviewStep = () => {
   const { state, dispatch } = useOnboarding();
-  const { data: whitelistedCitiesSet } = useWhitelistedCities();
+  const { data: cities } = useWhitelistedCities();
+  const whitelistedSet = (cities || []).reduce<Set<string>>((acc, c) => {
+    acc.add((c.name || '').toLowerCase().trim());
+    return acc;
+  }, new Set<string>());
+
   const [isCityWhitelisted, setIsCityWhitelisted] = useState<boolean | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,18 +45,38 @@ export const FinalReviewStep = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    if (state.address.city) {
+      const raw = state.address.city.toLowerCase().trim();
+      // Accept variants like "new york" and "new york city"
+      const base = raw.replace(/\s*city$/,'').trim();
+      const variants = new Set([raw, base, `${base} city`]);
+      const accepted = Array.from(variants).some(v => whitelistedSet.has(v));
+      setIsCityWhitelisted(accepted);
+      return;
+    }
+
+    // Fallback: if no address.city we can still try reverse geocoding from coordinates
+    if (state.cityId !== null && cities) {
+      const found = cities.some(c => c.id === state.cityId && c.active);
+      setIsCityWhitelisted(found);
+      return;
+    }
+
     if (state.coordinates.lat !== null && state.coordinates.lng !== null) {
       reverseGeocode({ lat: state.coordinates.lat, lng: state.coordinates.lng }).then(addressDetails => {
         if (addressDetails) {
           dispatch({ type: 'SET_FULL_ADDRESS', payload: addressDetails });
-          const city = (addressDetails.city || '').toLowerCase().trim();
-          if (city && whitelistedCitiesSet) {
-            setIsCityWhitelisted(whitelistedCitiesSet.has(city));
+          const raw = (addressDetails.city || '').toLowerCase().trim();
+          if (raw) {
+            const base = raw.replace(/\s*city$/,'').trim();
+            const variants = new Set([raw, base, `${base} city`]);
+            const accepted = Array.from(variants).some(v => whitelistedSet.has(v));
+            setIsCityWhitelisted(accepted);
           }
         }
       });
     }
-  }, [state.coordinates, dispatch, whitelistedCitiesSet]);
+  }, [state.address.city, state.cityId, state.coordinates, dispatch, whitelistedSet, cities]);
   
   const handleFinalSubmit = async () => {
     setIsSubmitting(true);
@@ -60,11 +85,19 @@ export const FinalReviewStep = () => {
       const payload = {
         businessName: state.businessName,
         address: fullAddress,
+        cityId: state.cityId,
         latitude: state.coordinates.lat,
         longitude: state.coordinates.lng,
         description: state.description || undefined,
         logoUrl: state.logoUrl || undefined,
       };
+
+      // Validation: ensure cityId is present
+      if (!payload.cityId) {
+        toast({ title: 'Submission Failed', description: 'A city must be selected. Please go back.', variant: 'destructive' });
+        setIsSubmitting(false);
+        return;
+      }
 
       const response = await apiPost('/merchants/register', payload);
       if (response.success) {

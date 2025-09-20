@@ -2,34 +2,26 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
 
-const FALLBACK_CITIES = [
-  "Atlanta",
-  "Florida", 
-  "New York",
-  "Texas",   
-  "Washington DC"
-];
-
-const processCityList = (cities: string[]): Set<string> => {
-  return new Set(cities.map(city => city.toLowerCase().trim()));
-};
+export interface City {
+  id: number;
+  name: string;
+  state: string;
+  active: boolean;
+}
 
 export const useWhitelistedCities = () => {
-  return useQuery<Set<string>, Error>({
+  return useQuery<City[], Error>({
     queryKey: ['whitelistedCities'],
+    // Fetch only active cities as per the API documentation
     queryFn: async () => {
-      try {
-        const response = await apiGet<{ cities: string[] }>('/cities/whitelist');
-        if (response.success && response.data && response.data.cities.length > 0) {
-          return processCityList(response.data.cities);
-        }
-        return processCityList(FALLBACK_CITIES);
-      } catch (error) {
-        console.warn("Could not fetch whitelisted cities from API, using fallback list.", error);
-        return processCityList(FALLBACK_CITIES);
-      }
+      const res = await apiGet<{ cities?: City[] }>('/cities?active=true');
+      // apiGet should return an object with `data` property. Guard the shapes.
+      const payload = (res && (res.data ?? res)) as { cities?: City[] } | undefined;
+      if (payload && Array.isArray(payload.cities)) return payload.cities;
+      return [] as City[];
     },
-    staleTime: 60 * 60 * 1000, 
+    select: (data) => data ?? [],
+    staleTime: 60 * 60 * 1000, // Cache for 1 hour
     refetchOnWindowFocus: false,
   });
 };

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 
 interface State {
   step: number;
+  cityId: number | null;
   businessName: string;
   businessCategory: string | null;
   address: {
@@ -22,6 +23,7 @@ interface State {
 
 type Action =
   | { type: 'SET_STEP'; payload: number }
+  | { type: 'SET_CITY_ID'; payload: number | null }
   | { type: 'SET_BUSINESS_NAME'; payload: string }
   | {
       type: 'SET_ADDRESS_FIELD';
@@ -36,6 +38,7 @@ type Action =
 
 const initialState: State = {
   step: 1,
+  cityId: null,
   businessName: '',
   businessCategory: null,
   address: { street: '', city: '', state: '', zip: '', country: '' },
@@ -50,6 +53,8 @@ function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'SET_STEP':
       return { ...state, step: action.payload };
+    case 'SET_CITY_ID':
+      return { ...state, cityId: action.payload };
     case 'SET_BUSINESS_NAME':
       return { ...state, businessName: action.payload };
     case 'SET_ADDRESS_FIELD':
