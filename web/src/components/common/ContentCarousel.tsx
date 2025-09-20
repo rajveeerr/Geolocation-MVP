@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from 'react'; // Import useState and useEffect
 import { Link } from 'react-router-dom';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { PremiumV2DealCard } from '@/components/deals/PremiumV2DealCard'; // <-- Import the NEW card
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/common/Button';
@@ -19,6 +20,12 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [dragConstraint, setDragConstraint] = useState(0);
+
+  const scroll = (value: number) => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    viewport.scrollBy({ left: value, behavior: 'smooth' });
+  };
 
   // Measure track and viewport to compute drag constraint
   useEffect(() => {
@@ -52,7 +59,6 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
           <h2 className="text-xl font-bold tracking-tight text-neutral-900 sm:text-2xl">
             {title}
           </h2>
-          {/* Removed arrow buttons — carousel is draggable now */}
           <div className="flex items-center gap-1 sm:gap-2">
             <Link to={PATHS.ALL_DEALS}>
               <Button
@@ -63,6 +69,20 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
                 Show all
               </Button>
             </Link>
+            <button
+              onClick={() => scroll(-360)}
+              className="hidden h-7 w-7 items-center justify-center rounded-full border border-neutral-300 bg-white shadow-sm transition-all hover:bg-neutral-50 hover:shadow-md sm:flex sm:h-8 sm:w-8"
+              aria-label="Scroll left"
+            >
+              <ChevronLeft className="h-3.5 w-3.5 text-neutral-600 sm:h-4 sm:w-4" />
+            </button>
+            <button
+              onClick={() => scroll(360)}
+              className="hidden h-7 w-7 items-center justify-center rounded-full border border-neutral-300 bg-white shadow-sm transition-all hover:bg-neutral-50 hover:shadow-md sm:flex sm:h-8 sm:w-8"
+              aria-label="Scroll right"
+            >
+              <ChevronRight className="h-3.5 w-3.5 text-neutral-600 sm:h-4 sm:w-4" />
+            </button>
           </div>
         </div>
 
