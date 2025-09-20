@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, Mail, Lock, User, Phone, Loader2 } from 'lucide-react';
-import { Helmet } from 'react-helmet-async';
 
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/ui/input';
@@ -55,10 +54,8 @@ export const SignUpPage = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Sign Up | CitySpark</title>
-        <meta name="description" content="Create an account on CitySpark to find local deals and earn rewards by checking in to merchants." />
-      </Helmet>
+      <title>Sign Up | CitySpark</title>
+      <meta name="description" content="Create an account on CitySpark to find local deals and earn rewards by checking in to merchants." />
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-brand-primary-light via-brand-primary-50 to-white px-4 py-24 sm:px-6 lg:px-8">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute bottom-0 left-[4%] top-0 w-0.5 bg-brand-primary-200/40"></div>

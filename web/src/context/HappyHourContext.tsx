@@ -28,6 +28,7 @@ export interface HappyHourState {
   recurringDays: string[];
   selectedMenuItems: SelectedMenuItem[];
   kickbackEnabled: boolean;
+  kickbackPercent?: number | null;
 }
 
 type Action =
@@ -47,6 +48,7 @@ const initialState: HappyHourState = {
   recurringDays: [],
   selectedMenuItems: [],
   kickbackEnabled: false,
+  kickbackPercent: null,
 };
 
 function reducer(state: HappyHourState, action: Action): HappyHourState {

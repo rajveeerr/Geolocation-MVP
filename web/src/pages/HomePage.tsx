@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import { DealFinder } from '@/components/landing/DealFinder';
 import { SectionDivider } from '@/components/common/SectionDivider';
 import { ContentCarousel } from '@/components/common/ContentCarousel';
@@ -47,13 +46,11 @@ export const HomePage = () => {
 
   return (
     <>
-      <Helmet>
-        <title>CitySpark | Live Local Deals, Happy Hours & Events</title>
-        <meta
-          name="description"
-          content="Discover real-time deals, exclusive happy hours, and unique local experiences. CitySpark is your live map to the best moments in your city."
-        />
-      </Helmet>
+      <title>CitySpark | Live Local Deals, Happy Hours & Events</title>
+      <meta
+        name="description"
+        content="Discover real-time deals, exclusive happy hours, and unique local experiences. CitySpark is your live map to the best moments in your city."
+      />
       <div className="bg-white pt-16 sm:pt-20">
       <section className="border-b border-neutral-200 bg-white pb-6 pt-6 sm:pb-8 sm:pt-8 lg:pb-10 lg:pt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

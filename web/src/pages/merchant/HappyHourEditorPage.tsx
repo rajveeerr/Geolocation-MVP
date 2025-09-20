@@ -4,6 +4,7 @@ import { Button } from '@/components/common/Button';
 import { ArrowLeft, Plus } from 'lucide-react';
 import { FormSection } from '@/components/merchant/create-deal/FormSection';
 import { TimeRangePicker } from '@/components/merchant/create-deal/TimeRangePicker';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -28,11 +29,12 @@ export const HappyHourEditorPage = () => {
         title: `Happy Hour - ${state.happyHourType}`,
         description: `Happy Hour - ${state.happyHourType}`,
         dealType: 'HAPPY_HOUR',
-        timeRanges: state.timeRanges.map((tr: any) => ({ day: tr.day ?? 'All', start: tr.start, end: tr.end })),
-        activeStartDate: state.activeStartDate || undefined,
-        activeEndDate: state.activeEndDate || undefined,
-        kickbackEnabled: state.kickbackEnabled,
-        selectedMenuItems: state.selectedMenuItems?.map((i: any) => ({ id: i.id, price: i.price })) || [],
+  timeRanges: state.timeRanges.map((tr: any) => ({ day: tr.day ?? 'All', start: tr.start, end: tr.end })),
+  activeStartDate: state.activeStartDate || undefined,
+  activeEndDate: state.activeEndDate || undefined,
+  kickbackEnabled: state.kickbackEnabled,
+  kickbackPercent: state.kickbackEnabled ? state.kickbackPercent ?? undefined : undefined,
+  selectedMenuItems: state.selectedMenuItems?.map((i: any) => ({ id: i.id, price: i.price })) || [],
       };
 
       const response = await apiPost('/deals', payload);
@@ -102,13 +104,46 @@ export const HappyHourEditorPage = () => {
                 </div>
               </FormSection>
 
-              <FormSection title="Kickback" subtitle="Enable a kickback offer">
-                <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-neutral-100">
-                  <div>
-                    <Label htmlFor="hh-kickback-switch" className="font-semibold">Enable kickback</Label>
-                    <p className="text-sm text-neutral-500 mt-1">Offer a small kickback to customers who redeem this deal.</p>
+              <FormSection title="Kickback" subtitle="Reward users who bring friends">
+                <div className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="hh-kickback-switch" className="font-semibold text-neutral-800">Enable kickback</Label>
+                      <p className="text-sm text-neutral-500 mt-1">Offer a percentage of sales back to customers who referred the paying guests.</p>
+                    </div>
+                    <Switch id="hh-kickback-switch" checked={state.kickbackEnabled} onCheckedChange={(checked: boolean) => dispatch({ type: 'SET_FIELD', field: 'kickbackEnabled', value: checked })} />
                   </div>
-                  <Switch id="hh-kickback-switch" checked={state.kickbackEnabled} onCheckedChange={(checked: boolean) => dispatch({ type: 'SET_FIELD', field: 'kickbackEnabled', value: checked })} />
+
+                  <AnimatePresence>
+                    {state.kickbackEnabled && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="border-t border-neutral-200 pt-4 mt-4">
+                          <Label htmlFor="kickback-percent" className="block font-medium text-neutral-700">Kickback Percentage</Label>
+                          <div className="mt-2 flex items-center gap-2 max-w-xs">
+                            <Input
+                              id="kickback-percent"
+                              type="number"
+                              min={0}
+                              max={100}
+                              step={1}
+                              aria-label="Kickback percentage"
+                              placeholder="5"
+                              value={state.kickbackPercent ?? ''}
+                              onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'kickbackPercent', value: e.target.value === '' ? null : Math.max(0, Math.min(100, parseInt(e.target.value))) })}
+                              className="flex-1"
+                            />
+                            <span className="text-sm text-neutral-500">%</span>
+                          </div>
+                          <p className="mt-2 text-xs text-neutral-500">We recommend keeping kickbacks small (e.g., 3–10%) to maintain margin.</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </FormSection>
             </div>

@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
-import { Helmet } from 'react-helmet-async';
 
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/ui/input';
@@ -35,10 +34,8 @@ export const LoginPage = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Log In | CitySpark</title>
-        <meta name="description" content="Log in to CitySpark to discover local deals and earn points by checking in to offers near you." />
-      </Helmet>
+      <title>Log In | CitySpark</title>
+      <meta name="description" content="Log in to CitySpark to discover local deals and earn points by checking in to offers near you." />
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-brand-primary-light via-brand-primary-50 to-white px-4 py-24 sm:px-6 lg:px-8">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute bottom-0 left-[4%] top-0 w-0.5 bg-brand-primary-200/40"></div>

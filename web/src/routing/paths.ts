@@ -10,6 +10,7 @@ export const PATHS = {
 
   // Merchant paths
   MERCHANT_DASHBOARD: '/merchant/dashboard',
+  MERCHANT_KICKBACKS: '/merchant/kickbacks',
   MERCHANT_ONBOARDING: '/merchant/onboarding',
   MERCHANT_DEALS_CREATE: '/merchant/deals/create',
 

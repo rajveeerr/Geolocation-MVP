@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
-import { HelmetProvider } from 'react-helmet-async';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { SignUpPage } from './pages/SignUpPage';
@@ -49,6 +48,9 @@ const LeaderboardPage = React.lazy(() =>
 const ReferralPage = React.lazy(() =>
   import('./pages/ReferralPage').then((m) => ({ default: m.ReferralPage })),
 );
+const KickbackEarningsPage = React.lazy(() =>
+  import('./pages/merchant/KickbackEarningsPage').then((m) => ({ default: m.KickbackEarningsPage })),
+);
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
 
@@ -67,8 +69,7 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-      <HelmetProvider>
-        <RedirectProvider>
+      <RedirectProvider>
           <AuthProvider>
             <ModalProvider>
             <Routes>
@@ -161,6 +162,19 @@ function App() {
                 }
               />
 
+              <Route
+                path={PATHS.MERCHANT_KICKBACKS}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <KickbackEarningsPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+
               {/* Catch-all route for 404 */}
               <Route path={PATHS.NOT_FOUND} element={<NotFoundPage />} />
             </Routes>
@@ -168,7 +182,6 @@ function App() {
             </ModalProvider>
           </AuthProvider>
         </RedirectProvider>
-      </HelmetProvider>
     </BrowserRouter>
   );
 }

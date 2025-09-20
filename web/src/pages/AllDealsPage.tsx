@@ -29,7 +29,6 @@
 // web/src/pages/AllDealsPage.tsx
 
 import { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet-async';
 import { DealsSidebar } from '@/components/deals/DealsSidebar';
 import { DealResultsMap } from '@/components/deals/DealResultsMap';
 import type { DealWithLocation } from '@/data/deals';
@@ -235,10 +234,8 @@ export const AllDealsPage = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-      </Helmet>
+      <title>{pageTitle}</title>
+      <meta name="description" content={pageDescription} />
   <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-50/50 pt-20">
       <div className="w-full">
         <div className="grid min-h-[calc(100vh-5rem)] grid-cols-1 lg:grid-cols-12">

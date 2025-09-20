@@ -252,6 +252,11 @@ export const MerchantDashboardPage = () => {
                 <p className="mt-2 text-2xl font-extrabold text-neutral-900">{formatCurrency(revenue || 120)}</p>
                 <p className="text-xs text-rose-500 mt-1">- 3% vs yesterday</p>
               </div>
+              <div className="mt-4">
+                <Link to={PATHS.MERCHANT_KICKBACKS}>
+                  <Button size="sm" variant="ghost">View Kickback Earnings</Button>
+                </Link>
+              </div>
             </div>
           </div>
 

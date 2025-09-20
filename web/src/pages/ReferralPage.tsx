@@ -1,5 +1,4 @@
 import { useReferrals } from '@/hooks/useReferrals';
-import { Helmet } from 'react-helmet-async';
 import { ReferralCard } from '@/components/common/ReferralCard';
 import { ReferralCardSkeleton } from '@/components/common/ReferralCardSkeleton';
 
@@ -35,10 +34,8 @@ export const ReferralPage = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Invite Friends, Earn Rewards | CitySpark</title>
-        <meta name="description" content="Share your referral code and earn points when friends join CitySpark." />
-      </Helmet>
+      <title>Invite Friends, Earn Rewards | CitySpark</title>
+      <meta name="description" content="Share your referral code and earn points when friends join CitySpark." />
     <div className="min-h-screen bg-neutral-50 pt-24">
       <div className="container mx-auto max-w-2xl px-4 py-8">
         <div className="mb-10 text-center">

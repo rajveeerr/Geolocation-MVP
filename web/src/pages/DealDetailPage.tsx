@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
 import type { DealWithLocation } from '@/data/deals';
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
-import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/common/Button';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
@@ -124,10 +123,8 @@ export const DealDetailPage = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{`${deal.name} in ${deal.location} | CitySpark`}</title>
-        <meta name="description" content={metaDescription} />
-      </Helmet>
+      <title>{`${deal.name} in ${deal.location} | CitySpark`}</title>
+      <meta name="description" content={metaDescription} />
       <div className="bg-neutral-50">
       <div className="container mx-auto max-w-4xl px-4 py-24">
         {/* Hero Image */}
