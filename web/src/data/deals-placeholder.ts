@@ -7,6 +7,7 @@ export type ApiDeal = {
   title: string;
   description: string;
   imageUrl?: string | null;
+  images?: string[];
   merchant: {
     businessName: string;
     address: string;
@@ -19,6 +20,9 @@ export type ApiDeal = {
   dealType?: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING'; // Backend enum values
   startTime?: string;
   endTime?: string;
+  offerDisplay?: string; // "FREE" | "50% OFF" | etc from backend
+  offerTerms?: string; // fine print
+  claimedBy?: { totalCount: number; visibleUsers: { avatarUrl: string }[] };
   rating?: number;
   price?: '$$' | '$$$' | '$';
   bookingInfo?: string;
@@ -67,6 +71,10 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => ({
   image:
     apiDeal.imageUrl ||
     'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
+  images:
+    apiDeal.images && apiDeal.images.length > 0
+      ? apiDeal.images
+      : [apiDeal.imageUrl || 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80'],
   rating: apiDeal.rating ?? 4.2,
   category: apiDeal.category || 'Restaurant',
 
@@ -94,11 +102,18 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => ({
       : undefined,
 
   // Map discount value for display
-  dealValue: apiDeal.discountPercentage
-    ? `${apiDeal.discountPercentage}% OFF`
-    : apiDeal.discountAmount
-      ? `$${apiDeal.discountAmount} OFF`
-      : undefined,
+  // prefer explicit `offerDisplay` when provided by backend
+  dealValue: apiDeal.offerDisplay
+    ? apiDeal.offerDisplay
+    : apiDeal.discountPercentage
+      ? `${apiDeal.discountPercentage}% OFF`
+      : apiDeal.discountAmount
+        ? `$${apiDeal.discountAmount} OFF`
+        : undefined,
+
+  // new fine-print + social proof passthrough
+  offerTerms: apiDeal.offerTerms,
+  claimedBy: apiDeal.claimedBy,
 
   // Pricing fallbacks: if backend provides discountAmount/percentage try to use it
   originalPrice: 100,

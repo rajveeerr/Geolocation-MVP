@@ -12,6 +12,11 @@ export interface Deal {
   // --- NEW DEAL-SPECIFIC FIELDS ---
   dealType?: 'Discount' | 'Happy Hour' | 'Kickback' | 'Recurring';
   dealValue?: string; // e.g., "50% OFF", "$5 Per Friend"
+  offerTerms?: string; // new fine-print field from backend
+  claimedBy?: {
+    totalCount: number;
+    visibleUsers: { avatarUrl: string }[];
+  };
   originalValue?: number;
   discountValue?: number;
   expiresAt?: string; // ISO String for countdown timer

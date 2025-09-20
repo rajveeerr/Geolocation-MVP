@@ -12,21 +12,24 @@ const placeholderAvatars = [
 
 interface AvatarStackProps {
   count: number;
+  users?: { avatarUrl?: string | null }[];
 }
 
-export const AvatarStack = ({ count }: AvatarStackProps) => {
+export const AvatarStack = ({ count, users }: AvatarStackProps) => {
+  const toRender = users && users.length > 0 ? users : placeholderAvatars.map((src) => ({ avatarUrl: src }));
+
   return (
     <div className="flex items-center">
       <div className="flex -space-x-3">
-        {placeholderAvatars.map((src, index) => (
+        {toRender.map((user, index) => (
           <Avatar key={index} className="h-8 w-8 border-2 border-white">
-            <AvatarImage src={src} />
+            <AvatarImage src={user.avatarUrl || undefined} />
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
         ))}
       </div>
       <span className="ml-3 text-sm font-semibold text-neutral-700">
-        {count} people claimed
+        {count} people tapped in
       </span>
     </div>
   );

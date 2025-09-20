@@ -9,6 +9,7 @@ import { useSavedDeals } from '@/hooks/useSavedDeals';
 import { useAuth } from '@/context/useAuth';
 import { useModal } from '@/context/ModalContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AvatarStack } from '@/components/common/AvatarStack';
 
 // Extended type to include multiple images and other properties
 interface PremiumDeal extends Deal {
@@ -16,6 +17,8 @@ interface PremiumDeal extends Deal {
   subtitle?: string;
   tapInCount?: number;
   priceValue?: number;
+  offerTerms?: string;
+  claimedBy?: { totalCount: number; visibleUsers: { avatarUrl: string }[] };
 }
 
 export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
@@ -150,12 +153,16 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                   <p className="mt-1.5 text-base text-neutral-300">
                     {deal.subtitle || 'Cyber Hub sdfsv sdsd'}
                   </p>
-                  <p className="mt-4 font-semibold text-brand-primary-400">
-                    <span className="text-brand-primary-400">
-                      {deal.tapInCount || 340}
-                    </span>
-                    <span className="text-white"> people claimed</span>
-                  </p>
+                  <div className="mt-4 font-semibold text-brand-primary-400">
+                    {deal.claimedBy && deal.claimedBy.totalCount > 0 ? (
+                      <AvatarStack
+                        count={deal.claimedBy.totalCount}
+                        users={deal.claimedBy.visibleUsers}
+                      />
+                    ) : (
+                      <p className="text-white/80">Be the first to claim</p>
+                    )}
+                  </div>
                 </div>
 
                 {/* Heart Button - Bottom Right */}
