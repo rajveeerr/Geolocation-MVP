@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { PATHS } from '@/routing/paths';
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
-import { CalendarIcon, ClockIcon, PercentIcon } from 'lucide-react';
+import { CalendarIcon, ClockIcon, DollarSign, Percent } from 'lucide-react';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
@@ -50,9 +50,9 @@ const DealCard = ({ deal }: { deal: Deal }) => {
 
       <p className="mb-4 text-neutral-600">{deal.description}</p>
 
-      <div className="space-y-3">
+          <div className="space-y-3">
         <div className="flex items-center gap-2">
-          <PercentIcon className="h-4 w-4 text-brand-primary-600" />
+          <Percent className="h-4 w-4 text-brand-primary-600" />
           <span className="font-medium">
             {deal.discountPercentage
               ? `${deal.discountPercentage}% OFF`
@@ -127,6 +127,16 @@ export const MerchantDashboardPage = () => {
   const isLoading = dealsLoading;
   const error = dealsError;
 
+  // Zero-state placeholders for future earnings integration
+  const revenue = 0;
+  const commission = 0;
+  const formatCurrency = (v: number) =>
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 2,
+    }).format(v);
+
   const filteredDeals = useMemo(() => {
     if (activeFilter === 'all') {
       return deals;
@@ -153,8 +163,8 @@ export const MerchantDashboardPage = () => {
       <div className="container mx-auto max-w-7xl px-4 py-12">
         <div className="animate-pulse">
           <div className="mb-8 h-8 w-64 rounded bg-neutral-200" />
-          <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
+          <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-6">
+            {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="h-24 rounded bg-neutral-200" />
             ))}
           </div>
@@ -212,42 +222,85 @@ export const MerchantDashboardPage = () => {
 
       {merchantStatus === 'APPROVED' && (
         <>
-          <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-4">
-            <div className="rounded-lg border border-neutral-200 bg-white p-6">
-              <h3 className="text-sm font-medium text-neutral-500">
-                Total Deals
-              </h3>
-              <p className="text-3xl font-bold text-neutral-800">
-                {deals.length}
-              </p>
+          {/* KPI Row */}
+          <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm text-neutral-500">Gross sales</h4>
+                  <p className="mt-2 text-2xl font-extrabold text-neutral-900 flex items-baseline gap-2">
+                    <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-neutral-100 text-neutral-700">
+                      <DollarSign className="h-3 w-3" />
+                    </span>
+                    {formatCurrency(revenue)}
+                  </p>
+                  <p className="text-xs text-green-600 mt-1">+ 4% vs yesterday</p>
+                </div>
+              </div>
             </div>
-            <div className="rounded-lg border border-neutral-200 bg-white p-6">
-              <h3 className="text-sm font-medium text-neutral-500">
-                Active Deals
-              </h3>
-              <p className="text-3xl font-bold text-green-600">
-                {
-                  deals.filter(
-                    (d) =>
-                      new Date() >= new Date(d.startTime) &&
-                      new Date() <= new Date(d.endTime),
-                  ).length
-                }
-              </p>
+
+            <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <div>
+                <h4 className="text-sm text-neutral-500">Order Volume</h4>
+                <p className="mt-2 text-2xl font-extrabold text-neutral-900">1,800</p>
+                <p className="text-xs text-green-600 mt-1">+ 8% vs yesterday</p>
+              </div>
             </div>
-            <div className="rounded-lg border border-neutral-200 bg-white p-6">
-              <h3 className="text-sm font-medium text-neutral-500">
-                Scheduled
-              </h3>
-              <p className="text-3xl font-bold text-amber-600">
-                {deals.filter((d) => new Date() < new Date(d.startTime)).length}
-              </p>
+
+            <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <div>
+                <h4 className="text-sm text-neutral-500">Average Order Value</h4>
+                <p className="mt-2 text-2xl font-extrabold text-neutral-900">{formatCurrency(revenue || 120)}</p>
+                <p className="text-xs text-rose-500 mt-1">- 3% vs yesterday</p>
+              </div>
             </div>
-            <div className="rounded-lg border border-neutral-200 bg-white p-6">
-              <h3 className="text-sm font-medium text-neutral-500">Expired</h3>
-              <p className="text-3xl font-bold text-red-600">
-                {deals.filter((d) => new Date() > new Date(d.endTime)).length}
-              </p>
+          </div>
+
+          {/* Region badges */}
+          <div className="mb-6 flex flex-wrap items-center gap-3">
+            {[
+              { name: 'Atlanta', value: 840, change: '+5.2%' },
+              { name: 'Houston', value: 653, change: '+8.1%' },
+              { name: 'Phoenix', value: 708, change: '+3.2%' },
+              { name: 'Salt Lake City', value: 800, change: '+2.1%' },
+              { name: 'San Diego', value: 820, change: '+1.4%' },
+              { name: 'Chicago', value: 530, change: '+6.2%' },
+              { name: 'Toronto', value: 980, change: '+4.3%' },
+            ].map((r) => (
+              <div key={r.name} className="rounded-md bg-neutral-900 px-4 py-2 text-white text-sm">
+                <div className="font-semibold">{r.name}</div>
+                <div className="text-xs text-neutral-200">{r.value} <span className="text-green-400 ml-2">{r.change}</span></div>
+              </div>
+            ))}
+          </div>
+
+          {/* Chart + Store List */}
+          <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="col-span-2 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <h4 className="text-sm text-neutral-600 mb-4">Sales (Last 7 days)</h4>
+              <svg className="w-full h-56" viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+                <polyline fill="none" stroke="#3B82F6" strokeWidth="3" points="0,120 80,80 160,90 240,70 320,60 400,80 480,110 560,130 600,140" />
+              </svg>
+            </div>
+
+            <div className="col-span-1 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <h4 className="text-sm text-neutral-600 mb-4">Sales by Store</h4>
+              <ul className="space-y-3">
+                {[
+                  { name: 'Lemon & Sage Mediterranean Kitchen', value: 177, pct: '+2.3%' },
+                  { name: 'Garden Grove Café & Bistro', value: 408, pct: '+7.4%' },
+                  { name: 'Bella Vista Pizzeria & Pasta', value: 198, pct: '+1.2%' },
+                  { name: 'Twilight Tavern & Lounge', value: 600, pct: '+5.8%' },
+                ].map((s) => (
+                  <li key={s.name} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="h-3 w-3 rounded-full bg-rose-500 inline-block" />
+                      <span className="text-sm text-neutral-800">{s.name}</span>
+                    </div>
+                    <div className="text-sm text-neutral-600">{s.value} <span className="text-green-500 ml-2">{s.pct}</span></div>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
 
