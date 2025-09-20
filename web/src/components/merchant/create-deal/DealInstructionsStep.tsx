@@ -13,7 +13,7 @@ export const DealInstructionsStep = () => {
     <OnboardingStepLayout
       title="How do customers redeem the deal?"
       onNext={() => navigate('/merchant/deals/create/review')}
-      onBack={() => navigate(-1)}
+      onBack={() => navigate('/merchant/deals/create/schedule')}
       isNextDisabled={!state.redemptionInstructions}
       progress={80}
     >

@@ -24,7 +24,7 @@ export const DealScheduleStep = () => {
     <OnboardingStepLayout
       title="When will your deal be available?"
       onNext={() => navigate('/merchant/deals/create/instructions')}
-      onBack={() => navigate(-1)}
+      onBack={() => navigate('/merchant/deals/create/offer')}
       isNextDisabled={!state.startTime || !state.endTime}
       progress={60}
     >

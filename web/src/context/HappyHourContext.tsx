@@ -28,7 +28,11 @@ export interface HappyHourState {
   recurringDays: string[];
   selectedMenuItems: SelectedMenuItem[];
   kickbackEnabled: boolean;
-  kickbackPercent?: number | null;
+  kickbackPercent: number | null; // <-- Make explicit and non-optional
+  // --- Add basic deal info ---
+  title: string;
+  description: string;
+  category: string;
 }
 
 type Action =
@@ -49,6 +53,10 @@ const initialState: HappyHourState = {
   selectedMenuItems: [],
   kickbackEnabled: false,
   kickbackPercent: null,
+  // --- Initialize basic info ---
+  title: '',
+  description: '',
+  category: 'FOOD_AND_BEVERAGE',
 };
 
 function reducer(state: HappyHourState, action: Action): HappyHourState {
@@ -66,7 +74,7 @@ function reducer(state: HappyHourState, action: Action): HappyHourState {
     case 'TOGGLE_RECURRING_DAY': {
       const day = action.payload;
       const newDays = state.recurringDays.includes(day) ? state.recurringDays.filter(d => d !== day) : [...state.recurringDays, day];
-      return { ...state, recurringDays: newDays };
+      return { ...state, recurringDays: newDays, periodType: newDays.length > 0 ? 'Recurring' : 'Single day' };
     }
     default:
       return state;

@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import MenuItemCard from '@/components/common/MenuItemCard';
 
 export const DealEditorPage = () => {
   const navigate = useNavigate();
@@ -86,13 +87,11 @@ export const DealEditorPage = () => {
               {state.selectedMenuItems.length > 0 && (
                   <div className="grid grid-cols-2 gap-4 mt-2">
                       {state.selectedMenuItems.map(item => (
-                          <div key={item.id} className="border rounded-lg p-2 flex items-center gap-2">
-                              <img src={item.imageUrl} className="h-12 w-12 rounded-md object-cover" />
-                              <div>
-                                  <p className="text-sm font-bold">{item.name}</p>
-                                  <p className="text-xs">${item.price.toFixed(2)}</p>
-                              </div>
-                          </div>
+                        <MenuItemCard key={item.id} item={item} isSelected={true} onToggle={() => {
+                          // Remove item when toggled from the editor (mirror AddMenuItemPage behavior)
+                          const newItems = state.selectedMenuItems.filter((s) => s.id !== item.id);
+                          dispatch({ type: 'SET_SELECTED_ITEMS', payload: newItems });
+                        }} compact />
                       ))}
                   </div>
               )}

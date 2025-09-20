@@ -102,7 +102,7 @@ export const DealOfferStep = () => {
     <OnboardingStepLayout
       title="Make it irresistible — choose how customers will save"
       onNext={() => navigate('/merchant/deals/create/schedule')}
-      onBack={() => navigate(-1)}
+      onBack={() => navigate('/merchant/deals/create/basics')}
       isNextDisabled={isNextDisabled}
       progress={40}
     >

@@ -101,7 +101,7 @@ export const DealReviewStep = () => {
     <OnboardingStepLayout
       title="Ready to publish?"
       onNext={handlePublish}
-      onBack={() => navigate(-1)}
+      onBack={() => navigate('/merchant/deals/create/instructions')}
       progress={100}
       nextButtonText="Publish Deal"
       isNextDisabled={isPublishing}
