@@ -138,7 +138,7 @@ router.get('/me', protect, async (req: AuthRequest, res: Response) => {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       // @ts-ignore new field added in migration; prisma generate pending
-      select: { id: true, email: true, name: true, createdAt: true, points: true, referralCode: true }, 
+      select: { id: true, email: true, name: true, createdAt: true, points: true, referralCode: true, role: true }, 
     });
 
     if (!user) {
