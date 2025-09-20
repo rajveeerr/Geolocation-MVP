@@ -26,6 +26,10 @@ export const PATHS = {
   SETTINGS: '/settings',
   LEADERBOARD: '/leaderboard',
 
+  // Admin
+  ADMIN_DASHBOARD: '/admin',
+  ADMIN_MERCHANTS: '/admin/merchants',
+
   DEAL_DETAIL: '/deals/:dealId',
   LOCATION_DETAIL: '/locations/:locationId',
   CATEGORY: '/category/:categoryId',

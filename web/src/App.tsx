@@ -11,6 +11,8 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
 import { MerchantLayout } from './components/layout/MerchantLayout';
+import { AdminLayout } from './components/layout/AdminLayout';
+import { AdminProtectedRoute } from './routing/AdminProtectedRoute';
 import { ProtectedRoute } from './routing/ProtectedRoute';
 import { PATHS } from './routing/paths';
 import { Toaster } from '@/components/ui/toaster';
@@ -40,6 +42,9 @@ const CreateDealPage = React.lazy(() =>
 const DealDetailPage = React.lazy(() =>
   import('./pages/DealDetailPage').then((m) => ({ default: m.DealDetailPage })),
 );
+const AdminDashboardPage = React.lazy(() =>
+  import('./pages/admin/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })),
+);
 const LeaderboardPage = React.lazy(() =>
   import('./pages/LeaderboardPage').then((m) => ({
     default: m.LeaderboardPage,
@@ -54,7 +59,6 @@ const KickbackEarningsPage = React.lazy(() =>
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
 
-// Helper for default layout
 const DefaultLayout = () => (
   <>
     <Header />
@@ -73,7 +77,6 @@ function App() {
           <AuthProvider>
             <ModalProvider>
             <Routes>
-              {/* Public Routes */}
               <Route element={<DefaultLayout />}>
                 <Route path={PATHS.HOME} element={<HomePage />} />
                 <Route path={PATHS.LOGIN} element={<LoginPage />} />
@@ -124,7 +127,6 @@ function App() {
                 <Route path={PATHS.TERMS} element={<TermsPage />} />
               </Route>
 
-              {/* Merchant Protected Routes */}
               <Route
                 path={PATHS.MERCHANT_DASHBOARD}
                 element={
@@ -175,7 +177,31 @@ function App() {
                 }
               />
 
-              {/* Catch-all route for 404 */}
+              <Route
+                path={PATHS.ADMIN_DASHBOARD}
+                element={
+                  <AdminProtectedRoute>
+                    <AdminLayout />
+                  </AdminProtectedRoute>
+                }
+              >
+                <Route
+                  index
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <AdminDashboardPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path={PATHS.ADMIN_MERCHANTS}
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <AdminDashboardPage />
+                    </Suspense>
+                  }
+                />
+              </Route>
               <Route path={PATHS.NOT_FOUND} element={<NotFoundPage />} />
             </Routes>
             <Toaster />

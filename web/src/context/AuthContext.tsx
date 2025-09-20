@@ -5,7 +5,7 @@ import { apiGet, apiPost } from '@/services/api';
 
 import { PATHS } from '@/routing/paths';
 import { useToast } from '@/hooks/use-toast';
-import { useRedirect } from './RedirectContext'; // <-- new
+import { useRedirect } from './RedirectContext';
 import type {
   LoginFormValues,
   SignUpFormValues,
@@ -18,6 +18,7 @@ interface User {
   name: string | null;
   profilePictureUrl?: string | null;
   points?: number;
+  role?: string;
 }
 
 const hasAuthToken = () => !!localStorage.getItem('authToken');
@@ -47,7 +48,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           description: 'Welcome back to CitySpark.',
         });
 
-        // Check for a stored redirect path. If it exists, go there. Otherwise, go home.
         const redirectTo = consumeRedirectPath() || PATHS.HOME;
         navigate(redirectTo, { replace: true });
       } else {

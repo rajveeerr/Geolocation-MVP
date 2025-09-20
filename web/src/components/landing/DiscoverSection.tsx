@@ -1,4 +1,3 @@
-// web/src/components/landing/DiscoverSection.tsx
 import { DiscoveryColumn } from './DiscoveryColumn';
 import { happyHourDeals, topRatedDeals, newDeals } from '@/data/deals';
 import { Zap, Trophy, Sparkles, Clock } from 'lucide-react'; // <-- Import the Clock icon

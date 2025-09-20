@@ -1,6 +1,6 @@
 // src/components/layout/ProfileDropDown.tsx
 import { Link } from 'react-router-dom';
-import { LogOut, User, Settings, LayoutDashboard } from 'lucide-react';
+import { LogOut, User, Settings, LayoutDashboard, Shield } from 'lucide-react'; // <-- Import Shield icon
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,11 +11,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/context/useAuth';
+import { useAdminStatus } from '@/hooks/useAdminStatus'; // <-- 1. Import the admin hook
 import { PATHS } from '@/routing/paths';
 import { cn } from '@/lib/utils'; // Import cn utility
 
 export const ProfileDropDown = ({ isMerchant }: { isMerchant: boolean }) => {
   const { user, logout } = useAuth();
+  const { isAdmin } = useAdminStatus(); // <-- 2. Use the hook to get the admin status
 
   const userInitials = user?.name
     ? user.name
@@ -29,12 +31,12 @@ export const ProfileDropDown = ({ isMerchant }: { isMerchant: boolean }) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-brand-primary-main focus:ring-offset-2">
-          {/* --- MODIFIED: Add conditional ring for merchants --- */}
-          <Avatar
-            className={cn(
-              isMerchant && 'ring-2 ring-brand-primary-500 ring-offset-2',
-            )}
-          >
+          {/* --- NEW: Add a special ring for admins for extra visual distinction --- */}
+          <Avatar className={cn({
+              'ring-2 ring-offset-2': isMerchant || isAdmin,
+              'ring-destructive': isAdmin, // Admin ring is red (destructive color)
+              'ring-brand-primary-500': isMerchant && !isAdmin, // Merchant ring is primary color
+          })}>
             <AvatarImage
               src="https://github.com/shadcn.png"
               alt={user?.name || ''}
@@ -45,13 +47,22 @@ export const ProfileDropDown = ({ isMerchant }: { isMerchant: boolean }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        {/* --- NEW: Add label for merchants --- */}
-        {isMerchant && (
-          <DropdownMenuLabel className="!px-2 !py-0 text-xs font-normal text-brand-primary-600">
-            Merchant Profile
-          </DropdownMenuLabel>
-        )}
+        {isAdmin && <DropdownMenuLabel className="!py-0 !px-2 text-xs font-normal text-destructive">Admin Role</DropdownMenuLabel>}
+        {isMerchant && !isAdmin && <DropdownMenuLabel className="!py-0 !px-2 text-xs font-normal text-brand-primary-600">Merchant Profile</DropdownMenuLabel>}
         <DropdownMenuSeparator />
+
+        {/* --- 3. Conditionally render the Admin Dashboard link --- */}
+        {isAdmin && (
+          <>
+            <DropdownMenuItem asChild>
+              <Link to={PATHS.ADMIN_DASHBOARD}>
+                <Shield className="mr-2 h-4 w-4" />
+                <span>Admin Dashboard</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
 
         {isMerchant && (
           <>
