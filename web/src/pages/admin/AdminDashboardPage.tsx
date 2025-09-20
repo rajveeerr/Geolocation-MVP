@@ -7,6 +7,27 @@ import { Loader2, Building, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useCallback } from 'react';
+
+const MerchantAvatar = ({ src, name }: { src?: string | null; name?: string | null }) => {
+    const [errored, setErrored] = useState(false);
+    const onError = useCallback(() => setErrored(true), []);
+
+    if (!src || errored) {
+        return (
+            <Avatar className="h-14 w-14 rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200">
+                <AvatarFallback>{name?.charAt(0) || 'M'}</AvatarFallback>
+            </Avatar>
+        );
+    }
+
+    return (
+        <Avatar className="h-14 w-14 rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200">
+            <AvatarImage src={src} alt={name || 'Merchant logo'} onError={onError} />
+        </Avatar>
+    );
+};
 
 interface MerchantOwner {
   id: number;
@@ -17,6 +38,8 @@ interface MerchantApplication {
   id: number;
   businessName: string;
   address: string;
+    description?: string | null;
+    logoUrl?: string | null;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   createdAt: string;
   owner: MerchantOwner;
@@ -79,7 +102,7 @@ export const AdminDashboardPage = () => {
 
   return (
     <div>
-        <h1 className="text-3xl font-bold text-neutral-900">Merchant Approval</h1>
+        <h1 className="text-3xl pt-12 font-bold text-neutral-900">Merchant Approval</h1>
         <p className="text-neutral-600 mt-1">Review and manage new merchant applications.</p>
 
         <div className="border-b mt-6">
@@ -98,16 +121,27 @@ export const AdminDashboardPage = () => {
             
             <div className="space-y-4">
                 {data?.map(merchant => (
-                    <div key={merchant.id} className="bg-white border rounded-lg p-4 flex items-center justify-between">
-                        <div>
-                            <p className="font-bold text-lg text-neutral-800 flex items-center gap-2"><Building className="h-5 w-5 text-neutral-400" /> {merchant.businessName}</p>
-                            <p className="text-sm text-neutral-500 flex items-center gap-2 mt-1"><Mail className="h-4 w-4 text-neutral-400" />{merchant.owner.email}</p>
-                            <p className="text-xs text-neutral-400 mt-2">Applied on: {new Date(merchant.createdAt).toLocaleDateString()}</p>
+                    <div key={merchant.id} className="bg-white border rounded-lg p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-start gap-4">
+                            <div className="flex-shrink-0">
+                                <MerchantAvatar src={merchant.logoUrl} name={merchant.businessName} />
+                            </div>
+                            <div className="min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <p className="font-bold text-lg text-neutral-800 flex items-center gap-2 truncate"><Building className="h-5 w-5 text-neutral-400" /> {merchant.businessName}</p>
+                                    {merchant.status === 'APPROVED' && (
+                                        <span className="ml-2 inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 border border-amber-100">Premium</span>
+                                    )}
+                                </div>
+                                <p className="text-sm text-neutral-500 flex items-center gap-2 mt-1 truncate"><Mail className="h-4 w-4 text-neutral-400" />{merchant.owner.email}</p>
+                                {merchant.description && <p className="text-sm text-neutral-600 mt-2 max-w-xl line-clamp-2">{merchant.description}</p>}
+                                <p className="text-xs text-neutral-400 mt-2">Applied on: {new Date(merchant.createdAt).toLocaleDateString()}</p>
+                            </div>
                         </div>
                         {activeTab === 'PENDING' && (
-                            <div className="flex gap-2">
-                                <Button size="sm" className="bg-destructive text-destructive-foreground" onClick={() => setMerchantToReject(merchant)}>Reject</Button>
-                                <Button size="sm" className="bg-status-live text-white" onClick={() => approveMutation.mutate(merchant.id)}>Approve</Button>
+                            <div className="mt-3 sm:mt-0 flex gap-2">
+                                <Button size="sm" className="bg-destructive text-destructive-foreground w-full sm:w-auto" onClick={() => setMerchantToReject(merchant)}>Reject</Button>
+                                <Button size="sm" className="bg-status-live text-white w-full sm:w-auto" onClick={() => approveMutation.mutate(merchant.id)}>Approve</Button>
                             </div>
                         )}
                     </div>
