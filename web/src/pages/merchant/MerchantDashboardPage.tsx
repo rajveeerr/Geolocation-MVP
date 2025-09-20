@@ -129,7 +129,6 @@ export const MerchantDashboardPage = () => {
 
   // Zero-state placeholders for future earnings integration
   const revenue = 0;
-  const commission = 0;
   const formatCurrency = (v: number) =>
     new Intl.NumberFormat('en-US', {
       style: 'currency',

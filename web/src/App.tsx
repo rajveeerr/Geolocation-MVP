@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { SignUpPage } from './pages/SignUpPage';
@@ -66,9 +67,10 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-      <RedirectProvider>
-        <AuthProvider>
-          <ModalProvider>
+      <HelmetProvider>
+        <RedirectProvider>
+          <AuthProvider>
+            <ModalProvider>
             <Routes>
               {/* Public Routes */}
               <Route element={<DefaultLayout />}>
@@ -163,9 +165,10 @@ function App() {
               <Route path={PATHS.NOT_FOUND} element={<NotFoundPage />} />
             </Routes>
             <Toaster />
-          </ModalProvider>
-        </AuthProvider>
-      </RedirectProvider>
+            </ModalProvider>
+          </AuthProvider>
+        </RedirectProvider>
+      </HelmetProvider>
     </BrowserRouter>
   );
 }

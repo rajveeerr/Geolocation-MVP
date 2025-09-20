@@ -29,6 +29,7 @@
 // web/src/pages/AllDealsPage.tsx
 
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { DealsSidebar } from '@/components/deals/DealsSidebar';
 import { DealResultsMap } from '@/components/deals/DealResultsMap';
 import type { DealWithLocation } from '@/data/deals';
@@ -223,8 +224,22 @@ export const AllDealsPage = () => {
     );
   }
 
+  // --- NEW: Dynamic page title and description based on search term ---
+  const pageTitle = searchTerm
+    ? `Search results for "${searchTerm}" | CitySpark`
+    : 'Discover Hot Deals Near You | CitySpark';
+
+  const pageDescription = searchTerm
+    ? `Find the best deals and offers for "${searchTerm}" on CitySpark.`
+    : 'Browse a live map of all the best deals, discounts, and happy hours happening right now in your city.';
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-50/50 pt-20">
+    <>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+      </Helmet>
+  <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-50/50 pt-20">
       <div className="w-full">
         <div className="grid min-h-[calc(100vh-5rem)] grid-cols-1 lg:grid-cols-12">
           {/* Left Column: Pass filter state and setters to the Sidebar */}
@@ -258,5 +273,6 @@ export const AllDealsPage = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };

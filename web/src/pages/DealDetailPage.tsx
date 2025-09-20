@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
 import type { DealWithLocation } from '@/data/deals';
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
+import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/common/Button';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
@@ -114,8 +115,20 @@ export const DealDetailPage = () => {
   const handleSaveClick = () =>
     isSaved ? unsaveDeal(deal.id) : saveDeal(deal.id);
 
+  // --- NEW: Dynamic meta tags using deal data ---
+  const metaDescription = deal.description
+    ? deal.description.length > 155
+      ? `${deal.description.substring(0, 152)}...`
+      : deal.description
+    : 'Discover this deal on CitySpark.';
+
   return (
-    <div className="bg-neutral-50">
+    <>
+      <Helmet>
+        <title>{`${deal.name} in ${deal.location} | CitySpark`}</title>
+        <meta name="description" content={metaDescription} />
+      </Helmet>
+      <div className="bg-neutral-50">
       <div className="container mx-auto max-w-4xl px-4 py-24">
         {/* Hero Image */}
         <div className="h-80 w-full overflow-hidden rounded-2xl bg-neutral-200 shadow-lg">
@@ -226,5 +239,6 @@ export const DealDetailPage = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
