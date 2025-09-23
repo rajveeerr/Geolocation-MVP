@@ -19,6 +19,9 @@ dotenv.config();
 
 const app: Express = express();
 
+// Trust proxy for accurate client IP detection (required for rate limiting behind load balancers)
+app.set('trust proxy', 1);
+
 app.use(cors());
 app.use(express.json());
 app.use(helmet());
