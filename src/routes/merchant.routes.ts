@@ -409,6 +409,148 @@ router.get('/merchants/deals', protect, isApprovedMerchant, async (req: AuthRequ
 
 export default router;
 
+// --- Endpoint: GET /api/merchants/me/menu ---
+// Returns menu items for the authenticated approved merchant.
+// Response: { menuItems: [ { id, name, price, category, imageUrl } ] }
+router.get('/merchants/me/menu', protect, isApprovedMerchant, async (req: AuthRequest, res) => {
+  try {
+    const merchantId = req.merchant?.id;
+    if (!merchantId) return res.status(401).json({ error: 'Merchant authentication required' });
+
+    // @ts-ignore - MenuItem available post generate
+    const menuItems = await prisma.menuItem.findMany({
+      where: { merchantId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        category: true,
+        imageUrl: true,
+      }
+    });
+    res.status(200).json({ menuItems });
+  } catch (e) {
+    console.error('Fetch menu items failed', e);
+    res.status(500).json({ error: 'Failed to fetch menu items' });
+  }
+});
+
+// --- Endpoint: POST /api/merchants/me/menu/item ---
+// Create a new menu item for the approved merchant
+router.post('/merchants/me/menu/item', protect, isApprovedMerchant, async (req: AuthRequest, res) => {
+  try {
+    const merchantId = req.merchant?.id;
+    if (!merchantId) return res.status(401).json({ error: 'Merchant authentication required' });
+
+    const { name, price, category, description, imageUrl } = req.body || {};
+
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      return res.status(400).json({ error: 'name is required' });
+    }
+    if (price === undefined || price === null || isNaN(Number(price)) || Number(price) <= 0) {
+      return res.status(400).json({ error: 'price must be a positive number' });
+    }
+    if (!category || typeof category !== 'string' || category.trim().length === 0) {
+      return res.status(400).json({ error: 'category is required' });
+    }
+
+    // @ts-ignore
+    const created = await prisma.menuItem.create({
+      data: {
+        merchantId,
+        name: name.trim(),
+        price: Number(price),
+        category: category.trim(),
+        description: description ? String(description).trim() : null,
+        imageUrl: imageUrl ? String(imageUrl).trim() : null,
+      },
+      select: { id: true, name: true, price: true, category: true, imageUrl: true, description: true }
+    });
+    res.status(201).json({ menuItem: created });
+  } catch (e) {
+    console.error('Create menu item failed', e);
+    res.status(500).json({ error: 'Failed to create menu item' });
+  }
+});
+
+// --- Endpoint: PUT /api/merchants/me/menu/item/:itemId ---
+// Update an existing menu item (must belong to merchant)
+router.put('/merchants/me/menu/item/:itemId', protect, isApprovedMerchant, async (req: AuthRequest, res) => {
+  try {
+    const merchantId = req.merchant?.id;
+    if (!merchantId) return res.status(401).json({ error: 'Merchant authentication required' });
+    const itemId = Number(req.params.itemId);
+    if (!Number.isFinite(itemId)) return res.status(400).json({ error: 'Invalid itemId' });
+
+    // @ts-ignore
+    const existing = await prisma.menuItem.findUnique({ where: { id: itemId }, select: { id: true, merchantId: true } });
+    if (!existing || existing.merchantId !== merchantId) {
+      return res.status(404).json({ error: 'Menu item not found' });
+    }
+
+    const { name, price, category, description, imageUrl } = req.body || {};
+    const data: any = {};
+    if (name !== undefined) {
+      if (!name || typeof name !== 'string' || name.trim().length === 0) return res.status(400).json({ error: 'name cannot be empty' });
+      data.name = name.trim();
+    }
+    if (price !== undefined) {
+      if (price === null || isNaN(Number(price)) || Number(price) <= 0) return res.status(400).json({ error: 'price must be a positive number' });
+      data.price = Number(price);
+    }
+    if (category !== undefined) {
+      if (!category || typeof category !== 'string' || category.trim().length === 0) return res.status(400).json({ error: 'category cannot be empty' });
+      data.category = category.trim();
+    }
+    if (description !== undefined) {
+      data.description = description ? String(description).trim() : null;
+    }
+    if (imageUrl !== undefined) {
+      data.imageUrl = imageUrl ? String(imageUrl).trim() : null;
+    }
+
+    if (Object.keys(data).length === 0) {
+      return res.status(400).json({ error: 'No valid fields provided for update' });
+    }
+
+    // @ts-ignore
+    const updated = await prisma.menuItem.update({
+      where: { id: itemId },
+      data,
+      select: { id: true, name: true, price: true, category: true, imageUrl: true, description: true }
+    });
+    res.status(200).json({ menuItem: updated });
+  } catch (e) {
+    console.error('Update menu item failed', e);
+    res.status(500).json({ error: 'Failed to update menu item' });
+  }
+});
+
+// --- Endpoint: DELETE /api/merchants/me/menu/item/:itemId ---
+// Permanently deletes a menu item (consider soft delete later)
+router.delete('/merchants/me/menu/item/:itemId', protect, isApprovedMerchant, async (req: AuthRequest, res) => {
+  try {
+    const merchantId = req.merchant?.id;
+    if (!merchantId) return res.status(401).json({ error: 'Merchant authentication required' });
+    const itemId = Number(req.params.itemId);
+    if (!Number.isFinite(itemId)) return res.status(400).json({ error: 'Invalid itemId' });
+
+    // @ts-ignore
+    const existing = await prisma.menuItem.findUnique({ where: { id: itemId }, select: { id: true, merchantId: true } });
+    if (!existing || existing.merchantId !== merchantId) {
+      return res.status(404).json({ error: 'Menu item not found' });
+    }
+
+    // @ts-ignore
+    await prisma.menuItem.delete({ where: { id: itemId } });
+    res.status(200).json({ message: 'Menu item deleted' });
+  } catch (e) {
+    console.error('Delete menu item failed', e);
+    res.status(500).json({ error: 'Failed to delete menu item' });
+  }
+});
+
 // --- Endpoint: GET /api/merchants/stores ---
 // List stores for the authenticated approved merchant
 router.get('/merchants/stores', protect, isApprovedMerchant, async (req: AuthRequest, res) => {

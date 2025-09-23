@@ -92,17 +92,41 @@ Response:
 }
 ```
 
+### Whitelisted Cities (Public)
+
+`GET /api/cities/whitelist`
+
+Returns only the names of active cities (whitelisted for merchant onboarding) sorted alphabetically. Used by the front end to gate merchant sign-up flows.
+
+Response:
+
+```json
+{
+  "cities": [
+    "Atlanta",
+    "Dallas",
+    "New York City"
+  ]
+}
+```
+
 ### Toggle City Active (Admin)
+
 `POST /api/cities/toggle`
+
 Body:
+
 ```json
 { "cityId": 12, "active": false }
 ```
 Requires admin auth (middleware `requireAdmin`).
 
 ### List Stores in a City
+
 `GET /api/cities/:cityId/stores`
+
 Query:
+
 - `includeInactive=true` (optional) – include inactive stores.
 
 Returns only stores whose merchants are `APPROVED`.
@@ -198,15 +222,19 @@ You encountered a failing migration due to an already existing unique index (`Us
 4. Temporary workaround (already added): manual table creation via `scripts/manual-create-city-store.ts` then run the seed. This bypasses the migration history; fix properly before production deploy.
 
 ### Recommended Path Forward
+
 - Investigate current constraints:
+
   ```sql
   SELECT indexname FROM pg_indexes WHERE tablename='User';
   ALTER TABLE "User" ADD CONSTRAINT "User_referralCode_key" UNIQUE ("referralCode"); -- only if missing
   ```
+
 - Adjust migration SQL to skip creating what already exists (edit the specific migration file) or drop the duplicate first.
 - After fixing drift, run `npx prisma migrate dev` again.
 
 ## Backward Compatibility Strategy
+
 | Aspect | Current | Future Plan |
 |--------|---------|-------------|
 | `Merchant.city` | Optional string | Deprecate after front-end fully uses cities & stores |
@@ -214,6 +242,7 @@ You encountered a failing migration due to an already existing unique index (`Us
 | Deals query | Merchant->Store->City (filter) | Add direct `cityId` index if performance needed |
 
 ## Performance Considerations
+
 - Indexes provided: `(active, name)` on City, `(active, cityId)` on Store for fast active-city lookups and deal filtering.
 - If deal volume grows, consider a materialized view that maps dealId -> cityIds for faster filtering.
 

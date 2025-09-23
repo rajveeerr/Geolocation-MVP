@@ -116,7 +116,10 @@ router.post('/save-deal', protect, async (req: AuthRequest, res: Response) => {
           id: savedDeal.deal.id,
           title: savedDeal.deal.title,
           description: savedDeal.deal.description,
-          imageUrl: savedDeal.deal.imageUrl,
+          // imageUrl deprecated: schema now uses imageUrls (string[])
+          imageUrls: savedDeal.deal.imageUrls,
+          // Provide first image for backward compatibility with older clients expecting `imageUrl`
+          imageUrl: savedDeal.deal.imageUrls?.[0] || null,
           discountPercentage: savedDeal.deal.discountPercentage,
           discountAmount: savedDeal.deal.discountAmount,
           category: savedDeal.deal.category,
@@ -363,7 +366,8 @@ router.get('/saved-deals', protect, async (req: AuthRequest, res: Response) => {
           id: savedDeal.deal.id,
           title: savedDeal.deal.title,
           description: savedDeal.deal.description,
-          imageUrl: savedDeal.deal.imageUrl,
+          imageUrls: savedDeal.deal.imageUrls,
+          imageUrl: savedDeal.deal.imageUrls?.[0] || null,
           discountPercentage: savedDeal.deal.discountPercentage,
           discountAmount: savedDeal.deal.discountAmount,
           category: savedDeal.deal.category,

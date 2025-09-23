@@ -82,3 +82,20 @@ router.get('/cities/:cityId/stores', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch stores' });
   }
 });
+
+// GET /api/cities/whitelist
+// Public: returns list of active city names only, ordered alphabetically
+router.get('/cities/whitelist', async (_req, res) => {
+  try {
+    // @ts-ignore - available after Prisma generate
+    const cities = await prisma.city.findMany({
+      where: { active: true },
+      select: { name: true },
+      orderBy: { name: 'asc' }
+    });
+    res.status(200).json({ cities: cities.map(c => c.name) });
+  } catch (e) {
+    console.error('Cities whitelist failed', e);
+    res.status(500).json({ error: 'Failed to fetch whitelisted cities' });
+  }
+});

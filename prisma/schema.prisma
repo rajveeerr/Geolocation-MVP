@@ -118,6 +118,9 @@ model Merchant {
 
   // A Merchant can have multiple physical stores/locations
   stores        Store[]
+
+  // A Merchant can have many menu items (for Happy Hour / detailed deals)
+  menuItems     MenuItem[]
 }
 
 model Deal {
@@ -252,4 +255,23 @@ model Store {
   @@index([merchantId])
   @@index([cityId])
   @@index([active, cityId])
+}
+
+// --- MENU ITEMS ---
+// Individual menu entries a merchant can attach to Happy Hour or other deal types.
+// NOTE: Using Float for price per initial spec; consider switching to Decimal for currency accuracy later.
+model MenuItem {
+  id          Int       @id @default(autoincrement())
+  merchantId  Int
+  name        String
+  description String?
+  price       Float     // Consider Decimal for money values
+  category    String
+  imageUrl    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  merchant    Merchant  @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@index([merchantId])
 }
