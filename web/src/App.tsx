@@ -20,7 +20,7 @@ import { AuthProvider } from './context/AuthContext';
 import { RedirectProvider } from './context/RedirectContext';
 import { ModalProvider } from './context/ModalContext';
 import { AllDealsPage } from './pages/AllDealsPage';
-// Lazy-load less-frequently-used pages to split bundles
+
 const ProfilePage = React.lazy(() =>
   import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage })),
 );

@@ -5,23 +5,31 @@ import { OnboardingStepLayout } from './OnboardingStepLayout';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useWhitelistedCities } from '@/hooks/useWhitelistedCities';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { apiPost } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 import { PATHS } from '@/routing/paths';
 
-async function reverseGeocode(coords: { lat: number; lng: number }): Promise<Partial<any> | null> {
+type AddressDetails = {
+  street?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  country?: string;
+};
+
+async function reverseGeocode(coords: { lat: number; lng: number }): Promise<Partial<AddressDetails> | null> {
     try {
         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.lat}&lon=${coords.lng}`);
         const data = await res.json();
-        if (data && data.address) {
-            return {
-                street: `${data.address.house_number || ''} ${data.address.road || ''}`.trim(),
-                city: data.address.city || data.address.town || data.address.village || '',
-                state: data.address.state || '',
-                zip: data.address.postcode || '',
-                country: data.address.country || '',
-            };
+    if (data && data.address) {
+      return {
+        street: `${data.address.house_number || ''} ${data.address.road || ''}`.trim(),
+        city: data.address.city || data.address.town || data.address.village || '',
+        state: data.address.state || '',
+        zip: data.address.postcode || '',
+        country: data.address.country || '',
+      } as Partial<AddressDetails>;
         }
         return null;
     } catch (error) {
@@ -114,12 +122,14 @@ export const FinalReviewStep = () => {
     }
   };
 
+  const cityFilled = !!state.address.city && state.address.city.trim().length > 0;
+
   return (
     <OnboardingStepLayout
       title="Confirm your address"
       onNext={handleFinalSubmit}
       onBack={() => dispatch({ type: 'SET_STEP', payload: state.step - 1 })}
-      isNextDisabled={isCityWhitelisted === false || isCityWhitelisted === null || isSubmitting}
+      isNextDisabled={isSubmitting || !cityFilled || isCityWhitelisted === false || isCityWhitelisted === null}
       isLoading={isSubmitting}
       progress={100}
       nextButtonText={isSubmitting ? 'Submitting...' : 'Finish & Submit'}
@@ -144,18 +154,24 @@ export const FinalReviewStep = () => {
           </div>
         </div>
       </div>
-      {isCityWhitelisted === true && (
-          <div className="mt-4 flex items-center gap-3 rounded-lg bg-green-50 p-4 text-green-800 border border-green-200">
-              <CheckCircle className="h-6 w-6" />
-              <p className="font-semibold">Great! Your city is supported.</p>
-          </div>
+      {cityFilled && isCityWhitelisted === true && (
+      <div className="mt-4 flex items-center gap-3 rounded-lg bg-green-50 p-4 text-green-800 border border-green-200">
+        <CheckCircle className="h-6 w-6" />
+        <p className="font-semibold">Great! Your city is supported.</p>
+      </div>
+    )}
+      {cityFilled && isCityWhitelisted === null && (
+        <div className="mt-4 flex items-center gap-3 rounded-lg bg-blue-50 p-4 text-blue-800 border border-blue-200">
+          <Loader2 className="h-5 w-5 animate-spin" />
+          <p className="font-medium">Checking city availability...</p>
+        </div>
       )}
-      {isCityWhitelisted === false && (
-          <div className="mt-4 flex items-center gap-3 rounded-lg bg-amber-50 p-4 text-amber-800 border border-amber-200">
-              <XCircle className="h-6 w-6" />
-              <p className="font-semibold">We're not in your city yet, but we're expanding soon!</p>
-          </div>
-      )}
+    {cityFilled && isCityWhitelisted === false && (
+      <div className="mt-4 flex items-center gap-3 rounded-lg bg-amber-50 p-4 text-amber-800 border border-amber-200">
+        <XCircle className="h-6 w-6" />
+        <p className="font-semibold">We're not in your city yet, but we're expanding soon!</p>
+      </div>
+    )}
     </OnboardingStepLayout>
   );
 };

@@ -61,10 +61,34 @@ export const MapAddressStep = () => {
     
     toast({ title: "Location Pinned!", description: suggestion.display_name });
   };
+
+  useEffect(() => {
+    const lat = state.coordinates.lat;
+    const lng = state.coordinates.lng;
+    if (lat === null || lng === null) return;
+
+    let cancelled = false;
+    const fetchAddress = async () => {
+      try {
+        const addressDetails = await reverseGeocodeCoordinates({ lat, lng });
+        if (!cancelled && addressDetails) {
+          dispatch({ type: 'SET_FULL_ADDRESS', payload: addressDetails });
+        }
+      } catch (err) {
+        console.error('Reverse geocode failed for map coordinates', err);
+      }
+    };
+
+    const id = setTimeout(fetchAddress, 300);
+    return () => {
+      cancelled = true;
+      clearTimeout(id);
+    };
+  }, [state.coordinates.lat, state.coordinates.lng, dispatch]);
   
   const initialCenter = (state.coordinates.lat !== null && state.coordinates.lng !== null)
     ? { lat: state.coordinates.lat, lng: state.coordinates.lng }
-    : { lat: 40.7128, lng: -74.0060 }; // Default to NYC
+    : { lat: 40.7128, lng: -74.0060 };
 
   return (
     <OnboardingStepLayout
@@ -75,10 +99,9 @@ export const MapAddressStep = () => {
       progress={80}
     >
       <div className="relative">
-        {/* --- NEW: Search Input & Dropdown --- */}
-        <div className="relative mb-4 z-10">
+        <div className="relative mb-4 z-50">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400 z-50" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -89,7 +112,7 @@ export const MapAddressStep = () => {
           </div>
 
           {suggestions.length > 0 && (
-            <div className="absolute top-full mt-2 w-full bg-white border rounded-lg shadow-lg">
+            <div className="absolute top-full mt-2 w-full bg-white border rounded-lg shadow-lg z-50">
               {suggestions.map(suggestion => (
                 <button
                   key={suggestion.place_id}
