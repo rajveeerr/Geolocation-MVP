@@ -33,7 +33,7 @@ export const DiscoverSection = () => {
             deals={topRatedDeals}
           />
           <DiscoveryColumn
-            title="New On CitySpark"
+            title="New On Yohop"
             icon={<Sparkles className="h-6 w-6 text-brand-primary-600" />}
             deals={newDeals}
           />

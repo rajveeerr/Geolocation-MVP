@@ -79,7 +79,7 @@ export const ProfilePage = () => {
           </Avatar>
           <div className="text-center sm:text-left">
             <h1 className="text-3xl font-bold text-neutral-900">
-              {user?.name || 'CitySpark User'}
+              {user?.name || 'Yohop User'}
             </h1>
             <p className="mt-1 text-neutral-600">{user?.email}</p>
 

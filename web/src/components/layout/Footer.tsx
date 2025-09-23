@@ -122,7 +122,7 @@
 //         <div className="flex flex-col items-center justify-between border-t border-neutral-border pt-8 sm:flex-row">
 //           <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 sm:mb-0">
 //             <span className="text-center text-sm text-neutral-text-secondary sm:text-left">
-//               © {new Date().getFullYear()} CitySpark All rights reserved
+//               © {new Date().getFullYear()} Yohop All rights reserved
 //             </span>
 //             <span className="hidden text-neutral-border sm:inline">·</span>
 //             <Link
@@ -213,7 +213,7 @@ export const Footer = () => {
                 href="#"
                 className="text-white transition-colors hover:text-red-400"
               >
-                @CitySparkApp
+                @YohopApp
               </a>
             </p>
           </div>
@@ -230,7 +230,7 @@ export const Footer = () => {
             </p>
             <div className="text-center">
               <p>+1 (234) 567-890</p>
-              <p>hello@cityspark.app</p>
+              <p>hello@Yohop.app</p>
               <p>123 Spark Avenue, New York</p>
             </div>
             <div className="mt-6 flex justify-center gap-5">
@@ -271,7 +271,7 @@ export const Footer = () => {
       <div className="border-t border-neutral-700">
         <div className="container mx-auto px-6 py-4">
           <p className="text-center text-sm text-neutral-500">
-            © {new Date().getFullYear()} CitySpark. All Rights Reserved.
+            © {new Date().getFullYear()} Yohop. All Rights Reserved.
           </p>
         </div>
       </div>

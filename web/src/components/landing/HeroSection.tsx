@@ -18,7 +18,7 @@
 //         <div className="mx-auto max-w-4xl">
 //           <DynamicHeadline />
 //           <p className="mx-auto mt-6 max-w-2xl px-4 text-lg leading-relaxed text-neutral-text-primary sm:mt-8 sm:px-0 sm:text-xl">
-//             Stop scrolling endless review sites. CitySpark shows you a live map
+//             Stop scrolling endless review sites. Yohop shows you a live map
 //             of exclusive deals and happy hours from top-rated local spots, ready
 //             for you right now.
 //           </p>

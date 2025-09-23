@@ -289,7 +289,7 @@ export const Header = () => {
               <Button variant="secondary" size="md" className="rounded-full">
                 {hasMerchantProfile
                   ? 'Business Dashboard'
-                  : 'CitySpark for Business'}
+                  : 'Yohop for Business'}
               </Button>
             </Link>
             {isLoadingUser ? (

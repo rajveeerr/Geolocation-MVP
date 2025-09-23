@@ -42,8 +42,8 @@ export const LeaderboardPage = () => {
 
   return (
     <>
-      <title>This Month's Leaderboard | CitySpark</title>
-      <meta name="description" content="See who topped the leaderboard this month by checking in to deals and earning points on CitySpark." />
+      <title>This Month's Leaderboard | Yohop</title>
+      <meta name="description" content="See who topped the leaderboard this month by checking in to deals and earning points on Yohop." />
     <div className="min-h-screen bg-neutral-50 pt-24">
       <div className="container mx-auto max-w-2xl px-4 py-8">
         <div className="mb-12 text-center">

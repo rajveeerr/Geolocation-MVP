@@ -225,11 +225,11 @@ export const AllDealsPage = () => {
 
   // --- NEW: Dynamic page title and description based on search term ---
   const pageTitle = searchTerm
-    ? `Search results for "${searchTerm}" | CitySpark`
-    : 'Discover Hot Deals Near You | CitySpark';
+    ? `Search results for "${searchTerm}" | Yohop`
+    : 'Discover Hot Deals Near You | Yohop';
 
   const pageDescription = searchTerm
-    ? `Find the best deals and offers for "${searchTerm}" on CitySpark.`
+    ? `Find the best deals and offers for "${searchTerm}" on Yohop.`
     : 'Browse a live map of all the best deals, discounts, and happy hours happening right now in your city.';
 
   return (

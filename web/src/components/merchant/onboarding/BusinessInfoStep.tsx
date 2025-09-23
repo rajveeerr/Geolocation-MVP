@@ -23,7 +23,7 @@ export const BusinessInfoStep = () => {
             Business Name
           </Label>
           <p className="mb-2 text-neutral-500">
-            This will be your public name on CitySpark.
+            This will be your public name on Yohop.
           </p>
           <Input
             id="businessName"

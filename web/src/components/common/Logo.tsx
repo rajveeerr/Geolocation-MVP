@@ -28,7 +28,7 @@ export const Logo = () => {
           </div>
         </div>
         <span className="text-neutral-text-primary text-xl font-semibold tracking-tight transition-colors duration-300">
-          CitySpark
+          Yohop
         </span>
       </div>
     </Link>

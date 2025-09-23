@@ -109,7 +109,7 @@ export const DealReviewStep = () => {
       <div className="space-y-4">
         <p className="text-neutral-600">
           Review the details of your deal below. Once you publish, it will be
-          visible to all CitySpark users.
+          visible to all Yohop users.
         </p>
         <div className="rounded-lg border bg-white p-4">
           <ReviewItem label="Title" value={state.title} />

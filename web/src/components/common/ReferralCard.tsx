@@ -24,8 +24,8 @@ export const ReferralCard = ({ code, count }: ReferralCardProps) => {
     if (navigator.share) {
       navigator
         .share({
-          title: 'Join me on CitySpark!',
-          text: `Find the best local deals on CitySpark. Use my code ${code} when you sign up!`,
+          title: 'Join me on Yohop!',
+          text: `Find the best local deals on Yohop. Use my code ${code} when you sign up!`,
           url: referralLink,
         })
         .catch(console.error);

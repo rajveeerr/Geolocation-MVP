@@ -46,10 +46,10 @@ export const HomePage = () => {
 
   return (
     <>
-      <title>CitySpark | Live Local Deals, Happy Hours & Events</title>
+      <title>Yohop | Live Local Deals, Happy Hours & Events</title>
       <meta
         name="description"
-        content="Discover real-time deals, exclusive happy hours, and unique local experiences. CitySpark is your live map to the best moments in your city."
+        content="Discover real-time deals, exclusive happy hours, and unique local experiences. Yohop is your live map to the best moments in your city."
       />
       <div className="bg-white pt-16 sm:pt-20">
       <section className="border-b border-neutral-200 bg-white pb-6 pt-6 sm:pb-8 sm:pt-8 lg:pb-10 lg:pt-12">

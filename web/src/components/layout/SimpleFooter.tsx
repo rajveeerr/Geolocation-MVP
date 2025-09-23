@@ -33,7 +33,7 @@ export const SimpleFooter = () => {
           </p>
           <div className="mb-6 text-center">
             <p>+1 (234) 567-890</p>
-            <p>hello@cityspark.app</p>
+            <p>hello@Yohop.app</p>
             <p>123 Spark Avenue, New York</p>
           </div>
           <div className="flex justify-center gap-5">
@@ -53,7 +53,7 @@ export const SimpleFooter = () => {
       <div className="border-t border-neutral-700">
         <div className="container mx-auto px-6 py-4">
           <p className="text-center text-sm text-neutral-500">
-            © {new Date().getFullYear()} CitySpark. All Rights Reserved.
+            © {new Date().getFullYear()} Yohop. All Rights Reserved.
           </p>
         </div>
       </div>

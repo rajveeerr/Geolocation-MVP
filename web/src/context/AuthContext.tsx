@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         queryClient.invalidateQueries({ queryKey: ['user'] });
         toast({
           title: 'Login Successful!',
-          description: 'Welcome back to CitySpark.',
+          description: 'Welcome back to Yohop.',
         });
 
         const redirectTo = consumeRedirectPath() || PATHS.HOME;

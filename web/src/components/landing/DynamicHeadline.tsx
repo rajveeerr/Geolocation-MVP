@@ -14,7 +14,7 @@ export const DynamicHeadline = () => {
 
   return (
     <h1 className="text-neutral-text-primary text-4xl font-semibold leading-tight tracking-tight sm:text-5xl md:text-6xl">
-      CitySpark gets you exclusive local{' '}
+      Yohop gets you exclusive local{' '}
       <span className="text-neutral-text-primary mt-2 inline-flex flex-wrap items-center justify-center gap-2 transition-all duration-500 ease-in-out sm:gap-3">
         <span className="flex items-center justify-center gap-2 sm:gap-3">
           <svg

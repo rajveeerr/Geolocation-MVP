@@ -119,11 +119,11 @@ export const DealDetailPage = () => {
     ? deal.description.length > 155
       ? `${deal.description.substring(0, 152)}...`
       : deal.description
-    : 'Discover this deal on CitySpark.';
+    : 'Discover this deal on Yohop.';
 
   return (
     <>
-      <title>{`${deal.name} in ${deal.location} | CitySpark`}</title>
+      <title>{`${deal.name} in ${deal.location} | Yohop`}</title>
       <meta name="description" content={metaDescription} />
       <div className="bg-neutral-50">
       <div className="container mx-auto max-w-4xl px-4 py-24">

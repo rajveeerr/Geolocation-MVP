@@ -4,7 +4,7 @@ export const TermsPage = () => {
       <h1 className="text-h1 mb-8 text-center">Terms of Service</h1>
       <div className="prose prose-lg mx-auto">
         <p className="text-neutral-text-secondary text-lg">
-          Please read these terms carefully before using CitySpark.
+          Please read these terms carefully before using Yohop.
         </p>
         <p>Coming soon - our complete terms of service.</p>
       </div>

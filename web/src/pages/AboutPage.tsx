@@ -1,10 +1,10 @@
 export const AboutPage = () => {
   return (
     <div className="container mx-auto min-h-screen max-w-4xl px-4 py-16">
-      <h1 className="text-h1 mb-8 text-center">About CitySpark</h1>
+      <h1 className="text-h1 mb-8 text-center">About Yohop</h1>
       <div className="prose prose-lg mx-auto">
         <p className="text-neutral-text-secondary text-lg">
-          CitySpark is revolutionizing how you discover local experiences. We
+          Yohop is revolutionizing how you discover local experiences. We
           connect you with real-time deals and experiences from the best local
           businesses in your city.
         </p>

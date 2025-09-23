@@ -32,7 +32,7 @@ export const DealResultsList = ({
           All Results
         </Button>
         <h2 className="text-3xl font-bold text-neutral-800">
-          New on CitySpark
+          New on Yohop
         </h2>
         <p className="mt-2 text-neutral-600">
           These deals just dropped. Be the first to check them out!
