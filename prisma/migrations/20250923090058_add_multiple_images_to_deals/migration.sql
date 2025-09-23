@@ -1,0 +1,3 @@
+-- Placeholder migration to satisfy Prisma migration engine.
+-- The intended schema change (adding imageUrls to Deal) will be applied in the next migration.
+-- This file is intentionally left blank.

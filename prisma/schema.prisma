@@ -124,7 +124,8 @@ model Deal {
   id            Int      @id @default(autoincrement())
   title         String
   description   String
-  imageUrl      String?
+  imageUrls     String[] // Array of Cloudinary URLs for multiple images
+
 
   // Basic deal parameters (can be expanded later)
   discountPercentage Int?

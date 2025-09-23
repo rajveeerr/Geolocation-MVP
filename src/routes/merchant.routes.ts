@@ -2,6 +2,9 @@
 import { Router } from 'express';
 import { protect, isApprovedMerchant, AuthRequest } from '../middleware/auth.middleware';
 import prisma from '../lib/prisma';
+import { upload, uploadToCloudinary } from '../lib/cloudinary';
+import { slugify } from '../lib/slugify';
+
 
 const router = Router();
 
@@ -160,13 +163,18 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
       discountAmount,
       category,
       dealType: rawDealType,
-      recurringDays: rawRecurringDays
+      recurringDays: rawRecurringDays,
+      imageUrls 
     } = req.body;
     const merchantId = req.merchant?.id; // from middleware
 
     // Basic required fields
     if (!title || !description || !startTime || !endTime) {
       return res.status(400).json({ error: 'Title, description, startTime, endTime are required.' });
+    }
+
+    if (imageUrls && (!Array.isArray(imageUrls) || imageUrls.some(url => typeof url !== 'string'))) {
+        return res.status(400).json({ error: 'imageUrls must be an array of strings.' });
     }
 
     // Normalize deal type (allow human friendly input like "Happy Hour", case-insensitive)
@@ -242,6 +250,7 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
         startTime: new Date(startTime),
         endTime: new Date(endTime),
         redemptionInstructions,
+        imageUrls: imageUrls || [],
         discountPercentage: discountPercentage ? parseInt(discountPercentage, 10) : null,
         discountAmount: discountAmount ? parseFloat(discountAmount) : null,
         category: category || 'OTHER',
@@ -454,4 +463,47 @@ router.post('/merchants/stores', protect, isApprovedMerchant, async (req: AuthRe
     console.error('Create store failed', e);
     res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+
+// --- Endpoint: POST /api/deals/upload-image ---
+// Allows an APPROVED merchant to upload a single image for a deal.
+// The middleware chain ensures security and handles the file parsing.
+router.post('/deals/upload-image', protect, isApprovedMerchant, upload.single('image'), async (req: AuthRequest, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No image file provided.' });
+        }
+
+        // Extract optional metadata from the request body
+        const { businessName, dealTitle } = req.body;
+        const merchantId = req.merchant!.id; // Available from isApprovedMerchant middleware
+
+         const businessSlug = slugify(businessName || `merchant-${merchantId}`);
+        const dealSlug = slugify(dealTitle || 'deal-image');
+        const timestamp = Date.now();
+
+        // Build deterministic publicId path (folder style) for overwrite/idempotency potential
+        const publicId = `${businessSlug}-${merchantId}/${dealSlug}-${timestamp}`;
+
+        const result = await uploadToCloudinary(req.file.buffer, { publicId });
+
+        if (!result || !result.secure_url) {
+            return res.status(500).json({ error: 'Cloudinary upload failed.' });
+        }
+        
+        res.status(200).json({
+            message: 'Image uploaded successfully.',
+            imageUrl: result.secure_url,
+      publicId: result.public_id
+        });
+
+    } catch (error: any) {
+        console.error('Image upload error:', error);
+        // Handle multer file filter errors
+        if (error.message === 'Only image files are allowed!') {
+            return res.status(400).json({ error: error.message });
+        }
+        res.status(500).json({ error: 'Internal server error during file upload.' });
+    }
 });

@@ -24,7 +24,7 @@ function formatDealForFrontend(deal: any, distance?: number) {
     id: deal.id,
     title: deal.title || '',
     description: deal.description || '',
-    imageUrl: deal.imageUrl || null,
+    imageUrls: deal.imageUrls || [],
     discountPercentage: deal.discountPercentage || null,
     discountAmount: deal.discountAmount || null,
     category: deal.category || 'OTHER',
