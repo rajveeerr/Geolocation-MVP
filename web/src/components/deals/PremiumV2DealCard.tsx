@@ -56,6 +56,13 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
     { title: '$5 Draft Beers', time: 'All Night' },
   ];
 
+  // Mock claimed users for kickback deals when backend data isn't available
+  const mockClaimedUsers = [
+    { avatarUrl: 'https://github.com/shadcn.png' },
+    { avatarUrl: 'https://github.com/vercel.png' },
+    { avatarUrl: 'https://github.com/react.png' },
+  ];
+
   // State to control visibility of offers dropdown/list
   const [offersVisible, setOffersVisible] = useState(false);
 
@@ -206,7 +213,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                   <h3 className="text-3xl font-bold leading-tight">
                     {deal.name}
                   </h3>
-                  <p className="mt-1.5 text-base text-neutral-300">
+                  <p className="mt-1.5 text-base text-white/90">
                     {deal.subtitle || 'Cyber Hub sdfsv sdsd'}
                   </p>
                   <div className="mt-4 font-semibold text-brand-primary-400">
@@ -214,9 +221,17 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                       <AvatarStack
                         count={deal.claimedBy.totalCount}
                         users={deal.claimedBy.visibleUsers}
+                        textClassName="text-white/90"
                       />
                     ) : (
-                      <p className="text-white/80">Be the first to claim</p>
+                      // Show placeholder avatars for cards without backend claimedBy data
+                      <div className="opacity-90">
+                        <AvatarStack
+                          count={mockClaimedUsers.length}
+                          users={mockClaimedUsers}
+                          textClassName="text-white/90"
+                        />
+                      </div>
                     )}
                   </div>
                 </div>
@@ -343,9 +358,9 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                 : null;
 
             return priceDisplay ? (
-              <div className="flex h-14 flex-shrink-0 items-center justify-center rounded-full bg-neutral-100 px-6 text-lg font-bold text-neutral-900 shadow-lg">
-                {priceDisplay}
-              </div>
+                  <div className="flex h-14 flex-shrink-0 items-center justify-center rounded-full bg-neutral-100 px-6 text-lg font-bold text-neutral-900 shadow-lg">
+                    {priceDisplay}
+                  </div>
             ) : null;
           })()
         }

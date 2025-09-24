@@ -13,9 +13,10 @@ const placeholderAvatars = [
 interface AvatarStackProps {
   count: number;
   users?: { avatarUrl?: string | null }[];
+  textClassName?: string;
 }
 
-export const AvatarStack = ({ count, users }: AvatarStackProps) => {
+export const AvatarStack = ({ count, users, textClassName }: AvatarStackProps) => {
   const toRender = users && users.length > 0 ? users : placeholderAvatars.map((src) => ({ avatarUrl: src }));
 
   return (
@@ -28,7 +29,7 @@ export const AvatarStack = ({ count, users }: AvatarStackProps) => {
           </Avatar>
         ))}
       </div>
-      <span className="ml-3 text-sm font-semibold text-neutral-700">
+      <span className={textClassName ?? 'ml-3 text-sm font-semibold text-neutral-700'}>
         {count} people tapped in
       </span>
     </div>
