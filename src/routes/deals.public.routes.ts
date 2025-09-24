@@ -18,38 +18,56 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return R * c; // Distance in kilometers
 }
 
-// Utility function to format deal data for frontend consumption
-function formatDealForFrontend(deal: any, distance?: number) {
-  return {
-    id: deal.id,
-    title: deal.title || '',
-    description: deal.description || '',
-    imageUrls: deal.imageUrls || [],
-    discountPercentage: deal.discountPercentage || null,
-    discountAmount: deal.discountAmount || null,
-    category: deal.category || 'OTHER',
-    dealType: deal.dealType || 'STANDARD',
-    recurringDays: deal.recurringDays || null,
-    startTime: deal.startTime?.toISOString() || null,
-    endTime: deal.endTime?.toISOString() || null,
-    redemptionInstructions: deal.redemptionInstructions || '',
-    createdAt: deal.createdAt?.toISOString() || null,
-    updatedAt: deal.updatedAt?.toISOString() || null,
-    merchantId: deal.merchantId,
+// --- Social Proof Utilities ---
+// Utility to add social proof to a deal object (expects raw prisma deal with savedByUsers + _count)
+function addSocialProofToDeal(deal: any) {
+    if (!deal.savedByUsers) {
+        return {
+            ...deal,
+            claimedBy: { totalCount: 0, visibleUsers: [] }
+        };
+    }
+    const totalCount = deal._count?.savedByUsers ?? deal.savedByUsers.length;
+    const visibleUsers = deal.savedByUsers
+      .map((save: any) => ({ avatarUrl: save.user?.avatarUrl || null }))
+      .filter((u: any) => u.avatarUrl);
+
+    // Remove the raw savedByUsers data from the final output
+    const { savedByUsers, _count, ...dealWithoutSocialProof } = deal;
+
+    return {
+        ...dealWithoutSocialProof,
+        claimedBy: { totalCount, visibleUsers }
+    };
+}
+
+// Utility function to format deal data for frontend consumption (compact shape + social proof)
+function formatDealForFrontend(rawDeal: any, distance?: number) {
+  const formattedDeal = {
+    id: rawDeal.id,
+    title: rawDeal.title || '',
+    description: rawDeal.description || '',
+    imageUrl: rawDeal.imageUrls?.[0] || null, // Primary image
+    images: rawDeal.imageUrls || [],          // All images
+    offerDisplay: rawDeal.discountPercentage ? `${rawDeal.discountPercentage}% OFF` : (rawDeal.discountAmount ? 'DEAL' : 'FREE'),
+    offerTerms: rawDeal.offerTerms || null,
+    dealType: rawDeal.dealType || 'STANDARD',
+    startTime: rawDeal.startTime?.toISOString() || null,
+    endTime: rawDeal.endTime?.toISOString() || null,
+    redemptionInstructions: rawDeal.redemptionInstructions || '',
     merchant: {
-      id: deal.merchant?.id || null,
-      businessName: deal.merchant?.businessName || '',
-      address: deal.merchant?.address || '',
-      description: deal.merchant?.description || null,
-      logoUrl: deal.merchant?.logoUrl || null,
-      latitude: deal.merchant?.latitude || null,
-      longitude: deal.merchant?.longitude || null,
-      status: deal.merchant?.status || 'PENDING',
-      createdAt: deal.merchant?.createdAt?.toISOString() || null,
-      updatedAt: deal.merchant?.updatedAt?.toISOString() || null,
+      id: rawDeal.merchant?.id || null,
+      businessName: rawDeal.merchant?.businessName || '',
+      address: rawDeal.merchant?.address || '',
+      latitude: rawDeal.merchant?.latitude || null,
+      longitude: rawDeal.merchant?.longitude || null,
+      logoUrl: rawDeal.merchant?.logoUrl || null,
     },
-    ...(distance !== undefined && { distance: Math.round(distance * 100) / 100 }), // Round to 2 decimal places
+    ...(distance !== undefined && { distance: Math.round(distance * 100) / 100 }),
   };
+
+  // Merge social proof from raw deal
+  return addSocialProofToDeal({ ...formattedDeal, savedByUsers: rawDeal.savedByUsers, _count: rawDeal._count });
 }
 
 // Performance monitoring utility
@@ -143,31 +161,15 @@ router.get('/deals', async (req, res) => {
     // @ts-ignore: Prisma types will include merchant.stores after generate
     let deals: any[] = await prisma.deal.findMany({
       where: whereClause,
-      // ADD THIS SELECT CLAUSE
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        imageUrls: true,
-        discountPercentage: true,
-        discountAmount: true,
-        category: true,
-        dealType: true,
-        recurringDays: true,
-        startTime: true,
-        endTime: true,
-        redemptionInstructions: true,
-        createdAt: true,
-        updatedAt: true,
-        merchantId: true,
+      include: {
         merchant: { include: { stores: { include: { city: true } } } },
+        _count: { select: { savedByUsers: true } },
+        savedByUsers: {
+          take: 5,
+          select: { user: { select: { avatarUrl: true } } }
+        }
       },
-      // include clause is now part of the select
-      orderBy: {
-        createdAt: 'desc',
-      },
-      // Add query hints for better performance
-      // This helps PostgreSQL choose the right indexes
+      orderBy: { createdAt: 'desc' },
     });
 
     // Filter recurring deals so they only appear on their specified day(s)
@@ -239,40 +241,15 @@ router.get('/deals', async (req, res) => {
       // Re-query with geospatial constraints
       deals = await prisma.deal.findMany({
         where: whereClause,
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          imageUrls: true,
-          discountPercentage: true,
-          discountAmount: true,
-          category: true,
-          dealType: true,
-          recurringDays: true,
-          startTime: true,
-          endTime: true,
-          redemptionInstructions: true,
-          createdAt: true,
-          updatedAt: true,
-          merchantId: true,
-          merchant: {
-            select: {
-              id: true,
-              businessName: true,
-              address: true,
-              description: true,
-              logoUrl: true,
-              latitude: true,
-              longitude: true,
-              status: true,
-              createdAt: true,
-              updatedAt: true,
-            },
-          },
+        include: {
+          merchant: true,
+          _count: { select: { savedByUsers: true } },
+          savedByUsers: {
+            take: 5,
+            select: { user: { select: { avatarUrl: true } } }
+          }
         },
-        orderBy: {
-          createdAt: 'desc',
-        },
+        orderBy: { createdAt: 'desc' },
       });
 
       // Filter by distance and add distance information
@@ -528,6 +505,37 @@ router.get('/deals/featured', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching featured deals:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// --- NEW Endpoint: GET /api/deals/:id ---
+router.get('/deals/:id', async (req, res) => {
+  try {
+    const dealId = parseInt(req.params.id);
+    if (isNaN(dealId)) {
+      return res.status(400).json({ error: 'Invalid Deal ID.' });
+    }
+
+    const deal = await prisma.deal.findUnique({
+      where: { id: dealId },
+      include: {
+        merchant: true,
+        _count: { select: { savedByUsers: true } },
+        savedByUsers: {
+          take: 5,
+          select: { user: { select: { avatarUrl: true } } }
+        }
+      }
+    });
+
+    if (!deal || deal.merchant.status !== 'APPROVED') {
+      return res.status(404).json({ error: 'Deal not found or not available.' });
+    }
+
+    res.status(200).json(formatDealForFrontend(deal));
+  } catch (error) {
+    console.error(`Error fetching deal ${req.params.id}:`, error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

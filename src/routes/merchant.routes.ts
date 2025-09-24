@@ -156,39 +156,44 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
     const {
       title,
       description,
-      startTime,
-      endTime,
+      activeDateRange, // { startDate, endDate }
+      timeRanges, // placeholder for future granular hours
       redemptionInstructions,
+      imageUrls,
       discountPercentage,
       discountAmount,
       category,
       dealType: rawDealType,
       recurringDays: rawRecurringDays,
-      imageUrls 
+      offerTerms,
+      kickbackEnabled,
+      menuItems // [{ id, isHidden }]
     } = req.body;
-    const merchantId = req.merchant?.id; // from middleware
+    const merchantId = req.merchant?.id;
 
-    // Basic required fields
-    if (!title || !description || !startTime || !endTime) {
-      return res.status(400).json({ error: 'Title, description, startTime, endTime are required.' });
+    if (!title || !activeDateRange?.startDate || !activeDateRange?.endDate) {
+      return res.status(400).json({ error: 'Title and activeDateRange (with startDate and endDate) are required.' });
+    }
+    const startTime = new Date(activeDateRange.startDate);
+    const endTime = new Date(activeDateRange.endDate);
+    if (!(startTime instanceof Date) || isNaN(startTime.getTime()) || !(endTime instanceof Date) || isNaN(endTime.getTime())) {
+      return res.status(400).json({ error: 'Invalid start or end date.' });
+    }
+    if (startTime >= endTime) {
+      return res.status(400).json({ error: 'End date must be after start date.' });
     }
 
-    if (imageUrls && (!Array.isArray(imageUrls) || imageUrls.some(url => typeof url !== 'string'))) {
-        return res.status(400).json({ error: 'imageUrls must be an array of strings.' });
+    if (imageUrls && (!Array.isArray(imageUrls) || imageUrls.some((u: any) => typeof u !== 'string'))) {
+      return res.status(400).json({ error: 'imageUrls must be an array of strings.' });
     }
 
-    // Normalize deal type (allow human friendly input like "Happy Hour", case-insensitive)
+    // Normalize deal type
     const validDealTypes = ['STANDARD', 'HAPPY_HOUR', 'RECURRING'] as const;
     let dealType: string = 'STANDARD';
     if (rawDealType) {
-      const normalized = String(rawDealType)
-        .trim()
-        .toUpperCase()
-        .replace(/\s+/g, '_'); // "Happy Hour" -> "HAPPY_HOUR"
+      const normalized = String(rawDealType).trim().toUpperCase().replace(/\s+/g, '_');
       if (!validDealTypes.includes(normalized as any)) {
-        return res.status(400).json({
-          error: `Invalid dealType. Must be one of: ${validDealTypes.join(', ')}`
-        });
+        return res.status(400).json({ error: `Invalid dealType. Must be one of: ${validDealTypes.join(', ')}` });
       }
       dealType = normalized;
     }
@@ -201,13 +206,11 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
         'HOME_AND_GARDEN', 'OTHER'
       ];
       if (!validCategories.includes(category)) {
-        return res.status(400).json({
-          error: `Invalid category. Must be one of: ${validCategories.join(', ')}`
-        });
+        return res.status(400).json({ error: `Invalid category. Must be one of: ${validCategories.join(', ')}` });
       }
     }
 
-    // Normalize recurringDays: accept array ["MONDAY", "TUESDAY"] OR comma separated string
+    // Normalize recurringDays input
     const validDays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
     let recurringDays: string | null = null;
     if (rawRecurringDays !== undefined && rawRecurringDays !== null && rawRecurringDays !== '') {
@@ -217,47 +220,57 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
       } else if (typeof rawRecurringDays === 'string') {
         daysArray = rawRecurringDays.split(',').map(d => d.trim().toUpperCase()).filter(Boolean);
       } else {
-        return res.status(400).json({ error: 'recurringDays must be an array of days or a comma-separated string.' });
+        return res.status(400).json({ error: 'recurringDays must be an array or comma-separated string.' });
       }
-
-      // Remove duplicates while preserving order
       const seen = new Set<string>();
       daysArray = daysArray.filter(d => { if (!seen.has(d)) { seen.add(d); return true; } return false; });
-
       const invalidDays = daysArray.filter(d => !validDays.includes(d));
       if (invalidDays.length) {
-        return res.status(400).json({ error: `Invalid recurringDays: ${invalidDays.join(', ')}. Must be within ${validDays.join(', ')}` });
+        return res.status(400).json({ error: `Invalid recurringDays: ${invalidDays.join(', ')}` });
       }
-      if (daysArray.length === 0) {
-        return res.status(400).json({ error: 'recurringDays cannot be empty if provided.' });
-      }
+      if (daysArray.length === 0) return res.status(400).json({ error: 'recurringDays cannot be empty if provided.' });
       recurringDays = daysArray.join(',');
     }
-
-    // Enforce recurringDays presence only when dealType=RECURRING
     if (dealType === 'RECURRING' && !recurringDays) {
-      return res.status(400).json({ error: 'recurringDays are required when dealType is RECURRING.' });
+      return res.status(400).json({ error: 'recurringDays required for RECURRING deals.' });
     }
-    if (dealType !== 'RECURRING') {
-      recurringDays = null; // ignore any provided days for non-recurring deals
-    }
+    if (dealType !== 'RECURRING') recurringDays = null;
 
-    // Persist
-    const newDeal = await prisma.deal.create({
-      data: {
-        title,
-        description,
-        startTime: new Date(startTime),
-        endTime: new Date(endTime),
-        redemptionInstructions,
-        imageUrls: imageUrls || [],
-        discountPercentage: discountPercentage ? parseInt(discountPercentage, 10) : null,
-        discountAmount: discountAmount ? parseFloat(discountAmount) : null,
-        category: category || 'OTHER',
-        dealType: dealType as any,
-        recurringDays,
-        merchant: { connect: { id: merchantId } }
+    // Transaction: create deal + attach menu items (if provided)
+    const newDeal = await prisma.$transaction(async (tx) => {
+      const createdDeal = await tx.deal.create({
+        data: {
+          title,
+          description: description || '',
+          startTime,
+          endTime,
+          redemptionInstructions: redemptionInstructions || '',
+          imageUrls: imageUrls || [],
+          discountPercentage: discountPercentage ? parseInt(discountPercentage, 10) : null,
+          discountAmount: discountAmount ? parseFloat(discountAmount) : null,
+          category: category || 'OTHER',
+          dealType: dealType as any,
+          recurringDays,
+          offerTerms: offerTerms || null,
+          kickbackEnabled: !!kickbackEnabled,
+          merchant: { connect: { id: merchantId } }
+        }
+      });
+
+      if (menuItems && Array.isArray(menuItems) && menuItems.length > 0) {
+        const dealMenuItemsData = menuItems
+          .filter(mi => mi && typeof mi.id !== 'undefined')
+          .map(mi => ({
+            dealId: createdDeal.id,
+            menuItemId: Number(mi.id),
+            isHidden: !!mi.isHidden
+          }));
+        if (dealMenuItemsData.length) {
+          // @ts-ignore - DealMenuItem model available after generate
+          await tx.dealMenuItem.createMany({ data: dealMenuItemsData });
+        }
       }
+      return createdDeal;
     });
 
     res.status(201).json({
