@@ -1,30 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import prisma from '../lib/prisma';
-import { protect, AuthRequest } from '../middleware/auth.middleware';
+import { protect, AuthRequest, requireAdmin } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// Admin middleware - only allow ADMIN role
-const requireAdmin = (req: AuthRequest, res: Response, next: Function) => {
-  if (!req.user) {
-    return res.status(401).json({ error: 'Authentication required' });
-  }
-
-  // Get user with role information
-  prisma.user.findUnique({
-    where: { id: req.user.id },
-    select: { role: true }
-  }).then(user => {
-    if (!user || user.role !== 'ADMIN') {
-      return res.status(403).json({ error: 'Admin access required' });
-    }
-    next();
-  }).catch(error => {
-    console.error('Admin check error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  });
-};
 
 // Validation schemas
 const updateCityActiveSchema = z.object({
