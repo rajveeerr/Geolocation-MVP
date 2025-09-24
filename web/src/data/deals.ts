@@ -19,6 +19,9 @@ export interface Deal {
   };
   originalValue?: number;
   discountValue?: number;
+  discountPercentage?: number | null;
+  discountAmount?: number | null;
+  isBooking?: boolean;
   expiresAt?: string; // ISO String for countdown timer
 }
 
@@ -67,6 +70,9 @@ export const premiumDeals: Deal[] = [
     dealValue: '50% OFF',
     originalValue: 50,
     discountValue: 25,
+    discountPercentage: 50,
+    discountAmount: null,
+    isBooking: false,
     expiresAt: getFutureDate(26),
   },
   {
@@ -108,6 +114,9 @@ export const premiumDeals: Deal[] = [
     dealValue: '30% OFF',
     originalValue: 25,
     discountValue: 7.5,
+    discountPercentage: 30,
+    discountAmount: null,
+    isBooking: true,
     expiresAt: getFutureDate(8),
   },
 ];

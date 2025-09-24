@@ -65,7 +65,18 @@ export const placeholderDeals: DealWithLocation[] = [
 ];
 
 // Adapter function to convert an API deal into the format our components expect
-export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => ({
+export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
+  // --- NEW: Dynamic Deal Value Logic ---
+  let dealValue: string | undefined = 'Special Offer';
+  if (apiDeal.offerDisplay) {
+    dealValue = apiDeal.offerDisplay;
+  } else if (apiDeal.discountPercentage) {
+    dealValue = `${apiDeal.discountPercentage}% OFF`;
+  } else if (apiDeal.discountAmount) {
+    dealValue = `$${apiDeal.discountAmount} OFF`;
+  }
+
+  return {
   id: apiDeal.id,
   name: apiDeal.title,
   image:
@@ -103,13 +114,10 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => ({
 
   // Map discount value for display
   // prefer explicit `offerDisplay` when provided by backend
-  dealValue: apiDeal.offerDisplay
-    ? apiDeal.offerDisplay
-    : apiDeal.discountPercentage
-      ? `${apiDeal.discountPercentage}% OFF`
-      : apiDeal.discountAmount
-        ? `$${apiDeal.discountAmount} OFF`
-        : undefined,
+  // Use the dynamically computed dealValue and also pass through raw discount fields
+  dealValue: dealValue,
+  discountPercentage: apiDeal.discountPercentage ?? null,
+  discountAmount: apiDeal.discountAmount ?? null,
 
   // new fine-print + social proof passthrough
   offerTerms: apiDeal.offerTerms,
@@ -123,7 +131,8 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => ({
       ? Math.round(100 * (1 - apiDeal.discountPercentage / 100))
       : 80),
   bookingInfo: apiDeal.bookingInfo || 'Reservations available',
-});
+  };
+};
 
 // New universal adapter name for clarity across the app. Keep the old name for
 // backwards compatibility.

@@ -1,6 +1,6 @@
 // web/src/components/deals/PremiumV2DealCard.tsx
 import { useState, useEffect } from 'react';
-import { Heart, Clock, ArrowRight } from 'lucide-react';
+import { Heart, Clock, ArrowRight, Phone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import type { Deal } from '@/data/deals';
@@ -10,6 +10,7 @@ import { useAuth } from '@/context/useAuth';
 import { useModal } from '@/context/ModalContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AvatarStack } from '@/components/common/AvatarStack';
+import { Button } from '@/components/common/Button';
 
 // Extended type to include multiple images and other properties
 interface PremiumDeal extends Deal {
@@ -19,9 +20,22 @@ interface PremiumDeal extends Deal {
   priceValue?: number;
   offerTerms?: string;
   claimedBy?: { totalCount: number; visibleUsers: { avatarUrl: string }[] };
+  isBooking?: boolean;
+  discountPercentage?: number | null;
+  bookingInfo?: string;
 }
 
 export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
+  // If there's no discount or offer to render, don't render the card
+  const hasDiscount = Boolean(
+    deal.dealValue ||
+      deal.discountPercentage ||
+      deal.discountAmount ||
+      (deal as any).discountedPrice ||
+      (deal as any).discountValue,
+  );
+  if (!hasDiscount) return null;
+
   const { user } = useAuth();
   const { openModal } = useModal();
   const { savedDealIds, saveDeal, unsaveDeal, isSaving, isUnsaving } =
@@ -45,6 +59,21 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
     isHappyHour &&
     deal.expiresAt &&
     (countdown.hours > 0 || countdown.minutes > 0 || countdown.seconds > 0);
+
+  const isHighValueDiscount = (deal.discountPercentage ?? 0) >= 50;
+  
+  let ctaText = 'Tap in';
+  let ctaIcon = <ArrowRight className="h-6 w-6 -rotate-45" />;
+  let ctaVariant = 'primary';
+
+  if (deal.isBooking) {
+    ctaText = 'Pre-buy';
+    ctaIcon = <ArrowRight className="h-5 w-5 -rotate-45" />;
+    ctaVariant = 'primary';
+  } else if (isHighValueDiscount) {
+    ctaText = 'REDEEM NOW';
+    ctaIcon = null as any; 
+  }
 
   // Auto-scrolling image carousel effect
   useEffect(() => {
@@ -136,13 +165,30 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                   )}
                 </div> */}
 
-                {/* Discount Percentage - Top Right */}
+                <div className='absolute right-0 top-0 mt-4 mr-4'>
+                    <Button
+                      variant="secondary"
+                      size="md"
+                      className="h-10 w-10 rounded-full p-0"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const maybePhone = String(deal.bookingInfo || '');
+                        if (/\+?\d[\d\s\-()]{4,}/.test(maybePhone)) {
+                          window.location.href = `tel:${maybePhone.replace(/[^\d+]/g, '')}`;
+                        }
+                      }}
+                      icon={<Phone className="h-5 w-5 text-neutral-900" />}
+                      aria-label="Call restaurant"
+                    />
+                  </div>
+
                 <div className="absolute right-0 top-[50%]">
                   {deal.dealValue && (
                     <div className="rounded-tl-2xl bg-brand-primary-main px-4 py-2 text-base font-bold text-white shadow-md">
                       {deal.dealValue}
                     </div>
-                  )}
+                  )}                  
                 </div>
 
                 {/* Restaurant Info - Bottom Left */}
@@ -168,9 +214,9 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                 {/* Heart Button - Bottom Right */}
                 <button
                   onClick={handleLikeClick}
-                  disabled={isLikeButtonLoading}
+                    disabled={isLikeButtonLoading}
                   className="absolute bottom-6 right-6 flex h-16 w-16 items-center justify-center rounded-full bg-white/25 shadow-lg backdrop-blur-sm transition-transform hover:scale-110"
-                  aria-label={isSaved ? 'Unsave deal' : 'Save deal'}
+                    aria-label={isSaved ? 'Unsave deal' : 'Save deal'}
                 >
                   <Heart
                     className={cn(
@@ -198,13 +244,18 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
               transition={{ duration: 0.4, ease: 'easeInOut' }}
               className="flex-grow"
             >
-              <Link to={`/deals/${deal.id}`} className="block">
-                <button className="flex h-14 w-full items-center justify-between rounded-full bg-brand-primary-main p-1.5 font-bold text-white shadow-lg">
-                  <span className="pl-5 text-lg">Buy Now</span>
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white/30">
-                    <ArrowRight className="h-6 w-6 -rotate-45" />
-                  </div>
-                </button>
+                <Link to={`/deals/${deal.id}`} className="block">
+                <Button
+                  size="lg"
+                  variant={isHighValueDiscount ? 'primary' : ctaVariant as any}
+                  className={cn(
+                    'w-full rounded-full font-bold',
+                    isHighValueDiscount && '!bg-red-600 hover:!bg-red-700 text-white'
+                  )}
+                >
+                  {ctaIcon && <span className="mr-3">{ctaIcon}</span>}
+                  <span className="text-lg">{ctaText}</span>
+                </Button>
               </Link>
             </motion.div>
           ) : (
@@ -214,17 +265,46 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
               exit={{ opacity: 0 }}
             >
               <Link to={`/deals/${deal.id}`} className="block">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-primary-main text-white shadow-lg">
-                  <ArrowRight className="h-6 w-6 -rotate-45" />
-                </div>
+                <Button
+                  size="md"
+                  variant={isHighValueDiscount ? 'primary' : ctaVariant as any}
+                  className={cn(
+                    'h-14 w-14 rounded-full shadow-lg p-0',
+                    isHighValueDiscount
+                      ? 'bg-red-600 text-white'
+                      : deal.isBooking
+                      ? 'bg-amber-500 text-white'
+                      : 'bg-brand-primary-main text-white'
+                  )}
+                  icon={ctaIcon ?? <ArrowRight className="h-6 w-6 -rotate-45" />}
+                />
               </Link>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <div className="flex h-14 flex-shrink-0 items-center justify-center rounded-full bg-neutral-100 px-6 text-lg font-bold text-neutral-900 shadow-lg">
-          ${deal.priceValue || 50}
-        </div>
+        {
+          (() => {
+            const priceDisplay =
+              (deal as any).discountedPrice
+                ? `$${(deal as any).discountedPrice}`
+                : (deal as any).discountValue
+                ? `$${(deal as any).discountValue}`
+                : deal.discountAmount
+                ? `$${deal.discountAmount}`
+                : deal.discountPercentage
+                ? `${deal.discountPercentage}% OFF`
+                : (deal as any).originalPrice
+                ? `$${(deal as any).originalPrice}`
+                : null;
+
+            return priceDisplay ? (
+              <div className="flex h-14 flex-shrink-0 items-center justify-center rounded-full bg-neutral-100 px-6 text-lg font-bold text-neutral-900 shadow-lg">
+                {priceDisplay}
+              </div>
+            ) : null;
+          })()
+        }
       </div>
     </div>
   );

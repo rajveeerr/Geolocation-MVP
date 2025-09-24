@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DealFinder } from '@/components/landing/DealFinder';
+// ...existing imports...
 import { SectionDivider } from '@/components/common/SectionDivider';
 import { ContentCarousel } from '@/components/common/ContentCarousel';
 import { CarouselSkeleton } from '@/components/common/DealCardSkeleton';
@@ -14,7 +14,7 @@ import type { ApiDeal } from '@/data/deals-placeholder';
 import { adaptApiDealToFrontend } from '@/data/deals-placeholder';
 
 export const HomePage = () => {
-  const [activeTab, setActiveTab] = useState('deals');
+  const [activeTab] = useState('deals');
   const { data: featuredDeals, isLoading: isLoadingFeatured } =
     useFeaturedDeals();
 
@@ -52,11 +52,11 @@ export const HomePage = () => {
         content="Discover real-time deals, exclusive happy hours, and unique local experiences. Yohop is your live map to the best moments in your city."
       />
       <div className="bg-white pt-16 sm:pt-20">
-      <section className="border-b border-neutral-200 bg-white pb-6 pt-6 sm:pb-8 sm:pt-8 lg:pb-10 lg:pt-12">
+      {/* <section className="border-b border-neutral-200 bg-white pb-6 pt-6 sm:pb-8 sm:pt-8 lg:pb-10 lg:pt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <DealFinder activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
-      </section>
+      </section> */}
 
       <ContentCarousel title="Today's Top Deals" deals={premiumDeals} />
 
