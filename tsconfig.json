@@ -10,6 +10,6 @@
     "skipLibCheck": true, // Speeds up compilation by skipping type checks on declaration files
     "types": ["node", "jest"]
   },
-  "include": ["src/**/*", "tests/**/*", "jest.config.ts"],
-  "exclude": ["dist", "node_modules"]
+  "include": ["src/**/*", "jest.config.ts"],
+  "exclude": ["dist", "node_modules", "tests/**/*"]
 }

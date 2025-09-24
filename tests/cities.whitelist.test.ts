@@ -27,5 +27,3 @@ describe('GET /api/cities/whitelist', () => {
     expect(res.body.cities).not.toContain('Inactive City');
   });
 });
-npx prisma migrate dev --name add_menu_item_model
-npx prisma generate
