@@ -28,8 +28,9 @@ function getTransporter() {
   // Convenience Gmail support
   const provider = (process.env.EMAIL_PROVIDER || '').toLowerCase();
   // Allow alternate var names for ease of config
+  // Support alternate env var names (SMTP_PASSWORD) for convenience
   let user = process.env.SMTP_USER || process.env.GMAIL_USER;
-  let pass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD || process.env.GMAIL_PASS;
+  let pass = process.env.SMTP_PASS || process.env.SMTP_PASSWORD || process.env.GMAIL_APP_PASSWORD || process.env.GMAIL_PASS;
 
   if (!host && provider === 'gmail') {
     host = 'smtp.gmail.com';
@@ -54,8 +55,9 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
     logger.debug('[email] EMAIL_ENABLED not true – skipping send.');
     return;
   }
-  const fromEmail = process.env.EMAIL_FROM_ADDRESS;
-  const fromName = process.env.EMAIL_FROM_NAME || 'NoReply';
+  // Allow alias env names FROM_EMAIL / FROM_NAME for ergonomics
+  const fromEmail = process.env.EMAIL_FROM_ADDRESS || process.env.FROM_EMAIL;
+  const fromName = process.env.EMAIL_FROM_NAME || process.env.FROM_NAME || 'NoReply';
   if (!fromEmail) {
     logger.warn('[email] Missing EMAIL_FROM_ADDRESS – email disabled.');
     return;
