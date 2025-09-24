@@ -13,7 +13,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { PremiumV2DealCard } from './PremiumV2DealCard';
+import { DealResultCard } from './DealResultCard';
 import type { DealWithLocation } from '@/data/deals';
 import { Pagination } from '../common/Pagination';
 
@@ -213,16 +213,18 @@ export const DealsSidebar = ({
             deals.map((deal) => (
               <div
                 key={deal.id}
-                onMouseEnter={() => setHoveredDealId(deal.id)}
-                onMouseLeave={() => setHoveredDealId(null)}
                 className={cn(
                   // allow the card to take full available width and give a little horizontal padding
                   'w-full px-2 transition-all duration-200',
-                  hoveredDealId === deal.id &&
-                    'rounded-2xl ring-2 ring-primary/20',
+                  hoveredDealId === deal.id && 'rounded-2xl ring-2 ring-primary/20',
                 )}
               >
-                <PremiumV2DealCard deal={deal} />
+                <DealResultCard
+                  deal={deal}
+                  isHovered={hoveredDealId === deal.id}
+                  onMouseEnter={(id: string) => setHoveredDealId(id)}
+                  onMouseLeave={() => setHoveredDealId(null)}
+                />
               </div>
             ))
           )}

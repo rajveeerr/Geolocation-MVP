@@ -8,6 +8,7 @@ import { CalendarIcon, ClockIcon, DollarSign, Percent } from 'lucide-react';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
+import { ExploreDealsPreview } from '@/components/merchant/ExploreDealsPreview';
 
 interface Deal {
   id: string;
@@ -207,15 +208,17 @@ export const MerchantDashboardPage = () => {
       </div>
 
       {merchantStatus === 'PENDING' && (
-        <div className="rounded-lg border border-amber-200 bg-amber-100 p-6">
-          <h2 className="text-xl font-bold text-amber-800">
+        // The pending card provides a nice, colored container for our new section
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 sm:p-8">
+          <h2 className="text-2xl font-bold text-amber-800">
             Application Pending
           </h2>
           <p className="mt-2 text-amber-700">
-            Your application to become a merchant is currently under review.
-            We'll notify you via email once it's approved. This usually takes
-            1-2 business days.
+            Your application to become a merchant is currently under review. This usually takes 1-2 business days. We'll notify you via email once it's approved.
           </p>
+
+          {/* This component now renders the ContentCarousel internally. */}
+          <ExploreDealsPreview />
         </div>
       )}
 

@@ -1,4 +1,8 @@
 import { OnboardingProvider, useOnboarding } from '@/context/MerchantOnboardingContext';
+import { useMerchantStatus } from '@/hooks/useMerchantStatus';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { PATHS } from '@/routing/paths';
 import { CitySelectionStep } from '@/components/merchant/onboarding/CitySelectionStep';
 import { BusinessInfoStep } from '@/components/merchant/onboarding/BusinessInfoStep';
 import { BusinessCategoryStep } from '@/components/merchant/onboarding/BusinessCategoryStep';
@@ -20,6 +24,21 @@ const OnboardingFlow = () => {
 };
 
 export const MerchantOnboardingPage = () => {
+  const { data: merchantData, isLoading } = useMerchantStatus();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const status = merchantData?.data?.merchant?.status;
+    if (!isLoading && status === 'APPROVED') {
+      navigate(PATHS.MERCHANT_DASHBOARD);
+    }
+  }, [merchantData, isLoading, navigate]);
+
+  // If approved, don't render the onboarding flow (we navigate away).
+  if (merchantData?.data?.merchant?.status === 'APPROVED') {
+    return null;
+  }
+
   return (
     <OnboardingProvider>
       <OnboardingFlow />
