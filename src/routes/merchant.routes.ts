@@ -1,5 +1,5 @@
 // src/routes/merchant.routes.ts
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { protect, isApprovedMerchant, AuthRequest } from '../middleware/auth.middleware';
 import prisma from '../lib/prisma';
 import { upload, uploadToCloudinary } from '../lib/cloudinary';
@@ -551,6 +551,65 @@ router.delete('/merchants/me/menu/item/:itemId', protect, isApprovedMerchant, as
 
     // @ts-ignore
     const existing = await prisma.menuItem.findUnique({ where: { id: itemId }, select: { id: true, merchantId: true } });
+// --- Endpoint: GET /api/merchants/me/kickback-earnings ---
+// Fetches aggregated and detailed Kickback earnings data.
+// NOTE: Currently returns realistic MOCK DATA to enable frontend development.
+router.get('/merchants/me/kickback-earnings', protect, isApprovedMerchant, async (req: AuthRequest, res: Response) => {
+  try {
+    const merchantId = req.merchant!.id;
+    const { period = 'all_time' } = req.query as any;
+
+    // TODO: Replace mock with actual aggregation over KickbackEvent table
+    // Future implementation outline:
+    //  1. Determine date range based on period (e.g., last_7_days, last_30_days, this_month, all_time)
+    //  2. Query KickbackEvent where merchantId & createdAt in range
+    //  3. Aggregate total sourceAmountSpent (revenue proxy) & total amountEarned
+    //  4. Group by userId for details: sum(earned), count(distinct invitees), sum(sourceAmountSpent)
+    //  5. (Optional) Join to MenuItem / Deal for spending detail if stored per line item later
+    const mockData = {
+      summary: {
+        revenue: 1392.0,
+        totalKickbackHandout: 135.5
+      },
+      details: [
+        {
+          user: { name: 'Anita', avatarUrl: 'https://i.pravatar.cc/150?u=anita' },
+          earned: 3.5,
+            invitedCount: 2,
+          totalSpentByInvitees: 13.5,
+          spendingDetail: [
+            { itemName: 'Chicken Ginger', price: 14.0, imageUrl: 'https://example.com/chicken.png' },
+            { itemName: 'Coca Cola Zero', price: 2.5, imageUrl: 'https://example.com/coke.png' }
+          ]
+        },
+        {
+          user: { name: 'Benjamin', avatarUrl: 'https://i.pravatar.cc/150?u=benjamin' },
+          earned: 2.1,
+          invitedCount: 1,
+          totalSpentByInvitees: 13.5,
+          spendingDetail: []
+        },
+        {
+          user: { name: 'Carla', avatarUrl: 'https://i.pravatar.cc/150?u=carla' },
+          earned: 15.75,
+          invitedCount: 5,
+          totalSpentByInvitees: 150.2,
+          spendingDetail: []
+        }
+      ]
+    };
+
+    res.status(200).json({
+      ...mockData,
+      _note: `This is mock data for development. The period requested was '${period}'.`,
+      merchantId
+    });
+  } catch (error) {
+    console.error('Kickback earnings error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
     if (!existing || existing.merchantId !== merchantId) {
       return res.status(404).json({ error: 'Menu item not found' });
     }
