@@ -36,6 +36,10 @@ const bulkUpdateCitiesSchema = z.object({
   active: z.boolean()
 });
 
+const rejectMerchantSchema = z.object({
+  reason: z.string().min(1, 'Rejection reason is required')
+});
+
 // --- Endpoint: GET /api/admin/cities ---
 // Get all cities with pagination and filtering
 router.get('/cities', protect, requireAdmin, async (req: AuthRequest, res: Response) => {
@@ -380,6 +384,307 @@ router.post('/cities', protect, requireAdmin, async (req: AuthRequest, res: Resp
       return res.status(400).json({ errors: error.issues });
     }
     console.error('Create city error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// --- Endpoint: GET /api/admin/merchants ---
+// Get all merchants with pagination and filtering
+router.get('/merchants', protect, requireAdmin, async (req: AuthRequest, res: Response) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 50;
+    const status = req.query.status as string;
+    const search = req.query.search as string;
+
+    const skip = (page - 1) * limit;
+
+    // Build where clause
+    const where: any = {};
+    
+    if (status) {
+      where.status = status;
+    }
+    
+    if (search) {
+      where.OR = [
+        { businessName: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        { address: { contains: search, mode: 'insensitive' } }
+      ];
+    }
+
+    // Get merchants with related data
+    const [merchants, totalCount] = await Promise.all([
+      prisma.merchant.findMany({
+        where,
+        include: {
+          owner: {
+            select: {
+              id: true,
+              email: true,
+              name: true
+            }
+          },
+          stores: {
+            include: {
+              city: {
+                select: {
+                  id: true,
+                  name: true,
+                  state: true
+                }
+              }
+            }
+          },
+          _count: {
+            select: {
+              deals: true,
+              stores: true
+            }
+          }
+        },
+        orderBy: [
+          { status: 'asc' },
+          { createdAt: 'desc' }
+        ],
+        skip,
+        take: limit
+      }),
+      prisma.merchant.count({ where })
+    ]);
+
+    res.status(200).json({
+      message: 'Merchants retrieved successfully',
+      merchants: merchants.map(merchant => ({
+        id: merchant.id,
+        businessName: merchant.businessName,
+        description: merchant.description,
+        address: merchant.address,
+        logoUrl: merchant.logoUrl,
+        latitude: merchant.latitude,
+        longitude: merchant.longitude,
+        status: merchant.status,
+        createdAt: merchant.createdAt,
+        updatedAt: merchant.updatedAt,
+        owner: merchant.owner,
+        stores: merchant.stores,
+        totalDeals: merchant._count.deals,
+        totalStores: merchant._count.stores
+      })),
+      pagination: {
+        page,
+        limit,
+        totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        hasNext: page * limit < totalCount,
+        hasPrev: page > 1
+      }
+    });
+
+  } catch (error) {
+    console.error('Get merchants error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// --- Endpoint: POST /api/admin/merchants/:merchantId/approve ---
+// Approve a merchant application
+router.post('/merchants/:merchantId/approve', protect, requireAdmin, async (req: AuthRequest, res: Response) => {
+  try {
+    const merchantId = parseInt(req.params.merchantId);
+
+    if (isNaN(merchantId)) {
+      return res.status(400).json({ error: 'Invalid merchant ID' });
+    }
+
+    // Check if merchant exists
+    const existingMerchant = await prisma.merchant.findUnique({
+      where: { id: merchantId },
+      include: {
+        owner: {
+          select: {
+            id: true,
+            email: true,
+            name: true
+          }
+        },
+        stores: {
+          include: {
+            city: {
+              select: {
+                id: true,
+                name: true,
+                state: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if (!existingMerchant) {
+      return res.status(404).json({ error: 'Merchant not found' });
+    }
+
+    // Check if already approved
+    if (existingMerchant.status === 'APPROVED') {
+      return res.status(200).json({
+        message: 'Merchant is already approved',
+        merchant: {
+          id: existingMerchant.id,
+          businessName: existingMerchant.businessName,
+          status: existingMerchant.status
+        }
+      });
+    }
+
+    // Update merchant status to approved
+    const updatedMerchant = await prisma.merchant.update({
+      where: { id: merchantId },
+      data: { status: 'APPROVED' },
+      include: {
+        owner: {
+          select: {
+            id: true,
+            email: true,
+            name: true
+          }
+        },
+        stores: {
+          include: {
+            city: {
+              select: {
+                id: true,
+                name: true,
+                state: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    res.status(200).json({
+      message: 'Merchant approved successfully',
+      merchant: {
+        id: updatedMerchant.id,
+        businessName: updatedMerchant.businessName,
+        description: updatedMerchant.description,
+        address: updatedMerchant.address,
+        logoUrl: updatedMerchant.logoUrl,
+        latitude: updatedMerchant.latitude,
+        longitude: updatedMerchant.longitude,
+        status: updatedMerchant.status,
+        createdAt: updatedMerchant.createdAt,
+        updatedAt: updatedMerchant.updatedAt,
+        owner: updatedMerchant.owner,
+        stores: updatedMerchant.stores
+      }
+    });
+
+  } catch (error) {
+    console.error('Approve merchant error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// --- Endpoint: POST /api/admin/merchants/:merchantId/reject ---
+// Reject a merchant application
+router.post('/merchants/:merchantId/reject', protect, requireAdmin, async (req: AuthRequest, res: Response) => {
+  try {
+    const merchantId = parseInt(req.params.merchantId);
+    const { reason } = rejectMerchantSchema.parse(req.body);
+
+    if (isNaN(merchantId)) {
+      return res.status(400).json({ error: 'Invalid merchant ID' });
+    }
+
+    // Check if merchant exists
+    const existingMerchant = await prisma.merchant.findUnique({
+      where: { id: merchantId },
+      include: {
+        owner: {
+          select: {
+            id: true,
+            email: true,
+            name: true
+          }
+        },
+        stores: {
+          include: {
+            city: {
+              select: {
+                id: true,
+                name: true,
+                state: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if (!existingMerchant) {
+      return res.status(404).json({ error: 'Merchant not found' });
+    }
+
+    // Update merchant status to rejected
+    const updatedMerchant = await prisma.merchant.update({
+      where: { id: merchantId },
+      data: { 
+        status: 'REJECTED',
+        // Store rejection reason in description or create a separate field if needed
+        description: existingMerchant.description ? 
+          `${existingMerchant.description}\n\n[REJECTED] Reason: ${reason}` : 
+          `[REJECTED] Reason: ${reason}`
+      },
+      include: {
+        owner: {
+          select: {
+            id: true,
+            email: true,
+            name: true
+          }
+        },
+        stores: {
+          include: {
+            city: {
+              select: {
+                id: true,
+                name: true,
+                state: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    res.status(200).json({
+      message: 'Merchant rejected successfully',
+      merchant: {
+        id: updatedMerchant.id,
+        businessName: updatedMerchant.businessName,
+        description: updatedMerchant.description,
+        address: updatedMerchant.address,
+        logoUrl: updatedMerchant.logoUrl,
+        latitude: updatedMerchant.latitude,
+        longitude: updatedMerchant.longitude,
+        status: updatedMerchant.status,
+        createdAt: updatedMerchant.createdAt,
+        updatedAt: updatedMerchant.updatedAt,
+        owner: updatedMerchant.owner,
+        stores: updatedMerchant.stores,
+        rejectionReason: reason
+      }
+    });
+
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ errors: error.issues });
+    }
+    console.error('Reject merchant error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
