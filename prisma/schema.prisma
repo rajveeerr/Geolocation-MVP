@@ -57,6 +57,8 @@ model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   name      String?
+  // Optional avatar/profile image URL for social proof
+  avatarUrl String?
   password  String
   role      UserRole @default(USER) // All new users start as a regular USER
   // Gamification / reward points accumulated by the user
@@ -88,6 +90,9 @@ model User {
 
   // Check-ins
   checkIns   CheckIn[]
+
+  // Kickback events earned by this user
+  kickbackEvents KickbackEvent[]
 
   @@index([referredByUserId])
 }
@@ -121,6 +126,9 @@ model Merchant {
 
   // A Merchant can have many menu items (for Happy Hour / detailed deals)
   menuItems     MenuItem[]
+
+  // Kickback events associated with this merchant
+  kickbackEvents KickbackEvent[]
 }
 
 model Deal {
@@ -150,6 +158,11 @@ model Deal {
   
   redemptionInstructions String
 
+  // Fine print / terms of the offer
+  offerTerms    String?
+  // Whether kickback program is enabled for this deal
+  kickbackEnabled Boolean @default(false)
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -165,6 +178,12 @@ model Deal {
 
   // Check-ins
   checkIns  CheckIn[]
+
+  // Many-to-many relationship with MenuItem through join table
+  menuItems     DealMenuItem[]
+
+  // Kickback events associated with this deal
+  kickbackEvents KickbackEvent[]
 }
 
 // Junction table for User-Deal relationship (saved deals)
@@ -273,5 +292,45 @@ model MenuItem {
 
   merchant    Merchant  @relation(fields: [merchantId], references: [id], onDelete: Cascade)
 
+  // Back relation to deals via join table
+  dealLinks   DealMenuItem[]
+
   @@index([merchantId])
+}
+
+// Join table for many-to-many relationship between Deal and MenuItem with ability to hide items for specific deals
+model DealMenuItem {
+  dealId      Int
+  menuItemId  Int
+  // Flag to hide specific menu items in a given deal context (e.g., limited Happy Hour set)
+  isHidden    Boolean  @default(false)
+  assignedAt  DateTime @default(now())
+
+  deal        Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  menuItem    MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+  @@id([dealId, menuItemId])
+  @@index([menuItemId])
+  @@index([dealId])
+}
+
+// Tracks kickback events where a user earns rewards based on invitees' spending
+model KickbackEvent {
+  id                Int      @id @default(autoincrement())
+  merchantId        Int
+  dealId            Int
+  userId            Int // The user who earned the kickback
+  amountEarned      Float  // The amount earned by the user
+  sourceAmountSpent Float  // The total amount spent by invitees
+  inviteeCount      Int    @default(1) // How many invitees contributed
+  createdAt         DateTime @default(now())
+
+  merchant          Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deal              Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  @@index([merchantId, createdAt])
+  @@index([userId])
+  @@index([dealId])
+  @@index([userId, createdAt])
 }
