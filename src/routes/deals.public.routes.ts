@@ -143,10 +143,26 @@ router.get('/deals', async (req, res) => {
     // @ts-ignore: Prisma types will include merchant.stores after generate
     let deals: any[] = await prisma.deal.findMany({
       where: whereClause,
-      include: {
-        // @ts-ignore
+      // ADD THIS SELECT CLAUSE
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        imageUrls: true,
+        discountPercentage: true,
+        discountAmount: true,
+        category: true,
+        dealType: true,
+        recurringDays: true,
+        startTime: true,
+        endTime: true,
+        redemptionInstructions: true,
+        createdAt: true,
+        updatedAt: true,
+        merchantId: true,
         merchant: { include: { stores: { include: { city: true } } } },
       },
+      // include clause is now part of the select
       orderBy: {
         createdAt: 'desc',
       },
@@ -223,7 +239,22 @@ router.get('/deals', async (req, res) => {
       // Re-query with geospatial constraints
       deals = await prisma.deal.findMany({
         where: whereClause,
-        include: {
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          imageUrls: true,
+          discountPercentage: true,
+          discountAmount: true,
+          category: true,
+          dealType: true,
+          recurringDays: true,
+          startTime: true,
+          endTime: true,
+          redemptionInstructions: true,
+          createdAt: true,
+          updatedAt: true,
+          merchantId: true,
           merchant: {
             select: {
               id: true,
@@ -415,7 +446,23 @@ router.get('/deals/featured', async (req, res) => {
         endTime: { gte: now },
         merchant: { status: 'APPROVED' }
       },
-      include: {
+      // ADD THIS SELECT CLAUSE
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        imageUrls: true,
+        discountPercentage: true,
+        discountAmount: true,
+        category: true,
+        dealType: true,
+        recurringDays: true,
+        startTime: true,
+        endTime: true,
+        redemptionInstructions: true,
+        createdAt: true,
+        updatedAt: true,
+        merchantId: true,
         merchant: {
           select: {
             id: true,
