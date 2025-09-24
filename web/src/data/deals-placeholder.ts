@@ -26,6 +26,7 @@ export type ApiDeal = {
   rating?: number;
   price?: '$$' | '$$$' | '$';
   bookingInfo?: string;
+  offers?: { title: string; time: string }[];
 };
 
 // A small set of high-quality placeholder deals
@@ -122,6 +123,8 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
   // new fine-print + social proof passthrough
   offerTerms: apiDeal.offerTerms,
   claimedBy: apiDeal.claimedBy,
+  // passthrough offers array when backend provides it
+  offers: apiDeal.offers,
 
   // Pricing fallbacks: if backend provides discountAmount/percentage try to use it
   originalPrice: 100,

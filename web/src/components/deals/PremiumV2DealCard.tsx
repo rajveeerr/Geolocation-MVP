@@ -1,9 +1,9 @@
 // web/src/components/deals/PremiumV2DealCard.tsx
 import { useState, useEffect } from 'react';
-import { Heart, Clock, ArrowRight, Phone } from 'lucide-react';
+import { Heart, Clock, ArrowRight, Phone, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
-import type { Deal } from '@/data/deals';
+import type { Deal, Offer } from '@/data/deals';
 import { useCountdown } from '@/hooks/useCountdown';
 import { useSavedDeals } from '@/hooks/useSavedDeals';
 import { useAuth } from '@/context/useAuth';
@@ -48,6 +48,16 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   const imagesToShow =
     deal.images && deal.images.length > 0 ? deal.images : [deal.image];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Mock data for offers until the backend provides it
+  const mockOffers: Offer[] = [
+    { title: '2-for-1 Cocktails', time: '5-7 PM' },
+    { title: '50% Off Appetizers', time: '5-6 PM' },
+    { title: '$5 Draft Beers', time: 'All Night' },
+  ];
+
+  // State to control visibility of offers dropdown/list
+  const [offersVisible, setOffersVisible] = useState(false);
 
   const countdown = useCountdown(deal.expiresAt || '');
   // Format countdown to show HH.MM.SS format like 06.45.22
@@ -244,19 +254,53 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
               transition={{ duration: 0.4, ease: 'easeInOut' }}
               className="flex-grow"
             >
-                <Link to={`/deals/${deal.id}`} className="block">
-                <Button
-                  size="lg"
-                  variant={isHighValueDiscount ? 'primary' : ctaVariant as any}
-                  className={cn(
-                    'w-full rounded-full font-bold',
-                    isHighValueDiscount && '!bg-red-600 hover:!bg-red-700 text-white'
-                  )}
-                >
-                  {ctaIcon && <span className="mr-3">{ctaIcon}</span>}
-                  <span className="text-lg">{ctaText}</span>
-                </Button>
-              </Link>
+                <div>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setOffersVisible(!offersVisible);
+                    }}
+                    className="flex items-center justify-center w-full mb-3 text-sm font-semibold text-brand-primary-600 hover:text-brand-primary-800"
+                  >
+                    <span>View All Offers</span>
+                    <ChevronDown className={cn('h-5 w-5 ml-1 transition-transform', offersVisible && 'rotate-180')} />
+                  </button>
+
+                  <AnimatePresence>
+                    {offersVisible && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="scrollbar-hide flex gap-3 pb-4 overflow-x-auto">
+                          {(deal.offers || mockOffers).map((offer) => (
+                            <div key={offer.title} className="flex-shrink-0 w-36 rounded-lg border border-neutral-200 p-3 text-center bg-neutral-50">
+                              <p className="font-bold text-sm text-neutral-800">{offer.title}</p>
+                              <p className="text-xs text-neutral-500 mt-1">{offer.time}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <Link to={`/deals/${deal.id}`} className="block">
+                    <Button
+                      size="lg"
+                      variant={isHighValueDiscount ? 'primary' : ctaVariant as any}
+                      className={cn(
+                        'w-full rounded-full font-bold',
+                        isHighValueDiscount && '!bg-red-600 hover:!bg-red-700 text-white'
+                      )}
+                    >
+                      {ctaIcon && <span className="mr-3">{ctaIcon}</span>}
+                      <span className="text-lg">{ctaText}</span>
+                    </Button>
+                  </Link>
+                </div>
             </motion.div>
           ) : (
             <motion.div

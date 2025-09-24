@@ -1,3 +1,8 @@
+export interface Offer {
+  title: string;
+  time: string;
+}
+
 export interface Deal {
   id: string;
   name: string;
@@ -17,6 +22,7 @@ export interface Deal {
     totalCount: number;
     visibleUsers: { avatarUrl: string }[];
   };
+  offers?: Offer[];
   originalValue?: number;
   discountValue?: number;
   discountPercentage?: number | null;
