@@ -5,11 +5,6 @@ import { protect, AuthRequest, requireAdmin } from '../middleware/auth.middlewar
 
 const router = Router();
 
-// Test route to verify admin routes are working
-router.get('/test', (req: Request, res: Response) => {
-  res.status(200).json({ message: 'Admin routes are working!' });
-});
-
 // Validation schemas
 const updateCityActiveSchema = z.object({
   active: z.boolean()
