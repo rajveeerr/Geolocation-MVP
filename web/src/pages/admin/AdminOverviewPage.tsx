@@ -1,9 +1,8 @@
 // web/src/pages/admin/AdminOverviewPage.tsx
 import { StatCard } from '@/components/common/StatCard';
-import { DollarSign, Users, Tag, Building } from 'lucide-react';
+import { DollarSign, Users, Tag, Building, Loader2 } from 'lucide-react';
 import { DashboardLeaderboard } from './DashboardLeaderboard';
 import { useQuery } from '@tanstack/react-query';
-import { apiGet } from '@/services/api';
 
 // MOCK API HOOKS until backend is ready
 const useAdminGlobalStats = () => useQuery({ 
@@ -32,10 +31,30 @@ export const AdminOverviewPage = () => {
 
       {/* --- Key Metric Stat Cards --- */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Total Revenue" value={`$${stats?.totalRevenue.value.toLocaleString()}`} change={stats?.totalRevenue.change} icon={<DollarSign/>} isLoading={isLoading} />
-        <StatCard title="New Customers (30d)" value={stats?.newCustomers.value} change={stats?.newCustomers.change} icon={<Users/>} isLoading={isLoading} />
-        <StatCard title="Active Deals" value={stats?.activeDeals.value} change={stats?.activeDeals.change} icon={<Tag/>} isLoading={isLoading} />
-        <StatCard title="Active Merchants" value={stats?.activeMerchants.value} change={stats?.activeMerchants.change} icon={<Building/>} isLoading={isLoading} />
+        <StatCard 
+          title="Total Revenue" 
+          value={isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : `$${stats?.totalRevenue.value.toLocaleString()}`} 
+          icon={<DollarSign/>} 
+          color="primary"
+        />
+        <StatCard 
+          title="New Customers (30d)" 
+          value={isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats?.newCustomers.value} 
+          icon={<Users/>} 
+          color="primary"
+        />
+        <StatCard 
+          title="Active Deals" 
+          value={isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats?.activeDeals.value} 
+          icon={<Tag/>} 
+          color="primary"
+        />
+        <StatCard 
+          title="Active Merchants" 
+          value={isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats?.activeMerchants.value} 
+          icon={<Building/>} 
+          color="primary"
+        />
       </div>
 
       {/* --- Leaderboards Section --- */}

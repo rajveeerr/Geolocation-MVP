@@ -1,6 +1,5 @@
 // web/src/pages/admin/CustomerManagementPage.tsx
 import { useQuery } from '@tanstack/react-query';
-import { apiGet } from '@/services/api';
 import { Input } from '@/components/ui/input';
 
 // MOCK API HOOK
@@ -16,7 +15,7 @@ const useAllCustomers = () => useQuery({
 });
 
 export const CustomerManagementPage = () => {
-    const { data: customers, isLoading } = useAllCustomers();
+    const { data: customers } = useAllCustomers();
     
     return (
         <div>

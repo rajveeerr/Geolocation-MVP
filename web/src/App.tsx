@@ -42,9 +42,6 @@ const CreateDealPage = React.lazy(() =>
 const DealDetailPage = React.lazy(() =>
   import('./pages/DealDetailPage').then((m) => ({ default: m.DealDetailPage })),
 );
-const AdminDashboardPage = React.lazy(() =>
-  import('./pages/admin/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })),
-);
 const AdminOverviewPage = React.lazy(() =>
   import('./pages/admin/AdminOverviewPage').then((m) => ({ default: m.AdminOverviewPage })),
 );
