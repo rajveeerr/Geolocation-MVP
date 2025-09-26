@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "nodemon",
     "build": "tsc",
-    "start": "npm run build && node dist/index.js",
+    "start": "npm run build && node dist/src/index.js",
     "test": "jest --runInBand",
     "test:ci": "jest --ci --reporters=default --runInBand",
     "backfill:referrals": "ts-node scripts/backfill-referral-codes.ts",
