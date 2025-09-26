@@ -14,7 +14,7 @@ const useAdminGlobalStats = () => useQuery({
             totalRevenue: { value: 0, change: 0 },
             newCustomers: { value: 0, change: 0 },
             activeDeals: { value: 2, change: 1.0 },
-            activeMerchants: { value: 45, change: 2.1 },
+            activeMerchants: { value: 4, change: 2.1 },
         };
     }
 });
