@@ -1,13 +1,14 @@
 // web/src/pages/admin/MerchantApprovalDashboard.tsx
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiPost } from '@/services/api';
 import { Button } from '@/components/common/Button';
-import { Loader2, Building, Mail } from 'lucide-react';
+import { Loader2, Building, Mail, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { StatCard } from '@/components/common/StatCard';
 
 const MerchantAvatar = ({ src, name }: { src?: string | null; name?: string | null }) => {
     const [errored, setErrored] = useState(false);
@@ -72,10 +73,39 @@ export const MerchantApprovalDashboard = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['admin-merchants', activeTab],
-    queryFn: () => apiGet<{ merchants: MerchantApplication[] }>(`/admin/merchants?status=${activeTab}`).then(res => res.data?.merchants || []),
+  // --- THIS IS THE KEY CHANGE ---
+  // Fetch ALL merchants regardless of status to calculate stats.
+  // We will filter them on the client-side for the UI.
+  const { data: allMerchants = [], isLoading } = useQuery({
+    queryKey: ['admin-all-merchants'],
+    queryFn: () => apiGet<{ merchants: MerchantApplication[] }>(`/admin/merchants`).then(res => res.data?.merchants || []),
   });
+
+  // --- NEW: Derive stats from the fetched data using useMemo for performance ---
+  const stats = useMemo(() => {
+    const pendingCount = allMerchants.filter(m => m.status === 'PENDING').length;
+    const approvedCount = allMerchants.filter(m => m.status === 'APPROVED').length;
+    const rejectedCount = allMerchants.filter(m => m.status === 'REJECTED').length;
+    
+    // Calculate top cities by merchant count
+    const cityCounts = allMerchants.reduce((acc, merchant) => {
+      const city = merchant.address.split(',').slice(-2)[0]?.trim() || 'Unknown';
+      acc[city] = (acc[city] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const topCities = Object.entries(cityCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 3)
+      .map(([name, count]) => ({ name, count }));
+
+    return { pendingCount, approvedCount, rejectedCount, topCities };
+  }, [allMerchants]);
+
+  // Filter the merchants for the currently active tab
+  const filteredMerchants = useMemo(() => {
+    return allMerchants.filter(m => m.status === activeTab);
+  }, [allMerchants, activeTab]);
 
   const mutationOptions = {
       onSuccess: () => {
@@ -103,7 +133,43 @@ export const MerchantApprovalDashboard = () => {
         <h1 className="text-3xl pt-12 font-bold text-neutral-900">Merchant Approval</h1>
         <p className="text-neutral-600 mt-1">Review and manage new merchant applications.</p>
 
-        <div className="border-b mt-6">
+        {/* --- NEW: Stats Section --- */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 mt-6">
+            <StatCard 
+                title="Pending Approvals" 
+                value={isLoading ? <Loader2 className="h-5 w-5 animate-spin"/> : stats.pendingCount}
+                icon={<Clock className="h-6 w-6" />}
+                color="amber"
+            />
+            <StatCard 
+                title="Total Approved" 
+                value={isLoading ? <Loader2 className="h-5 w-5 animate-spin"/> : stats.approvedCount}
+                icon={<CheckCircle className="h-6 w-6" />}
+                color="green"
+            />
+            <StatCard 
+                title="Total Rejected" 
+                value={isLoading ? <Loader2 className="h-5 w-5 animate-spin"/> : stats.rejectedCount}
+                icon={<XCircle className="h-6 w-6" />}
+                color="red"
+            />
+             <div className="bg-white p-5 rounded-lg border shadow-sm">
+                <p className="text-sm font-medium text-neutral-500">Top Cities</p>
+                {isLoading ? <Loader2 className="h-5 w-5 animate-spin mt-2"/> : (
+                    <div className="mt-2 space-y-1">
+                        {stats.topCities.map(city => (
+                            <div key={city.name} className="flex justify-between items-baseline">
+                                <p className="font-semibold text-neutral-800">{city.name}</p>
+                                <p className="text-sm text-neutral-500">{city.count} merchants</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+
+        {/* --- Tab Navigation (No Changes) --- */}
+        <div className="border-b">
             {(['PENDING', 'APPROVED', 'REJECTED'] as const).map(status => (
                 <button
                     key={status}
@@ -113,12 +179,13 @@ export const MerchantApprovalDashboard = () => {
             ))}
         </div>
 
+        {/* --- MODIFIED: Data Display --- */}
         <div className="mt-6">
             {isLoading && <Loader2 className="mx-auto h-8 w-8 animate-spin" />}
-            {!isLoading && data?.length === 0 && <p className="text-center text-neutral-500 py-12">No merchants found with status "{activeTab}".</p>}
+            {!isLoading && filteredMerchants.length === 0 && <p className="text-center text-neutral-500 py-12">No merchants found with status "{activeTab}".</p>}
             
             <div className="space-y-4">
-                {data?.map(merchant => (
+                {filteredMerchants.map(merchant => (
                     <div key={merchant.id} className="bg-white border rounded-lg p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-start gap-4">
                             <div className="flex-shrink-0">

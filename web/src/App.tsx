@@ -45,6 +45,18 @@ const DealDetailPage = React.lazy(() =>
 const AdminDashboardPage = React.lazy(() =>
   import('./pages/admin/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })),
 );
+const AdminOverviewPage = React.lazy(() =>
+  import('./pages/admin/AdminOverviewPage').then((m) => ({ default: m.AdminOverviewPage })),
+);
+const MerchantApprovalDashboard = React.lazy(() =>
+  import('./pages/admin/MerchantApprovalDashboard').then((m) => ({ default: m.MerchantApprovalDashboard })),
+);
+const CityManagementDashboard = React.lazy(() =>
+  import('./pages/admin/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })),
+);
+const CustomerManagementPage = React.lazy(() =>
+  import('./pages/admin/CustomerManagementPage').then((m) => ({ default: m.CustomerManagementPage })),
+);
 const LeaderboardPage = React.lazy(() =>
   import('./pages/LeaderboardPage').then((m) => ({
     default: m.LeaderboardPage,
@@ -189,7 +201,7 @@ function App() {
                   index
                   element={
                     <Suspense fallback={<LoadingOverlay />}>
-                      <AdminDashboardPage />
+                      <AdminOverviewPage />
                     </Suspense>
                   }
                 />
@@ -197,7 +209,23 @@ function App() {
                   path={PATHS.ADMIN_MERCHANTS}
                   element={
                     <Suspense fallback={<LoadingOverlay />}>
-                      <AdminDashboardPage />
+                      <MerchantApprovalDashboard />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path={PATHS.ADMIN_CITIES}
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <CityManagementDashboard />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path={PATHS.ADMIN_CUSTOMERS}
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <CustomerManagementPage />
                     </Suspense>
                   }
                 />
