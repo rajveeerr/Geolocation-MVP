@@ -2,65 +2,17 @@ import { useState, useEffect } from 'react';
 import { useOnboarding } from '@/context/MerchantOnboardingContext';
 import { OnboardingStepLayout } from './OnboardingStepLayout';
 import { LocationPickerMap } from './LocationPickerMap';
-import { reverseGeocodeCoordinates, searchAddresses } from '@/services/geocoding';
-import type { AddressSuggestion } from '@/services/geocoding';
+import { LocationSearchModal } from './LocationSearchModal'; // <-- Import new modal
+import { reverseGeocodeCoordinates } from '@/services/geocoding';
 import { useToast } from '@/hooks/use-toast';
+import { Search, MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Search, Loader2 } from 'lucide-react';
 
 export const MapAddressStep = () => {
   const { state, dispatch } = useOnboarding();
   const { toast } = useToast();
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-
-  // --- Debounce the search input ---
-  useEffect(() => {
-    const timerId = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-    }, 500); // 500ms delay
-    return () => clearTimeout(timerId);
-  }, [searchQuery]);
-
-  // --- Fetch suggestions when the debounced query changes ---
-  useEffect(() => {
-    const fetchSuggestions = async () => {
-      if (debouncedQuery.trim().length < 3) {
-        setSuggestions([]);
-        return;
-      }
-      setIsSearching(true);
-      // We need the city name from the selected cityId. This would ideally be in the context.
-      // For now, we'll use a placeholder.
-      const selectedCityName = "New York"; // LATER: Get this from state.selectedCity.name
-      const results = await searchAddresses(debouncedQuery, selectedCityName);
-      setSuggestions(results);
-      setIsSearching(false);
-    };
-    fetchSuggestions();
-  }, [debouncedQuery]);
-
-  const handleSuggestionSelect = async (suggestion: AddressSuggestion) => {
-    const coords = { lat: parseFloat(suggestion.lat), lng: parseFloat(suggestion.lon) };
-    
-    // 1. Update coordinates in the global state, which will re-center the map
-    dispatch({ type: 'SET_COORDINATES', payload: coords });
-
-    // 2. Reverse geocode these new coordinates to get a structured address
-    const addressDetails = await reverseGeocodeCoordinates(coords);
-    if (addressDetails) {
-        dispatch({ type: 'SET_FULL_ADDRESS', payload: addressDetails });
-    }
-    
-    // 3. Clear the search and suggestions
-    setSearchQuery(suggestion.display_name);
-    setSuggestions([]);
-    
-    toast({ title: "Location Pinned!", description: suggestion.display_name });
-  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const lat = state.coordinates.lat;
@@ -90,49 +42,85 @@ export const MapAddressStep = () => {
     ? { lat: state.coordinates.lat, lng: state.coordinates.lng }
     : { lat: 40.7128, lng: -74.0060 };
 
+  const handleLocationSelectFromModal = (coords: { lat: number; lng: number }) => {
+    dispatch({ type: 'SET_COORDINATES', payload: coords });
+    toast({ title: "Location Updated", description: "You can drag the pin to refine the position." });
+  };
+
   return (
-    <OnboardingStepLayout
-      title="Where's your place located?"
-      onNext={() => dispatch({ type: 'SET_STEP', payload: state.step + 1 })}
-      onBack={() => dispatch({ type: 'SET_STEP', payload: state.step - 1 })}
-  isNextDisabled={!(state.coordinates.lat !== null && state.coordinates.lng !== null)}
-  progress={80}
-    >
-      <div className="relative">
-        <div className="relative mb-4 z-50">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400 z-50" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Enter your address..."
-              className="h-12 pl-10 text-base"
-            />
-            {isSearching && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 animate-spin" />}
-          </div>
-
-          {suggestions.length > 0 && (
-            <div className="absolute top-full mt-2 w-full bg-white border rounded-lg shadow-lg z-50">
-              {suggestions.map(suggestion => (
+    <>
+      <OnboardingStepLayout
+        title="Where's your place located?"
+        onNext={() => dispatch({ type: 'SET_STEP', payload: state.step + 1 })}
+        onBack={() => dispatch({ type: 'SET_STEP', payload: state.step - 1 })}
+        isNextDisabled={!(state.coordinates.lat !== null && state.coordinates.lng !== null)}
+        progress={80}
+      >
+        <div className="relative">
+          <LocationPickerMap 
+              center={initialCenter}
+              onLocationChange={(coords) => dispatch({ type: 'SET_COORDINATES', payload: coords })}
+          />
+          {/* --- NEW: Search control overlaid on the map (consistent UI) --- */}
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[401]">
+            <div className="flex items-center bg-white rounded-lg shadow-lg overflow-hidden">
+              <Input
+                readOnly
+                value={state.address.street || ''}
+                placeholder="Enter your address"
+                className="h-12 pl-4 text-base border-0 focus:ring-0 cursor-pointer"
+                onClick={() => setIsModalOpen(true)}
+                onFocus={() => setIsModalOpen(true)}
+              />
+              <div className="flex items-center gap-2 pr-2 pl-1">
                 <button
-                  key={suggestion.place_id}
-                  onClick={() => handleSuggestionSelect(suggestion)}
-                  className="w-full text-left p-3 hover:bg-neutral-100 border-b last:border-b-0"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    if (!navigator.geolocation) {
+                      toast({ title: 'Location Unavailable', description: 'Geolocation is not supported by your browser.' });
+                      return;
+                    }
+                    navigator.geolocation.getCurrentPosition(
+                      (pos) => {
+                        const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                        dispatch({ type: 'SET_COORDINATES', payload: coords });
+                        toast({ title: 'Using current location', description: 'You can drag the pin to refine the position.' });
+                      },
+                      (err) => {
+                        toast({ title: 'Unable to get location', description: err.message, variant: 'destructive' });
+                      },
+                      { enableHighAccuracy: true, timeout: 10000 }
+                    );
+                  }}
+                  aria-label="Use my location"
+                  className="flex items-center justify-center h-10 w-10 rounded-md text-neutral-600 hover:bg-neutral-100"
                 >
-                  {suggestion.display_name}
+                  <MapPin className="h-5 w-5" />
                 </button>
-              ))}
-            </div>
-          )}
-        </div>
 
-        <LocationPickerMap 
-            center={initialCenter}
-            // The map doesn't need to do reverse geocoding anymore
-            onLocationChange={(coords) => dispatch({ type: 'SET_COORDINATES', payload: coords })}
-        />
-      </div>
-    </OnboardingStepLayout>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsModalOpen(true);
+                  }}
+                  aria-label="Search address"
+                  className="flex items-center justify-center h-10 w-10 rounded-md text-neutral-600 hover:bg-neutral-100"
+                >
+                  <Search className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </OnboardingStepLayout>
+
+      <LocationSearchModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onLocationSelect={handleLocationSelectFromModal}
+        initialQuery={state.address.street || ''}
+      />
+    </>
   );
 };
 

@@ -1,6 +1,8 @@
 export interface Offer {
   title: string;
   time: string;
+  category: 'Drinks' | 'Bites'; // <-- Add category
+  imageUrl?: string; // <-- Add optional image
 }
 
 export interface Deal {

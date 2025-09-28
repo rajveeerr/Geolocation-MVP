@@ -123,8 +123,10 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
   // new fine-print + social proof passthrough
   offerTerms: apiDeal.offerTerms,
   claimedBy: apiDeal.claimedBy,
-  // passthrough offers array when backend provides it
-  offers: apiDeal.offers,
+  // passthrough offers array when backend provides it, adapt to frontend Offer shape
+  offers: apiDeal.offers
+    ? apiDeal.offers.map((o) => ({ title: o.title, time: o.time, category: 'Drinks' as const }))
+    : undefined,
 
   // Pricing fallbacks: if backend provides discountAmount/percentage try to use it
   originalPrice: 100,

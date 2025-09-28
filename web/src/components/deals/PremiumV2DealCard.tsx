@@ -1,5 +1,5 @@
 // web/src/components/deals/PremiumV2DealCard.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Heart, Clock, ArrowRight, Phone, ChevronDown, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -52,12 +52,14 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
     deal.images && deal.images.length > 0 ? deal.images : [deal.image];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Mock data for offers until the backend provides it
+  // --- UPDATED Mock data with categories and images ---
   const mockOffers: Offer[] = [
-    { title: '2-for-1 Cocktails', time: '5-7 PM' },
-    { title: '50% Off Appetizers', time: '5-6 PM' },
-    { title: '$5 Draft Beers', time: 'All Night' },
+    { title: '2-for-1 Cocktails', time: '5-7 PM', category: 'Drinks', imageUrl: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=200&q=80' },
+    { title: '50% Off Appetizers', time: '5-6 PM', category: 'Bites', imageUrl: 'https://images.unsplash.com/photo-1579871494447-9811CFb5d668?w=200&q=80' },
+    { title: '$5 Draft Beers', time: 'All Night', category: 'Drinks', imageUrl: 'https://images.unsplash.com/photo-1586993451228-098a8924133e?w=200&q=80' },
+    { title: 'Truffle Fries', time: '5-7 PM', category: 'Bites', imageUrl: 'https://images.unsplash.com/photo-1598679253544-2c9740f92d4f?w=200&q=80' },
   ];
+  const offerImageFallback = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&q=80';
 
   // Mock claimed users for kickback deals when backend data isn't available
   const mockClaimedUsers = [
@@ -68,6 +70,12 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
 
   // State to control visibility of offers dropdown/list
   const [offersVisible, setOffersVisible] = useState(false);
+  const [activeOfferTab, setActiveOfferTab] = useState<'Drinks' | 'Bites'>('Drinks');
+
+  // --- NEW: Memoize the filtered offers to prevent re-calculation on every render ---
+  const filteredOffers = useMemo(() => {
+    return (deal.offers || mockOffers).filter((offer) => offer.category === activeOfferTab);
+  }, [deal.offers, activeOfferTab]);
 
   const countdown = useCountdown(deal.expiresAt || '');
   // Format countdown to show HH.MM.SS format like 06.45.22
@@ -322,21 +330,49 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
 
                   <AnimatePresence>
                     {offersVisible && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="scrollbar-hide flex gap-3 pb-4 overflow-x-auto">
-                          {(deal.offers || mockOffers).map((offer) => (
-                            <div key={offer.title} className="flex-shrink-0 w-36 rounded-lg border border-neutral-200 p-3 text-center bg-neutral-50">
-                              <p className="font-bold text-sm text-neutral-800">{offer.title}</p>
-                              <p className="text-xs text-neutral-500 mt-1">{offer.time}</p>
+                        <motion.div 
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden mb-4"
+                        >
+                            {/* --- NEW: Tab Selector for Offers --- */}
+                            <div className="flex items-center gap-2 rounded-full bg-neutral-100 p-1 mb-3">
+                                <button onClick={(e) => {e.preventDefault(); e.stopPropagation(); setActiveOfferTab('Drinks')}} className={cn("flex-1 rounded-full py-1.5 text-sm font-semibold", activeOfferTab === 'Drinks' ? 'bg-black text-white shadow' : 'text-neutral-600')}>Drinks</button>
+                                <button onClick={(e) => {e.preventDefault(); e.stopPropagation(); setActiveOfferTab('Bites')}} className={cn("flex-1 rounded-full py-1.5 text-sm font-semibold", activeOfferTab === 'Bites' ? 'bg-black text-white shadow' : 'text-neutral-600')}>Bites</button>
                             </div>
-                          ))}
-                        </div>
-                      </motion.div>
+
+                            {/* --- NEW: Richer Offer Cards --- */}
+                            <div className="space-y-2">
+                              <AnimatePresence mode="wait">
+                                <motion.div
+                                  key={activeOfferTab}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -10 }}
+                                  transition={{ duration: 0.2 }}
+                                >
+                                  {filteredOffers.map(offer => (
+                                      <div key={offer.title} className="flex items-center gap-3 p-2 rounded-lg bg-neutral-50 border border-neutral-200/60">
+                                          <img
+                                            src={offer.imageUrl || offerImageFallback}
+                                            alt={offer.title}
+                                            onError={(e) => {
+                                              (e.currentTarget as HTMLImageElement).onerror = null;
+                                              (e.currentTarget as HTMLImageElement).src = offerImageFallback;
+                                            }}
+                                            className="h-12 w-12 rounded-md object-cover flex-shrink-0"
+                                          />
+                                          <div className="flex-grow">
+                                              <p className="font-bold text-sm text-neutral-800">{offer.title}</p>
+                                              <p className="text-xs text-neutral-500 mt-1">{offer.time}</p>
+                                          </div>
+                                      </div>
+                                  ))}
+                                </motion.div>
+                              </AnimatePresence>
+                            </div>
+                        </motion.div>
                     )}
                   </AnimatePresence>
 
