@@ -95,8 +95,8 @@ export const MapAddressStep = () => {
       title="Where's your place located?"
       onNext={() => dispatch({ type: 'SET_STEP', payload: state.step + 1 })}
       onBack={() => dispatch({ type: 'SET_STEP', payload: state.step - 1 })}
-      isNextDisabled={!(state.coordinates.lat !== null && state.coordinates.lng !== null)}
-      progress={80}
+  isNextDisabled={!(state.coordinates.lat !== null && state.coordinates.lng !== null)}
+  progress={80}
     >
       <div className="relative">
         <div className="relative mb-4 z-50">

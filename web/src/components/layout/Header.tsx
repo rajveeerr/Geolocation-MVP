@@ -201,6 +201,7 @@ import { ProfileDropDown } from './ProfileDropDown';
 import { NavbarSearch } from './NavbarSearch';
 import { SearchModal } from './SearchModal';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 const navigationItems = [
   { id: 'deals', label: 'Hot Deals', path: PATHS.ALL_DEALS },
@@ -214,6 +215,7 @@ export const Header = () => {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false); // <-- NEW STATE
   const { user, isLoadingUser } = useAuth();
   const { data: merchantData } = useMerchantStatus();
+  const { isAdmin } = useAdminStatus();
 
   // Check if user has a merchant profile (any status)
   const hasMerchantProfile = !!merchantData?.data?.merchant;
@@ -285,13 +287,13 @@ export const Header = () => {
           </div>
 
           <div className="hidden items-center justify-end gap-2 lg:flex">
-            <Link to={businessLink}>
-              <Button variant="secondary" size="md" className="rounded-full">
-                {hasMerchantProfile
-                  ? 'Business Dashboard'
-                  : 'Yohop for Business'}
-              </Button>
-            </Link>
+            {!isAdmin && (
+              <Link to={businessLink}>
+                <Button variant="secondary" size="md" className="rounded-full">
+                  {hasMerchantProfile ? 'Business Dashboard' : 'Yohop for Business'}
+                </Button>
+              </Link>
+            )}
             {isLoadingUser ? (
               <div className="h-10 w-24 animate-pulse rounded-full bg-neutral-200" />
             ) : user ? (
@@ -364,29 +366,31 @@ export const Header = () => {
                         Sign up / Log in
                       </Button>
                     </Link>
-                    <p className="mt-6 text-center text-base font-medium text-gray-500">
-                      {hasMerchantProfile ? (
-                        <>
-                          Manage your business{' '}
-                          <Link
-                            to={PATHS.MERCHANT_DASHBOARD}
-                            className="text-primary hover:text-primary/90"
-                          >
-                            Go to Dashboard
-                          </Link>
-                        </>
-                      ) : (
-                        <>
-                          Are you a business owner?{' '}
-                          <Link
-                            to={PATHS.MERCHANT_ONBOARDING}
-                            className="text-primary hover:text-primary/90"
-                          >
-                            Get on the map
-                          </Link>
-                        </>
-                      )}
-                    </p>
+                    {!isAdmin && (
+                      <p className="mt-6 text-center text-base font-medium text-gray-500">
+                        {hasMerchantProfile ? (
+                          <>
+                            Manage your business{' '}
+                            <Link
+                              to={PATHS.MERCHANT_DASHBOARD}
+                              className="text-primary hover:text-primary/90"
+                            >
+                              Go to Dashboard
+                            </Link>
+                          </>
+                        ) : (
+                          <>
+                            Are you a business owner?{' '}
+                            <Link
+                              to={PATHS.MERCHANT_ONBOARDING}
+                              className="text-primary hover:text-primary/90"
+                            >
+                              Get on the map
+                            </Link>
+                          </>
+                        )}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

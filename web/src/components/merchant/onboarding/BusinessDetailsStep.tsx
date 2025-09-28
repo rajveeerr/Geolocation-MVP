@@ -14,9 +14,9 @@ export const BusinessDetailsStep = () => {
   return (
     <OnboardingStepLayout
       title="Add a few more details"
-      onNext={handleNext}
-      onBack={() => dispatch({ type: 'SET_STEP', payload: state.step - 1 })}
-      progress={60}
+  onNext={handleNext}
+  onBack={() => dispatch({ type: 'SET_STEP', payload: state.step - 1 })}
+  progress={60}
     >
       <div className="space-y-4">
         <div>

@@ -1,7 +1,7 @@
 // web/src/components/layout/AdminLayout.tsx
 import { Outlet, NavLink } from 'react-router-dom';
 import { Logo } from '../common/Logo';
-import { Shield, Users, Menu, X } from 'lucide-react';
+import { Shield, Users, Menu, X, Building } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routing/paths';
 import { useState } from 'react';
@@ -31,8 +31,9 @@ export const AdminLayout = () => {
                     <Logo />
                 </div>
                 <nav className="space-y-2">
-                    <AdminSidebarLink to={PATHS.ADMIN_DASHBOARD} icon={<Shield className="h-5 w-5" />} label="Dashboard" />
+                    <AdminSidebarLink to={PATHS.ADMIN_DASHBOARD} icon={<Shield className="h-5 w-5" />} label="Overview" />
                     <AdminSidebarLink to={PATHS.ADMIN_MERCHANTS} icon={<Users className="h-5 w-5" />} label="Merchants" />
+                    <AdminSidebarLink to={PATHS.ADMIN_CITIES} icon={<Building className="h-5 w-5" />} label="Cities" />
                 </nav>
             </aside>
 
@@ -59,8 +60,9 @@ export const AdminLayout = () => {
                             </button>
                         </div>
                         <nav className="space-y-2">
-                            <AdminSidebarLink to={PATHS.ADMIN_DASHBOARD} icon={<Shield className="h-5 w-5" />} label="Dashboard" />
+                            <AdminSidebarLink to={PATHS.ADMIN_DASHBOARD} icon={<Shield className="h-5 w-5" />} label="Overview" />
                             <AdminSidebarLink to={PATHS.ADMIN_MERCHANTS} icon={<Users className="h-5 w-5" />} label="Merchants" />
+                            <AdminSidebarLink to={PATHS.ADMIN_CITIES} icon={<Building className="h-5 w-5" />} label="Cities" />
                         </nav>
                     </aside>
                 </div>

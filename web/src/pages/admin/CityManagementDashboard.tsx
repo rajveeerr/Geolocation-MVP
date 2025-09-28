@@ -1,4 +1,5 @@
 // web/src/pages/admin/CityManagementDashboard.tsx
+// Consolidated CityManagementDashboard implementation
 import { useState } from 'react';
 import { useAdminCities } from '@/hooks/useAdminCities';
 import type { AdminCity } from '@/hooks/useAdminCities';
@@ -29,13 +30,13 @@ export const CityManagementDashboard = () => {
   const { toast } = useToast();
 
   const updateCityMutation = useMutation({
-    mutationFn: ({ cityId, active }: { cityId: number, active: boolean }) => apiPut(`/admin/cities/${cityId}/active`, { active }),
+    mutationFn: ({ cityId, active }: { cityId: number; active: boolean }) => apiPut(`/admin/cities/${cityId}/active`, { active }),
     onSuccess: () => {
       toast({ title: 'City status updated!' });
       queryClient.invalidateQueries({ queryKey: ['admin-cities'] });
       queryClient.invalidateQueries({ queryKey: ['admin-city-stats'] });
     },
-    onError: (error: Error) => toast({ title: 'Error', description: error.message, variant: 'destructive' })
+    onError: (error: Error) => toast({ title: 'Error', description: error.message, variant: 'destructive' }),
   });
 
   const createCityMutation = useMutation<ApiResponse<any>, Error, { name: string; state: string; active?: boolean }>({
@@ -46,14 +47,16 @@ export const CityManagementDashboard = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-city-stats'] });
       setShowCreateModal(false);
     },
-    onError: (error: Error) => toast({ title: 'Error', description: error.message, variant: 'destructive' })
+    onError: (error: Error) => toast({ title: 'Error', description: error.message, variant: 'destructive' }),
   });
 
   return (
     <div className="space-y-6">
       {/* Stats Section */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {isLoadingStats ? <p>Loading stats...</p> : (
+        {isLoadingStats ? (
+          <p>Loading stats...</p>
+        ) : (
           <>
             <StatCard title="Total Cities" value={statsData?.stats.totalCities ?? 0} />
             <StatCard title="Active Cities" value={statsData?.stats.activeCities ?? 0} />
@@ -66,13 +69,15 @@ export const CityManagementDashboard = () => {
       {/* Controls and Table Section */}
       <div className="bg-white p-4 rounded-lg border shadow-sm">
         <div className="flex justify-between items-center mb-4">
-          <Input 
+          <Input
             placeholder="Search city or state..."
             className="max-w-xs"
-            onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value, page: 1 }))}
+            onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value, page: 1 }))}
           />
           <div className="flex items-center gap-2">
-            <Button onClick={() => setShowCreateModal(true)}><PlusCircle className="mr-2 h-4 w-4" /> Add City</Button>
+            <Button onClick={() => setShowCreateModal(true)}>
+              <PlusCircle className="mr-2 h-4 w-4" /> Add City
+            </Button>
           </div>
         </div>
 
@@ -84,7 +89,9 @@ export const CityManagementDashboard = () => {
           />
         )}
 
-        {isLoadingCities ? <Loader2 className="mx-auto h-8 w-8 animate-spin" /> : (
+        {isLoadingCities ? (
+          <Loader2 className="mx-auto h-8 w-8 animate-spin" />
+        ) : (
           <table className="w-full text-sm text-left">
             <thead className="bg-neutral-50">
               <tr>
@@ -101,10 +108,7 @@ export const CityManagementDashboard = () => {
                   <td className="p-2 text-neutral-600">{city.state}</td>
                   <td className="p-2 text-neutral-600">{city.approvedMerchants}</td>
                   <td className="p-2 text-center">
-                    <Switch
-                      checked={city.active}
-                      onCheckedChange={(active) => updateCityMutation.mutate({ cityId: city.id, active })}
-                    />
+                    <Switch checked={city.active} onCheckedChange={(active) => updateCityMutation.mutate({ cityId: city.id, active })} />
                   </td>
                 </tr>
               ))}
@@ -118,7 +122,11 @@ export const CityManagementDashboard = () => {
 };
 
 // Modal component for creating a new city
-const CreateCityModal = ({ onClose, onCreate, isLoading }: {
+const CreateCityModal = ({
+  onClose,
+  onCreate,
+  isLoading,
+}: {
   onClose: () => void;
   onCreate: (payload: { name: string; state: string; active?: boolean }) => void;
   isLoading?: boolean;
@@ -143,7 +151,9 @@ const CreateCityModal = ({ onClose, onCreate, isLoading }: {
         </div>
 
         <div className="mt-6 flex justify-end gap-3">
-          <Button variant="secondary" onClick={onClose} disabled={isLoading}>Cancel</Button>
+          <Button variant="secondary" onClick={onClose} disabled={isLoading}>
+            Cancel
+          </Button>
           <Button onClick={() => onCreate({ name: name.trim(), state: stateName.trim(), active })} disabled={isLoading || !name || !stateName}>
             {isLoading ? 'Creating...' : 'Create City'}
           </Button>
@@ -152,3 +162,6 @@ const CreateCityModal = ({ onClose, onCreate, isLoading }: {
     </div>
   );
 };
+
+export default CityManagementDashboard;
+

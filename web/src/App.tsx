@@ -49,7 +49,7 @@ const MerchantApprovalDashboard = React.lazy(() =>
   import('./pages/admin/MerchantApprovalDashboard').then((m) => ({ default: m.MerchantApprovalDashboard })),
 );
 const CityManagementDashboard = React.lazy(() =>
-  import('./pages/admin/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })),
+  import('./pages/admin/CityManagementDashboard').then((m) => ({ default: m.CityManagementDashboard })),
 );
 const CustomerManagementPage = React.lazy(() =>
   import('./pages/admin/CustomerManagementPage').then((m) => ({ default: m.CustomerManagementPage })),

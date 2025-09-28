@@ -170,9 +170,9 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
 
                 <div className='absolute right-3 top-3 flex flex-col gap-2'>
                   <Button
-                    variant="secondary"
+                    variant="ghost"
                     size="md"
-                    className="h-9 w-9 rounded-full p-0 focus-visible:ring-0 focus:ring-0 ring-0 ring-offset-0"
+                    className="h-9 w-9 rounded-full p-0 focus-visible:ring-0 focus:ring-0 ring-0 ring-offset-0 group transition-colors duration-200 bg-white hover:!bg-brand-primary-main"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -181,15 +181,15 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                         window.location.href = `tel:${maybePhone.replace(/[^\d+]/g, '')}`;
                       }
                     }}
-                    icon={<Phone className="h-4 w-4 text-neutral-900" />}
+                    icon={<Phone className="h-4 w-4 transition-colors text-neutral-900 group-hover:text-white" />}
                     aria-label="Call restaurant"
                   />
 
                   {/* Share button below the phone button */}
                   <Button
-                    variant="secondary"
+                    variant="ghost"
                     size="md"
-                    className="h-9 w-9 rounded-full p-0 focus-visible:ring-0 focus:ring-0 ring-0 ring-offset-0"
+                    className="h-9 w-9 rounded-full p-0 focus-visible:ring-0 focus:ring-0 ring-0 ring-offset-0 group transition-colors duration-200 bg-white hover:!bg-brand-primary-main"
                     onClick={async (e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -215,14 +215,14 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                         toast({ title: 'Unable to share', description: String(err), variant: 'destructive' });
                       }
                     }}
-                    icon={<Share2 className="h-4 w-4 text-neutral-900" />}
+                    icon={<Share2 className="h-4 w-4 transition-colors text-neutral-900 group-hover:text-white" />}
                     aria-label="Share deal"
                   />
                   {/* Like (save) button below share */}
                   <Button
-                    variant="secondary"
+                    variant="ghost"
                     size="md"
-                    className="h-9 w-9 rounded-full p-0 focus-visible:ring-0 focus:ring-0 ring-0 ring-offset-0"
+                    className="h-9 w-9 rounded-full p-0 focus-visible:ring-0 focus:ring-0 ring-0 ring-offset-0 group transition-colors duration-200 bg-white hover:!bg-brand-primary-main"
                     onClick={(e) => handleLikeClick(e)}
                     disabled={isLikeButtonLoading}
                     icon={
@@ -232,6 +232,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                           isSaved
                             ? 'fill-brand-primary-400 text-brand-primary-400'
                             : 'text-neutral-900',
+                          'group-hover:fill-white group-hover:text-white'
                         )}
                       />
                     }
@@ -252,8 +253,8 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
               <h3 className="text-3xl font-bold leading-tight">
                 {deal.name}
               </h3>
-              <p className="mt-1.5 text-base text-white/90">
-                {deal.subtitle || 'Cyber Hub is a part of the DLF Cyber City complex'}
+              <p className="text-base text-white/90">
+                {deal.subtitle || 'Cyber Hub is a part of the DLF'}
               </p>
               <div className="mt-4 font-semibold text-brand-primary-400">
                 {deal.claimedBy && deal.claimedBy.totalCount > 0 ? (

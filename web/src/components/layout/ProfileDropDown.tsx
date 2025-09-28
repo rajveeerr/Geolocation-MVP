@@ -64,7 +64,7 @@ export const ProfileDropDown = ({ isMerchant }: { isMerchant: boolean }) => {
           </>
         )}
 
-        {isMerchant && (
+        {isMerchant && !isAdmin && (
           <>
             <DropdownMenuItem asChild>
               <Link to={PATHS.MERCHANT_DASHBOARD}>

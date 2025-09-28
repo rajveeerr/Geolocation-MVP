@@ -3,7 +3,6 @@ import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PATHS } from '@/routing/paths';
-import { CitySelectionStep } from '@/components/merchant/onboarding/CitySelectionStep';
 import { BusinessInfoStep } from '@/components/merchant/onboarding/BusinessInfoStep';
 import { BusinessCategoryStep } from '@/components/merchant/onboarding/BusinessCategoryStep';
 import { BusinessDetailsStep } from '@/components/merchant/onboarding/BusinessDetailsStep';
@@ -12,14 +11,20 @@ import { FinalReviewStep } from '@/components/merchant/onboarding/FinalReviewSte
 
 const OnboardingFlow = () => {
   const { state } = useOnboarding();
+  // New 5-step flow: 1=BusinessInfo, 2=BusinessCategory, 3=BusinessDetails, 4=MapAddress, 5=FinalReview
   switch (state.step) {
-    case 1: return <CitySelectionStep />;
-    case 2: return <BusinessInfoStep />;
-    case 3: return <BusinessCategoryStep />;
-    case 4: return <BusinessDetailsStep />;
-    case 5: return <MapAddressStep />;
-    case 6: return <FinalReviewStep />;
-    default: return <CitySelectionStep />;
+    case 1:
+      return <BusinessInfoStep />;
+    case 2:
+      return <BusinessCategoryStep />;
+    case 3:
+      return <BusinessDetailsStep />;
+    case 4:
+      return <MapAddressStep />;
+    case 5:
+      return <FinalReviewStep />;
+    default:
+      return <BusinessInfoStep />;
   }
 };
 

@@ -26,8 +26,8 @@ export const BusinessCategoryStep = () => {
       title="Which of these best describes your place?"
       onNext={handleNext}
       onBack={() => dispatch({ type: 'SET_STEP', payload: state.step - 1 })}
-      isNextDisabled={!state.businessCategory}
-      progress={40}
+  isNextDisabled={!state.businessCategory}
+  progress={40}
     >
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {categories.map(cat => (

@@ -1,4 +1,4 @@
-// web/src/pages/admin/MerchantApprovalDashboard.tsx
+// Consolidated MerchantApprovalDashboard implementation
 import { useState, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiPost } from '@/services/api';
@@ -73,21 +73,15 @@ export const MerchantApprovalDashboard = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // --- THIS IS THE KEY CHANGE ---
-  // Fetch ALL merchants regardless of status to calculate stats.
-  // We will filter them on the client-side for the UI.
   const { data: allMerchants = [], isLoading } = useQuery({
     queryKey: ['admin-all-merchants'],
     queryFn: () => apiGet<{ merchants: MerchantApplication[] }>(`/admin/merchants`).then(res => res.data?.merchants || []),
   });
 
-  // --- NEW: Derive stats from the fetched data using useMemo for performance ---
   const stats = useMemo(() => {
     const pendingCount = allMerchants.filter(m => m.status === 'PENDING').length;
     const approvedCount = allMerchants.filter(m => m.status === 'APPROVED').length;
     const rejectedCount = allMerchants.filter(m => m.status === 'REJECTED').length;
-    
-    // Calculate top cities by merchant count
     const cityCounts = allMerchants.reduce((acc, merchant) => {
       const city = merchant.address.split(',').slice(-2)[0]?.trim() || 'Unknown';
       acc[city] = (acc[city] || 0) + 1;
@@ -102,10 +96,7 @@ export const MerchantApprovalDashboard = () => {
     return { pendingCount, approvedCount, rejectedCount, topCities };
   }, [allMerchants]);
 
-  // Filter the merchants for the currently active tab
-  const filteredMerchants = useMemo(() => {
-    return allMerchants.filter(m => m.status === activeTab);
-  }, [allMerchants, activeTab]);
+  const filteredMerchants = useMemo(() => allMerchants.filter(m => m.status === activeTab), [allMerchants, activeTab]);
 
   const mutationOptions = {
       onSuccess: () => {
@@ -133,7 +124,6 @@ export const MerchantApprovalDashboard = () => {
         <h1 className="text-3xl pt-12 font-bold text-neutral-900">Merchant Approval</h1>
         <p className="text-neutral-600 mt-1">Review and manage new merchant applications.</p>
 
-        {/* --- NEW: Stats Section --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 mt-6">
             <StatCard 
                 title="Pending Approvals" 
@@ -144,13 +134,13 @@ export const MerchantApprovalDashboard = () => {
             <StatCard 
                 title="Total Approved" 
                 value={isLoading ? <Loader2 className="h-5 w-5 animate-spin"/> : stats.approvedCount}
-                icon={<CheckCircle className="h-6 w-6" />}
+                icon={<CheckCircle className="h-6 w-6" />} 
                 color="green"
             />
             <StatCard 
                 title="Total Rejected" 
                 value={isLoading ? <Loader2 className="h-5 w-5 animate-spin"/> : stats.rejectedCount}
-                icon={<XCircle className="h-6 w-6" />}
+                icon={<XCircle className="h-6 w-6" />} 
                 color="red"
             />
              <div className="bg-white p-5 rounded-lg border shadow-sm">
@@ -168,7 +158,6 @@ export const MerchantApprovalDashboard = () => {
             </div>
         </div>
 
-        {/* --- Tab Navigation (No Changes) --- */}
         <div className="border-b">
             {(['PENDING', 'APPROVED', 'REJECTED'] as const).map(status => (
                 <button
@@ -179,7 +168,6 @@ export const MerchantApprovalDashboard = () => {
             ))}
         </div>
 
-        {/* --- MODIFIED: Data Display --- */}
         <div className="mt-6">
             {isLoading && <Loader2 className="mx-auto h-8 w-8 animate-spin" />}
             {!isLoading && filteredMerchants.length === 0 && <p className="text-center text-neutral-500 py-12">No merchants found with status "{activeTab}".</p>}
@@ -226,3 +214,5 @@ export const MerchantApprovalDashboard = () => {
     </div>
   );
 };
+
+export default MerchantApprovalDashboard;
