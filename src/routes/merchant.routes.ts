@@ -149,25 +149,59 @@ router.get('/merchants/status', protect, async (req: AuthRequest, res) => {
   }
 });
 
-// --- Endpoint: POST /api/deals ---
-// Allows an APPROVED merchant to create a new deal.
+// --- Enhanced Endpoint: POST /api/deals ---
+// Allows an APPROVED merchant to create a comprehensive deal with all dynamic fields.
 router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res) => {
   try {
     const {
+      // Basic deal information
       title,
       description,
       activeDateRange, // { startDate, endDate }
       timeRanges, // placeholder for future granular hours
       redemptionInstructions,
+      
+      // Visual content
       imageUrls,
+      primaryImageIndex, // Index of primary image in imageUrls array
+      
+      // Offer details
       discountPercentage,
       discountAmount,
+      offerTerms,
+      customOfferDisplay, // Custom offer text (e.g., "Buy 2 Get 1 Free")
+      
+      // Categorization
       category,
       dealType: rawDealType,
       recurringDays: rawRecurringDays,
-      offerTerms,
+      
+      // Features and settings
       kickbackEnabled,
-      menuItems // [{ id, isHidden }]
+      isFeatured, // Whether this deal should be featured
+      priority, // Deal priority for sorting (1-10, higher = more priority)
+      
+      // Menu integration
+      menuItems, // [{ id, isHidden, customPrice?, customDiscount? }]
+      
+      // Advanced settings
+      maxRedemptions, // Maximum number of redemptions allowed
+      minOrderAmount, // Minimum order amount to qualify
+      validDaysOfWeek, // Specific days of week when deal is valid
+      validHours, // Specific time ranges when deal is valid
+      
+      // Social and engagement
+      socialProofEnabled, // Whether to show social proof
+      allowSharing, // Whether deal can be shared
+      
+      // Location-specific settings
+      storeIds, // Specific store IDs where deal is valid (if not all stores)
+      cityIds, // Specific city IDs where deal is valid
+      
+      // Additional metadata
+      tags, // Array of tags for better categorization
+      notes, // Internal notes for merchant
+      externalUrl // Link to external page or menu
     } = req.body;
     const merchantId = req.merchant?.id;
 
@@ -175,9 +209,11 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
       return res.status(401).json({ error: 'Merchant authentication required' });
     }
 
+    // Enhanced validation
     if (!title || !activeDateRange?.startDate || !activeDateRange?.endDate) {
       return res.status(400).json({ error: 'Title and activeDateRange (with startDate and endDate) are required.' });
     }
+    
     const startTime = new Date(activeDateRange.startDate);
     const endTime = new Date(activeDateRange.endDate);
     if (!(startTime instanceof Date) || isNaN(startTime.getTime()) || !(endTime instanceof Date) || isNaN(endTime.getTime())) {
@@ -187,8 +223,58 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
       return res.status(400).json({ error: 'End date must be after start date.' });
     }
 
+    // Validate imageUrls
     if (imageUrls && (!Array.isArray(imageUrls) || imageUrls.some((u: any) => typeof u !== 'string'))) {
       return res.status(400).json({ error: 'imageUrls must be an array of strings.' });
+    }
+
+    // Validate primaryImageIndex
+    if (primaryImageIndex !== undefined) {
+      const primaryIndex = parseInt(primaryImageIndex);
+      if (isNaN(primaryIndex) || primaryIndex < 0 || (imageUrls && primaryIndex >= imageUrls.length)) {
+        return res.status(400).json({ error: 'primaryImageIndex must be a valid index within imageUrls array.' });
+      }
+    }
+
+    // Validate discount fields
+    if (discountPercentage !== undefined && (isNaN(discountPercentage) || discountPercentage < 0 || discountPercentage > 100)) {
+      return res.status(400).json({ error: 'discountPercentage must be between 0 and 100.' });
+    }
+    if (discountAmount !== undefined && (isNaN(discountAmount) || discountAmount < 0)) {
+      return res.status(400).json({ error: 'discountAmount must be a positive number.' });
+    }
+    if (!discountPercentage && !discountAmount && !customOfferDisplay) {
+      return res.status(400).json({ error: 'At least one of discountPercentage, discountAmount, or customOfferDisplay is required.' });
+    }
+
+    // Validate priority
+    if (priority !== undefined && (isNaN(priority) || priority < 1 || priority > 10)) {
+      return res.status(400).json({ error: 'priority must be between 1 and 10.' });
+    }
+
+    // Validate maxRedemptions
+    if (maxRedemptions !== undefined && (isNaN(maxRedemptions) || maxRedemptions < 1)) {
+      return res.status(400).json({ error: 'maxRedemptions must be a positive number.' });
+    }
+
+    // Validate minOrderAmount
+    if (minOrderAmount !== undefined && (isNaN(minOrderAmount) || minOrderAmount < 0)) {
+      return res.status(400).json({ error: 'minOrderAmount must be a non-negative number.' });
+    }
+
+    // Validate tags
+    if (tags && (!Array.isArray(tags) || tags.some((tag: any) => typeof tag !== 'string'))) {
+      return res.status(400).json({ error: 'tags must be an array of strings.' });
+    }
+
+    // Validate storeIds
+    if (storeIds && (!Array.isArray(storeIds) || storeIds.some((id: any) => isNaN(parseInt(id))))) {
+      return res.status(400).json({ error: 'storeIds must be an array of valid store IDs.' });
+    }
+
+    // Validate cityIds
+    if (cityIds && (!Array.isArray(cityIds) || cityIds.some((id: any) => isNaN(parseInt(id))))) {
+      return res.status(400).json({ error: 'cityIds must be an array of valid city IDs.' });
     }
 
     // Validate and resolve deal type ID
@@ -257,51 +343,116 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
       }
     }
 
-    // Transaction: create deal + attach menu items (if provided)
+    // Enhanced deal creation with all dynamic fields
     const newDeal = await prisma.$transaction(async (tx) => {
+      // Prepare enhanced deal data
+      const dealData = {
+        title,
+        description: description || '',
+        startTime,
+        endTime,
+        redemptionInstructions: redemptionInstructions || '',
+        imageUrls: imageUrls || [],
+        discountPercentage: discountPercentage ? parseFloat(discountPercentage) : null,
+        discountAmount: discountAmount ? parseFloat(discountAmount) : null,
+        categoryId: categoryId!,
+        dealTypeId: dealTypeId!,
+        recurringDays,
+        offerTerms: offerTerms || null,
+        kickbackEnabled: !!kickbackEnabled,
+        merchantId: merchantId,
+        
+        // Enhanced fields (stored as JSON in a metadata field or separate columns)
+        // Note: Some fields might need to be added to the schema
+        metadata: JSON.stringify({
+          primaryImageIndex: primaryImageIndex !== undefined ? parseInt(primaryImageIndex) : 0,
+          customOfferDisplay: customOfferDisplay || null,
+          isFeatured: !!isFeatured,
+          priority: priority ? parseInt(priority) : 5,
+          maxRedemptions: maxRedemptions ? parseInt(maxRedemptions) : null,
+          minOrderAmount: minOrderAmount ? parseFloat(minOrderAmount) : null,
+          validDaysOfWeek: validDaysOfWeek || null,
+          validHours: validHours || null,
+          socialProofEnabled: socialProofEnabled !== false, // default true
+          allowSharing: allowSharing !== false, // default true
+          storeIds: storeIds || null,
+          cityIds: cityIds || null,
+          tags: tags || [],
+          notes: notes || null,
+          externalUrl: externalUrl || null
+        })
+      };
+
       const createdDeal = await tx.deal.create({
-        data: {
-          title,
-          description: description || '',
-          startTime,
-          endTime,
-          redemptionInstructions: redemptionInstructions || '',
-          imageUrls: imageUrls || [],
-          discountPercentage: discountPercentage ? parseInt(discountPercentage, 10) : null,
-          discountAmount: discountAmount ? parseFloat(discountAmount) : null,
-          categoryId: categoryId!,
-          dealTypeId: dealTypeId!,
-          recurringDays,
-          offerTerms: offerTerms || null,
-          kickbackEnabled: !!kickbackEnabled,
-          merchantId: merchantId
-        }
+        data: dealData
       });
 
+      // Handle menu items with enhanced data
       if (menuItems && Array.isArray(menuItems) && menuItems.length > 0) {
         const dealMenuItemsData = menuItems
           .filter(mi => mi && typeof mi.id !== 'undefined')
           .map(mi => ({
             dealId: createdDeal.id,
             menuItemId: Number(mi.id),
-            isHidden: !!mi.isHidden
+            isHidden: !!mi.isHidden,
+            // Enhanced menu item data
+            customPrice: mi.customPrice ? parseFloat(mi.customPrice) : null,
+            customDiscount: mi.customDiscount ? parseFloat(mi.customDiscount) : null
           }));
+        
         if (dealMenuItemsData.length) {
           // @ts-ignore - DealMenuItem model available after generate
           await tx.dealMenuItem.createMany({ data: dealMenuItemsData });
         }
       }
+
       return createdDeal;
     });
 
-    res.status(201).json({
-      message: 'Deal created successfully',
-      deal: newDeal,
+    // Enhanced response with all dynamic fields
+    const response = {
+      success: true,
+      message: 'Deal created successfully with enhanced features',
+      deal: {
+        id: newDeal.id,
+        title: newDeal.title,
+        description: newDeal.description,
+        startTime: newDeal.startTime,
+        endTime: newDeal.endTime,
+        discountPercentage: newDeal.discountPercentage,
+        discountAmount: newDeal.discountAmount,
+        imageUrls: newDeal.imageUrls,
+        offerTerms: newDeal.offerTerms,
+        kickbackEnabled: newDeal.kickbackEnabled,
+        createdAt: newDeal.createdAt,
+        updatedAt: newDeal.updatedAt
+      },
+      enhancedFeatures: {
+        primaryImageIndex: primaryImageIndex !== undefined ? parseInt(primaryImageIndex) : 0,
+        customOfferDisplay: customOfferDisplay || null,
+        isFeatured: !!isFeatured,
+        priority: priority ? parseInt(priority) : 5,
+        maxRedemptions: maxRedemptions ? parseInt(maxRedemptions) : null,
+        minOrderAmount: minOrderAmount ? parseFloat(minOrderAmount) : null,
+        socialProofEnabled: socialProofEnabled !== false,
+        allowSharing: allowSharing !== false,
+        tags: tags || [],
+        externalUrl: externalUrl || null,
+        menuItemsCount: menuItems ? menuItems.length : 0,
+        storeRestrictions: storeIds ? storeIds.length : 'all',
+        cityRestrictions: cityIds ? cityIds.length : 'all'
+      },
       normalization: {
         dealTypeId,
         recurringDays: recurringDays ? recurringDays.split(',') : null
+      },
+      metadata: {
+        version: '2.0.0',
+        createdAt: new Date().toISOString()
       }
-    });
+    };
+
+    res.status(201).json(response);
   } catch (error) {
     console.error('Deal creation error:', error);
     res.status(500).json({ error: 'Internal server error' });

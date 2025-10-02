@@ -509,7 +509,8 @@ router.get('/deals/featured', async (req, res) => {
   }
 });
 
-// --- NEW Endpoint: GET /api/deals/:id ---
+// --- Enhanced Endpoint: GET /api/deals/:id ---
+// Returns comprehensive deal details for detailed view
 router.get('/deals/:id', async (req, res) => {
   try {
     const dealId = parseInt(req.params.id);
@@ -520,23 +521,232 @@ router.get('/deals/:id', async (req, res) => {
     const deal = await prisma.deal.findUnique({
       where: { id: dealId },
       include: {
-        merchant: true,
-        _count: { select: { savedByUsers: true } },
+        merchant: {
+          include: {
+            stores: {
+              include: {
+                city: {
+                  select: {
+                    id: true,
+                    name: true,
+                    state: true,
+                    active: true
+                  }
+                }
+              }
+            },
+            _count: {
+              select: {
+                deals: true,
+                stores: true
+              }
+            }
+          }
+        },
+        dealType: true,
+        category: true,
+        menuItems: {
+          where: { isHidden: false },
+          include: {
+            menuItem: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
+                price: true,
+                imageUrl: true,
+                category: true
+              }
+            }
+          }
+        },
+        _count: { 
+          select: { 
+            savedByUsers: true,
+            menuItems: true
+          } 
+        },
         savedByUsers: {
-          take: 5,
-          select: { user: { select: { avatarUrl: true } } }
+          take: 10,
+          select: { 
+            user: { 
+              select: { 
+                id: true,
+                name: true,
+                avatarUrl: true 
+              } 
+            },
+            savedAt: true
+          },
+          orderBy: { savedAt: 'desc' }
         }
       }
     });
 
     if (!deal || deal.merchant.status !== 'APPROVED') {
-      return res.status(404).json({ error: 'Deal not found or not available.' });
+      return res.status(404).json({ error: 'Deal not available or merchant not approved.' });
     }
 
-    res.status(200).json(formatDealForFrontend(deal));
+    // Check if deal is currently active
+    const now = new Date();
+    const isActive = deal.startTime <= now && deal.endTime >= now;
+    const isExpired = deal.endTime < now;
+    const isUpcoming = deal.startTime > now;
+    
+    // Calculate time remaining
+    const timeRemaining = isActive ? deal.endTime.getTime() - now.getTime() : 0;
+    const hoursRemaining = Math.floor(timeRemaining / (1000 * 60 * 60));
+    const minutesRemaining = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+
+    // Format recurring days if applicable
+    const recurringDays = deal.recurringDays ? 
+      deal.recurringDays.split(',').map(day => day.trim()) : [];
+
+    // Calculate discount value
+    const discountValue = deal.discountPercentage ? 
+      `${deal.discountPercentage}% OFF` : 
+      (deal.discountAmount ? `$${deal.discountAmount} OFF` : 'Special Offer');
+
+    // Format menu items
+    const formattedMenuItems = deal.menuItems.map(item => ({
+      id: item.menuItem.id,
+      name: item.menuItem.name,
+      description: item.menuItem.description,
+      originalPrice: item.menuItem.price,
+      discountedPrice: deal.discountPercentage ? 
+        item.menuItem.price * (1 - deal.discountPercentage / 100) : 
+        (deal.discountAmount ? Math.max(0, item.menuItem.price - deal.discountAmount) : item.menuItem.price),
+      imageUrl: item.menuItem.imageUrl,
+      category: item.menuItem.category
+    }));
+
+    // Format social proof
+    const socialProof = {
+      totalSaves: deal._count.savedByUsers,
+      recentSavers: deal.savedByUsers.map(save => ({
+        id: save.user.id,
+        name: save.user.name,
+        avatarUrl: save.user.avatarUrl,
+        savedAt: save.savedAt
+      }))
+    };
+
+    // Format merchant details
+    const merchantDetails = {
+      id: deal.merchant.id,
+      businessName: deal.merchant.businessName,
+      description: deal.merchant.description,
+      address: deal.merchant.address,
+      latitude: deal.merchant.latitude,
+      longitude: deal.merchant.longitude,
+      logoUrl: deal.merchant.logoUrl,
+      totalDeals: deal.merchant._count.deals,
+      totalStores: deal.merchant._count.stores,
+      stores: deal.merchant.stores.map(store => ({
+        id: store.id,
+        address: store.address,
+        latitude: store.latitude,
+        longitude: store.longitude,
+        active: store.active,
+        city: {
+          id: store.city.id,
+          name: store.city.name,
+          state: store.city.state,
+          active: store.city.active
+        }
+      }))
+    };
+
+    // Comprehensive deal response
+    const detailedDeal = {
+      // Basic deal info
+      id: deal.id,
+      title: deal.title,
+      description: deal.description,
+      category: {
+        value: deal.category.name,
+        label: deal.category.name.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (l: string) => l.toUpperCase()),
+        description: deal.category.description,
+        icon: deal.category.icon,
+        color: deal.category.color
+      },
+      
+      // Visual content
+      imageUrl: deal.imageUrls?.[0] || null,
+      images: deal.imageUrls || [],
+      
+      // Offer details
+      offerDisplay: discountValue,
+      discountPercentage: deal.discountPercentage,
+      discountAmount: deal.discountAmount,
+      offerTerms: deal.offerTerms,
+      
+      // Deal type and timing
+      dealType: {
+        name: deal.dealType.name,
+        description: deal.dealType.description
+      },
+      startTime: deal.startTime.toISOString(),
+      endTime: deal.endTime.toISOString(),
+      recurringDays: recurringDays,
+      
+      // Status and timing
+      status: {
+        isActive,
+        isExpired,
+        isUpcoming,
+        timeRemaining: {
+          total: timeRemaining,
+          hours: hoursRemaining,
+          minutes: minutesRemaining,
+          formatted: `${hoursRemaining}h ${minutesRemaining}m`
+        }
+      },
+      
+      // Redemption
+      redemptionInstructions: deal.redemptionInstructions,
+      kickbackEnabled: deal.kickbackEnabled,
+      
+      // Menu items (if applicable)
+      menuItems: formattedMenuItems,
+      hasMenuItems: formattedMenuItems.length > 0,
+      
+      // Merchant information
+      merchant: merchantDetails,
+      
+      // Social proof
+      socialProof,
+      
+      // Metadata
+      createdAt: deal.createdAt.toISOString(),
+      updatedAt: deal.updatedAt.toISOString(),
+      
+      // Additional context
+      context: {
+        isRecurring: deal.dealType.name === 'Recurring',
+        isHappyHour: deal.dealType.name === 'Happy Hour',
+        hasMultipleImages: (deal.imageUrls?.length || 0) > 1,
+        hasMultipleStores: merchantDetails.totalStores > 1,
+        isPopular: deal._count.savedByUsers > 10
+      }
+    };
+
+    res.status(200).json({
+      success: true,
+      deal: detailedDeal,
+      metadata: {
+        fetchedAt: now.toISOString(),
+        version: '2.0.0'
+      }
+    });
+
   } catch (error) {
-    console.error(`Error fetching deal ${req.params.id}:`, error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error(`Error fetching detailed deal ${req.params.id}:`, error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Internal server error',
+      message: 'Failed to fetch deal details'
+    });
   }
 });
 
