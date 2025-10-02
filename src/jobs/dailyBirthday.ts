@@ -11,7 +11,11 @@ function msUntilNextUtcMidnight(now = new Date()) {
   const m = now.getUTCMonth();
   const d = now.getUTCDate();
   const next = new Date(Date.UTC(y, m, d + 1, 0, 0, 0, 50)); // +50ms buffer
-  return next.getTime() - now.getTime();
+  const ms = next.getTime() - now.getTime();
+  
+  // Cap at maximum safe timeout value (24 days)
+  const MAX_SAFE_TIMEOUT = 24 * 24 * 60 * 60 * 1000; // 24 days in ms
+  return Math.min(ms, MAX_SAFE_TIMEOUT);
 }
 
 let timer: NodeJS.Timeout | null = null;
@@ -47,8 +51,13 @@ export function scheduleDailyBirthdays() {
     } catch (e) {
       console.error('[birthday-job]: failed run', e);
     } finally {
-      timer = setTimeout(schedule, 24 * 60 * 60 * 1000); // 24h
+      // Use a safer interval - 24 hours with a small buffer
+      const nextRun = Math.min(24 * 60 * 60 * 1000, 2147483647); // Cap at max 32-bit int
+      timer = setTimeout(schedule, nextRun);
     }
   };
-  timer = setTimeout(schedule, msUntilNextUtcMidnight());
+  
+  const initialDelay = msUntilNextUtcMidnight();
+  console.log(`[birthday-job]: Scheduling next run in ${Math.round(initialDelay / 1000 / 60)} minutes`);
+  timer = setTimeout(schedule, initialDelay);
 }

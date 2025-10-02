@@ -101,7 +101,9 @@ router.post('/save-deal', protect, async (req: AuthRequest, res: Response) => {
                 latitude: true,
                 longitude: true
               }
-            }
+            },
+            category: true,
+            dealType: true
           }
         }
       }
@@ -233,7 +235,7 @@ router.post('/check-in', protect, async (req: AuthRequest, res: Response) => {
           data: {
             userId,
             dealId: deal.id,
-            type: 'FIRST_CHECKIN_DEAL',
+            pointEventTypeId: 2, // FIRST_CHECKIN_DEAL point event type
             points: firstCheckInBonus
           }
         }));
@@ -244,7 +246,7 @@ router.post('/check-in', protect, async (req: AuthRequest, res: Response) => {
         data: {
           userId,
           dealId: deal.id,
-          type: 'CHECKIN',
+          pointEventTypeId: 3, // CHECKIN point event type
           points: checkInPoints
         }
       }));
@@ -346,7 +348,9 @@ router.get('/saved-deals', protect, async (req: AuthRequest, res: Response) => {
                 latitude: true,
                 longitude: true
               }
-            }
+            },
+            category: true,
+            dealType: true
           }
         }
       },

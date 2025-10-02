@@ -171,6 +171,10 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
     } = req.body;
     const merchantId = req.merchant?.id;
 
+    if (!merchantId) {
+      return res.status(401).json({ error: 'Merchant authentication required' });
+    }
+
     if (!title || !activeDateRange?.startDate || !activeDateRange?.endDate) {
       return res.status(400).json({ error: 'Title and activeDateRange (with startDate and endDate) are required.' });
     }
@@ -187,27 +191,36 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
       return res.status(400).json({ error: 'imageUrls must be an array of strings.' });
     }
 
-    // Normalize deal type
-    const validDealTypes = ['STANDARD', 'HAPPY_HOUR', 'RECURRING'] as const;
-    let dealType: string = 'STANDARD';
+    // Validate and resolve deal type ID
+    let dealTypeId: number | undefined;
     if (rawDealType) {
-      const normalized = String(rawDealType).trim().toUpperCase().replace(/\s+/g, '_');
-      if (!validDealTypes.includes(normalized as any)) {
-        return res.status(400).json({ error: `Invalid dealType. Must be one of: ${validDealTypes.join(', ')}` });
+      const dealTypeRecord = await prisma.dealTypeMaster.findFirst({
+        where: { name: { equals: String(rawDealType).trim(), mode: 'insensitive' }, active: true }
+      });
+      if (!dealTypeRecord) {
+        return res.status(400).json({ error: `Invalid dealType: ${rawDealType}. Please check available deal types.` });
       }
-      dealType = normalized;
+      dealTypeId = dealTypeRecord.id;
+    } else {
+      // Default to Standard deal type
+      const standardDealType = await prisma.dealTypeMaster.findFirst({
+        where: { name: { equals: 'Standard', mode: 'insensitive' }, active: true }
+      });
+      if (standardDealType) {
+        dealTypeId = standardDealType.id;
+      }
     }
 
-    // Validate category if provided
+    // Validate and resolve category ID if provided
+    let categoryId: number | undefined;
     if (category) {
-      const validCategories = [
-        'FOOD_AND_BEVERAGE', 'RETAIL', 'ENTERTAINMENT', 'HEALTH_AND_FITNESS',
-        'BEAUTY_AND_SPA', 'AUTOMOTIVE', 'TRAVEL', 'EDUCATION', 'TECHNOLOGY',
-        'HOME_AND_GARDEN', 'OTHER'
-      ];
-      if (!validCategories.includes(category)) {
-        return res.status(400).json({ error: `Invalid category. Must be one of: ${validCategories.join(', ')}` });
+      const categoryRecord = await prisma.dealCategoryMaster.findFirst({
+        where: { name: { equals: category, mode: 'insensitive' }, active: true }
+      });
+      if (!categoryRecord) {
+        return res.status(400).json({ error: `Invalid category: ${category}. Please check available categories.` });
       }
+      categoryId = categoryRecord.id;
     }
 
     // Normalize recurringDays input
@@ -231,10 +244,18 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
       if (daysArray.length === 0) return res.status(400).json({ error: 'recurringDays cannot be empty if provided.' });
       recurringDays = daysArray.join(',');
     }
-    if (dealType === 'RECURRING' && !recurringDays) {
-      return res.status(400).json({ error: 'recurringDays required for RECURRING deals.' });
+    // Check if deal type requires recurring days
+    if (dealTypeId) {
+      const dealTypeRecord = await prisma.dealTypeMaster.findUnique({
+        where: { id: dealTypeId }
+      });
+      if (dealTypeRecord && dealTypeRecord.name === 'Recurring' && !recurringDays) {
+        return res.status(400).json({ error: 'recurringDays required for RECURRING deals.' });
+      }
+      if (dealTypeRecord && dealTypeRecord.name !== 'Recurring') {
+        recurringDays = null;
+      }
     }
-    if (dealType !== 'RECURRING') recurringDays = null;
 
     // Transaction: create deal + attach menu items (if provided)
     const newDeal = await prisma.$transaction(async (tx) => {
@@ -248,12 +269,12 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
           imageUrls: imageUrls || [],
           discountPercentage: discountPercentage ? parseInt(discountPercentage, 10) : null,
           discountAmount: discountAmount ? parseFloat(discountAmount) : null,
-          category: category || 'OTHER',
-          dealType: dealType as any,
+          categoryId: categoryId!,
+          dealTypeId: dealTypeId!,
           recurringDays,
           offerTerms: offerTerms || null,
           kickbackEnabled: !!kickbackEnabled,
-          merchant: { connect: { id: merchantId } }
+          merchantId: merchantId
         }
       });
 
@@ -277,7 +298,7 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
       message: 'Deal created successfully',
       deal: newDeal,
       normalization: {
-        dealType,
+        dealTypeId,
         recurringDays: recurringDays ? recurringDays.split(',') : null
       }
     });

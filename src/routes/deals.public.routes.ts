@@ -289,8 +289,8 @@ router.get('/deals', async (req, res) => {
     if (Array.isArray(deals) && deals.length) {
       const isFormatted = !('merchant' in deals[0] && !(deals[0] as any).merchant.businessName); // naive check
       // deals are already formatted above (or include distance) at this point
-      const happyHourDeals = (deals as any[]).filter(d => d.dealType === 'HAPPY_HOUR');
-      const otherDeals = (deals as any[]).filter(d => d.dealType !== 'HAPPY_HOUR');
+      const happyHourDeals = (deals as any[]).filter(d => d.dealType.name === 'Happy Hour');
+      const otherDeals = (deals as any[]).filter(d => d.dealType.name !== 'Happy Hour');
       // Preserve existing sort inside each group (distance or createdAt formatting kept earlier)
       deals = [...happyHourDeals, ...otherDeals];
     }
@@ -461,7 +461,7 @@ router.get('/deals/featured', async (req, res) => {
 
     // Filter recurring deals to correct day
     candidates = candidates.filter(d => {
-      if (d.dealType !== 'RECURRING') return true;
+      if (d.dealType.name !== 'Recurring') return true;
       if (!d.recurringDays) return false;
       const days = d.recurringDays.split(',').map(s => s.trim().toUpperCase());
       return days.includes(todayName);
@@ -474,7 +474,7 @@ router.get('/deals/featured', async (req, res) => {
       const discountPct = d.discountPercentage || 0;
       const discountValue = d.discountAmount || 0;
       // Basic priority groups by deal type
-      const typePriority = d.dealType === 'HAPPY_HOUR' ? 3 : (d.dealType === 'RECURRING' ? 2 : 1);
+      const typePriority = d.dealType.name === 'Happy Hour' ? 3 : (d.dealType.name === 'Recurring' ? 2 : 1);
       return { d, timeRemainingMinutes, discountPct, discountValue, typePriority };
     });
 

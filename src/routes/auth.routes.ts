@@ -87,7 +87,7 @@ router.post('/register', async (req: Request, res: Response) => {
       await tx.userPointEvent.create({
         data: {
           userId: created.id,
-          type: 'SIGNUP',
+          pointEventTypeId: 1, // SIGNUP point event type
           points: signupPoints
         }
       });

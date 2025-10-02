@@ -50,6 +50,53 @@ enum PointEventType {
   CHECKIN
 }
 
+// --- MASTER DATA TABLES ---
+model DealCategoryMaster {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(100)
+  description String?
+  icon        String?  @db.VarChar(100)
+  color       String?  @db.VarChar(7) // hex color like #FF5733
+  sortOrder   Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  deals       Deal[]
+
+  @@index([active, sortOrder])
+}
+
+model DealTypeMaster {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(50)
+  description String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  deals       Deal[]
+
+  @@index([active])
+}
+
+model PointEventTypeMaster {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(50)
+  description String?
+  points      Int
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  pointEvents UserPointEvent[]
+
+  @@index([active])
+}
+
 
 // --- CORE MODELS ---
 
@@ -143,10 +190,12 @@ model Deal {
   discountAmount     Float?
   
   // Category for filtering and organization
-  category      DealCategory @default(OTHER)
+  categoryId    Int
+  category      DealCategoryMaster @relation(fields: [categoryId], references: [id])
   
   // Deal type for different deal behaviors
-  dealType      DealType @default(STANDARD)
+  dealTypeId    Int
+  dealType      DealTypeMaster @relation(fields: [dealTypeId], references: [id])
   
   // Recurring days for recurring deals (e.g., "Taco Tuesday")
   // Stored as comma-separated values: "MONDAY,TUESDAY,WEDNESDAY"
@@ -203,17 +252,18 @@ model UserDeal {
 
 // Log of points awarded to users for various actions
 model UserPointEvent {
-  id        Int            @id @default(autoincrement())
-  userId    Int
-  dealId    Int?
-  type      PointEventType
-  points    Int
-  createdAt DateTime       @default(now())
+  id                Int            @id @default(autoincrement())
+  userId            Int
+  dealId            Int?
+  pointEventTypeId  Int
+  points            Int
+  createdAt         DateTime       @default(now())
 
-  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  deal      Deal?          @relation(fields: [dealId], references: [id])
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deal            Deal?           @relation(fields: [dealId], references: [id])
+  pointEventType  PointEventTypeMaster @relation(fields: [pointEventTypeId], references: [id])
 
-  @@index([userId, type])
+  @@index([userId, pointEventTypeId])
   @@index([userId, dealId])
   // Added for efficient time-bounded leaderboard queries
   @@index([createdAt])

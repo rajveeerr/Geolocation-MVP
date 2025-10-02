@@ -14,7 +14,11 @@ function msUntilNextMonthUTC(now = new Date()) {
   const year = now.getUTCFullYear();
   const month = now.getUTCMonth();
   const firstNext = new Date(Date.UTC(year, month + 1, 1, 0, 0, 0, 0));
-  return firstNext.getTime() - now.getTime();
+  const ms = firstNext.getTime() - now.getTime();
+  
+  // Cap at maximum safe timeout value (24 days)
+  const MAX_SAFE_TIMEOUT = 24 * 24 * 60 * 60 * 1000; // 24 days in ms
+  return Math.min(ms, MAX_SAFE_TIMEOUT);
 }
 
 let timer: NodeJS.Timeout | null = null;
@@ -24,14 +28,20 @@ export function scheduleMonthlyReset() {
   const schedule = async () => {
     try {
       await resetMonthlyPoints();
+      console.log('[monthly-reset]: Points reset completed successfully');
       // After running, schedule next month
-      timer = setTimeout(schedule, msUntilNextMonthUTC());
+      const nextRun = msUntilNextMonthUTC();
+      console.log(`[monthly-reset]: Next reset scheduled in ${Math.round(nextRun / 1000 / 60 / 60)} hours`);
+      timer = setTimeout(schedule, nextRun);
     } catch (e) {
       console.error('Monthly points reset failed:', e);
       // Retry in 1 hour if failure
       timer = setTimeout(schedule, 60 * 60 * 1000);
     }
   };
+  
   // Initial delay until next month boundary
-  timer = setTimeout(schedule, msUntilNextMonthUTC());
+  const initialDelay = msUntilNextMonthUTC();
+  console.log(`[monthly-reset]: Initial scheduling - next reset in ${Math.round(initialDelay / 1000 / 60 / 60)} hours`);
+  timer = setTimeout(schedule, initialDelay);
 }
