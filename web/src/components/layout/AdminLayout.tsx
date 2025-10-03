@@ -34,6 +34,7 @@ export const AdminLayout = () => {
                     <AdminSidebarLink to={PATHS.ADMIN_DASHBOARD} icon={<Shield className="h-5 w-5" />} label="Overview" />
                     <AdminSidebarLink to={PATHS.ADMIN_MERCHANTS} icon={<Users className="h-5 w-5" />} label="Merchants" />
                     <AdminSidebarLink to={PATHS.ADMIN_CITIES} icon={<Building className="h-5 w-5" />} label="Cities" />
+                    <AdminSidebarLink to={PATHS.ADMIN_CUSTOMERS} icon={<Users className="h-5 w-5" />} label="Customers" />
                 </nav>
             </aside>
 
@@ -63,6 +64,7 @@ export const AdminLayout = () => {
                             <AdminSidebarLink to={PATHS.ADMIN_DASHBOARD} icon={<Shield className="h-5 w-5" />} label="Overview" />
                             <AdminSidebarLink to={PATHS.ADMIN_MERCHANTS} icon={<Users className="h-5 w-5" />} label="Merchants" />
                             <AdminSidebarLink to={PATHS.ADMIN_CITIES} icon={<Building className="h-5 w-5" />} label="Cities" />
+                            <AdminSidebarLink to={PATHS.ADMIN_CUSTOMERS} icon={<Users className="h-5 w-5" />} label="Customers" />
                         </nav>
                     </aside>
                 </div>

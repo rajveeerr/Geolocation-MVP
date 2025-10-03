@@ -27,6 +27,7 @@ export const PATHS = {
   LEADERBOARD: '/leaderboard',
 
   // Admin
+  ADMIN_LOGIN: '/admin/login',
   ADMIN_DASHBOARD: '/admin', // This is now the overview page
   ADMIN_MERCHANTS: '/admin/merchants',
   ADMIN_CITIES: '/admin/cities', // New route for the city management table

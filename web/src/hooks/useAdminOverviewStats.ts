@@ -1,5 +1,6 @@
 // web/src/hooks/useAdminOverviewStats.ts
 import { useQuery } from '@tanstack/react-query';
+import { apiGet } from '@/services/api';
 
 // This is the shape of the data our new dashboard will consume
 export interface AdminOverviewStats {
@@ -20,8 +21,12 @@ export interface AdminOverviewStats {
   topCategories: { name: string; value: string }[];
 }
 
-// MOCK API FUNCTION
+// MOCK API FUNCTION - This will be replaced when backend endpoint is implemented
 const fetchAdminOverviewStats = async (): Promise<AdminOverviewStats> => {
+  // TODO: Replace with real API call when backend endpoint is implemented
+  // const response = await apiGet('/admin/overview/stats');
+  // return response.data.stats;
+  
   await new Promise(res => setTimeout(res, 800)); // Simulate network delay
   return {
     kpis: {
@@ -43,7 +48,9 @@ const fetchAdminOverviewStats = async (): Promise<AdminOverviewStats> => {
     ],
     topCities: [
         { name: 'New York', value: '$25,800' }, 
+        { name: 'Los Angeles', value: '$22,400' },
         { name: 'Atlanta', value: '$19,100' },
+        { name: 'Chicago', value: '$17,200' },
         { name: 'Philadelphia', value: '$15,500' }
     ],
     topCategories: [

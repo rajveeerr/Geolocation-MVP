@@ -12,7 +12,7 @@ export const AdminProtectedRoute = ({ children }: { children: React.ReactNode })
   }
 
   if (!isAdmin) {
-    return <Navigate to={PATHS.HOME} replace />;
+    return <Navigate to={PATHS.ADMIN_LOGIN} replace />;
   }
   
   return <>{children}</>;

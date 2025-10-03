@@ -42,6 +42,12 @@ const CreateDealPage = React.lazy(() =>
 const DealDetailPage = React.lazy(() =>
   import('./pages/DealDetailPage').then((m) => ({ default: m.DealDetailPage })),
 );
+const EnhancedDealDetailPage = React.lazy(() =>
+  import('./pages/EnhancedDealDetailPage').then((m) => ({ default: m.EnhancedDealDetailPage })),
+);
+const AdminLoginPage = React.lazy(() =>
+  import('./pages/admin/AdminLoginPage').then((m) => ({ default: m.AdminLoginPage })),
+);
 const AdminOverviewPage = React.lazy(() =>
   import('./pages/admin/AdminOverviewPage').then((m) => ({ default: m.AdminOverviewPage })),
 );
@@ -124,7 +130,7 @@ function App() {
                   path={PATHS.DEAL_DETAIL}
                   element={
                     <Suspense fallback={<LoadingOverlay />}>
-                      <DealDetailPage />
+                      <EnhancedDealDetailPage />
                     </Suspense>
                   }
                 />
@@ -183,6 +189,15 @@ function App() {
                       </Suspense>
                     </MerchantLayout>
                   </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path={PATHS.ADMIN_LOGIN}
+                element={
+                  <Suspense fallback={<LoadingOverlay />}>
+                    <AdminLoginPage />
+                  </Suspense>
                 }
               />
 

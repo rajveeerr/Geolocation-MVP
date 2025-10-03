@@ -262,7 +262,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                 {deal.name}
               </h3>
               <p className="text-base text-white/90">
-                {deal.subtitle || 'Cyber Hub is a part of the DLF'}
+                {deal.subtitle || 'Times Square is the heart of NYC'}
               </p>
               <div className="mt-4 font-semibold text-brand-primary-400">
                 {deal.claimedBy && deal.claimedBy.totalCount > 0 ? (
@@ -325,6 +325,8 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                     className="flex items-center justify-center w-full mb-3 text-sm font-semibold text-brand-primary-600 hover:text-brand-primary-800"
                   >
                     <span>View All Offers</span>
+                    {/* Blinking dot */}
+                    <div className="w-1 h-1 bg-brand-primary-600 rounded-full ml-2 animate-pulse"></div>
                     <ChevronDown className={cn('h-5 w-5 ml-1 transition-transform', offersVisible && 'rotate-180')} />
                   </button>
 

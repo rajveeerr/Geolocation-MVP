@@ -2,10 +2,11 @@
 
 import { useRef, useState, useEffect } from 'react'; // Import useState and useEffect
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Star, Zap, Heart, MapPin, Clock, Sparkles } from 'lucide-react';
 import { PremiumV2DealCard } from '@/components/deals/PremiumV2DealCard'; // <-- Import the NEW card
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/common/Button';
+import { EnhancedSectionHeader } from '@/components/common/EnhancedSectionHeader';
 import type { Deal } from '@/data/deals';
 import { PATHS } from '@/routing/paths';
 import { motion } from 'framer-motion';
@@ -26,6 +27,60 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
     if (!viewport) return;
     viewport.scrollBy({ left: value, behavior: 'smooth' });
   };
+
+  // Get appropriate icon and styling based on title
+  const getSectionConfig = (title: string) => {
+    const titleLower = title.toLowerCase();
+    
+    if (titleLower.includes('featured') || titleLower.includes('top')) {
+      return {
+        icon: <Star className="h-6 w-6 text-amber-500 sm:h-7 sm:w-7" />,
+        subtitle: "Handpicked by our team",
+        variant: 'simple' as const
+      };
+    }
+    
+    if (titleLower.includes('happy hour') || titleLower.includes('happy hours')) {
+      return {
+        icon: <Clock className="h-6 w-6 text-orange-500 sm:h-7 sm:w-7" />,
+        subtitle: "Time to unwind",
+        variant: 'simple' as const
+      };
+    }
+    
+    if (titleLower.includes('latest') || titleLower.includes('new')) {
+      return {
+        icon: <Zap className="h-6 w-6 text-yellow-500 sm:h-7 sm:w-7" />,
+        subtitle: "Fresh from our partners",
+        variant: 'simple' as const
+      };
+    }
+    
+    if (titleLower.includes('popular') || titleLower.includes('trending')) {
+      return {
+        icon: <Heart className="h-6 w-6 text-red-500 sm:h-7 sm:w-7" />,
+        subtitle: "Loved by locals",
+        variant: 'simple' as const
+      };
+    }
+    
+    if (titleLower.includes('experience') || titleLower.includes('events')) {
+      return {
+        icon: <Sparkles className="h-6 w-6 text-purple-500 sm:h-7 sm:w-7" />,
+        subtitle: "Unforgettable moments",
+        variant: 'detailed' as const,
+        description: "Special events and unique experiences you won't find anywhere else."
+      };
+    }
+    
+    // Default configuration - minimal for generic sections
+    return {
+      icon: <MapPin className="h-6 w-6 text-brand-primary-500 sm:h-7 sm:w-7" />,
+      variant: 'minimal' as const
+    };
+  };
+
+  const sectionConfig = getSectionConfig(title);
 
   // Measure track and viewport to compute drag constraint
   useEffect(() => {
@@ -54,37 +109,16 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
       exit="hidden"
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="mb-4 flex items-center justify-between sm:mb-6">
-          <h2 className="text-xl font-bold tracking-tight text-neutral-900 sm:text-2xl">
-            {title}
-          </h2>
-          <div className="flex items-center gap-1 sm:gap-2">
-            <Link to={PATHS.ALL_DEALS}>
-              <Button
-                variant="secondary"
-                size="sm"
-                className="rounded-full px-3 py-1.5 text-xs font-semibold sm:px-4 sm:py-2 sm:text-sm"
-              >
-                Show all
-              </Button>
-            </Link>
-            <button
-              onClick={() => scroll(-360)}
-              className="hidden h-7 w-7 items-center justify-center rounded-full border border-neutral-300 bg-white shadow-sm transition-all hover:bg-neutral-50 hover:shadow-md sm:flex sm:h-8 sm:w-8"
-              aria-label="Scroll left"
-            >
-              <ChevronLeft className="h-3.5 w-3.5 text-neutral-600 sm:h-4 sm:w-4" />
-            </button>
-            <button
-              onClick={() => scroll(360)}
-              className="hidden h-7 w-7 items-center justify-center rounded-full border border-neutral-300 bg-white shadow-sm transition-all hover:bg-neutral-50 hover:shadow-md sm:flex sm:h-8 sm:w-8"
-              aria-label="Scroll right"
-            >
-              <ChevronRight className="h-3.5 w-3.5 text-neutral-600 sm:h-4 sm:w-4" />
-            </button>
-          </div>
-        </div>
+        {/* Enhanced Section Header */}
+        <EnhancedSectionHeader
+          icon={sectionConfig.icon}
+          title={title}
+          subtitle={sectionConfig.subtitle}
+          description={sectionConfig.description}
+          variant={sectionConfig.variant}
+          onScrollLeft={() => scroll(-360)}
+          onScrollRight={() => scroll(360)}
+        />
 
         {/* --- MODIFIED: This is now the draggable carousel --- */}
         <div ref={viewportRef} className="overflow-hidden">

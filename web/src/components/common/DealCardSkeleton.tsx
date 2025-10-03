@@ -1,4 +1,7 @@
 // src/components/common/DealCardSkeleton.tsx
+import { Star, Zap, Heart, MapPin, Clock, Sparkles } from 'lucide-react';
+import { EnhancedSectionHeader } from '@/components/common/EnhancedSectionHeader';
+
 export const DealCardSkeleton = () => {
   return (
     <div className="animate-pulse overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
@@ -33,15 +36,73 @@ export const DealCardSkeleton = () => {
 };
 
 export const CarouselSkeleton = ({ title }: { title: string }) => {
+  // Get appropriate icon and styling based on title (same logic as ContentCarousel)
+  const getSectionConfig = (title: string) => {
+    const titleLower = title.toLowerCase();
+    
+    if (titleLower.includes('featured') || titleLower.includes('top')) {
+      return {
+        icon: <Star className="h-6 w-6 text-amber-500 sm:h-7 sm:w-7" />,
+        subtitle: "Handpicked by our team",
+        variant: 'simple' as const
+      };
+    }
+    
+    if (titleLower.includes('happy hour') || titleLower.includes('happy hours')) {
+      return {
+        icon: <Clock className="h-6 w-6 text-orange-500 sm:h-7 sm:w-7" />,
+        subtitle: "Time to unwind",
+        variant: 'simple' as const
+      };
+    }
+    
+    if (titleLower.includes('latest') || titleLower.includes('new')) {
+      return {
+        icon: <Zap className="h-6 w-6 text-yellow-500 sm:h-7 sm:w-7" />,
+        subtitle: "Fresh from our partners",
+        variant: 'simple' as const
+      };
+    }
+    
+    if (titleLower.includes('popular') || titleLower.includes('trending')) {
+      return {
+        icon: <Heart className="h-6 w-6 text-red-500 sm:h-7 sm:w-7" />,
+        subtitle: "Loved by locals",
+        variant: 'simple' as const
+      };
+    }
+    
+    if (titleLower.includes('experience') || titleLower.includes('events')) {
+      return {
+        icon: <Sparkles className="h-6 w-6 text-purple-500 sm:h-7 sm:w-7" />,
+        subtitle: "Unforgettable moments",
+        variant: 'detailed' as const,
+        description: "Special events and unique experiences you won't find anywhere else."
+      };
+    }
+    
+    // Default configuration - minimal for generic sections
+    return {
+      icon: <MapPin className="h-6 w-6 text-brand-primary-500 sm:h-7 sm:w-7" />,
+      variant: 'minimal' as const
+    };
+  };
+
+  const sectionConfig = getSectionConfig(title);
+
   return (
     <section className="py-8 sm:py-12 lg:py-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-6 sm:mb-8">
-          <h2 className="mb-2 text-2xl font-bold text-neutral-800 sm:text-3xl">
-            {title}
-          </h2>
-          <div className="h-4 w-48 animate-pulse rounded bg-neutral-200" />
-        </div>
+        {/* Enhanced Section Header */}
+        <EnhancedSectionHeader
+          icon={sectionConfig.icon}
+          title={title}
+          subtitle={sectionConfig.subtitle}
+          description={sectionConfig.description}
+          variant={sectionConfig.variant}
+          showAllLink={false}
+          showNavigation={false}
+        />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, index) => (

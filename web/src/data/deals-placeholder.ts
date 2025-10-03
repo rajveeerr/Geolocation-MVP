@@ -39,8 +39,8 @@ export const placeholderDeals: DealWithLocation[] = [
     rating: 4.5,
     category: 'Cafe',
     price: '$$',
-    location: 'Sample Neighborhood, USA',
-    position: [40.7128, -74.006], // Centered on a default location
+    location: 'Times Square, New York',
+    position: [40.7589, -73.9851], // Centered on Times Square
     description:
       "This is a sample deal. Try searching for 'pizza' or changing your category to find live deals near you!",
     originalPrice: 100,
@@ -55,8 +55,8 @@ export const placeholderDeals: DealWithLocation[] = [
     rating: 4.8,
     category: 'Restaurant',
     price: '$$$',
-    location: 'Main Street, USA',
-    position: [40.7145, -74.0082],
+    location: 'Broadway, New York',
+    position: [40.7614, -73.9776],
     description:
       'A placeholder for a great happy hour special. Real deals will appear here when available.',
     originalPrice: 150,

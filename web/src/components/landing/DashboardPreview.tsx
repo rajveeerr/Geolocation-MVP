@@ -10,7 +10,7 @@ const deals = [
     name: '2-for-1 Tacos',
     business: 'Taco Fiesta',
     distance: '0.2 mi',
-    position: [51.515, -0.09] as L.LatLngExpression,
+    position: [40.7589, -73.9851] as L.LatLngExpression, // Times Square, NYC
     category: 'Food',
   },
   {
@@ -18,7 +18,7 @@ const deals = [
     name: 'Happy Hour Drafts',
     business: 'The Brew House',
     distance: '0.5 mi',
-    position: [51.51, -0.1] as L.LatLngExpression,
+    position: [40.7614, -73.9776] as L.LatLngExpression, // Broadway, NYC
     category: 'Drinks',
   },
   {
@@ -26,7 +26,7 @@ const deals = [
     name: '50% Off Appetizers',
     business: 'Gourmet Grill',
     distance: '0.8 mi',
-    position: [51.52, -0.12] as L.LatLngExpression,
+    position: [40.7505, -73.9934] as L.LatLngExpression, // Union Square, NYC
     category: 'Food',
   },
   {
@@ -34,7 +34,7 @@ const deals = [
     name: 'Free Coffee Top-up',
     business: 'Morning Buzz',
     distance: '1.2 mi',
-    position: [51.5, -0.08] as L.LatLngExpression,
+    position: [40.7282, -73.7949] as L.LatLngExpression, // Queens, NYC
     category: 'Drinks',
   },
 ];
@@ -42,7 +42,7 @@ const deals = [
 export const DashboardPreview = () => {
   const [hoveredDealId, setHoveredDealId] = useState<number | null>(null);
   const [mapCenter, setMapCenter] = useState<L.LatLngExpression>([
-    51.505, -0.09,
+    40.7589, -73.9851, // Times Square, NYC
   ]);
 
   useEffect(() => {
