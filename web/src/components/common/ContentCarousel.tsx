@@ -1,14 +1,11 @@
 // web/src/components/common/ContentCarousel.tsx
 
 import { useRef, useState, useEffect } from 'react'; // Import useState and useEffect
-import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Star, Zap, Heart, MapPin, Clock, Sparkles } from 'lucide-react';
+import { Star, Zap, Heart, MapPin, Clock, Sparkles } from 'lucide-react';
 import { PremiumV2DealCard } from '@/components/deals/PremiumV2DealCard'; // <-- Import the NEW card
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/common/Button';
 import { EnhancedSectionHeader } from '@/components/common/EnhancedSectionHeader';
 import type { Deal } from '@/data/deals';
-import { PATHS } from '@/routing/paths';
 import { motion } from 'framer-motion';
 
 interface ContentCarouselProps {

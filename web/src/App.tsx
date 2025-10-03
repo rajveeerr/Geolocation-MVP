@@ -39,9 +39,6 @@ const CreateDealPage = React.lazy(() =>
     default: m.CreateDealPage,
   })),
 );
-const DealDetailPage = React.lazy(() =>
-  import('./pages/DealDetailPage').then((m) => ({ default: m.DealDetailPage })),
-);
 const EnhancedDealDetailPage = React.lazy(() =>
   import('./pages/EnhancedDealDetailPage').then((m) => ({ default: m.EnhancedDealDetailPage })),
 );

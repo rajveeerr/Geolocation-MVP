@@ -286,8 +286,8 @@ export const useDealDetail = (dealId: string) => {
         // Try to fetch from real API first
         const response = await apiGet<{ success: boolean; deal: DetailedDeal }>(`/deals/${dealId}`);
         
-        if (response.success && response.deal) {
-          return response.deal;
+        if (response.success && response.data?.deal) {
+          return response.data.deal;
         } else {
           throw new Error('Deal not found');
         }

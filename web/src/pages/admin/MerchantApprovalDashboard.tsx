@@ -311,7 +311,7 @@ export const MerchantApprovalDashboard = () => {
                 title="Suspended" 
                 value={isLoading ? <Loader2 className="h-5 w-5 animate-spin"/> : stats.suspendedCount}
                 icon={<Pause className="h-6 w-6" />} 
-                color="orange"
+                color="amber"
             />
              <div className="bg-white p-5 rounded-lg border shadow-sm">
                 <p className="text-sm font-medium text-neutral-500">Top Cities</p>

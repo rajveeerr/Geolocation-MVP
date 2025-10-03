@@ -67,7 +67,7 @@ export const CustomerManagementPage = () => {
                     title="Avg. Spend" 
                     value={isLoading ? <Loader2 className="h-5 w-5 animate-spin"/> : `$${stats.averageSpend.toFixed(2)}`}
                     icon={<DollarSign className="h-6 w-6" />}
-                    color="blue"
+                    color="primary"
                 />
             </div>
 

@@ -28,7 +28,6 @@ export const EnhancedSectionHeader = ({
   variant = 'simple',
 }: EnhancedSectionHeaderProps) => {
   // Determine layout based on variant
-  const isSimple = variant === 'simple' || (!subtitle && !description);
   const isMinimal = variant === 'minimal';
   const isDetailed = variant === 'detailed' && (subtitle || description);
 

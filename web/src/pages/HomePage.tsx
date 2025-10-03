@@ -7,9 +7,6 @@ import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
 // import type { Deal } from '@/data/deals';
 import { DiscoverSection } from '@/components/landing/DiscoverSection';
-import { NewHeroSection } from '@/components/landing/NewHeroSection';
-import { AlternativeHeroSection } from '@/components/landing/AlternativeHeroSection';
-import { CommunityHeroSection } from '@/components/landing/CommunityHeroSection';
 import { premiumDeals, happyHourDeals, experiencesData } from '@/data/deals'; // Keep existing mock data
 import { AnimatePresence } from 'framer-motion';
 import { useFeaturedDeals } from '@/hooks/useFeaturedDeals'; // <-- Import the new hook

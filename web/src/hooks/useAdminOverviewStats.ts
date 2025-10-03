@@ -1,6 +1,5 @@
 // web/src/hooks/useAdminOverviewStats.ts
 import { useQuery } from '@tanstack/react-query';
-import { apiGet } from '@/services/api';
 
 // This is the shape of the data our new dashboard will consume
 export interface AdminOverviewStats {
