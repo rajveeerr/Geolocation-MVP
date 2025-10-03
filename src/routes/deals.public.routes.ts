@@ -105,12 +105,22 @@ router.get('/deals', async (req, res) => {
 
     // Add category filter if provided
     if (category) {
-      // Validate category
-      const validCategories = [
-        'FOOD_AND_BEVERAGE', 'RETAIL', 'ENTERTAINMENT', 'HEALTH_AND_FITNESS',
-        'BEAUTY_AND_SPA', 'AUTOMOTIVE', 'TRAVEL', 'EDUCATION', 'TECHNOLOGY',
-        'HOME_AND_GARDEN', 'OTHER'
-      ];
+      // Map enum-style category names to database names
+      const categoryMapping: Record<string, string> = {
+        'FOOD_AND_BEVERAGE': 'Food & Beverage',
+        'RETAIL': 'Retail',
+        'ENTERTAINMENT': 'Entertainment',
+        'HEALTH_AND_FITNESS': 'Health & Fitness',
+        'BEAUTY_AND_SPA': 'Beauty & Spa',
+        'AUTOMOTIVE': 'Automotive',
+        'TRAVEL': 'Travel',
+        'EDUCATION': 'Education',
+        'TECHNOLOGY': 'Technology',
+        'HOME_AND_GARDEN': 'Home & Garden',
+        'OTHER': 'Other'
+      };
+      
+      const validCategories = Object.keys(categoryMapping);
       
       if (!validCategories.includes(category as string)) {
         return res.status(400).json({
@@ -118,7 +128,32 @@ router.get('/deals', async (req, res) => {
         });
       }
       
-      whereClause.category = category;
+      const dbCategoryName = categoryMapping[category as string];
+      
+      // Check if category exists in database
+      try {
+        const categoryExists = await prisma.dealCategoryMaster.findFirst({
+          where: { name: dbCategoryName, active: true }
+        });
+        
+        if (!categoryExists) {
+          return res.status(400).json({
+            error: `Category '${category}' not found or inactive`
+          });
+        }
+      } catch (dbError) {
+        console.error('Error checking category:', dbError);
+        return res.status(500).json({
+          error: 'Database error while validating category'
+        });
+      }
+      
+      // Filter by category relation using the database name
+      whereClause.category = {
+        name: {
+          equals: dbCategoryName
+        }
+      };
     }
 
     // Add search filter if provided
@@ -163,6 +198,8 @@ router.get('/deals', async (req, res) => {
       where: whereClause,
       include: {
         merchant: { include: { stores: { include: { city: true } } } },
+        category: true,
+        dealType: true,
         _count: { select: { savedByUsers: true } },
         savedByUsers: {
           take: 5,
@@ -243,6 +280,8 @@ router.get('/deals', async (req, res) => {
         where: whereClause,
         include: {
           merchant: true,
+          category: true,
+          dealType: true,
           _count: { select: { savedByUsers: true } },
           savedByUsers: {
             take: 5,
@@ -310,82 +349,63 @@ router.get('/deals', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching deals:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      query: req.query
+    });
+    res.status(500).json({ 
+      error: 'Internal server error',
+      message: 'Failed to fetch deals. Please try again later.'
+    });
   }
 });
 
 // --- Endpoint: GET /api/deals/categories ---
-// Returns all available deal categories
+// Returns all available deal categories from database
 router.get('/deals/categories', async (req, res) => {
   try {
-    const categories = [
-      { 
-        value: 'FOOD_AND_BEVERAGE', 
-        label: 'Food & Beverage',
-        description: 'Restaurants, cafes, bars, food delivery',
-        icon: '🍽️'
-      },
-      { 
-        value: 'RETAIL', 
-        label: 'Retail',
-        description: 'Clothing, electronics, general merchandise',
-        icon: '🛍️'
-      },
-      { 
-        value: 'ENTERTAINMENT', 
-        label: 'Entertainment',
-        description: 'Movies, events, activities, gaming',
-        icon: '🎬'
-      },
-      { 
-        value: 'HEALTH_AND_FITNESS', 
-        label: 'Health & Fitness',
-        description: 'Gyms, wellness, medical services',
-        icon: '💪'
-      },
-      { 
-        value: 'BEAUTY_AND_SPA', 
-        label: 'Beauty & Spa',
-        description: 'Salons, spas, beauty services',
-        icon: '💅'
-      },
-      { 
-        value: 'AUTOMOTIVE', 
-        label: 'Automotive',
-        description: 'Car services, dealerships, auto parts',
-        icon: '🚗'
-      },
-      { 
-        value: 'TRAVEL', 
-        label: 'Travel',
-        description: 'Hotels, flights, vacation packages',
-        icon: '✈️'
-      },
-      { 
-        value: 'EDUCATION', 
-        label: 'Education',
-        description: 'Courses, training, educational services',
-        icon: '📚'
-      },
-      { 
-        value: 'TECHNOLOGY', 
-        label: 'Technology',
-        description: 'Software, gadgets, tech services',
-        icon: '💻'
-      },
-      { 
-        value: 'HOME_AND_GARDEN', 
-        label: 'Home & Garden',
-        description: 'Furniture, gardening, home improvement',
-        icon: '🏠'
-      },
-      { 
-        value: 'OTHER', 
-        label: 'Other',
-        description: 'Miscellaneous deals',
-        icon: '📦'
-      }
-    ];
+    // Fetch categories from database
+    const dbCategories = await prisma.dealCategoryMaster.findMany({
+      where: { active: true },
+      orderBy: { sortOrder: 'asc' }
+    });
+
+    // Map database categories to frontend format
+    const categoryMapping: Record<string, string> = {
+      'Food & Beverage': 'FOOD_AND_BEVERAGE',
+      'Retail': 'RETAIL',
+      'Entertainment': 'ENTERTAINMENT',
+      'Health & Fitness': 'HEALTH_AND_FITNESS',
+      'Beauty & Spa': 'BEAUTY_AND_SPA',
+      'Automotive': 'AUTOMOTIVE',
+      'Travel': 'TRAVEL',
+      'Education': 'EDUCATION',
+      'Technology': 'TECHNOLOGY',
+      'Home & Garden': 'HOME_AND_GARDEN',
+      'Other': 'OTHER'
+    };
+
+    const iconMapping: Record<string, string> = {
+      'Food & Beverage': '🍽️',
+      'Retail': '🛍️',
+      'Entertainment': '🎬',
+      'Health & Fitness': '💪',
+      'Beauty & Spa': '💅',
+      'Automotive': '🚗',
+      'Travel': '✈️',
+      'Education': '📚',
+      'Technology': '💻',
+      'Home & Garden': '🏠',
+      'Other': '📦'
+    };
+
+    const categories = dbCategories.map(category => ({
+      value: categoryMapping[category.name] || category.name.toUpperCase().replace(/[^A-Z]/g, '_'),
+      label: category.name,
+      description: category.description || `${category.name} deals and offers`,
+      icon: category.icon || iconMapping[category.name] || '📦'
+    }));
 
     res.status(200).json({
       categories,
