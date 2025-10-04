@@ -8,27 +8,8 @@ import { Loader2, Building, Mail, Clock, CheckCircle, XCircle, Search, MapPin, T
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { StatCard } from '@/components/common/StatCard';
-
-const MerchantAvatar = ({ src, name }: { src?: string | null; name?: string | null }) => {
-    const [errored, setErrored] = useState(false);
-    const onError = useCallback(() => setErrored(true), []);
-
-    if (!src || errored) {
-        return (
-            <Avatar className="h-14 w-14 rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200">
-                <AvatarFallback>{name?.charAt(0) || 'M'}</AvatarFallback>
-            </Avatar>
-        );
-    }
-
-    return (
-        <Avatar className="h-14 w-14 rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200">
-            <AvatarImage src={src} alt={name || 'Merchant logo'} onError={onError} />
-        </Avatar>
-    );
-};
+import { MerchantLogo } from '@/components/common/MerchantLogo';
 
 interface MerchantOwner {
   id: number;
@@ -122,7 +103,7 @@ const MerchantDetailsModal = ({ merchant, onClose }: any) => {
                 
                 <div className="space-y-6">
                     <div className="flex items-start gap-4">
-                        <MerchantAvatar src={merchant.logoUrl} name={merchant.businessName} />
+                        <MerchantLogo src={merchant.logoUrl} name={merchant.businessName} size="lg" />
                         <div className="flex-1">
                             <h4 className="font-semibold text-lg">{merchant.businessName}</h4>
                             <p className="text-sm text-neutral-500">{merchant.owner.email}</p>
@@ -360,7 +341,7 @@ export const MerchantApprovalDashboard = () => {
                     <div key={merchant.id} className="bg-white border rounded-lg p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-start gap-4">
                             <div className="flex-shrink-0">
-                                <MerchantAvatar src={merchant.logoUrl} name={merchant.businessName} />
+                                <MerchantLogo src={merchant.logoUrl} name={merchant.businessName} size="lg" />
                             </div>
                             <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-2 flex-wrap">

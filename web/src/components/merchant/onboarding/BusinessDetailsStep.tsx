@@ -2,13 +2,27 @@ import { useOnboarding } from '@/context/MerchantOnboardingContext';
 import { OnboardingStepLayout } from './OnboardingStepLayout';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
+import { ImageUpload } from '@/components/ui/ImageUpload';
+import { useToast } from '@/hooks/use-toast';
 
 export const BusinessDetailsStep = () => {
   const { state, dispatch } = useOnboarding();
+  const { toast } = useToast();
 
   const handleNext = () => {
     dispatch({ type: 'SET_STEP', payload: state.step + 1 });
+  };
+
+  const handleLogoUpload = (url: string | null) => {
+    dispatch({ type: 'SET_LOGO_URL', payload: url || '' });
+  };
+
+  const handleLogoError = (error: string) => {
+    toast({
+      title: 'Upload Error',
+      description: error,
+      variant: 'destructive',
+    });
   };
 
   return (
@@ -34,17 +48,16 @@ export const BusinessDetailsStep = () => {
             className="min-h-[120px]"
           />
         </div>
-        <div>
-          <Label htmlFor="logoUrl">Logo URL (Optional)</Label>
-          <Input
-            id="logoUrl"
-            value={state.logoUrl}
-            onChange={(e) =>
-              dispatch({ type: 'SET_LOGO_URL', payload: e.target.value })
-            }
-            placeholder="https://example.com/logo.png"
-          />
-        </div>
+        <ImageUpload
+          value={state.logoUrl || undefined}
+          onChange={handleLogoUpload}
+          onError={handleLogoError}
+          label="Business Logo (Optional)"
+          description="Upload your business logo. This will be displayed on your merchant profile and deals."
+          context="business_logo"
+          maxSize={5}
+          acceptedFormats={['image/jpeg', 'image/jpg', 'image/png', 'image/gif']}
+        />
       </div>
     </OnboardingStepLayout>
   );
