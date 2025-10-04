@@ -10,7 +10,7 @@ import {
   AlertCircle,
   Camera
 } from 'lucide-react';
-import { apiPost } from '@/services/api';
+import { apiPostFormData } from '@/services/api';
 
 interface DealImageUploadProps {
   images: string[];
@@ -67,7 +67,7 @@ export const DealImageUpload = ({
         formData.append('file', file);
         formData.append('context', 'deal_images');
 
-        const response = await apiPost('/media/upload', formData);
+        const response = await apiPostFormData('/media/upload', formData);
 
         // Check if response is valid and has the expected structure
         if (!response || !response.data || !(response.data as any).url) {

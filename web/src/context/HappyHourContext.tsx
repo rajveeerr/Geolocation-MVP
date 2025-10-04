@@ -33,6 +33,10 @@ export interface HappyHourState {
   title: string;
   description: string;
   category: string;
+  // --- Add discount fields ---
+  discountPercentage: number | null;
+  discountAmount: number | null;
+  customOfferDisplay: string;
 }
 
 type Action =
@@ -57,6 +61,10 @@ const initialState: HappyHourState = {
   title: '',
   description: '',
   category: 'FOOD_AND_BEVERAGE',
+  // --- Initialize discount fields ---
+  discountPercentage: 20, // Default 20% discount for happy hour
+  discountAmount: null,
+  customOfferDisplay: '',
 };
 
 function reducer(state: HappyHourState, action: Action): HappyHourState {

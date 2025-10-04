@@ -6,11 +6,14 @@ export const DiscoverSection = () => {
   return (
     <section className="bg-neutral-50 py-16 sm:py-20 lg:py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12 text-center">
+        <div className="mb-8 text-center">
             <h2 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
                 Discover Your Next Favorite Spot
             </h2>
         </div>
+        
+        {/* Thick primary colored line below section heading */}
+        <div className="mb-12 h-1 w-full bg-[#F97316] rounded-sm"></div>
         
         {/* --- MODIFIED: Updated grid to support 4 columns on xl screens --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 justify-items-center">

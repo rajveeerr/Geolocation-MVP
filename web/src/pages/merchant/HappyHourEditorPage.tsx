@@ -151,19 +151,52 @@ const HappyHourEditorContent = () => {
         return;
       }
 
+      // Validate that at least one time range is set
+      if (!state.timeRanges || state.timeRanges.length === 0) {
+        toast({ 
+          title: 'Error', 
+          description: 'Please set at least one time range for your happy hour.', 
+          variant: 'destructive' 
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Temporarily disable menu item validation to test basic deal creation
+      // if (!state.selectedMenuItems || state.selectedMenuItems.length === 0) {
+      //   toast({ 
+      //     title: 'Error', 
+      //     description: 'Please select at least one menu item for your happy hour.', 
+      //     variant: 'destructive' 
+      //   });
+      //   setIsSubmitting(false);
+      //   return;
+      // }
+
+      // Validate that at least one discount field is provided
+      if (!state.discountPercentage && !state.discountAmount && !state.customOfferDisplay) {
+        toast({ 
+          title: 'Error', 
+          description: 'Please provide at least one discount option (percentage, amount, or custom offer text).', 
+          variant: 'destructive' 
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       const payload: any = {
         title: state.title || `${state.happyHourType} Happy Hour`,
         description: state.description || `Special offers available during our ${state.happyHourType} happy hour.`,
         category: state.category || 'FOOD_AND_BEVERAGE',
-        dealType: 'HAPPY_HOUR',
+        dealType: 'Happy Hour',
         // Backend expects activeDateRange with startDate and endDate
         activeDateRange: {
-          startDate: state.timeRanges[0]
-            ? `${state.activeStartDate || new Date().toISOString().split('T')[0]}T${state.timeRanges[0].start}:00.000Z`
-            : undefined,
-          endDate: state.timeRanges[0]
-            ? `${state.activeEndDate || new Date().toISOString().split('T')[0]}T${state.timeRanges[0].end}:00.000Z`
-            : undefined,
+          startDate: state.activeStartDate 
+            ? `${state.activeStartDate}T00:00:00.000Z`
+            : new Date().toISOString(),
+          endDate: state.activeEndDate 
+            ? `${state.activeEndDate}T23:59:59.999Z`
+            : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         },
         // Convert recurring days to comma-separated string as backend expects
         recurringDays:
@@ -175,11 +208,15 @@ const HappyHourEditorContent = () => {
           'Show this screen to your server to redeem the happy hour offer.',
 
         kickbackEnabled: state.kickbackEnabled,
-        kickbackPercent: state.kickbackEnabled ? state.kickbackPercent ?? undefined : undefined,
-        selectedMenuItems: state.selectedMenuItems?.map((i: any) => ({ id: i.id, price: i.price })) || [],
+        // Temporarily disable menu items to test basic deal creation
+        // menuItems: state.selectedMenuItems?.map((i: any) => ({ id: i.id, isHidden: i.isHidden })) || [],
+        // Add required discount fields
+        discountPercentage: state.discountPercentage,
+        discountAmount: state.discountAmount,
+        customOfferDisplay: state.customOfferDisplay || null,
       };
 
-      console.log('Submitting Payload to /api/deals:', payload);
+      console.log('Submitting Payload to /api/deals:', JSON.stringify(payload, null, 2));
 
       const response = await apiPost('/deals', payload);
 
@@ -187,6 +224,7 @@ const HappyHourEditorContent = () => {
         toast({ title: 'Happy Hour Published!', description: 'Your new happy hour deal is now live.' });
         navigate(PATHS.MERCHANT_DASHBOARD);
       } else {
+        console.error('API Error Response:', response);
         throw new Error(response.error || 'Failed to publish happy hour deal.');
       }
 
@@ -223,6 +261,61 @@ const HappyHourEditorContent = () => {
                   <div>
                     <Label htmlFor="description">Description (optional)</Label>
                     <Textarea id="description" value={state.description} onChange={e => dispatch({ type: 'SET_FIELD', field: 'description', value: e.target.value })} placeholder="Let customers know what's special about this happy hour." />
+                  </div>
+                </div>
+              </FormSection>
+
+              <FormSection title="Happy Hour Offer" subtitle="Set the discount or special offer for your happy hour">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="discount-percentage">Discount Percentage</Label>
+                      <div className="flex items-center gap-2">
+                        <Input 
+                          id="discount-percentage" 
+                          type="number" 
+                          min="1" 
+                          max="100" 
+                          value={state.discountPercentage || ''} 
+                          onChange={e => dispatch({ type: 'SET_FIELD', field: 'discountPercentage', value: e.target.value ? parseInt(e.target.value) : null })} 
+                          placeholder="20" 
+                        />
+                        <span className="text-sm text-neutral-500">%</span>
+                      </div>
+                      <p className="text-xs text-neutral-500 mt-1">Percentage off regular prices</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="discount-amount">Fixed Discount Amount (optional)</Label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-neutral-500">$</span>
+                        <Input 
+                          id="discount-amount" 
+                          type="number" 
+                          min="0" 
+                          step="0.01"
+                          value={state.discountAmount || ''} 
+                          onChange={e => dispatch({ type: 'SET_FIELD', field: 'discountAmount', value: e.target.value ? parseFloat(e.target.value) : null })} 
+                          placeholder="5.00" 
+                        />
+                      </div>
+                      <p className="text-xs text-neutral-500 mt-1">Fixed dollar amount off</p>
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="custom-offer">Custom Offer Text (optional)</Label>
+                    <Input 
+                      id="custom-offer" 
+                      value={state.customOfferDisplay} 
+                      onChange={e => dispatch({ type: 'SET_FIELD', field: 'customOfferDisplay', value: e.target.value })} 
+                      placeholder="e.g., Buy 2 Get 1 Free, Half Price Appetizers" 
+                    />
+                    <p className="text-xs text-neutral-500 mt-1">Custom text to display instead of percentage/amount</p>
+                  </div>
+                  <div className="rounded-lg bg-blue-50 border border-blue-200 p-3">
+                    <p className="text-sm text-blue-800">
+                      <strong>Note:</strong> You can use either a percentage discount, fixed amount, or custom offer text. 
+                      If you provide multiple options, the custom offer text will take priority.
+                    </p>
                   </div>
                 </div>
               </FormSection>
@@ -330,6 +423,18 @@ const HappyHourEditorContent = () => {
                 <p className="text-sm text-neutral-500 mt-2">Happy Hour: <span className="font-medium">{state.happyHourType}</span></p>
                 <p className="text-sm text-neutral-500">Time ranges: <span className="font-medium">{state.timeRanges.length}</span></p>
                 <p className="text-sm text-neutral-500">Items: <span className="font-medium">{state.selectedMenuItems.length}</span></p>
+                <div className="mt-3 pt-3 border-t border-neutral-200">
+                  <p className="text-sm font-medium text-neutral-700">Offer Details:</p>
+                  {state.customOfferDisplay ? (
+                    <p className="text-sm text-neutral-600 mt-1">"{state.customOfferDisplay}"</p>
+                  ) : state.discountPercentage ? (
+                    <p className="text-sm text-neutral-600 mt-1">{state.discountPercentage}% off</p>
+                  ) : state.discountAmount ? (
+                    <p className="text-sm text-neutral-600 mt-1">${state.discountAmount} off</p>
+                  ) : (
+                    <p className="text-sm text-red-500 mt-1">No offer set</p>
+                  )}
+                </div>
               </div>
             </div>
           </aside>

@@ -9,12 +9,18 @@ import MenuItemCard from '@/components/common/MenuItemCard';
 
 // Mock menu data — replace with API call later
 const MOCK_MENU: MenuItemType[] = [
-  { id: 101, name: 'Spicy Tuna Roll', price: 12.5, category: 'Bites', imageUrl: 'https://images.unsplash.com/photo-1579871494447-9811CFb5d668?w=400&q=80' },
-  { id: 102, name: 'Crispy Chicken Wings', price: 9.0, category: 'Bites', imageUrl: 'https://images.unsplash.com/photo-1569058242253-92a9c55522cd?w=400&q=80' },
-  { id: 103, name: 'Truffle Fries', price: 7.5, category: 'Bites', imageUrl: 'https://images.unsplash.com/photo-1598679253544-2c9740f92d4f?w=400&q=80' },
-  { id: 201, name: 'Old Fashioned', price: 15.0, category: 'Drinks', imageUrl: 'https://images.unsplash.com/photo-1563223451-2453d19e6232?w=400&q=80' },
-  { id: 202, name: 'Margarita on the Rocks', price: 14.0, category: 'Drinks', imageUrl: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&q=80' },
-  { id: 203, name: 'House Red Wine', price: 10.0, category: 'Drinks', imageUrl: 'https://images.unsplash.com/photo-1598375263223-1a28a3f89838?w=400&q=80' },
+  { id: 101, name: 'Spicy Tuna Roll', price: 12.5, category: 'Bites', imageUrl: 'https://picsum.photos/400/300?random=1' },
+  { id: 102, name: 'Crispy Chicken Wings', price: 9.0, category: 'Bites', imageUrl: 'https://picsum.photos/400/300?random=2' },
+  { id: 103, name: 'Truffle Fries', price: 7.5, category: 'Bites', imageUrl: 'https://picsum.photos/400/300?random=3' },
+  { id: 104, name: 'Buffalo Cauliflower', price: 8.5, category: 'Bites', imageUrl: 'https://picsum.photos/400/300?random=4' },
+  { id: 105, name: 'Loaded Nachos', price: 11.0, category: 'Bites', imageUrl: 'https://picsum.photos/400/300?random=5' },
+  { id: 106, name: 'Artisan Cheese Board', price: 16.0, category: 'Bites', imageUrl: 'https://picsum.photos/400/300?random=6' },
+  { id: 201, name: 'Old Fashioned', price: 15.0, category: 'Drinks', imageUrl: 'https://picsum.photos/400/300?random=7' },
+  { id: 202, name: 'Margarita on the Rocks', price: 14.0, category: 'Drinks', imageUrl: 'https://picsum.photos/400/300?random=8' },
+  { id: 203, name: 'House Red Wine', price: 10.0, category: 'Drinks', imageUrl: 'https://picsum.photos/400/300?random=9' },
+  { id: 204, name: 'Craft Beer Flight', price: 12.0, category: 'Drinks', imageUrl: 'https://picsum.photos/400/300?random=10' },
+  { id: 205, name: 'Moscow Mule', price: 13.0, category: 'Drinks', imageUrl: 'https://picsum.photos/400/300?random=11' },
+  { id: 206, name: 'Fresh Lemonade', price: 6.0, category: 'Drinks', imageUrl: 'https://picsum.photos/400/300?random=12' },
 ];
 
 // Using shared MenuItemCard component for consistent premium UI
