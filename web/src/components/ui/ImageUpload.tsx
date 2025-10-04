@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { apiPostFormData } from '@/services/api';
-import { validateCloudinaryResponse, getOptimizedImageUrl, isCloudinaryUrl } from '@/lib/cloudinary';
+import { validateCloudinaryResponse } from '@/lib/cloudinary';
 
 interface ImageUploadProps {
   value?: string;
