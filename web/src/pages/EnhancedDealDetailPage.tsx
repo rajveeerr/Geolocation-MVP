@@ -8,6 +8,7 @@ import { useCheckIn } from '@/hooks/useCheckIn';
 import { useDealDetail, type DetailedDeal } from '@/hooks/useDealDetail';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routing/paths';
+import { MerchantLogo } from '@/components/common/MerchantLogo';
 
 // Icons
 import {
@@ -253,13 +254,12 @@ const MerchantInfoSection = ({ merchant }: { merchant: DetailedDeal['merchant'] 
   return (
     <div className="space-y-4">
       <div className="flex items-start gap-4">
-        {merchant.logoUrl && (
-          <img
-            src={merchant.logoUrl}
-            alt={`${merchant.businessName} logo`}
-            className="h-16 w-16 rounded-lg object-cover flex-shrink-0"
-          />
-        )}
+        <MerchantLogo 
+          src={merchant.logoUrl} 
+          name={merchant.businessName} 
+          size="lg" 
+          className="flex-shrink-0"
+        />
         
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-neutral-900 mb-2">{merchant.businessName}</h3>
