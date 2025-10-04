@@ -7,7 +7,7 @@ import prisma from '../lib/prisma';
 // Extend Express's Request type to include our custom 'user' property
 export interface AuthRequest extends Request {
   user?: { id: number; email: string; };
-  merchant?: { id: number; status: 'PENDING' | 'APPROVED' | 'REJECTED' }; // For step 3
+  merchant?: { id: number; status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'SUSPENDED' }; // For step 3
 }
 
 export const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {

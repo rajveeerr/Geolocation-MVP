@@ -66,27 +66,27 @@ CREATE INDEX "DealTypeMaster_active_idx" ON "DealTypeMaster"("active");
 CREATE INDEX "PointEventTypeMaster_active_idx" ON "PointEventTypeMaster"("active");
 
 -- Insert default categories (migrate from enum)
-INSERT INTO "DealCategoryMaster" ("name", "description", "sortOrder", "active") VALUES
-('Food & Beverage', 'Restaurants, cafes, bars, and food-related businesses', 1, true),
-('Retail', 'Stores, shopping centers, and retail businesses', 2, true),
-('Entertainment', 'Movies, games, events, and entertainment venues', 3, true),
-('Health & Fitness', 'Gyms, spas, wellness centers, and healthcare', 4, true),
-('Beauty & Spa', 'Salons, beauty treatments, and personal care', 5, true),
-('Automotive', 'Car services, repairs, and automotive businesses', 6, true),
-('Travel', 'Hotels, travel agencies, and tourism services', 7, true),
-('Education', 'Schools, training centers, and educational services', 8, true),
-('Technology', 'Tech services, electronics, and digital products', 9, true),
-('Home & Garden', 'Furniture, home improvement, and gardening', 10, true),
-('Other', 'Miscellaneous businesses and services', 99, true);
+INSERT INTO "DealCategoryMaster" ("name", "description", "sortOrder", "active", "updatedAt") VALUES
+('Food & Beverage', 'Restaurants, cafes, bars, and food-related businesses', 1, true, CURRENT_TIMESTAMP),
+('Retail', 'Stores, shopping centers, and retail businesses', 2, true, CURRENT_TIMESTAMP),
+('Entertainment', 'Movies, games, events, and entertainment venues', 3, true, CURRENT_TIMESTAMP),
+('Health & Fitness', 'Gyms, spas, wellness centers, and healthcare', 4, true, CURRENT_TIMESTAMP),
+('Beauty & Spa', 'Salons, beauty treatments, and personal care', 5, true, CURRENT_TIMESTAMP),
+('Automotive', 'Car services, repairs, and automotive businesses', 6, true, CURRENT_TIMESTAMP),
+('Travel', 'Hotels, travel agencies, and tourism services', 7, true, CURRENT_TIMESTAMP),
+('Education', 'Schools, training centers, and educational services', 8, true, CURRENT_TIMESTAMP),
+('Technology', 'Tech services, electronics, and digital products', 9, true, CURRENT_TIMESTAMP),
+('Home & Garden', 'Furniture, home improvement, and gardening', 10, true, CURRENT_TIMESTAMP),
+('Other', 'Miscellaneous businesses and services', 99, true, CURRENT_TIMESTAMP);
 
 -- Insert default deal types (migrate from enum)
-INSERT INTO "DealTypeMaster" ("name", "description", "active") VALUES
-('Standard', 'Regular deals and promotions', true),
-('Happy Hour', 'Time-limited special offers, typically during off-peak hours', true),
-('Recurring', 'Deals that repeat on specific days or times', true);
+INSERT INTO "DealTypeMaster" ("name", "description", "active", "updatedAt") VALUES
+('Standard', 'Regular deals and promotions', true, CURRENT_TIMESTAMP),
+('Happy Hour', 'Time-limited special offers, typically during off-peak hours', true, CURRENT_TIMESTAMP),
+('Recurring', 'Deals that repeat on specific days or times', true, CURRENT_TIMESTAMP);
 
 -- Insert default point event types (migrate from enum)
-INSERT INTO "PointEventTypeMaster" ("name", "description", "points", "active") VALUES
-('Signup', 'Points awarded for user registration', 50, true),
-('First Check-in Deal', 'Bonus points for first check-in at a deal', 25, true),
-('Check-in', 'Points awarded for each deal check-in', 10, true);
+INSERT INTO "PointEventTypeMaster" ("name", "description", "points", "active", "updatedAt") VALUES
+('Signup', 'Points awarded for user registration', 50, true, CURRENT_TIMESTAMP),
+('First Check-in Deal', 'Bonus points for first check-in at a deal', 25, true, CURRENT_TIMESTAMP),
+('Check-in', 'Points awarded for each deal check-in', 10, true, CURRENT_TIMESTAMP);
