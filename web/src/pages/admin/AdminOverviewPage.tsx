@@ -15,10 +15,6 @@ export const AdminOverviewPage = () => {
   const [selectedTimeRange, setSelectedTimeRange] = useState('Last 7 Days');
   const [selectedOfferType, setSelectedOfferType] = useState('All Offers');
 
-  const formatCurrency = (value?: number) => {
-    if (value === undefined) return <Loader2 className="h-6 w-6 animate-spin" />;
-    return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  };
 
   const formatNumber = (value?: number) => {
     if (value === undefined) return <Loader2 className="h-6 w-6 animate-spin" />;
