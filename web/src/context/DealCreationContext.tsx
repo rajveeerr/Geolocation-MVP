@@ -38,6 +38,23 @@ export interface DealCreationState {
   discountPercentage: number | null;
   discountAmount: number | null;
   redemptionInstructions: string;
+  imageUrls: string[];
+  primaryImageIndex: number | null;
+  offerTerms: string;
+  customOfferDisplay: string;
+  isFeatured: boolean;
+  priority: number;
+  maxRedemptions: number | null;
+  minOrderAmount: number | null;
+  validDaysOfWeek: string[] | null;
+  validHours: string | null;
+  socialProofEnabled: boolean;
+  allowSharing: boolean;
+  storeIds: number[] | null;
+  cityIds: number[] | null;
+  tags: string[];
+  notes: string;
+  externalUrl: string;
   // Legacy fields used by existing steps — keep for compatibility
   startTime: string;
   endTime: string;
@@ -53,7 +70,8 @@ type Action =
   | { type: 'SET_SELECTED_ITEMS'; payload: SelectedMenuItem[] }
   | { type: 'TOGGLE_RECURRING_DAY'; payload: string }
   | { type: 'SET_DEAL_TYPE'; dealType: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' }
-  | { type: 'SET_STANDARD_OFFER_KIND'; kind: 'percentage' | 'amount' | null };
+  | { type: 'SET_STANDARD_OFFER_KIND'; kind: 'percentage' | 'amount' | null }
+  | { type: 'SET_IMAGE_URLS'; payload: string[] };
 
 const initialState: DealCreationState = {
   dealType: null,
@@ -71,6 +89,23 @@ const initialState: DealCreationState = {
   discountPercentage: null,
   discountAmount: null,
   redemptionInstructions: 'Show this screen to redeem.',
+  imageUrls: [],
+  primaryImageIndex: null,
+  offerTerms: '',
+  customOfferDisplay: '',
+  isFeatured: false,
+  priority: 5,
+  maxRedemptions: 0, // 0 means unlimited
+  minOrderAmount: null,
+  validDaysOfWeek: null,
+  validHours: null,
+  socialProofEnabled: true,
+  allowSharing: true,
+  storeIds: null,
+  cityIds: null,
+  tags: [],
+  notes: '',
+  externalUrl: '',
   // Provide defaults for legacy fields so consumers can read them safely
   startTime: '',
   endTime: '',
@@ -103,6 +138,18 @@ function reducer(state: DealCreationState, action: Action): DealCreationState {
       const day = action.payload;
       const newDays = state.recurringDays.includes(day) ? state.recurringDays.filter(d => d !== day) : [...state.recurringDays, day];
       return { ...state, recurringDays: newDays };
+    }
+    case 'SET_IMAGE_URLS': {
+      const newImageUrls = action.payload;
+      // If no images, set primaryImageIndex to null
+      // If images exist and current primaryImageIndex is invalid, set to 0
+      let newPrimaryImageIndex = state.primaryImageIndex;
+      if (newImageUrls.length === 0) {
+        newPrimaryImageIndex = null;
+      } else if (state.primaryImageIndex === null || state.primaryImageIndex >= newImageUrls.length) {
+        newPrimaryImageIndex = 0;
+      }
+      return { ...state, imageUrls: newImageUrls, primaryImageIndex: newPrimaryImageIndex };
     }
     default:
       return state;

@@ -5,6 +5,7 @@ import { PATHS } from '@/routing/paths';
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
 import { MerchantDealCard } from '@/components/merchant/MerchantDealCard';
+import { MerchantProtectedRoute } from '@/components/auth/MerchantProtectedRoute';
 
 interface MerchantDeal {
   id: string;
@@ -17,7 +18,7 @@ interface MerchantDeal {
   discountAmount?: number | null;
 }
 
-export const MerchantMyDealsPage = () => {
+const MerchantMyDealsContent = () => {
   // Use react-query to fetch the deals for the logged-in merchant
   const {
     data: dealsResponse,
@@ -83,5 +84,13 @@ export const MerchantMyDealsPage = () => {
         </div>
       )}
     </div>
+  );
+};
+
+export const MerchantMyDealsPage = () => {
+  return (
+    <MerchantProtectedRoute fallbackMessage="Only merchants can view their deals. Please sign up as a merchant to access this feature.">
+      <MerchantMyDealsContent />
+    </MerchantProtectedRoute>
   );
 };

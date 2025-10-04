@@ -38,8 +38,8 @@ export const CustomerManagementPage = () => {
     
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold text-neutral-900">Customer Management</h1>
+        <div>
+            <h1 className="text-3xl font-bold text-neutral-900">Customer Management</h1>
                 <p className="text-neutral-600 mt-1">Manage and analyze customer data across the platform.</p>
             </div>
 
@@ -114,9 +114,9 @@ export const CustomerManagementPage = () => {
                 ) : (
                     <>
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
+                <table className="w-full text-sm">
                                 <thead className="bg-neutral-50">
-                                    <tr className="border-b">
+                        <tr className="border-b">
                                         <th className="text-left p-3 font-medium">Name</th>
                                         <th className="text-left p-3 font-medium">Email</th>
                                         <th className="text-left p-3 font-medium">Location</th>
@@ -124,9 +124,9 @@ export const CustomerManagementPage = () => {
                                         <th className="text-left p-3 font-medium">Points</th>
                                         <th className="text-left p-3 font-medium">Member Type</th>
                                         <th className="text-left p-3 font-medium">Last Active</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                        </tr>
+                    </thead>
+                    <tbody>
                                     {customers.map(customer => (
                                         <tr key={customer.id} className="border-b hover:bg-neutral-50">
                                             <td className="p-3 font-medium">{customer.name}</td>
@@ -152,10 +152,10 @@ export const CustomerManagementPage = () => {
                                             <td className="p-3 text-neutral-500 text-xs">
                                                 {new Date(customer.lastActiveAt).toLocaleDateString()}
                                             </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
                         </div>
 
                         {/* Pagination */}

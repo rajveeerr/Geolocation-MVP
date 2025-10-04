@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHappyHour } from '@/context/HappyHourContext'; // <-- Use the new hook
+import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { Button } from '@/components/common/Button';
 import { ArrowLeft, Plus, Loader2 } from 'lucide-react';
 import { FormSection } from '@/components/merchant/create-deal/FormSection';
@@ -15,18 +16,137 @@ import { apiPost } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 import { PATHS } from '@/routing/paths';
 import clsx from 'clsx';
+import { MerchantProtectedRoute } from '@/components/auth/MerchantProtectedRoute';
 
-export const HappyHourEditorPage = () => {
+const HappyHourEditorContent = () => {
   const navigate = useNavigate();
   const { state, dispatch } = useHappyHour();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Check merchant status before allowing deal creation
+  const { data: merchantData, isLoading: isLoadingMerchant } = useMerchantStatus();
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
+      // Check merchant status first
+      if (isLoadingMerchant) {
+        toast({
+          title: 'Loading...',
+          description: 'Please wait while we verify your merchant status.',
+          variant: 'destructive',
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (!merchantData?.data?.merchant) {
+        toast({
+          title: 'Merchant Profile Required',
+          description: 'You need to complete the merchant onboarding process before creating deals.',
+          variant: 'destructive',
+        });
+        navigate(PATHS.MERCHANT_ONBOARDING);
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (merchantData.data.merchant.status !== 'APPROVED') {
+        toast({
+          title: 'Merchant Not Approved',
+          description: `Your merchant profile is ${merchantData.data.merchant.status.toLowerCase()}. Please wait for admin approval before creating deals.`,
+          variant: 'destructive',
+        });
+        navigate(PATHS.MERCHANT_DASHBOARD);
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Comprehensive validation
+      if (!state.title || state.title.trim().length === 0) {
+        toast({ 
+          title: 'Error', 
+          description: 'Happy hour title is required.', 
+          variant: 'destructive' 
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (state.title.trim().length > 100) {
+        toast({ 
+          title: 'Error', 
+          description: 'Title must be 100 characters or less.', 
+          variant: 'destructive' 
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       if (!state.timeRanges || state.timeRanges.length === 0) {
         toast({ title: 'Error', description: 'Please add at least one time range.', variant: 'destructive' });
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Validate time ranges
+      for (const timeRange of state.timeRanges) {
+        if (!timeRange.start || !timeRange.end) {
+          toast({ 
+            title: 'Error', 
+            description: 'All time ranges must have start and end times.', 
+            variant: 'destructive' 
+          });
+          setIsSubmitting(false);
+          return;
+        }
+
+        const startTime = new Date(`2000-01-01T${timeRange.start}:00`);
+        const endTime = new Date(`2000-01-01T${timeRange.end}:00`);
+        
+        if (startTime >= endTime) {
+          toast({ 
+            title: 'Error', 
+            description: 'End time must be after start time for all time ranges.', 
+            variant: 'destructive' 
+          });
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      // Validate dates
+      if (!state.activeStartDate || !state.activeEndDate) {
+        toast({ 
+          title: 'Error', 
+          description: 'Please set start and end dates for your happy hour.', 
+          variant: 'destructive' 
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      const startDate = new Date(state.activeStartDate);
+      const endDate = new Date(state.activeEndDate);
+      const now = new Date();
+
+      if (startDate <= now) {
+        toast({ 
+          title: 'Error', 
+          description: 'Start date must be in the future.', 
+          variant: 'destructive' 
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (endDate <= startDate) {
+        toast({ 
+          title: 'Error', 
+          description: 'End date must be after start date.', 
+          variant: 'destructive' 
+        });
         setIsSubmitting(false);
         return;
       }
@@ -34,15 +154,17 @@ export const HappyHourEditorPage = () => {
       const payload: any = {
         title: state.title || `${state.happyHourType} Happy Hour`,
         description: state.description || `Special offers available during our ${state.happyHourType} happy hour.`,
-        category: state.category,
+        category: state.category || 'FOOD_AND_BEVERAGE',
         dealType: 'HAPPY_HOUR',
-        // use first time range as the backend expects a single start/end
-        startTime: state.timeRanges[0]
-          ? `${state.activeStartDate || new Date().toISOString().split('T')[0]}T${state.timeRanges[0].start}:00.000Z`
-          : undefined,
-        endTime: state.timeRanges[0]
-          ? `${state.activeEndDate || new Date().toISOString().split('T')[0]}T${state.timeRanges[0].end}:00.000Z`
-          : undefined,
+        // Backend expects activeDateRange with startDate and endDate
+        activeDateRange: {
+          startDate: state.timeRanges[0]
+            ? `${state.activeStartDate || new Date().toISOString().split('T')[0]}T${state.timeRanges[0].start}:00.000Z`
+            : undefined,
+          endDate: state.timeRanges[0]
+            ? `${state.activeEndDate || new Date().toISOString().split('T')[0]}T${state.timeRanges[0].end}:00.000Z`
+            : undefined,
+        },
         // Convert recurring days to comma-separated string as backend expects
         recurringDays:
           state.periodType === 'Recurring' && state.recurringDays.length > 0 ? state.recurringDays.join(',') : undefined,
@@ -222,6 +344,14 @@ export const HappyHourEditorPage = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+export const HappyHourEditorPage = () => {
+  return (
+    <MerchantProtectedRoute fallbackMessage="Only merchants can create Happy Hour deals. Please sign up as a merchant to access this feature.">
+      <HappyHourEditorContent />
+    </MerchantProtectedRoute>
   );
 };
 

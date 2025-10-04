@@ -53,23 +53,37 @@ export const FinalReviewStep = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (state.address.city) {
-      const raw = state.address.city.toLowerCase().trim();
-      // Accept variants like "new york" and "new york city"
-      const base = raw.replace(/\s*city$/,'').trim();
-      const variants = new Set([raw, base, `${base} city`]);
-      const accepted = Array.from(variants).some(v => whitelistedSet.has(v));
-      setIsCityWhitelisted(accepted);
-      return;
-    }
-
-    // Fallback: if no address.city we can still try reverse geocoding from coordinates
+    // If we have a cityId, validate it directly
     if (state.cityId !== null && cities) {
       const found = cities.some(c => c.id === state.cityId && c.active);
       setIsCityWhitelisted(found);
       return;
     }
 
+    // If we have an address city, try to match it with whitelisted cities
+    if (state.address.city) {
+      const raw = state.address.city.toLowerCase().trim();
+      // Accept variants like "new york" and "new york city"
+      const base = raw.replace(/\s*city$/,'').trim();
+      const variants = new Set([raw, base, `${base} city`]);
+      const accepted = Array.from(variants).some(v => whitelistedSet.has(v));
+      
+      // If city is whitelisted but we don't have a cityId, try to find and set it
+      if (accepted && cities && state.cityId === null) {
+        const matchingCity = cities.find(c => {
+          const cityName = c.name.toLowerCase().trim();
+          return variants.has(cityName) || variants.has(cityName.replace(/\s*city$/,'').trim());
+        });
+        if (matchingCity) {
+          dispatch({ type: 'SET_CITY_ID', payload: matchingCity.id });
+        }
+      }
+      
+      setIsCityWhitelisted(accepted);
+      return;
+    }
+
+    // Fallback: if no address.city we can still try reverse geocoding from coordinates
     if (state.coordinates.lat !== null && state.coordinates.lng !== null) {
       reverseGeocode({ lat: state.coordinates.lat, lng: state.coordinates.lng }).then(addressDetails => {
         if (addressDetails) {
@@ -79,6 +93,18 @@ export const FinalReviewStep = () => {
             const base = raw.replace(/\s*city$/,'').trim();
             const variants = new Set([raw, base, `${base} city`]);
             const accepted = Array.from(variants).some(v => whitelistedSet.has(v));
+            
+            // If city is whitelisted but we don't have a cityId, try to find and set it
+            if (accepted && cities && state.cityId === null) {
+              const matchingCity = cities.find(c => {
+                const cityName = c.name.toLowerCase().trim();
+                return variants.has(cityName) || variants.has(cityName.replace(/\s*city$/,'').trim());
+              });
+              if (matchingCity) {
+                dispatch({ type: 'SET_CITY_ID', payload: matchingCity.id });
+              }
+            }
+            
             setIsCityWhitelisted(accepted);
           }
         }
@@ -89,20 +115,52 @@ export const FinalReviewStep = () => {
   const handleFinalSubmit = async () => {
     setIsSubmitting(true);
     try {
+      console.log('Final submit - Current state:', {
+        cityId: state.cityId,
+        addressCity: state.address.city,
+        isCityWhitelisted,
+        cities: cities?.length
+      });
+
+      // Last attempt to find cityId if it's missing
+      let finalCityId = state.cityId;
+      if (!finalCityId && state.address.city && cities) {
+        const raw = state.address.city.toLowerCase().trim();
+        const base = raw.replace(/\s*city$/,'').trim();
+        const variants = new Set([raw, base, `${base} city`]);
+        
+        const matchingCity = cities.find(c => {
+          const cityName = c.name.toLowerCase().trim();
+          return variants.has(cityName) || variants.has(cityName.replace(/\s*city$/,'').trim());
+        });
+        
+        if (matchingCity) {
+          finalCityId = matchingCity.id;
+          dispatch({ type: 'SET_CITY_ID', payload: matchingCity.id });
+          console.log('Found matching city:', matchingCity);
+        }
+      }
+
       const fullAddress = `${state.address.street}, ${state.address.city}, ${state.address.state} ${state.address.zip}`;
       const payload = {
         businessName: state.businessName,
         address: fullAddress,
-        cityId: state.cityId,
+        cityId: finalCityId,
         latitude: state.coordinates.lat,
         longitude: state.coordinates.lng,
         description: state.description || undefined,
         logoUrl: state.logoUrl || undefined,
       };
 
-      // Validation: ensure cityId is present
-      if (!payload.cityId) {
-        toast({ title: 'Submission Failed', description: 'A city must be selected. Please go back.', variant: 'destructive' });
+      console.log('Final payload:', payload);
+
+      // Validation: ensure cityId is present or city is whitelisted
+      if (!payload.cityId && isCityWhitelisted !== true) {
+        toast({ 
+          title: 'Submission Failed', 
+          description: 'A city must be selected and must be in our service area. Please go back and select a valid city.', 
+          variant: 'destructive' 
+        });
         setIsSubmitting(false);
         return;
       }

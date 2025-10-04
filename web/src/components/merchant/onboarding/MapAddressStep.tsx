@@ -56,14 +56,10 @@ export const MapAddressStep = () => {
         isNextDisabled={!(state.coordinates.lat !== null && state.coordinates.lng !== null)}
         progress={80}
       >
-        <div className="relative">
-          <LocationPickerMap 
-              center={initialCenter}
-              onLocationChange={(coords) => dispatch({ type: 'SET_COORDINATES', payload: coords })}
-          />
-          {/* --- NEW: Search control overlaid on the map (consistent UI) --- */}
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[401]">
-            <div className="flex items-center bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="space-y-4">
+          {/* Search control moved outside the map to prevent overlapping */}
+          <div className="w-full max-w-md mx-auto">
+            <div className="flex items-center bg-white rounded-lg shadow-lg border border-neutral-200 overflow-hidden">
               <Input
                 readOnly
                 value={state.address.street || ''}
@@ -110,6 +106,14 @@ export const MapAddressStep = () => {
                 </button>
               </div>
             </div>
+          </div>
+          
+          {/* Map container without overlapping elements */}
+          <div className="relative">
+            <LocationPickerMap 
+                center={initialCenter}
+                onLocationChange={(coords) => dispatch({ type: 'SET_COORDINATES', payload: coords })}
+            />
           </div>
         </div>
       </OnboardingStepLayout>

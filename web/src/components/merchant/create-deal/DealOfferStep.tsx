@@ -1,13 +1,13 @@
 // src/components/merchant/create-deal/DealOfferStep.tsx
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useDealCreation } from '@/context/DealCreationContext';
 import { OnboardingStepLayout } from '../onboarding/OnboardingStepLayout';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Percent, Minus, Sparkles } from 'lucide-react';
+import { Percent, Minus, Sparkles, DollarSign, Calculator, TrendingUp, Target, Lightbulb, CheckCircle, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/common/Button';
-import { useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Small card component to give a premium feel
 const OfferCard = ({
@@ -45,65 +45,64 @@ const OfferCard = ({
   </button>
 );
 
-const QuickPreset = ({ children, onClick, active }: any) => (
-  <Button
-    onClick={onClick}
-    size="sm"
-    variant={active ? 'primary' : 'secondary'}
-    className={cn('!h-auto rounded-full px-3 py-1')}
-  >
-    {children}
-  </Button>
-);
-
-const OfferPreview = ({
-  dealType,
-  standardOfferKind,
-  discountPercentage,
-  discountAmount,
-}: any) => {
-  const text = useMemo(() => {
-    if (dealType === 'HAPPY_HOUR') return 'Happy Hour — Limited time offer';
-    if (dealType === 'RECURRING') return 'Recurring Deal — Repeats weekly';
-    if (standardOfferKind === 'percentage' && discountPercentage)
-      return `${discountPercentage}% OFF — Shown to users`;
-    if (standardOfferKind === 'amount' && discountAmount)
-      return `$${Number(discountAmount).toFixed(2)} OFF — Shown to users`;
-    return 'No offer configured yet';
-  }, [dealType, standardOfferKind, discountPercentage, discountAmount]);
-
-  return (
-    <div className="mt-4 rounded-xl border bg-white p-4 shadow-sm">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-md bg-gradient-to-br from-amber-50 to-amber-100 text-amber-600">
-          <Sparkles />
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-neutral-900">Preview</p>
-          <p className="mt-1 text-sm text-neutral-500">{text}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export const DealOfferStep = () => {
   const { state, dispatch } = useDealCreation();
   const navigate = useNavigate();
+  const [showTips, setShowTips] = useState(false);
 
-  // If choosing a STANDARD offer, require either discountPercentage or discountAmount
-  const isNextDisabled =
-    !state.dealType ||
-    (state.dealType === 'STANDARD' &&
-      !state.discountPercentage &&
-      !state.discountAmount);
+  // Real-time validation
+  const percentageValidation = {
+    isValid: state.discountPercentage !== null && state.discountPercentage > 0 && state.discountPercentage <= 100,
+    message: state.discountPercentage === null ? 'Enter a percentage' :
+             state.discountPercentage <= 0 ? 'Percentage must be greater than 0' :
+             state.discountPercentage > 100 ? 'Percentage cannot exceed 100%' :
+             'Perfect!'
+  };
+
+  const amountValidation = {
+    isValid: state.discountAmount !== null && state.discountAmount > 0,
+    message: state.discountAmount === null ? 'Enter an amount' :
+             state.discountAmount <= 0 ? 'Amount must be greater than 0' :
+             'Great!'
+  };
+
+  // Smart validation - if user has entered a value, infer the offer kind
+  const hasValidDiscount = 
+    (state.discountPercentage && state.discountPercentage > 0) ||
+    (state.discountAmount && state.discountAmount > 0);
+
+  const isNextDisabledSimple = !state.dealType || !hasValidDiscount;
+
+  // Calculate potential savings for preview - show based on what user has entered
+  const getSavingsPreview = () => {
+    if (state.discountPercentage && state.discountPercentage > 0) {
+      return `Save ${state.discountPercentage}% on your purchase`;
+    }
+    if (state.discountAmount && state.discountAmount > 0) {
+      return `Save $${Number(state.discountAmount).toFixed(2)} on your purchase`;
+    }
+    return 'Configure your offer to see preview';
+  };
+
+  // Get the display text for the preview
+  const getPreviewDisplayText = () => {
+    if (state.discountPercentage && state.discountPercentage > 0) {
+      return `${state.discountPercentage}% OFF`;
+    }
+    if (state.discountAmount && state.discountAmount > 0) {
+      return `$${Number(state.discountAmount).toFixed(2)} OFF`;
+    }
+    return 'Your Deal';
+  };
 
   return (
     <OnboardingStepLayout
-      title="Make it irresistible — choose how customers will save"
-      onNext={() => navigate('/merchant/deals/create/schedule')}
+      title="Make it irresistible"
+      subtitle="Choose how customers will save with your deal"
+      onNext={() => navigate('/merchant/deals/create/images')}
       onBack={() => navigate('/merchant/deals/create/basics')}
-      isNextDisabled={isNextDisabled}
+      isNextDisabled={isNextDisabledSimple}
       progress={40}
     >
       <div className="space-y-6">
@@ -130,19 +129,27 @@ export const DealOfferStep = () => {
           />
         </div>
 
-        {/* Inputs + quick-presets — improved layout: input above presets, better spacing */}
+        {/* Enhanced Input Sections with Validation */}
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
           {(state.standardOfferKind === 'percentage' ||
             state.discountPercentage !== null) && (
-            <div>
-              <Label htmlFor="percentage" className="text-lg font-semibold">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4"
+            >
+              <div className="flex items-center gap-2">
+                <Percent className="h-5 w-5 text-brand-primary-600" />
+                <Label htmlFor="percentage" className="text-lg font-semibold text-neutral-900">
                 Discount Percentage
               </Label>
-              <p className="mt-1 text-sm text-neutral-500">
-                Use presets or enter a custom percentage.
+              </div>
+              <p className="text-sm text-neutral-600">
+                Choose a percentage that's attractive but sustainable for your business.
               </p>
 
-              <div className="mt-3">
+              <div className="space-y-4">
+                <div className="relative">
                 <Input
                   id="percentage"
                   type="number"
@@ -151,22 +158,84 @@ export const DealOfferStep = () => {
                   value={state.discountPercentage ?? ''}
                   onChange={(e) => {
                     const v = parseInt(e.target.value);
+                    const newValue = Number.isFinite(v)
+                      ? Math.max(1, Math.min(100, v))
+                      : null;
+                    
+                    // Update the percentage value
                     dispatch({
                       type: 'UPDATE_FIELD',
                       field: 'discountPercentage',
-                      value: Number.isFinite(v)
-                        ? Math.max(1, Math.min(100, v))
-                        : null,
+                      value: newValue,
                     });
+                    
+                    // Auto-set the offer kind if not already set
+                    if (newValue && state.standardOfferKind !== 'percentage') {
+                      dispatch({
+                        type: 'SET_STANDARD_OFFER_KIND',
+                        kind: 'percentage'
+                      });
+                    }
                   }}
-                  className="h-10 max-w-xs text-lg"
+                    className={`h-12 max-w-xs text-lg transition-all ${
+                      state.discountPercentage !== null && !percentageValidation.isValid 
+                        ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' 
+                        : state.discountPercentage !== null && percentageValidation.isValid
+                        ? 'border-green-300 focus:border-green-500 focus:ring-green-500/20'
+                        : 'focus:ring-brand-primary-500/20'
+                    }`}
                   placeholder="e.g., 25"
                   aria-label="Discount percentage"
                 />
+                  {state.discountPercentage !== null && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2"
+                    >
+                      {percentageValidation.isValid ? (
+                        <CheckCircle className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <AlertCircle className="h-5 w-5 text-red-500" />
+                      )}
+                    </motion.div>
+                  )}
+                </div>
 
-                <div className="mt-3 flex flex-wrap items-center gap-3">
+                {/* Validation feedback */}
+                <AnimatePresence>
+                  {state.discountPercentage !== null && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className={`rounded-lg p-3 text-sm ${
+                        percentageValidation.isValid 
+                          ? 'bg-green-50 text-green-700 border border-green-200' 
+                          : 'bg-red-50 text-red-700 border border-red-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {percentageValidation.isValid ? (
+                          <CheckCircle className="h-4 w-4" />
+                        ) : (
+                          <AlertCircle className="h-4 w-4" />
+                        )}
+                        <span>{percentageValidation.message}</span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Quick presets */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Calculator className="h-4 w-4 text-neutral-500" />
+                    <span className="text-sm font-medium text-neutral-700">Quick presets:</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
                   {[10, 20, 30, 50].map((p) => (
-                    <QuickPreset
+                      <motion.button
                       key={p}
                       onClick={() =>
                         dispatch({
@@ -175,27 +244,43 @@ export const DealOfferStep = () => {
                           value: p,
                         })
                       }
-                      active={state.discountPercentage === p}
+                        className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                          state.discountPercentage === p
+                            ? 'bg-brand-primary-500 text-white shadow-md'
+                            : 'bg-neutral-100 text-neutral-600 hover:bg-brand-primary-100 hover:text-brand-primary-700'
+                        }`}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                     >
                       {p}%
-                    </QuickPreset>
+                      </motion.button>
                   ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {(state.standardOfferKind === 'amount' ||
             state.discountAmount !== null) && (
-            <div>
-              <Label htmlFor="amount" className="text-lg font-semibold">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="space-y-4"
+            >
+              <div className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5 text-brand-primary-600" />
+                <Label htmlFor="amount" className="text-lg font-semibold text-neutral-900">
                 Discount Amount
               </Label>
-              <p className="mt-1 text-sm text-neutral-500">
-                Enter how much customers save. Use presets for speed.
+              </div>
+              <p className="text-sm text-neutral-600">
+                Set a fixed dollar amount off. Great for simple, clear messaging.
               </p>
 
-              <div className="mt-3">
+              <div className="space-y-4">
+                <div className="relative">
                 <Input
                   id="amount"
                   type="number"
@@ -204,22 +289,84 @@ export const DealOfferStep = () => {
                   value={state.discountAmount ?? ''}
                   onChange={(e) => {
                     const v = parseFloat(e.target.value);
+                    const newValue = Number.isFinite(v)
+                      ? Math.max(0.01, Number(v.toFixed(2)))
+                      : null;
+                    
+                    // Update the amount value
                     dispatch({
                       type: 'UPDATE_FIELD',
                       field: 'discountAmount',
-                      value: Number.isFinite(v)
-                        ? Math.max(0.01, Number(v.toFixed(2)))
-                        : null,
+                      value: newValue,
                     });
+                    
+                    // Auto-set the offer kind if not already set
+                    if (newValue && state.standardOfferKind !== 'amount') {
+                      dispatch({
+                        type: 'SET_STANDARD_OFFER_KIND',
+                        kind: 'amount'
+                      });
+                    }
                   }}
-                  className="h-10 max-w-xs text-lg"
+                    className={`h-12 max-w-xs text-lg transition-all ${
+                      state.discountAmount !== null && !amountValidation.isValid 
+                        ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' 
+                        : state.discountAmount !== null && amountValidation.isValid
+                        ? 'border-green-300 focus:border-green-500 focus:ring-green-500/20'
+                        : 'focus:ring-brand-primary-500/20'
+                    }`}
                   placeholder="e.g., 5.00"
                   aria-label="Discount amount"
                 />
+                  {state.discountAmount !== null && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2"
+                    >
+                      {amountValidation.isValid ? (
+                        <CheckCircle className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <AlertCircle className="h-5 w-5 text-red-500" />
+                      )}
+                    </motion.div>
+                  )}
+                </div>
 
-                <div className="mt-3 flex flex-wrap items-center gap-3">
-                  {[2.5, 5, 10].map((a) => (
-                    <QuickPreset
+                {/* Validation feedback */}
+                <AnimatePresence>
+                  {state.discountAmount !== null && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className={`rounded-lg p-3 text-sm ${
+                        amountValidation.isValid 
+                          ? 'bg-green-50 text-green-700 border border-green-200' 
+                          : 'bg-red-50 text-red-700 border border-red-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {amountValidation.isValid ? (
+                          <CheckCircle className="h-4 w-4" />
+                        ) : (
+                          <AlertCircle className="h-4 w-4" />
+                        )}
+                        <span>{amountValidation.message}</span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Quick presets */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Calculator className="h-4 w-4 text-neutral-500" />
+                    <span className="text-sm font-medium text-neutral-700">Quick presets:</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {[2.5, 5, 10, 15].map((a) => (
+                      <motion.button
                       key={String(a)}
                       onClick={() =>
                         dispatch({
@@ -228,33 +375,122 @@ export const DealOfferStep = () => {
                           value: a,
                         })
                       }
-                      active={state.discountAmount === a}
+                        className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                          state.discountAmount === a
+                            ? 'bg-brand-primary-500 text-white shadow-md'
+                            : 'bg-neutral-100 text-neutral-600 hover:bg-brand-primary-100 hover:text-brand-primary-700'
+                        }`}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                     >
                       ${Number(a).toFixed(2)}
-                    </QuickPreset>
+                      </motion.button>
                   ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
         </div>
 
-        {/* Live preview of how the deal will look */}
-        <OfferPreview
-          dealType={state.dealType}
-          standardOfferKind={state.standardOfferKind}
-          discountPercentage={state.discountPercentage}
-          discountAmount={state.discountAmount}
-        />
+        {/* Enhanced Live Preview */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="rounded-xl border border-neutral-200 bg-gradient-to-r from-white to-neutral-50 p-6 shadow-sm"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-brand-primary-500 to-brand-primary-600 text-white">
+              <TrendingUp className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-neutral-900">Deal Preview</h3>
+              <p className="text-sm text-neutral-600">How your offer will appear to customers</p>
+            </div>
+          </div>
+          
+          <div className="rounded-lg border border-neutral-200 bg-white p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
+                <Sparkles className="h-6 w-6 text-amber-600" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-semibold text-neutral-900">{state.title || 'Your Deal Title'}</h4>
+                <p className="text-sm text-neutral-600">{getSavingsPreview()}</p>
+              </div>
+              <div className="text-right">
+                <div className="text-lg font-bold text-brand-primary-600">
+                  {getPreviewDisplayText()}
+                </div>
+                <div className="text-xs text-neutral-500">
+                  {state.dealType === 'HAPPY_HOUR' ? 'Happy Hour' :
+                   state.dealType === 'RECURRING' ? 'Recurring' :
+                   'Standard Deal'}
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
 
-        {/* microcopy to help merchants */}
-        <div className="text-sm text-neutral-500">
-          <p>
-            If you're unsure, start with a small preset and preview how it
-            appears to customers. Happy Hour or Recurring deals will show timing
-            options in the next step.
-          </p>
+        {/* Pro Tips Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="rounded-lg border border-neutral-200 bg-neutral-50 p-4"
+        >
+          <button
+            onClick={() => setShowTips(!showTips)}
+            className="flex w-full items-center justify-between"
+          >
+            <div className="flex items-center gap-2">
+              <Lightbulb className="h-5 w-5 text-brand-primary-600" />
+              <span className="font-medium text-neutral-900">Pricing Strategy Tips</span>
+            </div>
+            <motion.div
+              animate={{ rotate: showTips ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <svg className="h-5 w-5 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </motion.div>
+          </button>
+          
+          <AnimatePresence>
+            {showTips && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-4 space-y-3"
+              >
+                <div className="flex items-start gap-3">
+                  <Target className="h-4 w-4 text-green-500 mt-1" />
+                  <div>
+                    <div className="font-medium text-neutral-900">Sweet Spot Percentages</div>
+                    <div className="text-sm text-neutral-600">20-30% off typically drives the most engagement without hurting margins</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <TrendingUp className="h-4 w-4 text-blue-500 mt-1" />
+                  <div>
+                    <div className="font-medium text-neutral-900">Test and Learn</div>
+                    <div className="text-sm text-neutral-600">Start with smaller discounts and increase based on customer response</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <DollarSign className="h-4 w-4 text-amber-500 mt-1" />
+                  <div>
+                    <div className="font-medium text-neutral-900">Fixed Amount Benefits</div>
+                    <div className="text-sm text-neutral-600">Dollar amounts work great for lower-priced items and create clear value perception</div>
+                  </div>
         </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </div>
     </OnboardingStepLayout>
   );

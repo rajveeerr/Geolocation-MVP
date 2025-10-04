@@ -6,6 +6,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 interface Props {
   title: string;
+  subtitle?: string;
   children: ReactNode;
   onNext: () => void | Promise<void>;
   onBack: () => void;
@@ -17,6 +18,7 @@ interface Props {
 
 export const OnboardingStepLayout = ({
   title,
+  subtitle,
   children,
   onNext,
   onBack,
@@ -34,14 +36,21 @@ export const OnboardingStepLayout = ({
         className="flex flex-grow items-center justify-center px-4 py-8"
       >
         <div className="w-full max-w-lg">
-          <motion.h1
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="mb-8 text-center text-3xl font-bold text-neutral-800"
+            className="mb-8 text-center"
           >
-            {title}
-          </motion.h1>
+            <h1 className="text-3xl font-bold text-neutral-800">
+              {title}
+            </h1>
+            {subtitle && (
+              <p className="mt-2 text-lg text-neutral-600">
+                {subtitle}
+              </p>
+            )}
+          </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}

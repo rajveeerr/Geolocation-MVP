@@ -39,8 +39,8 @@ interface MerchantApplication {
   id: number;
   businessName: string;
   address: string;
-  description?: string | null;
-  logoUrl?: string | null;
+    description?: string | null;
+    logoUrl?: string | null;
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'SUSPENDED';
   createdAt: string;
   owner: MerchantOwner;
@@ -329,14 +329,14 @@ export const MerchantApprovalDashboard = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <div className="border-b">
+        <div className="border-b">
                 {(['PENDING', 'APPROVED', 'REJECTED', 'SUSPENDED'] as const).map(status => (
-                    <button
-                        key={status}
-                        onClick={() => setActiveTab(status)}
-                        className={cn("px-4 py-2 font-semibold border-b-2", activeTab === status ? "border-brand-primary-500 text-brand-primary-600" : "border-transparent text-neutral-500 hover:border-neutral-300")}
-                    >{status}</button>
-                ))}
+                <button
+                    key={status}
+                    onClick={() => setActiveTab(status)}
+                    className={cn("px-4 py-2 font-semibold border-b-2", activeTab === status ? "border-brand-primary-500 text-brand-primary-600" : "border-transparent text-neutral-500 hover:border-neutral-300")}
+                >{status}</button>
+            ))}
             </div>
             
             <div className="relative">
@@ -433,10 +433,10 @@ export const MerchantApprovalDashboard = () => {
                                 View Details
                             </Button>
                             
-                            {activeTab === 'PENDING' && (
+                        {activeTab === 'PENDING' && (
                                 <>
-                                    <Button size="sm" className="bg-destructive text-destructive-foreground w-full sm:w-auto" onClick={() => setMerchantToReject(merchant)}>Reject</Button>
-                                    <Button size="sm" className="bg-status-live text-white w-full sm:w-auto" onClick={() => approveMutation.mutate(merchant.id)}>Approve</Button>
+                                <Button size="sm" className="bg-destructive text-destructive-foreground w-full sm:w-auto" onClick={() => setMerchantToReject(merchant)}>Reject</Button>
+                                <Button size="sm" className="bg-status-live text-white w-full sm:w-auto" onClick={() => approveMutation.mutate(merchant.id)}>Approve</Button>
                                 </>
                             )}
                             
@@ -460,7 +460,7 @@ export const MerchantApprovalDashboard = () => {
                                     Unsuspend
                                 </Button>
                             )}
-                        </div>
+                            </div>
                     </div>
                 ))}
             </div>

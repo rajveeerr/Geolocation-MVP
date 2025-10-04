@@ -51,6 +51,9 @@ const AdminOverviewPage = React.lazy(() =>
 const MerchantApprovalDashboard = React.lazy(() =>
   import('./pages/admin/MerchantApprovalDashboard').then((m) => ({ default: m.MerchantApprovalDashboard })),
 );
+const CityAnalyticsDashboard = React.lazy(() =>
+  import('./pages/admin/CityAnalyticsDashboard').then((m) => ({ default: m.CityAnalyticsDashboard })),
+);
 const CityManagementDashboard = React.lazy(() =>
   import('./pages/admin/CityManagementDashboard').then((m) => ({ default: m.CityManagementDashboard })),
 );
@@ -227,6 +230,14 @@ function App() {
                   element={
                     <Suspense fallback={<LoadingOverlay />}>
                       <CityManagementDashboard />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/admin/city-analytics"
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <CityAnalyticsDashboard />
                     </Suspense>
                   }
                 />
