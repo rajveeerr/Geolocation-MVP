@@ -21,6 +21,7 @@ enum MerchantStatus {
   PENDING
   APPROVED
   REJECTED
+  SUSPENDED
 }
 
 enum DealCategory {

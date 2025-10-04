@@ -209,30 +209,87 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
       return res.status(401).json({ error: 'Merchant authentication required' });
     }
 
-    // Enhanced validation
-    if (!title || !activeDateRange?.startDate || !activeDateRange?.endDate) {
-      return res.status(400).json({ error: 'Title and activeDateRange (with startDate and endDate) are required.' });
+    // Enhanced validation with detailed error messages
+    if (!title || typeof title !== 'string' || title.trim().length === 0) {
+      return res.status(400).json({ error: 'Title is required and must be a non-empty string.' });
+    }
+    
+    if (title.trim().length > 100) {
+      return res.status(400).json({ error: 'Title must be 100 characters or less.' });
+    }
+    
+    if (!activeDateRange?.startDate || !activeDateRange?.endDate) {
+      return res.status(400).json({ error: 'activeDateRange with startDate and endDate are required.' });
     }
     
     const startTime = new Date(activeDateRange.startDate);
     const endTime = new Date(activeDateRange.endDate);
-    if (!(startTime instanceof Date) || isNaN(startTime.getTime()) || !(endTime instanceof Date) || isNaN(endTime.getTime())) {
-      return res.status(400).json({ error: 'Invalid start or end date.' });
+    
+    if (!(startTime instanceof Date) || isNaN(startTime.getTime())) {
+      return res.status(400).json({ error: 'Invalid start date format. Please provide a valid ISO date string.' });
     }
+    
+    if (!(endTime instanceof Date) || isNaN(endTime.getTime())) {
+      return res.status(400).json({ error: 'Invalid end date format. Please provide a valid ISO date string.' });
+    }
+    
     if (startTime >= endTime) {
       return res.status(400).json({ error: 'End date must be after start date.' });
+    }
+    
+    // Check if dates are not too far in the past or future
+    const now = new Date();
+    const oneYearFromNow = new Date(now.getTime() + (365 * 24 * 60 * 60 * 1000));
+    
+    if (startTime < now) {
+      return res.status(400).json({ error: 'Start date cannot be in the past.' });
+    }
+    
+    if (endTime > oneYearFromNow) {
+      return res.status(400).json({ error: 'End date cannot be more than one year in the future.' });
+    }
+
+    // Validate description
+    if (description && typeof description !== 'string') {
+      return res.status(400).json({ error: 'Description must be a string.' });
+    }
+    
+    if (description && description.length > 1000) {
+      return res.status(400).json({ error: 'Description must be 1000 characters or less.' });
+    }
+
+    // Validate redemptionInstructions
+    if (redemptionInstructions && typeof redemptionInstructions !== 'string') {
+      return res.status(400).json({ error: 'Redemption instructions must be a string.' });
+    }
+    
+    if (redemptionInstructions && redemptionInstructions.length > 500) {
+      return res.status(400).json({ error: 'Redemption instructions must be 500 characters or less.' });
     }
 
     // Validate imageUrls
     if (imageUrls && (!Array.isArray(imageUrls) || imageUrls.some((u: any) => typeof u !== 'string'))) {
       return res.status(400).json({ error: 'imageUrls must be an array of strings.' });
     }
+    
+    if (imageUrls && imageUrls.length > 10) {
+      return res.status(400).json({ error: 'Maximum 10 images allowed per deal.' });
+    }
 
-    // Validate primaryImageIndex
-    if (primaryImageIndex !== undefined) {
-      const primaryIndex = parseInt(primaryImageIndex);
-      if (isNaN(primaryIndex) || primaryIndex < 0 || (imageUrls && primaryIndex >= imageUrls.length)) {
-        return res.status(400).json({ error: 'primaryImageIndex must be a valid index within imageUrls array.' });
+    // Handle primaryImageIndex validation and final value
+    let finalPrimaryImageIndex = primaryImageIndex;
+    
+    // If no images are provided, set primaryImageIndex to null
+    if (!imageUrls || imageUrls.length === 0) {
+      finalPrimaryImageIndex = null;
+    } else {
+      // Only validate primaryImageIndex if images are provided
+      if (primaryImageIndex !== undefined && primaryImageIndex !== null) {
+        const primaryIndex = parseInt(primaryImageIndex);
+        if (isNaN(primaryIndex) || primaryIndex < 0 || primaryIndex >= imageUrls.length) {
+          return res.status(400).json({ error: 'primaryImageIndex must be a valid index within imageUrls array.' });
+        }
+        finalPrimaryImageIndex = primaryIndex;
       }
     }
 
@@ -252,9 +309,9 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
       return res.status(400).json({ error: 'priority must be between 1 and 10.' });
     }
 
-    // Validate maxRedemptions
-    if (maxRedemptions !== undefined && (isNaN(maxRedemptions) || maxRedemptions < 1)) {
-      return res.status(400).json({ error: 'maxRedemptions must be a positive number.' });
+    // Validate maxRedemptions (0 means unlimited)
+    if (maxRedemptions !== undefined && (isNaN(maxRedemptions) || maxRedemptions < 0)) {
+      return res.status(400).json({ error: 'maxRedemptions must be a non-negative number (0 for unlimited).' });
     }
 
     // Validate minOrderAmount
@@ -294,19 +351,80 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
       });
       if (standardDealType) {
         dealTypeId = standardDealType.id;
+      } else {
+        // If Standard doesn't exist, get the first available deal type
+        const firstDealType = await prisma.dealTypeMaster.findFirst({
+          where: { active: true },
+          orderBy: { id: 'asc' }
+        });
+        if (firstDealType) {
+          dealTypeId = firstDealType.id;
+        } else {
+          return res.status(500).json({ error: 'No active deal types found in the system.' });
+        }
       }
+    }
+    
+    // Ensure dealTypeId is set
+    if (!dealTypeId) {
+      return res.status(500).json({ error: 'Failed to resolve deal type. Please try again.' });
     }
 
     // Validate and resolve category ID if provided
     let categoryId: number | undefined;
+    
+    // Map frontend category values to database category names
+    const categoryMapping: Record<string, string> = {
+      'FOOD_AND_BEVERAGE': 'Food & Beverage',
+      'RETAIL': 'Retail',
+      'ENTERTAINMENT': 'Entertainment',
+      'HEALTH_AND_FITNESS': 'Health & Fitness',
+      'BEAUTY_AND_SPA': 'Beauty & Spa',
+      'AUTOMOTIVE': 'Automotive',
+      'TRAVEL': 'Travel',
+      'EDUCATION': 'Education',
+      'TECHNOLOGY': 'Technology',
+      'HOME_AND_GARDEN': 'Home & Garden',
+      'OTHER': 'Other'
+    };
+    
     if (category) {
+      const dbCategoryName = categoryMapping[category] || category;
+      
       const categoryRecord = await prisma.dealCategoryMaster.findFirst({
-        where: { name: { equals: category, mode: 'insensitive' }, active: true }
+        where: { name: { equals: dbCategoryName, mode: 'insensitive' }, active: true }
       });
+      
       if (!categoryRecord) {
         return res.status(400).json({ error: `Invalid category: ${category}. Please check available categories.` });
       }
       categoryId = categoryRecord.id;
+    } else {
+      // Default to "Other" category if no category is provided
+      const defaultCategory = await prisma.dealCategoryMaster.findFirst({
+        where: { name: { equals: 'Other', mode: 'insensitive' }, active: true }
+      });
+      
+      if (defaultCategory) {
+        categoryId = defaultCategory.id;
+      } else {
+        // If "Other" doesn't exist, get the first available category
+        const firstCategory = await prisma.dealCategoryMaster.findFirst({
+          where: { active: true },
+          orderBy: { sortOrder: 'asc' }
+        });
+        
+        if (firstCategory) {
+          categoryId = firstCategory.id;
+        } else {
+          return res.status(500).json({ error: 'No active categories found in the system.' });
+        }
+      }
+    }
+    
+    // Ensure categoryId is set
+    if (!categoryId) {
+      return res.status(500).json({ error: 'Failed to resolve category. Please try again.' });
     }
 
     // Normalize recurringDays input
@@ -344,7 +462,9 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
     }
 
     // Enhanced deal creation with all dynamic fields
-    const newDeal = await prisma.$transaction(async (tx) => {
+    let newDeal;
+    try {
+      newDeal = await prisma.$transaction(async (tx) => {
       // Prepare enhanced deal data
       const dealData = {
         title,
@@ -360,27 +480,7 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
         recurringDays,
         offerTerms: offerTerms || null,
         kickbackEnabled: !!kickbackEnabled,
-        merchantId: merchantId,
-        
-        // Enhanced fields (stored as JSON in a metadata field or separate columns)
-        // Note: Some fields might need to be added to the schema
-        metadata: JSON.stringify({
-          primaryImageIndex: primaryImageIndex !== undefined ? parseInt(primaryImageIndex) : 0,
-          customOfferDisplay: customOfferDisplay || null,
-          isFeatured: !!isFeatured,
-          priority: priority ? parseInt(priority) : 5,
-          maxRedemptions: maxRedemptions ? parseInt(maxRedemptions) : null,
-          minOrderAmount: minOrderAmount ? parseFloat(minOrderAmount) : null,
-          validDaysOfWeek: validDaysOfWeek || null,
-          validHours: validHours || null,
-          socialProofEnabled: socialProofEnabled !== false, // default true
-          allowSharing: allowSharing !== false, // default true
-          storeIds: storeIds || null,
-          cityIds: cityIds || null,
-          tags: tags || [],
-          notes: notes || null,
-          externalUrl: externalUrl || null
-        })
+        merchantId: merchantId
       };
 
       const createdDeal = await tx.deal.create({
@@ -408,6 +508,27 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
 
       return createdDeal;
     });
+    } catch (transactionError: unknown) {
+      console.error('Transaction error during deal creation:', transactionError);
+      
+      // Handle specific Prisma errors
+      if (transactionError instanceof Error) {
+        if (transactionError.message.includes('Unique constraint')) {
+          return res.status(400).json({ error: 'A deal with this title already exists for your business.' });
+        }
+        if (transactionError.message.includes('Foreign key constraint')) {
+          return res.status(400).json({ error: 'Invalid reference to category, deal type, or merchant.' });
+        }
+        if (transactionError.message.includes('Invalid input')) {
+          return res.status(400).json({ error: 'Invalid data provided. Please check your input and try again.' });
+        }
+      }
+      
+      return res.status(500).json({ 
+        error: 'Failed to create deal. Please try again or contact support if the problem persists.',
+        details: process.env.NODE_ENV === 'development' && transactionError instanceof Error ? transactionError.message : undefined
+      });
+    }
 
     // Enhanced response with all dynamic fields
     const response = {
@@ -427,28 +548,9 @@ router.post('/deals', protect, isApprovedMerchant, async (req: AuthRequest, res)
         createdAt: newDeal.createdAt,
         updatedAt: newDeal.updatedAt
       },
-      enhancedFeatures: {
-        primaryImageIndex: primaryImageIndex !== undefined ? parseInt(primaryImageIndex) : 0,
-        customOfferDisplay: customOfferDisplay || null,
-        isFeatured: !!isFeatured,
-        priority: priority ? parseInt(priority) : 5,
-        maxRedemptions: maxRedemptions ? parseInt(maxRedemptions) : null,
-        minOrderAmount: minOrderAmount ? parseFloat(minOrderAmount) : null,
-        socialProofEnabled: socialProofEnabled !== false,
-        allowSharing: allowSharing !== false,
-        tags: tags || [],
-        externalUrl: externalUrl || null,
-        menuItemsCount: menuItems ? menuItems.length : 0,
-        storeRestrictions: storeIds ? storeIds.length : 'all',
-        cityRestrictions: cityIds ? cityIds.length : 'all'
-      },
       normalization: {
         dealTypeId,
         recurringDays: recurringDays ? recurringDays.split(',') : null
-      },
-      metadata: {
-        version: '2.0.0',
-        createdAt: new Date().toISOString()
       }
     };
 
