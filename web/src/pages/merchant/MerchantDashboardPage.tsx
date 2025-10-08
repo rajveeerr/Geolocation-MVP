@@ -128,14 +128,7 @@ export const MerchantDashboardPage = () => {
   const isLoading = dealsLoading;
   const error = dealsError;
 
-  // Zero-state placeholders for future earnings integration
-  const revenue = 0;
-  const formatCurrency = (v: number) =>
-    new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      maximumFractionDigits: 2,
-    }).format(v);
+  // Testing phase - no revenue data yet
 
   const filteredDeals = useMemo(() => {
     if (activeFilter === 'all') {
@@ -234,9 +227,8 @@ export const MerchantDashboardPage = () => {
                     <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-neutral-100 text-neutral-700">
                       <DollarSign className="h-3 w-3" />
                     </span>
-                    {formatCurrency(revenue)}
+                    $0
                   </p>
-                  <p className="text-xs text-green-600 mt-1">+ 4% vs yesterday</p>
                 </div>
               </div>
             </div>
@@ -244,16 +236,14 @@ export const MerchantDashboardPage = () => {
             <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
               <div>
                 <h4 className="text-sm text-neutral-500">Order Volume</h4>
-                <p className="mt-2 text-2xl font-extrabold text-neutral-900">1,800</p>
-                <p className="text-xs text-green-600 mt-1">+ 8% vs yesterday</p>
+                <p className="mt-2 text-2xl font-extrabold text-neutral-900">0</p>
               </div>
             </div>
 
             <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
               <div>
                 <h4 className="text-sm text-neutral-500">Average Order Value</h4>
-                <p className="mt-2 text-2xl font-extrabold text-neutral-900">{formatCurrency(revenue || 120)}</p>
-                <p className="text-xs text-rose-500 mt-1">- 3% vs yesterday</p>
+                <p className="mt-2 text-2xl font-extrabold text-neutral-900">$0</p>
               </div>
               <div className="mt-4 space-y-2">
                 <Link to={PATHS.MERCHANT_KICKBACKS}>
@@ -269,13 +259,13 @@ export const MerchantDashboardPage = () => {
           {/* Region badges */}
           <div className="mb-6 flex flex-wrap items-center gap-3">
             {[
-              { name: 'Atlanta', value: 840, change: '+5.2%' },
-              { name: 'Houston', value: 653, change: '+8.1%' },
-              { name: 'Phoenix', value: 708, change: '+3.2%' },
-              { name: 'Salt Lake City', value: 800, change: '+2.1%' },
-              { name: 'San Diego', value: 820, change: '+1.4%' },
-              { name: 'Chicago', value: 530, change: '+6.2%' },
-              { name: 'Toronto', value: 980, change: '+4.3%' },
+              { name: 'Atlanta', value: 0, change: '0%' },
+              { name: 'Houston', value: 0, change: '0%' },
+              { name: 'Phoenix', value: 0, change: '0%' },
+              { name: 'Salt Lake City', value: 0, change: '0%' },
+              { name: 'San Diego', value: 0, change: '0%' },
+              { name: 'Chicago', value: 0, change: '0%' },
+              { name: 'Toronto', value: 0, change: '0%' },
             ].map((r) => (
               <div key={r.name} className="rounded-md bg-neutral-900 px-4 py-2 text-white text-sm">
                 <div className="font-semibold">{r.name}</div>
@@ -288,9 +278,13 @@ export const MerchantDashboardPage = () => {
           <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
             <div className="col-span-2 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
               <h4 className="text-sm text-neutral-600 mb-4">Sales (Last 7 days)</h4>
-              <svg className="w-full h-56" viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
-                <polyline fill="none" stroke="#3B82F6" strokeWidth="3" points="0,120 80,80 160,90 240,70 320,60 400,80 480,110 560,130 600,140" />
-              </svg>
+              <div className="flex items-center justify-center h-56">
+                <div className="text-center">
+                  <div className="text-4xl text-neutral-300 mb-2">📊</div>
+                  <p className="text-sm text-neutral-500">No sales data yet</p>
+                  <p className="text-xs text-neutral-400 mt-1">Testing phase</p>
+                </div>
+              </div>
             </div>
 
             <div className="col-span-1 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
@@ -304,10 +298,10 @@ export const MerchantDashboardPage = () => {
               </div>
               <ul className="space-y-3">
                 {[
-                  { name: 'Lemon & Sage Mediterranean Kitchen', value: 177, pct: '+2.3%' },
-                  { name: 'Garden Grove Café & Bistro', value: 408, pct: '+7.4%' },
-                  { name: 'Bella Vista Pizzeria & Pasta', value: 198, pct: '+1.2%' },
-                  { name: 'Twilight Tavern & Lounge', value: 600, pct: '+5.8%' },
+                  { name: 'Lemon & Sage Mediterranean Kitchen', value: 0, pct: '0%' },
+                  { name: 'Garden Grove Café & Bistro', value: 0, pct: '0%' },
+                  { name: 'Bella Vista Pizzeria & Pasta', value: 0, pct: '0%' },
+                  { name: 'Twilight Tavern & Lounge', value: 0, pct: '0%' },
                 ].map((s) => (
                   <li key={s.name} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">

@@ -110,7 +110,7 @@ export const KickbackEarningsPage = () => {
         {error && <div className="text-center py-20 text-status-expired">Could not load earnings data.</div>}
 
         {data && (
-          <div className="mt-6 space-y-6">
+          <div className="mt-6 space-y-6">            
             <div className="flex flex-col sm:flex-row gap-4">
               <SummaryCard title="Revenue" value={data.summary.revenue} subtext="All time" />
               <SummaryCard title="Total kickback handout" value={data.summary.totalKickbackHandout} subtext="All time" />

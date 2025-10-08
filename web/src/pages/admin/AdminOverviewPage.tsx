@@ -21,140 +21,100 @@ export const AdminOverviewPage = () => {
     return value.toLocaleString();
   };
 
-  // Comprehensive city data with different performance patterns
-  const citySalesData = {
-    'Atlanta': [
-      { label: 'Mon', value: 280 },
-      { label: 'Tue', value: 320 },
-      { label: 'Wed', value: 300 },
-      { label: 'Thu', value: 350 },
-      { label: 'Fri', value: 380 },
-      { label: 'Sat', value: 320 },
-      { label: 'Sun', value: 250 }
-    ],
-    'Houston': [
-      { label: 'Mon', value: 220 },
-      { label: 'Tue', value: 280 },
-      { label: 'Wed', value: 320 },
-      { label: 'Thu', value: 290 },
-      { label: 'Fri', value: 350 },
-      { label: 'Sat', value: 400 },
-      { label: 'Sun', value: 180 }
-    ],
-    'Phoenix': [
-      { label: 'Mon', value: 180 },
-      { label: 'Tue', value: 200 },
-      { label: 'Wed', value: 250 },
-      { label: 'Thu', value: 280 },
-      { label: 'Fri', value: 320 },
-      { label: 'Sat', value: 350 },
-      { label: 'Sun', value: 220 }
-    ],
-    'Salt Lake City': [
-      { label: 'Mon', value: 150 },
-      { label: 'Tue', value: 180 },
-      { label: 'Wed', value: 200 },
-      { label: 'Thu', value: 220 },
-      { label: 'Fri', value: 250 },
-      { label: 'Sat', value: 280 },
-      { label: 'Sun', value: 160 }
-    ],
-    'San Diego': [
-      { label: 'Mon', value: 320 },
-      { label: 'Tue', value: 350 },
-      { label: 'Wed', value: 380 },
-      { label: 'Thu', value: 400 },
-      { label: 'Fri', value: 420 },
-      { label: 'Sat', value: 450 },
-      { label: 'Sun', value: 300 }
-    ],
-    'Chicago': [
-      { label: 'Mon', value: 200 },
-      { label: 'Tue', value: 250 },
-      { label: 'Wed', value: 280 },
-      { label: 'Thu', value: 300 },
-      { label: 'Fri', value: 350 },
-      { label: 'Sat', value: 320 },
-      { label: 'Sun', value: 180 }
-    ],
-    'Toronto': [
-      { label: 'Mon', value: 400 },
-      { label: 'Tue', value: 450 },
-      { label: 'Wed', value: 480 },
-      { label: 'Thu', value: 500 },
-      { label: 'Fri', value: 550 },
-      { label: 'Sat', value: 520 },
-      { label: 'Sun', value: 380 }
-    ]
+  // Testing phase data - no sales yet, showing zero or minimal test data
+  const getCitySalesData = (city: string, timeRange: string, offerType: string) => {
+    // In testing phase, show mostly zeros with occasional test values
+    const isTestData = Math.random() > 0.7; // 30% chance of showing test data
+    const testMultiplier = isTestData ? (Math.random() * 3 + 1) : 0; // 1-4 if test data, 0 otherwise
+    
+    return [
+      { label: 'Mon', value: Math.round(testMultiplier) },
+      { label: 'Tue', value: Math.round(testMultiplier * 0.8) },
+      { label: 'Wed', value: Math.round(testMultiplier * 1.2) },
+      { label: 'Thu', value: Math.round(testMultiplier * 0.6) },
+      { label: 'Fri', value: Math.round(testMultiplier * 1.5) },
+      { label: 'Sat', value: Math.round(testMultiplier * 0.9) },
+      { label: 'Sun', value: Math.round(testMultiplier * 0.4) }
+    ];
   };
 
-  const weeklySalesData = citySalesData[selectedCity as keyof typeof citySalesData] || citySalesData.Atlanta;
+  const weeklySalesData = getCitySalesData(selectedCity, selectedTimeRange, selectedOfferType);
 
-  const cityPerformanceData = [
-    { name: 'Atlanta', value: 840, change: 5.2, isPositive: true },
-    { name: 'Houston', value: 653, change: 8.1, isPositive: true },
-    { name: 'Phoenix', value: 708, change: 3.2, isPositive: true },
-    { name: 'Salt Lake City', value: 800, change: 2.1, isPositive: true },
-    { name: 'San Diego', value: 820, change: 1.4, isPositive: false },
-    { name: 'Chicago', value: 530, change: 6.2, isPositive: true },
-    { name: 'Toronto', value: 980, change: 4.3, isPositive: true }
-  ];
-
-  // City-specific store data
-  const cityStoreData = {
-    'Atlanta': [
-      { name: 'Lemon & Sage Mediterranean Kitchen', sales: 177, change: 2.3, isPositive: true },
-      { name: 'Garden Grove Café & Bistro', sales: 408, change: 7.4, isPositive: true },
-      { name: 'Bella Vista Pizzeria & Pasta', sales: 198, change: 1.2, isPositive: true },
-      { name: 'Twilight Tavern & Lounge', sales: 600, change: 5.8, isPositive: true },
-      { name: 'The Harvest Moon Bistro', sales: 45, change: 3.1, isPositive: false },
-      { name: 'Olive & Thyme Ristorante', sales: 462, change: 8.9, isPositive: true },
-      { name: 'The Loft Kitchen & Bar', sales: 189, change: 4.2, isPositive: true }
-    ],
-    'Houston': [
-      { name: 'Texas BBQ House', sales: 320, change: 6.2, isPositive: true },
-      { name: 'Houston Heights Bistro', sales: 280, change: 4.1, isPositive: true },
-      { name: 'Downtown Sports Bar', sales: 450, change: 8.5, isPositive: true },
-      { name: 'River Oaks Café', sales: 190, change: 2.8, isPositive: true },
-      { name: 'Midtown Mexican Grill', sales: 380, change: 5.3, isPositive: true },
-      { name: 'Galleria Food Court', sales: 220, change: 1.9, isPositive: true }
-    ],
-    'Phoenix': [
-      { name: 'Desert Oasis Restaurant', sales: 250, change: 3.7, isPositive: true },
-      { name: 'Phoenix Downtown Bar', sales: 180, change: 2.1, isPositive: true },
-      { name: 'Scottsdale Fine Dining', sales: 420, change: 7.2, isPositive: true },
-      { name: 'Tempe University Café', sales: 150, change: 1.5, isPositive: true },
-      { name: 'Camelback Mountain Grill', sales: 290, change: 4.8, isPositive: true }
-    ],
-    'Salt Lake City': [
-      { name: 'Mountain View Bistro', sales: 180, change: 2.9, isPositive: true },
-      { name: 'Downtown SLC Café', sales: 220, change: 3.4, isPositive: true },
-      { name: 'Park City Ski Lodge', sales: 350, change: 6.1, isPositive: true },
-      { name: 'Temple Square Restaurant', sales: 160, change: 2.2, isPositive: true }
-    ],
-    'San Diego': [
-      { name: 'Pacific Beach Bar & Grill', sales: 480, change: 8.7, isPositive: true },
-      { name: 'Gaslamp Quarter Bistro', sales: 520, change: 9.2, isPositive: true },
-      { name: 'La Jolla Seafood House', sales: 380, change: 6.8, isPositive: true },
-      { name: 'Mission Bay Café', sales: 290, change: 4.5, isPositive: true },
-      { name: 'Downtown San Diego Pub', sales: 420, change: 7.1, isPositive: true }
-    ],
-    'Chicago': [
-      { name: 'Chicago Deep Dish Pizza', sales: 350, change: 5.9, isPositive: true },
-      { name: 'Magnificent Mile Bistro', sales: 280, change: 4.2, isPositive: true },
-      { name: 'Wrigleyville Sports Bar', sales: 320, change: 5.5, isPositive: true },
-      { name: 'Loop Business District Café', sales: 200, change: 2.8, isPositive: true }
-    ],
-    'Toronto': [
-      { name: 'CN Tower Restaurant', sales: 650, change: 11.2, isPositive: true },
-      { name: 'Distillery District Bistro', sales: 480, change: 8.9, isPositive: true },
-      { name: 'Yorkville Fine Dining', sales: 720, change: 12.5, isPositive: true },
-      { name: 'Kensington Market Café', sales: 320, change: 5.7, isPositive: true },
-      { name: 'Entertainment District Bar', sales: 580, change: 10.1, isPositive: true }
-    ]
+  // Testing phase city performance - mostly zeros with occasional test values
+  const getCityPerformanceData = (timeRange: string, offerType: string) => {
+    return [
+      { name: 'Atlanta', value: Math.random() > 0.8 ? Math.round(Math.random() * 5 + 1) : 0, change: 0, isPositive: true },
+      { name: 'Houston', value: Math.random() > 0.85 ? Math.round(Math.random() * 4 + 1) : 0, change: 0, isPositive: true },
+      { name: 'Phoenix', value: Math.random() > 0.9 ? Math.round(Math.random() * 3 + 1) : 0, change: 0, isPositive: true },
+      { name: 'Salt Lake City', value: Math.random() > 0.95 ? Math.round(Math.random() * 2 + 1) : 0, change: 0, isPositive: true },
+      { name: 'San Diego', value: Math.random() > 0.75 ? Math.round(Math.random() * 6 + 1) : 0, change: 0, isPositive: true },
+      { name: 'Chicago', value: Math.random() > 0.88 ? Math.round(Math.random() * 4 + 1) : 0, change: 0, isPositive: true },
+      { name: 'Toronto', value: Math.random() > 0.7 ? Math.round(Math.random() * 7 + 1) : 0, change: 0, isPositive: true }
+    ];
   };
 
-  const salesByStoreData = cityStoreData[selectedCity as keyof typeof cityStoreData] || cityStoreData.Atlanta;
+  // Testing phase store data - mostly zeros with occasional test values
+  const getCityStoreData = (city: string, timeRange: string, offerType: string) => {
+    const cityStoreTemplates = {
+      'Atlanta': [
+        { name: 'Lemon & Sage Mediterranean Kitchen', change: 0, isPositive: true },
+        { name: 'Garden Grove Café & Bistro', change: 0, isPositive: true },
+        { name: 'Bella Vista Pizzeria & Pasta', change: 0, isPositive: true },
+        { name: 'Twilight Tavern & Lounge', change: 0, isPositive: true },
+        { name: 'The Harvest Moon Bistro', change: 0, isPositive: false },
+        { name: 'Olive & Thyme Ristorante', change: 0, isPositive: true },
+        { name: 'The Loft Kitchen & Bar', change: 0, isPositive: true }
+      ],
+      'Houston': [
+        { name: 'Texas BBQ House', change: 0, isPositive: true },
+        { name: 'Houston Heights Bistro', change: 0, isPositive: true },
+        { name: 'Downtown Sports Bar', change: 0, isPositive: true },
+        { name: 'River Oaks Café', change: 0, isPositive: true },
+        { name: 'Midtown Mexican Grill', change: 0, isPositive: true },
+        { name: 'Galleria Food Court', change: 0, isPositive: true }
+      ],
+      'Phoenix': [
+        { name: 'Desert Oasis Restaurant', change: 0, isPositive: true },
+        { name: 'Phoenix Downtown Bar', change: 0, isPositive: true },
+        { name: 'Scottsdale Fine Dining', change: 0, isPositive: true },
+        { name: 'Tempe University Café', change: 0, isPositive: true },
+        { name: 'Camelback Mountain Grill', change: 0, isPositive: true }
+      ],
+      'Salt Lake City': [
+        { name: 'Mountain View Bistro', change: 0, isPositive: true },
+        { name: 'Downtown SLC Café', change: 0, isPositive: true },
+        { name: 'Park City Ski Lodge', change: 0, isPositive: true },
+        { name: 'Temple Square Restaurant', change: 0, isPositive: true }
+      ],
+      'San Diego': [
+        { name: 'Pacific Beach Bar & Grill', change: 0, isPositive: true },
+        { name: 'Gaslamp Quarter Bistro', change: 0, isPositive: true },
+        { name: 'La Jolla Seafood House', change: 0, isPositive: true },
+        { name: 'Mission Bay Café', change: 0, isPositive: true },
+        { name: 'Downtown San Diego Pub', change: 0, isPositive: true }
+      ],
+      'Chicago': [
+        { name: 'Chicago Deep Dish Pizza', change: 0, isPositive: true },
+        { name: 'Magnificent Mile Bistro', change: 0, isPositive: true },
+        { name: 'Wrigleyville Sports Bar', change: 0, isPositive: true },
+        { name: 'Loop Business District Café', change: 0, isPositive: true }
+      ],
+      'Toronto': [
+        { name: 'CN Tower Restaurant', change: 0, isPositive: true },
+        { name: 'Distillery District Bistro', change: 0, isPositive: true },
+        { name: 'Yorkville Fine Dining', change: 0, isPositive: true },
+        { name: 'Kensington Market Café', change: 0, isPositive: true },
+        { name: 'Entertainment District Bar', change: 0, isPositive: true }
+      ]
+    };
+    
+    const template = cityStoreTemplates[city as keyof typeof cityStoreTemplates] || cityStoreTemplates.Atlanta;
+    
+    return template.map(store => ({
+      ...store,
+      sales: Math.random() > 0.9 ? Math.round(Math.random() * 3 + 1) : 0 // 10% chance of test data
+    }));
+  };
 
   return (
     <div className="space-y-8">
@@ -222,24 +182,24 @@ export const AdminOverviewPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
           title="Gross sales" 
-          value="$2,000" 
+          value="$0"
           icon={<DollarSign />} 
           color="green"
-          change={{ value: 4, period: 'vs yesterday' }}
+          change={{ value: 0, period: 'vs yesterday' }}
         />
         <StatCard 
           title="Order Volume" 
-          value="1,800" 
+          value="0"
           icon={<Users />} 
           color="primary"
-          change={{ value: 8, period: 'vs yesterday' }}
+          change={{ value: 0, period: 'vs yesterday' }}
         />
         <StatCard 
           title="Average Order Value" 
-          value="$120" 
+          value="$0"
           icon={<Tag />} 
           color="red"
-          change={{ value: -3, period: 'vs yesterday' }}
+          change={{ value: 0, period: 'vs yesterday' }}
         />
         <StatCard 
           title="Total Approved Merchants" 
@@ -251,7 +211,7 @@ export const AdminOverviewPage = () => {
       </div>
 
       {/* --- City Performance Section --- */}
-      <CityPerformanceCards data={cityPerformanceData} />
+      <CityPerformanceCards data={getCityPerformanceData(selectedTimeRange, selectedOfferType)} />
 
       {/* --- Sales Performance and Store Analytics --- */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -261,7 +221,7 @@ export const AdminOverviewPage = () => {
           height={300}
           color="#2563EB"
         />
-        <SalesByStore data={salesByStoreData} />
+        <SalesByStore data={getCityStoreData(selectedCity, selectedTimeRange, selectedOfferType)} />
       </div>
 
       {/* --- Leaderboards Section --- */}

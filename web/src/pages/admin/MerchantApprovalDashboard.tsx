@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiPost } from '@/services/api';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Building, Mail, Clock, CheckCircle, XCircle, Search, MapPin, Tag, Eye, Pause, Play, RotateCcw } from 'lucide-react';
+import { Loader2, Building, Mail, Clock, CheckCircle, XCircle, Search, MapPin, Tag, Eye, Pause, Play, RotateCcw, DollarSign, Users, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -177,6 +177,67 @@ const MerchantDetailsModal = ({ merchant, onClose }: any) => {
                             <p className="text-sm text-neutral-600">{merchant.description}</p>
                         </div>
                     )}
+
+                    {/* Sales Performance Section */}
+                    <div>
+                        <h5 className="font-medium text-neutral-700 mb-4">Sales Performance</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="bg-neutral-50 rounded-lg p-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <DollarSign className="h-4 w-4 text-green-600" />
+                                    <span className="text-sm font-medium text-neutral-700">Total Revenue</span>
+                                </div>
+                                <p className="text-2xl font-bold text-neutral-900">$0</p>
+                                <p className="text-xs text-neutral-500 mt-1">Testing phase</p>
+                            </div>
+                            
+                            <div className="bg-neutral-50 rounded-lg p-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Users className="h-4 w-4 text-blue-600" />
+                                    <span className="text-sm font-medium text-neutral-700">Total Orders</span>
+                                </div>
+                                <p className="text-2xl font-bold text-neutral-900">0</p>
+                                <p className="text-xs text-neutral-500 mt-1">No orders yet</p>
+                            </div>
+                            
+                            <div className="bg-neutral-50 rounded-lg p-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Tag className="h-4 w-4 text-purple-600" />
+                                    <span className="text-sm font-medium text-neutral-700">Avg Order Value</span>
+                                </div>
+                                <p className="text-2xl font-bold text-neutral-900">$0</p>
+                                <p className="text-xs text-neutral-500 mt-1">No data available</p>
+                            </div>
+                        </div>
+                        
+                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-neutral-50 rounded-lg p-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Calendar className="h-4 w-4 text-orange-600" />
+                                    <span className="text-sm font-medium text-neutral-700">Active Deals</span>
+                                </div>
+                                <p className="text-2xl font-bold text-neutral-900">0</p>
+                                <p className="text-xs text-neutral-500 mt-1">No active deals</p>
+                            </div>
+                            
+                            <div className="bg-neutral-50 rounded-lg p-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Building className="h-4 w-4 text-indigo-600" />
+                                    <span className="text-sm font-medium text-neutral-700">Total Stores</span>
+                                </div>
+                                <p className="text-2xl font-bold text-neutral-900">0</p>
+                                <p className="text-xs text-neutral-500 mt-1">No stores created</p>
+                            </div>
+                        </div>
+                        
+                        <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                            <div className="flex items-center gap-2">
+                                <div className="h-2 w-2 rounded-full bg-amber-500"></div>
+                                <span className="text-sm font-medium text-amber-800">Testing Phase</span>
+                            </div>
+                            <p className="text-xs text-amber-700 mt-1">This merchant is in testing phase with no sales data yet.</p>
+                        </div>
+                    </div>
                 </div>
             </motion.div>
         </div>
