@@ -293,6 +293,45 @@ export const DealReviewStep = () => {
             <ReviewItem label="Deal Type" value={state.dealType} />
           </div>
 
+          {/* Menu Items */}
+          {state.selectedMenuItems && state.selectedMenuItems.length > 0 && (
+            <div className="rounded-lg border bg-white p-4">
+              <h3 className="mb-4 font-semibold text-neutral-900">Selected Menu Items</h3>
+              <div className="space-y-3">
+                {state.selectedMenuItems.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between rounded-lg bg-neutral-50 p-3">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-neutral-900">{item.name}</span>
+                        {item.isHidden && (
+                          <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">
+                            Hidden
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-sm text-neutral-600">${item.price.toFixed(2)}</span>
+                    </div>
+                    <span className="rounded-full bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-700">
+                      {item.category}
+                    </span>
+                  </div>
+                ))}
+                <div className="mt-3 pt-3 border-t border-neutral-200">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium text-neutral-700">Total Items:</span>
+                    <span className="font-semibold text-neutral-900">{state.selectedMenuItems.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium text-neutral-700">Visible Items:</span>
+                    <span className="font-semibold text-green-600">
+                      {state.selectedMenuItems.filter(item => !item.isHidden).length}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Offer Details */}
           <div className="rounded-lg border bg-white p-4">
             <h3 className="mb-4 font-semibold text-neutral-900">Offer Details</h3>

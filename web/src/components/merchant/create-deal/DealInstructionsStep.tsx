@@ -61,7 +61,7 @@ export const DealInstructionsStep = () => {
       onNext={() => navigate('/merchant/deals/create/advanced')}
       onBack={() => navigate('/merchant/deals/create/schedule')}
       isNextDisabled={!instructionsValidation.isValid}
-      progress={70}
+      progress={75}
     >
       <div className="space-y-8">
         {/* Instructions Input */}

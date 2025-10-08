@@ -77,10 +77,10 @@ export const DealBasicsStep = () => {
     <OnboardingStepLayout
       title="Describe your deal"
       subtitle="Create an attractive offer that customers will love"
-      onNext={() => navigate('/merchant/deals/create/offer')}
+      onNext={() => navigate('/merchant/deals/create/menu')}
       onBack={() => navigate('/merchant/deals/create')}
       isNextDisabled={!isFormValid}
-      progress={30}
+      progress={25}
     >
       <div className="space-y-8">
         {/* Deal Title Section */}

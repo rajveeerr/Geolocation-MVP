@@ -203,7 +203,7 @@ export const DealScheduleStep = () => {
       onNext={() => navigate('/merchant/deals/create/instructions')}
       onBack={() => navigate('/merchant/deals/create/images')}
       isNextDisabled={!isDateValid()}
-      progress={60}
+      progress={65}
     >
       <div className="space-y-8">
         {/* Quick Options */}

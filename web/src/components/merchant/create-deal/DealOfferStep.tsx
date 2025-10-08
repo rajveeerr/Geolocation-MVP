@@ -101,9 +101,9 @@ export const DealOfferStep = () => {
       title="Make it irresistible"
       subtitle="Choose how customers will save with your deal"
       onNext={() => navigate('/merchant/deals/create/images')}
-      onBack={() => navigate('/merchant/deals/create/basics')}
+      onBack={() => navigate('/merchant/deals/create/menu')}
       isNextDisabled={isNextDisabledSimple}
-      progress={40}
+      progress={45}
     >
       <div className="space-y-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

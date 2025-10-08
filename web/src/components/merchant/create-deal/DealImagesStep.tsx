@@ -22,7 +22,7 @@ export const DealImagesStep = () => {
       onNext={() => navigate('/merchant/deals/create/schedule')}
       onBack={() => navigate('/merchant/deals/create/offer')}
       isNextDisabled={false} // Images are optional
-      progress={50}
+      progress={55}
     >
       <DealImageUpload
         images={state.imageUrls || []}

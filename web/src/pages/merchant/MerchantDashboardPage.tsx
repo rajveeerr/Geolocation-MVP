@@ -255,9 +255,12 @@ export const MerchantDashboardPage = () => {
                 <p className="mt-2 text-2xl font-extrabold text-neutral-900">{formatCurrency(revenue || 120)}</p>
                 <p className="text-xs text-rose-500 mt-1">- 3% vs yesterday</p>
               </div>
-              <div className="mt-4">
+              <div className="mt-4 space-y-2">
                 <Link to={PATHS.MERCHANT_KICKBACKS}>
-                  <Button size="sm" variant="ghost">View Kickback Earnings</Button>
+                  <Button size="sm" variant="ghost" className="w-full">View Kickback Earnings</Button>
+                </Link>
+                <Link to={PATHS.MERCHANT_ANALYTICS}>
+                  <Button size="sm" variant="ghost" className="w-full">View Analytics</Button>
                 </Link>
               </div>
             </div>
@@ -291,7 +294,14 @@ export const MerchantDashboardPage = () => {
             </div>
 
             <div className="col-span-1 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-              <h4 className="text-sm text-neutral-600 mb-4">Sales by Store</h4>
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-sm text-neutral-600">Sales by Store</h4>
+                <Link to={PATHS.MERCHANT_STORES}>
+                  <Button variant="ghost" size="sm" className="text-xs">
+                    Manage Stores
+                  </Button>
+                </Link>
+              </div>
               <ul className="space-y-3">
                 {[
                   { name: 'Lemon & Sage Mediterranean Kitchen', value: 177, pct: '+2.3%' },

@@ -9,6 +9,7 @@ import { MerchantProtectedRoute } from '@/components/auth/MerchantProtectedRoute
 // Import all necessary step and page components
 import { DealTypeStep } from '@/components/merchant/create-deal/DealTypeStep';
 import { DealBasicsStep } from '@/components/merchant/create-deal/DealBasicsStep';
+import { DealMenuStep } from '@/components/merchant/create-deal/DealMenuStep';
 import { DealOfferStep } from '@/components/merchant/create-deal/DealOfferStep';
 import { DealImagesStep } from '@/components/merchant/create-deal/DealImagesStep';
 import { DealScheduleStep } from '@/components/merchant/create-deal/DealScheduleStep';
@@ -48,6 +49,7 @@ export const CreateDealPage = () => {
           
           {/* --- MODIFIED: Explicit routes for the Standard/Recurring flow --- */}
           <Route path="basics" element={<DealBasicsStep />} />
+          <Route path="menu" element={<DealMenuStep />} />
           <Route path="offer" element={<DealOfferStep />} />
           <Route path="images" element={<DealImagesStep />} />
           <Route path="schedule" element={<DealScheduleStep />} />

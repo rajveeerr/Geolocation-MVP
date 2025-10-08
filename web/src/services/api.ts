@@ -8,9 +8,15 @@ export interface ApiResponse<T> {
 
 class ApiClient {
   private baseUrl: string;
+  private onAuthError?: () => void;
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
+  }
+
+  // Method to set auth error callback
+  public setAuthErrorCallback(callback: () => void) {
+    this.onAuthError = callback;
   }
 
   private getAuthToken = () => localStorage.getItem('authToken');
@@ -38,6 +44,16 @@ class ApiClient {
         if (contentType?.includes('application/json')) {
           errorData = await response.json();
         }
+        
+        // Handle 401 Unauthorized - clear auth token and notify
+        if (response.status === 401) {
+          localStorage.removeItem('authToken');
+          // Call the auth error callback if set
+          if (this.onAuthError) {
+            this.onAuthError();
+          }
+        }
+        
         return {
           success: false,
           data: null,
@@ -93,6 +109,16 @@ class ApiClient {
         if (contentType?.includes('application/json')) {
           errorData = await response.json();
         }
+        
+        // Handle 401 Unauthorized - clear auth token and notify
+        if (response.status === 401) {
+          localStorage.removeItem('authToken');
+          // Call the auth error callback if set
+          if (this.onAuthError) {
+            this.onAuthError();
+          }
+        }
+        
         return {
           success: false,
           data: null,
@@ -135,3 +161,4 @@ export const apiPost = api.post.bind(api);
 export const apiPostFormData = api.postFormData.bind(api);
 export const apiPut = api.put.bind(api);
 export const apiDelete = api.delete.bind(api);
+export { api };

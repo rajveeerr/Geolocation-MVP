@@ -71,6 +71,30 @@ const ReferralPage = React.lazy(() =>
 const KickbackEarningsPage = React.lazy(() =>
   import('./pages/merchant/KickbackEarningsPage').then((m) => ({ default: m.KickbackEarningsPage })),
 );
+const StoreManagementPage = React.lazy(() =>
+  import('./pages/merchant/StoreManagementPage').then((m) => ({ default: m.StoreManagementPage })),
+);
+const StoreFormPage = React.lazy(() =>
+  import('./pages/merchant/StoreFormPage').then((m) => ({ default: m.StoreFormPage })),
+);
+const MenuManagementPage = React.lazy(() =>
+  import('./pages/merchant/MenuManagementPage').then((m) => ({ default: m.MenuManagementPage })),
+);
+const MenuItemFormPage = React.lazy(() =>
+  import('./pages/merchant/MenuItemFormPage').then((m) => ({ default: m.MenuItemFormPage })),
+);
+const ComingSoonPage = React.lazy(() =>
+  import('./pages/ComingSoonPage').then((m) => ({ default: m.ComingSoonPage })),
+);
+const MenuItemDetailPage = React.lazy(() =>
+  import('./pages/merchant/MenuItemDetailPage').then((m) => ({ default: m.MenuItemDetailPage })),
+);
+const StoreDetailPage = React.lazy(() =>
+  import('./pages/merchant/StoreDetailPage').then((m) => ({ default: m.StoreDetailPage })),
+);
+const MerchantMyDealsPage = React.lazy(() =>
+  import('./pages/merchant/MerchantMyDealsPage').then((m) => ({ default: m.MerchantMyDealsPage })),
+);
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
 
@@ -155,6 +179,18 @@ function App() {
                 }
               />
               <Route
+                path={PATHS.MERCHANT_DEALS}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MerchantMyDealsPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/merchant/deals/create/*"
                 element={
                   <ProtectedRoute>
@@ -186,6 +222,117 @@ function App() {
                     <MerchantLayout>
                       <Suspense fallback={<LoadingOverlay />}>
                         <KickbackEarningsPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path={PATHS.MERCHANT_STORES}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <StoreManagementPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={PATHS.MERCHANT_STORES_CREATE}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <StoreFormPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/merchant/stores/:storeId/edit"
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <StoreFormPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/merchant/stores/:storeId"
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <StoreDetailPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path={PATHS.MERCHANT_MENU}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MenuManagementPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={PATHS.MERCHANT_MENU_CREATE}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MenuItemFormPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/merchant/menu/:itemId/edit"
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MenuItemFormPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/merchant/menu/:itemId"
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MenuItemDetailPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path={PATHS.MERCHANT_ANALYTICS}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <ComingSoonPage />
                       </Suspense>
                     </MerchantLayout>
                   </ProtectedRoute>

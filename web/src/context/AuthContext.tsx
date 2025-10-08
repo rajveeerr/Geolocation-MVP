@@ -1,7 +1,7 @@
-import { type ReactNode } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { apiGet, apiPost } from '@/services/api';
+import { apiGet, apiPost, api } from '@/services/api';
 
 import { PATHS } from '@/routing/paths';
 import { useToast } from '@/hooks/use-toast';
@@ -29,11 +29,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
   const { consumeRedirectPath } = useRedirect(); // <-- new
 
+  // Set up global auth error handler
+  useEffect(() => {
+    api.setAuthErrorCallback(() => {
+      // Clear user data and invalidate queries when auth fails
+      queryClient.setQueryData(['user'], null);
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+    });
+  }, [queryClient]);
+
   const { data: user, isLoading: isLoadingUser } = useQuery({
     queryKey: ['user'],
     queryFn: () => apiGet<User>('/auth/me').then((res) => res.data),
     enabled: hasAuthToken(),
     staleTime: Infinity,
+    retry: (failureCount, error: any) => {
+      // Don't retry on 401 errors - token is invalid
+      if (error?.message?.includes('401') || error?.message?.includes('Unauthorized')) {
+        return false;
+      }
+      return failureCount < 3;
+    },
   });
 
   const { mutateAsync: login, isPending: isLoggingIn } = useMutation({
