@@ -7,6 +7,7 @@ import { apiGet } from '@/services/api';
 import { CalendarIcon, ClockIcon, DollarSign, Percent, BarChart3, Users, Settings } from 'lucide-react';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useMerchantDashboardStats } from '@/hooks/useMerchantDashboardStats';
+import { useMerchantStores } from '@/hooks/useMerchantStores';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { ExploreDealsPreview } from '@/components/merchant/ExploreDealsPreview';
@@ -118,6 +119,9 @@ export const MerchantDashboardPage = () => {
   const { data: dashboardStats, isLoading: statsLoading } = useMerchantDashboardStats({ 
     period: 'all_time' 
   });
+
+  // Fetch real store data
+  const { data: storesData, isLoading: storesLoading } = useMerchantStores();
 
   const {
     data: dealsData,
@@ -309,22 +313,52 @@ export const MerchantDashboardPage = () => {
                   </Button>
                 </Link>
               </div>
-              <ul className="space-y-3">
-                {[
-                  { name: 'Lemon & Sage Mediterranean Kitchen', value: 0, pct: '0%' },
-                  { name: 'Garden Grove Café & Bistro', value: 0, pct: '0%' },
-                  { name: 'Bella Vista Pizzeria & Pasta', value: 0, pct: '0%' },
-                  { name: 'Twilight Tavern & Lounge', value: 0, pct: '0%' },
-                ].map((s) => (
-                  <li key={s.name} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="h-3 w-3 rounded-full bg-rose-500 inline-block" />
-                      <span className="text-sm text-neutral-800">{s.name}</span>
+              {storesLoading ? (
+                <div className="space-y-3">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="flex items-center justify-between animate-pulse">
+                      <div className="flex items-center gap-3">
+                        <div className="h-3 w-3 rounded-full bg-neutral-200" />
+                        <div className="h-4 w-32 bg-neutral-200 rounded" />
+                      </div>
+                      <div className="h-4 w-16 bg-neutral-200 rounded" />
                     </div>
-                    <div className="text-sm text-neutral-600">{s.value} <span className="text-green-500 ml-2">{s.pct}</span></div>
-                  </li>
-                ))}
-              </ul>
+                  ))}
+                </div>
+              ) : storesData && storesData.stores.length > 0 ? (
+                <ul className="space-y-3">
+                  {storesData.stores.map((store) => (
+                    <li key={store.id} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className={`h-3 w-3 rounded-full inline-block ${
+                          store.active ? 'bg-green-500' : 'bg-red-500'
+                        }`} />
+                        <div className="min-w-0 flex-1">
+                          <span className="text-sm text-neutral-800 block truncate">
+                            {store.address}
+                          </span>
+                          <span className="text-xs text-neutral-500">
+                            {store.city.name}, {store.city.state}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-sm text-neutral-600">
+                        <span className="text-neutral-500">0</span>
+                        <span className="text-green-500 ml-2">0%</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-sm text-neutral-500 mb-4">No stores found</p>
+                  <Link to={PATHS.MERCHANT_STORES_CREATE}>
+                    <Button size="sm" variant="secondary">
+                      Create Your First Store
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
 

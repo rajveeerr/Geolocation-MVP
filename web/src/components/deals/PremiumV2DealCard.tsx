@@ -24,6 +24,7 @@ interface PremiumDeal extends Deal {
   isBooking?: boolean;
   discountPercentage?: number | null;
   bookingInfo?: string;
+  description?: string;
 }
 
 export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
@@ -52,30 +53,28 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
     deal.images && deal.images.length > 0 ? deal.images : [deal.image];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // --- UPDATED Mock data with categories and images ---
-  const mockOffers: Offer[] = [
-    { title: '2-for-1 Cocktails', time: '5-7 PM', category: 'Drinks', imageUrl: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=200&q=80' },
-    { title: '50% Off Appetizers', time: '5-6 PM', category: 'Bites', imageUrl: 'https://images.unsplash.com/photo-1579871494447-9811CFb5d668?w=200&q=80' },
-    { title: '$5 Draft Beers', time: 'All Night', category: 'Drinks', imageUrl: 'https://images.unsplash.com/photo-1586993451228-098a8924133e?w=200&q=80' },
-    { title: 'Truffle Fries', time: '5-7 PM', category: 'Bites', imageUrl: 'https://images.unsplash.com/photo-1598679253544-2c9740f92d4f?w=200&q=80' },
-  ];
+  // Use real backend data instead of mock data
+  const realOffers: Offer[] = deal.offers || [];
   const offerImageFallback = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&q=80';
 
-  // Mock claimed users for kickback deals when backend data isn't available
-  const mockClaimedUsers = [
-    { avatarUrl: 'https://github.com/shadcn.png' },
-    { avatarUrl: 'https://github.com/vercel.png' },
-    { avatarUrl: 'https://github.com/react.png' },
-  ];
+  // Use real claimed users from backend data
+  const realClaimedUsers = deal.claimedBy?.visibleUsers || [];
 
   // State to control visibility of offers dropdown/list
   const [offersVisible, setOffersVisible] = useState(false);
-  const [activeOfferTab, setActiveOfferTab] = useState<'Drinks' | 'Bites'>('Drinks');
+  
+  // Get unique categories from real offers
+  const availableCategories = useMemo(() => {
+    const categories = realOffers.map(offer => offer.category).filter(Boolean);
+    return [...new Set(categories)];
+  }, [realOffers]);
+  
+  const [activeOfferTab, setActiveOfferTab] = useState<string>(availableCategories[0] || 'Offers');
 
   // --- NEW: Memoize the filtered offers to prevent re-calculation on every render ---
   const filteredOffers = useMemo(() => {
-    return (deal.offers || mockOffers).filter((offer) => offer.category === activeOfferTab);
-  }, [deal.offers, activeOfferTab]);
+    return realOffers.filter((offer) => offer.category === activeOfferTab);
+  }, [realOffers, activeOfferTab]);
 
   const countdown = useCountdown(deal.expiresAt || '');
   // Format countdown to show HH.MM.SS format like 06.45.22
@@ -271,14 +270,15 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                     users={deal.claimedBy.visibleUsers}
                     textClassName="text-white/90"
                   />
+                ) : realClaimedUsers.length > 0 ? (
+                  <AvatarStack
+                    count={realClaimedUsers.length}
+                    users={realClaimedUsers}
+                    textClassName="text-white/90"
+                  />
                 ) : (
-                  // Show placeholder avatars for cards without backend claimedBy data
-                  <div className="opacity-90">
-                    <AvatarStack
-                      count={mockClaimedUsers.length}
-                      users={mockClaimedUsers}
-                      textClassName="text-white/90 ml-4"
-                    />
+                  <div className="text-white/70 text-sm">
+                    Be the first to tap in!
                   </div>
                 )}
               </div>
@@ -315,20 +315,21 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
               transition={{ duration: 0.4, ease: 'easeInOut' }}
               className="flex-grow"
             >
-                <div>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setOffersVisible(!offersVisible);
-                    }}
-                    className="flex items-center justify-center w-full mb-3 text-sm font-semibold text-brand-primary-600 hover:text-brand-primary-800"
-                  >
-                    <span>View All Offers</span>
-                    {/* Blinking dot */}
-                    <div className="w-1 h-1 bg-brand-primary-600 rounded-full ml-2 animate-pulse"></div>
-                    <ChevronDown className={cn('h-5 w-5 ml-1 transition-transform', offersVisible && 'rotate-180')} />
-                  </button>
+                {realOffers.length > 0 && (
+                  <div>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setOffersVisible(!offersVisible);
+                      }}
+                      className="flex items-center justify-center w-full mb-3 text-sm font-semibold text-brand-primary-600 hover:text-brand-primary-800"
+                    >
+                      <span>View All Offers</span>
+                      {/* Blinking dot */}
+                      <div className="w-1 h-1 bg-brand-primary-600 rounded-full ml-2 animate-pulse"></div>
+                      <ChevronDown className={cn('h-5 w-5 ml-1 transition-transform', offersVisible && 'rotate-180')} />
+                    </button>
 
                   <AnimatePresence>
                     {offersVisible && (
@@ -338,11 +339,20 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                             exit={{ height: 0, opacity: 0 }}
                             className="overflow-hidden mb-4"
                         >
-                            {/* --- NEW: Tab Selector for Offers --- */}
-                            <div className="flex items-center gap-2 rounded-full bg-neutral-100 p-1 mb-3">
-                                <button onClick={(e) => {e.preventDefault(); e.stopPropagation(); setActiveOfferTab('Drinks')}} className={cn("flex-1 rounded-full py-1.5 text-sm font-semibold", activeOfferTab === 'Drinks' ? 'bg-black text-white shadow' : 'text-neutral-600')}>Drinks</button>
-                                <button onClick={(e) => {e.preventDefault(); e.stopPropagation(); setActiveOfferTab('Bites')}} className={cn("flex-1 rounded-full py-1.5 text-sm font-semibold", activeOfferTab === 'Bites' ? 'bg-black text-white shadow' : 'text-neutral-600')}>Bites</button>
-                            </div>
+                            {/* --- NEW: Dynamic Tab Selector for Offers --- */}
+                            {availableCategories.length > 1 && (
+                              <div className="flex items-center gap-2 rounded-full bg-neutral-100 p-1 mb-3">
+                                {availableCategories.map((category) => (
+                                  <button 
+                                    key={category}
+                                    onClick={(e) => {e.preventDefault(); e.stopPropagation(); setActiveOfferTab(category)}} 
+                                    className={cn("flex-1 rounded-full py-1.5 text-sm font-semibold", activeOfferTab === category ? 'bg-black text-white shadow' : 'text-neutral-600')}
+                                  >
+                                    {category}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
 
                             {/* --- NEW: Richer Offer Cards --- */}
                             <div className="space-y-2">
@@ -377,8 +387,17 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                         </motion.div>
                     )}
                   </AnimatePresence>
+                  </div>
+                )}
+                
+                {/* Show deal description when no offers available */}
+                {realOffers.length === 0 && deal.description && (
+                  <div className="text-sm text-neutral-600 leading-relaxed mb-4">
+                    {deal.description}
+                  </div>
+                )}
 
-                  <Link to={`/deals/${deal.id}`} className="block">
+                <Link to={`/deals/${deal.id}`} className="block">
                     <Button
                       size="lg"
                       variant={isHighValueDiscount ? 'primary' : ctaVariant as any}
@@ -391,7 +410,6 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                       <span className="text-lg">{ctaText}</span>
                     </Button>
                   </Link>
-                </div>
             </motion.div>
           ) : (
             <motion.div

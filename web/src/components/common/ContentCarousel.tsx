@@ -117,8 +117,6 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
           onScrollRight={() => scroll(360)}
         />
         
-        {/* Thick primary colored line below section heading */}
-        <div className="mb-6 h-1 w-full bg-[#F97316] rounded-sm"></div>
 
         {/* --- MODIFIED: This is now the draggable carousel --- */}
         <div ref={viewportRef} className="overflow-hidden">

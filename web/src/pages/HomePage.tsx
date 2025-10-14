@@ -7,42 +7,31 @@ import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
 // import type { Deal } from '@/data/deals';
 import { DiscoverSection } from '@/components/landing/DiscoverSection';
-import { premiumDeals, happyHourDeals, experiencesData } from '@/data/deals'; // Keep existing mock data
+import { premiumDeals, happyHourDeals, experiencesData } from '@/data/deals'; // Fallback mock data
 import { AnimatePresence } from 'framer-motion';
-import { useFeaturedDeals } from '@/hooks/useFeaturedDeals'; // <-- Import the new hook
+import { useFeaturedDeals } from '@/hooks/useFeaturedDeals';
+import { useTodaysDeals } from '@/hooks/useTodaysDeals';
+import { usePopularDeals } from '@/hooks/usePopularDeals';
+import { useHappyHourDeals } from '@/hooks/useDealsByCategory';
+import { useExperienceDeals } from '@/hooks/useDealsByCategory';
 import type { ApiDeal } from '@/data/deals-placeholder';
 import { adaptApiDealToFrontend } from '@/data/deals-placeholder';
 
 export const HomePage = () => {
   const [activeTab] = useState('deals');
-  const { data: featuredDeals, isLoading: isLoadingFeatured } =
-    useFeaturedDeals();
+  
+  // Fetch real data from backend APIs
+  const { data: featuredDeals, isLoading: isLoadingFeatured } = useFeaturedDeals();
+  const { data: todaysDeals, isLoading: isLoadingTodays } = useTodaysDeals();
+  const { data: popularDeals, isLoading: isLoadingPopular } = usePopularDeals();
+  const { data: happyHourDealsData, isLoading: isLoadingHappyHour } = useHappyHourDeals();
+  const { data: experienceDealsData, isLoading: isLoadingExperiences } = useExperienceDeals();
 
-  const {
-    data: rawDeals,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['deals'],
-    queryFn: () => apiGet<ApiDeal[]>('/deals'),
-  });
-  const normalizeDealsArray = (data: unknown): ApiDeal[] => {
-    if (!data) return [];
-    if (Array.isArray(data)) return data as ApiDeal[];
-
-    if (typeof data === 'object' && data !== null) {
-      const obj = data as Record<string, unknown>;
-      if (Array.isArray(obj.deals)) return obj.deals as ApiDeal[];
-      if (Array.isArray(obj.data)) return obj.data as ApiDeal[];
-      return [data as ApiDeal];
-    }
-
-    return [];
-  };
-
-  const liveDeals = normalizeDealsArray(rawDeals?.data).map((d) =>
-    adaptApiDealToFrontend(d as ApiDeal),
-  );
+  // Fallback to mock data if real data is not available
+  const displayTodaysDeals = todaysDeals && todaysDeals.length > 0 ? todaysDeals : premiumDeals;
+  const displayHappyHourDeals = happyHourDealsData && happyHourDealsData.length > 0 ? happyHourDealsData : happyHourDeals;
+  const displayExperienceDeals = experienceDealsData && experienceDealsData.length > 0 ? experienceDealsData : experiencesData;
+  const displayPopularDeals = popularDeals && popularDeals.length > 0 ? popularDeals : premiumDeals;
 
   return (
     <>
@@ -58,9 +47,14 @@ export const HomePage = () => {
         </div>
       </section> */}
 
-      <ContentCarousel title="Today's Top Deals" deals={premiumDeals} />
+      {/* Today's Top Deals */}
+      {isLoadingTodays ? (
+        <CarouselSkeleton title="Today's Top Deals" />
+      ) : (
+        <ContentCarousel title="Today's Top Deals" deals={displayTodaysDeals} />
+      )}
 
-      {/* --- NEW: Featured Deals Section --- */}
+      {/* Featured Deals Section */}
       {isLoadingFeatured ? (
         <CarouselSkeleton title="Featured Deals" />
       ) : (
@@ -72,43 +66,46 @@ export const HomePage = () => {
 
       <SectionDivider />
 
-      {isLoading ? (
-        <>
-          <CarouselSkeleton title="Latest Merchant Deals" />
-          <SectionDivider />
-        </>
-      ) : error ? (
-        <div className="py-8 text-center text-red-500">
-          Error fetching live deals.
-        </div>
-      ) : liveDeals.length > 0 ? (
-        <>
-          <ContentCarousel title="Latest Merchant Deals" deals={liveDeals} />
-          <SectionDivider />
-        </>
-      ) : null}
+      {/* Popular Deals Near You */}
+      {isLoadingPopular ? (
+        <CarouselSkeleton title="Popular Deals Near You" />
+      ) : (
+        <ContentCarousel title="Popular Deals Near You" deals={displayPopularDeals} />
+      )}
 
+      <SectionDivider />
+
+      {/* Dynamic Content Based on Active Tab */}
       <AnimatePresence mode="wait">
         {activeTab === 'deals' && (
           <ContentCarousel
             key="deals-carousel"
-            title="Popular Deals Near You"
-            deals={premiumDeals}
+            title="Latest Deals"
+            deals={displayPopularDeals}
           />
         )}
 
         {activeTab === 'experiences' && (
-          <ContentCarousel
-            key="experiences-carousel"
-            title="Unforgettable Experiences"
-            deals={experiencesData}
-          />
+          isLoadingExperiences ? (
+            <CarouselSkeleton title="Unforgettable Experiences" />
+          ) : (
+            <ContentCarousel
+              key="experiences-carousel"
+              title="Unforgettable Experiences"
+              deals={displayExperienceDeals}
+            />
+          )
         )}
       </AnimatePresence>
 
       <SectionDivider />
 
-      <ContentCarousel title="Popular Happy Hours" deals={happyHourDeals} />
+      {/* Popular Happy Hours */}
+      {isLoadingHappyHour ? (
+        <CarouselSkeleton title="Popular Happy Hours" />
+      ) : (
+        <ContentCarousel title="Popular Happy Hours" deals={displayHappyHourDeals} />
+      )}
 
       <SectionDivider />
 
