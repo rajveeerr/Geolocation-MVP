@@ -55,7 +55,6 @@ export const useMerchantStores = () => {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
-
 // Hook to create a new store
 export const useCreateStore = () => {
   const queryClient = useQueryClient();
@@ -148,3 +147,4 @@ export const useDeleteStore = () => {
     },
   });
 };
+

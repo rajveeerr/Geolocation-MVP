@@ -67,10 +67,11 @@ export const DealOfferStep = () => {
              'Great!'
   };
 
-  // Smart validation - if user has entered a value, infer the offer kind
+  // Smart validation - ensure at least one discount field is provided (backend requirement)
   const hasValidDiscount = 
     (state.discountPercentage && state.discountPercentage > 0) ||
-    (state.discountAmount && state.discountAmount > 0);
+    (state.discountAmount && state.discountAmount > 0) ||
+    (state.customOfferDisplay && state.customOfferDisplay.trim().length > 0);
 
   const isNextDisabledSimple = !state.dealType || !hasValidDiscount;
 
@@ -82,6 +83,9 @@ export const DealOfferStep = () => {
     if (state.discountAmount && state.discountAmount > 0) {
       return `Save $${Number(state.discountAmount).toFixed(2)} on your purchase`;
     }
+    if (state.customOfferDisplay && state.customOfferDisplay.trim().length > 0) {
+      return state.customOfferDisplay;
+    }
     return 'Configure your offer to see preview';
   };
 
@@ -92,6 +96,9 @@ export const DealOfferStep = () => {
     }
     if (state.discountAmount && state.discountAmount > 0) {
       return `$${Number(state.discountAmount).toFixed(2)} OFF`;
+    }
+    if (state.customOfferDisplay && state.customOfferDisplay.trim().length > 0) {
+      return state.customOfferDisplay;
     }
     return 'Your Deal';
   };
@@ -106,7 +113,7 @@ export const DealOfferStep = () => {
       progress={45}
     >
       <div className="space-y-6">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <OfferCard
             icon={<Percent className="h-6 w-6" />}
             title="Percentage Off"
@@ -125,6 +132,16 @@ export const DealOfferStep = () => {
             ariaPressed={state.standardOfferKind === 'amount'}
             onClick={() =>
               dispatch({ type: 'SET_STANDARD_OFFER_KIND', kind: 'amount' })
+            }
+          />
+          <OfferCard
+            icon={<Sparkles className="h-6 w-6" />}
+            title="Custom Offer"
+            subtitle="Create your own offer text like 'Buy 2 Get 1 Free'"
+            selected={state.standardOfferKind === 'custom'}
+            ariaPressed={state.standardOfferKind === 'custom'}
+            onClick={() =>
+              dispatch({ type: 'SET_STANDARD_OFFER_KIND', kind: 'custom' })
             }
           />
         </div>
@@ -389,6 +406,109 @@ export const DealOfferStep = () => {
                   </div>
                 </div>
               </div>
+            </motion.div>
+          )}
+
+          {/* Custom Offer Display Section */}
+          {(state.standardOfferKind === 'custom' ||
+            state.customOfferDisplay !== null) && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+                  <Sparkles className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-neutral-900">Custom Offer Text</h3>
+                  <p className="text-sm text-neutral-600">Create your own offer message</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Label htmlFor="customOfferDisplay" className="text-sm font-medium text-neutral-700">
+                  Offer Display Text
+                </Label>
+                <Input
+                  id="customOfferDisplay"
+                  type="text"
+                  placeholder="e.g., Buy 2 Get 1 Free, Happy Hour Special, Free Dessert"
+                  maxLength={50}
+                  value={state.customOfferDisplay ?? ''}
+                  onChange={(e) => {
+                    dispatch({
+                      type: 'UPDATE_FIELD',
+                      field: 'customOfferDisplay',
+                      value: e.target.value,
+                    });
+                  }}
+                  className={`h-12 text-lg transition-all ${
+                    state.customOfferDisplay !== null && state.customOfferDisplay.trim().length === 0
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' 
+                      : state.customOfferDisplay !== null && state.customOfferDisplay.trim().length > 0
+                      ? 'border-green-300 focus:border-green-500 focus:ring-green-500/20'
+                      : 'focus:ring-brand-primary-500/20'
+                  }`}
+                />
+                {state.customOfferDisplay !== null && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex items-center gap-2 text-sm"
+                  >
+                    {state.customOfferDisplay.trim().length > 0 ? (
+                      <>
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span className="text-green-600">Perfect custom offer!</span>
+                      </>
+                    ) : (
+                      <>
+                        <AlertCircle className="h-4 w-4 text-red-500" />
+                        <span className="text-red-600">Please enter your custom offer text</span>
+                      </>
+                    )}
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Quick Custom Offer Suggestions */}
+              <AnimatePresence>
+                {state.customOfferDisplay !== null && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="space-y-3"
+                  >
+                    <p className="text-sm font-medium text-neutral-700">Quick suggestions:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {['Buy 2 Get 1 Free', 'Happy Hour Special', 'Free Dessert', '50% Off Drinks', 'Kids Eat Free', 'Early Bird Special'].map((suggestion) => (
+                        <motion.button
+                          key={suggestion}
+                          onClick={() =>
+                            dispatch({
+                              type: 'UPDATE_FIELD',
+                              field: 'customOfferDisplay',
+                              value: suggestion,
+                            })
+                          }
+                          className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                            state.customOfferDisplay === suggestion
+                              ? 'bg-purple-500 text-white shadow-md'
+                              : 'bg-neutral-100 text-neutral-600 hover:bg-purple-100 hover:text-purple-700'
+                          }`}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          {suggestion}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           )}
         </div>

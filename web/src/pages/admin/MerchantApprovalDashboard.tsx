@@ -16,12 +16,25 @@ interface MerchantOwner {
   email: string;
   name: string | null;
 }
+interface MerchantStore {
+  id: number;
+  address: string;
+  latitude: number | null;
+  longitude: number | null;
+  active: boolean;
+  city: {
+    id: number;
+    name: string;
+    state: string;
+  };
+}
+
 interface MerchantApplication {
   id: number;
   businessName: string;
   address: string;
-    description?: string | null;
-    logoUrl?: string | null;
+  description?: string | null;
+  logoUrl?: string | null;
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'SUSPENDED';
   createdAt: string;
   owner: MerchantOwner;
@@ -30,6 +43,9 @@ interface MerchantApplication {
   rejectionReason?: string | null;
   suspendedUntil?: string | null;
   suspendedReason?: string | null;
+  stores?: MerchantStore[];
+  totalDeals?: number;
+  totalStores?: number;
 }
 
 const RejectionModal = ({ merchant, onClose, onConfirm }: any) => {
@@ -178,66 +194,84 @@ const MerchantDetailsModal = ({ merchant, onClose }: any) => {
                         </div>
                     )}
 
-                    {/* Sales Performance Section */}
-                    <div>
-                        <h5 className="font-medium text-neutral-700 mb-4">Sales Performance</h5>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="bg-neutral-50 rounded-lg p-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <DollarSign className="h-4 w-4 text-green-600" />
-                                    <span className="text-sm font-medium text-neutral-700">Total Revenue</span>
+                    {/* Business Information Section - Only for approved merchants */}
+                    {merchant.status === 'APPROVED' && (
+                        <div>
+                            <h5 className="font-medium text-neutral-700 mb-4">Business Information</h5>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="bg-neutral-50 rounded-lg p-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Calendar className="h-4 w-4 text-orange-600" />
+                                        <span className="text-sm font-medium text-neutral-700">Total Deals</span>
+                                    </div>
+                                    <p className="text-2xl font-bold text-neutral-900">{merchant.totalDeals || 0}</p>
+                                    <p className="text-xs text-neutral-500 mt-1">
+                                        {merchant.totalDeals > 0 ? 'Active deals created' : 'No deals created yet'}
+                                    </p>
                                 </div>
-                                <p className="text-2xl font-bold text-neutral-900">$0</p>
-                                <p className="text-xs text-neutral-500 mt-1">Testing phase</p>
+                                
+                                <div className="bg-neutral-50 rounded-lg p-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Building className="h-4 w-4 text-indigo-600" />
+                                        <span className="text-sm font-medium text-neutral-700">Total Stores</span>
+                                    </div>
+                                    <p className="text-2xl font-bold text-neutral-900">{merchant.totalStores || 0}</p>
+                                    <p className="text-xs text-neutral-500 mt-1">
+                                        {merchant.totalStores > 0 ? 'Stores registered' : 'No stores created yet'}
+                                    </p>
+                                </div>
                             </div>
                             
-                            <div className="bg-neutral-50 rounded-lg p-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Users className="h-4 w-4 text-blue-600" />
-                                    <span className="text-sm font-medium text-neutral-700">Total Orders</span>
+                            {merchant.stores && merchant.stores.length > 0 && (
+                                <div className="mt-4">
+                                    <h6 className="font-medium text-neutral-700 mb-3">Store Locations</h6>
+                                    <div className="space-y-2">
+                                        {merchant.stores.map((store) => (
+                                            <div key={store.id} className="bg-white border border-neutral-200 rounded-lg p-3">
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <p className="font-medium text-neutral-900">{store.address}</p>
+                                                        <p className="text-xs text-neutral-400">
+                                                            {store.city.name}, {store.city.state}
+                                                        </p>
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            <span className={`px-2 py-1 text-xs rounded-full ${
+                                                                store.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                                            }`}>
+                                                                {store.active ? 'Active' : 'Inactive'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                                <p className="text-2xl font-bold text-neutral-900">0</p>
-                                <p className="text-xs text-neutral-500 mt-1">No orders yet</p>
-                            </div>
-                            
-                            <div className="bg-neutral-50 rounded-lg p-4">
+                            )}
+                        </div>
+                    )}
+
+                    {/* Status-specific information for non-approved merchants */}
+                    {merchant.status !== 'APPROVED' && (
+                        <div>
+                            <h5 className="font-medium text-neutral-700 mb-4">Application Status</h5>
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <Tag className="h-4 w-4 text-purple-600" />
-                                    <span className="text-sm font-medium text-neutral-700">Avg Order Value</span>
+                                    <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                                    <span className="text-sm font-medium text-blue-800">
+                                        {merchant.status === 'PENDING' && 'Pending Approval'}
+                                        {merchant.status === 'REJECTED' && 'Application Rejected'}
+                                        {merchant.status === 'SUSPENDED' && 'Account Suspended'}
+                                    </span>
                                 </div>
-                                <p className="text-2xl font-bold text-neutral-900">$0</p>
-                                <p className="text-xs text-neutral-500 mt-1">No data available</p>
+                                <p className="text-xs text-blue-700 mt-1">
+                                    {merchant.status === 'PENDING' && 'This merchant application is awaiting admin approval. Business data will be available after approval.'}
+                                    {merchant.status === 'REJECTED' && 'This merchant application has been rejected. Business data is not available.'}
+                                    {merchant.status === 'SUSPENDED' && 'This merchant account has been suspended. Business data may be limited.'}
+                                </p>
                             </div>
                         </div>
-                        
-                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="bg-neutral-50 rounded-lg p-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Calendar className="h-4 w-4 text-orange-600" />
-                                    <span className="text-sm font-medium text-neutral-700">Active Deals</span>
-                                </div>
-                                <p className="text-2xl font-bold text-neutral-900">0</p>
-                                <p className="text-xs text-neutral-500 mt-1">No active deals</p>
-                            </div>
-                            
-                            <div className="bg-neutral-50 rounded-lg p-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Building className="h-4 w-4 text-indigo-600" />
-                                    <span className="text-sm font-medium text-neutral-700">Total Stores</span>
-                                </div>
-                                <p className="text-2xl font-bold text-neutral-900">0</p>
-                                <p className="text-xs text-neutral-500 mt-1">No stores created</p>
-                            </div>
-                        </div>
-                        
-                        <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                            <div className="flex items-center gap-2">
-                                <div className="h-2 w-2 rounded-full bg-amber-500"></div>
-                                <span className="text-sm font-medium text-amber-800">Testing Phase</span>
-                            </div>
-                            <p className="text-xs text-amber-700 mt-1">This merchant is in testing phase with no sales data yet.</p>
-                        </div>
-                    </div>
+                    )}
                 </div>
             </motion.div>
         </div>
@@ -255,7 +289,7 @@ export const MerchantApprovalDashboard = () => {
 
   const { data: allMerchants = [], isLoading } = useQuery({
     queryKey: ['admin-all-merchants'],
-    queryFn: () => apiGet<{ merchants: MerchantApplication[] }>(`/admin/merchants`).then(res => res.data?.merchants || []),
+    queryFn: () => apiGet<{ merchants: MerchantApplication[] }>(`/admin/merchants?limit=100`).then(res => res.data?.merchants || []),
   });
 
   const stats = useMemo(() => {

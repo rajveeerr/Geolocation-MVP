@@ -6,6 +6,7 @@ import { OnboardingStepLayout } from '../onboarding/OnboardingStepLayout';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { CategorySelector } from '@/components/common/CategorySelector';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Tag, 
@@ -40,22 +41,7 @@ export const DealBasicsStep = () => {
 
   const isFormValid = titleValidation.isValid && descriptionValidation.isValid && state.category;
 
-  // Category options with icons and descriptions
-  const categories = [
-    { value: 'FOOD_AND_BEVERAGE', label: 'Food & Beverage', icon: '🍽️', description: 'Restaurants, cafes, bars' },
-    { value: 'RETAIL', label: 'Retail', icon: '🛍️', description: 'Stores, shopping centers' },
-    { value: 'ENTERTAINMENT', label: 'Entertainment', icon: '🎬', description: 'Movies, games, events' },
-    { value: 'HEALTH_AND_FITNESS', label: 'Health & Fitness', icon: '💪', description: 'Gyms, spas, wellness' },
-    { value: 'BEAUTY_AND_SPA', label: 'Beauty & Spa', icon: '💅', description: 'Salons, beauty treatments' },
-    { value: 'AUTOMOTIVE', label: 'Automotive', icon: '🚗', description: 'Car services, repairs' },
-    { value: 'TRAVEL', label: 'Travel', icon: '✈️', description: 'Hotels, travel agencies' },
-    { value: 'EDUCATION', label: 'Education', icon: '📚', description: 'Schools, training centers' },
-    { value: 'TECHNOLOGY', label: 'Technology', icon: '💻', description: 'Tech services, electronics' },
-    { value: 'HOME_AND_GARDEN', label: 'Home & Garden', icon: '🏠', description: 'Furniture, home improvement' },
-    { value: 'OTHER', label: 'Other', icon: '📦', description: 'Miscellaneous services' }
-  ];
-
-  // Title suggestions based on category
+  // Title suggestions based on category (simplified for backend categories)
   const getTitleSuggestions = () => {
     const suggestions = {
       'FOOD_AND_BEVERAGE': ['2-for-1 Tacos', 'Happy Hour Special', 'Weekend Brunch Deal', 'Buy One Get One Free'],
@@ -204,36 +190,14 @@ export const DealBasicsStep = () => {
             Choose the category that best represents your business.
           </p>
           
-          <div className="grid grid-cols-1 gap-3">
-            {categories.map((category) => (
-              <motion.button
-                key={category.value}
-                onClick={() => dispatch({ type: 'UPDATE_FIELD', field: 'category', value: category.value })}
-                className={`flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all ${
-                  state.category === category.value
-                    ? 'border-brand-primary-500 bg-brand-primary-50'
-                    : 'border-neutral-200 bg-white hover:border-neutral-300'
-                }`}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <span className="text-2xl">{category.icon}</span>
-                <div className="flex-1">
-                  <div className="font-medium text-neutral-900">{category.label}</div>
-                  <div className="text-sm text-neutral-500">{category.description}</div>
-                </div>
-                {state.category === category.value && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-primary-500 text-white"
-                  >
-                    <CheckCircle className="h-4 w-4" />
-                  </motion.div>
-                )}
-              </motion.button>
-            ))}
-        </div>
+          <CategorySelector
+            value={state.category}
+            onChange={(value) => dispatch({ type: 'UPDATE_FIELD', field: 'category', value })}
+            placeholder="Select a category"
+            label=""
+            required
+            searchable
+          />
         </motion.div>
 
         {/* Description Section */}

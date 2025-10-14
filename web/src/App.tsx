@@ -34,6 +34,11 @@ const MerchantDashboardPage = React.lazy(() =>
     default: m.MerchantDashboardPage,
   })),
 );
+const MerchantAnalyticsPage = React.lazy(() =>
+  import('./pages/merchant/MerchantAnalyticsPage').then((m) => ({
+    default: m.MerchantAnalyticsPage,
+  })),
+);
 const CreateDealPage = React.lazy(() =>
   import('./pages/merchant/DealCreatePage').then((m) => ({
     default: m.CreateDealPage,
@@ -45,8 +50,8 @@ const EnhancedDealDetailPage = React.lazy(() =>
 const AdminLoginPage = React.lazy(() =>
   import('./pages/admin/AdminLoginPage').then((m) => ({ default: m.AdminLoginPage })),
 );
-const AdminOverviewPage = React.lazy(() =>
-  import('./pages/admin/AdminOverviewPage').then((m) => ({ default: m.AdminOverviewPage })),
+const AdminDashboardPage = React.lazy(() =>
+  import('./pages/admin/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })),
 );
 const MerchantApprovalDashboard = React.lazy(() =>
   import('./pages/admin/MerchantApprovalDashboard').then((m) => ({ default: m.MerchantApprovalDashboard })),
@@ -82,9 +87,6 @@ const MenuManagementPage = React.lazy(() =>
 );
 const MenuItemFormPage = React.lazy(() =>
   import('./pages/merchant/MenuItemFormPage').then((m) => ({ default: m.MenuItemFormPage })),
-);
-const ComingSoonPage = React.lazy(() =>
-  import('./pages/ComingSoonPage').then((m) => ({ default: m.ComingSoonPage })),
 );
 const MenuItemDetailPage = React.lazy(() =>
   import('./pages/merchant/MenuItemDetailPage').then((m) => ({ default: m.MenuItemDetailPage })),
@@ -332,7 +334,7 @@ function App() {
                   <ProtectedRoute>
                     <MerchantLayout>
                       <Suspense fallback={<LoadingOverlay />}>
-                        <ComingSoonPage />
+                        <MerchantAnalyticsPage />
                       </Suspense>
                     </MerchantLayout>
                   </ProtectedRoute>
@@ -360,7 +362,7 @@ function App() {
                   index
                   element={
                     <Suspense fallback={<LoadingOverlay />}>
-                      <AdminOverviewPage />
+                      <CityManagementDashboard />
                     </Suspense>
                   }
                 />
@@ -393,6 +395,22 @@ function App() {
                   element={
                     <Suspense fallback={<LoadingOverlay />}>
                       <CustomerManagementPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/admin/analytics"
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <AdminDashboardPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/admin/master-data"
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <AdminDashboardPage />
                     </Suspense>
                   }
                 />

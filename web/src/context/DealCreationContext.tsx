@@ -58,7 +58,7 @@ export interface DealCreationState {
   // Legacy fields used by existing steps — keep for compatibility
   startTime: string;
   endTime: string;
-  standardOfferKind: 'percentage' | 'amount' | null;
+  standardOfferKind: 'percentage' | 'amount' | 'custom' | null;
 }
 
 type Action =
@@ -70,7 +70,7 @@ type Action =
   | { type: 'SET_SELECTED_ITEMS'; payload: SelectedMenuItem[] }
   | { type: 'TOGGLE_RECURRING_DAY'; payload: string }
   | { type: 'SET_DEAL_TYPE'; dealType: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' }
-  | { type: 'SET_STANDARD_OFFER_KIND'; kind: 'percentage' | 'amount' | null }
+  | { type: 'SET_STANDARD_OFFER_KIND'; kind: 'percentage' | 'amount' | 'custom' | null }
   | { type: 'SET_IMAGE_URLS'; payload: string[] };
 
 const initialState: DealCreationState = {

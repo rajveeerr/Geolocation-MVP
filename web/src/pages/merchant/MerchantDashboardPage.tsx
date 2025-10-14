@@ -4,8 +4,9 @@ import { Link } from 'react-router-dom';
 import { PATHS } from '@/routing/paths';
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
-import { CalendarIcon, ClockIcon, DollarSign, Percent } from 'lucide-react';
+import { CalendarIcon, ClockIcon, DollarSign, Percent, BarChart3, Users, Settings } from 'lucide-react';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
+import { useMerchantDashboardStats } from '@/hooks/useMerchantDashboardStats';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { ExploreDealsPreview } from '@/components/merchant/ExploreDealsPreview';
@@ -51,7 +52,7 @@ const DealCard = ({ deal }: { deal: Deal }) => {
 
       <p className="mb-4 text-neutral-600">{deal.description}</p>
 
-          <div className="space-y-3">
+      <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Percent className="h-4 w-4 text-brand-primary-600" />
           <span className="font-medium">
@@ -110,9 +111,13 @@ export const MerchantDashboardPage = () => {
   type DealStatusFilter = 'all' | 'active' | 'scheduled' | 'expired';
   const [activeFilter, setActiveFilter] = useState<DealStatusFilter>('all');
 
-  const { data: merchantData, isLoading: merchantLoading } =
-    useMerchantStatus();
+  const { data: merchantData, isLoading: merchantLoading } = useMerchantStatus();
   const merchantStatus = merchantData?.data?.merchant?.status;
+
+  // Fetch dashboard stats for dynamic KPI cards
+  const { data: dashboardStats, isLoading: statsLoading } = useMerchantDashboardStats({ 
+    period: 'all_time' 
+  });
 
   const {
     data: dealsData,
@@ -127,8 +132,6 @@ export const MerchantDashboardPage = () => {
   const deals = dealsData?.data?.deals || [];
   const isLoading = dealsLoading;
   const error = dealsError;
-
-  // Testing phase - no revenue data yet
 
   const filteredDeals = useMemo(() => {
     if (activeFilter === 'all') {
@@ -192,16 +195,23 @@ export const MerchantDashboardPage = () => {
           </p>
         </div>
         {merchantStatus === 'APPROVED' && (
-          <Link to={PATHS.MERCHANT_DEALS_CREATE}>
-            <Button size="lg" className="rounded-lg">
-              Create New Deal
-            </Button>
-          </Link>
+          <div className="flex gap-3">
+            <Link to={PATHS.MERCHANT_ANALYTICS}>
+              <Button variant="secondary" size="lg" className="rounded-lg">
+                <BarChart3 className="h-4 w-4 mr-2" />
+                View Analytics
+              </Button>
+            </Link>
+            <Link to={PATHS.MERCHANT_DEALS_CREATE}>
+              <Button size="lg" className="rounded-lg">
+                Create New Deal
+              </Button>
+            </Link>
+          </div>
         )}
       </div>
 
       {merchantStatus === 'PENDING' && (
-        // The pending card provides a nice, colored container for our new section
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 sm:p-8">
           <h2 className="text-2xl font-bold text-amber-800">
             Application Pending
@@ -210,14 +220,13 @@ export const MerchantDashboardPage = () => {
             Your application to become a merchant is currently under review. This usually takes 1-2 business days. We'll notify you via email once it's approved.
           </p>
 
-          {/* This component now renders the ContentCarousel internally. */}
           <ExploreDealsPreview />
         </div>
       )}
 
       {merchantStatus === 'APPROVED' && (
         <>
-          {/* KPI Row */}
+          {/* Dynamic KPI Row */}
           <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
             <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between">
@@ -227,7 +236,7 @@ export const MerchantDashboardPage = () => {
                     <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-neutral-100 text-neutral-700">
                       <DollarSign className="h-3 w-3" />
                     </span>
-                    $0
+                    {statsLoading ? '...' : `$${dashboardStats?.kpis.grossSales || 0}`}
                   </p>
                 </div>
               </div>
@@ -236,14 +245,18 @@ export const MerchantDashboardPage = () => {
             <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
               <div>
                 <h4 className="text-sm text-neutral-500">Order Volume</h4>
-                <p className="mt-2 text-2xl font-extrabold text-neutral-900">0</p>
+                <p className="mt-2 text-2xl font-extrabold text-neutral-900">
+                  {statsLoading ? '...' : dashboardStats?.kpis.orderVolume || 0}
+                </p>
               </div>
             </div>
 
             <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
               <div>
                 <h4 className="text-sm text-neutral-500">Average Order Value</h4>
-                <p className="mt-2 text-2xl font-extrabold text-neutral-900">$0</p>
+                <p className="mt-2 text-2xl font-extrabold text-neutral-900">
+                  {statsLoading ? '...' : `$${dashboardStats?.kpis.averageOrderValue || 0}`}
+                </p>
               </div>
               <div className="mt-4 space-y-2">
                 <Link to={PATHS.MERCHANT_KICKBACKS}>
@@ -256,7 +269,7 @@ export const MerchantDashboardPage = () => {
             </div>
           </div>
 
-          {/* Region badges */}
+          {/* Dynamic Region badges - using real data if available */}
           <div className="mb-6 flex flex-wrap items-center gap-3">
             {[
               { name: 'Atlanta', value: 0, change: '0%' },

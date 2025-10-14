@@ -1,7 +1,7 @@
 // web/src/components/layout/AdminLayout.tsx
 import { Outlet, NavLink } from 'react-router-dom';
 import { Logo } from '../common/Logo';
-import { Shield, Users, Menu, X, Building, BarChart3 } from 'lucide-react';
+import { Users, Menu, X, Building, BarChart3, TrendingUp, Award, Database } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routing/paths';
 import { useState } from 'react';
@@ -31,11 +31,12 @@ export const AdminLayout = () => {
                     <Logo />
                 </div>
                 <nav className="space-y-2">
-                    <AdminSidebarLink to={PATHS.ADMIN_CITIES} icon={<Building className="h-5 w-5" />} label="Cities" />
-                    <AdminSidebarLink to={PATHS.ADMIN_DASHBOARD} icon={<Shield className="h-5 w-5" />} label="Overview" />
-                    <AdminSidebarLink to={PATHS.ADMIN_MERCHANTS} icon={<Users className="h-5 w-5" />} label="Merchants" />
-                    <AdminSidebarLink to="/admin/city-analytics" icon={<BarChart3 className="h-5 w-5" />} label="City Analytics" />
-                    <AdminSidebarLink to={PATHS.ADMIN_CUSTOMERS} icon={<Users className="h-5 w-5" />} label="Customers" />
+                    <AdminSidebarLink to={PATHS.ADMIN_CITIES} icon={<BarChart3 className="h-5 w-5" />} label="City Management" />
+                    <AdminSidebarLink to="/admin/analytics" icon={<TrendingUp className="h-5 w-5" />} label="Performance Analytics" />
+                    <AdminSidebarLink to={PATHS.ADMIN_MERCHANTS} icon={<Building className="h-5 w-5" />} label="Merchant Management" />
+                    <AdminSidebarLink to="/admin/city-analytics" icon={<Award className="h-5 w-5" />} label="City Analytics" />
+                    <AdminSidebarLink to={PATHS.ADMIN_CUSTOMERS} icon={<Users className="h-5 w-5" />} label="Customer Management" />
+                    <AdminSidebarLink to="/admin/master-data" icon={<Database className="h-5 w-5" />} label="Master Data" />
                 </nav>
             </aside>
 
@@ -62,11 +63,12 @@ export const AdminLayout = () => {
                             </button>
                         </div>
                         <nav className="space-y-2">
-                            <AdminSidebarLink to={PATHS.ADMIN_DASHBOARD} icon={<Shield className="h-5 w-5" />} label="Overview" />
-                            <AdminSidebarLink to={PATHS.ADMIN_CITIES} icon={<Building className="h-5 w-5" />} label="Cities" />
-                            <AdminSidebarLink to={PATHS.ADMIN_MERCHANTS} icon={<Users className="h-5 w-5" />} label="Merchants" />
-                            <AdminSidebarLink to="/admin/city-analytics" icon={<BarChart3 className="h-5 w-5" />} label="City Analytics" />
-                            <AdminSidebarLink to={PATHS.ADMIN_CUSTOMERS} icon={<Users className="h-5 w-5" />} label="Customers" />
+                            <AdminSidebarLink to={PATHS.ADMIN_CITIES} icon={<BarChart3 className="h-5 w-5" />} label="City Management" />
+                            <AdminSidebarLink to="/admin/analytics" icon={<TrendingUp className="h-5 w-5" />} label="Performance Analytics" />
+                            <AdminSidebarLink to={PATHS.ADMIN_MERCHANTS} icon={<Building className="h-5 w-5" />} label="Merchant Management" />
+                            <AdminSidebarLink to="/admin/city-analytics" icon={<Award className="h-5 w-5" />} label="City Analytics" />
+                            <AdminSidebarLink to={PATHS.ADMIN_CUSTOMERS} icon={<Users className="h-5 w-5" />} label="Customer Management" />
+                            <AdminSidebarLink to="/admin/master-data" icon={<Database className="h-5 w-5" />} label="Master Data" />
                         </nav>
                     </aside>
                 </div>

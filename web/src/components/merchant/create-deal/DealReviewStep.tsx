@@ -131,10 +131,10 @@ export const DealReviewStep = () => {
         return;
       }
 
-      if (!state.discountPercentage && !state.discountAmount) {
+      if (!state.discountPercentage && !state.discountAmount && !state.customOfferDisplay) {
         toast({
           title: 'Error',
-          description: 'Please specify either a discount percentage or discount amount.',
+          description: 'Please specify either a discount percentage, discount amount, or custom offer display.',
           variant: 'destructive',
         });
         return;
@@ -226,8 +226,8 @@ export const DealReviewStep = () => {
           errorMessage = 'Please set a valid start date in the future.';
         } else if (response.error?.includes('End date must be after start date')) {
           errorMessage = 'End date must be after start date.';
-        } else if (response.error?.includes('discountPercentage') || response.error?.includes('discountAmount')) {
-          errorMessage = 'Please specify a valid discount percentage or amount.';
+        } else if (response.error?.includes('discountPercentage') || response.error?.includes('discountAmount') || response.error?.includes('customOfferDisplay')) {
+          errorMessage = 'Please specify a valid discount percentage, amount, or custom offer display.';
         } else if (response.error?.includes('category')) {
           errorMessage = 'Please select a valid category for your deal.';
         } else if (response.error?.includes('dealType')) {
@@ -336,13 +336,15 @@ export const DealReviewStep = () => {
           <div className="rounded-lg border bg-white p-4">
             <h3 className="mb-4 font-semibold text-neutral-900">Offer Details</h3>
             <ReviewItem
-              label="Discount"
+              label="Offer"
               value={
                 state.discountPercentage
                   ? `${state.discountPercentage}% off`
                   : state.discountAmount
                     ? `$${state.discountAmount} off`
-                    : 'Not set'
+                    : state.customOfferDisplay
+                      ? state.customOfferDisplay
+                      : 'Not set'
               }
             />
             {state.offerTerms && (

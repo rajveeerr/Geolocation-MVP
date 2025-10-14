@@ -15,37 +15,34 @@ import {
 import { StatCard } from '@/components/common/StatCard';
 import { useAdminCities } from '@/hooks/useAdminCities';
 import { useAdminOverviewStats } from '@/hooks/useAdminOverviewStats';
+import { useAdminPerformanceTopCategories } from '@/hooks/useAdminPerformanceTopCategories';
 
-// Simplified category data - using consistent colors
-const categoryData = [
-  { name: 'Food & Beverage', count: 45, color: 'primary' },
-  { name: 'Entertainment', count: 32, color: 'amber' },
-  { name: 'Retail', count: 28, color: 'green' },
-  { name: 'Services', count: 22, color: 'red' },
-  { name: 'Health & Wellness', count: 18, color: 'primary' },
-  { name: 'Automotive', count: 15, color: 'amber' }
-];
+// Color mapping for categories
+const getCategoryColor = (index: number) => {
+  const colors = ['primary', 'amber', 'green', 'red', 'primary', 'amber', 'green', 'red', 'primary', 'amber'];
+  return colors[index % colors.length];
+};
 
 // Simple category card using consistent design
-const CategoryCard = ({ category }: { category: any }) => (
+const CategoryCard = ({ category, color }: { category: any; color: string }) => (
   <div className="bg-white p-4 rounded-lg border shadow-sm">
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
         <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
-          category.color === 'primary' ? 'bg-brand-primary-100 text-brand-primary-600' :
-          category.color === 'amber' ? 'bg-amber-100 text-amber-600' :
-          category.color === 'green' ? 'bg-green-100 text-green-600' :
+          color === 'primary' ? 'bg-brand-primary-100 text-brand-primary-600' :
+          color === 'amber' ? 'bg-amber-100 text-amber-600' :
+          color === 'green' ? 'bg-green-100 text-green-600' :
           'bg-red-100 text-red-600'
         }`}>
           <Utensils className="h-5 w-5" />
         </div>
         <div>
           <h3 className="font-medium text-neutral-900">{category.name}</h3>
-          <p className="text-sm text-neutral-600">{category.count} merchants</p>
+          <p className="text-sm text-neutral-600">{category.deals} deals</p>
         </div>
       </div>
       <div className="text-right">
-        <div className="text-lg font-bold text-neutral-900">{category.count}</div>
+        <div className="text-lg font-bold text-neutral-900">{category.deals}</div>
       </div>
     </div>
   </div>
@@ -75,11 +72,17 @@ export const CityAnalyticsDashboard = () => {
   // Use real data from existing hooks
   const { data: citiesData, isLoading: citiesLoading } = useAdminCities({ page: 1, limit: 50 });
   const { data: overviewStats, isLoading: statsLoading } = useAdminOverviewStats();
-
+  
   const cities = citiesData?.cities || [];
   const selectedCityData = cities.find(city => `${city.name}, ${city.state}` === selectedCity);
+  
+  const { data: categoriesData, isLoading: categoriesLoading } = useAdminPerformanceTopCategories({
+    period: '7d',
+    cityId: selectedCityData?.id
+  });
 
-  // Mock customer data for now
+  // TODO: Replace with real customer analytics API when backend is fixed
+  // Currently using placeholder data due to backend API issues
   const mockCustomers = [
     { name: 'Sarah Johnson', checkIns: 23, avatar: 'SJ' },
     { name: 'Mike Chen', checkIns: 19, avatar: 'MC' },
@@ -323,11 +326,21 @@ export const CityAnalyticsDashboard = () => {
               <div>
                 <h3 className="text-lg font-semibold text-neutral-900 mb-4">Top Categories</h3>
                 <p className="text-neutral-600 mb-6">Most popular merchant categories in {selectedCity}</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {categoryData.map((category, index) => (
-                    <CategoryCard key={index} category={category} />
-                  ))}
-                </div>
+                {categoriesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-brand-primary-600" />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {categoriesData?.categories?.map((category, index) => (
+                      <CategoryCard 
+                        key={category.id} 
+                        category={category} 
+                        color={getCategoryColor(index)}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -335,6 +348,18 @@ export const CityAnalyticsDashboard = () => {
               <div>
                 <h3 className="text-lg font-semibold text-neutral-900 mb-4">Top Customers</h3>
                 <p className="text-neutral-600 mb-6">Most active customers in {selectedCity}</p>
+                
+                {/* Placeholder data notice */}
+                <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+                    <p className="text-amber-800 text-sm font-medium">Placeholder Data</p>
+                  </div>
+                  <p className="text-amber-700 text-sm mt-1">
+                    Customer analytics API is currently unavailable. This shows sample data until the backend is fixed.
+                  </p>
+                </div>
+                
                 <div className="space-y-3">
                   {mockCustomers.map((customer, index) => (
                     <CustomerCard key={index} customer={customer} />

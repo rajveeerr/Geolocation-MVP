@@ -4,6 +4,7 @@ import { Button } from '@/components/common/Button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ImageUpload } from '@/components/common/ImageUpload';
+import { CategoryDropdown } from '@/components/common/CategoryDropdown';
 import { PATHS } from '@/routing/paths';
 import { useCreateMenuItem, useUpdateMenuItem, useMerchantMenu, type CreateMenuItemData, type UpdateMenuItemData, type MenuItemImage } from '@/hooks/useMerchantMenu';
 import { 
@@ -22,7 +23,7 @@ import { z } from 'zod';
 const menuItemFormSchema = z.object({
   name: z.string().min(1, 'Item name is required').max(100, 'Name is too long'),
   price: z.number().min(0.01, 'Price must be greater than 0').max(999.99, 'Price is too high'),
-  category: z.string().min(1, 'Category is required').max(50, 'Category name is too long'),
+  category: z.string().min(1, 'Please select a category'),
   description: z.string().max(500, 'Description is too long').optional(),
   // Remove imageUrl from schema since we're using the ImageUpload component
 });
@@ -207,18 +208,13 @@ export const MenuItemFormPage = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="category">Category *</Label>
-                <Input
-                  id="category"
-                  placeholder="e.g., Pizza, Salads, Desserts"
-                  {...register('category')}
-                  className={cn(errors.category && 'border-red-500')}
+                <CategoryDropdown
+                  value={watchedValues.category}
+                  onChange={(value) => setValue('category', value)}
+                  placeholder="Select a category"
+                  required
+                  error={errors.category?.message}
                 />
-                {errors.category && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="h-4 w-4" />
-                    {errors.category.message}
-                  </p>
-                )}
               </div>
             </div>
 
