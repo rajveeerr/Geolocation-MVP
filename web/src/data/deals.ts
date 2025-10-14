@@ -31,6 +31,12 @@ export interface Deal {
   discountAmount?: number | null;
   isBooking?: boolean;
   expiresAt?: string; // ISO String for countdown timer
+  
+  // --- MERCHANT INFORMATION ---
+  merchantName?: string;
+  merchantAddress?: string;
+  merchantLogo?: string;
+  description?: string;
 }
 
 // Function to get a future date for mock data

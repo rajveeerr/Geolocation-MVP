@@ -6,13 +6,15 @@ import { SkeletonList } from '@/components/common/Skeleton';
 interface AdminTopCategoriesProps {
   limit?: number;
   period?: '1d' | '7d' | '30d';
+  cityId?: number;
 }
 
 export const AdminTopCategories: React.FC<AdminTopCategoriesProps> = ({
   limit = 10,
-  period = '7d'
+  period = '7d',
+  cityId
 }) => {
-  const { data, isLoading, error } = useAdminPerformanceTopCategories({ limit, period });
+  const { data, isLoading, error } = useAdminPerformanceTopCategories({ limit, period, cityId });
 
   if (isLoading) {
     return <SkeletonList items={limit} />;

@@ -16,6 +16,7 @@ import { StatCard } from '@/components/common/StatCard';
 import { useAdminCities } from '@/hooks/useAdminCities';
 import { useAdminOverviewStats } from '@/hooks/useAdminOverviewStats';
 import { useAdminPerformanceTopCategories } from '@/hooks/useAdminPerformanceTopCategories';
+import { useAdminCustomerAnalytics } from '@/hooks/useAdminCustomerAnalytics';
 
 // Color mapping for categories
 const getCategoryColor = (index: number) => {
@@ -81,15 +82,10 @@ export const CityAnalyticsDashboard = () => {
     cityId: selectedCityData?.id
   });
 
-  // TODO: Replace with real customer analytics API when backend is fixed
-  // Currently using placeholder data due to backend API issues
-  const mockCustomers = [
-    { name: 'Sarah Johnson', checkIns: 23, avatar: 'SJ' },
-    { name: 'Mike Chen', checkIns: 19, avatar: 'MC' },
-    { name: 'Lisa Rodriguez', checkIns: 17, avatar: 'LR' },
-    { name: 'David Kim', checkIns: 15, avatar: 'DK' },
-    { name: 'Emma Wilson', checkIns: 14, avatar: 'EW' }
-  ];
+  // Fetch real customer analytics data
+  const { data: customerAnalytics, isLoading: customerAnalyticsLoading } = useAdminCustomerAnalytics({
+    period: '30d'
+  });
 
   return (
     <div className="space-y-8">
@@ -349,22 +345,30 @@ export const CityAnalyticsDashboard = () => {
                 <h3 className="text-lg font-semibold text-neutral-900 mb-4">Top Customers</h3>
                 <p className="text-neutral-600 mb-6">Most active customers in {selectedCity}</p>
                 
-                {/* Placeholder data notice */}
-                <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
-                    <p className="text-amber-800 text-sm font-medium">Placeholder Data</p>
+                {customerAnalyticsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-brand-primary-600" />
+                    <span className="ml-2 text-neutral-600">Loading customer data...</span>
                   </div>
-                  <p className="text-amber-700 text-sm mt-1">
-                    Customer analytics API is currently unavailable. This shows sample data until the backend is fixed.
-                  </p>
-                </div>
-                
-                <div className="space-y-3">
-                  {mockCustomers.map((customer, index) => (
-                    <CustomerCard key={index} customer={customer} />
-                  ))}
-                </div>
+                ) : customerAnalytics?.topCustomers && customerAnalytics.topCustomers.length > 0 ? (
+                  <div className="space-y-3">
+                    {customerAnalytics.topCustomers.map((customer, index) => (
+                      <CustomerCard 
+                        key={customer.id} 
+                        customer={{
+                          name: customer.name,
+                          checkIns: Math.floor(customer.totalSpend / 10), // Convert spend to approximate check-ins
+                          avatar: customer.name.split(' ').map(n => n[0]).join('').toUpperCase()
+                        }} 
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Users className="h-12 w-12 text-neutral-300 mx-auto mb-4" />
+                    <p className="text-neutral-500">No customer data available</p>
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -34,14 +34,14 @@ export const MerchantHeader = () => {
             <NavLink to={PATHS.MERCHANT_DASHBOARD} className={navLinkClass}>
               Dashboard
             </NavLink>
+            <NavLink to={PATHS.MERCHANT_MENU} className={navLinkClass}>
+              My Menu
+            </NavLink>
             <NavLink to={PATHS.MERCHANT_DEALS} className={navLinkClass}>
               My Deals
             </NavLink>
             <NavLink to={PATHS.MERCHANT_STORES} className={navLinkClass}>
               My Stores
-            </NavLink>
-            <NavLink to={PATHS.MERCHANT_MENU} className={navLinkClass}>
-              My Menu
             </NavLink>
             <NavLink to={PATHS.MERCHANT_ANALYTICS} className={navLinkClass}>
               Analytics

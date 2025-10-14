@@ -23,6 +23,22 @@ export const AdminWeeklyChart: React.FC<AdminWeeklyChartProps> = ({
   }
 
   if (error || !data) {
+    // Show helpful message when no city is selected
+    if (!cityId) {
+      return (
+        <div className="bg-white rounded-lg border border-neutral-200 p-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <BarChart3 className="h-12 w-12 text-neutral-300 mx-auto mb-4" />
+              <p className="text-neutral-600 font-medium mb-2">Select a City to View Analytics</p>
+              <p className="text-neutral-500 text-sm">Choose a specific city from the filter above to see detailed performance metrics and trends.</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    // Show error message for other cases
     return (
       <div className="bg-white rounded-lg border border-red-200 p-6">
         <div className="flex items-center justify-center h-64">

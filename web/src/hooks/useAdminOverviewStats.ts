@@ -1,5 +1,26 @@
 // web/src/hooks/useAdminOverviewStats.ts
 import { useQuery } from '@tanstack/react-query';
+import { apiGet } from '@/services/api';
+
+// Backend response interface
+interface AdminPerformanceOverviewResponse {
+  success: boolean;
+  period: string;
+  dateRange: {
+    from: string;
+    to: string;
+  };
+  metrics: {
+    grossSales: { value: number; change: number; trend: 'up' | 'down' };
+    orderVolume: { value: number; change: number; trend: 'up' | 'down' };
+    averageOrderValue: { value: number; change: number; trend: 'up' | 'down' };
+    totalApprovedMerchants: { value: number; change: number; trend: 'up' | 'down' };
+  };
+  filters: {
+    cityId: number | null;
+    merchantId: number | null;
+  };
+}
 
 // This is the shape of the data our new dashboard will consume
 export interface AdminOverviewStats {
@@ -20,49 +41,71 @@ export interface AdminOverviewStats {
   topCategories: { name: string; value: string }[];
 }
 
-// MOCK API FUNCTION - This will be replaced when backend endpoint is implemented
-const fetchAdminOverviewStats = async (): Promise<AdminOverviewStats> => {
-  // TODO: Replace with real API call when backend endpoint is implemented
-  // const response = await apiGet('/admin/overview/stats');
-  // return response.data.stats;
+interface UseAdminOverviewStatsParams {
+  period?: '1d' | '7d' | '30d' | '90d';
+  cityId?: number;
+  merchantId?: number;
+}
+
+const fetchAdminOverviewStats = async (params: UseAdminOverviewStatsParams = {}): Promise<AdminOverviewStats> => {
+  const { period = '7d', cityId, merchantId } = params;
   
-  await new Promise(res => setTimeout(res, 800)); // Simulate network delay
+  const searchParams = new URLSearchParams();
+  searchParams.append('period', period);
+  if (cityId) {
+    searchParams.append('cityId', cityId.toString());
+  }
+  if (merchantId) {
+    searchParams.append('merchantId', merchantId.toString());
+  }
+
+  const response = await apiGet<AdminPerformanceOverviewResponse>(
+    `/admin/performance/overview?${searchParams.toString()}`
+  );
+
+  if (!response.success || !response.data) {
+    throw new Error(response.error || 'Failed to fetch admin overview stats');
+  }
+
+  const data = response.data;
+
+  // Transform backend data to frontend format
   return {
     kpis: {
-      totalRevenue: { value: 0, change: 0 },
-      newCustomers: { value: 0, change: 0 },
-      activeDeals: { value: 0, change: 0 },
-      totalMerchants: { value: 2, change: 1 },
+      totalRevenue: { 
+        value: data.metrics.grossSales.value, 
+        change: data.metrics.grossSales.change 
+      },
+      newCustomers: { 
+        value: data.metrics.orderVolume.value, // Using order volume as proxy for new customers
+        change: data.metrics.orderVolume.change 
+      },
+      activeDeals: { 
+        value: 0, // This would need a separate endpoint
+        change: 0 
+      },
+      totalMerchants: { 
+        value: data.metrics.totalApprovedMerchants.value, 
+        change: data.metrics.totalApprovedMerchants.change 
+      },
     },
     secondaryStats: {
-      averageOrderValue: 0,
-      totalCheckIns: 1,
-      pendingMerchants: 3,
-      totalUsers: 8,
+      averageOrderValue: data.metrics.averageOrderValue.value,
+      totalCheckIns: data.metrics.orderVolume.value,
+      pendingMerchants: 0, // This would need a separate endpoint
+      totalUsers: 0, // This would need a separate endpoint
     },
-    topMerchants: [
-        { name: 'The Corner Bistro', value: '$0' }, 
-        { name: 'Zahav', value: '$0' },
-        { name: 'Alpen Rose', value: '$0' }
-    ],
-    topCities: [
-        { name: 'New York', value: '$0' }, 
-        { name: 'Los Angeles', value: '$0' },
-        { name: 'Atlanta', value: '$0' },
-        { name: 'Chicago', value: '$0' },
-        { name: 'Philadelphia', value: '$0' }
-    ],
-    topCategories: [
-        { name: 'Food & Beverage', value: '0 deals' }, 
-        { name: 'Entertainment', value: '0 deals' },
-        { name: 'Retail', value: '0 deals' }
-    ],
+    topMerchants: [], // This would need a separate endpoint
+    topCities: [], // This would need a separate endpoint
+    topCategories: [], // This would need a separate endpoint
   };
 };
 
-export const useAdminOverviewStats = () => {
+export const useAdminOverviewStats = (params: UseAdminOverviewStatsParams = {}) => {
   return useQuery<AdminOverviewStats, Error>({ 
-    queryKey: ['adminOverviewStats'], 
-    queryFn: fetchAdminOverviewStats,
+    queryKey: ['adminOverviewStats', params.period, params.cityId, params.merchantId], 
+    queryFn: () => fetchAdminOverviewStats(params),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 2,
   });
 };

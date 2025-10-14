@@ -121,6 +121,7 @@ export const AdminOverviewPage = () => {
         />
         <AdminTopCategories 
           period={selectedTimeRange}
+          cityId={cityId}
         />
       </div>
     </div>

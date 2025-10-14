@@ -58,7 +58,7 @@ export const useAdminCustomerAnalytics = (params: UseAdminCustomerAnalyticsParam
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
-    // Disable the query for now since the backend API is not working
-    enabled: false,
+    // Backend API is now working
+    enabled: true,
   });
 };

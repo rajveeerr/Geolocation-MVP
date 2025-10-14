@@ -10,8 +10,51 @@ import { useSavedDeals } from '@/hooks/useSavedDeals';
 import { useAuth } from '@/context/useAuth';
 import { useModal } from '@/context/ModalContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AvatarStack } from '@/components/common/AvatarStack';
+// AvatarStack component inline to avoid import issues
 import { Button } from '@/components/common/Button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
+// Inline AvatarStack component
+interface AvatarStackProps {
+  count: number;
+  users?: { avatarUrl?: string | null }[];
+  textClassName?: string;
+}
+
+const AvatarStack = ({ count, users, textClassName }: AvatarStackProps) => {
+  // Only show avatars if we have real users and a count > 0
+  const shouldShowAvatars = count > 0 && users && users.length > 0;
+  
+  // Limit the number of avatars shown to a reasonable number (max 5)
+  const maxAvatarsToShow = Math.min(count, 5);
+  const avatarsToShow = shouldShowAvatars ? users.slice(0, maxAvatarsToShow) : [];
+
+  return (
+    <div className="flex items-center">
+      {shouldShowAvatars && (
+        <div className="flex -space-x-3">
+          {avatarsToShow.map((user, index) => (
+            <Avatar key={index} className="h-8 w-8 border-2 border-white">
+              <AvatarImage src={user.avatarUrl || undefined} />
+              <AvatarFallback className="bg-neutral-200 text-neutral-600 text-xs">
+                {user.avatarUrl ? 'U' : '?'}
+              </AvatarFallback>
+            </Avatar>
+          ))}
+          {/* Show a "+X more" indicator if there are more users than we can display */}
+          {count > maxAvatarsToShow && (
+            <div className="h-8 w-8 rounded-full border-2 border-white bg-neutral-600 flex items-center justify-center">
+              <span className="text-white text-xs font-semibold">+{count - maxAvatarsToShow}</span>
+            </div>
+          )}
+        </div>
+      )}
+      <span className={textClassName ?? 'ml-3 text-sm font-semibold text-neutral-700'}>
+        {count === 1 ? '1 person tapped in' : `${count} people tapped in`}
+      </span>
+    </div>
+  );
+};
 
 // Extended type to include multiple images and other properties
 interface PremiumDeal extends Deal {
@@ -49,16 +92,38 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   const isSaved = savedDealIds.has(deal.id);
   const isLikeButtonLoading = isSaving || isUnsaving;
 
-  const imagesToShow =
-    deal.images && deal.images.length > 0 ? deal.images : [deal.image];
+  const imagesToShow = useMemo(() => {
+    if (deal.images && deal.images.length > 0) {
+      return deal.images;
+    }
+    // Use deal image, then merchant logo, then fallback
+    const imageSources = [deal.image];
+    if (deal.merchantLogo) {
+      imageSources.push(deal.merchantLogo);
+    }
+    imageSources.push('https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80');
+    return imageSources;
+  }, [deal.images, deal.image, deal.merchantLogo]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Use real backend data instead of mock data
-  const realOffers: Offer[] = deal.offers || [];
-  const offerImageFallback = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&q=80';
+  // Use real backend data with fallback to mock data for better UX
+  const fallbackOffers: Offer[] = [
+    { title: '2-for-1 Cocktails', time: '5-7 PM', category: 'Drinks', imageUrl: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=200&q=80' },
+    { title: '50% Off Appetizers', time: '5-6 PM', category: 'Bites', imageUrl: 'https://images.unsplash.com/photo-1579871494447-9811CFb5d668?w=200&q=80' },
+    { title: '$5 Draft Beers', time: 'All Night', category: 'Drinks', imageUrl: 'https://images.unsplash.com/photo-1586993451228-098a8924133e?w=200&q=80' },
+    { title: 'Truffle Fries', time: '5-7 PM', category: 'Bites', imageUrl: 'https://images.unsplash.com/photo-1598679253544-2c9740f92d4f?w=200&q=80' },
+  ];
+  
+  const realOffers: Offer[] = deal.offers && deal.offers.length > 0 ? deal.offers : fallbackOffers;
+  const offerImageFallback = deal.merchantLogo || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&q=80';
 
-  // Use real claimed users from backend data
+  // Use real claimed users from backend data - no fallback to mock data
   const realClaimedUsers = deal.claimedBy?.visibleUsers || [];
+  const realClaimedCount = deal.claimedBy?.totalCount || 0;
+  
+  // Use real data only - no fake data
+  const finalClaimedCount = realClaimedCount;
+  const finalClaimedUsers = realClaimedUsers;
 
   // State to control visibility of offers dropdown/list
   const [offersVisible, setOffersVisible] = useState(false);
@@ -69,7 +134,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
     return [...new Set(categories)];
   }, [realOffers]);
   
-  const [activeOfferTab, setActiveOfferTab] = useState<string>(availableCategories[0] || 'Offers');
+  const [activeOfferTab, setActiveOfferTab] = useState<string>('Drinks');
 
   // --- NEW: Memoize the filtered offers to prevent re-calculation on every render ---
   const filteredOffers = useMemo(() => {
@@ -261,19 +326,13 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                 {deal.name}
               </h3>
               <p className="text-base text-white/90">
-                {deal.subtitle || 'Times Square is the heart of NYC'}
+                {deal.merchantName || deal.location || 'Great deals await you'}
               </p>
               <div className="mt-4 font-semibold text-brand-primary-400">
-                {deal.claimedBy && deal.claimedBy.totalCount > 0 ? (
+                {finalClaimedCount > 0 ? (
                   <AvatarStack
-                    count={deal.claimedBy.totalCount}
-                    users={deal.claimedBy.visibleUsers}
-                    textClassName="text-white/90"
-                  />
-                ) : realClaimedUsers.length > 0 ? (
-                  <AvatarStack
-                    count={realClaimedUsers.length}
-                    users={realClaimedUsers}
+                    count={finalClaimedCount}
+                    users={finalClaimedUsers}
                     textClassName="text-white/90"
                   />
                 ) : (
@@ -315,21 +374,20 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
               transition={{ duration: 0.4, ease: 'easeInOut' }}
               className="flex-grow"
             >
-                {realOffers.length > 0 && (
-                  <div>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setOffersVisible(!offersVisible);
-                      }}
-                      className="flex items-center justify-center w-full mb-3 text-sm font-semibold text-brand-primary-600 hover:text-brand-primary-800"
-                    >
-                      <span>View All Offers</span>
-                      {/* Blinking dot */}
-                      <div className="w-1 h-1 bg-brand-primary-600 rounded-full ml-2 animate-pulse"></div>
-                      <ChevronDown className={cn('h-5 w-5 ml-1 transition-transform', offersVisible && 'rotate-180')} />
-                    </button>
+                <div>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setOffersVisible(!offersVisible);
+                    }}
+                    className="flex items-center justify-center w-full mb-3 text-sm font-semibold text-brand-primary-600 hover:text-brand-primary-800"
+                  >
+                    <span>View All Offers</span>
+                    {/* Blinking dot */}
+                    <div className="w-1 h-1 bg-brand-primary-600 rounded-full ml-2 animate-pulse"></div>
+                    <ChevronDown className={cn('h-5 w-5 ml-1 transition-transform', offersVisible && 'rotate-180')} />
+                  </button>
 
                   <AnimatePresence>
                     {offersVisible && (
@@ -339,7 +397,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                             exit={{ height: 0, opacity: 0 }}
                             className="overflow-hidden mb-4"
                         >
-                            {/* --- NEW: Dynamic Tab Selector for Offers --- */}
+                            {/* --- Tab Selector for Offers --- */}
                             {availableCategories.length > 1 && (
                               <div className="flex items-center gap-2 rounded-full bg-neutral-100 p-1 mb-3">
                                 {availableCategories.map((category) => (
@@ -387,15 +445,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                         </motion.div>
                     )}
                   </AnimatePresence>
-                  </div>
-                )}
-                
-                {/* Show deal description when no offers available */}
-                {realOffers.length === 0 && deal.description && (
-                  <div className="text-sm text-neutral-600 leading-relaxed mb-4">
-                    {deal.description}
-                  </div>
-                )}
+                </div>
 
                 <Link to={`/deals/${deal.id}`} className="block">
                     <Button

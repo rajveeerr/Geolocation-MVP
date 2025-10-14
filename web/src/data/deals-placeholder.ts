@@ -99,6 +99,11 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
     apiDeal.merchant.longitude ?? -74.006,
   ],
 
+  // Add merchant information for dynamic display
+  merchantName: apiDeal.merchant.businessName,
+  merchantAddress: apiDeal.merchant.address,
+  merchantLogo: apiDeal.merchant.logoUrl,
+
   // Map deal type from backend enum to frontend format
   dealType:
     apiDeal.dealType === 'HAPPY_HOUR'
