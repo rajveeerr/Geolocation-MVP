@@ -70,15 +70,20 @@ export const AllDealsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // --- NEW: State for location and filters ---
+  // --- State for location and filters ---
   const [userLocation, setUserLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
   const [activeCategory, setActiveCategory] =
-    useState<string>('FOOD_AND_BEVERAGE');
+    useState<string>(''); // Start with "All Categories"
   const [searchRadius, setSearchRadius] = useState<number>(10); // Default radius in km
   const [showAllDeals, setShowAllDeals] = useState<boolean>(false);
+  
+  // --- NEW: Additional filter states ---
+  const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
+  const [selectedDealType, setSelectedDealType] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>('newest');
 
   // --- NEW: State for search term and debounced search term ---
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -133,8 +138,11 @@ export const AllDealsPage = () => {
         // Build query parameters depending on whether user requested ALL deals
         let response;
         if (showAllDeals) {
-          const params = new URLSearchParams({ category: 'OTHER' });
+          const params = new URLSearchParams();
+          // Only add category if it's not empty (not "All Categories")
+          if (activeCategory) params.append('category', activeCategory);
           if (trimmed) params.append('search', trimmed);
+          if (selectedCityId) params.append('cityId', selectedCityId.toString());
           response = await apiGet<{ deals: ApiDeal[] }>(`/deals?${params}`);
         } else {
           // Geo-filtered request. At this point we guarantee userLocation exists
@@ -145,9 +153,11 @@ export const AllDealsPage = () => {
             latitude: lat,
             longitude: lng,
             radius: searchRadius.toString(),
-            category: activeCategory,
           });
+          // Only add category if it's not empty (not "All Categories")
+          if (activeCategory) params.append('category', activeCategory);
           if (trimmed) params.append('search', trimmed);
+          if (selectedCityId) params.append('cityId', selectedCityId.toString());
           response = await apiGet<{ deals: ApiDeal[] }>(`/deals?${params}`);
         }
 
@@ -177,12 +187,18 @@ export const AllDealsPage = () => {
         const errorMessage =
           err instanceof Error ? err.message : 'An error occurred.';
         console.error('Fetch filtered deals error:', err);
-        setError(errorMessage); // keep the error so we can show a banner/page when appropriate
+        
+        // Set error but don't crash the page - show fallback data
+        setError(errorMessage);
+        
+        // Show user-friendly toast notification
         toast({
-          title: 'Could Not Fetch Live Deals',
-          description: 'Showing sample data instead.',
+          title: 'Connection Issue',
+          description: 'Unable to fetch live deals. Showing sample data instead.',
           variant: 'destructive',
         });
+        
+        // Always provide fallback data so the page doesn't crash
         setDeals(mergeBackendDeals(undefined));
       } finally {
         setIsLoading(false);
@@ -196,6 +212,9 @@ export const AllDealsPage = () => {
     searchRadius,
     debouncedSearchTerm,
     showAllDeals,
+    selectedCityId,
+    selectedDealType,
+    sortBy,
   ]); // Re-run when location, filters, debounced search, or toggle change
 
   // --- NEW: Debouncing effect for the search term ---
@@ -204,23 +223,9 @@ export const AllDealsPage = () => {
     return () => clearTimeout(timerId);
   }, [searchTerm]);
 
-  // Loading and error UI remains the same...
-  if (isLoading && deals.length === 0) {
-    // Only show full overlay on initial load
+  // Show loading overlay only on initial load when no deals are available
+  if (isLoading && deals.length === 0 && !error) {
     return <LoadingOverlay message="Finding deals near you..." />;
-  }
-
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center pt-20 text-center">
-        <div>
-          <h2 className="text-2xl font-bold text-red-600">
-            Failed to Load Deals
-          </h2>
-          <p className="mt-2 text-neutral-600">{error}</p>
-        </div>
-      </div>
-    );
   }
 
   // --- NEW: Dynamic page title and description based on search term ---
@@ -255,6 +260,13 @@ export const AllDealsPage = () => {
                 isLoading={isLoading} // Pass loading state for UI feedback
                 showAllDeals={showAllDeals}
                 setShowAllDeals={setShowAllDeals}
+                selectedCityId={selectedCityId}
+                setSelectedCityId={setSelectedCityId}
+                selectedDealType={selectedDealType}
+                setSelectedDealType={setSelectedDealType}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+                error={error} // Pass error state for graceful error handling
               />
             </div>
           </div>

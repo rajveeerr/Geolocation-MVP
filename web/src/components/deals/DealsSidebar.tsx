@@ -4,29 +4,19 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/common/Button';
 import {
   Search,
-  Utensils,
-  Hotel,
-  Fuel,
-  Coffee,
   Filter,
   MapPin,
   Loader2,
+  X,
+  ChevronDown,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DealResultCard } from './DealResultCard';
 import type { DealWithLocation } from '@/data/deals';
 import { Pagination } from '../common/Pagination';
-
-const categoryFilters = [
-  {
-    id: 'FOOD_AND_BEVERAGE',
-    label: 'Restaurants',
-    icon: <Utensils className="h-4 w-4" />,
-  },
-  { id: 'TRAVEL', label: 'Hotels', icon: <Hotel className="h-4 w-4" /> },
-  { id: 'RETAIL', label: 'Retail', icon: <Fuel className="h-4 w-4" /> }, // Example, adjust as needed
-  { id: 'OTHER', label: 'Cafés', icon: <Coffee className="h-4 w-4" /> }, // Example
-];
+import { useDealCategories } from '@/hooks/useDealCategories';
+import { useActiveCities } from '@/hooks/useActiveCities';
+import { useState } from 'react';
 
 // --- NEW: Define radius options ---
 const radiusOptions = [
@@ -39,19 +29,44 @@ interface DealsSidebarProps {
   deals: DealWithLocation[];
   hoveredDealId: string | null;
   setHoveredDealId: (id: string | null) => void;
-  // --- NEW: Props for filters ---
+  // --- Props for filters ---
   activeCategory: string;
   setActiveCategory: (category: string) => void;
   searchRadius: number;
   setSearchRadius: (radius: number) => void;
   isLoading: boolean;
-  // --- NEW: Props for search (lifted to parent) ---
+  // --- Props for search (lifted to parent) ---
   searchTerm?: string;
   setSearchTerm?: (term: string) => void;
   // Toggle to show all deals (no geo filter) vs nearby
   showAllDeals?: boolean;
   setShowAllDeals?: (v: boolean) => void;
+  // --- NEW: Additional filters ---
+  selectedCityId?: number | null;
+  setSelectedCityId?: (cityId: number | null) => void;
+  selectedDealType?: string;
+  setSelectedDealType?: (dealType: string) => void;
+  sortBy?: string;
+  setSortBy?: (sort: string) => void;
+  // --- NEW: Error handling ---
+  error?: string | null;
 }
+
+// Deal type options
+const dealTypeOptions = [
+  { value: '', label: 'All Types' },
+  { value: 'STANDARD', label: 'Standard' },
+  { value: 'RECURRING', label: 'Recurring' },
+  { value: 'HAPPY_HOUR', label: 'Happy Hour' },
+];
+
+// Sort options
+const sortOptions = [
+  { value: 'newest', label: 'Newest First' },
+  { value: 'popular', label: 'Most Popular' },
+  { value: 'distance', label: 'Distance' },
+  { value: 'expiring', label: 'Expiring Soon' },
+];
 
 export const DealsSidebar = ({
   deals,
@@ -66,7 +81,22 @@ export const DealsSidebar = ({
   setSearchTerm = () => {},
   showAllDeals = false,
   setShowAllDeals = () => {},
+  selectedCityId = null,
+  setSelectedCityId = () => {},
+  selectedDealType = '',
+  setSelectedDealType = () => {},
+  sortBy = 'newest',
+  setSortBy = () => {},
+  error = null,
 }: DealsSidebarProps) => {
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  
+  // Fetch categories and cities from backend
+  const { data: categoriesData, isLoading: categoriesLoading } = useDealCategories();
+  const { data: citiesData, isLoading: citiesLoading } = useActiveCities();
+  
+  const categories = categoriesData?.categories || [];
+  const cities = citiesData?.cities || [];
   return (
     <div className="flex h-full flex-col bg-neutral-50/50">
       <div className="flex-shrink-0 border-b border-neutral-200/80 bg-white">
@@ -143,7 +173,10 @@ export const DealsSidebar = ({
                 className="h-11 rounded-xl border-neutral-200/80 bg-white/80 pl-12 text-sm font-medium backdrop-blur-sm placeholder:text-neutral-400 focus:border-primary/50 focus:ring-primary/10 sm:h-12 sm:text-base"
               />
             </div>
-            <button className="flex h-11 w-full items-center justify-center rounded-xl border border-neutral-200/80 bg-white/80 backdrop-blur-sm transition-colors hover:border-primary/30 hover:bg-white sm:h-12 sm:w-12">
+            <button 
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className="flex h-11 w-full items-center justify-center rounded-xl border border-neutral-200/80 bg-white/80 backdrop-blur-sm transition-colors hover:border-primary/30 hover:bg-white sm:h-12 sm:w-12"
+            >
               <Filter className="h-5 w-5 text-brand-primary-600" />
               <span className="ml-2 sm:hidden">Filters</span>
             </button>
@@ -151,65 +184,209 @@ export const DealsSidebar = ({
         </div>
 
         <div className="px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8">
-          <div className="scrollbar-hide flex items-center gap-2 overflow-x-auto p-2 pb-2">
-            {categoryFilters.map((cat) => (
-              <Button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                variant={activeCategory === cat.id ? 'primary' : 'ghost'}
-                size="sm"
-                className={cn(
-                  'flex flex-shrink-0 items-center gap-2 whitespace-nowrap rounded-xl border px-3 py-2 text-xs font-semibold transition-all sm:px-4 sm:py-2.5 sm:text-sm',
-                  activeCategory === cat.id
-                    ? 'scale-105 shadow-md'
-                    : 'border-neutral-200/80 bg-white/80 text-neutral-700 hover:border-primary/30 hover:bg-white hover:text-primary',
-                )}
-              >
-                <span className="text-current">{cat.icon}</span>
-                <span className="hidden sm:inline">{cat.label}</span>
-                <span className="sm:hidden">{cat.label.split(' ')[0]}</span>
-              </Button>
-            ))}
+          {/* Categories Section */}
+          <div className="mb-4">
+            <h3 className="mb-2 text-sm font-semibold text-neutral-700">Categories</h3>
+            <div className="scrollbar-hide flex items-center gap-2 overflow-x-auto p-2 pb-2">
+              {categoriesLoading ? (
+                <div className="flex items-center gap-2 text-sm text-neutral-500">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading categories...
+                </div>
+              ) : (
+                <>
+                  {/* All Categories Button */}
+                  <Button
+                    key="ALL"
+                    onClick={() => setActiveCategory('')}
+                    variant={activeCategory === '' ? 'primary' : 'ghost'}
+                    size="sm"
+                    className={cn(
+                      'flex flex-shrink-0 items-center gap-2 whitespace-nowrap rounded-xl border px-3 py-2 text-xs font-semibold transition-all sm:px-4 sm:py-2.5 sm:text-sm',
+                      activeCategory === ''
+                        ? 'scale-105 shadow-md'
+                        : 'border-neutral-200/80 bg-white/80 text-neutral-700 hover:border-primary/30 hover:bg-white hover:text-primary',
+                    )}
+                  >
+                    <span className="text-current">🌟</span>
+                    <span className="hidden sm:inline">All Categories</span>
+                    <span className="sm:hidden">All</span>
+                  </Button>
+                  
+                  {/* Individual Category Buttons */}
+                  {categories.map((cat) => (
+                    <Button
+                      key={cat.value}
+                      onClick={() => setActiveCategory(cat.value)}
+                      variant={activeCategory === cat.value ? 'primary' : 'ghost'}
+                      size="sm"
+                      className={cn(
+                        'flex flex-shrink-0 items-center gap-2 whitespace-nowrap rounded-xl border px-3 py-2 text-xs font-semibold transition-all sm:px-4 sm:py-2.5 sm:text-sm',
+                        activeCategory === cat.value
+                          ? 'scale-105 shadow-md'
+                          : 'border-neutral-200/80 bg-white/80 text-neutral-700 hover:border-primary/30 hover:bg-white hover:text-primary',
+                      )}
+                    >
+                      <span className="text-current">{cat.icon}</span>
+                      <span className="hidden sm:inline">{cat.label}</span>
+                      <span className="sm:hidden">{cat.label.split(' ')[0]}</span>
+                    </Button>
+                  ))}
+                </>
+              )}
+            </div>
           </div>
 
-          {/* --- NEW: Radius Filter UI --- */}
-          <div className="mt-4 flex items-center gap-2 rounded-xl border border-neutral-200/80 bg-white/50 p-2">
-            <span className="pl-2 text-xs font-bold text-neutral-600">
-              Radius:
-            </span>
-            {radiusOptions.map((opt) => (
-              <Button
-                key={opt.value}
-                onClick={() => setSearchRadius(opt.value)}
-                variant={searchRadius === opt.value ? 'secondary' : 'ghost'}
-                size="sm"
-                className={cn(
-                  'flex-1 rounded-lg text-xs',
-                  searchRadius === opt.value && 'font-bold shadow-sm',
-                )}
-              >
-                {opt.label}
-              </Button>
-            ))}
+          {/* Radius Filter */}
+          <div className="mb-4">
+            <h3 className="mb-2 text-sm font-semibold text-neutral-700">Search Radius</h3>
+            <div className="flex items-center gap-2 rounded-xl border border-neutral-200/80 bg-white/50 p-2">
+              {radiusOptions.map((opt) => (
+                <Button
+                  key={opt.value}
+                  onClick={() => setSearchRadius(opt.value)}
+                  variant={searchRadius === opt.value ? 'secondary' : 'ghost'}
+                  size="sm"
+                  className={cn(
+                    'flex-1 rounded-lg text-xs',
+                    searchRadius === opt.value && 'font-bold shadow-sm',
+                  )}
+                >
+                  {opt.label}
+                </Button>
+              ))}
+            </div>
           </div>
+
+          {/* Advanced Filters */}
+          {showAdvancedFilters && (
+            <div className="space-y-4 border-t border-neutral-200/80 pt-4">
+              {/* City Filter */}
+              <div>
+                <h3 className="mb-2 text-sm font-semibold text-neutral-700">City</h3>
+                <select
+                  value={selectedCityId || ''}
+                  onChange={(e) => setSelectedCityId(e.target.value ? Number(e.target.value) : null)}
+                  className="w-full rounded-lg border border-neutral-200/80 bg-white/80 px-3 py-2 text-sm focus:border-primary/50 focus:outline-none"
+                  disabled={citiesLoading}
+                >
+                  <option value="">All Cities</option>
+                  {cities.map((city) => (
+                    <option key={city.id} value={city.id}>
+                      {city.name}, {city.state}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Deal Type Filter */}
+              <div>
+                <h3 className="mb-2 text-sm font-semibold text-neutral-700">Deal Type</h3>
+                <select
+                  value={selectedDealType}
+                  onChange={(e) => setSelectedDealType(e.target.value)}
+                  className="w-full rounded-lg border border-neutral-200/80 bg-white/80 px-3 py-2 text-sm focus:border-primary/50 focus:outline-none"
+                >
+                  {dealTypeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Sort Options */}
+              <div>
+                <h3 className="mb-2 text-sm font-semibold text-neutral-700">Sort By</h3>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full rounded-lg border border-neutral-200/80 bg-white/80 px-3 py-2 text-sm focus:border-primary/50 focus:outline-none"
+                >
+                  {sortOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Clear Filters Button */}
+              <Button
+                onClick={() => {
+                  setActiveCategory(''); // Reset to "All Categories"
+                  setSearchRadius(10);
+                  setSelectedCityId(null);
+                  setSelectedDealType('');
+                  setSortBy('newest');
+                  setSearchTerm('');
+                }}
+                variant="ghost"
+                size="sm"
+                className="w-full text-xs text-neutral-600 hover:text-neutral-800"
+              >
+                <X className="mr-2 h-3 w-3" />
+                Clear All Filters
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* --- MODIFIED: Content List with Empty State --- */}
+      {/* --- MODIFIED: Content List with Error and Empty State --- */}
       <div className="flex-grow overflow-y-auto">
         <div className="space-y-4 p-3 sm:space-y-6 sm:p-4 lg:space-y-8 lg:p-6 xl:p-8">
-          {/* Conditional rendering based on loading and deals count */}
-          {!isLoading && deals.length === 0 ? (
+          {/* Error State */}
+          {error ? (
             <div className="py-12 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
+                <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-800">
+                Unable to Load Deals
+              </h3>
+              <p className="mt-2 text-sm text-neutral-500">
+                We're having trouble connecting to our servers. Please try refreshing the page or check your internet connection.
+              </p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90"
+              >
+                Refresh Page
+              </button>
+            </div>
+          ) : isLoading && deals.length === 0 ? (
+            /* Loading State */
+            <div className="py-12 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-50">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-800">
+                Loading Deals...
+              </h3>
+              <p className="mt-2 text-sm text-neutral-500">
+                Finding the best deals near you
+              </p>
+            </div>
+          ) : deals.length === 0 ? (
+            /* Empty State */
+            <div className="py-12 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-neutral-50">
+                <svg className="h-8 w-8 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
               <h3 className="text-lg font-semibold text-neutral-800">
                 No Deals Found
               </h3>
               <p className="mt-2 text-sm text-neutral-500">
-                Try adjusting your search or filters to find what you're looking
-                for.
+                Try adjusting your search or filters to find what you're looking for.
               </p>
             </div>
           ) : (
+            /* Deals List */
             deals.map((deal) => (
               <div
                 key={deal.id}
