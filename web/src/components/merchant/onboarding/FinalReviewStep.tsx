@@ -40,8 +40,14 @@ async function reverseGeocode(coords: { lat: number; lng: number }): Promise<Par
 
 export const FinalReviewStep = () => {
   const { state, dispatch } = useOnboarding();
-  const { data: cities } = useWhitelistedCities();
-  const whitelistedSet = (cities || []).reduce<Set<string>>((acc, c) => {
+  const { data: citiesData } = useWhitelistedCities();
+  
+  // Debug logging to see what we're getting
+  console.log('FinalReviewStep - citiesData:', citiesData);
+  
+  // Ensure we have an array
+  const cities = Array.isArray(citiesData?.cities) ? citiesData.cities : [];
+  const whitelistedSet = cities.reduce<Set<string>>((acc, c) => {
     acc.add((c.name || '').toLowerCase().trim());
     return acc;
   }, new Set<string>());

@@ -24,7 +24,10 @@ const CityCard = ({ city, isSelected, onClick }: { city: City; isSelected: boole
 
 export const CitySelectionStep = () => {
   const { state, dispatch } = useOnboarding();
-  const { data: cities, isLoading } = useWhitelistedCities();
+  const { data: citiesData, isLoading } = useWhitelistedCities();
+  
+  // Ensure we have an array
+  const cities = Array.isArray(citiesData?.cities) ? citiesData.cities : [];
 
   return (
     <OnboardingStepLayout

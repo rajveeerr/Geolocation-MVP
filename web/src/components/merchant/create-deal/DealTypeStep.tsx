@@ -2,16 +2,15 @@
 import { useNavigate } from 'react-router-dom';
 import { useDealCreation } from '@/context/DealCreationContext';
 import { OnboardingStepLayout } from '../onboarding/OnboardingStepLayout';
-import { Tag, Clock, Repeat, Sparkles, Zap, Calendar } from 'lucide-react';
+import { Tag, Clock, Repeat, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routing/paths';
 import { motion } from 'framer-motion';
 
-const DealTypeCard = ({
+const DealTypeButton = ({
   icon,
   title,
   description,
-  features,
   isSelected,
   onClick,
   delay = 0,
@@ -24,63 +23,26 @@ const DealTypeCard = ({
     whileHover={{ scale: 1.02 }}
     whileTap={{ scale: 0.98 }}
     className={cn(
-      'group relative flex w-full items-center gap-4 rounded-xl border-2 p-6 text-left transition-all duration-300',
+      'group relative flex flex-col items-center justify-center rounded-xl border-2 p-6 text-center transition-all duration-300 min-h-[120px]',
       isSelected
-        ? 'border-brand-primary-500 bg-gradient-to-r from-brand-primary-50 to-brand-primary-25 shadow-lg ring-2 ring-brand-primary-200'
-        : 'border-neutral-200 bg-white hover:border-brand-primary-300 hover:shadow-md',
+        ? 'border-black bg-black text-white shadow-lg'
+        : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:shadow-md',
     )}
   >
-    {/* Selection indicator */}
-    {isSelected && (
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-brand-primary-500 text-white"
-      >
-        <Sparkles className="h-3 w-3" />
-      </motion.div>
-    )}
-    
     <motion.div
       className={cn(
-        'flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl transition-all duration-300',
+        'flex h-12 w-12 items-center justify-center rounded-lg transition-all duration-300 mb-3',
         isSelected
-          ? 'bg-brand-primary-500 text-white shadow-lg'
-          : 'bg-gradient-to-br from-neutral-100 to-neutral-200 text-brand-primary-600 group-hover:from-brand-primary-100 group-hover:to-brand-primary-200',
+          ? 'bg-white/20 text-white'
+          : 'bg-neutral-100 text-neutral-600 group-hover:bg-neutral-200',
       )}
       whileHover={{ rotate: 5 }}
     >
       {icon}
     </motion.div>
     
-    <div className="flex-1">
-      <div className="flex items-center gap-2">
-        <h3 className="text-lg font-bold text-neutral-900">{title}</h3>
-        {isSelected && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex items-center gap-1 text-brand-primary-600"
-          >
-            <Zap className="h-4 w-4" />
-            <span className="text-xs font-medium">Recommended</span>
-          </motion.div>
-        )}
-      </div>
-      <p className="mt-1 text-sm text-neutral-600">{description}</p>
-      {features && (
-        <div className="mt-2 flex flex-wrap gap-1">
-          {features.map((feature: string, index: number) => (
-            <span
-              key={index}
-              className="rounded-full bg-neutral-100 px-2 py-1 text-xs text-neutral-600"
-            >
-              {feature}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
+    <h3 className="text-lg font-bold mb-2">{title}</h3>
+    <p className="text-sm opacity-80 leading-relaxed">{description}</p>
   </motion.button>
 );
 
@@ -97,23 +59,23 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
       isNextDisabled={!state.dealType}
       progress={15}
     >
-      <div className="space-y-6">
+      <div className="space-y-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <p className="text-neutral-600">
+          <p className="text-neutral-600 text-lg">
             Select the deal type that matches your marketing strategy
           </p>
         </motion.div>
 
-        <div className="space-y-4">
-          <DealTypeCard
-            icon={<Tag className="h-7 w-7" />}
+        {/* Three side-by-side deal type buttons */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <DealTypeButton
+            icon={<Tag className="h-6 w-6" />}
             title="Standard Deal"
             description="Perfect for promotions, sales, and special offers that run for a specific time period."
-            features={['Flexible duration', 'Easy setup', 'High visibility']}
             isSelected={state.dealType === 'STANDARD'}
             onClick={() =>
               dispatch({ type: 'SET_FIELD', field: 'dealType', value: 'STANDARD' })
@@ -121,11 +83,10 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
             delay={0.1}
           />
           
-          <DealTypeCard
-            icon={<Clock className="h-7 w-7" />}
+          <DealTypeButton
+            icon={<Clock className="h-6 w-6" />}
             title="Happy Hour"
             description="Create urgency with time-limited offers during specific hours to boost traffic."
-            features={['Time-sensitive', 'Urgency-driven', 'Peak hours']}
             isSelected={state.dealType === 'HAPPY_HOUR'}
             onClick={() =>
               dispatch({ type: 'SET_FIELD', field: 'dealType', value: 'HAPPY_HOUR' })
@@ -133,11 +94,10 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
             delay={0.2}
           />
           
-          <DealTypeCard
-            icon={<Repeat className="h-7 w-7" />}
+          <DealTypeButton
+            icon={<Repeat className="h-6 w-6" />}
             title="Recurring Deal"
             description="Set up weekly repeating offers to build customer habits and consistent foot traffic."
-            features={['Weekly repeats', 'Customer habits', 'Consistent traffic']}
             isSelected={state.dealType === 'RECURRING'}
             onClick={() =>
               dispatch({ type: 'SET_FIELD', field: 'dealType', value: 'RECURRING' })
@@ -151,13 +111,13 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="rounded-lg border border-neutral-200 bg-neutral-50 p-4"
+          className="rounded-lg border border-neutral-200 bg-neutral-50 p-6"
         >
-          <div className="flex items-start gap-3">
-            <Calendar className="h-5 w-5 text-brand-primary-600 mt-0.5" />
+          <div className="flex items-start gap-4">
+            <Calendar className="h-6 w-6 text-neutral-600 mt-1 flex-shrink-0" />
             <div>
-              <h4 className="font-medium text-neutral-900">Need help choosing?</h4>
-              <p className="text-sm text-neutral-600 mt-1">
+              <h4 className="font-semibold text-neutral-900 mb-2">Need help choosing?</h4>
+              <p className="text-neutral-600 leading-relaxed">
                 <strong>Standard</strong> for one-time promotions, <strong>Happy Hour</strong> for daily specials, 
                 or <strong>Recurring</strong> for weekly deals like "Taco Tuesday" or "Wine Wednesday".
               </p>

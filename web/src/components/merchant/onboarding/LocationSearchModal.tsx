@@ -16,7 +16,13 @@ interface LocationSearchModalProps {
 }
 
 export const LocationSearchModal = ({ isOpen, onClose, onLocationSelect, initialQuery = '' }: LocationSearchModalProps) => {
-  const { data: popularCities, isLoading: isLoadingCities } = useWhitelistedCities();
+  const { data: citiesData, isLoading: isLoadingCities } = useWhitelistedCities();
+  
+  // Debug logging to see what we're getting
+  console.log('LocationSearchModal - citiesData:', citiesData);
+  
+  // Ensure we have an array
+  const popularCities = Array.isArray(citiesData?.cities) ? citiesData.cities : [];
   const [searchQuery, setSearchQuery] = useState(initialQuery || '');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
@@ -111,7 +117,7 @@ export const LocationSearchModal = ({ isOpen, onClose, onLocationSelect, initial
                   <h3 className="font-semibold text-neutral-500 mb-4">Popular Cities</h3>
                   {isLoadingCities ? <Loader2 className="h-6 w-6 animate-spin" /> : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2">
-                      {popularCities?.map((city: City) => (
+                      {popularCities.map((city: City) => (
                         <button key={city.id} onClick={() => handleCityClick(city)} className="text-left p-2 hover:bg-neutral-100 rounded-md font-medium text-neutral-800">
                           {city.name}
                         </button>
