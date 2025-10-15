@@ -23,10 +23,10 @@ const DealTypeButton = ({
     whileHover={{ scale: 1.02 }}
     whileTap={{ scale: 0.98 }}
     className={cn(
-      'group relative flex flex-col items-center justify-center rounded-xl border-2 p-6 text-center transition-all duration-300 min-h-[120px]',
+      'group relative flex flex-col items-center justify-center rounded-xl border-2 p-6 text-center transition-all duration-300 min-h-[140px]',
       isSelected
-        ? 'border-black bg-black text-white shadow-lg'
-        : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:shadow-md',
+        ? 'border-primary bg-primary text-white shadow-lg'
+        : 'border-neutral-200 bg-white text-neutral-700 hover:border-primary/30 hover:shadow-md',
     )}
   >
     <motion.div
@@ -34,7 +34,7 @@ const DealTypeButton = ({
         'flex h-12 w-12 items-center justify-center rounded-lg transition-all duration-300 mb-3',
         isSelected
           ? 'bg-white/20 text-white'
-          : 'bg-neutral-100 text-neutral-600 group-hover:bg-neutral-200',
+          : 'bg-neutral-100 text-neutral-600 group-hover:bg-primary/10 group-hover:text-primary',
       )}
       whileHover={{ rotate: 5 }}
     >
@@ -59,7 +59,7 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
       isNextDisabled={!state.dealType}
       progress={15}
     >
-      <div className="space-y-8">
+      <div className="space-y-8 max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -71,7 +71,7 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
         </motion.div>
 
         {/* Three side-by-side deal type buttons */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
           <DealTypeButton
             icon={<Tag className="h-6 w-6" />}
             title="Standard Deal"
@@ -111,7 +111,7 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="rounded-lg border border-neutral-200 bg-neutral-50 p-6"
+          className="rounded-lg border border-neutral-200 bg-neutral-50 p-6 max-w-3xl mx-auto"
         >
           <div className="flex items-start gap-4">
             <Calendar className="h-6 w-6 text-neutral-600 mt-1 flex-shrink-0" />

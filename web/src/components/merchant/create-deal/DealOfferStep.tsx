@@ -22,25 +22,25 @@ const OfferCard = ({
     onClick={onClick}
     aria-pressed={ariaPressed}
     className={cn(
-      'flex w-full items-start gap-4 rounded-2xl border p-5 text-left transition-shadow',
+      'flex w-full flex-col items-center justify-center gap-4 rounded-2xl border p-6 text-center transition-all duration-300 min-h-[140px]',
       selected
-        ? 'bg-gradient-to-b from-white to-brand-primary-50 shadow-[0_6px_18px_rgba(59,130,246,0.12)] ring-2 ring-brand-primary-300'
-        : 'border-neutral-200 bg-white hover:shadow-sm',
+        ? 'border-primary bg-primary text-white shadow-lg'
+        : 'border-neutral-200 bg-white text-neutral-700 hover:border-primary/30 hover:shadow-md',
     )}
   >
     <div
       className={cn(
-        'flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg',
+        'flex h-12 w-12 items-center justify-center rounded-lg transition-all duration-300',
         selected
-          ? 'bg-gradient-to-br from-brand-primary-500 to-brand-primary-600 text-white'
-          : 'bg-neutral-100 text-brand-primary-600',
+          ? 'bg-white/20 text-white'
+          : 'bg-neutral-100 text-neutral-600',
       )}
     >
       {icon}
     </div>
-    <div>
-      <p className="font-semibold text-neutral-900">{title}</p>
-      <p className="mt-1 text-sm text-neutral-500">{subtitle}</p>
+    <div className="space-y-2">
+      <h3 className="text-lg font-bold">{title}</h3>
+      <p className="text-sm opacity-80 leading-relaxed">{subtitle}</p>
     </div>
   </button>
 );
@@ -112,8 +112,8 @@ export const DealOfferStep = () => {
       isNextDisabled={isNextDisabledSimple}
       progress={45}
     >
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="space-y-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 max-w-4xl mx-auto">
           <OfferCard
             icon={<Percent className="h-6 w-6" />}
             title="Percentage Off"
@@ -147,7 +147,7 @@ export const DealOfferStep = () => {
         </div>
 
         {/* Enhanced Input Sections with Validation */}
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 max-w-4xl mx-auto">
           {(state.standardOfferKind === 'percentage' ||
             state.discountPercentage !== null) && (
             <motion.div
@@ -518,7 +518,7 @@ export const DealOfferStep = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="rounded-xl border border-neutral-200 bg-gradient-to-r from-white to-neutral-50 p-6 shadow-sm"
+          className="rounded-xl border border-neutral-200 bg-gradient-to-r from-white to-neutral-50 p-6 shadow-sm max-w-3xl mx-auto"
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-brand-primary-500 to-brand-primary-600 text-white">
@@ -558,7 +558,7 @@ export const DealOfferStep = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="rounded-lg border border-neutral-200 bg-neutral-50 p-4"
+          className="rounded-lg border border-neutral-200 bg-neutral-50 p-6 max-w-3xl mx-auto"
         >
           <button
             onClick={() => setShowTips(!showTips)}
