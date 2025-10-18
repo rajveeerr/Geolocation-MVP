@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/common/Button';
 import { PATHS } from '@/routing/paths';
@@ -12,9 +12,11 @@ import {
   Loader2,
   AlertCircle,
   DollarSign,
+  Hash,
   Image as ImageIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+// Removed shadcn tabs import - using custom styling
 
 const MenuItemCard = ({ item, onEdit, onDelete, onView }: { 
   item: MenuItem; 
@@ -174,8 +176,34 @@ export const MenuManagementPage = () => {
   const { data: menuData, isLoading, error } = useMerchantMenu();
   const deleteMenuItemMutation = useDeleteMenuItem();
   const { openModal } = useModal();
+  const [activeTab, setActiveTab] = useState('all');
 
   const menuItems = menuData?.menuItems || [];
+
+  // Group menu items by category
+  const menuItemsByCategory = useMemo(() => {
+    if (!menuItems) return {};
+    
+    const grouped = menuItems.reduce((acc, item) => {
+      const category = item.category || 'Uncategorized';
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(item);
+      return acc;
+    }, {} as Record<string, MenuItem[]>);
+
+    return grouped;
+  }, [menuItems]);
+
+  const categories = useMemo(() => {
+    return Object.keys(menuItemsByCategory).sort();
+  }, [menuItemsByCategory]);
+
+  const filteredMenuItems = useMemo(() => {
+    if (activeTab === 'all') return menuItems;
+    return menuItemsByCategory[activeTab] || [];
+  }, [activeTab, menuItems, menuItemsByCategory]);
 
   const handleEdit = (item: MenuItem) => {
     navigate(`/merchant/menu/${item.id}/edit`);
@@ -282,10 +310,10 @@ export const MenuManagementPage = () => {
                 <div>
                   <h4 className="text-sm text-neutral-500">Categories</h4>
                   <p className="mt-2 text-2xl font-extrabold text-neutral-900">
-                    {new Set(menuItems.map(item => item.category)).size}
+                    {categories.length}
                   </p>
                 </div>
-                <DollarSign className="h-8 w-8 text-green-600" />
+                <Hash className="h-8 w-8 text-green-600" />
               </div>
             </div>
 
@@ -302,16 +330,65 @@ export const MenuManagementPage = () => {
             </div>
           </div>
 
-          {/* Menu Items Grid */}
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {menuItems.map((item) => (
-              <MenuItemCard
-                key={item.id}
-                item={item}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onView={handleView}
-              />
+          {/* Custom Tabs for Categories - matching kickback page style */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 rounded-full bg-neutral-100 p-1">
+              <button
+                onClick={() => setActiveTab('all')}
+                className={cn(
+                  'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                  activeTab === 'all'
+                    ? 'bg-black text-white shadow-sm'
+                    : 'text-neutral-600 hover:bg-neutral-200/50',
+                )}
+              >
+                All Items ({menuItems.length})
+              </button>
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setActiveTab(category)}
+                  className={cn(
+                    'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                    activeTab === category
+                      ? 'bg-black text-white shadow-sm'
+                      : 'text-neutral-600 hover:bg-neutral-200/50',
+                  )}
+                >
+                  {category} ({menuItemsByCategory[category]?.length || 0})
+                </button>
+              ))}
+            </div>
+
+            {/* Tab Content */}
+            {activeTab === 'all' && (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {menuItems.map((item) => (
+                  <MenuItemCard
+                    key={item.id}
+                    item={item}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onView={handleView}
+                  />
+                ))}
+              </div>
+            )}
+
+            {categories.map((category) => (
+              activeTab === category && (
+                <div key={category} className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {menuItemsByCategory[category]?.map((item) => (
+                    <MenuItemCard
+                      key={item.id}
+                      item={item}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                      onView={handleView}
+                    />
+                  ))}
+                </div>
+              )
             ))}
           </div>
         </>

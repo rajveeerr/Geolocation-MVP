@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 // AvatarStack component inline to avoid import issues
 import { Button } from '@/components/common/Button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { TableBookingButton } from '@/components/table-booking/TableBookingButton';
 
 // Inline AvatarStack component
 interface AvatarStackProps {
@@ -447,7 +448,8 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                   </AnimatePresence>
                 </div>
 
-                <Link to={`/deals/${deal.id}`} className="block">
+                <div className="space-y-3">
+                  <Link to={`/deals/${deal.id}`} className="block">
                     <Button
                       size="lg"
                       variant={isHighValueDiscount ? 'primary' : ctaVariant as any}
@@ -460,6 +462,16 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                       <span className="text-lg">{ctaText}</span>
                     </Button>
                   </Link>
+                  
+                  {/* Table Booking Button */}
+                  <TableBookingButton
+                    merchantId={deal.merchantId}
+                    merchantName={deal.merchantName || deal.location || 'Restaurant'}
+                    variant="outline"
+                    size="lg"
+                    className="w-full rounded-full"
+                  />
+                </div>
             </motion.div>
           ) : (
             <motion.div

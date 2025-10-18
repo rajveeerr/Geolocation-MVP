@@ -3,8 +3,6 @@ import { useState } from 'react';
 import { SectionDivider } from '@/components/common/SectionDivider';
 import { ContentCarousel } from '@/components/common/ContentCarousel';
 import { CarouselSkeleton } from '@/components/common/DealCardSkeleton';
-import { useQuery } from '@tanstack/react-query';
-import { apiGet } from '@/services/api';
 // import type { Deal } from '@/data/deals';
 import { DiscoverSection } from '@/components/landing/DiscoverSection';
 import { premiumDeals, happyHourDeals, experiencesData } from '@/data/deals'; // Fallback mock data
@@ -14,8 +12,6 @@ import { useTodaysDeals } from '@/hooks/useTodaysDeals';
 import { usePopularDeals } from '@/hooks/usePopularDeals';
 import { useHappyHourDeals } from '@/hooks/useDealsByCategory';
 import { useExperienceDeals } from '@/hooks/useDealsByCategory';
-import type { ApiDeal } from '@/data/deals-placeholder';
-import { adaptApiDealToFrontend } from '@/data/deals-placeholder';
 
 export const HomePage = () => {
   const [activeTab] = useState('deals');
@@ -53,6 +49,8 @@ export const HomePage = () => {
       ) : (
         <ContentCarousel title="Today's Top Deals" deals={displayTodaysDeals} />
       )}
+
+      <SectionDivider />
 
       {/* Featured Deals Section */}
       {isLoadingFeatured ? (

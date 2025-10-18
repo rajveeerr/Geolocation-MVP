@@ -152,7 +152,12 @@ const MerchantMyDealsContent = () => {
   const navigate = useNavigate();
   const { openModal } = useModal();
   type DealStatusFilter = 'all' | 'active' | 'scheduled' | 'expired';
+  type DealTypeFilter = 'all' | 'happy_hour' | 'standard' | 'recurring';
+  type CategoryFilter = 'all' | 'food_beverage' | 'retail' | 'entertainment' | 'health_fitness' | 'beauty_wellness' | 'other';
+  
   const [activeFilter, setActiveFilter] = useState<DealStatusFilter>('all');
+  const [activeDealType, setActiveDealType] = useState<DealTypeFilter>('all');
+  const [activeCategory, setActiveCategory] = useState<CategoryFilter>('all');
 
   const { data: merchantData, isLoading: merchantLoading } = useMerchantStatus();
   const merchantStatus = merchantData?.data?.merchant?.status;
@@ -173,25 +178,69 @@ const MerchantMyDealsContent = () => {
   const error = dealsError;
 
   const filteredDeals = useMemo(() => {
-    if (activeFilter === 'all') {
-      return deals;
+    let filtered = deals;
+
+    // Filter by status (active, scheduled, expired)
+    if (activeFilter !== 'all') {
+      const now = new Date();
+      filtered = filtered.filter((deal) => {
+        const start = new Date(deal.startTime);
+        const end = new Date(deal.endTime);
+        switch (activeFilter) {
+          case 'active':
+            return now >= start && now <= end;
+          case 'scheduled':
+            return now < start;
+          case 'expired':
+            return now > end;
+          default:
+            return true;
+        }
+      });
     }
-    const now = new Date();
-    return deals.filter((deal) => {
-      const start = new Date(deal.startTime);
-      const end = new Date(deal.endTime);
-      switch (activeFilter) {
-        case 'active':
-          return now >= start && now <= end;
-        case 'scheduled':
-          return now < start;
-        case 'expired':
-          return now > end;
-        default:
-          return true;
-      }
-    });
-  }, [deals, activeFilter]);
+
+    // Filter by deal type
+    if (activeDealType !== 'all') {
+      filtered = filtered.filter((deal) => {
+        const dealType = (deal as any).dealType?.name?.toLowerCase() || 'standard';
+        switch (activeDealType) {
+          case 'happy_hour':
+            return dealType.includes('happy') || dealType.includes('hour');
+          case 'standard':
+            return dealType.includes('standard') || dealType.includes('regular');
+          case 'recurring':
+            return dealType.includes('recurring');
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Filter by category
+    if (activeCategory !== 'all') {
+      filtered = filtered.filter((deal) => {
+        const category = (deal as any).category?.name?.toLowerCase() || 'other';
+        switch (activeCategory) {
+          case 'food_beverage':
+            return category.includes('food') || category.includes('beverage') || category.includes('restaurant');
+          case 'retail':
+            return category.includes('retail') || category.includes('shopping');
+          case 'entertainment':
+            return category.includes('entertainment') || category.includes('movie') || category.includes('game');
+          case 'health_fitness':
+            return category.includes('health') || category.includes('fitness') || category.includes('gym');
+          case 'beauty_wellness':
+            return category.includes('beauty') || category.includes('wellness') || category.includes('spa');
+          case 'other':
+            return !['food', 'beverage', 'restaurant', 'retail', 'shopping', 'entertainment', 'movie', 'game', 'health', 'fitness', 'gym', 'beauty', 'wellness', 'spa'].some(keyword => category.includes(keyword));
+          default:
+            return true;
+        }
+      });
+    }
+
+    return filtered;
+  }, [deals, activeFilter, activeDealType, activeCategory]);
 
   const handleEdit = (deal: Deal) => {
     // Navigate to edit page - you might need to implement this route
@@ -282,45 +331,136 @@ const MerchantMyDealsContent = () => {
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-12">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-bold text-neutral-900">My Deals</h1>
-          <p className="mt-2 text-neutral-600">
-            Manage all your active, scheduled, and expired deals.
-          </p>
+      {/* Enhanced Header with Quick Actions */}
+      <div className="mb-8">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div>
+            <h1 className="text-4xl font-bold text-neutral-900">My Deals</h1>
+            <p className="mt-2 text-neutral-600">
+              Manage all your active, scheduled, and expired deals.
+            </p>
+          </div>
+          
+          {/* Quick Create Deal Options */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link to={PATHS.MERCHANT_DEALS_CREATE}>
+              <Button size="lg" className="rounded-lg w-full sm:w-auto">
+                <Plus className="mr-2 h-4 w-4" />
+                Create New Deal
+              </Button>
+            </Link>
+            <Link to={PATHS.MERCHANT_HAPPY_HOUR_CREATE}>
+              <Button size="lg" variant="outline" className="rounded-lg w-full sm:w-auto">
+                <ClockIcon className="mr-2 h-4 w-4" />
+                Quick Happy Hour
+              </Button>
+            </Link>
+          </div>
         </div>
-        <Link to={PATHS.MERCHANT_DEALS_CREATE}>
-          <Button size="lg" className="rounded-lg">
-            <Plus className="mr-2 h-4 w-4" />
-            Create New Deal
-          </Button>
-        </Link>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2 rounded-full border bg-neutral-100 p-1">
-          {(
-            [
-              'all',
-              'active',
-              'scheduled',
-              'expired',
-            ] as DealStatusFilter[]
-          ).map((filter) => (
-            <button
-              key={filter}
-              onClick={() => setActiveFilter(filter)}
-              className={cn(
-                'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
-                activeFilter === filter
-                  ? 'bg-white text-brand-primary-600 shadow-sm'
-                  : 'text-neutral-600 hover:bg-neutral-200/50',
-              )}
-            >
-              {filter.charAt(0).toUpperCase() + filter.slice(1)}
-            </button>
-          ))}
+      {/* Enhanced Filter Section */}
+      <div className="mb-8 bg-white rounded-xl border border-neutral-200 p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-neutral-900">Filter Deals</h3>
+          <div className="flex items-center gap-2 text-sm text-neutral-500">
+            <span>Showing {filteredDeals.length} deals</span>
+            {(activeFilter !== 'all' || activeDealType !== 'all' || activeCategory !== 'all') && (
+              <button
+                onClick={() => {
+                  setActiveFilter('all');
+                  setActiveDealType('all');
+                  setActiveCategory('all');
+                }}
+                className="text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Clear all
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {/* Status Filter */}
+          <div>
+            <label className="block text-sm font-medium text-neutral-700 mb-2">Status</label>
+            <div className="flex flex-wrap items-center gap-2">
+              {[
+                { key: 'all', label: 'All' },
+                { key: 'active', label: 'Active' },
+                { key: 'scheduled', label: 'Scheduled' },
+                { key: 'expired', label: 'Expired' },
+              ].map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setActiveFilter(key as DealStatusFilter)}
+                  className={cn(
+                    'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 border',
+                    activeFilter === key
+                      ? 'bg-black text-white border-black shadow-sm'
+                      : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400',
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Deal Type Filter */}
+          <div>
+            <label className="block text-sm font-medium text-neutral-700 mb-2">Deal Type</label>
+            <div className="flex flex-wrap items-center gap-2">
+              {[
+                { key: 'all', label: 'All Types' },
+                { key: 'happy_hour', label: 'Happy Hour' },
+                { key: 'standard', label: 'Standard' },
+                { key: 'recurring', label: 'Recurring' },
+              ].map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setActiveDealType(key as DealTypeFilter)}
+                  className={cn(
+                    'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 border',
+                    activeDealType === key
+                      ? 'bg-black text-white border-black shadow-sm'
+                      : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400',
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Category Filter */}
+          <div>
+            <label className="block text-sm font-medium text-neutral-700 mb-2">Category</label>
+            <div className="flex flex-wrap items-center gap-2">
+              {[
+                { key: 'all', label: 'All Categories' },
+                { key: 'food_beverage', label: 'Food & Beverage' },
+                { key: 'retail', label: 'Retail' },
+                { key: 'entertainment', label: 'Entertainment' },
+                { key: 'health_fitness', label: 'Health & Fitness' },
+                { key: 'beauty_wellness', label: 'Beauty & Wellness' },
+                { key: 'other', label: 'Other' },
+              ].map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setActiveCategory(key as CategoryFilter)}
+                  className={cn(
+                    'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 border',
+                    activeCategory === key
+                      ? 'bg-black text-white border-black shadow-sm'
+                      : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400',
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -334,38 +474,106 @@ const MerchantMyDealsContent = () => {
           </p>
         </div>
       ) : filteredDeals.length === 0 ? (
-        <div className="rounded-lg border border-neutral-200 bg-white py-12 text-center">
-          <div className="mx-auto h-12 w-12 text-neutral-400">
-            <Tag />
+        <div className="rounded-xl border border-neutral-200 bg-white py-16 text-center">
+          <div className="mx-auto h-16 w-16 text-neutral-400 mb-4">
+            <Tag className="h-16 w-16" />
           </div>
-          <h3 className="mb-2 text-xl font-semibold text-neutral-800">
-            {activeFilter === 'all'
+          <h3 className="mb-2 text-2xl font-semibold text-neutral-800">
+            {activeFilter === 'all' && activeDealType === 'all' && activeCategory === 'all'
               ? 'No deals yet'
-              : `No ${activeFilter} deals found`}
+              : 'No deals found with current filters'}
           </h3>
-          <p className="mb-6 text-neutral-600">
-            {activeFilter === 'all'
-              ? 'Create your first deal to start attracting customers'
-              : 'Try selecting a different filter to see your other deals.'}
+          <p className="mb-8 text-neutral-600 max-w-md mx-auto">
+            {activeFilter === 'all' && activeDealType === 'all' && activeCategory === 'all'
+              ? 'Create your first deal to start attracting customers and grow your business'
+              : 'Try adjusting your filters to see your other deals, or create a new one.'}
           </p>
-          {activeFilter === 'all' && (
-            <Link to={PATHS.MERCHANT_DEALS_CREATE}>
-              <Button>Create Your First Deal</Button>
-            </Link>
+          
+          {activeFilter === 'all' && activeDealType === 'all' && activeCategory === 'all' ? (
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to={PATHS.MERCHANT_DEALS_CREATE}>
+                <Button size="lg" className="rounded-lg">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Your First Deal
+                </Button>
+              </Link>
+              <Link to={PATHS.MERCHANT_HAPPY_HOUR_CREATE}>
+                <Button size="lg" variant="outline" className="rounded-lg">
+                  <ClockIcon className="mr-2 h-4 w-4" />
+                  Quick Happy Hour
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => {
+                  setActiveFilter('all');
+                  setActiveDealType('all');
+                  setActiveCategory('all');
+                }}
+                className="px-6 py-3 text-blue-600 hover:text-blue-700 font-medium border border-blue-200 hover:border-blue-300 rounded-lg transition-colors"
+              >
+                Clear Filters
+              </button>
+              <Link to={PATHS.MERCHANT_DEALS_CREATE}>
+                <Button size="lg" variant="outline" className="rounded-lg">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create New Deal
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredDeals.map((deal) => (
-            <DealCard 
-              key={deal.id} 
-              deal={deal} 
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
-          ))}
-        </div>
+        <>
+          {/* Deals Grid with Enhanced Layout */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {filteredDeals.map((deal) => (
+              <DealCard 
+                key={deal.id} 
+                deal={deal} 
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+
+          {/* Quick Actions Bar */}
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+            <div className="text-center sm:text-left">
+              <h4 className="font-semibold text-blue-900">Need more deals?</h4>
+              <p className="text-sm text-blue-700">Create different types of deals to attract more customers</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Link to={PATHS.MERCHANT_DEALS_CREATE}>
+                <Button size="sm" className="rounded-lg">
+                  <Plus className="mr-1 h-3 w-3" />
+                  Standard Deal
+                </Button>
+              </Link>
+              <Link to={PATHS.MERCHANT_HAPPY_HOUR_CREATE}>
+                <Button size="sm" variant="outline" className="rounded-lg border-blue-300 text-blue-700 hover:bg-blue-100">
+                  <ClockIcon className="mr-1 h-3 w-3" />
+                  Happy Hour
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </>
       )}
+
+      {/* Floating Action Button for Mobile */}
+      <div className="fixed bottom-6 right-6 z-50 sm:hidden">
+        <Link to={PATHS.MERCHANT_DEALS_CREATE}>
+          <Button 
+            size="lg" 
+            className="rounded-full h-14 w-14 shadow-lg hover:shadow-xl transition-all duration-200"
+          >
+            <Plus className="h-6 w-6" />
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };

@@ -101,7 +101,7 @@ export const MerchantKPICards = ({ period = 'all_time' }: MerchantKPICardsProps)
         />
         
         <KPICard
-          title="Kickback Handout"
+          title="Kickback"
           value={stats?.kpis.totalKickbackHandout || 0}
           icon={<Gift className="h-6 w-6" />}
           color="blue"

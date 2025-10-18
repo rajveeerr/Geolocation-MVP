@@ -99,7 +99,7 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
 
   return (
     <motion.div
-      className="bg-white py-6 sm:py-8 lg:py-12"
+      className="bg-white py-6 sm:py-8"
       variants={carouselVariants}
       initial="hidden"
       animate="visible"

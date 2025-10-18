@@ -65,6 +65,9 @@ const CityManagementDashboard = React.lazy(() =>
 const CustomerManagementPage = React.lazy(() =>
   import('./pages/admin/CustomerManagementPage').then((m) => ({ default: m.CustomerManagementPage })),
 );
+const CustomerDetailPage = React.lazy(() =>
+  import('./pages/admin/CustomerDetailPage').then((m) => ({ default: m.CustomerDetailPage })),
+);
 const LeaderboardPage = React.lazy(() =>
   import('./pages/LeaderboardPage').then((m) => ({
     default: m.LeaderboardPage,
@@ -395,6 +398,14 @@ function App() {
                   element={
                     <Suspense fallback={<LoadingOverlay />}>
                       <CustomerManagementPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/admin/customers/:customerId"
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <CustomerDetailPage />
                     </Suspense>
                   }
                 />

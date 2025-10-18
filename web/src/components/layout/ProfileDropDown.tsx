@@ -28,53 +28,54 @@ export const ProfileDropDown = ({ isMerchant }: { isMerchant: boolean }) => {
     : (user?.email?.[0].toUpperCase() ?? 'U');
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-brand-primary-main focus:ring-offset-2">
-          {/* --- NEW: Add a special ring for admins for extra visual distinction --- */}
-          <Avatar className={cn({
-              'ring-2 ring-offset-2': isMerchant || isAdmin,
-              'ring-destructive': isAdmin, // Admin ring is red (destructive color)
-              'ring-brand-primary-500': isMerchant && !isAdmin, // Merchant ring is primary color
-          })}>
-            <AvatarImage
-              src="https://github.com/shadcn.png"
-              alt={user?.name || ''}
-            />
-            <AvatarFallback>{userInitials}</AvatarFallback>
-          </Avatar>
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        {isAdmin && <DropdownMenuLabel className="!py-0 !px-2 text-xs font-normal text-destructive">Admin Role</DropdownMenuLabel>}
-        {isMerchant && !isAdmin && <DropdownMenuLabel className="!py-0 !px-2 text-xs font-normal text-brand-primary-600">Merchant Profile</DropdownMenuLabel>}
-        <DropdownMenuSeparator />
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-brand-primary-main focus:ring-offset-2">
+            {/* --- NEW: Add a special ring for admins for extra visual distinction --- */}
+            <Avatar className={cn({
+                'ring-2 ring-offset-2': isMerchant || isAdmin,
+                'ring-destructive': isAdmin, // Admin ring is red (destructive color)
+                'ring-brand-primary-500': isMerchant && !isAdmin, // Merchant ring is primary color
+            })}>
+              <AvatarImage
+                src={(user as any)?.avatarUrl || "https://github.com/shadcn.png"}
+                alt={user?.name || ''}
+              />
+              <AvatarFallback>{userInitials}</AvatarFallback>
+            </Avatar>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56" align="end">
+          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          {isAdmin && <DropdownMenuLabel className="!py-0 !px-2 text-xs font-normal text-destructive">Admin Role</DropdownMenuLabel>}
+          {isMerchant && !isAdmin && <DropdownMenuLabel className="!py-0 !px-2 text-xs font-normal text-brand-primary-600">Merchant Profile</DropdownMenuLabel>}
+          <DropdownMenuSeparator />
 
-        {/* --- 3. Conditionally render the Admin Dashboard link --- */}
-        {isAdmin && (
-          <>
-            <DropdownMenuItem asChild>
-              <Link to={PATHS.ADMIN_DASHBOARD}>
-                <Shield className="mr-2 h-4 w-4" />
-                <span>Admin Dashboard</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-          </>
-        )}
+          {/* --- 3. Conditionally render the Admin Dashboard link --- */}
+          {isAdmin && (
+            <>
+              <DropdownMenuItem asChild>
+                <Link to={PATHS.ADMIN_DASHBOARD}>
+                  <Shield className="mr-2 h-4 w-4" />
+                  <span>Admin Dashboard</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
 
-        {isMerchant && !isAdmin && (
-          <>
-            <DropdownMenuItem asChild>
-              <Link to={PATHS.MERCHANT_DASHBOARD}>
-                <LayoutDashboard className="mr-2 h-4 w-4" />
-                <span>Merchant Dashboard</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-          </>
-        )}
+          {isMerchant && !isAdmin && (
+            <>
+              <DropdownMenuItem asChild>
+                <Link to={PATHS.MERCHANT_DASHBOARD}>
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <span>Merchant Dashboard</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
 
         <DropdownMenuItem asChild>
           <Link to={PATHS.PROFILE}>
@@ -82,21 +83,22 @@ export const ProfileDropDown = ({ isMerchant }: { isMerchant: boolean }) => {
             <span>Profile</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to={PATHS.SETTINGS}>
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={logout}
-          className="text-red-600 focus:text-red-600"
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <DropdownMenuItem asChild>
+            <Link to={PATHS.SETTINGS}>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={logout}
+            className="text-red-600 focus:text-red-600"
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log out</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
   );
 };

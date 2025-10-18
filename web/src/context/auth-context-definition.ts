@@ -9,7 +9,7 @@ interface User {
   id: number;
   email: string;
   name: string | null;
-  profilePictureUrl?: string | null;
+  avatarUrl?: string | null;
   points?: number; 
   role?: string;
 }

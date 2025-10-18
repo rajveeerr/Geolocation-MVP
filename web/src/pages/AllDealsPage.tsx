@@ -77,7 +77,7 @@ export const AllDealsPage = () => {
   } | null>(null);
   const [activeCategory, setActiveCategory] =
     useState<string>(''); // Start with "All Categories"
-  const [searchRadius, setSearchRadius] = useState<number>(10); // Default radius in km
+  const [searchRadius, setSearchRadius] = useState<number>(10); // Default radius in miles
   const [showAllDeals, setShowAllDeals] = useState<boolean>(false);
   
   // --- NEW: Additional filter states ---

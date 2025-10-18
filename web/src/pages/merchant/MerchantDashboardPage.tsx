@@ -11,6 +11,8 @@ import { useMerchantStores } from '@/hooks/useMerchantStores';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { ExploreDealsPreview } from '@/components/merchant/ExploreDealsPreview';
+// Removed shadcn tabs import - using custom styling like kickback page
+import { MerchantTableBookingDashboard } from '@/components/table-booking/MerchantTableBookingDashboard';
 
 interface Deal {
   id: string;
@@ -111,6 +113,7 @@ const DealsSkeleton = () => (
 export const MerchantDashboardPage = () => {
   type DealStatusFilter = 'all' | 'active' | 'scheduled' | 'expired';
   const [activeFilter, setActiveFilter] = useState<DealStatusFilter>('all');
+  const [activeTab, setActiveTab] = useState('overview');
 
   const { data: merchantData, isLoading: merchantLoading } = useMerchantStatus();
   const merchantStatus = merchantData?.data?.merchant?.status;
@@ -224,14 +227,87 @@ export const MerchantDashboardPage = () => {
             Your application to become a merchant is currently under review. This usually takes 1-2 business days. We'll notify you via email once it's approved.
           </p>
 
-          <ExploreDealsPreview />
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white rounded-lg p-4 border border-amber-200">
+              <h3 className="font-semibold text-amber-800 mb-2">Prepare Your Menu</h3>
+              <p className="text-sm text-amber-700 mb-4">
+                While waiting for approval, you can start setting up your menu items.
+              </p>
+              <Link to={PATHS.MERCHANT_MENU_MANAGEMENT}>
+                <Button variant="outline" size="sm" className="w-full">
+                  Manage Menu
+                </Button>
+              </Link>
+            </div>
+            
+            <div className="bg-white rounded-lg p-4 border border-amber-200">
+              <h3 className="font-semibold text-amber-800 mb-2">Explore Deals</h3>
+              <p className="text-sm text-amber-700 mb-4">
+                See what other merchants are offering to get inspired.
+              </p>
+              <ExploreDealsPreview />
+            </div>
+          </div>
         </div>
       )}
 
       {merchantStatus === 'APPROVED' && (
         <>
-          {/* Dynamic KPI Row */}
-          <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+          {/* Custom Tabs Navigation - matching kickback page style */}
+          <div className="mb-6">
+            <div className="flex items-center gap-2 rounded-full bg-neutral-100 p-1">
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={cn(
+                  'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                  activeTab === 'overview'
+                    ? 'bg-black text-white shadow-sm'
+                    : 'text-neutral-600 hover:bg-neutral-200/50',
+                )}
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => setActiveTab('deals')}
+                className={cn(
+                  'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                  activeTab === 'deals'
+                    ? 'bg-black text-white shadow-sm'
+                    : 'text-neutral-600 hover:bg-neutral-200/50',
+                )}
+              >
+                Deals
+              </button>
+              <button
+                onClick={() => setActiveTab('analytics')}
+                className={cn(
+                  'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                  activeTab === 'analytics'
+                    ? 'bg-black text-white shadow-sm'
+                    : 'text-neutral-600 hover:bg-neutral-200/50',
+                )}
+              >
+                Analytics
+              </button>
+              <button
+                onClick={() => setActiveTab('booking')}
+                className={cn(
+                  'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                  activeTab === 'booking'
+                    ? 'bg-black text-white shadow-sm'
+                    : 'text-neutral-600 hover:bg-neutral-200/50',
+                )}
+              >
+                Table Booking
+              </button>
+            </div>
+          </div>
+
+          {/* Tab Content */}
+          {activeTab === 'overview' && (
+            <div className="space-y-6">
+              {/* Dynamic KPI Row */}
+              <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
@@ -256,11 +332,30 @@ export const MerchantDashboardPage = () => {
             </div>
 
             <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-              <div>
-                <h4 className="text-sm text-neutral-500">Average Order Value</h4>
-                <p className="mt-2 text-2xl font-extrabold text-neutral-900">
-                  {statsLoading ? '...' : `$${dashboardStats?.kpis.averageOrderValue || 0}`}
-                </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm text-neutral-500">Tap-ins</h4>
+                  <p className="mt-2 text-2xl font-extrabold text-neutral-900 flex items-baseline gap-2">
+                    <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-neutral-100 text-neutral-700">
+                      <Users className="h-3 w-3" />
+                    </span>
+                    {statsLoading ? '...' : dashboardStats?.kpis.orderVolume || 0}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm text-neutral-500">Bounty Earnings</h4>
+                  <p className="mt-2 text-2xl font-extrabold text-neutral-900 flex items-baseline gap-2">
+                    <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-neutral-100 text-neutral-700">
+                      <DollarSign className="h-3 w-3" />
+                    </span>
+                    {statsLoading ? '...' : `$${dashboardStats?.kpis.totalKickbackHandout || 0}`}
+                  </p>
+                </div>
               </div>
               <div className="mt-4 space-y-2">
                 <Link to={PATHS.MERCHANT_KICKBACKS}>
@@ -273,22 +368,36 @@ export const MerchantDashboardPage = () => {
             </div>
           </div>
 
-          {/* Dynamic Region badges - using real data if available */}
+          {/* Dynamic Region badges - using real merchant store data */}
           <div className="mb-6 flex flex-wrap items-center gap-3">
-            {[
-              { name: 'Atlanta', value: 0, change: '0%' },
-              { name: 'Houston', value: 0, change: '0%' },
-              { name: 'Phoenix', value: 0, change: '0%' },
-              { name: 'Salt Lake City', value: 0, change: '0%' },
-              { name: 'San Diego', value: 0, change: '0%' },
-              { name: 'Chicago', value: 0, change: '0%' },
-              { name: 'Toronto', value: 0, change: '0%' },
-            ].map((r) => (
-              <div key={r.name} className="rounded-md bg-neutral-900 px-4 py-2 text-white text-sm">
-                <div className="font-semibold">{r.name}</div>
-                <div className="text-xs text-neutral-200">{r.value} <span className="text-green-400 ml-2">{r.change}</span></div>
+            {storesLoading ? (
+              // Loading state
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="rounded-md bg-neutral-200 px-4 py-2 text-sm animate-pulse">
+                  <div className="h-4 w-20 bg-neutral-300 rounded mb-1"></div>
+                  <div className="h-3 w-16 bg-neutral-300 rounded"></div>
+                </div>
+              ))
+            ) : storesData && storesData.stores.length > 0 ? (
+              // Show only cities where merchant has stores
+              storesData.stores.map((store) => (
+                <div key={store.id} className="rounded-md bg-neutral-900 px-4 py-2 text-white text-sm">
+                  <div className="font-semibold">{store.city.name}</div>
+                  <div className="text-xs text-neutral-200">
+                    {store.active ? 'Active' : 'Inactive'} 
+                    <span className="text-green-400 ml-2">
+                      {store.active ? '100%' : '0%'}
+                    </span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              // No stores state
+              <div className="rounded-md bg-neutral-100 px-4 py-2 text-sm text-neutral-600">
+                <div className="font-semibold">No Stores</div>
+                <div className="text-xs text-neutral-500">Create your first store to see city performance</div>
               </div>
-            ))}
+            )}
           </div>
 
           {/* Chart + Store List */}
@@ -361,69 +470,93 @@ export const MerchantDashboardPage = () => {
               )}
             </div>
           </div>
-
-          <div className="mb-6">
-            <div className="mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
-              <h2 className="text-2xl font-bold">Your Deals</h2>
-              <div className="flex items-center gap-2 rounded-full border bg-neutral-100 p-1">
-                {(
-                  [
-                    'all',
-                    'active',
-                    'scheduled',
-                    'expired',
-                  ] as DealStatusFilter[]
-                ).map((filter) => (
-                  <button
-                    key={filter}
-                    onClick={() => setActiveFilter(filter)}
-                    className={cn(
-                      'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
-                      activeFilter === filter
-                        ? 'bg-white text-brand-primary-600 shadow-sm'
-                        : 'text-neutral-600 hover:bg-neutral-200/50',
-                    )}
-                  >
-                    {filter.charAt(0).toUpperCase() + filter.slice(1)}
-                  </button>
-                ))}
-              </div>
             </div>
+          )}
 
-            {isLoading ? (
-              <DealsSkeleton />
-            ) : error ? (
-              <div className="rounded-lg border border-red-200 bg-red-100 p-6">
-                <p className="text-red-800">
-                  Error loading deals. Please try again later.
-                </p>
-              </div>
-            ) : filteredDeals.length === 0 ? (
-              <div className="rounded-lg border border-neutral-200 bg-white py-12 text-center">
-                <h3 className="mb-2 text-xl font-semibold text-neutral-800">
-                  {activeFilter === 'all'
-                    ? 'No deals yet'
-                    : `No ${activeFilter} deals found`}
-                </h3>
-                <p className="mb-6 text-neutral-600">
-                  {activeFilter === 'all'
-                    ? 'Create your first deal to start attracting customers'
-                    : 'Try selecting a different filter to see your other deals.'}
-                </p>
-                {activeFilter === 'all' && (
-                  <Link to={PATHS.MERCHANT_DEALS_CREATE}>
-                    <Button>Create Your First Deal</Button>
-                  </Link>
+          {activeTab === 'deals' && (
+            <div className="space-y-6">
+              <div className="mb-6">
+                <div className="mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
+                  <h2 className="text-2xl font-bold">Your Deals</h2>
+                  <div className="flex items-center gap-2 rounded-full border bg-neutral-100 p-1">
+                    {(
+                      [
+                        'all',
+                        'active',
+                        'scheduled',
+                        'expired',
+                      ] as DealStatusFilter[]
+                    ).map((filter) => (
+                      <button
+                        key={filter}
+                        onClick={() => setActiveFilter(filter)}
+                        className={cn(
+                          'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                          activeFilter === filter
+                            ? 'bg-white text-brand-primary-600 shadow-sm'
+                            : 'text-neutral-600 hover:bg-neutral-200/50',
+                        )}
+                      >
+                        {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {isLoading ? (
+                  <DealsSkeleton />
+                ) : error ? (
+                  <div className="rounded-lg border border-red-200 bg-red-100 p-6">
+                    <p className="text-red-800">
+                      Error loading deals. Please try again later.
+                    </p>
+                  </div>
+                ) : filteredDeals.length === 0 ? (
+                  <div className="rounded-lg border border-neutral-200 bg-white py-12 text-center">
+                    <h3 className="mb-2 text-xl font-semibold text-neutral-800">
+                      {activeFilter === 'all'
+                        ? 'No deals yet'
+                        : `No ${activeFilter} deals found`}
+                    </h3>
+                    <p className="mb-6 text-neutral-600">
+                      {activeFilter === 'all'
+                        ? 'Create your first deal to start attracting customers'
+                        : 'Try selecting a different filter to see your other deals.'}
+                    </p>
+                    {activeFilter === 'all' && (
+                      <Link to={PATHS.MERCHANT_DEALS_CREATE}>
+                        <Button>Create Your First Deal</Button>
+                      </Link>
+                    )}
+                  </div>
+                ) : (
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {filteredDeals.map((deal) => (
+                      <DealCard key={deal.id} deal={deal} />
+                    ))}
+                  </div>
                 )}
               </div>
-            ) : (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {filteredDeals.map((deal) => (
-                  <DealCard key={deal.id} deal={deal} />
-                ))}
+            </div>
+          )}
+
+          {activeTab === 'analytics' && (
+            <div className="space-y-6">
+              <div className="text-center py-12">
+                <h3 className="text-xl font-semibold mb-4">Advanced Analytics</h3>
+                <p className="text-neutral-600 mb-6">Detailed performance insights and analytics</p>
+                <Link to={PATHS.MERCHANT_ANALYTICS}>
+                  <Button size="lg">View Full Analytics</Button>
+                </Link>
               </div>
-            )}
-          </div>
+            </div>
+          )}
+
+          {activeTab === 'booking' && (
+            <div className="space-y-6">
+              <MerchantTableBookingDashboard />
+            </div>
+          )}
         </>
       )}
 

@@ -1,8 +1,9 @@
 // web/src/pages/admin/CustomerManagementPage.tsx
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/common/Button';
-import { Loader2, Search, Users, DollarSign, Crown, MapPin } from 'lucide-react';
+import { Loader2, Search, Users, DollarSign, Crown, MapPin, Eye } from 'lucide-react';
 import { useAdminCustomers } from '@/hooks/useAdminCustomers';
 import { StatCard } from '@/components/common/StatCard';
 
@@ -124,6 +125,7 @@ export const CustomerManagementPage = () => {
                                         <th className="text-left p-3 font-medium">Points</th>
                                         <th className="text-left p-3 font-medium">Member Type</th>
                                         <th className="text-left p-3 font-medium">Last Active</th>
+                                        <th className="text-left p-3 font-medium">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -151,6 +153,14 @@ export const CustomerManagementPage = () => {
                                             </td>
                                             <td className="p-3 text-neutral-500 text-xs">
                                                 {new Date(customer.lastActiveAt).toLocaleDateString()}
+                                            </td>
+                                            <td className="p-3">
+                                                <Link to={`/admin/customers/${customer.id}`}>
+                                                    <Button variant="outline" size="sm" className="flex items-center gap-2">
+                                                        <Eye className="h-4 w-4" />
+                                                        View Details
+                                                    </Button>
+                                                </Link>
                                             </td>
                             </tr>
                         ))}

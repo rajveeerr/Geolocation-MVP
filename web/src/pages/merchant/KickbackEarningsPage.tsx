@@ -113,7 +113,7 @@ export const KickbackEarningsPage = () => {
           <div className="mt-6 space-y-6">            
             <div className="flex flex-col sm:flex-row gap-4">
               <SummaryCard title="Revenue" value={data.summary.revenue} subtext="All time" />
-              <SummaryCard title="Total kickback handout" value={data.summary.totalKickbackHandout} subtext="All time" />
+              <SummaryCard title="Total kickback" value={data.summary.totalKickbackHandout} subtext="All time" />
             </div>
             <div className="rounded-2xl border border-neutral-200 overflow-hidden">
               {data.details.map((detail: any, index: number) => (

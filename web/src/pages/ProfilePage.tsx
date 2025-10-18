@@ -20,6 +20,8 @@ import { DealResultCard } from '@/components/deals/DealResultCard';
 import { MerchantDealCard } from '@/components/merchant/MerchantDealCard';
 import { Button } from '@/components/common/Button';
 import { PATHS } from '@/routing/paths';
+import { ProfilePictureUpload } from '@/components/profile/ProfilePictureUpload';
+import { useUpdateAvatar } from '@/hooks/useUpdateProfile';
 
 export const ProfilePage = () => {
   const { user } = useAuth();
@@ -29,6 +31,7 @@ export const ProfilePage = () => {
 
   const { data: merchantStatusData } = useMerchantStatus();
   const isMerchant = !!merchantStatusData?.data?.merchant;
+  const updateAvatar = useUpdateAvatar();
 
   // These hooks now correctly talk to your new backend endpoints
   const { savedDeals, isLoading: isLoadingSaved } = useSavedDeals();
@@ -43,6 +46,10 @@ export const ProfilePage = () => {
         .join('')
         .toUpperCase()
     : (user?.email[0].toUpperCase() ?? 'U');
+
+  const handleAvatarUpdate = (newAvatarUrl: string) => {
+    updateAvatar.mutate(newAvatarUrl);
+  };
 
   const TabButton = ({
     tabName,
@@ -68,37 +75,39 @@ export const ProfilePage = () => {
     <div className="min-h-screen bg-neutral-50 pt-24">
       <div className="container mx-auto max-w-4xl px-4 py-8">
         {/* --- User Header --- */}
-        <div className="flex flex-col items-center gap-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm sm:flex-row">
-          <Avatar className="h-24 w-24 border-4 border-white shadow-md">
-            {/* Use the same placeholder avatar source as the navbar to keep visuals consistent */}
-            <AvatarImage
-              src="https://github.com/shadcn.png"
-              alt={user?.name || user?.email}
+        <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+          <div className="flex flex-col items-center gap-6 sm:flex-row">
+            <ProfilePictureUpload
+              currentAvatarUrl={(user as any)?.avatarUrl}
+              userName={user?.name}
+              userEmail={user?.email}
+              onAvatarUpdate={handleAvatarUpdate}
+              size="lg"
+              showUploadButton={true}
             />
-            <AvatarFallback className="text-3xl">{userInitials}</AvatarFallback>
-          </Avatar>
-          <div className="text-center sm:text-left">
-            <h1 className="text-3xl font-bold text-neutral-900">
-              {user?.name || 'Yohop User'}
-            </h1>
-            <p className="mt-1 text-neutral-600">{user?.email}</p>
+            <div className="text-center sm:text-left">
+              <h1 className="text-3xl font-bold text-neutral-900">
+                {user?.name || 'Yohop User'}
+              </h1>
+              <p className="mt-1 text-neutral-600">{user?.email}</p>
 
-            {/* --- NEW: Points Display --- */}
-            {user?.points !== undefined && (
-              <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-100 px-4 py-2">
-                <Star className="h-5 w-5 fill-current text-amber-500" />
-                <span className="text-lg font-bold text-amber-700">
-                  {user.points.toLocaleString()}
-                </span>
-                <span className="text-sm text-amber-600">Points</span>
-              </div>
-            )}
-          </div>
-          <div className="sm:ml-auto">
-            <Button variant="secondary" size="md">
-              <Settings className="mr-2 h-4 w-4" />
-              Edit Profile
-            </Button>
+              {/* --- NEW: Points Display --- */}
+              {user?.points !== undefined && (
+                <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-100 px-4 py-2">
+                  <Star className="h-5 w-5 fill-current text-amber-500" />
+                  <span className="text-lg font-bold text-amber-700">
+                    {user.points.toLocaleString()}
+                  </span>
+                  <span className="text-sm text-amber-600">Points</span>
+                </div>
+              )}
+            </div>
+            <div className="sm:ml-auto">
+              <Button variant="secondary" size="md">
+                <Settings className="mr-2 h-4 w-4" />
+                Edit Profile
+              </Button>
+            </div>
           </div>
         </div>
 

@@ -212,42 +212,6 @@ export const CityAnalyticsDashboard = () => {
         </div>
       )}
 
-      {/* Platform Overview Stats */}
-      {overviewStats && (
-        <div>
-          <h2 className="text-xl font-semibold text-neutral-900 mb-4">Platform Overview</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatCard
-              title="Total Revenue"
-              value={statsLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : `$${overviewStats.kpis.totalRevenue.value.toLocaleString()}`}
-              icon={<DollarSign className="h-5 w-5" />}
-              color="green"
-              change={{ value: overviewStats.kpis.totalRevenue.change, period: '30d' }}
-            />
-            <StatCard
-              title="New Customers"
-              value={statsLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : overviewStats.kpis.newCustomers.value.toLocaleString()}
-              icon={<Users className="h-5 w-5" />}
-              color="primary"
-              change={{ value: overviewStats.kpis.newCustomers.change, period: '30d' }}
-            />
-            <StatCard
-              title="Active Deals"
-              value={statsLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : overviewStats.kpis.activeDeals.value.toLocaleString()}
-              icon={<Activity className="h-5 w-5" />}
-              color="amber"
-              change={{ value: overviewStats.kpis.activeDeals.change, period: '30d' }}
-            />
-            <StatCard
-              title="Total Merchants"
-              value={statsLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : overviewStats.kpis.totalMerchants.value.toLocaleString()}
-              icon={<Building2 className="h-5 w-5" />}
-              color="primary"
-              change={{ value: overviewStats.kpis.totalMerchants.change, period: '30d' }}
-            />
-          </div>
-        </div>
-      )}
 
       {/* Tabs */}
       {selectedCity && (

@@ -20,9 +20,9 @@ import { useState } from 'react';
 
 // --- NEW: Define radius options ---
 const radiusOptions = [
-  { value: 5, label: '5 km' },
-  { value: 10, label: '10 km' },
-  { value: 25, label: '25 km' },
+  { value: 5, label: '5 mi' },
+  { value: 10, label: '10 mi' },
+  { value: 25, label: '25 mi' },
 ];
 
 interface DealsSidebarProps {

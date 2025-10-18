@@ -13,6 +13,7 @@ interface LeaderboardResponse {
   me?: LeaderboardRowData & { inTop: boolean };
 }
 
+// Legacy hook for backward compatibility
 export const useLeaderboard = () => {
   return useQuery<LeaderboardResponse | null, Error>({
     queryKey: ['leaderboard'],
@@ -23,3 +24,13 @@ export const useLeaderboard = () => {
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 };
+
+// Re-export enhanced leaderboard hooks for easy access
+export { 
+  useGlobalLeaderboard,
+  useCityLeaderboard,
+  useCityComparisonLeaderboard,
+  useCategoryLeaderboard,
+  useLeaderboardAnalytics,
+  useLeaderboardInsights
+} from './useEnhancedLeaderboard';
