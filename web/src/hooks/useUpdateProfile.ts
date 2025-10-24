@@ -1,51 +1,42 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiPut } from '@/services/api';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/useAuth';
 
-export interface UpdateProfileRequest {
+interface UpdateProfileRequest {
   name?: string;
   email?: string;
   avatarUrl?: string;
 }
 
-export interface UpdateProfileResponse {
+interface UpdateProfileResponse {
   success: boolean;
   user: {
     id: number;
-    name: string;
+    name: string | null;
     email: string;
-    avatarUrl?: string;
-    points: number;
-    role: string;
+    avatarUrl?: string | null;
+    points?: number;
+    role?: string;
   };
   message: string;
 }
 
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
+  const { refetchUser } = useAuth();
 
   return useMutation<UpdateProfileResponse, Error, UpdateProfileRequest>({
-    mutationFn: async (profileData) => {
-      const response = await apiPut<UpdateProfileResponse, UpdateProfileRequest>(
-        '/auth/profile',
-        profileData
-      );
-      
+    mutationFn: async (data) => {
+      const response = await apiPut<UpdateProfileResponse, UpdateProfileRequest>('/auth/profile', data);
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to update profile');
       }
-      
       return response.data;
     },
     onSuccess: (data) => {
-      // Invalidate and refetch user-related queries
-      queryClient.invalidateQueries({ queryKey: ['user'] });
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-      queryClient.invalidateQueries({ queryKey: ['auth'] });
-      
-      // Update the auth context with new user data
-      queryClient.setQueryData(['user'], data.user);
-      
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+      refetchUser(); // Re-fetch user data to update context
       toast.success(data.message || 'Profile updated successfully!');
     },
     onError: (error) => {
@@ -54,36 +45,25 @@ export const useUpdateProfile = () => {
   });
 };
 
-// Hook specifically for updating avatar
 export const useUpdateAvatar = () => {
   const queryClient = useQueryClient();
+  const { refetchUser } = useAuth();
 
   return useMutation<UpdateProfileResponse, Error, string>({
-    mutationFn: async (avatarUrl) => {
-      const response = await apiPut<UpdateProfileResponse, { avatarUrl: string }>(
-        '/auth/profile',
-        { avatarUrl }
-      );
-      
+    mutationFn: async (avatarUrl: string) => {
+      const response = await apiPut<UpdateProfileResponse, { avatarUrl: string }>('/auth/profile', { avatarUrl });
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to update avatar');
       }
-      
       return response.data;
     },
     onSuccess: (data) => {
-      // Invalidate and refetch user-related queries
-      queryClient.invalidateQueries({ queryKey: ['user'] });
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-      queryClient.invalidateQueries({ queryKey: ['auth'] });
-      
-      // Update the auth context with new user data
-      queryClient.setQueryData(['user'], data.user);
-      
-      toast.success('Profile picture updated successfully!');
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+      refetchUser(); // Re-fetch user data to update context
+      toast.success(data.message || 'Avatar updated successfully!');
     },
     onError: (error) => {
-      toast.error(`Failed to update profile picture: ${error.message}`);
+      toast.error(`Failed to update avatar: ${error.message}`);
     },
   });
 };

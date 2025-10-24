@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Camera, Upload, X, Loader2 } from 'lucide-react';
-import { useMediaUpload } from '@/hooks/useMediaUpload';
+import { useAvatarUpload } from '@/hooks/useMediaUpload';
+import { useUpdateAvatar } from '@/hooks/useUpdateProfile';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -30,7 +30,8 @@ export const ProfilePictureUpload = ({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const mediaUpload = useMediaUpload();
+  const avatarUpload = useAvatarUpload();
+  const updateAvatar = useUpdateAvatar();
 
   const sizeClasses = {
     sm: 'h-16 w-16',
@@ -70,40 +71,19 @@ export const ProfilePictureUpload = ({
     };
     reader.readAsDataURL(file);
 
-    // Upload the file
-    uploadFile(file);
-  };
-
-  const uploadFile = async (file: File) => {
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('context', 'user_avatar');
-
-      const response = await fetch('/api/media/upload', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: formData
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Upload failed');
-      }
-
-      if (result.url) {
+    // Upload the file using the avatar upload hook
+    avatarUpload.mutate(file, {
+      onSuccess: (data) => {
         toast.success('Profile picture updated successfully!');
-        onAvatarUpdate?.(result.url);
+        onAvatarUpdate?.(data.url);
+        setPreviewUrl(null);
+      },
+      onError: (error) => {
+        console.error('Upload error:', error);
+        toast.error(error.message || 'Failed to upload profile picture');
         setPreviewUrl(null);
       }
-    } catch (error: any) {
-      console.error('Upload error:', error);
-      toast.error(error.message || 'Failed to upload profile picture');
-      setPreviewUrl(null);
-    }
+    });
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -210,10 +190,10 @@ export const ProfilePictureUpload = ({
             variant="outline"
             size="sm"
             onClick={() => fileInputRef.current?.click()}
-            disabled={mediaUpload.isPending}
+            disabled={avatarUpload.isPending}
             className="flex items-center gap-2"
           >
-            {mediaUpload.isPending ? (
+            {avatarUpload.isPending ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Uploading...

@@ -4,12 +4,9 @@ import { apiPostFormData } from '@/services/api';
 // Media Upload Types
 
 export interface MediaUploadResponse {
-  success: boolean;
-  fileUrl: string;
-  fileName: string;
-  fileSize: number;
-  fileType: string;
-  error?: string;
+  message: string;
+  url: string;
+  publicId: string;
 }
 
 export interface MediaUploadRequest {

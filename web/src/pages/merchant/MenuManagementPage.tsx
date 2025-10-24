@@ -3,22 +3,25 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/common/Button';
 import { PATHS } from '@/routing/paths';
 import { useMerchantMenu, useDeleteMenuItem, type MenuItem } from '@/hooks/useMerchantMenu';
-import { useModal } from '@/context/ModalContext';
 import { 
   Plus, 
   Utensils, 
   Edit, 
   Trash2, 
-  Loader2,
   AlertCircle,
   DollarSign,
   Hash,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Grid3X3,
+  List,
+  Eye,
+  Table
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 // Removed shadcn tabs import - using custom styling
 
-const MenuItemCard = ({ item, onEdit, onDelete, onView }: { 
+// List View Component
+const MenuItemListRow = ({ item, onEdit, onDelete, onView }: { 
   item: MenuItem; 
   onEdit: (item: MenuItem) => void;
   onDelete: (item: MenuItem) => void;
@@ -30,6 +33,214 @@ const MenuItemCard = ({ item, onEdit, onDelete, onView }: {
       currency: 'USD',
       maximumFractionDigits: 2,
     }).format(price);
+
+  const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return 'Recently';
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date string:', dateString);
+        return 'Recently';
+      }
+      return date.toLocaleDateString();
+    } catch (error) {
+      console.warn('Error formatting date:', dateString, error);
+      return 'Recently';
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-4 rounded-lg border border-neutral-200 bg-white p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:border-neutral-300">
+      {/* Image */}
+      <div className="flex-shrink-0">
+        {item.imageUrl ? (
+          <img
+            src={item.imageUrl}
+            alt={item.name}
+            className="h-16 w-16 rounded-lg object-cover border border-neutral-200"
+          />
+        ) : (
+          <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-neutral-100 border border-neutral-200">
+            <ImageIcon className="h-6 w-6 text-neutral-400" />
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-start justify-between">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg font-semibold text-neutral-900 truncate">
+              {item.name}
+            </h3>
+            <p className="mt-1 text-sm text-neutral-600 line-clamp-2">
+              {item.description}
+            </p>
+            <div className="mt-2 flex items-center gap-4 text-sm text-neutral-500">
+              <span className="font-medium text-green-600">
+                {formatCurrency(item.price)}
+              </span>
+              <span>•</span>
+              <span className="px-2 py-1 bg-neutral-100 rounded-full text-xs font-medium">
+                {item.category}
+              </span>
+              <span>•</span>
+              <span>Updated {formatDate(item.updatedAt)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center gap-2">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => onView(item)}
+          className="flex items-center gap-1 hover:bg-neutral-100"
+        >
+          <Eye className="h-4 w-4" />
+          View
+        </Button>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => onEdit(item)}
+          className="flex items-center gap-1 hover:bg-blue-50 hover:text-blue-600"
+        >
+          <Edit className="h-4 w-4" />
+          Edit
+        </Button>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => onDelete(item)}
+          className="flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 hover:border-red-200"
+        >
+          <Trash2 className="h-4 w-4" />
+          Delete
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// Table View Component
+const MenuItemTableRow = ({ item, onEdit, onDelete, onView }: { 
+  item: MenuItem; 
+  onEdit: (item: MenuItem) => void;
+  onDelete: (item: MenuItem) => void;
+  onView: (item: MenuItem) => void;
+}) => {
+  const formatCurrency = (price: number) =>
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 2,
+    }).format(price);
+
+  const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return 'Recently';
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date string:', dateString);
+        return 'Recently';
+      }
+      return date.toLocaleDateString();
+    } catch (error) {
+      console.warn('Error formatting date:', dateString, error);
+      return 'Recently';
+    }
+  };
+
+  return (
+    <tr className="border-b border-neutral-200 hover:bg-neutral-50 transition-colors">
+      {/* Image */}
+      <td className="px-4 py-3">
+        <div className="flex items-center">
+          {item.imageUrl ? (
+            <img
+              src={item.imageUrl}
+              alt={item.name}
+              className="h-12 w-12 rounded-lg object-cover border border-neutral-200"
+            />
+          ) : (
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-neutral-100 border border-neutral-200">
+              <ImageIcon className="h-4 w-4 text-neutral-400" />
+            </div>
+          )}
+        </div>
+      </td>
+
+      {/* Name & Description */}
+      <td className="px-4 py-3">
+        <div>
+          <h3 className="font-semibold text-neutral-900">{item.name}</h3>
+          <p className="text-sm text-neutral-600 line-clamp-1">{item.description}</p>
+        </div>
+      </td>
+
+      {/* Category */}
+      <td className="px-4 py-3">
+        <span className="px-2 py-1 bg-neutral-100 rounded-full text-xs font-medium">
+          {item.category}
+        </span>
+      </td>
+
+      {/* Price */}
+      <td className="px-4 py-3">
+        <span className="font-medium text-green-600">
+          {formatCurrency(item.price)}
+        </span>
+      </td>
+
+      {/* Updated Date */}
+      <td className="px-4 py-3 text-sm text-neutral-500">
+        {formatDate(item.updatedAt)}
+      </td>
+
+      {/* Actions */}
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onView(item)}
+            className="flex items-center gap-1 hover:bg-neutral-100"
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onEdit(item)}
+            className="flex items-center gap-1 hover:bg-blue-50 hover:text-blue-600"
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onDelete(item)}
+            className="flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 hover:border-red-200"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </td>
+    </tr>
+  );
+};
+
+const MenuItemCard = ({ item, onEdit, onDelete, onView }: { 
+  item: MenuItem; 
+  onEdit: (item: MenuItem) => void;
+  onDelete: (item: MenuItem) => void;
+  onView: (item: MenuItem) => void;
+}) => {
 
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return 'Recently';
@@ -133,9 +344,10 @@ const MenuItemCard = ({ item, onEdit, onDelete, onView }: {
           Edit
         </Button>
         <Button
-          variant="destructive"
+          variant="secondary"
           size="sm"
           onClick={() => onDelete(item)}
+          className="text-red-600 hover:text-red-700 hover:border-red-300"
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -175,8 +387,8 @@ export const MenuManagementPage = () => {
   const navigate = useNavigate();
   const { data: menuData, isLoading, error } = useMerchantMenu();
   const deleteMenuItemMutation = useDeleteMenuItem();
-  const { openModal } = useModal();
   const [activeTab, setActiveTab] = useState('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table'>('grid');
 
   const menuItems = menuData?.menuItems || [];
 
@@ -200,10 +412,6 @@ export const MenuManagementPage = () => {
     return Object.keys(menuItemsByCategory).sort();
   }, [menuItemsByCategory]);
 
-  const filteredMenuItems = useMemo(() => {
-    if (activeTab === 'all') return menuItems;
-    return menuItemsByCategory[activeTab] || [];
-  }, [activeTab, menuItems, menuItemsByCategory]);
 
   const handleEdit = (item: MenuItem) => {
     navigate(`/merchant/menu/${item.id}/edit`);
@@ -214,14 +422,9 @@ export const MenuManagementPage = () => {
   };
 
   const handleDelete = (item: MenuItem) => {
-    openModal({
-      title: 'Delete Menu Item',
-      content: `Are you sure you want to delete "${item.name}"? This action cannot be undone.`,
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
-      onConfirm: () => deleteMenuItemMutation.mutate(item.id),
-      variant: 'destructive'
-    });
+    if (window.confirm(`Are you sure you want to delete "${item.name}"? This action cannot be undone.`)) {
+      deleteMenuItemMutation.mutate(item.id);
+    }
   };
 
   if (isLoading) {
@@ -265,12 +468,42 @@ export const MenuManagementPage = () => {
             Manage your menu items and pricing
           </p>
         </div>
+        <div className="flex items-center gap-3">
+          {/* View Toggle */}
+          <div className="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white p-1">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={cn(
+                'flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                viewMode === 'grid'
+                  ? 'bg-neutral-900 text-white'
+                  : 'text-neutral-600 hover:bg-neutral-100'
+              )}
+            >
+              <Grid3X3 className="h-4 w-4" />
+              Grid
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={cn(
+                'flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                viewMode === 'list'
+                  ? 'bg-neutral-900 text-white'
+                  : 'text-neutral-600 hover:bg-neutral-100'
+              )}
+            >
+              <List className="h-4 w-4" />
+              List
+            </button>
+          </div>
+          
         <Link to={PATHS.MERCHANT_MENU_CREATE}>
           <Button size="lg" className="rounded-lg">
             <Plus className="mr-2 h-5 w-5" />
             Add Menu Item
           </Button>
         </Link>
+        </div>
       </div>
 
       {menuItems.length === 0 ? (
@@ -362,23 +595,9 @@ export const MenuManagementPage = () => {
 
             {/* Tab Content */}
             {activeTab === 'all' && (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {menuItems.map((item) => (
-                  <MenuItemCard
-                    key={item.id}
-                    item={item}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    onView={handleView}
-                  />
-                ))}
-              </div>
-            )}
-
-            {categories.map((category) => (
-              activeTab === category && (
-                <div key={category} className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {menuItemsByCategory[category]?.map((item) => (
+              <div className={viewMode === 'grid' ? 'grid gap-6 md:grid-cols-2 lg:grid-cols-3' : 'space-y-4'}>
+                {menuItems.map((item) => 
+                  viewMode === 'grid' ? (
                     <MenuItemCard
                       key={item.id}
                       item={item}
@@ -386,7 +605,41 @@ export const MenuManagementPage = () => {
                       onDelete={handleDelete}
                       onView={handleView}
                     />
-                  ))}
+                  ) : (
+                    <MenuItemListRow
+                      key={item.id}
+                      item={item}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                      onView={handleView}
+                    />
+                  )
+                )}
+              </div>
+            )}
+
+            {categories.map((category) => (
+              activeTab === category && (
+                <div key={category} className={viewMode === 'grid' ? 'grid gap-6 md:grid-cols-2 lg:grid-cols-3' : 'space-y-4'}>
+                  {menuItemsByCategory[category]?.map((item) => 
+                    viewMode === 'grid' ? (
+              <MenuItemCard
+                key={item.id}
+                item={item}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onView={handleView}
+              />
+                    ) : (
+                      <MenuItemListRow
+                        key={item.id}
+                        item={item}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                        onView={handleView}
+                      />
+                    )
+                  )}
                 </div>
               )
             ))}
