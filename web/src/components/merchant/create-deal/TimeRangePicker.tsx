@@ -54,7 +54,13 @@ export const TimeRangePicker = () => {
     const [startHour, startMin] = start.split(':').map(Number);
     const [endHour, endMin] = end.split(':').map(Number);
     const startMinutes = startHour * 60 + startMin;
-    const endMinutes = endHour * 60 + endMin;
+    let endMinutes = endHour * 60 + endMin;
+    
+    // Handle overnight time ranges (e.g., 22:00 to 02:00)
+    if (endMinutes < startMinutes) {
+      endMinutes += 24 * 60; // Add 24 hours
+    }
+    
     const duration = endMinutes - startMinutes;
     const hours = Math.floor(duration / 60);
     const minutes = duration % 60;
@@ -63,25 +69,74 @@ export const TimeRangePicker = () => {
     return `${hours}h ${minutes}m`;
   };
 
+  const validateTimeRange = (start: string, end: string) => {
+    if (!start || !end) return { isValid: false, message: 'Please set both start and end times' };
+    
+    const [startHour, startMin] = start.split(':').map(Number);
+    const [endHour, endMin] = end.split(':').map(Number);
+    const startMinutes = startHour * 60 + startMin;
+    let endMinutes = endHour * 60 + endMin;
+    
+    // Handle overnight time ranges
+    if (endMinutes < startMinutes) {
+      endMinutes += 24 * 60;
+    }
+    
+    const duration = endMinutes - startMinutes;
+    
+    if (duration <= 0) {
+      return { isValid: false, message: 'End time must be after start time' };
+    }
+    
+    if (duration < 30) {
+      return { isValid: false, message: 'Minimum duration is 30 minutes' };
+    }
+    
+    if (duration > 8 * 60) {
+      return { isValid: false, message: 'Maximum duration is 8 hours' };
+    }
+    
+    return { isValid: true, message: '' };
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Clock className="h-5 w-5 text-brand-primary-600" />
-        <h3 className="text-lg font-semibold text-neutral-900">Time Ranges</h3>
-        <span className="text-sm text-neutral-500">({state.timeRanges.length} range{state.timeRanges.length !== 1 ? 's' : ''})</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Clock className="h-5 w-5 text-brand-primary-600" />
+          <h3 className="text-lg font-semibold text-neutral-900">Time Ranges</h3>
+          <span className="text-sm text-neutral-500">({state.timeRanges.length} range{state.timeRanges.length !== 1 ? 's' : ''})</span>
+        </div>
+        {state.timeRanges.length === 0 && (
+          <span className="text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded-full">
+            ⚠️ Add at least one time range
+          </span>
+        )}
       </div>
+      
+      {state.timeRanges.length > 0 && (
+        <div className="text-sm text-neutral-600 bg-blue-50 p-3 rounded-lg border border-blue-200">
+          💡 <strong>Tip:</strong> Click the chevron to expand and edit time ranges. You can set different times for different days of the week.
+        </div>
+      )}
 
     <div className="space-y-3">
         {state.timeRanges.map((range, index) => {
           const isExpanded = expandedRanges.has(range.id);
           const dayInfo = days.find(d => d.value === (range.day ?? 'All'));
+          const validation = validateTimeRange(range.start, range.end);
+          const duration = getDuration(range.start, range.end);
           
           return (
             <motion.div
               key={range.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition-all hover:shadow-md"
+              className={`rounded-xl border p-4 shadow-sm transition-all hover:shadow-md ${
+                validation.isValid 
+                  ? 'border-green-200 bg-green-50' 
+                  : 'border-red-200 bg-red-50'
+              }`}
             >
               {/* Compact View */}
               <div className="flex items-center justify-between">
@@ -93,13 +148,18 @@ export const TimeRangePicker = () => {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-neutral-400" />
-                    <span className="text-sm text-neutral-600">
+                    <Clock className={`h-4 w-4 ${validation.isValid ? 'text-green-500' : 'text-red-500'}`} />
+                    <span className={`text-sm ${validation.isValid ? 'text-neutral-600' : 'text-red-600'}`}>
                       {formatTime(range.start)} - {formatTime(range.end)}
                     </span>
-                    <span className="text-xs text-neutral-500">
-                      ({getDuration(range.start, range.end)})
+                    <span className={`text-xs ${validation.isValid ? 'text-green-600' : 'text-red-500'}`}>
+                      ({duration})
                     </span>
+                    {!validation.isValid && (
+                      <span className="text-xs text-red-500 font-medium">
+                        ⚠️ {validation.message}
+                      </span>
+                    )}
                   </div>
                 </div>
                 

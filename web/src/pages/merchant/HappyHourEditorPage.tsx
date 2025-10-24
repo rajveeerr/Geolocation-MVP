@@ -61,6 +61,52 @@ const HappyHourEditorContent = () => {
     }
   }, [dealCreationState.dealType, dispatch]);
 
+  // Auto-update time ranges when happy hour type changes
+  useEffect(() => {
+    if (state.happyHourType && state.timeRanges.length > 0) {
+      const getSuggestedTimes = (type: string) => {
+        switch (type) {
+          case 'Mornings':
+            return { start: '06:00', end: '12:00' };
+          case 'Midday':
+            return { start: '12:00', end: '18:00' };
+          case 'Late night':
+            return { start: '22:00', end: '02:00' };
+          default:
+            return { start: '17:00', end: '19:00' };
+        }
+      };
+
+      const suggestedTimes = getSuggestedTimes(state.happyHourType);
+      
+      // Only update if the current time range seems to be a default/placeholder
+      const currentRange = state.timeRanges[0];
+      if (currentRange && (
+        currentRange.start === '17:00' || 
+        currentRange.start === '12:00' || 
+        currentRange.start === '22:00' ||
+        currentRange.start === '06:00'
+      )) {
+        dispatch({ 
+          type: 'UPDATE_TIME_RANGE', 
+          payload: { 
+            id: currentRange.id, 
+            field: 'start', 
+            value: suggestedTimes.start 
+          }
+        });
+        dispatch({ 
+          type: 'UPDATE_TIME_RANGE', 
+          payload: { 
+            id: currentRange.id, 
+            field: 'end', 
+            value: suggestedTimes.end 
+          }
+        });
+      }
+    }
+  }, [state.happyHourType, dispatch]);
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
@@ -364,14 +410,60 @@ const HappyHourEditorContent = () => {
                 </div>
               </FormSection>
               <FormSection title="Happy Hour Type" subtitle="Select which type of happy hour">
-                <div className="mb-4">
-                  <div className="flex items-center gap-3">
-                    {['Mornings', 'Midday', 'Late night'].map((type: string) => (
+                <div className="mb-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {[
+                      { 
+                        type: 'Mornings', 
+                        icon: '🌅', 
+                        description: 'Early morning deals (6 AM - 12 PM)',
+                        suggestedTimes: '06:00 - 12:00'
+                      },
+                      { 
+                        type: 'Midday', 
+                        icon: '☀️', 
+                        description: 'Lunch and afternoon deals (12 PM - 6 PM)',
+                        suggestedTimes: '12:00 - 18:00'
+                      },
+                      { 
+                        type: 'Late night', 
+                        icon: '🌙', 
+                        description: 'Evening and night deals (10 PM - 2 AM)',
+                        suggestedTimes: '22:00 - 02:00'
+                      }
+                    ].map((option) => (
                       <button
-                        key={type}
-                        onClick={() => dispatch({ type: 'SET_FIELD', field: 'happyHourType', value: type })}
-                        className={`py-2 px-3 rounded-md text-sm font-semibold ${state.happyHourType === type ? 'bg-brand-primary-600 text-white shadow' : 'bg-white text-neutral-700 border border-neutral-200'}`}>
-                        {type}
+                        key={option.type}
+                        onClick={() => dispatch({ type: 'SET_FIELD', field: 'happyHourType', value: option.type })}
+                        className={`relative p-4 rounded-xl border-2 transition-all duration-200 text-left ${
+                          state.happyHourType === option.type 
+                            ? 'border-brand-primary-500 bg-brand-primary-50 shadow-md' 
+                            : 'border-neutral-200 bg-white hover:border-brand-primary-300 hover:shadow-sm'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="text-2xl">{option.icon}</span>
+                          <span className={`font-semibold ${
+                            state.happyHourType === option.type ? 'text-brand-primary-700' : 'text-neutral-800'
+                          }`}>
+                            {option.type}
+                          </span>
+                        </div>
+                        <p className={`text-sm ${
+                          state.happyHourType === option.type ? 'text-brand-primary-600' : 'text-neutral-500'
+                        }`}>
+                          {option.description}
+                        </p>
+                        <p className={`text-xs mt-1 ${
+                          state.happyHourType === option.type ? 'text-brand-primary-500' : 'text-neutral-400'
+                        }`}>
+                          Suggested: {option.suggestedTimes}
+                        </p>
+                        {state.happyHourType === option.type && (
+                          <div className="absolute top-2 right-2">
+                            <div className="w-2 h-2 bg-brand-primary-500 rounded-full"></div>
+                          </div>
+                        )}
                       </button>
                     ))}
                   </div>
