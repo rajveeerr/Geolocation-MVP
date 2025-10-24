@@ -156,6 +156,7 @@ export const FinalReviewStep = () => {
         longitude: state.coordinates.lng,
         description: state.description || undefined,
         logoUrl: state.logoUrl || undefined,
+        businessType: state.businessType || 'LOCAL', // Default to LOCAL if not set
       };
 
       console.log('Final payload:', payload);
@@ -198,6 +199,35 @@ export const FinalReviewStep = () => {
       progress={100}
       nextButtonText={isSubmitting ? 'Submitting...' : 'Finish & Submit'}
     >
+      {/* Business Information Summary */}
+      <div className="mb-6 rounded-lg border border-neutral-200 bg-white p-6">
+        <h3 className="text-lg font-semibold text-neutral-800 mb-4">Business Information</h3>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-neutral-600">Business Name:</span>
+            <span className="font-medium text-neutral-800">{state.businessName}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-neutral-600">Business Type:</span>
+            <div className="flex items-center gap-2">
+              <span className={`text-sm px-2 py-1 rounded-full ${
+                state.businessType === 'NATIONAL' 
+                  ? 'bg-blue-100 text-blue-800' 
+                  : 'bg-green-100 text-green-800'
+              }`}>
+                {state.businessType === 'NATIONAL' ? '🏢 National Chain' : '🏪 Local Business'}
+              </span>
+            </div>
+          </div>
+          {state.description && (
+            <div className="flex items-start justify-between">
+              <span className="text-sm text-neutral-600">Description:</span>
+              <span className="font-medium text-neutral-800 text-right max-w-xs">{state.description}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="space-y-4">
         <div>
           <Label htmlFor="street">Street address</Label>

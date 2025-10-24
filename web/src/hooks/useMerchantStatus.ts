@@ -7,9 +7,12 @@ interface MerchantStatus {
   id: number;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   businessName: string;
+  businessType: 'NATIONAL' | 'LOCAL';
   address: string;
   description?: string;
   logoUrl?: string;
+  phoneNumber?: string;
+  city?: string;
   createdAt: string;
   updatedAt: string;
 }

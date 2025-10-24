@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { ExploreDealsPreview } from '@/components/merchant/ExploreDealsPreview';
 // Removed shadcn tabs import - using custom styling like kickback page
 import { MerchantTableBookingDashboard } from '@/components/table-booking/MerchantTableBookingDashboard';
+import { BusinessTypeCard } from '@/components/merchant/BusinessTypeCard';
 
 interface Deal {
   id: string;
@@ -366,6 +367,11 @@ export const MerchantDashboardPage = () => {
                 </Link>
               </div>
             </div>
+          </div>
+
+          {/* Business Type Card */}
+          <div className="mb-6">
+            <BusinessTypeCard />
           </div>
 
           {/* Dynamic Region badges - using real merchant store data */}

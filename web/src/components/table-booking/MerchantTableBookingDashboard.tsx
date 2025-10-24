@@ -37,6 +37,7 @@ import {
   useMerchantBookingSettings,
   useUpdateMerchantBookingSettings
 } from '@/hooks/useTableBooking';
+import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
@@ -48,20 +49,26 @@ export const MerchantTableBookingDashboard = () => {
   const [editingTable, setEditingTable] = useState<any>(null);
   const [editingTimeSlot, setEditingTimeSlot] = useState<any>(null);
 
+  // Get merchant ID
+  const { data: merchantData } = useMerchantStatus();
+  const merchantId = merchantData?.data?.merchant?.id;
+
   // Table management
-  const { data: tables, isLoading: isLoadingTables } = useMerchantTables();
+  const { data: tablesData, isLoading: isLoadingTables } = useMerchantTables(merchantId);
+  const tables = tablesData?.tables || [];
   const createTableMutation = useCreateTable();
   const updateTableMutation = useUpdateTable();
   const deleteTableMutation = useDeleteTable();
 
   // Time slot management
-  const { data: timeSlots, isLoading: isLoadingTimeSlots } = useMerchantTimeSlots();
+  const { data: timeSlotsData, isLoading: isLoadingTimeSlots } = useMerchantTimeSlots();
+  const timeSlots = timeSlotsData?.timeSlots || [];
   const createTimeSlotMutation = useCreateTimeSlot();
   const updateTimeSlotMutation = useUpdateTimeSlot();
   const deleteTimeSlotMutation = useDeleteTimeSlot();
 
   // Booking management
-  const { data: bookings, isLoading: isLoadingBookings } = useMerchantBookings();
+  const { data: bookings, isLoading: isLoadingBookings } = useMerchantBookings(merchantId);
   const updateBookingStatusMutation = useUpdateBookingStatus();
 
   // Settings management
@@ -80,6 +87,8 @@ export const MerchantTableBookingDashboard = () => {
     dayOfWeek: 1,
     startTime: '09:00',
     endTime: '17:00',
+    duration: 60, // Default 60 minutes
+    maxBookings: 1, // Default 1 booking per slot
   });
 
   // Settings form state
@@ -153,7 +162,13 @@ export const MerchantTableBookingDashboard = () => {
   const handleCreateTimeSlot = async () => {
     try {
       await createTimeSlotMutation.mutateAsync(timeSlotForm);
-      setTimeSlotForm({ dayOfWeek: 1, startTime: '09:00', endTime: '17:00' });
+      setTimeSlotForm({ 
+        dayOfWeek: 1, 
+        startTime: '09:00', 
+        endTime: '17:00',
+        duration: 60,
+        maxBookings: 1
+      });
       setIsTimeSlotDialogOpen(false);
       toast.success('Time slot created successfully');
     } catch (error) {
@@ -169,7 +184,13 @@ export const MerchantTableBookingDashboard = () => {
         data: timeSlotForm,
       });
       setEditingTimeSlot(null);
-      setTimeSlotForm({ dayOfWeek: 1, startTime: '09:00', endTime: '17:00' });
+      setTimeSlotForm({ 
+        dayOfWeek: 1, 
+        startTime: '09:00', 
+        endTime: '17:00',
+        duration: 60,
+        maxBookings: 1
+      });
       setIsTimeSlotDialogOpen(false);
       toast.success('Time slot updated successfully');
     } catch (error) {
@@ -397,6 +418,8 @@ export const MerchantTableBookingDashboard = () => {
                                   dayOfWeek: timeSlot.dayOfWeek,
                                   startTime: timeSlot.startTime,
                                   endTime: timeSlot.endTime,
+                                  duration: timeSlot.duration || 60,
+                                  maxBookings: timeSlot.maxBookings || 1,
                                 });
                                 setIsTimeSlotDialogOpen(true);
                               }}
@@ -615,6 +638,30 @@ export const MerchantTableBookingDashboard = () => {
                 />
               </div>
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="duration">Duration (minutes)</Label>
+                <Input
+                  id="duration"
+                  type="number"
+                  min="15"
+                  max="480"
+                  value={timeSlotForm.duration}
+                  onChange={(e) => setTimeSlotForm({ ...timeSlotForm, duration: parseInt(e.target.value) || 60 })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="maxBookings">Max Bookings per Slot</Label>
+                <Input
+                  id="maxBookings"
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={timeSlotForm.maxBookings}
+                  onChange={(e) => setTimeSlotForm({ ...timeSlotForm, maxBookings: parseInt(e.target.value) || 1 })}
+                />
+              </div>
+            </div>
             <div className="flex gap-3 pt-4">
               <Button variant="outline" onClick={() => setIsTimeSlotDialogOpen(false)} className="flex-1">
                 Cancel
@@ -622,7 +669,7 @@ export const MerchantTableBookingDashboard = () => {
               <Button
                 onClick={editingTimeSlot ? handleUpdateTimeSlot : handleCreateTimeSlot}
                 className="flex-1"
-                disabled={!timeSlotForm.startTime || !timeSlotForm.endTime}
+                disabled={!timeSlotForm.startTime || !timeSlotForm.endTime || !timeSlotForm.duration || !timeSlotForm.maxBookings}
               >
                 {editingTimeSlot ? 'Update Time Slot' : 'Create Time Slot'}
               </Button>

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/common/Button';
 import { PATHS } from '@/routing/paths';
 import { useMerchantMenu, useDeleteMenuItem, type MenuItem } from '@/hooks/useMerchantMenu';
+import { BulkMenuUpload } from '@/components/merchant/BulkMenuUpload';
 import { 
   Plus, 
   Utensils, 
@@ -15,7 +16,8 @@ import {
   Grid3X3,
   List,
   Eye,
-  Table
+  Table,
+  Upload
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 // Removed shadcn tabs import - using custom styling
@@ -389,6 +391,7 @@ export const MenuManagementPage = () => {
   const deleteMenuItemMutation = useDeleteMenuItem();
   const [activeTab, setActiveTab] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table'>('grid');
+  const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
 
   const menuItems = menuData?.menuItems || [];
 
@@ -497,12 +500,23 @@ export const MenuManagementPage = () => {
             </button>
           </div>
           
-        <Link to={PATHS.MERCHANT_MENU_CREATE}>
-          <Button size="lg" className="rounded-lg">
-            <Plus className="mr-2 h-5 w-5" />
-            Add Menu Item
+        <div className="flex gap-3">
+          <Link to={PATHS.MERCHANT_MENU_CREATE}>
+            <Button size="lg" className="rounded-lg">
+              <Plus className="mr-2 h-5 w-5" />
+              Add Menu Item
+            </Button>
+          </Link>
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="rounded-lg"
+            onClick={() => setIsBulkUploadOpen(true)}
+          >
+            <Upload className="mr-2 h-5 w-5" />
+            Bulk Upload
           </Button>
-        </Link>
+        </div>
         </div>
       </div>
 
@@ -646,6 +660,12 @@ export const MenuManagementPage = () => {
           </div>
         </>
       )}
+
+      {/* Bulk Upload Dialog */}
+      <BulkMenuUpload 
+        isOpen={isBulkUploadOpen} 
+        onClose={() => setIsBulkUploadOpen(false)} 
+      />
     </div>
   );
 };

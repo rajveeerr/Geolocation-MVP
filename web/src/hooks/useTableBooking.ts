@@ -24,18 +24,21 @@ export interface Table {
 
 export interface AvailabilityResponse {
   date: string;
-  merchantId: number;
-  tables: Table[];
-  availableSlots: {
-    tableId: number;
-    tableName: string;
+  partySize: number;
+  availableTimeSlots: {
+    id: number;
+    startTime: string;
+    endTime: string;
+    duration: number;
+    maxBookings: number;
+    currentBookings: number;
+    availableSpots: number;
+  }[];
+  availableTables: {
+    id: number;
+    name: string;
     capacity: number;
-    timeSlots: {
-      id: number;
-      startTime: string;
-      endTime: string;
-      availableBookings: number;
-    }[];
+    features: string[];
   }[];
 }
 

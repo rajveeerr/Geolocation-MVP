@@ -29,12 +29,14 @@ import {
   type CreateMenuItemRequest,
   type UpdateMenuItemRequest
 } from '@/hooks/useMerchantMenuManagement';
+import { BulkMenuUpload } from './BulkMenuUpload';
 import { toast } from 'sonner';
 
 export const MerchantMenuManagement = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [activeTab, setActiveTab] = useState('all');
+  const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
 
   // Fetch menu items
   const { data: menuItems, isLoading } = useMerchantMenuItems();
@@ -177,10 +179,20 @@ export const MerchantMenuManagement = () => {
             Manage your restaurant menu items and categories
           </p>
         </div>
-        <Button onClick={openCreateDialog}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Menu Item
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={openCreateDialog}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Menu Item
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => setIsBulkUploadOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <Utensils className="h-4 w-4" />
+            Bulk Upload
+          </Button>
+        </div>
       </div>
 
       {/* Category Tabs */}
@@ -493,6 +505,12 @@ export const MerchantMenuManagement = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk Upload Dialog */}
+      <BulkMenuUpload 
+        isOpen={isBulkUploadOpen} 
+        onClose={() => setIsBulkUploadOpen(false)} 
+      />
     </div>
   );
 };

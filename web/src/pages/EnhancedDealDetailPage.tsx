@@ -5,6 +5,7 @@ import { Button } from '@/components/common/Button';
 import { useToast } from '@/hooks/use-toast';
 import { useSavedDeals } from '@/hooks/useSavedDeals';
 import { useCheckIn } from '@/hooks/useCheckIn';
+import { useNavigationHistory } from '@/hooks/useNavigationHistory';
 import { useDealDetail, type DetailedDeal } from '@/hooks/useDealDetail';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routing/paths';
@@ -313,6 +314,7 @@ export const EnhancedDealDetailPage = () => {
   const { savedDealIds, saveDeal, unsaveDeal } = useSavedDeals();
   const { isCheckingIn, checkIn } = useCheckIn();
   const { toast } = useToast();
+  const { canGoBack, goBack } = useNavigationHistory();
 
   const {
     data: deal,
@@ -337,11 +339,13 @@ export const EnhancedDealDetailPage = () => {
             <p className="mt-2 text-sm text-neutral-500">Error: {messageStr}</p>
           )}
           <div className="mt-6 flex justify-center">
-            <Link to={PATHS.ALL_DEALS}>
-              <Button size="md" variant="primary">
-                Back to all deals
-              </Button>
-            </Link>
+            <Button 
+              size="md" 
+              variant="primary"
+              onClick={canGoBack ? goBack : () => window.history.back()}
+            >
+              Back
+            </Button>
           </div>
         </div>
       </div>
@@ -398,12 +402,15 @@ export const EnhancedDealDetailPage = () => {
       <div className="sticky top-20 z-20 bg-white border-b border-neutral-200">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link to={PATHS.ALL_DEALS}>
-              <Button variant="ghost" size="sm" className="rounded-full">
-                <ChevronLeft className="h-4 w-4 mr-2" />
-                Back
-              </Button>
-            </Link>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="rounded-full"
+              onClick={canGoBack ? goBack : () => window.history.back()}
+            >
+              <ChevronLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
             
             <div className="flex items-center gap-2">
               <Button

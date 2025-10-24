@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAdminPerformanceTopCities } from '@/hooks/useAdminPerformanceTopCities';
-import { TrendingUp, TrendingDown, Minus, MapPin, DollarSign } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, MapPin, DollarSign, ChevronDown, ChevronUp } from 'lucide-react';
 import { SkeletonList } from '@/components/common/Skeleton';
+import { Button } from '@/components/ui/button';
 
 interface AdminTopCitiesProps {
   limit?: number;
@@ -12,6 +13,7 @@ export const AdminTopCities: React.FC<AdminTopCitiesProps> = ({
   limit = 10,
   period = '7d'
 }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
   const { data, isLoading, error } = useAdminPerformanceTopCities({ limit, period });
 
   if (isLoading) {
@@ -29,6 +31,8 @@ export const AdminTopCities: React.FC<AdminTopCitiesProps> = ({
   }
 
   const { cities } = data;
+  const displayCities = isExpanded ? cities : cities.slice(0, 5);
+  const hasMore = cities.length > 5;
 
   const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
@@ -61,7 +65,7 @@ export const AdminTopCities: React.FC<AdminTopCitiesProps> = ({
       </div>
       
       <div className="space-y-3">
-        {cities.map((city, index) => (
+        {displayCities.map((city, index) => (
           <div
             key={city.id}
             className="flex items-center justify-between p-3 rounded-lg border border-neutral-200 hover:border-brand-primary-300 transition-colors"
@@ -94,6 +98,28 @@ export const AdminTopCities: React.FC<AdminTopCitiesProps> = ({
           </div>
         ))}
       </div>
+      
+      {hasMore && (
+        <div className="mt-4 pt-4 border-t border-neutral-200">
+          <Button
+            variant="ghost"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="w-full flex items-center justify-center gap-2 text-sm text-neutral-600 hover:text-neutral-900"
+          >
+            {isExpanded ? (
+              <>
+                <ChevronUp className="h-4 w-4" />
+                Show Less
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-4 w-4" />
+                Show All ({cities.length} cities)
+              </>
+            )}
+          </Button>
+        </div>
+      )}
       
       {cities.length === 0 && (
         <div className="text-center py-8">

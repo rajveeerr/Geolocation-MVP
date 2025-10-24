@@ -9,6 +9,7 @@ import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { useModal } from '@/context/ModalContext';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Deal {
   id: string;
@@ -380,86 +381,56 @@ const MerchantMyDealsContent = () => {
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Status Filter */}
-          <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">Status</label>
-            <div className="flex flex-wrap items-center gap-2">
-              {[
-                { key: 'all', label: 'All' },
-                { key: 'active', label: 'Active' },
-                { key: 'scheduled', label: 'Scheduled' },
-                { key: 'expired', label: 'Expired' },
-              ].map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => setActiveFilter(key as DealStatusFilter)}
-                  className={cn(
-                    'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 border',
-                    activeFilter === key
-                      ? 'bg-black text-white border-black shadow-sm'
-                      : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400',
-                  )}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-neutral-700">Status</label>
+            <Select value={activeFilter} onValueChange={(value) => setActiveFilter(value as DealStatusFilter)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="scheduled">Scheduled</SelectItem>
+                <SelectItem value="expired">Expired</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Deal Type Filter */}
-          <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">Deal Type</label>
-            <div className="flex flex-wrap items-center gap-2">
-              {[
-                { key: 'all', label: 'All Types' },
-                { key: 'happy_hour', label: 'Happy Hour' },
-                { key: 'standard', label: 'Standard' },
-                { key: 'recurring', label: 'Recurring' },
-              ].map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => setActiveDealType(key as DealTypeFilter)}
-                  className={cn(
-                    'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 border',
-                    activeDealType === key
-                      ? 'bg-black text-white border-black shadow-sm'
-                      : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400',
-                  )}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-neutral-700">Deal Type</label>
+            <Select value={activeDealType} onValueChange={(value) => setActiveDealType(value as DealTypeFilter)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select deal type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="happy_hour">Happy Hour</SelectItem>
+                <SelectItem value="standard">Standard</SelectItem>
+                <SelectItem value="recurring">Recurring</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Category Filter */}
-          <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">Category</label>
-            <div className="flex flex-wrap items-center gap-2">
-              {[
-                { key: 'all', label: 'All Categories' },
-                { key: 'food_beverage', label: 'Food & Beverage' },
-                { key: 'retail', label: 'Retail' },
-                { key: 'entertainment', label: 'Entertainment' },
-                { key: 'health_fitness', label: 'Health & Fitness' },
-                { key: 'beauty_wellness', label: 'Beauty & Wellness' },
-                { key: 'other', label: 'Other' },
-              ].map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => setActiveCategory(key as CategoryFilter)}
-                  className={cn(
-                    'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 border',
-                    activeCategory === key
-                      ? 'bg-black text-white border-black shadow-sm'
-                      : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400',
-                  )}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-neutral-700">Category</label>
+            <Select value={activeCategory} onValueChange={(value) => setActiveCategory(value as CategoryFilter)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="food_beverage">Food & Beverage</SelectItem>
+                <SelectItem value="retail">Retail</SelectItem>
+                <SelectItem value="entertainment">Entertainment</SelectItem>
+                <SelectItem value="health_fitness">Health & Fitness</SelectItem>
+                <SelectItem value="beauty_wellness">Beauty & Wellness</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>

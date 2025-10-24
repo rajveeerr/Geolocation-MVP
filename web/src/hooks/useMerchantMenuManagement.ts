@@ -126,3 +126,66 @@ export const useDeleteMenuItem = () => {
     },
   });
 };
+
+// Bulk upload interface
+export interface BulkUploadMenuItem {
+  name: string;
+  description?: string;
+  price: number;
+  category: string;
+  isAvailable?: boolean;
+  imageUrl?: string;
+  allergens?: string[];
+  dietaryInfo?: string[];
+  preparationTime?: number;
+  calories?: number;
+  ingredients?: string[];
+}
+
+export interface BulkUploadResponse {
+  message: string;
+  created: number;
+  total: number;
+}
+
+export interface BulkUploadError {
+  error: string;
+  details?: string[];
+  validItems?: number;
+  totalItems?: number;
+}
+
+export const useBulkUploadMenuItems = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<BulkUploadResponse, BulkUploadError, File>({
+    mutationFn: async (file) => {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+      const response = await fetch(`${API_BASE_URL}/merchants/me/menu/bulk-upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to upload menu items');
+      }
+
+      const data = await response.json();
+      return {
+        message: data.message || 'Menu items uploaded successfully',
+        created: data.created || 0,
+        total: data.total || 0,
+      };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['merchantMenuItems'] });
+    },
+  });
+};

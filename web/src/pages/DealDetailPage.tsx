@@ -5,6 +5,7 @@ import { apiGet } from '@/services/api';
 import type { DealWithLocation } from '@/data/deals';
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { Button } from '@/components/common/Button';
+import { useNavigationHistory } from '@/hooks/useNavigationHistory';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import {
@@ -16,6 +17,7 @@ import {
   XCircle,
   MapPin,
   Loader2,
+  ChevronLeft,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PATHS } from '@/routing/paths';
@@ -55,6 +57,7 @@ const DetailSection = ({
 export const DealDetailPage = () => {
   const { dealId } = useParams<{ dealId: string }>();
   const { savedDealIds, saveDeal, unsaveDeal } = useSavedDeals();
+  const { canGoBack, goBack } = useNavigationHistory();
 
   const {
     data: deal,
@@ -96,11 +99,13 @@ export const DealDetailPage = () => {
             <p className="mt-2 text-sm text-neutral-500">Error: {messageStr}</p>
           )}
           <div className="mt-6 flex justify-center">
-            <Link to={PATHS.ALL_DEALS}>
-              <Button size="md" variant="primary">
-                Back to all deals
-              </Button>
-            </Link>
+            <Button 
+              size="md" 
+              variant="primary"
+              onClick={canGoBack ? goBack : () => window.history.back()}
+            >
+              Back
+            </Button>
           </div>
         </div>
       </div>
@@ -127,6 +132,18 @@ export const DealDetailPage = () => {
       <meta name="description" content={metaDescription} />
       <div className="bg-neutral-50">
       <div className="container mx-auto max-w-4xl px-4 py-24">
+        {/* Back Button */}
+        <div className="mb-6">
+          <Button
+            variant="ghost"
+            onClick={canGoBack ? goBack : () => window.history.back()}
+            className="flex items-center gap-2 text-neutral-600 hover:text-neutral-900"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back
+          </Button>
+        </div>
+        
         {/* Hero Image */}
         <div className="h-80 w-full overflow-hidden rounded-2xl bg-neutral-200 shadow-lg">
           <img

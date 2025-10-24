@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/common/Button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TableBookingButton } from '@/components/table-booking/TableBookingButton';
+import { AvailableTablesList } from '@/components/table-booking/AvailableTablesList';
 
 // Inline AvatarStack component
 interface AvatarStackProps {
@@ -129,16 +130,21 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   // State to control visibility of offers dropdown/list
   const [offersVisible, setOffersVisible] = useState(false);
   
-  // Get unique categories from real offers
+  // Get unique categories from real offers and add Tables
   const availableCategories = useMemo(() => {
     const categories = realOffers.map(offer => offer.category).filter(Boolean);
-    return [...new Set(categories)];
+    // Always include Tables tab
+    return [...new Set([...categories, 'Tables'])];
   }, [realOffers]);
   
   const [activeOfferTab, setActiveOfferTab] = useState<string>('Drinks');
 
   // --- NEW: Memoize the filtered offers to prevent re-calculation on every render ---
   const filteredOffers = useMemo(() => {
+    // If Tables tab is selected, return empty array as tables are handled separately
+    if (activeOfferTab === 'Tables') {
+      return [];
+    }
     return realOffers.filter((offer) => offer.category === activeOfferTab);
   }, [realOffers, activeOfferTab]);
 
@@ -423,23 +429,30 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                                   exit={{ opacity: 0, y: -10 }}
                                   transition={{ duration: 0.2 }}
                                 >
-                                  {filteredOffers.map(offer => (
-                                      <div key={offer.title} className="flex items-center gap-3 p-2 rounded-lg bg-neutral-50 border border-neutral-200/60">
-                                          <img
-                                            src={offer.imageUrl || offerImageFallback}
-                                            alt={offer.title}
-                                            onError={(e) => {
-                                              (e.currentTarget as HTMLImageElement).onerror = null;
-                                              (e.currentTarget as HTMLImageElement).src = offerImageFallback;
-                                            }}
-                                            className="h-12 w-12 rounded-md object-cover flex-shrink-0"
-                                          />
-                                          <div className="flex-grow">
-                                              <p className="font-bold text-sm text-neutral-800">{offer.title}</p>
-                                              <p className="text-xs text-neutral-500 mt-1">{offer.time}</p>
-                                          </div>
-                                      </div>
-                                  ))}
+                                  {activeOfferTab === 'Tables' ? (
+                                    <AvailableTablesList 
+                                      merchantId={deal.merchantId} 
+                                      merchantName={deal.merchantName || deal.name}
+                                    />
+                                  ) : (
+                                    filteredOffers.map(offer => (
+                                        <div key={offer.title} className="flex items-center gap-3 p-2 rounded-lg bg-neutral-50 border border-neutral-200/60">
+                                            <img
+                                              src={offer.imageUrl || offerImageFallback}
+                                              alt={offer.title}
+                                              onError={(e) => {
+                                                (e.currentTarget as HTMLImageElement).onerror = null;
+                                                (e.currentTarget as HTMLImageElement).src = offerImageFallback;
+                                              }}
+                                              className="h-12 w-12 rounded-md object-cover flex-shrink-0"
+                                            />
+                                            <div className="flex-grow">
+                                                <p className="font-bold text-sm text-neutral-800">{offer.title}</p>
+                                                <p className="text-xs text-neutral-500 mt-1">{offer.time}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                  )}
                                 </motion.div>
                               </AnimatePresence>
                             </div>

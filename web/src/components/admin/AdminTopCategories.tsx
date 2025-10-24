@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAdminPerformanceTopCategories } from '@/hooks/useAdminPerformanceTopCategories';
-import { TrendingUp, TrendingDown, Minus, Tag, Hash } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Tag, Hash, ChevronDown, ChevronUp } from 'lucide-react';
 import { SkeletonList } from '@/components/common/Skeleton';
+import { Button } from '@/components/ui/button';
 
 interface AdminTopCategoriesProps {
   limit?: number;
@@ -14,6 +15,7 @@ export const AdminTopCategories: React.FC<AdminTopCategoriesProps> = ({
   period = '7d',
   cityId
 }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
   const { data, isLoading, error } = useAdminPerformanceTopCategories({ limit, period, cityId });
 
   if (isLoading) {
@@ -31,6 +33,8 @@ export const AdminTopCategories: React.FC<AdminTopCategoriesProps> = ({
   }
 
   const { categories } = data;
+  const displayCategories = isExpanded ? categories : categories.slice(0, 5);
+  const hasMore = categories.length > 5;
 
   const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
@@ -63,7 +67,7 @@ export const AdminTopCategories: React.FC<AdminTopCategoriesProps> = ({
       </div>
       
       <div className="space-y-3">
-        {categories.map((category, index) => (
+        {displayCategories.map((category, index) => (
           <div
             key={category.id}
             className="flex items-center justify-between p-3 rounded-lg border border-neutral-200 hover:border-brand-primary-300 transition-colors"
@@ -98,6 +102,28 @@ export const AdminTopCategories: React.FC<AdminTopCategoriesProps> = ({
           </div>
         ))}
       </div>
+      
+      {hasMore && (
+        <div className="mt-4 pt-4 border-t border-neutral-200">
+          <Button
+            variant="ghost"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="w-full flex items-center justify-center gap-2 text-sm text-neutral-600 hover:text-neutral-900"
+          >
+            {isExpanded ? (
+              <>
+                <ChevronUp className="h-4 w-4" />
+                Show Less
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-4 w-4" />
+                Show All ({categories.length} categories)
+              </>
+            )}
+          </Button>
+        </div>
+      )}
       
       {categories.length === 0 && (
         <div className="text-center py-8">

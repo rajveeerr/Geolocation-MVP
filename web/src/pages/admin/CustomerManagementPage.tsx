@@ -3,8 +3,9 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/common/Button';
-import { Loader2, Search, Users, DollarSign, Crown, MapPin, Eye } from 'lucide-react';
+import { Loader2, Search, Users, DollarSign, Crown, MapPin, Eye, Zap, Trophy } from 'lucide-react';
 import { useAdminCustomers } from '@/hooks/useAdminCustomers';
+import { useAdminTapInsOverview, useAdminBountiesOverview } from '@/hooks/useAdminAdvancedAnalytics';
 import { StatCard } from '@/components/common/StatCard';
 
 export const CustomerManagementPage = () => {
@@ -17,6 +18,15 @@ export const CustomerManagementPage = () => {
     });
 
     const { data: customersResponse, isLoading } = useAdminCustomers(filters);
+    
+    // Fetch tap-ins and bounties data
+    const { data: tapInsOverview, isLoading: isLoadingTapIns } = useAdminTapInsOverview({
+        period: 'last_30_days'
+    });
+    
+    const { data: bountiesOverview, isLoading: isLoadingBounties } = useAdminBountiesOverview({
+        period: 'last_30_days'
+    });
     
     const handleSearchChange = (value: string) => {
         setFilters(prev => ({ ...prev, search: value, page: 1 }));
@@ -45,7 +55,7 @@ export const CustomerManagementPage = () => {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                 <StatCard 
                     title="Total Customers" 
                     value={isLoading ? <Loader2 className="h-5 w-5 animate-spin"/> : stats.totalCustomers}
@@ -69,6 +79,22 @@ export const CustomerManagementPage = () => {
                     value={isLoading ? <Loader2 className="h-5 w-5 animate-spin"/> : `$${stats.averageSpend.toFixed(2)}`}
                     icon={<DollarSign className="h-6 w-6" />}
                     color="primary"
+                />
+                
+                {/* Tap-ins Stats */}
+                <StatCard 
+                    title="Total Tap-ins" 
+                    value={isLoadingTapIns ? <Loader2 className="h-5 w-5 animate-spin"/> : (tapInsOverview?.overview?.totalTapIns || 0)}
+                    icon={<Zap className="h-6 w-6" />}
+                    color="yellow"
+                />
+                
+                {/* Bounties Stats */}
+                <StatCard 
+                    title="Total Bounties" 
+                    value={isLoadingBounties ? <Loader2 className="h-5 w-5 animate-spin"/> : (bountiesOverview?.overview?.totalBounties || 0)}
+                    icon={<Trophy className="h-6 w-6" />}
+                    color="purple"
                 />
             </div>
 

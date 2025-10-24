@@ -6,6 +6,7 @@ interface State {
   cityId: number | null;
   businessName: string;
   businessCategory: string | null;
+  businessType: 'NATIONAL' | 'LOCAL' | null;
   address: {
     street: string;
     city: string;
@@ -30,6 +31,7 @@ type Action =
       payload: { field: keyof State['address']; value: string };
     }
   | { type: 'SET_BUSINESS_CATEGORY'; payload: string }
+  | { type: 'SET_BUSINESS_TYPE'; payload: 'NATIONAL' | 'LOCAL' }
   | { type: 'SET_FULL_ADDRESS'; payload: Partial<State['address']> }
   | { type: 'SET_COORDINATES'; payload: { lat: number; lng: number } }
   | { type: 'SET_DESCRIPTION'; payload: string }
@@ -41,6 +43,7 @@ const initialState: State = {
   cityId: null,
   businessName: '',
   businessCategory: null,
+  businessType: null,
   address: { street: '', city: '', state: '', zip: '', country: '' },
   coordinates: { lat: null, lng: null },
   description: '',
@@ -69,6 +72,8 @@ function reducer(state: State, action: Action): State {
       return { ...state, address: { ...state.address, ...action.payload } };
     case 'SET_BUSINESS_CATEGORY':
       return { ...state, businessCategory: action.payload };
+    case 'SET_BUSINESS_TYPE':
+      return { ...state, businessType: action.payload };
     case 'SET_COORDINATES':
       return { ...state, coordinates: action.payload };
     case 'SET_DESCRIPTION':

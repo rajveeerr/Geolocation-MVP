@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -13,7 +14,9 @@ import {
   Building2,
   UserCheck,
   Zap,
-  Trophy
+  Trophy,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { 
   useAdminPerformanceOverview,
@@ -36,6 +39,7 @@ import { AdminCityPerformanceCards } from '@/components/admin/AdminCityPerforman
 export const AdminAnalyticsDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedPeriod, setSelectedPeriod] = useState('last_30_days');
+  const [isBountiesExpanded, setIsBountiesExpanded] = useState(false);
 
   // Fetch data
   const { data: performanceOverview, isLoading: isLoadingOverview } = useAdminPerformanceOverview({
@@ -534,7 +538,7 @@ export const AdminAnalyticsDashboard = () => {
               <>
                 {/* Customer Overview Stats */}
                 {customerOverview?.overview && (
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
                     <Card>
                       <CardContent className="p-4">
                         <div className="flex items-center gap-2">
@@ -582,6 +586,36 @@ export const AdminAnalyticsDashboard = () => {
                         </div>
                       </CardContent>
                     </Card>
+
+                    {/* Tap-ins Stats */}
+                    {tapInsOverview?.overview && (
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2">
+                            <Zap className="h-5 w-5 text-yellow-500" />
+                            <div>
+                              <p className="text-sm text-gray-600">Total Tap-ins</p>
+                              <p className="text-2xl font-bold">{formatCount(tapInsOverview.overview.totalTapIns)}</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Bounties Stats */}
+                    {bountiesOverview?.overview && (
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2">
+                            <Trophy className="h-5 w-5 text-yellow-600" />
+                            <div>
+                              <p className="text-sm text-gray-600">Total Bounties</p>
+                              <p className="text-2xl font-bold">{formatCount(bountiesOverview.overview.totalBounties)}</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
                   </div>
                 )}
 
@@ -620,6 +654,69 @@ export const AdminAnalyticsDashboard = () => {
 
           {/* Merchants Tab */}
           <TabsContent value="merchants" className="space-y-6">
+            {/* Merchant Stats Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              {/* Total Merchants */}
+              {performanceOverview?.overview && (
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-5 w-5 text-blue-500" />
+                      <div>
+                        <p className="text-sm text-gray-600">Total Merchants</p>
+                        <p className="text-2xl font-bold">{formatCount(performanceOverview.overview.totalActiveMerchants)}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Total Revenue */}
+              {performanceOverview?.overview && (
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-5 w-5 text-green-500" />
+                      <div>
+                        <p className="text-sm text-gray-600">Total Revenue</p>
+                        <p className="text-2xl font-bold">{formatNumber(performanceOverview.overview.totalRevenue)}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Tap-ins Stats */}
+              {tapInsOverview?.overview && (
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2">
+                      <Zap className="h-5 w-5 text-yellow-500" />
+                      <div>
+                        <p className="text-sm text-gray-600">Total Tap-ins</p>
+                        <p className="text-2xl font-bold">{formatCount(tapInsOverview.overview.totalTapIns)}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Bounties Stats */}
+              {bountiesOverview?.overview && (
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2">
+                      <Trophy className="h-5 w-5 text-yellow-600" />
+                      <div>
+                        <p className="text-sm text-gray-600">Total Bounties</p>
+                        <p className="text-2xl font-bold">{formatCount(bountiesOverview.overview.totalBounties)}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -822,24 +919,51 @@ export const AdminAnalyticsDashboard = () => {
                     {isLoadingBountiesLeaderboard ? (
                       <div className="text-center py-8">Loading leaderboard...</div>
                     ) : (
-                      <div className="space-y-3">
-                        {bountiesLeaderboard?.leaderboard?.slice(0, 20).map((user, index) => (
-                          <div key={user.user.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
-                            <div className="flex items-center gap-3">
-                              <span className="text-sm font-bold text-gray-600">#{index + 1}</span>
-                              <div>
-                                <h4 className="font-semibold">{user.user.name}</h4>
-                                <p className="text-sm text-gray-600">{formatCount(user.totalBounties)} bounties</p>
+                      <>
+                        <div className="space-y-3">
+                          {(isBountiesExpanded 
+                            ? bountiesLeaderboard?.leaderboard 
+                            : bountiesLeaderboard?.leaderboard?.slice(0, 5)
+                          )?.map((user, index) => (
+                            <div key={user.user.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                              <div className="flex items-center gap-3">
+                                <span className="text-sm font-bold text-gray-600">#{index + 1}</span>
+                                <div>
+                                  <h4 className="font-semibold">{user.user.name}</h4>
+                                  <p className="text-sm text-gray-600">{formatCount(user.totalBounties)} bounties</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-semibold">{formatNumber(user.totalBountyValue)}</p>
+                                <p className="text-sm text-gray-600">{formatCount(user.totalBountyClaims)} claims</p>
+                                <p className="text-sm text-gray-500">{formatCount(user.totalBountyWinners)} wins</p>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <p className="font-semibold">{formatNumber(user.totalBountyValue)}</p>
-                              <p className="text-sm text-gray-600">{formatCount(user.totalBountyClaims)} claims</p>
-                              <p className="text-sm text-gray-500">{formatCount(user.totalBountyWinners)} wins</p>
-                            </div>
+                          ))}
+                        </div>
+                        
+                        {bountiesLeaderboard?.leaderboard && bountiesLeaderboard.leaderboard.length > 5 && (
+                          <div className="mt-4 pt-4 border-t border-gray-200">
+                            <Button
+                              variant="ghost"
+                              onClick={() => setIsBountiesExpanded(!isBountiesExpanded)}
+                              className="w-full flex items-center justify-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                            >
+                              {isBountiesExpanded ? (
+                                <>
+                                  <ChevronUp className="h-4 w-4" />
+                                  Show Less
+                                </>
+                              ) : (
+                                <>
+                                  <ChevronDown className="h-4 w-4" />
+                                  Show All ({bountiesLeaderboard.leaderboard.length} users)
+                                </>
+                              )}
+                            </Button>
                           </div>
-                        ))}
-                      </div>
+                        )}
+                      </>
                     )}
                   </CardContent>
                 </Card>
