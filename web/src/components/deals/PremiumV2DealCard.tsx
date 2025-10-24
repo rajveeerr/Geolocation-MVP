@@ -1,6 +1,6 @@
 // web/src/components/deals/PremiumV2DealCard.tsx
 import { useState, useEffect, useMemo } from 'react';
-import { Heart, Clock, ArrowRight, Phone, ChevronDown, Share2, Eye, Trophy } from 'lucide-react';
+import { Heart, Clock, ArrowRight, Phone, ChevronDown, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
@@ -24,10 +24,6 @@ interface AvatarStackProps {
 }
 
 const AvatarStack = ({ count, users, textClassName }: AvatarStackProps) => {
-  // Debug logging to see what data we're receiving
-  console.log('AvatarStack - count:', count);
-  console.log('AvatarStack - users:', users);
-  
   // Only show avatars if we have real users and a count > 0
   const shouldShowAvatars = count > 0 && users && users.length > 0;
   
@@ -41,18 +37,8 @@ const AvatarStack = ({ count, users, textClassName }: AvatarStackProps) => {
         <div className="flex -space-x-3">
           {avatarsToShow.map((user, index) => (
             <Avatar key={index} className="h-8 w-8 border-2 border-white">
-              <AvatarImage 
-                src={user.avatarUrl || undefined} 
-                alt={`User ${index + 1}`}
-                onError={(e) => {
-                  console.log('Avatar image failed to load:', user.avatarUrl);
-                  // The AvatarFallback will show instead
-                }}
-                onLoad={() => {
-                  console.log('Avatar image loaded successfully:', user.avatarUrl);
-                }}
-              />
-              <AvatarFallback className="bg-gradient-to-br from-blue-400 to-purple-500 text-white text-xs font-semibold">
+              <AvatarImage src={user.avatarUrl || undefined} />
+              <AvatarFallback className="bg-neutral-200 text-neutral-600 text-xs">
                 {user.avatarUrl ? 'U' : '?'}
               </AvatarFallback>
             </Avatar>
@@ -137,11 +123,6 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   const realClaimedUsers = deal.claimedBy?.visibleUsers || [];
   const realClaimedCount = deal.claimedBy?.totalCount || 0;
   
-  // Debug logging to see what data we're receiving from backend
-  console.log('PremiumV2DealCard - deal.claimedBy:', deal.claimedBy);
-  console.log('PremiumV2DealCard - realClaimedUsers:', realClaimedUsers);
-  console.log('PremiumV2DealCard - realClaimedCount:', realClaimedCount);
-  
   // Use real data only - no fake data
   const finalClaimedCount = realClaimedCount;
   const finalClaimedUsers = realClaimedUsers;
@@ -184,22 +165,9 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   let ctaIcon = <ArrowRight className="h-6 w-6 -rotate-45" />;
   let ctaVariant = 'primary';
 
-  // Handle different deal types
   if (deal.isBooking) {
     ctaText = 'Pre-buy';
     ctaIcon = <ArrowRight className="h-5 w-5 -rotate-45" />;
-    ctaVariant = 'primary';
-  } else if (deal.dealType === 'Redeem Now' || deal.dealType === 'REDEEM_NOW') {
-    ctaText = 'REDEEM NOW';
-    ctaIcon = null as any;
-    ctaVariant = 'primary';
-  } else if (deal.dealType === 'Hidden Deal' || deal.dealType === 'HIDDEN') {
-    ctaText = 'Unlock Deal';
-    ctaIcon = <Eye className="h-5 w-5" />;
-    ctaVariant = 'secondary';
-  } else if (deal.dealType === 'Bounty Deal' || deal.dealType === 'BOUNTY') {
-    ctaText = 'Earn Rewards';
-    ctaIcon = <Trophy className="h-5 w-5" />;
     ctaVariant = 'primary';
   } else if (isHighValueDiscount) {
     ctaText = 'REDEEM NOW';
@@ -462,10 +430,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                                   transition={{ duration: 0.2 }}
                                 >
                                   {activeOfferTab === 'Tables' ? (
-                                    <AvailableTablesList 
-                                      merchantId={deal.merchantId} 
-                                      merchantName={deal.merchantName || deal.name}
-                                    />
+                                    <AvailableTablesList merchantId={deal.merchantId} />
                                   ) : (
                                     filteredOffers.map(offer => (
                                         <div key={offer.title} className="flex items-center gap-3 p-2 rounded-lg bg-neutral-50 border border-neutral-200/60">

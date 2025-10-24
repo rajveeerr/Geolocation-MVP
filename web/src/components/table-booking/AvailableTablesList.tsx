@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, Clock, MapPin, Calendar } from 'lucide-react';
+import { Users, Calendar } from 'lucide-react';
 import { TableBookingModal } from './TableBookingModal';
-import { useMerchantAvailability, usePublicMerchantTables } from '@/hooks/useTableBooking';
-import { format } from 'date-fns';
+import { usePublicMerchantTables } from '@/hooks/useTableBooking';
 
 interface Table {
   tableId: number;
@@ -23,7 +21,6 @@ interface AvailableTablesListProps {
 export const AvailableTablesList = ({ merchantId, merchantName }: AvailableTablesListProps) => {
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedDate] = useState(new Date());
 
   const handleTableSelect = (table: Table) => {
     setSelectedTable(table);
@@ -38,13 +35,6 @@ export const AvailableTablesList = ({ merchantId, merchantName }: AvailableTable
   // Fetch tables directly from backend
   const { data: tablesData, isLoading: isLoadingTables } = usePublicMerchantTables(merchantId);
   const apiTables = tablesData?.tables || [];
-
-  // Fetch availability from backend (for time slots)
-  const { data: availability, isLoading: isLoadingAvailability } = useMerchantAvailability(
-    merchantId,
-    format(selectedDate, 'yyyy-MM-dd'),
-    2 // Default party size
-  );
 
   // Mock table data - fallback when no real data is available
   const mockTables: Table[] = [
@@ -61,27 +51,6 @@ export const AvailableTablesList = ({ merchantId, merchantName }: AvailableTable
       capacity: 6,
       location: "Main dining area",
       features: ["Private", "Comfortable seating"]
-    },
-    {
-      tableId: 3,
-      tableName: "Bar Table",
-      capacity: 2,
-      location: "Bar area",
-      features: ["Bar view", "High-top seating"]
-    },
-    {
-      tableId: 4,
-      tableName: "Family Table",
-      capacity: 8,
-      location: "Center of restaurant",
-      features: ["Large table", "Family-friendly"]
-    },
-    {
-      tableId: 5,
-      tableName: "Outdoor Table",
-      capacity: 4,
-      location: "Patio",
-      features: ["Outdoor seating", "Fresh air"]
     }
   ];
 
@@ -105,7 +74,7 @@ export const AvailableTablesList = ({ merchantId, merchantName }: AvailableTable
           <p className="text-sm text-neutral-600">Loading tables...</p>
         </div>
         <div className="space-y-2">
-          {[1, 2, 3].map((i) => (
+          {[1, 2].map((i) => (
             <div key={i} className="animate-pulse">
               <div className="h-16 bg-neutral-200 rounded-lg"></div>
             </div>
