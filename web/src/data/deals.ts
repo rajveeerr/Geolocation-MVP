@@ -22,7 +22,7 @@ export interface Deal {
   offerTerms?: string; // new fine-print field from backend
   claimedBy?: {
     totalCount: number;
-    visibleUsers: { avatarUrl: string }[];
+    visibleUsers: { avatarUrl?: string | null }[];
   };
   offers?: Offer[];
   originalValue?: number;

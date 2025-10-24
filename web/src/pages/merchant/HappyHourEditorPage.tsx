@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHappyHour } from '@/context/HappyHourContext'; // <-- Use the new hook
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
+import { useDealCreation } from '@/context/DealCreationContext';
 import { Button } from '@/components/common/Button';
 import { ArrowLeft, Plus, Loader2 } from 'lucide-react';
 import { FormSection } from '@/components/merchant/create-deal/FormSection';
@@ -21,11 +22,44 @@ import { MerchantProtectedRoute } from '@/components/auth/MerchantProtectedRoute
 const HappyHourEditorContent = () => {
   const navigate = useNavigate();
   const { state, dispatch } = useHappyHour();
+  const { state: dealCreationState } = useDealCreation();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Check merchant status before allowing deal creation
   const { data: merchantData, isLoading: isLoadingMerchant } = useMerchantStatus();
+
+  // Preset information based on deal type
+  useEffect(() => {
+    if (dealCreationState.dealType) {
+      switch (dealCreationState.dealType) {
+        case 'REDEEM_NOW':
+          dispatch({ type: 'SET_FIELD', field: 'title', value: 'Redeem Now Deal' });
+          dispatch({ type: 'SET_FIELD', field: 'description', value: 'Immediate redemption - no waiting required!' });
+          dispatch({ type: 'SET_FIELD', field: 'happyHourType', value: 'Midday' });
+          dispatch({ type: 'SET_FIELD', field: 'discountPercentage', value: 25 });
+          dispatch({ type: 'SET_FIELD', field: 'timeRanges', value: [{ id: Date.now(), start: '12:00', end: '23:59', day: 'All' }] });
+          break;
+        case 'HIDDEN':
+          dispatch({ type: 'SET_FIELD', field: 'title', value: 'Hidden Deal' });
+          dispatch({ type: 'SET_FIELD', field: 'description', value: 'Exclusive access deal - only for special customers' });
+          dispatch({ type: 'SET_FIELD', field: 'happyHourType', value: 'Late night' });
+          dispatch({ type: 'SET_FIELD', field: 'discountPercentage', value: 30 });
+          dispatch({ type: 'SET_FIELD', field: 'timeRanges', value: [{ id: Date.now(), start: '22:00', end: '02:00', day: 'All' }] });
+          break;
+        case 'BOUNTY':
+          dispatch({ type: 'SET_FIELD', field: 'title', value: 'Bounty Deal' });
+          dispatch({ type: 'SET_FIELD', field: 'description', value: 'Complete tasks to earn rewards and discounts' });
+          dispatch({ type: 'SET_FIELD', field: 'happyHourType', value: 'Mornings' });
+          dispatch({ type: 'SET_FIELD', field: 'discountPercentage', value: 15 });
+          dispatch({ type: 'SET_FIELD', field: 'timeRanges', value: [{ id: Date.now(), start: '06:00', end: '12:00', day: 'All' }] });
+          break;
+        default:
+          // Default happy hour settings
+          break;
+      }
+    }
+  }, [dealCreationState.dealType, dispatch]);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -184,11 +218,21 @@ const HappyHourEditorContent = () => {
         return;
       }
 
+      // Determine deal type for backend
+      let backendDealType = 'Happy Hour';
+      if (dealCreationState.dealType === 'REDEEM_NOW') {
+        backendDealType = 'Redeem Now';
+      } else if (dealCreationState.dealType === 'HIDDEN') {
+        backendDealType = 'Hidden Deal';
+      } else if (dealCreationState.dealType === 'BOUNTY') {
+        backendDealType = 'Bounty Deal';
+      }
+
       const payload: any = {
         title: state.title || `${state.happyHourType} Happy Hour`,
         description: state.description || `Special offers available during our ${state.happyHourType} happy hour.`,
         category: state.category || 'FOOD_AND_BEVERAGE',
-        dealType: 'Happy Hour',
+        dealType: backendDealType,
         // Backend expects activeDateRange with startDate and endDate
         activeDateRange: {
           startDate: state.activeStartDate 

@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Users, Clock, MapPin, Calendar } from 'lucide-react';
 import { TableBookingModal } from './TableBookingModal';
-import { useMerchantAvailability } from '@/hooks/useTableBooking';
+import { useMerchantAvailability, usePublicMerchantTables } from '@/hooks/useTableBooking';
 import { format } from 'date-fns';
 
 interface Table {
@@ -18,10 +18,9 @@ interface Table {
 interface AvailableTablesListProps {
   merchantId: number;
   merchantName: string;
-  tables?: Table[];
 }
 
-export const AvailableTablesList = ({ merchantId, merchantName, tables }: AvailableTablesListProps) => {
+export const AvailableTablesList = ({ merchantId, merchantName }: AvailableTablesListProps) => {
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate] = useState(new Date());
@@ -36,8 +35,12 @@ export const AvailableTablesList = ({ merchantId, merchantName, tables }: Availa
     setSelectedTable(null);
   };
 
-  // Fetch availability from backend
-  const { data: availability, isLoading } = useMerchantAvailability(
+  // Fetch tables directly from backend
+  const { data: tablesData, isLoading: isLoadingTables } = usePublicMerchantTables(merchantId);
+  const apiTables = tablesData?.tables || [];
+
+  // Fetch availability from backend (for time slots)
+  const { data: availability, isLoading: isLoadingAvailability } = useMerchantAvailability(
     merchantId,
     format(selectedDate, 'yyyy-MM-dd'),
     2 // Default party size
@@ -83,26 +86,18 @@ export const AvailableTablesList = ({ merchantId, merchantName, tables }: Availa
   ];
 
   // Use real data from API if available, otherwise use mock data
-  const tablesToShow = availability?.availableTables?.length > 0 
-    ? availability.availableTables.map(table => ({
+  const tablesToShow = apiTables && apiTables.length > 0 
+    ? apiTables.map(table => ({
         tableId: table.id,
         tableName: table.name,
         capacity: table.capacity,
         location: "Restaurant",
         features: table.features || []
       }))
-    : tables && tables.length > 0 
-    ? tables 
     : mockTables;
 
-  // Debug logging
-  console.log('AvailableTablesList - merchantId:', merchantId);
-  console.log('AvailableTablesList - availability:', availability);
-  console.log('AvailableTablesList - availability.availableTables:', availability?.availableTables);
-  console.log('AvailableTablesList - tablesToShow:', tablesToShow);
-  console.log('AvailableTablesList - isLoading:', isLoading);
 
-  if (isLoading) {
+  if (isLoadingTables) {
     return (
       <div className="space-y-3">
         <div className="text-center mb-4">
@@ -185,10 +180,7 @@ export const AvailableTablesList = ({ merchantId, merchantName, tables }: Availa
             </div>
             <h3 className="text-lg font-semibold text-neutral-600 mb-2">No Tables Available</h3>
             <p className="text-sm text-neutral-500">
-              {availability?.availableTables?.length === 0 
-                ? "This restaurant hasn't set up table reservations yet. Please contact them directly."
-                : "All tables are currently booked. Please try a different time or date."
-              }
+              All tables are currently booked. Please try a different time or date.
             </p>
           </div>
         )}

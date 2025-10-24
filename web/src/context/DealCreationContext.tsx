@@ -23,7 +23,7 @@ export interface SelectedMenuItem extends MenuItem {
 }
 
 export interface DealCreationState {
-  dealType: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' | null;
+  dealType: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' | 'REDEEM_NOW' | 'HIDDEN' | 'BOUNTY' | null;
   happyHourPeriod: 'Mornings' | 'Midday' | 'Late night';
   timeRanges: TimeRange[];
   activeStartDate: string;

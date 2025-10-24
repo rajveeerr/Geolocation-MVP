@@ -30,8 +30,11 @@ const InitialStepHandler = () => {
         // Based on the deal type chosen, navigate to the correct flow's first step
         if (state.dealType === 'HAPPY_HOUR') {
             navigate('/merchant/deals/create/happy-hour/edit');
+        } else if (state.dealType === 'REDEEM_NOW' || state.dealType === 'HIDDEN' || state.dealType === 'BOUNTY') {
+            // For new deal types, use the happy hour flow with preset information
+            navigate('/merchant/deals/create/happy-hour/edit');
         } else {
-            // For both 'STANDARD' and 'RECURRING', start the simple multi-step flow
+            // For 'STANDARD' and 'RECURRING', start the simple multi-step flow
             navigate('/merchant/deals/create/basics');
         }
     };

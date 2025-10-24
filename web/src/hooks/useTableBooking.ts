@@ -219,6 +219,27 @@ export const useMerchantTables = (merchantId: number | undefined) => {
   });
 };
 
+// Get merchant tables (public - for customers)
+export const usePublicMerchantTables = (merchantId: number | undefined) => {
+  return useQuery<{ tables: Table[] }, Error>({
+    queryKey: ['public-merchant-tables', merchantId],
+    queryFn: async () => {
+      const response = await apiGet<{ tables: Table[] }>(
+        `/table-booking/merchants/${merchantId}/tables`
+      );
+
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to fetch merchant tables');
+      }
+
+      return response.data;
+    },
+    enabled: !!merchantId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 2,
+  });
+};
+
 // Get merchant bookings (for merchant dashboard)
 export const useMerchantBookings = (merchantId: number | undefined, date?: string) => {
   return useQuery<{ bookings: Booking[] }, Error>({
