@@ -56,7 +56,7 @@ interface DealsSidebarProps {
 const dealTypeOptions = [
   { value: '', label: 'All Types' },
   { value: 'STANDARD', label: 'Standard' },
-  { value: 'RECURRING', label: 'Recurring' },
+  { value: 'RECURRING', label: 'Daily Deals' },
   { value: 'HAPPY_HOUR', label: 'Happy Hour' },
 ];
 

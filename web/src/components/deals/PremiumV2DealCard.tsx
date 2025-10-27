@@ -1,5 +1,5 @@
 // web/src/components/deals/PremiumV2DealCard.tsx
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
 import { Heart, Clock, ArrowRight, Phone, ChevronDown, Share2, Eye, Trophy, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -28,10 +28,6 @@ interface AvatarStackProps {
 }
 
 const AvatarStack = ({ count, users, textClassName }: AvatarStackProps) => {
-  // Debug logging to see what data we're receiving
-  console.log('AvatarStack - count:', count);
-  console.log('AvatarStack - users:', users);
-  
   // Only show avatars if we have real users and a count > 0
   const shouldShowAvatars = count > 0 && users && users.length > 0;
   
@@ -49,11 +45,7 @@ const AvatarStack = ({ count, users, textClassName }: AvatarStackProps) => {
                 src={user.avatarUrl || undefined} 
                 alt={`User ${index + 1}`}
                 onError={() => {
-                  console.log('Avatar image failed to load:', user.avatarUrl);
                   // The AvatarFallback will show instead
-                }}
-                onLoad={() => {
-                  console.log('Avatar image loaded successfully:', user.avatarUrl);
                 }}
               />
               <AvatarFallback className="bg-gradient-to-br from-blue-400 to-purple-500 text-white text-xs font-semibold">
@@ -105,35 +97,13 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
     useSavedDeals();
 
   // Fetch today's availability for this merchant
-  // TEMPORARY FIX: Use merchantId 1 if undefined (for testing)
-  const effectiveMerchantId = deal.merchantId || 1;
-  const shouldFetchAvailability = true; // Always fetch for now
-  
-  // DEBUG: Log merchant availability fetch
-  console.log(`🔍 [${deal.name}] Merchant Availability Fetch:`, {
-    dealId: deal.id,
-    merchantId: deal.merchantId,
-    merchantObject: deal.merchant,
-    fullDeal: deal,
-    shouldFetch: shouldFetchAvailability,
-    willFetchFor: shouldFetchAvailability ? deal.merchantId : 0
-  });
+  // Only fetch availability if merchantId is defined
+  const shouldFetchAvailability = deal.merchantId !== undefined && deal.merchantId !== null;
   
   const { data: todayAvailability, isLoading: isLoadingAvailability, error: availabilityError } = useTodayAvailability(
-    effectiveMerchantId, // Use effective merchantId (1 if undefined)
+    deal.merchantId || 0, // Use 0 if undefined (will not fetch due to enabled condition)
     2 // default party size
   );
-
-  // DEBUG: Log availability result
-  console.log(`📊 [${deal.name}] Availability Result:`, {
-    dealId: deal.id,
-    merchantId: deal.merchantId,
-    isLoading: isLoadingAvailability,
-    hasData: !!todayAvailability,
-    tablesCount: todayAvailability?.availableTables?.length,
-    slotsCount: todayAvailability?.availableTimeSlots?.length,
-    error: availabilityError
-  });
 
   // State for booking modal
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -165,11 +135,6 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   // Use real claimed users from backend data - no fallback to mock data
   const realClaimedUsers = deal.claimedBy?.visibleUsers || [];
   const realClaimedCount = deal.claimedBy?.totalCount || 0;
-  
-  // Debug logging to see what data we're receiving from backend
-  console.log('PremiumV2DealCard - deal.claimedBy:', deal.claimedBy);
-  console.log('PremiumV2DealCard - realClaimedUsers:', realClaimedUsers);
-  console.log('PremiumV2DealCard - realClaimedCount:', realClaimedCount);
   
   // Use real data only - no fake data
   const finalClaimedCount = realClaimedCount;
@@ -495,7 +460,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                     }}
                     className="flex items-center justify-center w-full mb-3 text-sm font-semibold text-brand-primary-600 hover:text-brand-primary-800"
                   >
-                    <span>View All Offers</span>
+                    <span>View All Offers/Tables</span>
                     {/* Blinking dot */}
                     <div className="w-1 h-1 bg-brand-primary-600 rounded-full ml-2 animate-pulse"></div>
                     <ChevronDown className={cn('h-5 w-5 ml-1 transition-transform', offersVisible && 'rotate-180')} />
@@ -536,20 +501,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                                 >
                                   {activeOfferTab === 'Tables' ? (
                                     <div className="space-y-3">
-                                      {/* Check if merchant has table booking set up */}
-                                      {(() => {
-                                        console.log('🔍 Tables Tab Debug:', {
-                                          dealName: deal.name,
-                                          merchantId: deal.merchantId,
-                                          hasMerchantId: !!deal.merchantId,
-                                          todayAvailability,
-                                          isLoadingAvailability,
-                                          availableTables: todayAvailability?.availableTables,
-                                          availableSlots: todayAvailability?.availableTimeSlots
-                                        });
-                                        return null;
-                                      })()}
-                                      {!effectiveMerchantId ? (
+                                      {!deal.merchantId ? (
                                         <div className="text-center py-8">
                                           <div className="text-neutral-400 mb-2">
                                             <Calendar className="h-12 w-12 mx-auto" />
@@ -583,7 +535,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                                                 {todayAvailability.availableTimeSlots.slice(0, 3).map((slot) => (
                     <TimeSlotQuickCard
                       key={slot.id}
-                      merchantId={effectiveMerchantId}
+                      merchantId={deal.merchantId!}
                       merchantName={deal.merchantName || deal.name}
                       slot={slot}
                       date={todayAvailability.date}
@@ -640,7 +592,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                                               </summary>
                                               <div className="mt-2">
                   <AvailableTablesList
-                    merchantId={effectiveMerchantId}
+                    merchantId={deal.merchantId!}
                     merchantName={deal.merchantName || deal.name}
                   />
                                               </div>
@@ -734,7 +686,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
         <TableBookingModal
           isOpen={isBookingModalOpen}
           onClose={handleCloseBookingModal}
-          merchantId={effectiveMerchantId}
+          merchantId={deal.merchantId!}
           merchantName={deal.merchantName || deal.name}
           preselectedTimeSlot={preselectedTimeSlot}
         />
@@ -742,3 +694,5 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
     </div>
   );
 };
+
+export default memo(PremiumV2DealCard);

@@ -201,10 +201,12 @@ export const useMerchantAvailability = (merchantId: number, date: string, partyS
     queryKey: ['merchant-availability', merchantId, date, partySize],
     queryFn: () => fetchAvailability(merchantId, date, partySize),
     enabled: !!merchantId && merchantId > 0 && !!date, // Only fetch if merchantId is valid (> 0)
-    staleTime: 1 * 60 * 1000, // 1 minute
-    gcTime: 5 * 60 * 1000, // 5 minutes (was cacheTime in v4)
+    staleTime: 5 * 60 * 1000, // 5 minutes - increased to reduce refetches
+    gcTime: 10 * 60 * 1000, // 10 minutes - increased to keep data longer
     retry: 1, // Only retry once to avoid rate limiting
     refetchOnWindowFocus: false,
+    refetchOnMount: false, // Don't refetch on component mount if data exists
+    refetchOnReconnect: false, // Don't refetch on network reconnect
   });
 };
 

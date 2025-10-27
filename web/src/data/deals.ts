@@ -15,6 +15,7 @@ export interface Deal {
   price: '$$' | '$$$' | '$';
   location: string;
   tag?: string;
+  merchantId?: number | null;
 
   // --- NEW DEAL-SPECIFIC FIELDS ---
   dealType?: 'Discount' | 'Happy Hour' | 'Kickback' | 'Recurring' | 'Redeem Now' | 'Hidden Deal' | 'Bounty Deal' | 'REDEEM_NOW' | 'HIDDEN' | 'BOUNTY';

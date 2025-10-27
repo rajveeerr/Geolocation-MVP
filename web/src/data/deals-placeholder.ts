@@ -8,11 +8,15 @@ export type ApiDeal = {
   description: string;
   imageUrl?: string | null;
   images?: string[];
+  merchantId?: number | null; // Add merchantId field
   merchant: {
+    id?: number | null; // Add merchant id
     businessName: string;
     address: string;
     latitude?: number | null;
     longitude?: number | null;
+    logoUrl?: string | null; // Add logoUrl
+    phoneNumber?: string | null; // Add phoneNumber
   };
   discountPercentage?: number | null;
   discountAmount?: number | null;
@@ -100,6 +104,7 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
   ],
 
   // Add merchant information for dynamic display
+  merchantId: apiDeal.merchantId, // Pass through merchantId
   merchantName: apiDeal.merchant.businessName,
   merchantAddress: apiDeal.merchant.address,
   merchantLogo: apiDeal.merchant.logoUrl,

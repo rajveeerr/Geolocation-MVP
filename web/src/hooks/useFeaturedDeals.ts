@@ -18,7 +18,7 @@ export const useFeaturedDeals = () => {
       }
       return res.data;
     },
-    select: (data) => (data?.deals || []).map(adaptApiDealToFrontend), // Map backend deals to frontend shape
+    select: (data) => (data?.deals || []).map(adaptApiDealToFrontend),
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 };

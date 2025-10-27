@@ -409,7 +409,7 @@ const MerchantMyDealsContent = () => {
                 <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="happy_hour">Happy Hour</SelectItem>
                 <SelectItem value="standard">Standard</SelectItem>
-                <SelectItem value="recurring">Recurring</SelectItem>
+                <SelectItem value="recurring">Daily Deals</SelectItem>
               </SelectContent>
             </Select>
           </div>

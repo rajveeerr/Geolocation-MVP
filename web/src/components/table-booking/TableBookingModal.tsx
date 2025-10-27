@@ -145,7 +145,7 @@ export const TableBookingModal = ({ isOpen, onClose, merchantId, merchantName, p
             {/* Selected Date */}
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-neutral-600" />
-              <span className="text-sm font-medium">
+              <span className="text-sm font-medium text-neutral-700">
                 {selectedDate ? format(selectedDate, 'MMM dd, yyyy') : 'Select date'}
               </span>
               <div className="flex flex-col">
@@ -190,7 +190,7 @@ export const TableBookingModal = ({ isOpen, onClose, merchantId, merchantName, p
             {selectedTimeSlotId && availability?.availableTimeSlots && (
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-neutral-600" />
-                <span className="text-sm font-medium">
+                <span className="text-sm font-medium text-neutral-700">
                   {(() => {
                     const selectedSlot = availability.availableTimeSlots.find(slot => slot.id === selectedTimeSlotId);
                     return selectedSlot ? `${selectedSlot.startTime} - ${selectedSlot.endTime}` : 'Select time';
@@ -272,7 +272,7 @@ export const TableBookingModal = ({ isOpen, onClose, merchantId, merchantName, p
               <h3 className="text-lg font-semibold text-neutral-800 mb-4">Available Time Slots</h3>
               {isLoadingAvailability ? (
                 <div className="flex items-center justify-center py-8">
-                  <div className="text-sm text-neutral-500">Loading availability...</div>
+                  <div className="text-sm text-neutral-600">Loading availability...</div>
                 </div>
               ) : availability?.availableTimeSlots.length ? (
                 <div className="grid grid-cols-3 gap-3">
@@ -288,20 +288,20 @@ export const TableBookingModal = ({ isOpen, onClose, merchantId, merchantName, p
                         "flex items-center justify-center gap-2 h-12 text-sm font-medium",
                         selectedTimeSlotId === slot.id 
                           ? "bg-orange-600 text-white hover:bg-orange-700" 
-                          : "hover:bg-orange-50 border-orange-200"
+                          : "border-neutral-300 text-neutral-700 hover:bg-orange-50 hover:border-orange-300"
                       )}
                     >
                       <Clock className="h-4 w-4" />
                       <div className="flex flex-col">
                         <span>{slot.startTime}</span>
-                        <span className="text-xs text-neutral-500">{slot.availableSpots} spots</span>
+                        <span className="text-xs text-neutral-600">{slot.availableSpots} spots</span>
                       </div>
                     </Button>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-neutral-500">
-                  <Clock className="h-8 w-8 mx-auto mb-2 text-neutral-400" />
+                <div className="text-center py-8 text-neutral-600">
+                  <Clock className="h-8 w-8 mx-auto mb-2 text-neutral-500" />
                   <p>No time slots available for this date</p>
                 </div>
               )}
@@ -328,20 +328,20 @@ export const TableBookingModal = ({ isOpen, onClose, merchantId, merchantName, p
                           "flex items-center justify-start gap-3 h-16 text-sm font-medium",
                           selectedTableId === table.id 
                             ? "bg-orange-600 text-white hover:bg-orange-700" 
-                            : "hover:bg-orange-50 border-orange-200"
+                            : "border-neutral-300 text-neutral-700 hover:bg-orange-50 hover:border-orange-300"
                         )}
                       >
                         <Users className="h-5 w-5" />
                         <div className="flex flex-col items-start">
                           <span className="font-medium">{table.name}</span>
-                          <span className="text-xs text-neutral-500">Up to {table.capacity} people</span>
+                          <span className="text-xs text-neutral-600">Up to {table.capacity} people</span>
                         </div>
                       </Button>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-neutral-500">
-                    <Users className="h-8 w-8 mx-auto mb-2 text-neutral-400" />
+                  <div className="text-center py-8 text-neutral-600">
+                    <Users className="h-8 w-8 mx-auto mb-2 text-neutral-500" />
                     <p>No tables available for {partySize} people at this time</p>
                   </div>
                 );
@@ -360,7 +360,7 @@ export const TableBookingModal = ({ isOpen, onClose, merchantId, merchantName, p
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="contactName">Full Name *</Label>
+                  <Label htmlFor="contactName" className="text-neutral-700 font-medium">Full Name *</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -374,7 +374,7 @@ export const TableBookingModal = ({ isOpen, onClose, merchantId, merchantName, p
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="contactEmail">Email *</Label>
+                  <Label htmlFor="contactEmail" className="text-neutral-700 font-medium">Email *</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -389,7 +389,7 @@ export const TableBookingModal = ({ isOpen, onClose, merchantId, merchantName, p
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="contactPhone">Phone Number *</Label>
+                  <Label htmlFor="contactPhone" className="text-neutral-700 font-medium">Phone Number *</Label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -404,7 +404,7 @@ export const TableBookingModal = ({ isOpen, onClose, merchantId, merchantName, p
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="specialRequests">Special Requests</Label>
+                  <Label htmlFor="specialRequests" className="text-neutral-700 font-medium">Special Requests</Label>
                   <div className="relative">
                     <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Textarea

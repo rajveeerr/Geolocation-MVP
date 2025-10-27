@@ -36,8 +36,6 @@ import {
   useCreateTimeSlot,
   useUpdateTimeSlot,
   useDeleteTimeSlot,
-  useMerchantBookings,
-  useUpdateBookingStatus,
   useMerchantBookingSettings,
   useUpdateMerchantBookingSettings,
   useFilteredMerchantBookings
@@ -586,7 +584,7 @@ export const MerchantTableBookingDashboard = () => {
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>
-          </div>
+                </div>
 
           {/* View Toggle */}
           <div className="flex gap-2 mb-4">
@@ -603,13 +601,13 @@ export const MerchantTableBookingDashboard = () => {
             >
               <Calendar className="h-4 w-4 mr-2" />
               Calendar View
-            </Button>
-          </div>
+                </Button>
+              </div>
 
           {/* Table View */}
           {view === 'table' && (
             <Card>
-              <CardContent>
+            <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -652,16 +650,16 @@ export const MerchantTableBookingDashboard = () => {
                           <div className="flex items-center gap-2">
                             {booking.status === 'PENDING' && (
                               <>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
+                            <Button
+                              variant="ghost"
+                              size="sm"
                                   onClick={() => handleUpdateBookingStatus(booking.id, 'CONFIRMED')}
                                 >
                                   <CheckCircle className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
                                   onClick={() => handleUpdateBookingStatus(booking.id, 'CANCELLED')}
                                 >
                                   <XCircle className="h-4 w-4" />
@@ -677,8 +675,8 @@ export const MerchantTableBookingDashboard = () => {
                     ))}
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
+            </CardContent>
+          </Card>
           )}
 
           {/* Calendar View */}
@@ -706,7 +704,7 @@ export const MerchantTableBookingDashboard = () => {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Advance Booking Settings */}
-              <div>
+                <div>
                 <Label>Advance Booking Days</Label>
                 <Input
                   type="number"
@@ -716,7 +714,7 @@ export const MerchantTableBookingDashboard = () => {
                 <p className="text-sm text-muted-foreground">
                   How many days in advance customers can book
                 </p>
-              </div>
+                </div>
 
               {/* Party Size Limits */}
               <div className="grid grid-cols-2 gap-4">
@@ -727,7 +725,7 @@ export const MerchantTableBookingDashboard = () => {
                     value={settingsForm.minPartySize}
                     onChange={(e) => setSettingsForm(prev => ({ ...prev, minPartySize: parseInt(e.target.value) || 1 }))}
                   />
-                </div>
+              </div>
                 <div>
                   <Label>Max Party Size</Label>
                   <Input 
@@ -735,11 +733,11 @@ export const MerchantTableBookingDashboard = () => {
                     value={settingsForm.maxPartySize}
                     onChange={(e) => setSettingsForm(prev => ({ ...prev, maxPartySize: parseInt(e.target.value) || 20 }))}
                   />
-                </div>
-              </div>
+                          </div>
+                          </div>
 
               {/* Cancellation Policy */}
-              <div>
+                          <div>
                 <Label>Cancellation Hours</Label>
                 <Input
                   type="number"
@@ -749,7 +747,7 @@ export const MerchantTableBookingDashboard = () => {
                 <p className="text-sm text-muted-foreground">
                   Hours before booking when cancellation is allowed
                 </p>
-              </div>
+                          </div>
 
               {/* Toggle Settings */}
               <div className="space-y-4">
@@ -759,7 +757,7 @@ export const MerchantTableBookingDashboard = () => {
                     <p className="text-sm text-muted-foreground">
                       Automatically confirm without manual approval
                     </p>
-                  </div>
+                          </div>
                   <Switch
                     checked={settingsForm.autoConfirmBookings}
                     onCheckedChange={(checked) => setSettingsForm(prev => ({ ...prev, autoConfirmBookings: checked }))}
