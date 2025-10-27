@@ -53,7 +53,7 @@ export const EnhancedCalendar = ({
     const monthName = format(month, 'MMMM yyyy');
     
     return (
-      <div className={`flex flex-col ${isSecondMonth ? 'ml-4' : ''}`}>
+      <div className={`flex flex-col w-full ${isSecondMonth ? 'ml-6' : ''}`}>
         <div className="text-center mb-4">
           <h3 className="text-lg font-semibold text-neutral-800">{monthName}</h3>
         </div>
@@ -85,11 +85,11 @@ export const EnhancedCalendar = ({
                 variant="ghost"
                 size="sm"
                 className={`
-                  h-10 w-10 p-0 text-sm font-medium
+                  h-10 w-10 p-0 text-sm font-medium rounded-md
                   ${!isCurrentMonth ? 'text-neutral-300' : ''}
-                  ${isTodayDate ? 'bg-blue-100 text-blue-600 font-bold' : ''}
-                  ${isSelected ? 'bg-neutral-800 text-white font-bold' : ''}
-                  ${isDisabled ? 'text-neutral-300 cursor-not-allowed' : 'hover:bg-neutral-100'}
+                  ${isTodayDate ? 'bg-orange-100 text-orange-600 font-bold' : ''}
+                  ${isSelected ? 'bg-orange-600 text-white font-bold hover:bg-orange-700' : ''}
+                  ${isDisabled ? 'text-neutral-300 cursor-not-allowed' : 'hover:bg-orange-50'}
                   ${!isDisabled && isCurrentMonth && !isSelected && !isTodayDate ? 'text-neutral-800' : ''}
                 `}
                 disabled={isDisabled}
@@ -134,7 +134,7 @@ export const EnhancedCalendar = ({
       </div>
       
       {/* Dual Calendar */}
-      <div className="flex">
+      <div className="flex gap-8">
         {renderCalendar(currentMonth)}
         {renderCalendar(secondMonth, true)}
       </div>

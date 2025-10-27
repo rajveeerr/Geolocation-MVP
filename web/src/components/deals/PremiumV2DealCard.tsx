@@ -1,6 +1,6 @@
 // web/src/components/deals/PremiumV2DealCard.tsx
 import { useState, useEffect, useMemo } from 'react';
-import { Heart, Clock, ArrowRight, Phone, ChevronDown, Share2 } from 'lucide-react';
+import { Heart, Clock, ArrowRight, Phone, ChevronDown, Share2, Eye, Trophy, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
@@ -13,8 +13,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 // AvatarStack component inline to avoid import issues
 import { Button } from '@/components/common/Button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { TableBookingButton } from '@/components/table-booking/TableBookingButton';
 import { AvailableTablesList } from '@/components/table-booking/AvailableTablesList';
+import { TimeSlotQuickCard } from '@/components/table-booking/TimeSlotQuickCard';
+import { TableBookingModal } from '@/components/table-booking/TableBookingModal';
+import { useTodayAvailability } from '@/hooks/useTableBooking';
+import { useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
 
 // Inline AvatarStack component
 interface AvatarStackProps {
@@ -24,6 +28,10 @@ interface AvatarStackProps {
 }
 
 const AvatarStack = ({ count, users, textClassName }: AvatarStackProps) => {
+  // Debug logging to see what data we're receiving
+  console.log('AvatarStack - count:', count);
+  console.log('AvatarStack - users:', users);
+  
   // Only show avatars if we have real users and a count > 0
   const shouldShowAvatars = count > 0 && users && users.length > 0;
   
@@ -37,8 +45,18 @@ const AvatarStack = ({ count, users, textClassName }: AvatarStackProps) => {
         <div className="flex -space-x-3">
           {avatarsToShow.map((user, index) => (
             <Avatar key={index} className="h-8 w-8 border-2 border-white">
-              <AvatarImage src={user.avatarUrl || undefined} />
-              <AvatarFallback className="bg-neutral-200 text-neutral-600 text-xs">
+              <AvatarImage 
+                src={user.avatarUrl || undefined} 
+                alt={`User ${index + 1}`}
+                onError={() => {
+                  console.log('Avatar image failed to load:', user.avatarUrl);
+                  // The AvatarFallback will show instead
+                }}
+                onLoad={() => {
+                  console.log('Avatar image loaded successfully:', user.avatarUrl);
+                }}
+              />
+              <AvatarFallback className="bg-gradient-to-br from-blue-400 to-purple-500 text-white text-xs font-semibold">
                 {user.avatarUrl ? 'U' : '?'}
               </AvatarFallback>
             </Avatar>
@@ -63,7 +81,6 @@ interface PremiumDeal extends Deal {
   images?: string[];
   subtitle?: string;
   tapInCount?: number;
-  priceValue?: number;
   offerTerms?: string;
   claimedBy?: { totalCount: number; visibleUsers: { avatarUrl: string }[] };
   isBooking?: boolean;
@@ -77,9 +94,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   const hasDiscount = Boolean(
     deal.dealValue ||
       deal.discountPercentage ||
-      deal.discountAmount ||
-      (deal as any).discountedPrice ||
-      (deal as any).discountValue,
+      deal.discountAmount
   );
   if (!hasDiscount) return null;
 
@@ -88,6 +103,38 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   const { toast } = useToast();
   const { savedDealIds, saveDeal, unsaveDeal, isSaving, isUnsaving } =
     useSavedDeals();
+
+  // Fetch today's availability for this merchant
+  // Only fetch availability if merchantId is defined
+  const shouldFetchAvailability = deal.merchantId !== undefined && deal.merchantId !== null;
+  
+  // DEBUG: Log merchant availability fetch
+  console.log(`🔍 [${deal.name}] Merchant Availability Fetch:`, {
+    dealId: deal.id,
+    merchantId: deal.merchantId,
+    shouldFetch: shouldFetchAvailability,
+    willFetchFor: shouldFetchAvailability ? deal.merchantId : 0
+  });
+  
+  const { data: todayAvailability, isLoading: isLoadingAvailability, error: availabilityError } = useTodayAvailability(
+    shouldFetchAvailability ? deal.merchantId : 0, // Use 0 if no merchantId (will not fetch)
+    2 // default party size
+  );
+
+  // DEBUG: Log availability result
+  console.log(`📊 [${deal.name}] Availability Result:`, {
+    dealId: deal.id,
+    merchantId: deal.merchantId,
+    isLoading: isLoadingAvailability,
+    hasData: !!todayAvailability,
+    tablesCount: todayAvailability?.availableTables?.length,
+    slotsCount: todayAvailability?.availableTimeSlots?.length,
+    error: availabilityError
+  });
+
+  // State for booking modal
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [preselectedTimeSlot, setPreselectedTimeSlot] = useState<any>(null);
 
   // Always show the full card details (no hover required)
   const isHovered = true;
@@ -108,36 +155,43 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   }, [deal.images, deal.image, deal.merchantLogo]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Use real backend data with fallback to mock data for better UX
-  const fallbackOffers: Offer[] = [
-    { title: '2-for-1 Cocktails', time: '5-7 PM', category: 'Drinks', imageUrl: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=200&q=80' },
-    { title: '50% Off Appetizers', time: '5-6 PM', category: 'Bites', imageUrl: 'https://images.unsplash.com/photo-1579871494447-9811CFb5d668?w=200&q=80' },
-    { title: '$5 Draft Beers', time: 'All Night', category: 'Drinks', imageUrl: 'https://images.unsplash.com/photo-1586993451228-098a8924133e?w=200&q=80' },
-    { title: 'Truffle Fries', time: '5-7 PM', category: 'Bites', imageUrl: 'https://images.unsplash.com/photo-1598679253544-2c9740f92d4f?w=200&q=80' },
-  ];
-  
-  const realOffers: Offer[] = deal.offers && deal.offers.length > 0 ? deal.offers : fallbackOffers;
+  // Use real backend data only - no fallback to mock data
+  const realOffers: Offer[] = deal.offers || [];
   const offerImageFallback = deal.merchantLogo || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&q=80';
 
   // Use real claimed users from backend data - no fallback to mock data
   const realClaimedUsers = deal.claimedBy?.visibleUsers || [];
   const realClaimedCount = deal.claimedBy?.totalCount || 0;
   
+  // Debug logging to see what data we're receiving from backend
+  console.log('PremiumV2DealCard - deal.claimedBy:', deal.claimedBy);
+  console.log('PremiumV2DealCard - realClaimedUsers:', realClaimedUsers);
+  console.log('PremiumV2DealCard - realClaimedCount:', realClaimedCount);
+  
   // Use real data only - no fake data
   const finalClaimedCount = realClaimedCount;
   const finalClaimedUsers = realClaimedUsers;
 
   // State to control visibility of offers dropdown/list
-  const [offersVisible, setOffersVisible] = useState(false);
+  const [offersVisible, setOffersVisible] = useState(true);
   
-  // Get unique categories from real offers and add Tables
+  // Get unique categories from real offers and always add Tables
   const availableCategories = useMemo(() => {
     const categories = realOffers.map(offer => offer.category).filter(Boolean);
-    // Always include Tables tab
-    return [...new Set([...categories, 'Tables'])];
+    // Always include Drinks, Bites, and Tables tabs
+    const defaultCategories = ['Drinks', 'Bites', 'Tables'];
+    
+    return [...new Set([...defaultCategories, ...categories])];
   }, [realOffers]);
   
   const [activeOfferTab, setActiveOfferTab] = useState<string>('Drinks');
+
+  // Ensure active tab is always valid
+  useEffect(() => {
+    if (!availableCategories.includes(activeOfferTab)) {
+      setActiveOfferTab('Drinks');
+    }
+  }, [availableCategories, activeOfferTab]);
 
   // --- NEW: Memoize the filtered offers to prevent re-calculation on every render ---
   const filteredOffers = useMemo(() => {
@@ -165,9 +219,22 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   let ctaIcon = <ArrowRight className="h-6 w-6 -rotate-45" />;
   let ctaVariant = 'primary';
 
+  // Handle different deal types
   if (deal.isBooking) {
     ctaText = 'Pre-buy';
     ctaIcon = <ArrowRight className="h-5 w-5 -rotate-45" />;
+    ctaVariant = 'primary';
+  } else if (deal.dealType === 'Redeem Now' || deal.dealType === 'REDEEM_NOW') {
+    ctaText = 'REDEEM NOW';
+    ctaIcon = null as any;
+    ctaVariant = 'primary';
+  } else if (deal.dealType === 'Hidden Deal' || deal.dealType === 'HIDDEN') {
+    ctaText = 'Unlock Deal';
+    ctaIcon = <Eye className="h-5 w-5" />;
+    ctaVariant = 'secondary';
+  } else if (deal.dealType === 'Bounty Deal' || deal.dealType === 'BOUNTY') {
+    ctaText = 'Earn Rewards';
+    ctaIcon = <Trophy className="h-5 w-5" />;
     ctaVariant = 'primary';
   } else if (isHighValueDiscount) {
     ctaText = 'REDEEM NOW';
@@ -195,6 +262,21 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
     }
     if (isLikeButtonLoading) return;
     isSaved ? unsaveDeal(deal.id) : saveDeal(deal.id);
+  };
+
+  const handleTimeSlotBook = (timeSlot: any) => {
+    setPreselectedTimeSlot(timeSlot);
+    setIsBookingModalOpen(true);
+  };
+
+  const handleViewAllTimes = () => {
+    setPreselectedTimeSlot(null);
+    setIsBookingModalOpen(true);
+  };
+
+  const handleCloseBookingModal = () => {
+    setIsBookingModalOpen(false);
+    setPreselectedTimeSlot(null);
   };
 
   const imageVariants = {
@@ -237,6 +319,26 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
+            {/* Deal Type Badge - Top Left */}
+            {(deal.dealType === 'Redeem Now' || deal.dealType === 'REDEEM_NOW' || 
+              deal.dealType === 'Hidden Deal' || deal.dealType === 'HIDDEN' || 
+              deal.dealType === 'Bounty Deal' || deal.dealType === 'BOUNTY') && (
+              <div className="absolute left-3 top-3">
+                <div className={cn(
+                  "px-3 py-1 rounded-full text-xs font-bold shadow-lg",
+                  deal.dealType === 'Redeem Now' || deal.dealType === 'REDEEM_NOW' 
+                    ? "bg-red-500 text-white" 
+                    : deal.dealType === 'Hidden Deal' || deal.dealType === 'HIDDEN'
+                    ? "bg-purple-500 text-white"
+                    : "bg-yellow-500 text-black"
+                )}>
+                  {deal.dealType === 'Redeem Now' || deal.dealType === 'REDEEM_NOW' ? '⚡ REDEEM NOW' :
+                   deal.dealType === 'Hidden Deal' || deal.dealType === 'HIDDEN' ? '🔒 HIDDEN' :
+                   '🏆 BOUNTY'}
+                </div>
+              </div>
+            )}
+
             {/* Timer - Top Center */}
             {showCountdown && (
               <div className="absolute left-1/2 top-0 -translate-x-1/2">
@@ -405,7 +507,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                             className="overflow-hidden mb-4"
                         >
                             {/* --- Tab Selector for Offers --- */}
-                            {availableCategories.length > 1 && (
+                            {availableCategories.length > 0 && (
                               <div className="flex items-center gap-2 rounded-full bg-neutral-100 p-1 mb-3">
                                 {availableCategories.map((category) => (
                                   <button 
@@ -430,8 +532,121 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                                   transition={{ duration: 0.2 }}
                                 >
                                   {activeOfferTab === 'Tables' ? (
-                                    <AvailableTablesList merchantId={deal.merchantId} />
-                                  ) : (
+                                    <div className="space-y-3">
+                                      {/* Check if merchant has table booking set up */}
+                                      {(() => {
+                                        console.log('🔍 Tables Tab Debug:', {
+                                          dealName: deal.name,
+                                          merchantId: deal.merchantId,
+                                          hasMerchantId: !!deal.merchantId,
+                                          todayAvailability,
+                                          isLoadingAvailability,
+                                          availableTables: todayAvailability?.availableTables,
+                                          availableSlots: todayAvailability?.availableTimeSlots
+                                        });
+                                        return null;
+                                      })()}
+                                      {!deal.merchantId ? (
+                                        <div className="text-center py-8">
+                                          <div className="text-neutral-400 mb-2">
+                                            <Calendar className="h-12 w-12 mx-auto" />
+                                          </div>
+                                          <h3 className="text-lg font-semibold text-neutral-600 mb-2">Table Booking Not Available</h3>
+                                          <p className="text-sm text-neutral-500">
+                                            This merchant hasn't set up table booking yet.
+                                          </p>
+                                        </div>
+                                      ) : (
+                                        <>
+                                          {/* Today's Quick Time Slots */}
+                                          <div>
+                                            <div className="flex items-center justify-between mb-3">
+                                              <h4 className="text-sm font-semibold text-neutral-800">Available Today</h4>
+                                              <span className="text-xs text-neutral-500">
+                                                {format(new Date(), 'MMM dd')}
+                                              </span>
+                                            </div>
+                                            
+                                            {isLoadingAvailability ? (
+                                              <div className="space-y-2">
+                                                {[1, 2, 3].map((i) => (
+                                                  <div key={i} className="animate-pulse">
+                                                    <div className="h-12 bg-neutral-200 rounded-lg"></div>
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            ) : todayAvailability?.availableTimeSlots && todayAvailability.availableTimeSlots.length > 0 ? (
+                                              <div className="space-y-2">
+                                                {todayAvailability.availableTimeSlots.slice(0, 3).map((slot) => (
+                                                  <TimeSlotQuickCard
+                                                    key={slot.id}
+                                                    merchantId={deal.merchantId!}
+                                                    merchantName={deal.merchantName || deal.name}
+                                                    slot={slot}
+                                                    date={todayAvailability.date}
+                                                    onBook={() => handleTimeSlotBook(slot)}
+                                                    compact={true}
+                                                  />
+                                                ))}
+                                                
+                                                {/* View All Times Button */}
+                                                {todayAvailability.availableTimeSlots.length > 3 && (
+                                                  <Button
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    className="w-full mt-2"
+                                                    onClick={handleViewAllTimes}
+                                                  >
+                                                    <Calendar className="h-3 w-3 mr-1" />
+                                                    View All Times ({todayAvailability.availableTimeSlots.length - 3} more)
+                                                  </Button>
+                                                )}
+                                              </div>
+                                            ) : todayAvailability?.availableTables && todayAvailability.availableTables.length === 0 ? (
+                                              <div className="text-center py-6">
+                                                <div className="text-neutral-400 mb-2">
+                                                  <Clock className="h-10 w-10 mx-auto" />
+                                                </div>
+                                                <h3 className="text-base font-semibold text-neutral-600 mb-1">No Tables Available</h3>
+                                                <p className="text-sm text-neutral-500">
+                                                  This merchant hasn't configured their tables yet.
+                                                </p>
+                                              </div>
+                                            ) : (
+                                              <div className="text-center py-4 text-neutral-500">
+                                                <Clock className="h-6 w-6 mx-auto mb-2 text-neutral-400" />
+                                                <p className="text-sm">No availability today</p>
+                                                <Button
+                                                  variant="secondary"
+                                                  size="sm"
+                                                  className="mt-2"
+                                                  onClick={handleViewAllTimes}
+                                                >
+                                                  Check Other Days
+                                                </Button>
+                                              </div>
+                                            )}
+                                          </div>
+
+                                          {/* Tables Section (Collapsed) - Only show if tables exist */}
+                                          {todayAvailability?.availableTables && todayAvailability.availableTables.length > 0 && (
+                                            <details className="group">
+                                              <summary className="cursor-pointer text-sm font-medium text-neutral-700 hover:text-neutral-900 transition-colors">
+                                                Browse All Tables
+                                                <ChevronDown className="inline h-3 w-3 ml-1 group-open:rotate-180 transition-transform" />
+                                              </summary>
+                                              <div className="mt-2">
+                                                <AvailableTablesList 
+                                                  merchantId={deal.merchantId!} 
+                                                  merchantName={deal.merchantName || deal.name}
+                                                />
+                                              </div>
+                                            </details>
+                                          )}
+                                        </>
+                                      )}
+                                    </div>
+                                  ) : filteredOffers.length > 0 ? (
                                     filteredOffers.map(offer => (
                                         <div key={offer.title} className="flex items-center gap-3 p-2 rounded-lg bg-neutral-50 border border-neutral-200/60">
                                             <img
@@ -449,6 +664,16 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                                             </div>
                                         </div>
                                     ))
+                                  ) : (
+                                    <div className="text-center py-6 text-neutral-500">
+                                      <div className="text-neutral-400 mb-2">
+                                        <Trophy className="h-8 w-8 mx-auto" />
+                                      </div>
+                                      <p className="text-sm">No {activeOfferTab.toLowerCase()} offers available</p>
+                                      <p className="text-xs text-neutral-400 mt-1">
+                                        Check back later for new deals
+                                      </p>
+                                    </div>
                                   )}
                                 </motion.div>
                               </AnimatePresence>
@@ -472,15 +697,6 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                       <span className="text-lg">{ctaText}</span>
                     </Button>
                   </Link>
-                  
-                  {/* Table Booking Button */}
-                  <TableBookingButton
-                    merchantId={deal.merchantId}
-                    merchantName={deal.merchantName || deal.location || 'Restaurant'}
-                    variant="outline"
-                    size="lg"
-                    className="w-full rounded-full"
-                  />
                 </div>
             </motion.div>
           ) : (
@@ -508,29 +724,18 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
           )}
         </AnimatePresence>
 
-        {
-          (() => {
-            const priceDisplay =
-              (deal as any).discountedPrice
-                ? `$${(deal as any).discountedPrice}`
-                : (deal as any).discountValue
-                ? `$${(deal as any).discountValue}`
-                : deal.discountAmount
-                ? `$${deal.discountAmount}`
-                : deal.discountPercentage
-                ? `${deal.discountPercentage}% OFF`
-                : (deal as any).originalPrice
-                ? `$${(deal as any).originalPrice}`
-                : null;
-
-            return priceDisplay ? (
-                  <div className="flex h-14 flex-shrink-0 items-center justify-center rounded-full px-6 text-lg font-bold text-neutral-900 shadow-lg bg-neutral-100/70 backdrop-blur-sm border border-white/10">
-                    {priceDisplay}
-                  </div>
-            ) : null;
-          })()
-        }
       </div>
+
+      {/* Table Booking Modal */}
+      {isBookingModalOpen && (
+        <TableBookingModal
+          isOpen={isBookingModalOpen}
+          onClose={handleCloseBookingModal}
+          merchantId={deal.merchantId ?? 1}
+          merchantName={deal.merchantName || deal.name}
+          preselectedTimeSlot={preselectedTimeSlot}
+        />
+      )}
     </div>
   );
 };

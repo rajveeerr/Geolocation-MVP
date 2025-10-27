@@ -21,7 +21,11 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  MoreHorizontal
+  MoreHorizontal,
+  Download,
+  List,
+  TrendingUp,
+  BarChart3
 } from 'lucide-react';
 import { 
   useMerchantTables, 
@@ -35,19 +39,28 @@ import {
   useMerchantBookings,
   useUpdateBookingStatus,
   useMerchantBookingSettings,
-  useUpdateMerchantBookingSettings
+  useUpdateMerchantBookingSettings,
+  useFilteredMerchantBookings
 } from '@/hooks/useTableBooking';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
+import { WeeklyScheduleGrid } from './WeeklyScheduleGrid';
+import { BookingCalendarView } from './BookingCalendarView';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
 export const MerchantTableBookingDashboard = () => {
-  const [activeTab, setActiveTab] = useState('tables');
+  const [activeTab, setActiveTab] = useState('overview');
   const [isTableDialogOpen, setIsTableDialogOpen] = useState(false);
   const [isTimeSlotDialogOpen, setIsTimeSlotDialogOpen] = useState(false);
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
   const [editingTable, setEditingTable] = useState<any>(null);
   const [editingTimeSlot, setEditingTimeSlot] = useState<any>(null);
+  
+  // Booking filters
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({ from: undefined, to: undefined });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [view, setView] = useState<'table' | 'calendar'>('table');
 
   // Get merchant ID
   const { data: merchantData } = useMerchantStatus();
@@ -68,7 +81,14 @@ export const MerchantTableBookingDashboard = () => {
   const deleteTimeSlotMutation = useDeleteTimeSlot();
 
   // Booking management
-  const { data: bookings, isLoading: isLoadingBookings } = useMerchantBookings(merchantId);
+  const { data: bookings, isLoading: isLoadingBookings } = useFilteredMerchantBookings(
+    merchantId || 0,
+    {
+      status: statusFilter === 'all' ? undefined : statusFilter,
+      startDate: dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : undefined,
+      endDate: dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : undefined,
+    }
+  );
   const updateBookingStatusMutation = useUpdateBookingStatus();
 
   // Settings management
@@ -91,13 +111,36 @@ export const MerchantTableBookingDashboard = () => {
     maxBookings: 1, // Default 1 booking per slot
   });
 
+  // Calculate stats
+  const todayBookings = bookings?.bookings?.filter(booking => {
+    const bookingDate = new Date(booking.bookingDate);
+    const today = new Date();
+    return bookingDate.toDateString() === today.toDateString();
+  }) || [];
+
+  const upcomingBookings = bookings?.bookings?.filter(booking => {
+    const bookingDate = new Date(booking.bookingDate);
+    const today = new Date();
+    const nextWeek = new Date();
+    nextWeek.setDate(today.getDate() + 7);
+    return bookingDate >= today && bookingDate <= nextWeek;
+  }) || [];
+
+  const pendingBookings = bookings?.bookings?.filter(booking => booking.status === 'PENDING') || [];
+
+  const stats = {
+    todayBookings: todayBookings.length,
+    upcomingBookings: upcomingBookings.length,
+    pendingBookings: pendingBookings.length,
+    totalBookings: bookings?.bookings?.length || 0,
+  };
+
   // Settings form state
   const [settingsForm, setSettingsForm] = useState({
     advanceBookingDays: 30,
     cancellationHours: 24,
     maxPartySize: 20,
     minPartySize: 1,
-    isBookingEnabled: true,
     autoConfirmBookings: false,
     requireDeposit: false,
     depositAmount: 0,
@@ -273,10 +316,136 @@ export const MerchantTableBookingDashboard = () => {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="tables">Tables</TabsTrigger>
           <TabsTrigger value="time-slots">Time Slots</TabsTrigger>
           <TabsTrigger value="bookings">Bookings</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
+
+        {/* Overview Tab */}
+        <TabsContent value="overview">
+          {/* Stats Cards Row */}
+          <div className="grid grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Today's Bookings</p>
+                    <p className="text-2xl font-bold">{stats.todayBookings}</p>
+                  </div>
+                  <Calendar className="h-8 w-8 text-blue-600" />
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Upcoming (7 days)</p>
+                    <p className="text-2xl font-bold">{stats.upcomingBookings}</p>
+                  </div>
+                  <Clock className="h-8 w-8 text-green-600" />
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Pending Approval</p>
+                    <p className="text-2xl font-bold">{stats.pendingBookings}</p>
+                  </div>
+                  <AlertCircle className="h-8 w-8 text-yellow-600" />
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Total Tables</p>
+                    <p className="text-2xl font-bold">{tables.length}</p>
+                  </div>
+                  <Users className="h-8 w-8 text-purple-600" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Today's Schedule Timeline */}
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Today's Schedule</CardTitle>
+              <CardDescription>{format(new Date(), 'EEEE, MMMM dd, yyyy')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {todayBookings.length > 0 ? (
+                <div className="space-y-3">
+                  {todayBookings.map(booking => (
+                    <div key={booking.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="font-medium">{booking.timeSlot.startTime} - {booking.timeSlot.endTime}</p>
+                          <p className="text-sm text-muted-foreground">{booking.table.name} • {booking.partySize} people</p>
+                        </div>
+                      </div>
+                      <Badge variant={booking.status === 'CONFIRMED' ? 'default' : 'secondary'}>
+                        {booking.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Calendar className="h-8 w-8 mx-auto mb-2" />
+                  <p>No bookings scheduled for today</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-2 gap-4 mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Button onClick={() => setActiveTab('tables')} className="w-full">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add New Table
+                </Button>
+                <Button onClick={() => setActiveTab('time-slots')} variant="outline" className="w-full">
+                  <Clock className="h-4 w-4 mr-2" />
+                  Configure Time Slots
+                </Button>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Activity</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {bookings?.bookings?.slice(0, 3).map(booking => (
+                    <div key={booking.id} className="text-sm">
+                      <p className="font-medium">{booking.table.name}</p>
+                      <p className="text-muted-foreground">
+                        {format(new Date(booking.bookingDate), 'MMM dd')} at {booking.timeSlot.startTime}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
         {/* Tables Tab */}
         <TabsContent value="tables" className="space-y-4">
@@ -362,110 +531,89 @@ export const MerchantTableBookingDashboard = () => {
 
         {/* Time Slots Tab */}
         <TabsContent value="time-slots" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Time Slots</CardTitle>
-                  <CardDescription>
-                    Manage your available booking time slots
-                  </CardDescription>
-                </div>
-                <Button onClick={() => setIsTimeSlotDialogOpen(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Time Slot
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {isLoadingTimeSlots ? (
-                <div className="text-center py-8">Loading time slots...</div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Day</TableHead>
-                      <TableHead>Time</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {timeSlots?.map((timeSlot) => (
-                      <TableRow key={timeSlot.id}>
-                        <TableCell className="font-medium">
-                          {getDayName(timeSlot.dayOfWeek)}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            {timeSlot.startTime} - {timeSlot.endTime}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={timeSlot.isActive ? 'default' : 'secondary'}>
-                            {timeSlot.isActive ? 'Active' : 'Inactive'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setEditingTimeSlot(timeSlot);
-                                setTimeSlotForm({
-                                  dayOfWeek: timeSlot.dayOfWeek,
-                                  startTime: timeSlot.startTime,
-                                  endTime: timeSlot.endTime,
-                                  duration: timeSlot.duration || 60,
-                                  maxBookings: timeSlot.maxBookings || 1,
-                                });
-                                setIsTimeSlotDialogOpen(true);
-                              }}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteTimeSlot(timeSlot.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
+          <WeeklyScheduleGrid
+            timeSlots={timeSlots}
+            onEdit={(slot) => {
+              setEditingTimeSlot(slot);
+              setTimeSlotForm({
+                dayOfWeek: slot.dayOfWeek,
+                startTime: slot.startTime,
+                endTime: slot.endTime,
+                duration: slot.duration,
+                maxBookings: slot.maxBookings,
+              });
+              setIsTimeSlotDialogOpen(true);
+            }}
+            onDelete={handleDeleteTimeSlot}
+            onCreate={(dayOfWeek, time) => {
+              setTimeSlotForm({
+                dayOfWeek,
+                startTime: time,
+                endTime: time, // Will be set in dialog
+                duration: 60,
+                maxBookings: 1,
+              });
+              setIsTimeSlotDialogOpen(true);
+            }}
+          />
         </TabsContent>
 
         {/* Bookings Tab */}
         <TabsContent value="bookings" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Bookings</CardTitle>
-                  <CardDescription>
-                    Manage customer bookings and reservations
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {isLoadingBookings ? (
-                <div className="text-center py-8">Loading bookings...</div>
-              ) : (
+          {/* Filter Bar */}
+          <div className="flex gap-3 mb-4">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="CONFIRMED">Confirmed</SelectItem>
+                <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                <SelectItem value="COMPLETED">Completed</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Input
+              placeholder="Search customer..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="max-w-sm"
+            />
+
+            <Button variant="outline" onClick={() => {/* Export functionality */}}>
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+          </div>
+
+          {/* View Toggle */}
+          <div className="flex gap-2 mb-4">
+            <Button
+              variant={view === 'table' ? 'default' : 'outline'}
+              onClick={() => setView('table')}
+            >
+              <List className="h-4 w-4 mr-2" />
+              Table View
+            </Button>
+            <Button
+              variant={view === 'calendar' ? 'default' : 'outline'}
+              onClick={() => setView('calendar')}
+            >
+              <Calendar className="h-4 w-4 mr-2" />
+              Calendar View
+            </Button>
+          </div>
+
+          {/* Table View */}
+          {view === 'table' && (
+            <Card>
+              <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Time</TableHead>
+                      <TableHead>Date & Time</TableHead>
                       <TableHead>Customer</TableHead>
                       <TableHead>Party Size</TableHead>
                       <TableHead>Table</TableHead>
@@ -474,24 +622,18 @@ export const MerchantTableBookingDashboard = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {bookings?.bookings?.map((booking) => (
+                    {bookings?.bookings?.map(booking => (
                       <TableRow key={booking.id}>
                         <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            {format(new Date(booking.bookingDate), 'MMM dd, yyyy')}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            {booking.timeSlot.startTime} - {booking.timeSlot.endTime}
+                          <div>
+                            <div className="font-medium">{format(new Date(booking.bookingDate), 'MMM dd, yyyy')}</div>
+                            <div className="text-sm text-muted-foreground">{booking.timeSlot.startTime} - {booking.timeSlot.endTime}</div>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div>
-                            <div className="font-medium">{booking.contactName}</div>
-                            <div className="text-sm text-muted-foreground">{booking.contactEmail}</div>
+                            <div className="font-medium">{booking.contactName || 'N/A'}</div>
+                            <div className="text-sm text-muted-foreground">{booking.contactEmail || booking.contactPhone || 'No contact info'}</div>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -501,29 +643,146 @@ export const MerchantTableBookingDashboard = () => {
                           </div>
                         </TableCell>
                         <TableCell>{booking.table.name}</TableCell>
-                        <TableCell>{getStatusBadge(booking.status)}</TableCell>
                         <TableCell>
-                          <Select
-                            value={booking.status}
-                            onValueChange={(value) => handleUpdateBookingStatus(booking.id, value)}
-                          >
-                            <SelectTrigger className="w-32">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="pending">Pending</SelectItem>
-                              <SelectItem value="confirmed">Confirmed</SelectItem>
-                              <SelectItem value="cancelled">Cancelled</SelectItem>
-                              <SelectItem value="completed">Completed</SelectItem>
-                              <SelectItem value="no_show">No Show</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <Badge variant={booking.status === 'CONFIRMED' ? 'default' : 'secondary'}>
+                            {booking.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            {booking.status === 'PENDING' && (
+                              <>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleUpdateBookingStatus(booking.id, 'CONFIRMED')}
+                                >
+                                  <CheckCircle className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleUpdateBookingStatus(booking.id, 'CANCELLED')}
+                                >
+                                  <XCircle className="h-4 w-4" />
+                                </Button>
+                              </>
+                            )}
+                            <Button variant="ghost" size="sm">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
-              )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Calendar View */}
+          {view === 'calendar' && (
+            <BookingCalendarView
+              bookings={bookings?.bookings || []}
+              onDateClick={(date) => {
+                // Handle date click - could filter bookings for that date
+                console.log('Date clicked:', date);
+              }}
+              onBookingClick={(booking) => {
+                // Handle booking click - could open booking details
+                console.log('Booking clicked:', booking);
+              }}
+            />
+          )}
+        </TabsContent>
+
+        {/* Settings Tab */}
+        <TabsContent value="settings">
+          <Card>
+            <CardHeader>
+              <CardTitle>Booking Settings</CardTitle>
+              <CardDescription>Configure your booking policies and preferences</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Advance Booking Settings */}
+              <div>
+                <Label>Advance Booking Days</Label>
+                <Input
+                  type="number"
+                  value={settingsForm.advanceBookingDays}
+                  onChange={(e) => setSettingsForm(prev => ({ ...prev, advanceBookingDays: parseInt(e.target.value) || 30 }))}
+                />
+                <p className="text-sm text-muted-foreground">
+                  How many days in advance customers can book
+                </p>
+              </div>
+
+              {/* Party Size Limits */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Min Party Size</Label>
+                  <Input 
+                    type="number" 
+                    value={settingsForm.minPartySize}
+                    onChange={(e) => setSettingsForm(prev => ({ ...prev, minPartySize: parseInt(e.target.value) || 1 }))}
+                  />
+                </div>
+                <div>
+                  <Label>Max Party Size</Label>
+                  <Input 
+                    type="number" 
+                    value={settingsForm.maxPartySize}
+                    onChange={(e) => setSettingsForm(prev => ({ ...prev, maxPartySize: parseInt(e.target.value) || 20 }))}
+                  />
+                </div>
+              </div>
+
+              {/* Cancellation Policy */}
+              <div>
+                <Label>Cancellation Hours</Label>
+                <Input
+                  type="number"
+                  value={settingsForm.cancellationHours}
+                  onChange={(e) => setSettingsForm(prev => ({ ...prev, cancellationHours: parseInt(e.target.value) || 24 }))}
+                />
+                <p className="text-sm text-muted-foreground">
+                  Hours before booking when cancellation is allowed
+                </p>
+              </div>
+
+              {/* Toggle Settings */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Auto-Confirm Bookings</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Automatically confirm without manual approval
+                    </p>
+                  </div>
+                  <Switch
+                    checked={settingsForm.autoConfirmBookings}
+                    onCheckedChange={(checked) => setSettingsForm(prev => ({ ...prev, autoConfirmBookings: checked }))}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Require Deposit</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Require a deposit for bookings
+                    </p>
+                  </div>
+                  <Switch
+                    checked={settingsForm.requireDeposit}
+                    onCheckedChange={(checked) => setSettingsForm(prev => ({ ...prev, requireDeposit: checked }))}
+                  />
+                </div>
+              </div>
+
+              <Button onClick={() => {/* Save settings */}}>
+                Save Settings
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>

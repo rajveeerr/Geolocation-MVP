@@ -42,20 +42,6 @@ export const AdminCityPerformanceCards: React.FC<AdminCityPerformanceCardsProps>
   };
 
 
-  const getCityGradient = (index: number) => {
-    const gradients = [
-      'from-blue-500 to-purple-600',
-      'from-green-500 to-teal-600',
-      'from-orange-500 to-red-600',
-      'from-pink-500 to-rose-600',
-      'from-indigo-500 to-blue-600',
-      'from-emerald-500 to-green-600',
-      'from-amber-500 to-orange-600',
-      'from-violet-500 to-purple-600',
-    ];
-    return gradients[index % gradients.length];
-  };
-
   const getCityIcon = (index: number) => {
     const icons = ['🏙️', '🌆', '🏢', '🌃', '🏘️', '🌇', '🏛️', '🌉'];
     return icons[index % icons.length];
@@ -81,40 +67,32 @@ export const AdminCityPerformanceCards: React.FC<AdminCityPerformanceCardsProps>
         {citiesWithStores.map((city, index) => (
           <div
             key={city.id}
-            className={`relative overflow-hidden rounded-xl bg-gradient-to-br ${getCityGradient(index)} p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105`}
+            className="bg-white rounded-xl border border-neutral-200 p-6 shadow-sm hover:shadow-md transition-all duration-300 hover:border-neutral-300"
           >
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"></div>
-            </div>
-            
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-2xl">
-                    {getCityIcon(index)}
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white text-lg">{city.name}</h4>
-                    <p className="text-white/80 text-sm">{city.state}</p>
-                  </div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-neutral-100 flex items-center justify-center text-2xl">
+                  {getCityIcon(index)}
+                </div>
+                <div>
+                  <h4 className="font-bold text-neutral-900 text-lg">{city.name}</h4>
+                  <p className="text-neutral-500 text-sm">{city.state}</p>
                 </div>
               </div>
-              
-              <div className="space-y-2">
-                <div className="text-3xl font-bold text-white">
-                  {city.value.toLocaleString()}
-                </div>
-                <div className={`flex items-center gap-2 text-sm font-medium ${
-                  city.trend === 'up' ? 'text-green-200' : 
-                  city.trend === 'down' ? 'text-red-200' : 
-                  'text-white/80'
-                }`}>
-                  {getTrendIcon(city.trend)}
-                  <span>{city.change > 0 ? '+' : ''}{city.change.toFixed(1)}%</span>
-                  <span className="text-white/60">vs last period</span>
-                </div>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="text-3xl font-bold text-neutral-900">
+                {city.value.toLocaleString()}
+              </div>
+              <div className={`flex items-center gap-2 text-sm font-medium ${
+                city.trend === 'up' ? 'text-green-600' : 
+                city.trend === 'down' ? 'text-red-600' : 
+                'text-neutral-600'
+              }`}>
+                {getTrendIcon(city.trend)}
+                <span>{city.change > 0 ? '+' : ''}{city.change.toFixed(1)}%</span>
+                <span className="text-neutral-500">vs last period</span>
               </div>
             </div>
           </div>

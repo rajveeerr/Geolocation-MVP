@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Users, Calendar } from 'lucide-react';
 import { TableBookingModal } from './TableBookingModal';
-import { usePublicMerchantTables } from '@/hooks/useTableBooking';
+import { useMerchantAvailability } from '@/hooks/useTableBooking';
+import { format } from 'date-fns';
 
 interface Table {
   tableId: number;
@@ -32,38 +33,25 @@ export const AvailableTablesList = ({ merchantId, merchantName }: AvailableTable
     setSelectedTable(null);
   };
 
-  // Fetch tables directly from backend
-  const { data: tablesData, isLoading: isLoadingTables } = usePublicMerchantTables(merchantId);
-  const apiTables = tablesData?.tables || [];
+  // Fetch tables from availability endpoint (backend doesn't have public tables endpoint)
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const { data: availability, isLoading: isLoadingTables } = useMerchantAvailability(
+    merchantId,
+    today,
+    1 // min party size to see all tables
+  );
 
-  // Mock table data - fallback when no real data is available
-  const mockTables: Table[] = [
-    {
-      tableId: 1,
-      tableName: "Window Table",
-      capacity: 4,
-      location: "Near the window",
-      features: ["Window view", "Quiet"]
-    },
-    {
-      tableId: 2,
-      tableName: "Booth #1",
-      capacity: 6,
-      location: "Main dining area",
-      features: ["Private", "Comfortable seating"]
-    }
-  ];
+  // Extract tables from availability response
+  const apiTables = availability?.availableTables || [];
 
-  // Use real data from API if available, otherwise use mock data
-  const tablesToShow = apiTables && apiTables.length > 0 
-    ? apiTables.map(table => ({
-        tableId: table.id,
-        tableName: table.name,
-        capacity: table.capacity,
-        location: "Restaurant",
-        features: table.features || []
-      }))
-    : mockTables;
+  // Transform API data to component format
+  const tablesToShow = apiTables.map(table => ({
+    tableId: table.id,
+    tableName: table.name,
+    capacity: table.capacity,
+    location: "Restaurant",
+    features: table.features || []
+  }));
 
 
   if (isLoadingTables) {
@@ -147,9 +135,9 @@ export const AvailableTablesList = ({ merchantId, merchantName }: AvailableTable
             <div className="text-neutral-400 mb-2">
               <Users className="h-12 w-12 mx-auto" />
             </div>
-            <h3 className="text-lg font-semibold text-neutral-600 mb-2">No Tables Available</h3>
+            <h3 className="text-lg font-semibold text-neutral-600 mb-2">No Tables Configured</h3>
             <p className="text-sm text-neutral-500">
-              All tables are currently booked. Please try a different time or date.
+              This merchant hasn't set up their tables yet. Please check back later.
             </p>
           </div>
         )}

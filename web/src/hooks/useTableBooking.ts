@@ -1,5 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React from 'react';
+import { useQuery, useMutation, useQueryClient, useQueries } from '@tanstack/react-query';
 import { apiGet, apiPost, apiPut, apiDelete } from '@/services/api';
+import { format } from 'date-fns';
 
 // Types
 export interface TimeSlot {
@@ -9,7 +11,7 @@ export interface TimeSlot {
   endTime: string;
   duration: number;
   maxBookings: number;
-  isAvailable: boolean;
+  isActive: boolean;
   availableBookings: number;
 }
 
@@ -23,6 +25,7 @@ export interface Table {
 }
 
 export interface AvailabilityResponse {
+  success: boolean;
   date: string;
   partySize: number;
   availableTimeSlots: {
@@ -40,6 +43,14 @@ export interface AvailabilityResponse {
     capacity: number;
     features: string[];
   }[];
+  nextAvailableSlot?: {
+    id: number;
+    startTime: string;
+    endTime: string;
+    duration: number;
+    isNextAvailable: boolean;
+  };
+  nextAvailableDate?: string;
 }
 
 export interface CreateBookingRequest {
@@ -140,30 +151,86 @@ export interface CreateBookingResponse {
   message: string;
 }
 
+// Helper function to clear availability cache
+export const clearAvailabilityCache = () => {
+  const queryClient = useQueryClient();
+  queryClient.invalidateQueries({ queryKey: ['merchant-availability'] });
+};
+
+// Helper function to fetch availability  
+async function fetchAvailability(merchantId: number, date: string, partySize: number = 1): Promise<AvailabilityResponse> {
+  const searchParams = new URLSearchParams();
+  searchParams.append('date', date);
+  searchParams.append('partySize', partySize.toString());
+
+  // Use environment variable or fallback
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+  const url = `${API_BASE_URL}/table-booking/merchants/${merchantId}/availability?${searchParams.toString()}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.error || 'Failed to fetch merchant availability');
+    }
+
+    // Return the data directly (backend already returns the right structure)
+    return data;
+  } catch (error) {
+    console.error(`Failed to fetch availability for merchant ${merchantId}:`, error);
+    throw error;
+  }
+}
+
 // Hooks
 
 // Get merchant availability for a specific date and party size
 export const useMerchantAvailability = (merchantId: number, date: string, partySize: number = 1) => {
   return useQuery<AvailabilityResponse, Error>({
     queryKey: ['merchant-availability', merchantId, date, partySize],
-    queryFn: async () => {
-      const searchParams = new URLSearchParams();
-      searchParams.append('date', date);
-      searchParams.append('partySize', partySize.toString());
+    queryFn: () => fetchAvailability(merchantId, date, partySize),
+    enabled: !!merchantId && merchantId > 0 && !!date, // Only fetch if merchantId is valid (> 0)
+    staleTime: 1 * 60 * 1000, // 1 minute
+    gcTime: 5 * 60 * 1000, // 5 minutes (was cacheTime in v4)
+    retry: 1, // Only retry once to avoid rate limiting
+    refetchOnWindowFocus: false,
+  });
+};
 
-      const response = await apiGet<AvailabilityResponse>(
-        `/table-booking/merchants/${merchantId}/availability?${searchParams.toString()}`
-      );
+// Get today's availability specifically
+export const useTodayAvailability = (
+  merchantId: number,
+  partySize?: number
+) => {
+  const today = format(new Date(), 'yyyy-MM-dd');
+  return useMerchantAvailability(merchantId, today, partySize || 1);
+};
 
-      if (!response.success || !response.data) {
-        throw new Error(response.error || 'Failed to fetch merchant availability');
-      }
-
-      return response.data;
-    },
-    enabled: !!merchantId && !!date,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    retry: 2,
+// Fetch availability for multiple days (make multiple API calls)
+export const useMultiDayAvailability = (
+  merchantId: number,
+  dates: string[], // Array of dates
+  partySize?: number
+) => {
+  return useQueries({
+    queries: dates.map(date => ({
+      queryKey: ['availability', merchantId, date, partySize],
+      queryFn: () => fetchAvailability(merchantId, date, partySize || 1),
+      enabled: !!merchantId && !!date,
+      staleTime: 2 * 60 * 1000,
+      retry: 2,
+    })),
   });
 };
 
@@ -219,27 +286,6 @@ export const useMerchantTables = (merchantId: number | undefined) => {
   });
 };
 
-// Get merchant tables (public - for customers)
-export const usePublicMerchantTables = (merchantId: number | undefined) => {
-  return useQuery<{ tables: Table[] }, Error>({
-    queryKey: ['public-merchant-tables', merchantId],
-    queryFn: async () => {
-      const response = await apiGet<{ tables: Table[] }>(
-        `/table-booking/merchants/${merchantId}/tables`
-      );
-
-      if (!response.success || !response.data) {
-        throw new Error(response.error || 'Failed to fetch merchant tables');
-      }
-
-      return response.data;
-    },
-    enabled: !!merchantId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 2,
-  });
-};
-
 // Get merchant bookings (for merchant dashboard)
 export const useMerchantBookings = (merchantId: number | undefined, date?: string) => {
   return useQuery<{ bookings: Booking[] }, Error>({
@@ -260,6 +306,41 @@ export const useMerchantBookings = (merchantId: number | undefined, date?: strin
     },
     enabled: !!merchantId,
     staleTime: 2 * 60 * 1000, // 2 minutes
+    retry: 2,
+  });
+};
+
+// Get bookings with filters (leverages backend query params)
+export const useFilteredMerchantBookings = (
+  merchantId: number,
+  filters: {
+    status?: string;
+    date?: string;
+    startDate?: string;
+    endDate?: string;
+  }
+) => {
+  return useQuery<{ bookings: Booking[] }, Error>({
+    queryKey: ['merchant-bookings', merchantId, filters],
+    queryFn: async () => {
+      const searchParams = new URLSearchParams();
+      if (filters.status) searchParams.append('status', filters.status);
+      if (filters.date) searchParams.append('date', filters.date);
+      if (filters.startDate) searchParams.append('startDate', filters.startDate);
+      if (filters.endDate) searchParams.append('endDate', filters.endDate);
+
+      const response = await apiGet<{ bookings: Booking[] }>(
+        `/table-booking/merchant/bookings?${searchParams.toString()}`
+      );
+
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to fetch merchant bookings');
+      }
+
+      return response.data;
+    },
+    enabled: !!merchantId,
+    staleTime: 2 * 60 * 1000,
     retry: 2,
   });
 };

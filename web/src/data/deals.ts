@@ -17,7 +17,7 @@ export interface Deal {
   tag?: string;
 
   // --- NEW DEAL-SPECIFIC FIELDS ---
-  dealType?: 'Discount' | 'Happy Hour' | 'Kickback' | 'Recurring';
+  dealType?: 'Discount' | 'Happy Hour' | 'Kickback' | 'Recurring' | 'Redeem Now' | 'Hidden Deal' | 'Bounty Deal' | 'REDEEM_NOW' | 'HIDDEN' | 'BOUNTY';
   dealValue?: string; // e.g., "50% OFF", "$5 Per Friend"
   offerTerms?: string; // new fine-print field from backend
   claimedBy?: {
@@ -33,6 +33,7 @@ export interface Deal {
   expiresAt?: string; // ISO String for countdown timer
   
   // --- MERCHANT INFORMATION ---
+  merchantId?: number;
   merchantName?: string;
   merchantAddress?: string;
   merchantLogo?: string;
@@ -46,7 +47,7 @@ const getFutureDate = (hours: number) =>
 export const premiumDeals: Deal[] = [
   {
     id: 'pd1',
-    name: 'Echoes Living Room',
+    name: 'Happy Hour Pizza',
     image:
       'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&q=80',
     // --- IMAGES ADDED ---
@@ -61,12 +62,15 @@ export const premiumDeals: Deal[] = [
     location: 'Midtown, Atlanta',
     tag: 'Guest Favourite',
     dealType: 'Happy Hour',
-    dealValue: '2-for-1 Drinks',
+    dealValue: '30% OFF',
     expiresAt: getFutureDate(1),
+    // --- MERCHANT INFO ---
+    merchantId: 1, // This merchant HAS tables configured
+    merchantName: "Tony's Little Star Pizza",
   },
   {
     id: 'pd2',
-    name: 'The Irish House',
+    name: 'Morning Rush Special',
     image:
       'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80',
     // --- IMAGES ADDED ---
@@ -88,10 +92,13 @@ export const premiumDeals: Deal[] = [
     discountAmount: null,
     isBooking: false,
     expiresAt: getFutureDate(26),
+    // --- MERCHANT INFO ---
+    merchantId: 2, // This merchant does NOT have tables configured
+    merchantName: 'Blue Bottle Coffee',
   },
   {
     id: 'pd3',
-    name: 'Social',
+    name: 'Personal Training Package',
     image:
       'https://images.unsplash.com/photo-1562059392-096320bccc7e?w=500&q=80',
     // --- IMAGES ADDED ---
@@ -105,12 +112,15 @@ export const premiumDeals: Deal[] = [
     price: '$$',
     location: 'Rittenhouse Square, Philadelphia',
     dealType: 'Kickback',
-    dealValue: '$5 Per Friend',
+    dealValue: 'FREE',
     expiresAt: getFutureDate(72),
+    // --- MERCHANT INFO ---
+    merchantId: 1, // This merchant HAS tables configured (same as pd1)
+    merchantName: 'Equinox Fitness',
   },
   {
     id: 'pd4',
-    name: 'Mai Bao',
+    name: 'New Memb Special',
     image:
       'https://images.unsplash.com/photo-1585518419759-7fe2e0fbf8a6?w=500&q=80',
     // --- IMAGES ADDED ---
@@ -132,6 +142,9 @@ export const premiumDeals: Deal[] = [
     discountAmount: null,
     isBooking: true,
     expiresAt: getFutureDate(8),
+    // --- MERCHANT INFO ---
+    merchantId: 3, // This merchant does NOT have tables configured
+    merchantName: 'Equinox Fitness',
   },
 ];
 
@@ -179,6 +192,9 @@ export const allDeals: DealWithLocation[] = [
     originalValue: 20,
     discountValue: 10,
     expiresAt: getFutureDate(4),
+    // --- MERCHANT INFO ---
+    merchantId: 2, // This merchant does NOT have tables configured
+    merchantName: 'Blue Bottle Coffee',
   },
   {
     id: 'ad2',
@@ -203,6 +219,9 @@ export const allDeals: DealWithLocation[] = [
     dealType: 'Happy Hour',
     dealValue: 'Free Dessert',
     expiresAt: getFutureDate(12),
+    // --- MERCHANT INFO ---
+    merchantId: 1, // This merchant HAS tables configured
+    merchantName: "Tony's Little Star Pizza",
   },
   {
     id: 'ad3',
@@ -227,6 +246,9 @@ export const allDeals: DealWithLocation[] = [
     dealType: 'Happy Hour',
     dealValue: '2-for-1 Drinks',
     expiresAt: getFutureDate(3),
+    // --- MERCHANT INFO ---
+    merchantId: 1, // This merchant HAS tables configured
+    merchantName: "Tony's Little Star Pizza",
   },
   {
     id: 'ad4',
@@ -252,6 +274,9 @@ export const allDeals: DealWithLocation[] = [
     originalValue: 25,
     discountValue: 7.5,
     expiresAt: getFutureDate(8),
+    // --- MERCHANT INFO ---
+    merchantId: 3, // This merchant does NOT have tables configured
+    merchantName: 'Equinox Fitness',
   },
   {
     id: 'ad5',
@@ -276,5 +301,8 @@ export const allDeals: DealWithLocation[] = [
     dealType: 'Kickback',
     dealValue: 'Free Entry',
     expiresAt: getFutureDate(18),
+    // --- MERCHANT INFO ---
+    merchantId: 2, // This merchant does NOT have tables configured
+    merchantName: 'Blue Bottle Coffee',
   },
 ];
