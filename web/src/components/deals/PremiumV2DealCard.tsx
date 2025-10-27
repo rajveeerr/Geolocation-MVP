@@ -105,19 +105,22 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
     useSavedDeals();
 
   // Fetch today's availability for this merchant
-  // Only fetch availability if merchantId is defined
-  const shouldFetchAvailability = deal.merchantId !== undefined && deal.merchantId !== null;
+  // TEMPORARY FIX: Use merchantId 1 if undefined (for testing)
+  const effectiveMerchantId = deal.merchantId || 1;
+  const shouldFetchAvailability = true; // Always fetch for now
   
   // DEBUG: Log merchant availability fetch
   console.log(`🔍 [${deal.name}] Merchant Availability Fetch:`, {
     dealId: deal.id,
     merchantId: deal.merchantId,
+    merchantObject: deal.merchant,
+    fullDeal: deal,
     shouldFetch: shouldFetchAvailability,
     willFetchFor: shouldFetchAvailability ? deal.merchantId : 0
   });
   
   const { data: todayAvailability, isLoading: isLoadingAvailability, error: availabilityError } = useTodayAvailability(
-    shouldFetchAvailability ? deal.merchantId : 0, // Use 0 if no merchantId (will not fetch)
+    effectiveMerchantId, // Use effective merchantId (1 if undefined)
     2 // default party size
   );
 
@@ -546,7 +549,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                                         });
                                         return null;
                                       })()}
-                                      {!deal.merchantId ? (
+                                      {!effectiveMerchantId ? (
                                         <div className="text-center py-8">
                                           <div className="text-neutral-400 mb-2">
                                             <Calendar className="h-12 w-12 mx-auto" />
@@ -578,15 +581,15 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                                             ) : todayAvailability?.availableTimeSlots && todayAvailability.availableTimeSlots.length > 0 ? (
                                               <div className="space-y-2">
                                                 {todayAvailability.availableTimeSlots.slice(0, 3).map((slot) => (
-                                                  <TimeSlotQuickCard
-                                                    key={slot.id}
-                                                    merchantId={deal.merchantId!}
-                                                    merchantName={deal.merchantName || deal.name}
-                                                    slot={slot}
-                                                    date={todayAvailability.date}
-                                                    onBook={() => handleTimeSlotBook(slot)}
-                                                    compact={true}
-                                                  />
+                    <TimeSlotQuickCard
+                      key={slot.id}
+                      merchantId={effectiveMerchantId}
+                      merchantName={deal.merchantName || deal.name}
+                      slot={slot}
+                      date={todayAvailability.date}
+                      onBook={() => handleTimeSlotBook(slot)}
+                      compact={true}
+                    />
                                                 ))}
                                                 
                                                 {/* View All Times Button */}
@@ -636,10 +639,10 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                                                 <ChevronDown className="inline h-3 w-3 ml-1 group-open:rotate-180 transition-transform" />
                                               </summary>
                                               <div className="mt-2">
-                                                <AvailableTablesList 
-                                                  merchantId={deal.merchantId!} 
-                                                  merchantName={deal.merchantName || deal.name}
-                                                />
+                  <AvailableTablesList
+                    merchantId={effectiveMerchantId}
+                    merchantName={deal.merchantName || deal.name}
+                  />
                                               </div>
                                             </details>
                                           )}
@@ -731,7 +734,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
         <TableBookingModal
           isOpen={isBookingModalOpen}
           onClose={handleCloseBookingModal}
-          merchantId={deal.merchantId ?? 1}
+          merchantId={effectiveMerchantId}
           merchantName={deal.merchantName || deal.name}
           preselectedTimeSlot={preselectedTimeSlot}
         />
