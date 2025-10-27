@@ -3,11 +3,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Calendar } from '@/components/ui/Calendar';
 import { EnhancedCalendar } from './EnhancedCalendar';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock, Users, MapPin, Phone, Mail, User, MessageSquare } from 'lucide-react';
+import { Clock, Users, MapPin, Phone, Mail, User, MessageSquare, Calendar } from 'lucide-react';
 import { useMerchantAvailability, useCreateBooking } from '@/hooks/useTableBooking';
 import { format } from 'date-fns';
 import { toast } from 'sonner';

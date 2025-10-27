@@ -53,7 +53,7 @@ export const EnhancedCalendar = ({
     const monthName = format(month, 'MMMM yyyy');
     
     return (
-      <div className={`flex flex-col w-full ${isSecondMonth ? 'ml-6' : ''}`}>
+      <div className={`flex flex-col w-full`}>
         <div className="text-center mb-4">
           <h3 className="text-lg font-semibold text-neutral-800">{monthName}</h3>
         </div>
@@ -71,7 +71,7 @@ export const EnhancedCalendar = ({
         <div className="grid grid-cols-7 gap-1">
           {days.map((day, index) => {
             if (!day) {
-              return <div key={index} className="h-10" />;
+              return <div key={`empty-${index}`} className="h-10 w-10" />;
             }
             
             const isSelected = selectedDate && isSameDay(day, selectedDate);
@@ -85,7 +85,7 @@ export const EnhancedCalendar = ({
                 variant="ghost"
                 size="sm"
                 className={`
-                  h-10 w-10 p-0 text-sm font-medium rounded-md
+                  h-10 w-10 p-0 text-sm font-medium rounded-md flex items-center justify-center
                   ${!isCurrentMonth ? 'text-neutral-300' : ''}
                   ${isTodayDate ? 'bg-orange-100 text-orange-600 font-bold' : ''}
                   ${isSelected ? 'bg-orange-600 text-white font-bold hover:bg-orange-700' : ''}
@@ -134,7 +134,7 @@ export const EnhancedCalendar = ({
       </div>
       
       {/* Dual Calendar */}
-      <div className="flex gap-8">
+      <div className="flex gap-12">
         {renderCalendar(currentMonth)}
         {renderCalendar(secondMonth, true)}
       </div>
