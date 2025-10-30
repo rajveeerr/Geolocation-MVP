@@ -76,6 +76,9 @@ const LeaderboardPage = React.lazy(() =>
 const ReferralPage = React.lazy(() =>
   import('./pages/ReferralPage').then((m) => ({ default: m.ReferralPage })),
 );
+const GamificationPage = React.lazy(() =>
+  import('./pages/GamificationPage').then((m) => ({ default: m.GamificationPage })),
+);
 const KickbackEarningsPage = React.lazy(() =>
   import('./pages/merchant/KickbackEarningsPage').then((m) => ({ default: m.KickbackEarningsPage })),
 );
@@ -102,6 +105,8 @@ const MerchantMyDealsPage = React.lazy(() =>
 );
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
+import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
+import { PaymentCancelPage } from './pages/PaymentCancelPage';
 
 const DefaultLayout = () => (
   <>
@@ -156,6 +161,16 @@ function App() {
                   }
                 />
                 <Route
+                  path={PATHS.GAMIFICATION}
+                  element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <GamificationPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path={PATHS.DEAL_DETAIL}
                   element={
                     <Suspense fallback={<LoadingOverlay />}>
@@ -169,6 +184,8 @@ function App() {
                 />
                 <Route path={PATHS.PRIVACY} element={<PrivacyPage />} />
                 <Route path={PATHS.TERMS} element={<TermsPage />} />
+                <Route path={PATHS.PAYMENT_SUCCESS} element={<PaymentSuccessPage />} />
+                <Route path={PATHS.PAYMENT_CANCEL} element={<PaymentCancelPage />} />
               </Route>
 
               <Route

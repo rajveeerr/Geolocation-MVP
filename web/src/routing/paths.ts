@@ -35,6 +35,11 @@ export const PATHS = {
   PROFILE_EDIT: '/profile/edit',
   SETTINGS: '/settings',
   LEADERBOARD: '/leaderboard',
+  GAMIFICATION: '/gamification',
+
+  // Payments
+  PAYMENT_SUCCESS: '/payment/success',
+  PAYMENT_CANCEL: '/payment/cancel',
 
   // Admin
   ADMIN_LOGIN: '/admin/login',

@@ -200,6 +200,7 @@ import { useAuth } from '@/context/useAuth';
 import { ProfileDropDown } from './ProfileDropDown';
 import { NavbarSearch } from './NavbarSearch';
 import { SearchModal } from './SearchModal';
+import CoinDisplay from '../gamification/CoinDisplay';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
 
@@ -207,6 +208,7 @@ const navigationItems = [
   { id: 'deals', label: 'Hot Deals', path: PATHS.ALL_DEALS },
   { id: 'leaderboard', label: 'Leaderboard', path: PATHS.LEADERBOARD },
   { id: 'referral', label: 'Referral', path: PATHS.REFERRALS },
+  { id: 'gamification', label: 'Coins', path: PATHS.GAMIFICATION },
 ];
 
 export const Header = () => {
@@ -275,7 +277,7 @@ export const Header = () => {
                       <Link
                         key={item.id}
                         to={item.path}
-                        className="rounded-full px-4 py-2 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-100"
+                        className="rounded-full px-4 py-2 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-100 whitespace-nowrap"
                       >
                         {item.label}
                       </Link>
@@ -297,7 +299,10 @@ export const Header = () => {
             {isLoadingUser ? (
               <div className="h-10 w-24 animate-pulse rounded-full bg-neutral-200" />
             ) : user ? (
-              <ProfileDropDown isMerchant={hasMerchantProfile} />
+              <div className="flex items-center gap-3">
+                <CoinDisplay />
+                <ProfileDropDown isMerchant={hasMerchantProfile} />
+              </div>
             ) : (
               <Link to={PATHS.LOGIN}>
                 <Button variant="primary" size="md" className="rounded-full">
