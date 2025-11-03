@@ -38,6 +38,17 @@ export const PATHS = {
   STREAK_LEADERBOARD: '/streaks/leaderboard',
   GAMIFICATION: '/gamification',
 
+  // Loyalty (user)
+  LOYALTY_WALLET: '/loyalty',
+  LOYALTY_HISTORY: '/loyalty/history',
+
+  // Loyalty (merchant)
+  MERCHANT_LOYALTY_SETUP: '/merchant/loyalty/setup',
+  MERCHANT_LOYALTY_PROGRAM: '/merchant/loyalty/program',
+  MERCHANT_LOYALTY_ANALYTICS: '/merchant/loyalty/analytics',
+  MERCHANT_LOYALTY_CUSTOMERS: '/merchant/loyalty/customers',
+  MERCHANT_LOYALTY_TRANSACTIONS: '/merchant/loyalty/transactions',
+
   // Payments
   PAYMENT_SUCCESS: '/payment/success',
   PAYMENT_CANCEL: '/payment/cancel',

@@ -1,6 +1,6 @@
 // src/components/layout/ProfileDropDown.tsx
 import { Link } from 'react-router-dom';
-import { LogOut, User, Settings, LayoutDashboard, Shield, Briefcase } from 'lucide-react'; // <-- Import Shield icon
+import { LogOut, User, Settings, LayoutDashboard, Shield, Briefcase, Gift } from 'lucide-react'; // <-- Import Shield icon
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -78,10 +78,10 @@ export const ProfileDropDown = ({ isMerchant }: { isMerchant: boolean }) => {
           )}
 
           {/* Yohop for Business CTA - shows Dashboard for merchants, Onboarding for others */}
-          {!isAdmin && (
+          {!isAdmin && !isMerchant && (
             <>
               <DropdownMenuItem asChild>
-                <Link to={isMerchant ? PATHS.MERCHANT_DASHBOARD : PATHS.MERCHANT_ONBOARDING}>
+                <Link to={PATHS.MERCHANT_ONBOARDING}>
                   <Briefcase className="mr-2 h-4 w-4" />
                   <span>Yohop for Business</span>
                 </Link>
@@ -96,6 +96,14 @@ export const ProfileDropDown = ({ isMerchant }: { isMerchant: boolean }) => {
             <span>Profile</span>
           </Link>
         </DropdownMenuItem>
+          {!isMerchant && (
+            <DropdownMenuItem asChild>
+              <Link to={PATHS.LOYALTY_HISTORY}>
+                <Gift className="mr-2 h-4 w-4" />
+                <span>Loyalty Wallet</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem asChild>
             <Link to={PATHS.SETTINGS}>
               <Settings className="mr-2 h-4 w-4" />

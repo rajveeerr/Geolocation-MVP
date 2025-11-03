@@ -10,6 +10,7 @@ import { useDealDetail, type DetailedDeal } from '@/hooks/useDealDetail';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routing/paths';
 import { MerchantLogo } from '@/components/common/MerchantLogo';
+import { useLoyaltyBalance, useLoyaltyProgram } from '@/hooks/useLoyalty';
 
 // Icons
 import {
@@ -446,7 +447,11 @@ export const EnhancedDealDetailPage = () => {
             {/* Deal Title and Basic Info */}
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-2xl">{deal.category.icon}</span>
+                {deal.category.icon && (
+                  <span className="text-2xl" role="img" aria-label={deal.category.label}>
+                    {deal.category.icon}
+                  </span>
+                )}
                 <span className="text-sm text-neutral-600">{deal.category.label}</span>
               </div>
               <h1 className="text-3xl font-bold text-neutral-900 mb-4">{deal.title}</h1>
@@ -590,6 +595,9 @@ export const EnhancedDealDetailPage = () => {
                 )}
               </div>
 
+              {/* Loyalty Program Summary */}
+              <LoyaltySummary merchantId={deal.merchant.id} />
+
               {/* Action Buttons */}
               <div className="space-y-3 mb-6">
                 <Button
@@ -634,6 +642,29 @@ export const EnhancedDealDetailPage = () => {
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+const LoyaltySummary = ({ merchantId }: { merchantId: number }) => {
+  const { data: program } = useLoyaltyProgram(merchantId);
+  const { balance, isLoading } = useLoyaltyBalance(merchantId);
+
+  if (!program?.program?.isActive) return null;
+
+  return (
+    <div className="mb-6 rounded-xl border border-neutral-200 bg-white p-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-sm font-semibold text-neutral-900">Loyalty Program</div>
+          <div className="text-xs text-neutral-500">Earn {program.program.pointsPerDollar} pts per $1</div>
+        </div>
+        <div className="text-right">
+          <div className="text-xs text-neutral-500">Your balance</div>
+          <div className="text-sm font-bold text-neutral-900">{isLoading ? '...' : `${balance?.currentBalance ?? 0} pts`}</div>
+        </div>
+      </div>
+      <div className="mt-2 text-xs text-neutral-600">Redeem {program.program.minimumRedemption} pts = ${program.program.redemptionValue.toFixed(0)} off</div>
     </div>
   );
 };

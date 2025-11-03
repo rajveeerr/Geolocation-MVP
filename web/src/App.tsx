@@ -110,6 +110,24 @@ import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
 import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
 import { PaymentCancelPage } from './pages/PaymentCancelPage';
+const LoyaltyHistoryPage = React.lazy(() =>
+  import('./pages/LoyaltyHistoryPage').then((m) => ({ default: m.LoyaltyHistoryPage }))
+);
+const MerchantLoyaltySetupPage = React.lazy(() =>
+  import('./pages/merchant/loyalty/MerchantLoyaltySetupPage').then((m) => ({ default: m.MerchantLoyaltySetupPage }))
+);
+const MerchantLoyaltyProgramPage = React.lazy(() =>
+  import('./pages/merchant/loyalty/MerchantLoyaltyProgramPage').then((m) => ({ default: m.MerchantLoyaltyProgramPage }))
+);
+const MerchantLoyaltyAnalyticsPage = React.lazy(() =>
+  import('./pages/merchant/loyalty/MerchantLoyaltyAnalyticsPage').then((m) => ({ default: m.MerchantLoyaltyAnalyticsPage }))
+);
+const MerchantLoyaltyCustomersPage = React.lazy(() =>
+  import('./pages/merchant/loyalty/MerchantLoyaltyCustomersPage').then((m) => ({ default: m.MerchantLoyaltyCustomersPage }))
+);
+const MerchantLoyaltyTransactionsPage = React.lazy(() =>
+  import('./pages/merchant/loyalty/MerchantLoyaltyTransactionsPage').then((m) => ({ default: m.MerchantLoyaltyTransactionsPage }))
+);
 
 const DefaultLayout = () => (
   <>
@@ -161,6 +179,16 @@ function App() {
                   }
                 />
                 <Route path={PATHS.ALL_DEALS} element={<AllDealsPage />} />
+                <Route
+                  path={PATHS.LOYALTY_HISTORY}
+                  element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <LoyaltyHistoryPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  }
+                />
                 <Route
                   path={PATHS.REFERRALS}
                   element={
@@ -366,6 +394,68 @@ function App() {
                     <MerchantLayout>
                       <Suspense fallback={<LoadingOverlay />}>
                         <MerchantAnalyticsPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Merchant Loyalty */}
+              <Route
+                path={PATHS.MERCHANT_LOYALTY_SETUP}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MerchantLoyaltySetupPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={PATHS.MERCHANT_LOYALTY_PROGRAM}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MerchantLoyaltyProgramPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={PATHS.MERCHANT_LOYALTY_ANALYTICS}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MerchantLoyaltyAnalyticsPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={PATHS.MERCHANT_LOYALTY_CUSTOMERS}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MerchantLoyaltyCustomersPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={PATHS.MERCHANT_LOYALTY_TRANSACTIONS}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MerchantLoyaltyTransactionsPage />
                       </Suspense>
                     </MerchantLayout>
                   </ProtectedRoute>

@@ -25,6 +25,7 @@ import { useUpdateAvatar } from '@/hooks/useUpdateProfile';
 import { StreakCard } from '@/components/gamification/streak/StreakCard';
 import { useStreak } from '@/hooks/useStreak';
 import { StreakDiscountBreakdown } from '@/components/gamification/streak/StreakDiscountBreakdown';
+import { LoyaltyWallet } from '@/components/gamification/loyalty/LoyaltyWallet';
 
 export const ProfilePage = () => {
   const { user } = useAuth();
@@ -54,6 +55,8 @@ export const ProfilePage = () => {
     updateAvatar.mutate(newAvatarUrl);
   };
 
+  const avatarUrl: string | undefined = ((user as any)?.avatarUrl ?? undefined) as string | undefined;
+
   const TabButton = ({
     tabName,
     label,
@@ -81,9 +84,9 @@ export const ProfilePage = () => {
         <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
           <div className="flex flex-col items-center gap-6 sm:flex-row">
             <ProfilePictureUpload
-              currentAvatarUrl={(user as any)?.avatarUrl}
-              userName={user?.name}
-              userEmail={user?.email}
+              currentAvatarUrl={avatarUrl as unknown as string | undefined}
+              userName={user?.name ?? undefined}
+              userEmail={user?.email ?? undefined}
               onAvatarUpdate={handleAvatarUpdate}
               size="lg"
               showUploadButton={true}
@@ -121,6 +124,7 @@ export const ProfilePage = () => {
               <>
                 <StreakCard streak={streak} loading={isLoading} />
                 <StreakDiscountBreakdown />
+                {!isMerchant && <LoyaltyWallet />}
               </>
             );
           })()}

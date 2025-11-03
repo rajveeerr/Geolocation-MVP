@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 interface ProfilePictureUploadProps {
-  currentAvatarUrl?: string;
+  currentAvatarUrl?: string | null;
   userName?: string;
   userEmail?: string;
   onAvatarUpdate?: (newAvatarUrl: string) => void;

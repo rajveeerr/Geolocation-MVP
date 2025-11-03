@@ -224,11 +224,6 @@ export const Header = () => {
   // Check if user has a merchant profile (any status)
   const hasMerchantProfile = !!merchantData?.data?.merchant;
 
-  // Where the business CTA should navigate
-  const businessLink = hasMerchantProfile
-    ? PATHS.MERCHANT_DASHBOARD
-    : PATHS.MERCHANT_ONBOARDING;
-
   const openSearchModal = () => setIsSearchModalOpen(true);
   const closeSearchModal = () => setIsSearchModalOpen(false);
 
@@ -304,8 +299,19 @@ export const Header = () => {
               <div className="h-10 w-24 animate-pulse rounded-full bg-neutral-200" />
             ) : user ? (
               <div className="flex items-center gap-3">
-                <StreakBadge streak={streak} loading={isLoadingStreak} />
-                <CoinDisplay />
+                {hasMerchantProfile && (
+                  <Link to={PATHS.MERCHANT_DASHBOARD}>
+                    <Button variant="secondary" size="md" className="rounded-full">
+                      Business Dashboard
+                    </Button>
+                  </Link>
+                )}
+                {!hasMerchantProfile && (
+                  <>
+                    <StreakBadge streak={streak} loading={isLoadingStreak} />
+                    <CoinDisplay />
+                  </>
+                )}
                 <ProfileDropDown isMerchant={hasMerchantProfile} />
               </div>
             ) : (
