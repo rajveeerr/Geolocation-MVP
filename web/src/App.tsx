@@ -79,6 +79,9 @@ const ReferralPage = React.lazy(() =>
 const GamificationPage = React.lazy(() =>
   import('./pages/GamificationPage').then((m) => ({ default: m.GamificationPage })),
 );
+const StreakLeaderboardPage = React.lazy(() =>
+  import('./pages/StreakLeaderboard').then((m) => ({ default: m.StreakLeaderboardPage })),
+);
 const KickbackEarningsPage = React.lazy(() =>
   import('./pages/merchant/KickbackEarningsPage').then((m) => ({ default: m.KickbackEarningsPage })),
 );
@@ -141,6 +144,14 @@ function App() {
                   }
                 />
                 <Route path={PATHS.ABOUT} element={<AboutPage />} />
+                <Route
+                  path={PATHS.STREAK_LEADERBOARD}
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <StreakLeaderboardPage />
+                    </Suspense>
+                  }
+                />
                 <Route
                   path={PATHS.LEADERBOARD}
                   element={

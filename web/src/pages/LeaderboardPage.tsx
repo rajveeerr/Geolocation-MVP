@@ -8,9 +8,11 @@ import { LeaderboardSkeleton } from '@/components/common/LeaderboardSkeleton';
 import { TabSelector } from '@/components/common/TabSelector';
 import { DiscoverSection } from '@/components/landing/DiscoverSection';
 import { motion, AnimatePresence } from 'framer-motion'; // Import motion
+import { StreakLeaderboardTable } from '@/components/gamification/streak/StreakLeaderboardTable';
 
 const tabs = [
   { id: 'leaderboard', label: 'Leaderboard' },
+  { id: 'streaks', label: 'Streak Leaderboard' },
   { id: 'discover', label: 'Discover Deals' },
 ];
 
@@ -43,6 +45,15 @@ export const LeaderboardPage = () => {
 
         {/* --- Conditional Content --- */}
         {activeTab === 'leaderboard' && <LeaderboardContent />}
+        {activeTab === 'streaks' && (
+          <div className="max-w-4xl mx-auto space-y-4 mt-6">
+            <h2 className="text-2xl font-semibold text-neutral-900 text-center">Weekly Streak Leaderboard</h2>
+            <p className="mx-auto max-w-xl text-neutral-500 text-center">
+              Ranked by current weekly streak and discount tier. Keep checking in every week to climb.
+            </p>
+            <StreakLeaderboardTable />
+          </div>
+        )}
         {activeTab === 'discover' && <DiscoverSection />}
       </div>
     </div>

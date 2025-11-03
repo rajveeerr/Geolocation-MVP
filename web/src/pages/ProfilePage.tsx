@@ -22,6 +22,9 @@ import { Button } from '@/components/common/Button';
 import { PATHS } from '@/routing/paths';
 import { ProfilePictureUpload } from '@/components/profile/ProfilePictureUpload';
 import { useUpdateAvatar } from '@/hooks/useUpdateProfile';
+import { StreakCard } from '@/components/gamification/streak/StreakCard';
+import { useStreak } from '@/hooks/useStreak';
+import { StreakDiscountBreakdown } from '@/components/gamification/streak/StreakDiscountBreakdown';
 
 export const ProfilePage = () => {
   const { user } = useAuth();
@@ -109,6 +112,18 @@ export const ProfilePage = () => {
               </Button>
             </div>
           </div>
+        </div>
+
+        <div className="mt-6 space-y-6">
+          {(() => {
+            const { streak, isLoading } = useStreak();
+            return (
+              <>
+                <StreakCard streak={streak} loading={isLoading} />
+                <StreakDiscountBreakdown />
+              </>
+            );
+          })()}
         </div>
 
         <div className="mt-12">

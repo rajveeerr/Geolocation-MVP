@@ -4,7 +4,8 @@ import { Badge } from '../ui/badge';
 import { Progress } from '../ui/progress';
 import { useAchievements } from '../../hooks/useGamification';
 import { Trophy, Star, Coins, CheckCircle2, Clock } from 'lucide-react';
-import type { Achievement, AchievementType } from '../../types/gamification';
+import type { Achievement } from '../../types/gamification';
+import { AchievementType } from '../../types/gamification';
 
 const AchievementsList: React.FC = () => {
   const { data: achievements, isLoading, error } = useAchievements();

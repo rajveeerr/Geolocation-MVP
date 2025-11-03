@@ -194,6 +194,8 @@ import { Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
 import { PATHS } from '@/routing/paths';
+import { StreakBadge } from '@/components/gamification/streak/StreakBadge';
+import { useStreak } from '@/hooks/useStreak';
 import { Logo } from '../common/Logo';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/useAuth';
@@ -250,6 +252,8 @@ export const Header = () => {
     },
   };
 
+  const { streak, isLoading: isLoadingStreak } = useStreak();
+
   return (
     <>
       {/* <header
@@ -289,17 +293,18 @@ export const Header = () => {
           </div>
 
           <div className="hidden items-center justify-end gap-2 lg:flex">
-            {!isAdmin && (
+            {/* {!isAdmin && (
               <Link to={businessLink}>
                 <Button variant="secondary" size="md" className="rounded-full">
                   {hasMerchantProfile ? 'Business Dashboard' : 'Yohop for Business'}
                 </Button>
               </Link>
-            )}
+            )} */}
             {isLoadingUser ? (
               <div className="h-10 w-24 animate-pulse rounded-full bg-neutral-200" />
             ) : user ? (
               <div className="flex items-center gap-3">
+                <StreakBadge streak={streak} loading={isLoadingStreak} />
                 <CoinDisplay />
                 <ProfileDropDown isMerchant={hasMerchantProfile} />
               </div>

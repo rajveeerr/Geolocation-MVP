@@ -4,6 +4,7 @@ import { apiPost } from '@/services/api';
 import { useToast } from './use-toast';
 import { useAuth } from '@/context/useAuth';
 import { useModal } from '@/context/ModalContext';
+import { STREAK_QUERY_KEY } from './useStreak';
 
 interface CheckInPayload {
   dealId: number;
@@ -34,6 +35,20 @@ export const useCheckIn = () => {
             title: 'Check-in Successful!',
             description: `You earned ${response.data.pointsAwarded} points!`,
           });
+          // If streak data is returned, update cache and show contextual notifications
+          if (response.data.streak) {
+            const s = response.data.streak;
+            queryClient.setQueryData(STREAK_QUERY_KEY, s);
+            if (s.newWeek) {
+              toast({ title: 'Streak advanced!', description: s.message });
+            }
+            if (s.streakBroken) {
+              toast({ title: 'Streak broken', description: 'Starting fresh with 10% discount.', variant: 'destructive' });
+            }
+            if (s.maxDiscountReached) {
+              toast({ title: 'Maximum discount reached! 🎉', description: 'You now have 45% OFF.' });
+            }
+          }
           // Invalidate user data to refetch their new point total
           queryClient.invalidateQueries({ queryKey: ['user'] });
           queryClient.invalidateQueries({ queryKey: ['leaderboard'] }); // Also refresh leaderboard

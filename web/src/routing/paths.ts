@@ -35,6 +35,7 @@ export const PATHS = {
   PROFILE_EDIT: '/profile/edit',
   SETTINGS: '/settings',
   LEADERBOARD: '/leaderboard',
+  STREAK_LEADERBOARD: '/streaks/leaderboard',
   GAMIFICATION: '/gamification',
 
   // Payments

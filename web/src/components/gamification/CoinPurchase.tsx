@@ -86,114 +86,133 @@ const CoinPurchase: React.FC = () => {
   }
 
   const bestValueIndex = getBestValuePackage(packages);
+  const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
+  const hasPayPalConfig = paypalClientId && paypalClientId.trim() !== '';
 
-  return (
-    <PayPalScriptProvider
-      options={{
-        clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID || '',
-        currency: import.meta.env.VITE_PAYPAL_CURRENCY || 'USD',
-        intent: 'capture',
-      }}
-    >
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Coins className="h-5 w-5 text-yellow-500" />
-              <span>Purchase Coins</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600 mb-6">
-              Buy coins to unlock special deals, rewards, and exclusive offers. 
-              Choose the package that works best for you!
-            </p>
+  const content = (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Coins className="h-5 w-5 text-yellow-500" />
+            <span>Purchase Coins</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-600 mb-6">
+            Buy coins to unlock special deals, rewards, and exclusive offers. 
+            Choose the package that works best for you!
+          </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {packages.map((pkg, index) => (
-                <Card
-                  key={index}
-                  className={`relative cursor-pointer transition-all hover:shadow-lg ${
-                    selectedPackage === index ? 'ring-2 ring-blue-500' : ''
-                  } ${getPackageColor(pkg.coins)}`}
-                >
-                  {index === bestValueIndex && (
-                    <Badge className="absolute -top-2 -right-2 bg-red-500 text-white">
-                      Best Value
-                    </Badge>
-                  )}
-                  
-                  <CardContent className="p-6 text-center">
-                    <div className="flex justify-center mb-4">
-                      {getPackageIcon(pkg.coins)}
-                    </div>
-                    
-                    <h3 className="text-lg font-bold mb-2">{pkg.label}</h3>
-                    
-                    <div className="text-2xl font-bold text-yellow-600 mb-2">
-                      {pkg.coins.toLocaleString()} Coins
-                    </div>
-                    
-                    <div className="text-xl font-semibold text-green-600 mb-4">
-                      ${pkg.price.toFixed(2)}
-                    </div>
-                    
-                    <div className="text-sm text-gray-600 mb-4">
-                      {(pkg.coins / pkg.price).toFixed(0)} coins per $1
-                    </div>
-                    
-                    <Button
-                      className="w-full"
-                      onClick={() => handlePurchase(index)}
-                      disabled={processingPackage === index}
-                    >
-                      {processingPackage === index ? (
-                        <div className="flex items-center space-x-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          <span>Processing...</span>
-                        </div>
-                      ) : (
-                        `Buy ${pkg.coins.toLocaleString()} Coins`
-                      )}
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+          {!hasPayPalConfig && (
+            <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-yellow-800 text-sm">
+                PayPal is not configured. Please set VITE_PAYPAL_CLIENT_ID in your environment variables.
+              </p>
             </div>
-          </CardContent>
-        </Card>
+          )}
 
-        {/* Payment Instructions */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-center space-y-4">
-              <h4 className="font-semibold text-lg">How it works</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div className="flex flex-col items-center space-y-2">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-blue-600 font-bold">1</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {packages.map((pkg, index) => (
+              <Card
+                key={index}
+                className={`relative cursor-pointer transition-all hover:shadow-lg ${
+                  selectedPackage === index ? 'ring-2 ring-blue-500' : ''
+                } ${getPackageColor(pkg.coins)}`}
+              >
+                {index === bestValueIndex && (
+                  <Badge className="absolute -top-2 -right-2 bg-red-500 text-white">
+                    Best Value
+                  </Badge>
+                )}
+                
+                <CardContent className="p-6 text-center">
+                  <div className="flex justify-center mb-4">
+                    {getPackageIcon(pkg.coins)}
                   </div>
-                  <p className="text-gray-600">Choose your coin package</p>
-                </div>
-                <div className="flex flex-col items-center space-y-2">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-blue-600 font-bold">2</span>
+                  
+                  <h3 className="text-lg font-bold mb-2">{pkg.label}</h3>
+                  
+                  <div className="text-2xl font-bold text-yellow-600 mb-2">
+                    {pkg.coins.toLocaleString()} Coins
                   </div>
-                  <p className="text-gray-600">Pay securely with PayPal</p>
-                </div>
-                <div className="flex flex-col items-center space-y-2">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-blue-600 font-bold">3</span>
+                  
+                  <div className="text-xl font-semibold text-green-600 mb-4">
+                    ${pkg.price.toFixed(2)}
                   </div>
-                  <p className="text-gray-600">Coins added instantly to your account</p>
+                  
+                  <div className="text-sm text-gray-600 mb-4">
+                    {(pkg.coins / pkg.price).toFixed(0)} coins per $1
+                  </div>
+                  
+                  <Button
+                    className="w-full"
+                    onClick={() => handlePurchase(index)}
+                    disabled={processingPackage === index || !hasPayPalConfig}
+                  >
+                    {processingPackage === index ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        <span>Processing...</span>
+                      </div>
+                    ) : (
+                      `Buy ${pkg.coins.toLocaleString()} Coins`
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Payment Instructions */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="text-center space-y-4">
+            <h4 className="font-semibold text-lg">How it works</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="flex flex-col items-center space-y-2">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-blue-600 font-bold">1</span>
                 </div>
+                <p className="text-gray-600">Choose your coin package</p>
+              </div>
+              <div className="flex flex-col items-center space-y-2">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-blue-600 font-bold">2</span>
+                </div>
+                <p className="text-gray-600">Pay securely with PayPal</p>
+              </div>
+              <div className="flex flex-col items-center space-y-2">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-blue-600 font-bold">3</span>
+                </div>
+                <p className="text-gray-600">Coins added instantly to your account</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    </PayPalScriptProvider>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
+
+  // Only wrap with PayPalScriptProvider if client ID is configured
+  if (hasPayPalConfig) {
+    return (
+      <PayPalScriptProvider
+        options={{
+          clientId: paypalClientId,
+          currency: import.meta.env.VITE_PAYPAL_CURRENCY || 'USD',
+          intent: 'capture',
+        }}
+      >
+        {content}
+      </PayPalScriptProvider>
+    );
+  }
+
+  return content;
 };
 
 export default CoinPurchase;

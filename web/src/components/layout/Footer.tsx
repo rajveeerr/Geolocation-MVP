@@ -181,7 +181,9 @@
 // web/src/components/layout/Footer.tsx
 
 import { Logo } from '../common/Logo';
-import { Twitter, Instagram, Facebook } from 'lucide-react';
+import { Twitter, Instagram, Facebook, Briefcase } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { PATHS } from '@/routing/paths';
 
 const socialLinks = [
   { href: '#', icon: <Twitter className="h-5 w-5" /> },
@@ -249,6 +251,7 @@ export const Footer = () => {
           <div className="flex flex-col items-center md:items-start">
             <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-white">
               Discover Your City
+              
             </h3>
             <div className="grid w-full max-w-xs grid-cols-3 gap-2">
               {galleryImages.map((src, index) => (
@@ -265,6 +268,22 @@ export const Footer = () => {
               ))}
             </div>
           </div>
+        </div>
+        {/* Business CTA Row */}
+        <div className="mt-12 flex flex-col items-center gap-3 md:flex-row md:justify-center">
+          <Link
+            to={PATHS.MERCHANT_ONBOARDING}
+            className="inline-flex items-center gap-2 rounded-full border border-neutral-600 bg-neutral-800 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-neutral-700"
+          >
+            <Briefcase className="h-4 w-4" />
+            Yohop for Business
+          </Link>
+          <Link
+            to={PATHS.MERCHANT_DASHBOARD}
+            className="text-sm text-neutral-400 underline underline-offset-4 hover:text-white"
+          >
+            Business Login
+          </Link>
         </div>
       </div>
 
