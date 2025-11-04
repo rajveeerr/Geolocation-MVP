@@ -158,7 +158,9 @@ export const DealDetailPage = () => {
           <div className="flex flex-col items-start justify-between sm:flex-row">
             <div>
               <p className="font-semibold text-brand-primary-600">
-                {deal.category}
+                {typeof deal.category === 'string' 
+                  ? deal.category 
+                  : deal.category?.label || deal.category?.name || 'Category'}
               </p>
               <h1 className="mt-1 text-4xl font-bold text-neutral-900">
                 {deal.name}

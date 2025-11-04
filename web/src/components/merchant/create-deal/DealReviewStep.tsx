@@ -15,13 +15,21 @@ const ReviewItem = ({
   value,
 }: {
   label: string;
-  value: string | number | null | undefined;
-}) => (
-  <div className="flex justify-between border-b border-neutral-200 py-3">
-    <p className="text-neutral-600">{label}</p>
-    <p className="font-semibold text-neutral-800">{value || 'Not set'}</p>
-  </div>
-);
+  value: string | number | null | undefined | { name?: string; label?: string; value?: string };
+}) => {
+  // Handle category object - extract name/label/value
+  let displayValue: string | number | null | undefined = value;
+  if (typeof value === 'object' && value !== null) {
+    displayValue = value.name || value.label || value.value || 'Not set';
+  }
+  
+  return (
+    <div className="flex justify-between border-b border-neutral-200 py-3">
+      <p className="text-neutral-600">{label}</p>
+      <p className="font-semibold text-neutral-800">{displayValue || 'Not set'}</p>
+    </div>
+  );
+};
 
 export const DealReviewStep = () => {
   const { state } = useDealCreation();

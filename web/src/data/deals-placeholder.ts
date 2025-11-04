@@ -77,6 +77,18 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
     dealValue = `$${apiDeal.discountAmount} OFF`;
   }
 
+  // Handle category - can be string or object
+  let categoryString: string = 'Restaurant';
+  if (typeof apiDeal.category === 'string') {
+    categoryString = apiDeal.category;
+  } else if (apiDeal.category && typeof apiDeal.category === 'object') {
+    // Handle category object with name, label, or value property
+    categoryString = (apiDeal.category as any).name || 
+                     (apiDeal.category as any).label || 
+                     (apiDeal.category as any).value || 
+                     'Restaurant';
+  }
+
   return {
   id: apiDeal.id,
   name: apiDeal.title,
@@ -88,7 +100,7 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
       ? apiDeal.images
       : [apiDeal.imageUrl || 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80'],
   rating: apiDeal.rating ?? 4.2,
-  category: apiDeal.category || 'Restaurant',
+  category: categoryString,
 
   // Map required DealWithLocation fields
   price: apiDeal.price || '$$',

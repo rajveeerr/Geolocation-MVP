@@ -62,7 +62,9 @@ export const DealCardV2 = ({
           </div>
         </div>
         <p className="text-xs font-medium text-neutral-600 sm:text-sm">
-          {deal.category}
+          {typeof deal.category === 'string' 
+            ? deal.category 
+            : deal.category?.label || deal.category?.name || 'Category'}
         </p>
         <p className="mt-1 text-xs text-neutral-500">{deal.location}</p>
 

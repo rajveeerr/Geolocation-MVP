@@ -24,7 +24,9 @@ const DiscoveryItem = ({ deal }: { deal: Deal }) => (
         <Star className="h-4 w-4 fill-current text-brand-primary-500" />
         <span className="font-semibold">{deal.rating.toFixed(1)}</span>
         <span className="truncate">
-          ({deal.category}) &middot; {deal.price}
+          ({typeof deal.category === 'string' 
+            ? deal.category 
+            : deal.category?.label || deal.category?.name || 'Category'}) &middot; {deal.price}
         </span>
       </div>
       <div className="mt-1 flex items-center gap-1.5 text-sm text-neutral-500">

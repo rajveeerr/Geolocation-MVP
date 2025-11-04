@@ -81,7 +81,11 @@ export const DealResultCard = ({ deal, isHovered, onMouseEnter, onMouseLeave }: 
               <span className="font-semibold">{deal.rating}</span>
             </div>
             <span className="text-neutral-300">&middot;</span>
-            <span className="truncate">{deal.category}</span>
+            <span className="truncate">
+              {typeof deal.category === 'string' 
+                ? deal.category 
+                : deal.category?.label || deal.category?.name || 'Category'}
+            </span>
             <span className="text-neutral-300">&middot;</span>
             <span className="font-semibold text-neutral-800">{deal.price}</span>
           </div>

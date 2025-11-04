@@ -24,7 +24,11 @@ export const DealCard = ({ deal }: DealCardProps) => {
             <span>{deal.rating.toFixed(1)}</span>
           </div>
           <span className="hidden sm:inline">&middot;</span>
-          <span className="truncate">{deal.category}</span>
+          <span className="truncate">
+            {typeof deal.category === 'string' 
+              ? deal.category 
+              : deal.category?.label || deal.category?.name || 'Category'}
+          </span>
           <span className="hidden sm:inline">&middot;</span>
           <span className="font-medium text-sky-600">{deal.price}</span>
         </div>

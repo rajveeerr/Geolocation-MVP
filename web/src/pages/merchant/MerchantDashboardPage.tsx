@@ -4,10 +4,11 @@ import { Link } from 'react-router-dom';
 import { PATHS } from '@/routing/paths';
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
-import { CalendarIcon, ClockIcon, DollarSign, Percent, BarChart3, Users, Settings } from 'lucide-react';
+import { CalendarIcon, ClockIcon, DollarSign, Percent, BarChart3, Users, Settings, Gift } from 'lucide-react';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useMerchantDashboardStats } from '@/hooks/useMerchantDashboardStats';
 import { useMerchantStores } from '@/hooks/useMerchantStores';
+import { useMerchantLoyaltyProgram } from '@/hooks/useMerchantLoyalty';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { ExploreDealsPreview } from '@/components/merchant/ExploreDealsPreview';
@@ -110,6 +111,60 @@ const DealsSkeleton = () => (
     ))}
   </div>
 );
+
+const LoyaltyProgramCard = () => {
+  const { data: loyaltyProgram, isLoading } = useMerchantLoyaltyProgram();
+  const hasProgram = loyaltyProgram?.program && !loyaltyProgram.error;
+
+  return (
+    <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-primary-100">
+            <Gift className="h-6 w-6 text-brand-primary-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-neutral-900">Loyalty Program</h3>
+            <p className="mt-1 text-sm text-neutral-600">
+              {isLoading 
+                ? 'Checking status...' 
+                : hasProgram 
+                  ? 'Reward your customers with points' 
+                  : 'Set up a loyalty program to reward your customers'}
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div className="mt-4">
+        {isLoading ? (
+          <div className="animate-pulse">
+            <div className="h-10 w-32 rounded-md bg-neutral-200" />
+          </div>
+        ) : hasProgram ? (
+          <div className="flex gap-3">
+            <Link to={PATHS.MERCHANT_LOYALTY_ANALYTICS}>
+              <Button variant="primary" size="sm" className="rounded-lg">
+                View Program
+              </Button>
+            </Link>
+            <Link to={PATHS.MERCHANT_LOYALTY_PROGRAM}>
+              <Button variant="secondary" size="sm" className="rounded-lg">
+                Manage Settings
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <Link to={PATHS.MERCHANT_LOYALTY_SETUP}>
+            <Button variant="primary" size="sm" className="rounded-lg">
+              Set Up Loyalty Program
+            </Button>
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export const MerchantDashboardPage = () => {
   type DealStatusFilter = 'all' | 'active' | 'scheduled' | 'expired';
@@ -372,6 +427,11 @@ export const MerchantDashboardPage = () => {
           {/* Business Type Card */}
           <div className="mb-6">
             <BusinessTypeCard />
+          </div>
+
+          {/* Loyalty Program Card */}
+          <div className="mb-6">
+            <LoyaltyProgramCard />
           </div>
 
           {/* Dynamic Region badges - using real merchant store data */}
