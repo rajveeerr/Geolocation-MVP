@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import { Star } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { DealWithLocation } from '@/data/deals';
+import { useState } from 'react';
 
 interface DealCardV2Props {
   deal: DealWithLocation;
@@ -17,6 +18,23 @@ export const DealCardV2 = ({
   onMouseLeave,
 }: DealCardV2Props) => {
   const isOpen = deal.bookingInfo.toLowerCase().includes('sorry'); // Simple logic for status
+  
+  // Handle multiple images
+  const images = deal.images && deal.images.length > 0 ? deal.images : [deal.image];
+  const hasMultipleImages = images.length > 1;
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  const nextImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+  };
+  
+  const prevImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
 
   return (
     <motion.div
@@ -30,12 +48,48 @@ export const DealCardV2 = ({
           : 'shadow-sm',
       )}
     >
-      <div className="relative overflow-hidden">
+      <div className="group relative overflow-hidden">
         <img
-          src={deal.image}
+          src={images[currentImageIndex]}
           alt={deal.name}
           className="h-32 w-full object-cover transition-transform duration-300 hover:scale-105 sm:h-36 md:h-40"
         />
+        {hasMultipleImages && (
+          <>
+            {/* Image indicators */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+              {images.slice(0, 5).map((_, idx) => (
+                <div
+                  key={idx}
+                  className={cn(
+                    "h-1.5 rounded-full transition-all",
+                    idx === currentImageIndex ? "w-4 bg-white shadow-sm" : "w-1.5 bg-white/60"
+                  )}
+                />
+              ))}
+              {images.length > 5 && (
+                <div className="h-1.5 w-1.5 rounded-full bg-white/40" />
+              )}
+            </div>
+            {/* Navigation buttons */}
+            <button
+              onClick={prevImage}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+              aria-label="Previous image"
+              type="button"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              onClick={nextImage}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+              aria-label="Next image"
+              type="button"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </>
+        )}
         <div className="absolute right-2 top-2 sm:right-3 sm:top-3">
           <div
             className={cn(

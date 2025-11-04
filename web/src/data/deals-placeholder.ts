@@ -6,8 +6,8 @@ export type ApiDeal = {
   id: string;
   title: string;
   description: string;
-  imageUrl?: string | null;
-  images?: string[];
+  imageUrl?: string | null; // Deprecated - use images array instead
+  images?: string[]; // Primary field - array of image URLs
   merchant: {
     businessName: string;
     address: string;
@@ -89,16 +89,22 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
                      'Restaurant';
   }
 
+  // Handle images - backend returns both `images` array and `imageUrl` (singular)
+  // Priority: use `images` array if available, otherwise use `imageUrl`, otherwise fallback
+  let imagesArray: string[] = [];
+  if (apiDeal.images && Array.isArray(apiDeal.images) && apiDeal.images.length > 0) {
+    imagesArray = apiDeal.images;
+  } else if (apiDeal.imageUrl) {
+    imagesArray = [apiDeal.imageUrl];
+  } else {
+    imagesArray = ['https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80'];
+  }
+
   return {
   id: apiDeal.id,
   name: apiDeal.title,
-  image:
-    apiDeal.imageUrl ||
-    'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
-  images:
-    apiDeal.images && apiDeal.images.length > 0
-      ? apiDeal.images
-      : [apiDeal.imageUrl || 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80'],
+  image: imagesArray[0] || 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
+  images: imagesArray,
   rating: apiDeal.rating ?? 4.2,
   category: categoryString,
 

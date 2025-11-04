@@ -360,20 +360,10 @@ export const EnhancedDealDetailPage = () => {
   const handleSaveClick = () =>
     isSaved ? unsaveDeal(deal.id.toString()) : saveDeal(deal.id.toString());
 
-  const handleCheckIn = async () => {
-    try {
-      await checkIn(deal.id.toString());
-      toast({
-        title: 'Checked in successfully!',
-        description: 'You\'ve checked in to this deal.',
-      });
-    } catch (error) {
-      toast({
-        title: 'Check-in failed',
-        description: 'Unable to check in. Please try again.',
-        variant: 'destructive',
-      });
-    }
+  const handleCheckIn = () => {
+    // The useCheckIn hook handles all toast notifications internally
+    // based on the API response (success, too far, error, etc.)
+    checkIn(deal.id.toString());
   };
 
   const handleShare = async () => {

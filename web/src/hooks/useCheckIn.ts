@@ -29,44 +29,70 @@ export const useCheckIn = () => {
     mutationFn: (payload: CheckInPayload) =>
       apiPost<CheckInResponse, CheckInPayload>('/users/check-in', payload),
     onSuccess: (response: any) => {
-      if (response.success && response.data) {
-        if (response.data.withinRange) {
-          toast({
-            title: 'Check-in Successful!',
-            description: `You earned ${response.data.pointsAwarded} points!`,
-          });
-          // If streak data is returned, update cache and show contextual notifications
-          if (response.data.streak) {
-            const s = response.data.streak;
-            queryClient.setQueryData(STREAK_QUERY_KEY, s);
-            if (s.newWeek) {
-              toast({ title: 'Streak advanced!', description: s.message });
-            }
-            if (s.streakBroken) {
-              toast({ title: 'Streak broken', description: 'Starting fresh with 10% discount.', variant: 'destructive' });
-            }
-            if (s.maxDiscountReached) {
-              toast({ title: 'Maximum discount reached! 🎉', description: 'You now have 45% OFF.' });
-            }
-          }
-          // Invalidate user data to refetch their new point total
-          queryClient.invalidateQueries({ queryKey: ['user'] });
-          queryClient.invalidateQueries({ queryKey: ['leaderboard'] }); // Also refresh leaderboard
-        } else {
-          toast({
-            title: 'Too Far Away',
-            description: "You're not close enough to the merchant to check in.",
-            variant: 'destructive',
-          });
-        }
-      } else {
-        throw new Error(response.error || 'Check-in failed.');
+      // Check if response is successful
+      if (!response || !response.success) {
+        const errorMessage = response?.error || 'Check-in failed. Please try again.';
+        toast({
+          title: 'Check-in Failed',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        return;
       }
+
+      // Check if we have data
+      if (!response.data) {
+        toast({
+          title: 'Check-in Failed',
+          description: 'Invalid response from server. Please try again.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Check if user is within range
+      if (!response.data.withinRange) {
+        toast({
+          title: 'Too Far Away',
+          description: "You're not close enough to the merchant to check in.",
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Success - user is within range
+      toast({
+        title: 'Check-in Successful!',
+        description: `You earned ${response.data.pointsAwarded || 0} points!`,
+      });
+
+      // If streak data is returned, update cache and show contextual notifications
+      if (response.data.streak) {
+        const s = response.data.streak;
+        queryClient.setQueryData(STREAK_QUERY_KEY, s);
+        if (s.newWeek) {
+          toast({ title: 'Streak advanced!', description: s.message });
+        }
+        if (s.streakBroken) {
+          toast({ title: 'Streak broken', description: 'Starting fresh with 10% discount.', variant: 'destructive' });
+        }
+        if (s.maxDiscountReached) {
+          toast({ title: 'Maximum discount reached! 🎉', description: 'You now have 45% OFF.' });
+        }
+      }
+
+      // Invalidate user data to refetch their new point total
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ['leaderboard'] }); // Also refresh leaderboard
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
+      // Handle network errors, API errors, etc.
+      const errorMessage = error?.response?.data?.error || 
+                          error?.message || 
+                          'Unable to check in. Please try again.';
       toast({
         title: 'Check-in Error',
-        description: error.message,
+        description: errorMessage,
         variant: 'destructive',
       });
     },
