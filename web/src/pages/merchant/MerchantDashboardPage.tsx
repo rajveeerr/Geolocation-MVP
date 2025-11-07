@@ -444,19 +444,21 @@ export const MerchantDashboardPage = () => {
                   <div className="h-3 w-16 bg-neutral-300 rounded"></div>
                 </div>
               ))
-            ) : storesData && storesData.stores.length > 0 ? (
+            ) : storesData && storesData.length > 0 ? (
               // Show only cities where merchant has stores
-              storesData.stores.map((store) => (
-                <div key={store.id} className="rounded-md bg-neutral-900 px-4 py-2 text-white text-sm">
-                  <div className="font-semibold">{store.city.name}</div>
-                  <div className="text-xs text-neutral-200">
-                    {store.active ? 'Active' : 'Inactive'} 
-                    <span className="text-green-400 ml-2">
-                      {store.active ? '100%' : '0%'}
-                    </span>
+              storesData
+                .filter((store) => store.city) // Filter out stores without city data
+                .map((store) => (
+                  <div key={store.id} className="rounded-md bg-neutral-900 px-4 py-2 text-white text-sm">
+                    <div className="font-semibold">{store.city?.name || 'Unknown City'}</div>
+                    <div className="text-xs text-neutral-200">
+                      {store.active ? 'Active' : 'Inactive'} 
+                      <span className="text-green-400 ml-2">
+                        {store.active ? '100%' : '0%'}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))
+                ))
             ) : (
               // No stores state
               <div className="rounded-md bg-neutral-100 px-4 py-2 text-sm text-neutral-600">
@@ -500,9 +502,9 @@ export const MerchantDashboardPage = () => {
                     </div>
                   ))}
                 </div>
-              ) : storesData && storesData.stores.length > 0 ? (
+              ) : storesData && storesData.length > 0 ? (
                 <ul className="space-y-3">
-                  {storesData.stores.map((store) => (
+                  {storesData.map((store) => (
                     <li key={store.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <span className={`h-3 w-3 rounded-full inline-block ${

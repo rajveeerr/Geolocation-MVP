@@ -5,7 +5,7 @@ import { useDealCreation } from '@/context/DealCreationContext';
 import { OnboardingStepLayout } from '../onboarding/OnboardingStepLayout';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Percent, Minus, Sparkles, DollarSign, Calculator, TrendingUp, Target, Lightbulb, CheckCircle, AlertCircle } from 'lucide-react';
+import { Percent, Minus, Sparkles, DollarSign, Calculator, TrendingUp, Target, Lightbulb, CheckCircle, AlertCircle, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -73,7 +73,20 @@ export const DealOfferStep = () => {
     (state.discountAmount && state.discountAmount > 0) ||
     (state.customOfferDisplay && state.customOfferDisplay.trim().length > 0);
 
-  const isNextDisabledSimple = !state.dealType || !hasValidDiscount;
+  // Redeem Now discount validation: must be preset (15,30,45,50,75) or 1-100%
+  const isValidRedeemNowDiscount = () => {
+    if (state.dealType !== 'REDEEM_NOW') return true; // Not a Redeem Now deal
+    
+    if (!state.discountPercentage) return false; // Discount is required for Redeem Now
+    
+    const validPresets = [15, 30, 45, 50, 75];
+    const discount = state.discountPercentage;
+    
+    // Check if it's a preset or valid custom (1-100%)
+    return validPresets.includes(discount) || (discount >= 1 && discount <= 100);
+  };
+
+  const isNextDisabledSimple = !state.dealType || !hasValidDiscount || !isValidRedeemNowDiscount();
 
   // Calculate potential savings for preview - show based on what user has entered
   const getSavingsPreview = () => {
@@ -244,14 +257,16 @@ export const DealOfferStep = () => {
                   )}
                 </AnimatePresence>
 
-                {/* Quick presets */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Calculator className="h-4 w-4 text-neutral-500" />
-                    <span className="text-sm font-medium text-neutral-700">Quick presets:</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                  {[10, 20, 30, 50].map((p) => (
+          {/* Quick presets - Redeem Now has specific presets */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Calculator className="h-4 w-4 text-neutral-500" />
+              <span className="text-sm font-medium text-neutral-700">
+                {state.dealType === 'REDEEM_NOW' ? 'Redeem Now presets (or enter custom 1-100%):' : 'Quick presets:'}
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+            {(state.dealType === 'REDEEM_NOW' ? [15, 30, 45, 50, 75] : [10, 20, 30, 50]).map((p) => (
                       <motion.button
                       key={p}
                       onClick={() =>
@@ -512,6 +527,48 @@ export const DealOfferStep = () => {
             </motion.div>
           )}
         </div>
+
+          {/* Redeem Now Warning */}
+          {state.dealType === 'REDEEM_NOW' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-lg border border-amber-200 bg-amber-50 p-4 max-w-3xl mx-auto"
+            >
+              <div className="flex items-start gap-3">
+                <Zap className="h-5 w-5 text-amber-600 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-amber-900">Redeem Now Deal</h4>
+                  <p className="text-sm text-amber-700 mt-1">
+                    Redeem Now deals must be 24 hours or less. Make sure to set a short duration when scheduling your deal.
+                  </p>
+                  <p className="text-sm text-amber-700 mt-2">
+                    <strong>Discount:</strong> Choose from presets (15%, 30%, 45%, 50%, 75%) or enter a custom percentage (1-100%).
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Redeem Now Discount Validation Error */}
+          {state.dealType === 'REDEEM_NOW' && state.discountPercentage !== null && !isValidRedeemNowDiscount() && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-lg border border-red-200 bg-red-50 p-4 max-w-3xl mx-auto"
+            >
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-red-900">Invalid Discount</h4>
+                  <p className="text-sm text-red-700 mt-1">
+                    Redeem Now deals must use preset discounts (15%, 30%, 45%, 50%, 75%) or a custom percentage between 1-100%.
+                    Current value: {state.discountPercentage}%
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
 
         {/* Enhanced Live Preview */}
         <motion.div

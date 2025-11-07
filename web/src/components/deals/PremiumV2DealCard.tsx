@@ -105,22 +105,23 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
     useSavedDeals();
 
   // Fetch today's availability for this merchant
-  // TEMPORARY FIX: Use merchantId 1 if undefined (for testing)
-  const effectiveMerchantId = deal.merchantId || 1;
-  const shouldFetchAvailability = true; // Always fetch for now
+  // Check both deal.merchantId and deal.merchant?.id (handle both flat and nested structures)
+  const merchantIdFromDeal = deal.merchantId || (deal as any).merchant?.id;
+  const effectiveMerchantId = merchantIdFromDeal && merchantIdFromDeal > 0 ? Number(merchantIdFromDeal) : undefined;
   
   // DEBUG: Log merchant availability fetch
   console.log(`🔍 [${deal.name}] Merchant Availability Fetch:`, {
     dealId: deal.id,
     merchantId: deal.merchantId,
-    merchantObject: deal.merchant,
-    fullDeal: deal,
-    shouldFetch: shouldFetchAvailability,
-    willFetchFor: shouldFetchAvailability ? deal.merchantId : 0
+    merchantObject: (deal as any).merchant,
+    merchantIdFromNested: (deal as any).merchant?.id,
+    merchantIdFromDeal,
+    effectiveMerchantId,
+    willFetch: !!effectiveMerchantId
   });
   
   const { data: todayAvailability, isLoading: isLoadingAvailability, error: availabilityError } = useTodayAvailability(
-    effectiveMerchantId, // Use effective merchantId (1 if undefined)
+    effectiveMerchantId, // Pass undefined if invalid - hook will disable fetch
     2 // default party size
   );
 
@@ -128,6 +129,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   console.log(`📊 [${deal.name}] Availability Result:`, {
     dealId: deal.id,
     merchantId: deal.merchantId,
+    effectiveMerchantId,
     isLoading: isLoadingAvailability,
     hasData: !!todayAvailability,
     tablesCount: todayAvailability?.availableTables?.length,
@@ -176,7 +178,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   const finalClaimedUsers = realClaimedUsers;
 
   // State to control visibility of offers dropdown/list
-  const [offersVisible, setOffersVisible] = useState(true);
+  const [offersVisible, setOffersVisible] = useState(false);
   
   // Get unique categories from real offers and always add Tables
   const availableCategories = useMemo(() => {
@@ -583,7 +585,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                                                 {todayAvailability.availableTimeSlots.slice(0, 3).map((slot) => (
                     <TimeSlotQuickCard
                       key={slot.id}
-                      merchantId={effectiveMerchantId}
+                      merchantId={effectiveMerchantId!}
                       merchantName={deal.merchantName || deal.name}
                       slot={slot}
                       date={todayAvailability.date}
@@ -640,7 +642,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                                               </summary>
                                               <div className="mt-2">
                   <AvailableTablesList
-                    merchantId={effectiveMerchantId}
+                    merchantId={effectiveMerchantId!}
                     merchantName={deal.merchantName || deal.name}
                   />
                                               </div>
@@ -730,7 +732,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
       </div>
 
       {/* Table Booking Modal */}
-      {isBookingModalOpen && (
+      {isBookingModalOpen && effectiveMerchantId && (
         <TableBookingModal
           isOpen={isBookingModalOpen}
           onClose={handleCloseBookingModal}

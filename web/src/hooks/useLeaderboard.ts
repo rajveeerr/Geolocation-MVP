@@ -16,12 +16,15 @@ interface LeaderboardResponse {
 // Legacy hook for backward compatibility
 export const useLeaderboard = () => {
   return useQuery<LeaderboardResponse | null, Error>({
-    queryKey: ['leaderboard'],
-    queryFn: () =>
-      apiGet<LeaderboardResponse>(
-        '/leaderboard?period=month&includeSelf=true',
-      ).then((res) => res.data),
+    queryKey: ['leaderboard', 'month'],
+    queryFn: async () => {
+      const response = await apiGet<LeaderboardResponse>(
+        '/leaderboard?period=month&includeSelf=true&showMore=true',
+      );
+      return response.data;
+    },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    refetchOnWindowFocus: true,
   });
 };
 

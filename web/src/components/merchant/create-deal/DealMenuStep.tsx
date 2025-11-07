@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDealCreation } from '@/context/DealCreationContext';
+import { useDealCreation, type SelectedMenuItem } from '@/context/DealCreationContext';
 import { OnboardingStepLayout } from '../onboarding/OnboardingStepLayout';
 import { useMerchantMenu, type MenuItem } from '@/hooks/useMerchantMenu';
 import { Button } from '@/components/common/Button';
@@ -13,15 +13,11 @@ import {
   Eye, 
   EyeOff,
   DollarSign,
-  Image as ImageIcon,
-  Loader2,
   Tag,
-  Percent,
   Package,
   Sparkles
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
@@ -265,7 +261,7 @@ export const DealMenuStep = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedDealType, setSelectedDealType] = useState<string>('ALL');
-  const [editingDiscountItem, setEditingDiscountItem] = useState<MenuItem | null>(null);
+  const [editingDiscountItem, setEditingDiscountItem] = useState<MenuItem | SelectedMenuItem | null>(null);
   
   const { data: dealTypesData } = useDealTypes();
   const dealTypes = dealTypesData?.dealTypes || [];
@@ -327,11 +323,11 @@ export const DealMenuStep = () => {
     return selected?.isHidden || false;
   };
 
-  const getSelectedItem = (item: MenuItem) => {
+  const getSelectedItem = (item: MenuItem | SelectedMenuItem) => {
     return selectedMenuItems.find(selected => selected.id === item.id);
   };
 
-  const handleEditDiscount = (item: MenuItem) => {
+  const handleEditDiscount = (item: MenuItem | SelectedMenuItem) => {
     setEditingDiscountItem(item);
   };
 
@@ -401,6 +397,26 @@ export const DealMenuStep = () => {
       progress={40}
     >
       <div className="space-y-6">
+        {/* Hidden Deal Warning */}
+        {state.dealType === 'HIDDEN' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-lg border border-purple-200 bg-purple-50 p-4"
+          >
+            <div className="flex items-start gap-3">
+              <EyeOff className="h-5 w-5 text-purple-600 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-purple-900">Hidden Deal Notice</h4>
+                <p className="text-sm text-purple-700 mt-1">
+                  All items selected for this hidden deal will be automatically hidden from public view. 
+                  They will only be visible to customers who access the deal using the access code or shareable link.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Selection Mode Toggle */}
         <div className="rounded-lg border border-neutral-200 bg-white p-4">
           <div className="mb-4">
@@ -676,7 +692,7 @@ export const DealMenuStep = () => {
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
                       <button
-                        onClick={() => handleEditDiscount(selectedItem)}
+                        onClick={() => handleEditDiscount(selectedItem as unknown as MenuItem)}
                         className={cn(
                           'p-1.5 rounded-md transition-colors',
                           hasCustomPricing
@@ -779,8 +795,9 @@ export const DealMenuStep = () => {
             item={getSelectedItem(editingDiscountItem) || {
               ...editingDiscountItem,
               isHidden: false,
-              useGlobalDiscount: true
-            }}
+              useGlobalDiscount: true,
+              category: editingDiscountItem.category as 'Bites' | 'Drinks' | string
+            } as SelectedMenuItem}
             globalDiscountPercentage={state.discountPercentage}
             globalDiscountAmount={state.discountAmount}
             onClose={() => setEditingDiscountItem(null)}

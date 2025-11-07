@@ -48,11 +48,23 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
   const { state, dispatch } = useDealCreation();
   const navigate = useNavigate();
 
+  const handleNext = () => {
+    // Navigate to deal-type-specific steps
+    if (state.dealType === 'BOUNTY') {
+      navigate('/merchant/deals/create/bounty');
+    } else if (state.dealType === 'HIDDEN') {
+      navigate('/merchant/deals/create/hidden');
+    } else {
+      // For STANDARD, HAPPY_HOUR, RECURRING, REDEEM_NOW, go to basics
+      onNext();
+    }
+  };
+
   return (
     <OnboardingStepLayout
       title="What kind of deal are you creating?"
       subtitle="Choose the type that best fits your business goals"
-      onNext={onNext}
+      onNext={handleNext}
       onBack={() => navigate(PATHS.MERCHANT_DASHBOARD)}
       isNextDisabled={!state.dealType}
       progress={15}

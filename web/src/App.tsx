@@ -47,6 +47,9 @@ const CreateDealPage = React.lazy(() =>
 const EnhancedDealDetailPage = React.lazy(() =>
   import('./pages/EnhancedDealDetailPage').then((m) => ({ default: m.EnhancedDealDetailPage })),
 );
+const HiddenDealPage = React.lazy(() =>
+  import('./pages/HiddenDealPage').then((module) => ({ default: module.HiddenDealPage })),
+);
 const AdminLoginPage = React.lazy(() =>
   import('./pages/admin/AdminLoginPage').then((m) => ({ default: m.AdminLoginPage })),
 );
@@ -81,6 +84,12 @@ const GamificationPage = React.lazy(() =>
 );
 const StreakLeaderboardPage = React.lazy(() =>
   import('./pages/StreakLeaderboard').then((m) => ({ default: m.StreakLeaderboardPage })),
+);
+const HeistHistoryPage = React.lazy(() =>
+  import('./pages/HeistHistoryPage').then((m) => ({ default: m.HeistHistoryPage })),
+);
+const HeistNotificationsPage = React.lazy(() =>
+  import('./pages/HeistNotificationsPage').then((m) => ({ default: m.HeistNotificationsPage })),
 );
 const KickbackEarningsPage = React.lazy(() =>
   import('./pages/merchant/KickbackEarningsPage').then((m) => ({ default: m.KickbackEarningsPage })),
@@ -213,10 +222,38 @@ function App() {
                   }
                 />
                 <Route
+                  path={PATHS.HEIST_HISTORY}
+                  element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <HeistHistoryPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.HEIST_NOTIFICATIONS}
+                  element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <HeistNotificationsPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path={PATHS.DEAL_DETAIL}
                   element={
                     <Suspense fallback={<LoadingOverlay />}>
                       <EnhancedDealDetailPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/deals/hidden/:code"
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <HiddenDealPage />
                     </Suspense>
                   }
                 />

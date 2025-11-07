@@ -18,6 +18,13 @@ import { useToast } from '@/hooks/use-toast';
 import { PATHS } from '@/routing/paths';
 import clsx from 'clsx';
 import { MerchantProtectedRoute } from '@/components/auth/MerchantProtectedRoute';
+import { cn } from '@/lib/utils';
+import { mapDealTypeToBackend } from '@/utils/dealTypeUtils';
+import { HappyHourItemDiscountEditor } from '@/components/merchant/create-deal/HappyHourItemDiscountEditor';
+import { Pencil, Clock, MapPin, Store, Building2 } from 'lucide-react';
+import { useMerchantStores } from '@/hooks/useMerchantStores';
+import { useMerchantCities } from '@/hooks/useMerchantCities';
+import { DealImageUpload } from '@/components/merchant/create-deal/DealImageUpload';
 
 const HappyHourEditorContent = () => {
   const navigate = useNavigate();
@@ -25,9 +32,16 @@ const HappyHourEditorContent = () => {
   const { state: dealCreationState } = useDealCreation();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingItemId, setEditingItemId] = useState<number | null>(null);
+  const [showAdvancedScheduling, setShowAdvancedScheduling] = useState(false);
+  const [showLocationTargeting, setShowLocationTargeting] = useState(false);
   
   // Check merchant status before allowing deal creation
   const { data: merchantData, isLoading: isLoadingMerchant } = useMerchantStatus();
+  
+  // Fetch stores and cities for location targeting
+  const { data: stores = [] } = useMerchantStores();
+  const { data: cities = [] } = useMerchantCities();
 
   // Preset information based on deal type
   useEffect(() => {
@@ -264,15 +278,10 @@ const HappyHourEditorContent = () => {
         return;
       }
 
-      // Determine deal type for backend
-      let backendDealType = 'Happy Hour';
-      if (dealCreationState.dealType === 'REDEEM_NOW') {
-        backendDealType = 'Redeem Now';
-      } else if (dealCreationState.dealType === 'HIDDEN') {
-        backendDealType = 'Hidden Deal';
-      } else if (dealCreationState.dealType === 'BOUNTY') {
-        backendDealType = 'Bounty Deal';
-      }
+      // Determine deal type for backend - use mapping utility
+      const backendDealType = dealCreationState.dealType 
+        ? mapDealTypeToBackend(dealCreationState.dealType)
+        : 'Happy Hour';
 
       const payload: any = {
         title: state.title || `${state.happyHourType} Happy Hour`,
@@ -293,17 +302,31 @@ const HappyHourEditorContent = () => {
           state.periodType === 'Recurring' && state.recurringDays.length > 0 ? state.recurringDays.join(',') : undefined,
 
         // Ensure redemption instructions are always included (backend requires this)
-        redemptionInstructions:
-          (state as any).redemptionInstructions ||
-          'Show this screen to your server to redeem the happy hour offer.',
+        redemptionInstructions: state.redemptionInstructions || 'Show this screen to your server to redeem the happy hour offer.',
 
         kickbackEnabled: state.kickbackEnabled,
-        // Temporarily disable menu items to test basic deal creation
-        // menuItems: state.selectedMenuItems?.map((i: any) => ({ id: i.id, isHidden: i.isHidden })) || [],
+        // Include menu items with all discount fields
+        menuItems: state.selectedMenuItems?.length > 0 
+          ? state.selectedMenuItems.map((item) => ({
+              id: item.id,
+              isHidden: item.isHidden || false,
+              customPrice: item.customPrice !== null && item.customPrice !== undefined ? item.customPrice : undefined,
+              customDiscount: item.customDiscount !== null && item.customDiscount !== undefined ? item.customDiscount : undefined,
+              discountAmount: item.discountAmount !== null && item.discountAmount !== undefined ? item.discountAmount : undefined,
+            }))
+          : undefined,
         // Add required discount fields
         discountPercentage: state.discountPercentage,
         discountAmount: state.discountAmount,
         customOfferDisplay: state.customOfferDisplay || null,
+        // Add missing fields
+        imageUrls: state.imageUrls || [],
+        primaryImageIndex: state.primaryImageIndex || null,
+        offerTerms: state.offerTerms || null,
+        validDaysOfWeek: state.validDaysOfWeek || null,
+        validHours: state.validHours || null,
+        storeIds: state.storeIds || null,
+        cityIds: state.cityIds || null,
       };
 
       console.log('Submitting Payload to /api/deals:', JSON.stringify(payload, null, 2));
@@ -485,6 +508,241 @@ const HappyHourEditorContent = () => {
                 </div>
               </FormSection>
 
+              {/* Advanced Scheduling */}
+              <FormSection 
+                title="Advanced Scheduling (Optional)" 
+                subtitle="Set specific days and hours when deal is valid"
+              >
+                <button
+                  onClick={() => setShowAdvancedScheduling(!showAdvancedScheduling)}
+                  className="w-full flex items-center justify-between rounded-lg border border-neutral-200 bg-white p-4 hover:bg-neutral-50 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-brand-primary-600" />
+                    <span className="font-medium text-neutral-900">Advanced Scheduling</span>
+                  </div>
+                  <span className="text-sm text-neutral-500">
+                    {showAdvancedScheduling ? 'Hide' : 'Show'}
+                  </span>
+                </button>
+
+                <AnimatePresence>
+                  {showAdvancedScheduling && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mt-4 space-y-4"
+                    >
+                      {/* Valid Days of Week */}
+                      <div>
+                        <Label className="text-sm font-medium text-neutral-700 mb-2 block">Valid Days of Week</Label>
+                        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+                          {[
+                            { key: 'MONDAY', label: 'Mon' },
+                            { key: 'TUESDAY', label: 'Tue' },
+                            { key: 'WEDNESDAY', label: 'Wed' },
+                            { key: 'THURSDAY', label: 'Thu' },
+                            { key: 'FRIDAY', label: 'Fri' },
+                            { key: 'SATURDAY', label: 'Sat' },
+                            { key: 'SUNDAY', label: 'Sun' },
+                          ].map((day) => {
+                            const isSelected = state.validDaysOfWeek?.includes(day.key) ?? false;
+                            return (
+                              <button
+                                key={day.key}
+                                type="button"
+                                onClick={() => {
+                                  const currentDays = state.validDaysOfWeek || [];
+                                  const newDays = isSelected
+                                    ? currentDays.filter(d => d !== day.key)
+                                    : [...currentDays, day.key];
+                                  dispatch({
+                                    type: 'SET_FIELD',
+                                    field: 'validDaysOfWeek',
+                                    value: newDays.length > 0 ? newDays : null,
+                                  });
+                                }}
+                                className={cn(
+                                  'rounded-lg border-2 p-2 text-sm transition-all',
+                                  isSelected
+                                    ? 'border-brand-primary-500 bg-brand-primary-50 text-brand-primary-700'
+                                    : 'border-neutral-200 bg-white text-neutral-600 hover:border-brand-primary-300'
+                                )}
+                              >
+                                {day.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <p className="text-xs text-neutral-500 mt-2">
+                          Leave empty to use the date range above. If set, deal is only valid on selected days.
+                        </p>
+                      </div>
+
+                      {/* Valid Hours */}
+                      <div>
+                        <Label htmlFor="valid-hours" className="text-sm font-medium text-neutral-700">
+                          Valid Hours (e.g., "09:00-17:00")
+                        </Label>
+                        <Input
+                          id="valid-hours"
+                          type="text"
+                          value={state.validHours || ''}
+                          onChange={(e) => {
+                            const value = e.target.value.trim();
+                            dispatch({
+                              type: 'SET_FIELD',
+                              field: 'validHours',
+                              value: value || null,
+                            });
+                          }}
+                          placeholder="e.g., 09:00-17:00 or leave empty"
+                          className="mt-1"
+                        />
+                        <p className="text-xs text-neutral-500 mt-1">
+                          Format: HH:MM-HH:MM (24-hour format). Leave empty to use the full date range.
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </FormSection>
+
+              {/* Location Targeting */}
+              <FormSection 
+                title="Location Targeting (Optional)" 
+                subtitle="Choose which stores and cities this deal applies to"
+              >
+                <button
+                  onClick={() => setShowLocationTargeting(!showLocationTargeting)}
+                  className="w-full flex items-center justify-between rounded-lg border border-neutral-200 bg-white p-4 hover:bg-neutral-50 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-5 w-5 text-brand-primary-600" />
+                    <span className="font-medium text-neutral-900">Location Targeting</span>
+                  </div>
+                  <span className="text-sm text-neutral-500">
+                    {showLocationTargeting ? 'Hide' : 'Show'}
+                  </span>
+                </button>
+
+                <AnimatePresence>
+                  {showLocationTargeting && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mt-4 space-y-4"
+                    >
+                      {/* Stores */}
+                      <div>
+                        <Label className="text-sm font-medium text-neutral-700 mb-2 flex items-center gap-2">
+                          <Store className="h-4 w-4" />
+                          Select Stores
+                        </Label>
+                        {stores.length === 0 ? (
+                          <p className="text-sm text-neutral-500">No stores found. Add stores in store management.</p>
+                        ) : (
+                          <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
+                            {stores.map((store) => {
+                              const isSelected = state.storeIds?.includes(store.id) ?? false;
+                              return (
+                                <button
+                                  key={store.id}
+                                  type="button"
+                                  onClick={() => {
+                                    const currentStoreIds = state.storeIds || [];
+                                    const newStoreIds = isSelected
+                                      ? currentStoreIds.filter(id => id !== store.id)
+                                      : [...currentStoreIds, store.id];
+                                    dispatch({
+                                      type: 'SET_FIELD',
+                                      field: 'storeIds',
+                                      value: newStoreIds.length > 0 ? newStoreIds : null,
+                                    });
+                                  }}
+                                  className={cn(
+                                    'rounded-lg border-2 p-3 text-left transition-all',
+                                    isSelected
+                                      ? 'border-brand-primary-500 bg-brand-primary-50'
+                                      : 'border-neutral-200 bg-white hover:border-brand-primary-300'
+                                  )}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-neutral-900">
+                                      {store.address || `Store #${store.id}`}
+                                    </span>
+                                    {isSelected && (
+                                      <span className="text-xs text-brand-primary-600 font-medium">Selected</span>
+                                    )}
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                        <p className="text-xs text-neutral-500 mt-2">
+                          Leave empty to apply to all stores. If set, deal is only available at selected stores.
+                        </p>
+                      </div>
+
+                      {/* Cities */}
+                      <div>
+                        <Label className="text-sm font-medium text-neutral-700 mb-2 flex items-center gap-2">
+                          <Building2 className="h-4 w-4" />
+                          Select Cities
+                        </Label>
+                        {cities.length === 0 ? (
+                          <p className="text-sm text-neutral-500">No cities found.</p>
+                        ) : (
+                          <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
+                            {cities.map((city) => {
+                              const isSelected = state.cityIds?.includes(city.id) ?? false;
+                              return (
+                                <button
+                                  key={city.id}
+                                  type="button"
+                                  onClick={() => {
+                                    const currentCityIds = state.cityIds || [];
+                                    const newCityIds = isSelected
+                                      ? currentCityIds.filter(id => id !== city.id)
+                                      : [...currentCityIds, city.id];
+                                    dispatch({
+                                      type: 'SET_FIELD',
+                                      field: 'cityIds',
+                                      value: newCityIds.length > 0 ? newCityIds : null,
+                                    });
+                                  }}
+                                  className={cn(
+                                    'rounded-lg border-2 p-3 text-left transition-all',
+                                    isSelected
+                                      ? 'border-brand-primary-500 bg-brand-primary-50'
+                                      : 'border-neutral-200 bg-white hover:border-brand-primary-300'
+                                  )}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-neutral-900">
+                                      {city.name}, {city.state}
+                                    </span>
+                                    {isSelected && (
+                                      <span className="text-xs text-brand-primary-600 font-medium">Selected</span>
+                                    )}
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                        <p className="text-xs text-neutral-500 mt-2">
+                          Leave empty to apply to all cities. If set, deal is only available in selected cities.
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </FormSection>
+
               <FormSection title="Deal Items" subtitle="Select menu items included in this happy hour">
              <div className="flex items-center justify-between rounded-lg bg-neutral-100 p-2 mb-4">
                 {['Single day', 'Recurring'].map((type) => (
@@ -504,7 +762,148 @@ const HappyHourEditorContent = () => {
                   <Plus className="mr-2 h-4 w-4" /> Add items from menu ({state.selectedMenuItems.length})
               </Button>
             </div>
-            {/* ... (Display selected items) ... */}
+            
+            {/* Display selected items with discount info */}
+            {state.selectedMenuItems.length > 0 && (
+              <div className="mt-4 space-y-3">
+                <h4 className="font-semibold text-neutral-900">Selected Items ({state.selectedMenuItems.length})</h4>
+                {state.selectedMenuItems.map((item) => {
+                  // Calculate final price
+                  let finalPrice = item.price;
+                  let discountInfo = '';
+                  
+                  if (item.customPrice !== null && item.customPrice !== undefined) {
+                    finalPrice = item.customPrice;
+                    discountInfo = `Fixed: $${finalPrice.toFixed(2)}`;
+                  } else if (item.customDiscount !== null && item.customDiscount !== undefined) {
+                    finalPrice = item.price * (1 - item.customDiscount / 100);
+                    discountInfo = `${item.customDiscount}% off (item-specific)`;
+                  } else if (item.discountAmount !== null && item.discountAmount !== undefined) {
+                    finalPrice = Math.max(0, item.price - item.discountAmount);
+                    discountInfo = `$${item.discountAmount.toFixed(2)} off (item-specific)`;
+                  } else if (state.discountPercentage !== null) {
+                    finalPrice = item.price * (1 - state.discountPercentage / 100);
+                    discountInfo = `${state.discountPercentage}% off (global)`;
+                  } else if (state.discountAmount !== null) {
+                    finalPrice = Math.max(0, item.price - state.discountAmount);
+                    discountInfo = `$${state.discountAmount.toFixed(2)} off (global)`;
+                  }
+                  
+                  const hasDiscount = finalPrice < item.price;
+                  
+                  return (
+                    <div key={item.id} className="flex items-center justify-between rounded-lg bg-neutral-50 p-3 border border-neutral-200">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-neutral-900">{item.name}</span>
+                          {item.isHidden && (
+                            <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">
+                              Hidden
+                            </span>
+                          )}
+                          {(item.customPrice !== null || item.customDiscount !== null || item.discountAmount !== null) && (
+                            <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
+                              Custom Price
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-1 flex items-center gap-2 text-sm">
+                          {hasDiscount && (
+                            <span className="text-neutral-400 line-through">${item.price.toFixed(2)}</span>
+                          )}
+                          <span className={cn(
+                            "font-semibold",
+                            hasDiscount ? "text-green-600" : "text-neutral-700"
+                          )}>
+                            ${finalPrice.toFixed(2)}
+                          </span>
+                          {discountInfo && (
+                            <span className="text-xs text-neutral-500">({discountInfo})</span>
+                          )}
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditingItemId(item.id)}
+                        className="ml-2"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </FormSection>
+
+              <FormSection title="Deal Images" subtitle="Add images to showcase your Happy Hour deal">
+                <DealImageUpload
+                  images={state.imageUrls || []}
+                  onImagesChange={(images) => {
+                    dispatch({ type: 'SET_FIELD', field: 'imageUrls', value: images });
+                    // Set primary image index if not set and images exist
+                    if (state.primaryImageIndex === null && images.length > 0) {
+                      dispatch({ type: 'SET_FIELD', field: 'primaryImageIndex', value: 0 });
+                    }
+                  }}
+                  maxImages={5}
+                />
+                {state.imageUrls && state.imageUrls.length > 0 && (
+                  <div className="mt-4">
+                    <Label className="text-sm font-medium text-neutral-700 mb-2 block">
+                      Primary Image (shown first)
+                    </Label>
+                    <div className="grid grid-cols-5 gap-2">
+                      {state.imageUrls.map((url, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => dispatch({ type: 'SET_FIELD', field: 'primaryImageIndex', value: index })}
+                          className={cn(
+                            'relative rounded-lg border-2 overflow-hidden aspect-square',
+                            state.primaryImageIndex === index
+                              ? 'border-brand-primary-500 ring-2 ring-brand-primary-200'
+                              : 'border-neutral-200 hover:border-brand-primary-300'
+                          )}
+                        >
+                          <img src={url} alt={`Deal image ${index + 1}`} className="w-full h-full object-cover" />
+                          {state.primaryImageIndex === index && (
+                            <div className="absolute top-1 right-1 bg-brand-primary-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+                              ✓
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-xs text-neutral-500 mt-2">
+                      Click an image to set it as the primary image (shown first in listings).
+                    </p>
+                  </div>
+                )}
+              </FormSection>
+
+              <FormSection title="Redemption Instructions" subtitle="Tell customers how to claim this deal">
+                <Textarea
+                  value={state.redemptionInstructions}
+                  onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'redemptionInstructions', value: e.target.value })}
+                  placeholder="Show this screen to your server to redeem the happy hour offer."
+                  className="min-h-[100px]"
+                  rows={4}
+                />
+                <p className="text-xs text-neutral-500 mt-2">
+                  Clear instructions help customers know exactly how to redeem your deal.
+                </p>
+              </FormSection>
+
+              <FormSection title="Terms & Conditions" subtitle="Any restrictions or special terms (optional)">
+                <Textarea
+                  value={state.offerTerms}
+                  onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'offerTerms', value: e.target.value })}
+                  placeholder="e.g., Valid for dine-in only, Cannot be combined with other offers, Excludes alcohol..."
+                  className="min-h-[80px]"
+                  rows={3}
+                />
           </FormSection>
 
               <FormSection title="Kickback" subtitle="Reward users who bring friends">
@@ -551,6 +950,22 @@ const HappyHourEditorContent = () => {
               </FormSection>
             </div>
           </div>
+
+          {/* Item Discount Editor Modal */}
+          <AnimatePresence>
+            {editingItemId !== null && (() => {
+              const item = state.selectedMenuItems.find(i => i.id === editingItemId);
+              if (!item) return null;
+              return (
+                <HappyHourItemDiscountEditor
+                  item={item}
+                  globalDiscountPercentage={state.discountPercentage}
+                  globalDiscountAmount={state.discountAmount}
+                  onClose={() => setEditingItemId(null)}
+                />
+              );
+            })()}
+          </AnimatePresence>
 
           <aside className="lg:col-span-1">
             <div className="sticky top-20 space-y-4">

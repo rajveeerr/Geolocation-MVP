@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { Button } from '@/components/common/Button';
 import { useToast } from '@/hooks/use-toast';
@@ -8,7 +8,6 @@ import { useCheckIn } from '@/hooks/useCheckIn';
 import { useNavigationHistory } from '@/hooks/useNavigationHistory';
 import { useDealDetail, type DetailedDeal } from '@/hooks/useDealDetail';
 import { cn } from '@/lib/utils';
-import { PATHS } from '@/routing/paths';
 import { MerchantLogo } from '@/components/common/MerchantLogo';
 import { useLoyaltyBalance, useLoyaltyProgram } from '@/hooks/useLoyalty';
 
@@ -50,8 +49,9 @@ const ImageCarousel = ({ images, title }: { images: string[]; title: string }) =
   if (!images.length) return null;
 
   return (
-    <div className="relative">
-      <div className="aspect-[4/3] overflow-hidden rounded-xl bg-neutral-100">
+    <div className="relative w-full h-full flex items-center justify-center">
+      {/* Square container - maintains aspect ratio */}
+      <div className="relative w-full aspect-square max-w-full max-h-full overflow-hidden bg-neutral-100 rounded-2xl shadow-xl">
         <img
           src={images[currentIndex]}
           alt={`${title} - Image ${currentIndex + 1}`}
@@ -63,31 +63,34 @@ const ImageCarousel = ({ images, title }: { images: string[]; title: string }) =
         <>
           <button
             onClick={prevImage}
-            className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70"
+            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/90 backdrop-blur-sm p-2.5 text-neutral-900 hover:bg-white shadow-lg transition-all hover:scale-110 z-10"
+            aria-label="Previous image"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
           <button
             onClick={nextImage}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70"
+            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/90 backdrop-blur-sm p-2.5 text-neutral-900 hover:bg-white shadow-lg transition-all hover:scale-110 z-10"
+            aria-label="Next image"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
           
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
             {images.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
                 className={cn(
-                  "h-2 w-2 rounded-full transition-colors",
-                  index === currentIndex ? "bg-white" : "bg-white/50"
+                  "h-2 w-2 rounded-full transition-all",
+                  index === currentIndex ? "bg-white w-8" : "bg-white/50 hover:bg-white/75"
                 )}
+                aria-label={`Go to image ${index + 1}`}
               />
             ))}
           </div>
           
-          <div className="absolute top-2 right-2 rounded-full bg-black/50 px-2 py-1 text-xs text-white">
+          <div className="absolute top-4 right-4 rounded-full bg-black/60 backdrop-blur-sm px-3 py-1.5 text-xs font-medium text-white z-10">
             {currentIndex + 1} / {images.length}
           </div>
         </>
@@ -197,16 +200,33 @@ const MenuItemsSection = ({ menuItems }: { menuItems: DetailedDeal['menuItems'] 
   );
 };
 
-const QRCodeSection = ({ dealId, merchantName }: { dealId: number; merchantName: string }) => {
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
-    `${window.location.origin}/deals/${dealId}`
-  )}`;
+const QRCodeSection = ({ 
+  dealId, 
+  merchantName, 
+  dealType,
+  bountyQRCode 
+}: { 
+  dealId: number; 
+  merchantName: string;
+  dealType?: string;
+  bountyQRCode?: string | null;
+}) => {
+  // For bounty deals, use the bounty QR code if available
+  // Otherwise, use the deal link QR code
+  const isBountyDeal = dealType === 'Bounty Deal' || dealType === 'BOUNTY';
+  const qrCodeData = isBountyDeal && bountyQRCode 
+    ? bountyQRCode 
+    : `${window.location.origin}/deals/${dealId}`;
+  
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrCodeData)}`;
 
   return (
     <div className="text-center">
       <div className="flex items-center justify-center gap-2 mb-3">
         <QrCode className="h-4 w-4 text-brand-primary-600" />
-        <h3 className="text-sm font-semibold text-neutral-900">QR Code</h3>
+        <h3 className="text-sm font-semibold text-neutral-900">
+          {isBountyDeal ? 'Bounty Verification QR Code' : 'QR Code'}
+        </h3>
       </div>
       
       <div className="mx-auto mb-3 h-32 w-32 rounded-lg border border-neutral-200 bg-white p-2">
@@ -217,9 +237,20 @@ const QRCodeSection = ({ dealId, merchantName }: { dealId: number; merchantName:
         />
       </div>
       
-      <p className="text-xs text-neutral-600 mb-3">
-        Show at {merchantName} to redeem
-      </p>
+      {isBountyDeal ? (
+        <>
+          <p className="text-xs text-neutral-600 mb-2">
+            Scan this QR code when redeeming to verify you brought friends
+          </p>
+          <p className="text-xs text-amber-600 font-medium mb-3">
+            ⚠️ Required for bounty rewards
+          </p>
+        </>
+      ) : (
+        <p className="text-xs text-neutral-600 mb-3">
+          Show at {merchantName} to redeem
+        </p>
+      )}
       
       <Button
         variant="secondary"
@@ -228,7 +259,7 @@ const QRCodeSection = ({ dealId, merchantName }: { dealId: number; merchantName:
         onClick={() => {
           const link = document.createElement('a');
           link.href = qrCodeUrl;
-          link.download = `qr-code-${merchantName.replace(/\s+/g, '-').toLowerCase()}.png`;
+          link.download = `${isBountyDeal ? 'bounty-' : ''}qr-code-${merchantName.replace(/\s+/g, '-').toLowerCase()}.png`;
           link.click();
         }}
       >
@@ -457,41 +488,69 @@ export const EnhancedDealDetailPage = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 pt-24 pb-6">
-        <div className="grid gap-8 lg:grid-cols-3 mt-4">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
+      <div className="w-full max-w-7xl mx-auto px-4 pt-24 pb-6">
+        {/* Split Layout: Content Left, Image Right */}
+        <div className="grid gap-0 lg:grid-cols-2 mt-4 bg-white rounded-2xl overflow-hidden">
+          {/* Left Side: Deal Details */}
+          <div className="p-8 lg:p-12 space-y-8">
             {/* Deal Title and Basic Info */}
             <div>
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2 mb-3">
                 {deal.category.icon && (
                   <span className="text-2xl" role="img" aria-label={deal.category.label}>
                     {deal.category.icon}
                   </span>
                 )}
-                <span className="text-sm text-neutral-600">{deal.category.label}</span>
+                <span className="text-sm font-medium text-neutral-600">{deal.category.label}</span>
               </div>
-              <h1 className="text-3xl font-bold text-neutral-900 mb-4">{deal.title}</h1>
+              <h1 className="text-4xl lg:text-5xl font-bold text-neutral-900 mb-6 leading-tight">{deal.title}</h1>
               
-              <div className="flex items-center gap-4 mb-4">
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                {deal.socialProof.totalSaves > 0 && (
+                  <>
+                    <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm text-neutral-500">⭐</span>
+                        <span className="text-sm font-semibold text-neutral-900">
+                          {((deal.socialProof.totalSaves + (deal as any).popularity?.totalCheckIns || 0) / 100).toFixed(1)}
+                        </span>
+                      </div>
+                      <span className="text-sm text-neutral-500">
+                        ({deal.socialProof.totalSaves + ((deal as any).popularity?.totalCheckIns || 0)} reviews)
+                      </span>
+                    </div>
+                    <span className="text-neutral-300">•</span>
+                  </>
+                )}
+                <span className="text-sm text-neutral-600">{deal.category.label}</span>
+                {deal.category.description && (
+                  <>
+                    <span className="text-neutral-300">•</span>
+                    <span className="text-sm text-neutral-500">{deal.category.description}</span>
+                  </>
+                )}
+                <span className="text-neutral-300">•</span>
                 <div className="flex items-center gap-1">
-                  <span className="text-sm text-neutral-600">Hosted by</span>
-                  <span className="font-semibold text-neutral-900">{deal.merchant.businessName}</span>
+                  <MapPin className="h-3.5 w-3.5 text-neutral-500" />
+                  <span className="text-sm text-neutral-600">{deal.merchant.address.split(',')[0]}</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-sm text-neutral-600">•</span>
-                  <span className="text-sm text-neutral-600">{deal.merchant.totalDeals} deals</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-sm text-neutral-600">•</span>
-                  <span className="text-sm text-neutral-600">{deal.socialProof.totalSaves} saves</span>
-                </div>
+                {deal.merchant.phoneNumber && (
+                  <>
+                    <span className="text-neutral-300">•</span>
+                    <a 
+                      href={`tel:${deal.merchant.phoneNumber}`}
+                      className="text-sm text-brand-primary-600 hover:text-brand-primary-700"
+                    >
+                      {deal.merchant.phoneNumber}
+                    </a>
+                  </>
+                )}
               </div>
 
               {/* Status and Type Badges */}
-              <div className="flex items-center gap-2 mb-6">
+              <div className="flex flex-wrap items-center gap-2 mb-8">
                 <div className={cn(
-                  "flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium",
+                  "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium",
                   deal.status.isActive && "bg-green-100 text-green-700",
                   deal.status.isExpired && "bg-red-100 text-red-700",
                   deal.status.isUpcoming && "bg-blue-100 text-blue-700"
@@ -504,104 +563,47 @@ export const EnhancedDealDetailPage = () => {
                   {deal.status.isUpcoming && "Upcoming"}
                 </div>
                 
-                <div className="flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700">
+                <div className="flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1.5 text-sm font-medium text-blue-700">
                   <Zap className="h-4 w-4" />
-                  {deal.dealType.name}
+                  {typeof deal.dealType === 'string' ? deal.dealType : deal.dealType.name}
                 </div>
                 
                 {deal.context.isPopular && (
-                  <div className="flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-sm font-medium text-amber-700">
+                  <div className="flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1.5 text-sm font-medium text-amber-700">
                     <TrendingUp className="h-4 w-4" />
                     Popular
                   </div>
                 )}
+                {(deal as any).popularity?.isTrending && (
+                  <div className="flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1.5 text-sm font-medium text-red-700">
+                    <Zap className="h-4 w-4" />
+                    Trending
+                  </div>
+                )}
+                {deal.kickbackEnabled && (
+                  <div className="flex items-center gap-1.5 rounded-full bg-purple-100 px-3 py-1.5 text-sm font-medium text-purple-700">
+                    <Users className="h-4 w-4" />
+                    Kickback Enabled
+                  </div>
+                )}
               </div>
-            </div>
 
-            {/* Image Carousel */}
-            {deal.images.length > 0 && (
-              <div>
-                <ImageCarousel images={deal.images} title={deal.title} />
-              </div>
-            )}
-
-            {/* Deal Description */}
-            <div>
-              <h2 className="text-xl font-semibold text-neutral-900 mb-4">About this deal</h2>
-              <p className="text-neutral-700 leading-relaxed">{deal.description}</p>
-            </div>
-
-            {/* Menu Items */}
-            {deal.hasMenuItems && (
-              <div>
-                <MenuItemsSection menuItems={deal.menuItems} />
-              </div>
-            )}
-
-            {/* Redemption Instructions */}
-            {deal.redemptionInstructions && (
-              <div>
-                <h2 className="text-xl font-semibold text-neutral-900 mb-4">How to redeem</h2>
-                <div className="prose prose-neutral max-w-none">
-                  <p className="text-neutral-700 whitespace-pre-line leading-relaxed">
-                    {deal.redemptionInstructions}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Merchant Info */}
-            <div>
-              <h2 className="text-xl font-semibold text-neutral-900 mb-4">Meet your host</h2>
-              <MerchantInfoSection merchant={deal.merchant} />
-            </div>
-
-            {/* Things to Know */}
-            <div>
-              <h2 className="text-xl font-semibold text-neutral-900 mb-6">Things to know</h2>
-              <div className="grid gap-6 md:grid-cols-3">
-                <div>
-                  <h3 className="font-semibold text-neutral-900 mb-3">Deal details</h3>
-                  <ul className="space-y-2 text-sm text-neutral-700">
-                    <li>Valid until: {new Date(deal.endTime).toLocaleDateString()}</li>
-                    <li>Type: {deal.dealType.name}</li>
-                    <li>Category: {deal.category.label}</li>
-                    {deal.recurringDays.length > 0 && (
-                      <li>Recurring: {deal.recurringDays.join(', ')}</li>
-                    )}
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold text-neutral-900 mb-3">Location</h3>
-                  <ul className="space-y-2 text-sm text-neutral-700">
-                    <li>{deal.merchant.address}</li>
-                    <li>{deal.merchant.totalStores} location{deal.merchant.totalStores > 1 ? 's' : ''}</li>
-                    <li>Easy to find</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold text-neutral-900 mb-3">Cancellation</h3>
-                  <ul className="space-y-2 text-sm text-neutral-700">
-                    <li>Free cancellation</li>
-                    <li>Valid until deal expires</li>
-                    <li>No hidden fees</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Sticky Sidebar */}
-          <div className="lg:sticky lg:top-36 lg:h-fit">
-            <div className="bg-white border border-neutral-200 rounded-xl p-6 shadow-sm">
-              {/* Price and Offer */}
-              <div className="mb-8">
+              {/* Price and Offer - Prominent Display */}
+              <div className="mb-8 pb-8 border-b border-neutral-200">
                 <div className="flex items-baseline gap-3 mb-4">
-                  <span className="text-3xl font-bold text-neutral-900">{deal.offerDisplay}</span>
+                  <span className="text-4xl font-bold text-neutral-900">{deal.offerDisplay}</span>
                   {deal.offerTerms && (
-                    <span className="text-sm text-neutral-600">({deal.offerTerms})</span>
+                    <span className="text-sm text-neutral-500">({deal.offerTerms})</span>
+                  )}
+                  {deal.discountPercentage && (
+                    <span className="text-lg font-semibold text-green-600">
+                      {deal.discountPercentage}% OFF
+                    </span>
+                  )}
+                  {deal.discountAmount && !deal.discountPercentage && (
+                    <span className="text-lg font-semibold text-green-600">
+                      ${deal.discountAmount} OFF
+                    </span>
                   )}
                 </div>
                 
@@ -610,17 +612,234 @@ export const EnhancedDealDetailPage = () => {
                     <CountdownTimer timeRemaining={deal.status.timeRemaining} />
                   </div>
                 )}
+
+                {/* Hosted by */}
+                <div className="flex flex-wrap items-center gap-2 mt-4">
+                  <span className="text-sm text-neutral-600">Hosted by</span>
+                  <span className="font-semibold text-neutral-900">{deal.merchant.businessName}</span>
+                  <span className="text-neutral-300">•</span>
+                  <span className="text-sm text-neutral-600">{deal.merchant.totalDeals} deals</span>
+                  <span className="text-neutral-300">•</span>
+                  <span className="text-sm text-neutral-600">{deal.socialProof.totalSaves} saves</span>
+                  {(deal as any).popularity?.totalCheckIns > 0 && (
+                    <>
+                      <span className="text-neutral-300">•</span>
+                      <span className="text-sm text-neutral-600">
+                        {(deal as any).popularity.totalCheckIns} check-ins
+                      </span>
+                    </>
+                  )}
+                  {(deal as any).popularity?.totalEngagement > 0 && (
+                    <>
+                      <span className="text-neutral-300">•</span>
+                      <span className="text-sm font-medium text-brand-primary-600">
+                        {(deal as any).popularity.totalEngagement} total engagement
+                      </span>
+                    </>
+                  )}
+                </div>
+                
+                {/* Deal Type Description */}
+                {typeof deal.dealType === 'object' && deal.dealType.description && (
+                  <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                    <p className="text-sm text-blue-800">{deal.dealType.description}</p>
+                  </div>
+                )}
+                
+                {/* Time Information */}
+                <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-neutral-400" />
+                    <div>
+                      <div className="text-xs text-neutral-500">Starts</div>
+                      <div className="font-medium text-neutral-900">
+                        {new Date(deal.startTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </div>
+                      <div className="text-xs text-neutral-600">
+                        {new Date(deal.startTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-neutral-400" />
+                    <div>
+                      <div className="text-xs text-neutral-500">Ends</div>
+                      <div className="font-medium text-neutral-900">
+                        {new Date(deal.endTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </div>
+                      <div className="text-xs text-neutral-600">
+                        {new Date(deal.endTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Deal Highlights */}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {deal.hasMenuItems && (
+                    <div className="flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700">
+                      <Menu className="h-3.5 w-3.5" />
+                      Menu Items Available
+                    </div>
+                  )}
+                  {deal.context.isRecurring && deal.recurringDays.length > 0 && (
+                    <div className="flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700">
+                      <Clock className="h-3.5 w-3.5" />
+                      Repeats {deal.recurringDays.length} day{deal.recurringDays.length > 1 ? 's' : ''} per week
+                    </div>
+                  )}
+                  {deal.kickbackEnabled && (
+                    <div className="flex items-center gap-1.5 rounded-full bg-purple-50 px-3 py-1.5 text-xs font-medium text-purple-700">
+                      <Users className="h-3.5 w-3.5" />
+                      Earn Rewards
+                    </div>
+                  )}
+                  {deal.merchant.totalStores > 1 && (
+                    <div className="flex items-center gap-1.5 rounded-full bg-neutral-50 px-3 py-1.5 text-xs font-medium text-neutral-700">
+                      <Building className="h-3.5 w-3.5" />
+                      {deal.merchant.totalStores} Locations
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Loyalty Program Summary */}
               <LoyaltySummary merchantId={deal.merchant.id} />
 
-              {/* Action Buttons */}
-              <div className="space-y-3 mb-6">
+              {/* Deal Description */}
+              <div className="pt-8 border-t border-neutral-200">
+                <h2 className="text-xl font-semibold text-neutral-900 mb-4">About this deal</h2>
+                <p className="text-neutral-700 leading-relaxed">{deal.description}</p>
+              </div>
+
+              {/* Menu Items */}
+              {deal.hasMenuItems && (
+                <div className="pt-8 border-t border-neutral-200">
+                  <MenuItemsSection menuItems={deal.menuItems} />
+                </div>
+              )}
+
+              {/* Redemption Instructions */}
+              {deal.redemptionInstructions && (
+                <div className="pt-8 border-t border-neutral-200">
+                  <h2 className="text-xl font-semibold text-neutral-900 mb-4">How to redeem</h2>
+                  <div className="prose prose-neutral max-w-none">
+                    <p className="text-neutral-700 whitespace-pre-line leading-relaxed">
+                      {deal.redemptionInstructions}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Merchant Info */}
+              <div className="pt-8 border-t border-neutral-200">
+                <h2 className="text-xl font-semibold text-neutral-900 mb-4">Meet your host</h2>
+                <MerchantInfoSection merchant={deal.merchant} />
+              </div>
+
+              {/* Social Proof */}
+              <div className="pt-8 border-t border-neutral-200">
+                <SocialProofSection socialProof={deal.socialProof} />
+              </div>
+
+              {/* Things to Know */}
+              <div className="pt-8 border-t border-neutral-200">
+                <h2 className="text-xl font-semibold text-neutral-900 mb-6">Things to know</h2>
+                <div className="grid gap-6 md:grid-cols-3">
+                  <div>
+                    <h3 className="font-semibold text-neutral-900 mb-3">Deal details</h3>
+                    <ul className="space-y-2 text-sm text-neutral-700">
+                      <li><strong>Starts:</strong> {new Date(deal.startTime).toLocaleString()}</li>
+                      <li><strong>Ends:</strong> {new Date(deal.endTime).toLocaleString()}</li>
+                      <li><strong>Type:</strong> {typeof deal.dealType === 'string' ? deal.dealType : deal.dealType.name}</li>
+                      <li><strong>Category:</strong> {deal.category.label}</li>
+                      {deal.recurringDays.length > 0 && (
+                        <li><strong>Recurring:</strong> {deal.recurringDays.join(', ')}</li>
+                      )}
+                      {deal.kickbackEnabled && (
+                        <li><strong>Kickback:</strong> Enabled</li>
+                      )}
+                      <li><strong>Created:</strong> {new Date(deal.createdAt).toLocaleDateString()}</li>
+                      <li><strong>Updated:</strong> {new Date(deal.updatedAt).toLocaleDateString()}</li>
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-semibold text-neutral-900 mb-3">Location & Contact</h3>
+                    <ul className="space-y-2 text-sm text-neutral-700">
+                      <li>{deal.merchant.address}</li>
+                      {deal.merchant.phoneNumber && (
+                        <li>
+                          <a href={`tel:${deal.merchant.phoneNumber}`} className="text-brand-primary-600 hover:underline">
+                            {deal.merchant.phoneNumber}
+                          </a>
+                        </li>
+                      )}
+                      <li>{deal.merchant.totalStores} location{deal.merchant.totalStores > 1 ? 's' : ''}</li>
+                      {deal.merchant.latitude && deal.merchant.longitude && (
+                        <li>
+                          <a 
+                            href={`https://maps.google.com/?q=${deal.merchant.latitude},${deal.merchant.longitude}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-brand-primary-600 hover:underline"
+                          >
+                            View on Map
+                          </a>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-semibold text-neutral-900 mb-3">Engagement & Popularity</h3>
+                    <ul className="space-y-2 text-sm text-neutral-700">
+                      <li><strong>Saves:</strong> {deal.socialProof.totalSaves}</li>
+                      {(deal as any).popularity?.totalCheckIns > 0 && (
+                        <li><strong>Check-ins:</strong> {(deal as any).popularity.totalCheckIns}</li>
+                      )}
+                      {(deal as any).popularity?.totalEngagement > 0 && (
+                        <li><strong>Total Engagement:</strong> {(deal as any).popularity.totalEngagement}</li>
+                      )}
+                      {(deal as any).popularity?.engagementScore > 0 && (
+                        <li><strong>Engagement Score:</strong> {(deal as any).popularity.engagementScore}%</li>
+                      )}
+                      {deal.context.isPopular && <li><strong>Status:</strong> Popular</li>}
+                      {(deal as any).popularity?.isTrending && <li><strong>Status:</strong> Trending</li>}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Side: Image Carousel - Sticky & Square */}
+          {deal.images.length > 0 && (
+            <div className="lg:sticky lg:top-20 lg:h-screen lg:overflow-y-auto order-first lg:order-last flex flex-col">
+              {/* Image Carousel */}
+              <div className="flex items-center justify-center p-4 min-h-[60vh] lg:min-h-0">
+                <div className="w-full max-w-md">
+                  <ImageCarousel images={deal.images} title={deal.title} />
+                </div>
+              </div>
+              
+              {/* Quick Actions: QR, Check-in, Directions */}
+              <div className="p-4 lg:p-6 border-t border-neutral-200 bg-neutral-50 space-y-3">
+                {/* QR Code */}
+                <div className="mb-4">
+                  <QRCodeSection 
+                    dealId={deal.id} 
+                    merchantName={deal.merchant.businessName}
+                    dealType={typeof deal.dealType === 'string' ? deal.dealType : deal.dealType?.name}
+                    bountyQRCode={deal.bountyQRCode}
+                  />
+                </div>
+                
+                {/* Check In Button */}
                 <Button
                   variant="primary"
                   size="lg"
-                  className="w-full"
+                  className="w-full rounded-full h-14 text-base font-semibold"
                   onClick={handleCheckIn}
                   disabled={isCheckingIn || !deal.status.isActive}
                 >
@@ -632,11 +851,12 @@ export const EnhancedDealDetailPage = () => {
                   {deal.status.isActive ? "Check In" : "Deal Not Active"}
                 </Button>
                 
+                {/* Get Directions Button */}
                 {deal.merchant.latitude && deal.merchant.longitude && (
                   <Button
                     variant="secondary"
                     size="lg"
-                    className="w-full"
+                    className="w-full rounded-full h-12"
                     onClick={() => {
                       const url = `https://www.google.com/maps/dir/?api=1&destination=${deal.merchant.latitude},${deal.merchant.longitude}`;
                       window.open(url, '_blank');
@@ -647,16 +867,8 @@ export const EnhancedDealDetailPage = () => {
                   </Button>
                 )}
               </div>
-
-              {/* QR Code */}
-              <div className="mb-6">
-                <QRCodeSection dealId={deal.id} merchantName={deal.merchant.businessName} />
-              </div>
-
-              {/* Social Proof */}
-              <SocialProofSection socialProof={deal.socialProof} />
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

@@ -38,6 +38,9 @@ export const PATHS = {
   LEADERBOARD: '/leaderboard',
   STREAK_LEADERBOARD: '/streaks/leaderboard',
   GAMIFICATION: '/gamification',
+  HEIST_HISTORY: '/heist/history',
+  HEIST_NOTIFICATIONS: '/heist/notifications',
+  HEIST_STATS: '/heist/stats',
 
   // Loyalty (user)
   LOYALTY_WALLET: '/loyalty',

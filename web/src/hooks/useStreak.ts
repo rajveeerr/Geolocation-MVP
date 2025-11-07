@@ -11,8 +11,18 @@ export function useStreak() {
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: STREAK_QUERY_KEY,
     queryFn: async () => {
-      const res = await fetchStreak();
-      return (res.data as any)?.streak as StreakInfo;
+      try {
+        const res = await fetchStreak();
+        const streak = (res.data as any)?.streak as StreakInfo;
+        return streak || null; // Return null instead of undefined
+      } catch (error: any) {
+        // Handle 429 rate limit errors gracefully
+        if (error?.response?.status === 429) {
+          console.warn('Streak API rate limited');
+          return null;
+        }
+        throw error;
+      }
     },
     staleTime: 60_000,
     retry: 1,
@@ -22,8 +32,18 @@ export function useStreak() {
   const tiersQuery = useQuery({
     queryKey: STREAK_TIERS_QUERY_KEY,
     queryFn: async () => {
-      const res = await fetchDiscountTiers();
-      return (res.data as any)?.tiers as DiscountTier[];
+      try {
+        const res = await fetchDiscountTiers();
+        const tiers = (res.data as any)?.tiers as DiscountTier[];
+        return tiers || []; // Return empty array instead of undefined
+      } catch (error: any) {
+        // Handle 429 rate limit errors gracefully
+        if (error?.response?.status === 429) {
+          console.warn('Streak tiers API rate limited');
+          return [];
+        }
+        throw error;
+      }
     },
     staleTime: Infinity,
   });

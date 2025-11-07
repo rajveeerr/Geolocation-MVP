@@ -6,7 +6,7 @@ import { OnboardingStepLayout } from '../onboarding/OnboardingStepLayout';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/common/Button';
-import { Calendar, Clock, Zap, CalendarDays, ChevronRight, Info } from 'lucide-react';
+import { Calendar, Clock, Zap, CalendarDays, ChevronRight, Info, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const DealScheduleStep = () => {
@@ -190,19 +190,44 @@ export const DealScheduleStep = () => {
     return `${Math.ceil(diffDays / 30)} months`;
   };
 
-  const isDateValid = () => {
-    if (!state.startTime || !state.endTime) return false;
+  // Calculate duration for Redeem Now warning
+  const getDurationHours = () => {
+    if (!state.startTime || !state.endTime) return null;
     const start = new Date(state.startTime);
     const end = new Date(state.endTime);
-    return start < end && start > new Date();
+    return (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+  };
+  
+  const durationHours = getDurationHours();
+  const exceeds24Hours = state.dealType === 'REDEEM_NOW' && durationHours !== null && durationHours > 24;
+
+  const isDateValid = () => {
+    if (!state.startTime || !state.endTime) return false;
+    
+    const start = new Date(state.startTime);
+    const end = new Date(state.endTime);
+    
+    // Basic validation
+    if (start >= end) return false;
+    if (start <= new Date()) return false;
+    
+    // Redeem Now deals must be ≤ 24 hours
+    if (state.dealType === 'REDEEM_NOW') {
+      const duration = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+      if (duration > 24) {
+        return false; // Prevent proceeding if > 24 hours
+      }
+    }
+    
+    return true;
   };
 
   return (
     <OnboardingStepLayout
       title="When will your deal be available?"
-      onNext={() => navigate('/merchant/deals/create/instructions')}
+      onNext={() => navigate('/merchant/deals/create/location')}
       onBack={() => navigate('/merchant/deals/create/images')}
-      isNextDisabled={!isDateValid()}
+      isNextDisabled={!isDateValid() || exceeds24Hours}
       progress={65}
     >
       <div className="space-y-8">
@@ -448,6 +473,103 @@ export const DealScheduleStep = () => {
             </div>
           </motion.div>
         )}
+
+        {/* Redeem Now Duration Warning */}
+        {exceeds24Hours ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-lg border border-red-200 bg-red-50 p-4"
+            >
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-red-900">Duration Exceeds 24 Hours</h4>
+                  <p className="text-sm text-red-700 mt-1">
+                    Redeem Now deals must be 24 hours or less. Current duration: {durationHours.toFixed(1)} hours.
+                    Please adjust your end time.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          ) : null}
+
+        {/* Advanced Scheduling (Optional) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="space-y-4 rounded-xl border border-neutral-200 bg-white p-6"
+        >
+          <div className="flex items-center gap-2">
+            <Clock className="h-5 w-5 text-brand-primary-600" />
+            <h3 className="text-lg font-semibold text-neutral-900">Advanced Scheduling (Optional)</h3>
+          </div>
+          <p className="text-sm text-neutral-500">
+            Set specific days of week and hours when this deal is valid. Leave empty to use the date range above.
+          </p>
+
+          {/* Valid Days of Week */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-neutral-700">Valid Days of Week</Label>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+              {weekdays.map((day) => {
+                const isSelected = state.validDaysOfWeek?.includes(day.key) ?? false;
+                return (
+                  <motion.button
+                    key={day.key}
+                    type="button"
+                    onClick={() => {
+                      const currentDays = state.validDaysOfWeek || [];
+                      const newDays = isSelected
+                        ? currentDays.filter(d => d !== day.key)
+                        : [...currentDays, day.key];
+                      dispatch({
+                        type: 'UPDATE_FIELD',
+                        field: 'validDaysOfWeek',
+                        value: newDays.length > 0 ? newDays : null,
+                      });
+                    }}
+                    className={`rounded-lg border-2 p-2 text-sm transition-all ${
+                      isSelected
+                        ? 'border-brand-primary-500 bg-brand-primary-50 text-brand-primary-700'
+                        : 'border-neutral-200 bg-white text-neutral-600 hover:border-brand-primary-300'
+                    }`}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {day.short}
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Valid Hours */}
+          <div className="space-y-3">
+            <Label htmlFor="validHours" className="text-sm font-medium text-neutral-700">
+              Valid Hours (e.g., "09:00-17:00")
+            </Label>
+            <Input
+              id="validHours"
+              type="text"
+              value={state.validHours || ''}
+              onChange={(e) => {
+                const value = e.target.value.trim();
+                dispatch({
+                  type: 'UPDATE_FIELD',
+                  field: 'validHours',
+                  value: value || null,
+                });
+              }}
+              placeholder="e.g., 09:00-17:00 or leave empty"
+              className="h-12"
+            />
+            <p className="text-xs text-neutral-500">
+              Format: HH:MM-HH:MM (24-hour format). Leave empty to use the full date range.
+            </p>
+          </div>
+        </motion.div>
       </div>
     </OnboardingStepLayout>
   );

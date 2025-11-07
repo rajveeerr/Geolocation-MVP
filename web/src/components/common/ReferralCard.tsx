@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import { Button } from '@/components/common/Button';
-import { Copy, Check, Share2, Users, Gift } from 'lucide-react';
+import { Copy, Check, Share2, Users, Gift, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { formatDistanceToNow } from 'date-fns';
+import type { ReferredUser } from '@/hooks/useReferrals';
 
 interface ReferralCardProps {
   code: string;
   count: number;
+  referredUsers?: ReferredUser[];
 }
 
-export const ReferralCard = ({ code, count }: ReferralCardProps) => {
+export const ReferralCard = ({ code, count, referredUsers = [] }: ReferralCardProps) => {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   const referralLink = `${window.location.origin}/signup?ref=${code}`;
@@ -75,7 +79,7 @@ export const ReferralCard = ({ code, count }: ReferralCardProps) => {
       </Button>
 
       <div className="border-t border-neutral-200 pt-6">
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-center justify-center gap-4 mb-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
             <Users className="h-6 w-6 text-green-600" />
           </div>
@@ -86,6 +90,47 @@ export const ReferralCard = ({ code, count }: ReferralCardProps) => {
             </p>
           </div>
         </div>
+
+        {/* Referred Users List */}
+        {referredUsers.length > 0 && (
+          <div className="mt-6 space-y-3">
+            <h3 className="text-sm font-semibold text-neutral-700 mb-3">Referred Friends</h3>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {referredUsers.map((user) => (
+                <div
+                  key={user.id}
+                  className="flex items-center gap-3 p-3 rounded-lg bg-neutral-50 border border-neutral-200"
+                >
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={user.avatarUrl || undefined} />
+                    <AvatarFallback>
+                      {user.name?.charAt(0) || user.email.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-neutral-900 truncate">
+                      {user.name || user.email}
+                    </p>
+                    <div className="flex items-center gap-3 text-xs text-neutral-500">
+                      <span>{user.points.toLocaleString()} points</span>
+                      <span>•</span>
+                      <span>Joined {formatDistanceToNow(new Date(user.joinedAt), { addSuffix: true })}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {referredUsers.length === 0 && count === 0 && (
+          <div className="text-center py-4">
+            <User className="h-8 w-8 text-neutral-300 mx-auto mb-2" />
+            <p className="text-sm text-neutral-500">
+              No friends have joined yet. Share your code to get started!
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

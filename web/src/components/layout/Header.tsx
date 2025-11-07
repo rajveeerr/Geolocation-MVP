@@ -205,6 +205,8 @@ import { SearchModal } from './SearchModal';
 import CoinDisplay from '../gamification/CoinDisplay';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
+import { HeistTokenBadge } from '@/components/heist/HeistTokenBadge';
+import { HeistNotificationBadge } from '@/components/heist/HeistNotificationBadge';
 
 const navigationItems = [
   { id: 'deals', label: 'Hot Deals', path: PATHS.ALL_DEALS },
@@ -307,10 +309,12 @@ export const Header = () => {
                   </Link>
                 )}
                 {!hasMerchantProfile && (
-                  <>
+                  <div className="flex items-center gap-2">
                     <StreakBadge streak={streak} loading={isLoadingStreak} />
                     <CoinDisplay />
-                  </>
+                    <HeistTokenBadge />
+                    <HeistNotificationBadge />
+                  </div>
                 )}
                 <ProfileDropDown isMerchant={hasMerchantProfile} />
               </div>

@@ -19,10 +19,11 @@ export interface DetailedDeal {
   discountPercentage: number | null;
   discountAmount: number | null;
   offerTerms: string | null;
-  dealType: {
+  dealType: string | {
     name: string;
     description: string;
   };
+  bountyQRCode?: string | null;
   startTime: string;
   endTime: string;
   recurringDays: string[];
@@ -35,6 +36,7 @@ export interface DetailedDeal {
       hours: number;
       minutes: number;
       formatted: string;
+      percentageRemaining?: number;
     };
   };
   redemptionInstructions: string;
@@ -57,6 +59,7 @@ export interface DetailedDeal {
     latitude: number | null;
     longitude: number | null;
     logoUrl: string | null;
+    phoneNumber?: string | null;
     totalDeals: number;
     totalStores: number;
     stores: Array<{

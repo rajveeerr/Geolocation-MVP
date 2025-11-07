@@ -9,10 +9,12 @@ export type ApiDeal = {
   imageUrl?: string | null; // Deprecated - use images array instead
   images?: string[]; // Primary field - array of image URLs
   merchant: {
+    id?: number | null; // Merchant ID for table booking
     businessName: string;
     address: string;
     latitude?: number | null;
     longitude?: number | null;
+    logoUrl?: string | null;
   };
   discountPercentage?: number | null;
   discountAmount?: number | null;
@@ -118,6 +120,7 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
   ],
 
   // Add merchant information for dynamic display
+  merchantId: apiDeal.merchant.id || undefined, // Extract merchantId for table booking
   merchantName: apiDeal.merchant.businessName,
   merchantAddress: apiDeal.merchant.address,
   merchantLogo: apiDeal.merchant.logoUrl,

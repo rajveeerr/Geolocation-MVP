@@ -9,20 +9,15 @@ import { TabSelector } from '@/components/common/TabSelector';
 import { DiscoverSection } from '@/components/landing/DiscoverSection';
 import { motion, AnimatePresence } from 'framer-motion'; // Import motion
 import { StreakLeaderboardTable } from '@/components/gamification/streak/StreakLeaderboardTable';
+import { HeistActionButton } from '@/components/heist/HeistActionButton';
+import { HeistSuccessAnimation } from '@/components/heist/HeistSuccessAnimation';
+import { useQueryClient } from '@tanstack/react-query';
+import { useUserActivity } from '@/hooks/useUserActivity';
 
 const tabs = [
   { id: 'leaderboard', label: 'Leaderboard' },
   { id: 'streaks', label: 'Streak Leaderboard' },
   { id: 'discover', label: 'Discover Deals' },
-];
-
-// --- NEW: Mock data for recent user activity ---
-const mockUserActivity = [
-  { type: 'SIGNUP', points: 50, description: 'Joined CitySpark' },
-  { type: 'CHECKIN', points: 10, description: 'Checked in at The Corner Bistro' },
-  { type: 'CHECKIN', points: 10, description: 'Checked in at Downtown Grille' },
-  { type: 'REFERRAL', points: 100, description: 'Referred a friend' },
-  { type: 'FIRST_CHECKIN_BONUS', points: 25, description: 'First check-in bonus!' },
 ];
 
 export const LeaderboardPage = () => {
@@ -90,20 +85,24 @@ const LeaderboardContent = () => {
         performers may receive special rewards from participating merchants.
       </p>
       {displayUsers.length > 0 ? (
-        displayUsers.map((user) => (
-          <LeaderboardRow
-            key={user.userId}
-            user={{
-              userId: user.userId,
-              rank: user.rank,
-              name: currentUser?.id === user.userId ? 'You' : user.name,
-              points: user.periodPoints,
-              isCurrentUser: currentUser?.id === user.userId,
-            }}
-            isExpanded={expandedId === user.userId}
-            onToggle={() => setExpandedId(expandedId === user.userId ? null : user.userId)}
-          />
-        ))
+        displayUsers.map((user) => {
+          const isCurrentUserRow = currentUser?.id === user.userId;
+          return (
+            <LeaderboardRow
+              key={user.userId}
+              user={{
+                userId: user.userId,
+                rank: user.rank,
+                name: isCurrentUserRow ? 'You' : user.name,
+                points: user.periodPoints,
+                isCurrentUser: isCurrentUserRow,
+              }}
+              isExpanded={expandedId === user.userId}
+              onToggle={() => setExpandedId(expandedId === user.userId ? null : user.userId)}
+              isCurrentUser={isCurrentUserRow}
+            />
+          );
+        })
       ) : (
         <p className="text-center text-neutral-500 py-12">
           The leaderboard is empty. Be the first to check in and claim the top spot!
@@ -114,8 +113,16 @@ const LeaderboardContent = () => {
 };
 
 // --- Reusable Row Component (expandable) ---
-const LeaderboardRow = ({ user, isExpanded, onToggle }: { user: any; isExpanded: boolean; onToggle: () => void }) => {
+const LeaderboardRow = ({ user, isExpanded, onToggle, isCurrentUser }: { user: any; isExpanded: boolean; onToggle: () => void; isCurrentUser: boolean }) => {
   const isTopThree = user.rank <= 3;
+  const queryClient = useQueryClient();
+  const [heistSuccess, setHeistSuccess] = useState<{ pointsStolen: number; newTokenBalance: number } | null>(null);
+  // Only fetch activity for current user when expanded
+  const { data: activityData, isLoading: isLoadingActivity } = useUserActivity(
+    isCurrentUser && isExpanded ? user.userId : undefined,
+    10,
+    0
+  );
 
   const rankIcon =
     user.rank === 1 ? (
@@ -149,24 +156,52 @@ const LeaderboardRow = ({ user, isExpanded, onToggle }: { user: any; isExpanded:
       )}
     >
       {/* --- Main Clickable Row --- */}
-      <button onClick={onToggle} className="flex items-center w-full text-left p-4">
-        <div className="flex-shrink-0 w-8 text-center">{rankIcon}</div>
-        <Avatar>
-          <AvatarImage src="https://avatars.githubusercontent.com/u/124599?v=4" />
-          <AvatarFallback>{user.name?.charAt(0) || 'U'}</AvatarFallback>
-        </Avatar>
-        <div className="ml-4 flex-grow">
-          <p className="font-bold text-neutral-800 flex items-center gap-2">
-            {user.name}
-            {user.isCurrentUser && <span className="text-xs font-bold text-white bg-brand-primary-500 rounded-full px-2 py-0.5">You</span>}
-          </p>
-        </div>
-        <div className="text-right">
-          <p className="font-bold text-lg text-brand-primary-600">{user.points.toLocaleString()}</p>
-          <p className="text-xs text-neutral-500">Points</p>
-        </div>
-        <ChevronsUpDown className={cn('ml-4 h-5 w-5 text-neutral-400 transition-transform', isExpanded && 'rotate-180')} />
-      </button>
+      <div className="flex items-center w-full p-4">
+        <button onClick={onToggle} className="flex items-center flex-1 text-left">
+          <div className="flex-shrink-0 w-8 text-center">{rankIcon}</div>
+          <Avatar className="ml-2">
+            <AvatarImage src="https://avatars.githubusercontent.com/u/124599?v=4" />
+            <AvatarFallback>{user.name?.charAt(0) || 'U'}</AvatarFallback>
+          </Avatar>
+          <div className="ml-4 flex-grow">
+            <p className="font-bold text-neutral-800 flex items-center gap-2">
+              {user.name}
+              {user.isCurrentUser && <span className="text-xs font-bold text-white bg-brand-primary-500 rounded-full px-2 py-0.5">You</span>}
+            </p>
+          </div>
+          <div className="text-right mr-4">
+            <p className="font-bold text-lg text-brand-primary-600">{user.points.toLocaleString()}</p>
+            <p className="text-xs text-neutral-500">Points</p>
+          </div>
+        </button>
+        
+        {/* Heist Action Button - Outside the toggle button */}
+        {!user.isCurrentUser && (
+          <div className="flex-shrink-0 ml-2" onClick={(e) => e.stopPropagation()}>
+            <HeistActionButton
+              victimId={user.userId}
+              victimName={user.name || 'Unknown'}
+              victimPoints={user.points}
+              onSuccess={(data) => {
+                queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+                queryClient.invalidateQueries({ queryKey: ['heist', 'tokens'] });
+                // Show success animation
+                queryClient.invalidateQueries({ queryKey: ['heist', 'tokens'] }).then(() => {
+                  const tokens = queryClient.getQueryData(['heist', 'tokens']) as any;
+                  setHeistSuccess({
+                    pointsStolen: data.pointsStolen,
+                    newTokenBalance: tokens?.balance || 0,
+                  });
+                });
+              }}
+            />
+          </div>
+        )}
+        
+        <button onClick={onToggle} className="flex-shrink-0 ml-2">
+          <ChevronsUpDown className={cn('h-5 w-5 text-neutral-400 transition-transform', isExpanded && 'rotate-180')} />
+        </button>
+      </div>
 
       {/* --- Expandable Activity Section --- */}
       <AnimatePresence>
@@ -180,21 +215,42 @@ const LeaderboardRow = ({ user, isExpanded, onToggle }: { user: any; isExpanded:
           >
             <div className="px-4 pb-4 pt-2 border-t border-neutral-200">
               <h4 className="text-sm font-semibold text-neutral-600 mb-2">Recent Activity</h4>
-              <div className="space-y-2">
-                {mockUserActivity.map((activity, index) => (
-                  <div key={index} className="flex items-center justify-between text-sm p-2 rounded-md bg-neutral-50">
-                    <div className="flex items-center gap-2">
-                      {getActivityIcon(activity.type)}
-                      <span className="text-neutral-700">{activity.description}</span>
+              {!isCurrentUser ? (
+                <p className="text-sm text-neutral-500 text-center py-4">Activity is only visible for your own profile</p>
+              ) : isLoadingActivity ? (
+                <div className="space-y-2">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-10 bg-neutral-200 animate-pulse rounded-md" />
+                  ))}
+                </div>
+              ) : activityData && activityData.activities.length > 0 ? (
+                <div className="space-y-2">
+                  {activityData.activities.map((activity) => (
+                    <div key={activity.id} className="flex items-center justify-between text-sm p-2 rounded-md bg-neutral-50">
+                      <div className="flex items-center gap-2">
+                        {getActivityIcon(activity.type)}
+                        <span className="text-neutral-700">{activity.description}</span>
+                      </div>
+                      <span className="font-bold text-green-600">+{activity.points} pts</span>
                     </div>
-                    <span className="font-bold text-green-600">+{activity.points} pts</span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-neutral-500 text-center py-4">No activity yet</p>
+              )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* Heist Success Animation */}
+      {heistSuccess && (
+        <HeistSuccessAnimation
+          pointsStolen={heistSuccess.pointsStolen}
+          newTokenBalance={heistSuccess.newTokenBalance}
+          onClose={() => setHeistSuccess(null)}
+        />
+      )}
     </div>
   );
 };

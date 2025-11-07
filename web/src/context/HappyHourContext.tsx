@@ -12,11 +12,19 @@ export interface MenuItem {
   id: number;
   name: string;
   price: number;
-  category: 'Bites' | 'Drinks';
+  category: 'Bites' | 'Drinks' | string; // Allow string for API compatibility
   imageUrl: string;
+  description?: string | null;
+  isHappyHour?: boolean;
+  happyHourPrice?: number | null;
 }
 export interface SelectedMenuItem extends MenuItem {
   isHidden: boolean;
+  // Item-specific discount fields
+  customPrice?: number | null;
+  customDiscount?: number | null;
+  discountAmount?: number | null;
+  useGlobalDiscount?: boolean; // Default true, false if item has custom pricing
 }
 
 export interface HappyHourState {
@@ -37,6 +45,15 @@ export interface HappyHourState {
   discountPercentage: number | null;
   discountAmount: number | null;
   customOfferDisplay: string;
+  // --- Missing fields from backend ---
+  imageUrls: string[];
+  primaryImageIndex: number | null;
+  redemptionInstructions: string;
+  offerTerms: string;
+  validDaysOfWeek: string[] | null;
+  validHours: string | null;
+  storeIds: number[] | null;
+  cityIds: number[] | null;
 }
 
 type Action =
@@ -45,7 +62,9 @@ type Action =
   | { type: 'UPDATE_TIME_RANGE'; payload: { id: number; field: 'start' | 'end' | 'day'; value: string } }
   | { type: 'REMOVE_TIME_RANGE'; payload: { id: number } }
   | { type: 'SET_SELECTED_ITEMS'; payload: SelectedMenuItem[] }
-  | { type: 'TOGGLE_RECURRING_DAY'; payload: string };
+  | { type: 'TOGGLE_RECURRING_DAY'; payload: string }
+  | { type: 'UPDATE_ITEM_DISCOUNT'; payload: { itemId: number; discount: { customPrice?: number | null; customDiscount?: number | null; discountAmount?: number | null; useGlobalDiscount?: boolean } } }
+  | { type: 'RESET_ITEM_DISCOUNT'; payload: { itemId: number } };
 
 const initialState: HappyHourState = {
   happyHourType: 'Midday',
@@ -65,6 +84,15 @@ const initialState: HappyHourState = {
   discountPercentage: 20, // Default 20% discount for happy hour
   discountAmount: null,
   customOfferDisplay: '',
+  // --- Initialize missing fields ---
+  imageUrls: [],
+  primaryImageIndex: null,
+  redemptionInstructions: 'Show this screen to your server to redeem the happy hour offer.',
+  offerTerms: '',
+  validDaysOfWeek: null,
+  validHours: null,
+  storeIds: null,
+  cityIds: null,
 };
 
 function reducer(state: HappyHourState, action: Action): HappyHourState {
@@ -83,6 +111,42 @@ function reducer(state: HappyHourState, action: Action): HappyHourState {
       const day = action.payload;
       const newDays = state.recurringDays.includes(day) ? state.recurringDays.filter(d => d !== day) : [...state.recurringDays, day];
       return { ...state, recurringDays: newDays, periodType: newDays.length > 0 ? 'Recurring' : 'Single day' };
+    }
+    case 'UPDATE_ITEM_DISCOUNT': {
+      const { itemId, discount } = action.payload;
+      const updatedItems = state.selectedMenuItems.map(item => {
+        if (item.id === itemId) {
+          // If item has custom pricing, set useGlobalDiscount to false
+          const hasCustomPricing = discount.customPrice !== null && discount.customPrice !== undefined ||
+                                   discount.customDiscount !== null && discount.customDiscount !== undefined ||
+                                   discount.discountAmount !== null && discount.discountAmount !== undefined;
+          return {
+            ...item,
+            ...discount,
+            useGlobalDiscount: discount.useGlobalDiscount !== undefined 
+              ? discount.useGlobalDiscount 
+              : !hasCustomPricing
+          };
+        }
+        return item;
+      });
+      return { ...state, selectedMenuItems: updatedItems };
+    }
+    case 'RESET_ITEM_DISCOUNT': {
+      const { itemId } = action.payload;
+      const updatedItems = state.selectedMenuItems.map(item => {
+        if (item.id === itemId) {
+          return {
+            ...item,
+            customPrice: null,
+            customDiscount: null,
+            discountAmount: null,
+            useGlobalDiscount: true
+          };
+        }
+        return item;
+      });
+      return { ...state, selectedMenuItems: updatedItems };
     }
     default:
       return state;

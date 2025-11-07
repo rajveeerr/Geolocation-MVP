@@ -2,9 +2,19 @@ import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
 import { useAuth } from '@/context/useAuth';
 
+export interface ReferredUser {
+  id: number;
+  name: string | null;
+  email: string;
+  avatarUrl: string | null;
+  points: number;
+  joinedAt: string;
+}
+
 interface ReferralData {
   referralCode: string;
   referralCount: number;
+  referredUsers?: ReferredUser[];
 }
 
 export const useReferrals = () => {

@@ -210,11 +210,12 @@ export const useMerchantAvailability = (merchantId: number, date: string, partyS
 
 // Get today's availability specifically
 export const useTodayAvailability = (
-  merchantId: number,
+  merchantId: number | undefined,
   partySize?: number
 ) => {
   const today = format(new Date(), 'yyyy-MM-dd');
-  return useMerchantAvailability(merchantId, today, partySize || 1);
+  // Only fetch if merchantId is valid - useMerchantAvailability will disable the query if merchantId is 0 or undefined
+  return useMerchantAvailability(merchantId ?? 0, today, partySize || 1);
 };
 
 // Fetch availability for multiple days (make multiple API calls)
