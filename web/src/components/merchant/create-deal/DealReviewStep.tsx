@@ -446,7 +446,7 @@ export const DealReviewStep = () => {
             />
             {state.dealType === 'RECURRING' && state.recurringDays.length > 0 && (
               <ReviewItem
-                label="Recurring Days"
+                label="Daily Deal Days"
                 value={state.recurringDays.join(', ')}
               />
             )}

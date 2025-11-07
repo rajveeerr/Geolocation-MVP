@@ -14,7 +14,6 @@ import {
   Loader2,
   AlertCircle,
   DollarSign,
-  Image as ImageIcon,
   Clock,
   Sparkles,
   Info

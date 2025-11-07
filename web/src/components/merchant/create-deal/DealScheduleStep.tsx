@@ -396,7 +396,7 @@ export const DealScheduleStep = () => {
           )}
         </div>
 
-        {/* Recurring Days for RECURRING deals */}
+        {/* Daily Deal Days for RECURRING deals */}
         {state.dealType === 'RECURRING' && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -405,10 +405,10 @@ export const DealScheduleStep = () => {
           >
             <div className="flex items-center gap-2">
               <CalendarDays className="h-5 w-5 text-brand-primary-600" />
-              <h3 className="text-lg font-semibold text-neutral-900">Recurring Days</h3>
+              <h3 className="text-lg font-semibold text-neutral-900">Daily Deal Days</h3>
             </div>
             <p className="text-sm text-neutral-500">
-              Select the weekdays this deal should repeat on
+              Select the days this deal should repeat on
             </p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
               {weekdays.map((day) => (

@@ -545,7 +545,7 @@ export const DealOfferStep = () => {
                 </div>
                 <div className="text-xs text-neutral-500">
                   {state.dealType === 'HAPPY_HOUR' ? 'Happy Hour' :
-                   state.dealType === 'RECURRING' ? 'Recurring' :
+                   state.dealType === 'RECURRING' ? 'Daily Deal' :
                    'Standard Deal'}
                 </div>
               </div>
