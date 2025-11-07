@@ -136,35 +136,62 @@ const MenuItemsSection = ({ menuItems }: { menuItems: DetailedDeal['menuItems'] 
       </div>
       
       <div className="grid gap-4 sm:grid-cols-2">
-        {menuItems.map((item) => (
-          <div key={item.id} className="rounded-lg border border-neutral-200 p-4">
-            <div className="flex gap-3">
-              {item.imageUrl && (
-                <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-neutral-100">
-                  <img
-                    src={item.imageUrl}
-                    alt={item.name}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              )}
-              <div className="flex-1">
-                <h4 className="font-semibold text-neutral-900">{item.name}</h4>
-                {item.description && (
-                  <p className="text-sm text-neutral-600 mt-1">{item.description}</p>
+        {menuItems.map((item) => {
+          const hasDiscount = item.discountedPrice < item.originalPrice;
+          const discountPercent = hasDiscount 
+            ? Math.round(((item.originalPrice - item.discountedPrice) / item.originalPrice) * 100)
+            : 0;
+
+          return (
+            <div key={item.id} className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex gap-3">
+                {item.imageUrl && (
+                  <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-neutral-100">
+                    <img
+                      src={item.imageUrl}
+                      alt={item.name}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
                 )}
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="text-sm text-neutral-500 line-through">
-                    ${item.originalPrice.toFixed(2)}
-                  </span>
-                  <span className="font-semibold text-brand-primary-600">
-                    ${item.discountedPrice.toFixed(2)}
-                  </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <h4 className="font-semibold text-neutral-900">{item.name}</h4>
+                    {hasDiscount && (
+                      <span className="flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
+                        {discountPercent}% OFF
+                      </span>
+                    )}
+                  </div>
+                  {item.description && (
+                    <p className="text-sm text-neutral-600 mt-1 line-clamp-2">{item.description}</p>
+                  )}
+                  <div className="flex items-center gap-2 mt-2">
+                    {hasDiscount ? (
+                      <>
+                        <span className="text-sm text-neutral-400 line-through">
+                          ${item.originalPrice.toFixed(2)}
+                        </span>
+                        <span className="font-bold text-lg text-green-600">
+                          ${item.discountedPrice.toFixed(2)}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="font-semibold text-neutral-900">
+                        ${item.originalPrice.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+                  {item.category && (
+                    <span className="mt-2 inline-block rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-600">
+                      {item.category}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

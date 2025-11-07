@@ -100,6 +100,9 @@ const MenuItemFormPage = React.lazy(() =>
 const MenuItemDetailPage = React.lazy(() =>
   import('./pages/merchant/MenuItemDetailPage').then((m) => ({ default: m.MenuItemDetailPage })),
 );
+const MenuCollectionsPage = React.lazy(() =>
+  import('./components/merchant/menu-collections/MenuCollectionsPage').then((m) => ({ default: m.MenuCollectionsPage })),
+);
 const StoreDetailPage = React.lazy(() =>
   import('./pages/merchant/StoreDetailPage').then((m) => ({ default: m.StoreDetailPage })),
 );
@@ -381,6 +384,18 @@ function App() {
                     <MerchantLayout>
                       <Suspense fallback={<LoadingOverlay />}>
                         <MenuItemDetailPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={PATHS.MERCHANT_MENU_COLLECTIONS}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MenuCollectionsPage />
                       </Suspense>
                     </MerchantLayout>
                   </ProtectedRoute>

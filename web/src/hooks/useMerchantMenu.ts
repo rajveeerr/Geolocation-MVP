@@ -9,6 +9,17 @@ export interface MenuItemImage {
   name: string;
 }
 
+export type MenuDealType = 
+  | 'STANDARD'
+  | 'HAPPY_HOUR_BOUNTY'
+  | 'HAPPY_HOUR_SURPRISE'
+  | 'HAPPY_HOUR_LATE_NIGHT'
+  | 'HAPPY_HOUR_MID_DAY'
+  | 'HAPPY_HOUR_MORNINGS'
+  | 'REDEEM_NOW_BOUNTY'
+  | 'REDEEM_NOW_SURPRISE'
+  | 'RECURRING';
+
 export interface MenuItem {
   id: number;
   name: string;
@@ -18,6 +29,14 @@ export interface MenuItem {
   imageUrl: string | null; // Keep for backward compatibility
   images: MenuItemImage[]; // New field for multiple images
   merchantId: number;
+  dealType?: MenuDealType;
+  isHappyHour?: boolean;
+  happyHourPrice?: number | null;
+  isSurprise?: boolean;
+  surpriseRevealTime?: string | null;
+  validStartTime?: string | null;
+  validEndTime?: string | null;
+  validDays?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -29,6 +48,14 @@ export interface CreateMenuItemData {
   description?: string;
   imageUrl?: string; // Keep for backward compatibility
   images?: MenuItemImage[]; // New field for multiple images
+  dealType?: MenuDealType;
+  isHappyHour?: boolean;
+  happyHourPrice?: number | null;
+  isSurprise?: boolean;
+  surpriseRevealTime?: string | null;
+  validStartTime?: string | null;
+  validEndTime?: string | null;
+  validDays?: string | null;
 }
 
 export interface UpdateMenuItemData {
@@ -38,6 +65,14 @@ export interface UpdateMenuItemData {
   description?: string;
   imageUrl?: string; // Keep for backward compatibility
   images?: MenuItemImage[]; // New field for multiple images
+  dealType?: MenuDealType;
+  isHappyHour?: boolean;
+  happyHourPrice?: number | null;
+  isSurprise?: boolean;
+  surpriseRevealTime?: string | null;
+  validStartTime?: string | null;
+  validEndTime?: string | null;
+  validDays?: string | null;
 }
 
 export interface MenuItemsResponse {

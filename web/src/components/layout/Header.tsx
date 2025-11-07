@@ -315,11 +315,18 @@ export const Header = () => {
                 <ProfileDropDown isMerchant={hasMerchantProfile} />
               </div>
             ) : (
-              <Link to={PATHS.LOGIN}>
-                <Button variant="primary" size="md" className="rounded-full">
-                  Log in
-                </Button>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link to={PATHS.MERCHANT_ONBOARDING}>
+                  <Button variant="secondary" size="md" className="rounded-full">
+                    CitySpark for Business
+                  </Button>
+                </Link>
+                <Link to={PATHS.LOGIN}>
+                  <Button variant="primary" size="md" className="rounded-full">
+                    Log in
+                  </Button>
+                </Link>
+              </div>
             )}
           </div>
 
@@ -382,6 +389,20 @@ export const Header = () => {
                         Sign up / Log in
                       </Button>
                     </Link>
+                    <div className="mt-3">
+                      <Link
+                        to={PATHS.MERCHANT_ONBOARDING}
+                        className="flex w-full items-center justify-center"
+                      >
+                        <Button
+                          variant="secondary"
+                          size="md"
+                          className="rounded-full w-full"
+                        >
+                          CitySpark for Business
+                        </Button>
+                      </Link>
+                    </div>
                     {!isAdmin && (
                       <p className="mt-6 text-center text-base font-medium text-gray-500">
                         {hasMerchantProfile ? (

@@ -22,6 +22,7 @@ export const PATHS = {
   MERCHANT_MENU_CREATE: '/merchant/menu/create',
   MERCHANT_MENU_EDIT: '/merchant/menu/:itemId/edit',
   MERCHANT_MENU_DETAIL: '/merchant/menu/:itemId',
+  MERCHANT_MENU_COLLECTIONS: '/merchant/menu/collections',
   MERCHANT_ANALYTICS: '/merchant/analytics',
 
   LOGIN: '/login',

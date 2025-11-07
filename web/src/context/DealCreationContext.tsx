@@ -20,6 +20,11 @@ export interface MenuItem {
 
 export interface SelectedMenuItem extends MenuItem {
   isHidden: boolean;
+  // Discount fields for item-specific pricing
+  customPrice?: number | null;
+  customDiscount?: number | null;
+  discountAmount?: number | null;
+  useGlobalDiscount?: boolean; // Default true, false if item has custom pricing
 }
 
 export interface DealCreationState {
@@ -55,6 +60,9 @@ export interface DealCreationState {
   tags: string[];
   notes: string;
   externalUrl: string;
+  // Menu Collection Support
+  menuCollectionId: number | null;
+  useMenuCollection: boolean;
   // Legacy fields used by existing steps — keep for compatibility
   startTime: string;
   endTime: string;
@@ -71,7 +79,11 @@ type Action =
   | { type: 'TOGGLE_RECURRING_DAY'; payload: string }
   | { type: 'SET_DEAL_TYPE'; dealType: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' }
   | { type: 'SET_STANDARD_OFFER_KIND'; kind: 'percentage' | 'amount' | 'custom' | null }
-  | { type: 'SET_IMAGE_URLS'; payload: string[] };
+  | { type: 'SET_IMAGE_URLS'; payload: string[] }
+  | { type: 'SET_MENU_COLLECTION'; collectionId: number | null }
+  | { type: 'TOGGLE_USE_COLLECTION'; useCollection: boolean }
+  | { type: 'UPDATE_ITEM_DISCOUNT'; payload: { itemId: number; discount: { customPrice?: number | null; customDiscount?: number | null; discountAmount?: number | null; useGlobalDiscount?: boolean } } }
+  | { type: 'RESET_ITEM_DISCOUNT'; payload: { itemId: number } };
 
 const initialState: DealCreationState = {
   dealType: null,
@@ -106,6 +118,9 @@ const initialState: DealCreationState = {
   tags: [],
   notes: '',
   externalUrl: '',
+  // Menu Collection Support
+  menuCollectionId: null,
+  useMenuCollection: false,
   // Provide defaults for legacy fields so consumers can read them safely
   startTime: '',
   endTime: '',
@@ -150,6 +165,46 @@ function reducer(state: DealCreationState, action: Action): DealCreationState {
         newPrimaryImageIndex = 0;
       }
       return { ...state, imageUrls: newImageUrls, primaryImageIndex: newPrimaryImageIndex };
+    }
+    case 'SET_MENU_COLLECTION':
+      return { ...state, menuCollectionId: action.collectionId };
+    case 'TOGGLE_USE_COLLECTION':
+      return { ...state, useMenuCollection: action.useCollection };
+    case 'UPDATE_ITEM_DISCOUNT': {
+      const { itemId, discount } = action.payload;
+      const updatedItems = state.selectedMenuItems.map(item => {
+        if (item.id === itemId) {
+          // If item has custom pricing, set useGlobalDiscount to false
+          const hasCustomPricing = discount.customPrice !== null && discount.customPrice !== undefined ||
+                                   discount.customDiscount !== null && discount.customDiscount !== undefined ||
+                                   discount.discountAmount !== null && discount.discountAmount !== undefined;
+          return {
+            ...item,
+            ...discount,
+            useGlobalDiscount: discount.useGlobalDiscount !== undefined 
+              ? discount.useGlobalDiscount 
+              : !hasCustomPricing
+          };
+        }
+        return item;
+      });
+      return { ...state, selectedMenuItems: updatedItems };
+    }
+    case 'RESET_ITEM_DISCOUNT': {
+      const { itemId } = action.payload;
+      const updatedItems = state.selectedMenuItems.map(item => {
+        if (item.id === itemId) {
+          return {
+            ...item,
+            customPrice: null,
+            customDiscount: null,
+            discountAmount: null,
+            useGlobalDiscount: true
+          };
+        }
+        return item;
+      });
+      return { ...state, selectedMenuItems: updatedItems };
     }
     default:
       return state;

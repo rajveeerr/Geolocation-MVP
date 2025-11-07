@@ -9,6 +9,7 @@ import { PATHS } from '@/routing/paths';
 import { useCountdown } from '@/hooks/useCountdown';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { Sparkles } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const ReviewItem = ({
   label,
@@ -204,8 +205,18 @@ export const DealReviewStep = () => {
         tags: state.tags || [],
         notes: state.notes || null,
         externalUrl: state.externalUrl || null,
-        // Menu items if any
-        menuItems: state.selectedMenuItems?.length > 0 ? state.selectedMenuItems : undefined,
+        // Menu items if any - format for API
+        menuItems: state.selectedMenuItems?.length > 0 
+          ? state.selectedMenuItems.map(item => ({
+              id: item.id,
+              isHidden: item.isHidden || false,
+              customPrice: item.customPrice !== null && item.customPrice !== undefined ? item.customPrice : undefined,
+              customDiscount: item.customDiscount !== null && item.customDiscount !== undefined ? item.customDiscount : undefined,
+              discountAmount: item.discountAmount !== null && item.discountAmount !== undefined ? item.discountAmount : undefined,
+            }))
+          : undefined,
+        // Menu collection if using collection
+        menuCollectionId: state.useMenuCollection && state.menuCollectionId ? state.menuCollectionId : undefined,
       };
 
       console.log('API Payload:', payload);
@@ -306,24 +317,67 @@ export const DealReviewStep = () => {
             <div className="rounded-lg border bg-white p-4">
               <h3 className="mb-4 font-semibold text-neutral-900">Selected Menu Items</h3>
               <div className="space-y-3">
-                {state.selectedMenuItems.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between rounded-lg bg-neutral-50 p-3">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-neutral-900">{item.name}</span>
-                        {item.isHidden && (
-                          <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">
-                            Hidden
+                {state.selectedMenuItems.map((item) => {
+                  // Calculate final price
+                  let finalPrice = item.price;
+                  let discountInfo = '';
+                  
+                  if (item.customPrice !== null && item.customPrice !== undefined) {
+                    finalPrice = item.customPrice;
+                    discountInfo = `Fixed: $${finalPrice.toFixed(2)}`;
+                  } else if (item.customDiscount !== null && item.customDiscount !== undefined) {
+                    finalPrice = item.price * (1 - item.customDiscount / 100);
+                    discountInfo = `${item.customDiscount}% off`;
+                  } else if (item.discountAmount !== null && item.discountAmount !== undefined) {
+                    finalPrice = Math.max(0, item.price - item.discountAmount);
+                    discountInfo = `$${item.discountAmount.toFixed(2)} off`;
+                  } else if (state.discountPercentage !== null) {
+                    finalPrice = item.price * (1 - state.discountPercentage / 100);
+                    discountInfo = `${state.discountPercentage}% off (global)`;
+                  } else if (state.discountAmount !== null) {
+                    finalPrice = Math.max(0, item.price - state.discountAmount);
+                    discountInfo = `$${state.discountAmount.toFixed(2)} off (global)`;
+                  }
+                  
+                  const hasDiscount = finalPrice < item.price;
+                  
+                  return (
+                    <div key={item.id} className="flex items-center justify-between rounded-lg bg-neutral-50 p-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-neutral-900">{item.name}</span>
+                          {item.isHidden && (
+                            <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">
+                              Hidden
+                            </span>
+                          )}
+                          {(item.customPrice !== null || item.customDiscount !== null || item.discountAmount !== null) && (
+                            <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">
+                              Custom Price
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-1 flex items-center gap-2 text-sm">
+                          {hasDiscount && (
+                            <span className="text-neutral-400 line-through">${item.price.toFixed(2)}</span>
+                          )}
+                          <span className={cn(
+                            "font-semibold",
+                            hasDiscount ? "text-green-600" : "text-neutral-700"
+                          )}>
+                            ${finalPrice.toFixed(2)}
                           </span>
-                        )}
+                          {discountInfo && (
+                            <span className="text-xs text-neutral-500">({discountInfo})</span>
+                          )}
+                        </div>
                       </div>
-                      <span className="text-sm text-neutral-600">${item.price.toFixed(2)}</span>
+                      <span className="rounded-full bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-700">
+                        {item.category}
+                      </span>
                     </div>
-                    <span className="rounded-full bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-700">
-                      {item.category}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
                 <div className="mt-3 pt-3 border-t border-neutral-200">
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium text-neutral-700">Total Items:</span>
@@ -337,6 +391,16 @@ export const DealReviewStep = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+          
+          {/* Menu Collection Info */}
+          {state.useMenuCollection && state.menuCollectionId && (
+            <div className="rounded-lg border bg-white p-4">
+              <h3 className="mb-2 font-semibold text-neutral-900">Menu Collection</h3>
+              <p className="text-sm text-neutral-600">
+                Using menu collection (ID: {state.menuCollectionId})
+              </p>
             </div>
           )}
 
