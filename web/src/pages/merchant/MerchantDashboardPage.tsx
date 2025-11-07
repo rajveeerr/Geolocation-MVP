@@ -15,6 +15,7 @@ import { ExploreDealsPreview } from '@/components/merchant/ExploreDealsPreview';
 // Removed shadcn tabs import - using custom styling like kickback page
 import { MerchantTableBookingDashboard } from '@/components/table-booking/MerchantTableBookingDashboard';
 import { BusinessTypeCard } from '@/components/merchant/BusinessTypeCard';
+import { CheckInFeed } from '@/components/merchant/CheckInFeed';
 
 interface Deal {
   id: string;
@@ -537,6 +538,11 @@ export const MerchantDashboardPage = () => {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Check-in Feed */}
+          <div className="mb-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <CheckInFeed limit={10} autoRefresh={true} refreshInterval={30000} />
           </div>
             </div>
           )}

@@ -87,8 +87,8 @@ const initialState: HappyHourState = {
   // --- Initialize missing fields ---
   imageUrls: [],
   primaryImageIndex: null,
-  redemptionInstructions: 'Show this screen to your server to redeem the happy hour offer.',
-  offerTerms: '',
+  redemptionInstructions: 'Show this screen to your server to redeem the happy hour offer.', // Default value, hidden from UI
+  offerTerms: '', // Default empty, hidden from UI
   validDaysOfWeek: null,
   validHours: null,
   storeIds: null,

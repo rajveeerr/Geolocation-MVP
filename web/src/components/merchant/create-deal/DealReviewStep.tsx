@@ -172,6 +172,79 @@ export const DealReviewStep = () => {
         return;
       }
 
+      // Deal type specific validation
+      if (state.dealType === 'BOUNTY') {
+        if (!state.bountyRewardAmount || state.bountyRewardAmount <= 0) {
+          toast({
+            title: 'Error',
+            description: 'Bounty reward amount is required and must be greater than 0.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        if (!state.minReferralsRequired || state.minReferralsRequired < 1) {
+          toast({
+            title: 'Error',
+            description: 'Minimum referrals required must be at least 1.',
+            variant: 'destructive',
+          });
+          return;
+        }
+      }
+
+      if (state.dealType === 'HIDDEN') {
+        if (!state.accessCode || state.accessCode.trim().length === 0) {
+          toast({
+            title: 'Error',
+            description: 'Access code is required for hidden deals.',
+            variant: 'destructive',
+          });
+          return;
+        }
+      }
+
+      if (state.dealType === 'REDEEM_NOW') {
+        if (!state.discountPercentage) {
+          toast({
+            title: 'Error',
+            description: 'Discount percentage is required for Redeem Now deals.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        const validPresets = [15, 30, 45, 50, 75];
+        const discount = state.discountPercentage;
+        if (!validPresets.includes(discount) && (discount < 1 || discount > 100)) {
+          toast({
+            title: 'Error',
+            description: 'Redeem Now deals must use preset discounts (15%, 30%, 45%, 50%, 75%) or custom (1-100%).',
+            variant: 'destructive',
+          });
+          return;
+        }
+        // Validate duration (max 24 hours)
+        const durationHours = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
+        if (durationHours > 24) {
+          toast({
+            title: 'Error',
+            description: 'Redeem Now deals must be 24 hours or less.',
+            variant: 'destructive',
+          });
+          return;
+        }
+      }
+
+      if (state.dealType === 'RECURRING') {
+        if (!state.recurringDays || state.recurringDays.length === 0) {
+          toast({
+            title: 'Error',
+            description: 'Please select at least one day for recurring deals.',
+            variant: 'destructive',
+          });
+          return;
+        }
+      }
+
       // 1. Prepare comprehensive payload for the API
       const payload = {
         title: state.title,
@@ -210,9 +283,13 @@ export const DealReviewStep = () => {
         tags: state.tags || [],
         notes: state.notes || null,
         externalUrl: state.externalUrl || null,
-        // Bounty Deal fields
-        bountyRewardAmount: state.dealType === 'BOUNTY' ? (state.bountyRewardAmount ?? undefined) : undefined,
-        minReferralsRequired: state.dealType === 'BOUNTY' ? (state.minReferralsRequired ?? undefined) : undefined,
+        // Bounty Deal fields (required for BOUNTY, optional for HIDDEN)
+        bountyRewardAmount: (state.dealType === 'BOUNTY' || state.dealType === 'HIDDEN') 
+          ? (state.bountyRewardAmount ?? undefined) 
+          : undefined,
+        minReferralsRequired: (state.dealType === 'BOUNTY' || state.dealType === 'HIDDEN')
+          ? (state.minReferralsRequired ?? undefined)
+          : undefined,
         // Hidden Deal fields
         accessCode: state.dealType === 'HIDDEN' ? (state.accessCode || undefined) : undefined,
         // Advanced scheduling

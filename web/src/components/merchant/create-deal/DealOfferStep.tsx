@@ -9,7 +9,7 @@ import { Percent, Minus, Sparkles, DollarSign, Calculator, TrendingUp, Target, L
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Small card component to give a premium feel
+// Premium square card component with consistent brand styling
 const OfferCard = ({
   icon,
   title,
@@ -18,31 +18,35 @@ const OfferCard = ({
   onClick,
   ariaPressed,
 }: any) => (
-  <button
+  <motion.button
     onClick={onClick}
     aria-pressed={ariaPressed}
+    whileHover={{ scale: selected ? 1 : 1.02 }}
+    whileTap={{ scale: 0.98 }}
     className={cn(
-      'flex w-full flex-col items-center justify-center gap-4 rounded-2xl border p-6 text-center transition-all duration-300 min-h-[140px]',
+      'flex w-full aspect-square flex-col items-center justify-center gap-4 rounded-2xl border-2 p-6 text-center transition-all duration-300 relative overflow-hidden',
       selected
-        ? 'border-primary bg-primary text-white shadow-lg'
-        : 'border-neutral-200 bg-white text-neutral-700 hover:border-primary/30 hover:shadow-md',
+        ? 'border-brand-primary-500 bg-gradient-to-br from-brand-primary-400 to-brand-primary-600 text-white shadow-xl shadow-brand-primary-500/25'
+        : 'border-neutral-200 bg-white text-neutral-700 hover:border-brand-primary-300 hover:shadow-lg hover:bg-neutral-50',
     )}
   >
+    {selected && (
+      <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+    )}
     <div
       className={cn(
-        'flex h-12 w-12 items-center justify-center rounded-lg transition-all duration-300',
+        'flex h-16 w-16 items-center justify-center rounded-xl transition-all duration-300 relative z-10',
         selected
-          ? 'bg-white/20 text-white'
-          : 'bg-neutral-100 text-neutral-600',
+          ? 'bg-white/20 backdrop-blur-sm text-white shadow-lg'
+          : 'bg-gradient-to-br from-neutral-100 to-neutral-50 text-brand-primary-600',
       )}
     >
       {icon}
     </div>
-    <div className="space-y-2">
+    <div className="relative z-10">
       <h3 className="text-lg font-bold">{title}</h3>
-      <p className="text-sm opacity-80 leading-relaxed">{subtitle}</p>
     </div>
-  </button>
+  </motion.button>
 );
 
 
@@ -125,8 +129,8 @@ export const DealOfferStep = () => {
       isNextDisabled={isNextDisabledSimple}
       progress={45}
     >
-      <div className="space-y-8 max-w-5xl mx-auto">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 max-w-4xl mx-auto">
+      <div className="space-y-10 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 max-w-4xl mx-auto">
           <OfferCard
             icon={<Percent className="h-6 w-6" />}
             title="Percentage Off"
@@ -160,9 +164,10 @@ export const DealOfferStep = () => {
         </div>
 
         {/* Enhanced Input Sections with Validation */}
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 max-w-4xl mx-auto">
-          {(state.standardOfferKind === 'percentage' ||
-            state.discountPercentage !== null) && (
+        <div className="space-y-10 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2">
+            {(state.standardOfferKind === 'percentage' ||
+              state.discountPercentage !== null) && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -207,13 +212,14 @@ export const DealOfferStep = () => {
                       });
                     }
                   }}
-                    className={`h-12 max-w-xs text-lg transition-all ${
-                      state.discountPercentage !== null && !percentageValidation.isValid 
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' 
-                        : state.discountPercentage !== null && percentageValidation.isValid
-                        ? 'border-green-300 focus:border-green-500 focus:ring-green-500/20'
-                        : 'focus:ring-brand-primary-500/20'
-                    }`}
+                  className={cn(
+                    'h-12 max-w-xs text-lg transition-all rounded-lg border-2',
+                    state.discountPercentage !== null && !percentageValidation.isValid 
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' 
+                      : state.discountPercentage !== null && percentageValidation.isValid
+                      ? 'border-green-300 focus:border-green-500 focus:ring-green-500/20'
+                      : 'border-neutral-200 focus:border-brand-primary-500 focus:ring-brand-primary-500/20'
+                  )}
                   placeholder="e.g., 25"
                   aria-label="Discount percentage"
                 />
@@ -239,11 +245,12 @@ export const DealOfferStep = () => {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      className={`rounded-lg p-3 text-sm ${
+                      className={cn(
+                        'rounded-xl p-3 text-sm border-2',
                         percentageValidation.isValid 
-                          ? 'bg-green-50 text-green-700 border border-green-200' 
-                          : 'bg-red-50 text-red-700 border border-red-200'
-                      }`}
+                          ? 'bg-green-50 text-green-700 border-green-200' 
+                          : 'bg-red-50 text-red-700 border-red-200'
+                      )}
                     >
                       <div className="flex items-center gap-2">
                         {percentageValidation.isValid ? (
@@ -276,11 +283,12 @@ export const DealOfferStep = () => {
                           value: p,
                         })
                       }
-                        className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                        className={cn(
+                          'rounded-full px-4 py-2 text-sm font-medium transition-all',
                           state.discountPercentage === p
-                            ? 'bg-brand-primary-500 text-white shadow-md'
-                            : 'bg-neutral-100 text-neutral-600 hover:bg-brand-primary-100 hover:text-brand-primary-700'
-                        }`}
+                            ? 'bg-gradient-to-br from-brand-primary-400 to-brand-primary-600 text-white shadow-md shadow-brand-primary-500/25'
+                            : 'bg-neutral-100 text-neutral-600 hover:bg-brand-primary-50 hover:text-brand-primary-700 hover:border hover:border-brand-primary-200'
+                        )}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
@@ -340,13 +348,14 @@ export const DealOfferStep = () => {
                       });
                     }
                   }}
-                    className={`h-12 max-w-xs text-lg transition-all ${
+                    className={cn(
+                      'h-12 max-w-xs text-lg transition-all rounded-lg border-2',
                       state.discountAmount !== null && !amountValidation.isValid 
                         ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' 
                         : state.discountAmount !== null && amountValidation.isValid
                         ? 'border-green-300 focus:border-green-500 focus:ring-green-500/20'
-                        : 'focus:ring-brand-primary-500/20'
-                    }`}
+                        : 'border-neutral-200 focus:border-brand-primary-500 focus:ring-brand-primary-500/20'
+                    )}
                   placeholder="e.g., 5.00"
                   aria-label="Discount amount"
                 />
@@ -372,11 +381,12 @@ export const DealOfferStep = () => {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      className={`rounded-lg p-3 text-sm ${
+                      className={cn(
+                        'rounded-xl p-3 text-sm border-2',
                         amountValidation.isValid 
-                          ? 'bg-green-50 text-green-700 border border-green-200' 
-                          : 'bg-red-50 text-red-700 border border-red-200'
-                      }`}
+                          ? 'bg-green-50 text-green-700 border-green-200' 
+                          : 'bg-red-50 text-red-700 border-red-200'
+                      )}
                     >
                       <div className="flex items-center gap-2">
                         {amountValidation.isValid ? (
@@ -407,11 +417,12 @@ export const DealOfferStep = () => {
                           value: a,
                         })
                       }
-                        className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                        className={cn(
+                          'rounded-full px-4 py-2 text-sm font-medium transition-all',
                           state.discountAmount === a
-                            ? 'bg-brand-primary-500 text-white shadow-md'
-                            : 'bg-neutral-100 text-neutral-600 hover:bg-brand-primary-100 hover:text-brand-primary-700'
-                        }`}
+                            ? 'bg-gradient-to-br from-brand-primary-400 to-brand-primary-600 text-white shadow-md shadow-brand-primary-500/25'
+                            : 'bg-neutral-100 text-neutral-600 hover:bg-brand-primary-50 hover:text-brand-primary-700 hover:border hover:border-brand-primary-200'
+                        )}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
@@ -423,107 +434,113 @@ export const DealOfferStep = () => {
               </div>
             </motion.div>
           )}
+          </div>
 
-          {/* Custom Offer Display Section */}
-          {(state.standardOfferKind === 'custom' ||
-            state.customOfferDisplay !== null) && (
+          {/* Custom Offer Display Section - Full Width */}
+          {state.standardOfferKind === 'custom' && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="space-y-4"
+              className="w-full rounded-2xl border-2 border-neutral-200 bg-gradient-to-br from-white to-neutral-50 p-6 sm:p-8 shadow-lg"
             >
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-                  <Sparkles className="h-5 w-5" />
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-brand-primary-400 to-brand-primary-600 text-white shadow-lg">
+                    <Sparkles className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-neutral-900">Custom Offer Text</h3>
+                    <p className="text-sm text-neutral-600">Create your own offer message</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-neutral-900">Custom Offer Text</h3>
-                  <p className="text-sm text-neutral-600">Create your own offer message</p>
-                </div>
-              </div>
 
-              <div className="space-y-3">
-                <Label htmlFor="customOfferDisplay" className="text-sm font-medium text-neutral-700">
-                  Offer Display Text
-                </Label>
-                <Input
-                  id="customOfferDisplay"
-                  type="text"
-                  placeholder="e.g., Buy 2 Get 1 Free, Happy Hour Special, Free Dessert"
-                  maxLength={50}
-                  value={state.customOfferDisplay ?? ''}
-                  onChange={(e) => {
-                    dispatch({
-                      type: 'UPDATE_FIELD',
-                      field: 'customOfferDisplay',
-                      value: e.target.value,
-                    });
-                  }}
-                  className={`h-12 text-lg transition-all ${
-                    state.customOfferDisplay !== null && state.customOfferDisplay.trim().length === 0
-                      ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' 
-                      : state.customOfferDisplay !== null && state.customOfferDisplay.trim().length > 0
-                      ? 'border-green-300 focus:border-green-500 focus:ring-green-500/20'
-                      : 'focus:ring-brand-primary-500/20'
-                  }`}
-                />
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="customOfferDisplay" className="text-sm font-semibold text-neutral-900 mb-2 block">
+                    Offer Display Text
+                  </Label>
+                  <Input
+                    id="customOfferDisplay"
+                    type="text"
+                    placeholder="e.g., Buy 2 Get 1 Free, Happy Hour Special, Free Dessert"
+                    maxLength={50}
+                    value={state.customOfferDisplay ?? ''}
+                    onChange={(e) => {
+                      dispatch({
+                        type: 'UPDATE_FIELD',
+                        field: 'customOfferDisplay',
+                        value: e.target.value,
+                      });
+                    }}
+                    className={cn(
+                      'h-14 w-full text-base transition-all rounded-xl border-2',
+                      state.customOfferDisplay !== null && state.customOfferDisplay.trim().length === 0
+                        ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' 
+                        : state.customOfferDisplay !== null && state.customOfferDisplay.trim().length > 0
+                        ? 'border-green-300 focus:border-green-500 focus:ring-green-500/20'
+                        : 'border-neutral-200 focus:border-brand-primary-500 focus:ring-brand-primary-500/20'
+                    )}
+                  />
+                </div>
+                
                 {state.customOfferDisplay !== null && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="flex items-center gap-2 text-sm"
+                    className={cn(
+                      'flex items-center gap-2 text-sm rounded-lg p-3 border-2',
+                      state.customOfferDisplay.trim().length > 0
+                        ? 'bg-green-50 text-green-700 border-green-200'
+                        : 'bg-red-50 text-red-700 border-red-200'
+                    )}
                   >
                     {state.customOfferDisplay.trim().length > 0 ? (
                       <>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                        <span className="text-green-600">Perfect custom offer!</span>
+                        <CheckCircle className="h-4 w-4" />
+                        <span>Perfect custom offer!</span>
                       </>
                     ) : (
                       <>
-                        <AlertCircle className="h-4 w-4 text-red-500" />
-                        <span className="text-red-600">Please enter your custom offer text</span>
+                        <AlertCircle className="h-4 w-4" />
+                        <span>Please enter your custom offer text</span>
                       </>
                     )}
                   </motion.div>
                 )}
               </div>
 
-              {/* Quick Custom Offer Suggestions */}
-              <AnimatePresence>
-                {state.customOfferDisplay !== null && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="space-y-3"
-                  >
-                    <p className="text-sm font-medium text-neutral-700">Quick suggestions:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {['Buy 2 Get 1 Free', 'Happy Hour Special', 'Free Dessert', '50% Off Drinks', 'Kids Eat Free', 'Early Bird Special'].map((suggestion) => (
-                        <motion.button
-                          key={suggestion}
-                          onClick={() =>
-                            dispatch({
-                              type: 'UPDATE_FIELD',
-                              field: 'customOfferDisplay',
-                              value: suggestion,
-                            })
-                          }
-                          className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                            state.customOfferDisplay === suggestion
-                              ? 'bg-purple-500 text-white shadow-md'
-                              : 'bg-neutral-100 text-neutral-600 hover:bg-purple-100 hover:text-purple-700'
-                          }`}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          {suggestion}
-                        </motion.button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {/* Quick Custom Offer Suggestions - Full Width Grid */}
+              <div className="space-y-4 w-full">
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4 text-brand-primary-600" />
+                  <p className="text-sm font-semibold text-neutral-900">Quick suggestions:</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full">
+                  {['Buy 2 Get 1 Free', 'Happy Hour Special', 'Free Dessert', '50% Off Drinks', 'Kids Eat Free', 'Early Bird Special'].map((suggestion) => (
+                    <motion.button
+                      key={suggestion}
+                      onClick={() =>
+                        dispatch({
+                          type: 'UPDATE_FIELD',
+                          field: 'customOfferDisplay',
+                          value: suggestion,
+                        })
+                      }
+                      className={cn(
+                        'w-full rounded-xl px-5 py-3.5 text-sm font-semibold transition-all border-2',
+                        state.customOfferDisplay === suggestion
+                          ? 'bg-gradient-to-br from-brand-primary-400 to-brand-primary-600 text-white border-brand-primary-500 shadow-lg shadow-brand-primary-500/25'
+                          : 'bg-white text-neutral-700 border-neutral-200 hover:bg-brand-primary-50 hover:text-brand-primary-700 hover:border-brand-primary-300 hover:shadow-md'
+                      )}
+                      whileHover={{ scale: 1.02, y: -1 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {suggestion}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+              </div>
             </motion.div>
           )}
         </div>
@@ -533,7 +550,7 @@ export const DealOfferStep = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-lg border border-amber-200 bg-amber-50 p-4 max-w-3xl mx-auto"
+              className="rounded-xl border-2 border-amber-200 bg-amber-50 p-5 max-w-3xl mx-auto shadow-sm"
             >
               <div className="flex items-start gap-3">
                 <Zap className="h-5 w-5 text-amber-600 mt-0.5" />
@@ -555,7 +572,7 @@ export const DealOfferStep = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-lg border border-red-200 bg-red-50 p-4 max-w-3xl mx-auto"
+              className="rounded-xl border-2 border-red-200 bg-red-50 p-5 max-w-3xl mx-auto shadow-sm"
             >
               <div className="flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
@@ -575,10 +592,10 @@ export const DealOfferStep = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="rounded-xl border border-neutral-200 bg-gradient-to-r from-white to-neutral-50 p-6 shadow-sm max-w-3xl mx-auto"
+          className="rounded-2xl border-2 border-neutral-200 bg-gradient-to-br from-white to-neutral-50 p-6 shadow-lg max-w-3xl mx-auto"
         >
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-brand-primary-500 to-brand-primary-600 text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-brand-primary-400 to-brand-primary-600 text-white shadow-md">
               <TrendingUp className="h-5 w-5" />
             </div>
             <div>
@@ -587,17 +604,17 @@ export const DealOfferStep = () => {
             </div>
           </div>
           
-          <div className="rounded-lg border border-neutral-200 bg-white p-4">
+          <div className="rounded-xl border-2 border-neutral-200 bg-white p-5 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
-                <Sparkles className="h-6 w-6 text-amber-600" />
+              <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-brand-primary-100 to-brand-primary-200 flex items-center justify-center">
+                <Sparkles className="h-6 w-6 text-brand-primary-600" />
               </div>
               <div className="flex-1">
                 <h4 className="font-semibold text-neutral-900">{state.title || 'Your Deal Title'}</h4>
                 <p className="text-sm text-neutral-600">{getSavingsPreview()}</p>
               </div>
               <div className="text-right">
-                <div className="text-lg font-bold text-brand-primary-600">
+                <div className="text-lg font-bold bg-gradient-to-br from-brand-primary-500 to-brand-primary-600 bg-clip-text text-transparent">
                   {getPreviewDisplayText()}
                 </div>
                 <div className="text-xs text-neutral-500">
@@ -615,15 +632,17 @@ export const DealOfferStep = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="rounded-lg border border-neutral-200 bg-neutral-50 p-6 max-w-3xl mx-auto"
+          className="rounded-xl border-2 border-neutral-200 bg-gradient-to-br from-neutral-50 to-white p-6 max-w-3xl mx-auto shadow-sm"
         >
           <button
             onClick={() => setShowTips(!showTips)}
-            className="flex w-full items-center justify-between"
+            className="flex w-full items-center justify-between hover:opacity-80 transition-opacity"
           >
             <div className="flex items-center gap-2">
-              <Lightbulb className="h-5 w-5 text-brand-primary-600" />
-              <span className="font-medium text-neutral-900">Pricing Strategy Tips</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-primary-400 to-brand-primary-600 text-white shadow-md">
+                <Lightbulb className="h-4 w-4" />
+              </div>
+              <span className="font-semibold text-neutral-900">Pricing Strategy Tips</span>
             </div>
             <motion.div
               animate={{ rotate: showTips ? 180 : 0 }}

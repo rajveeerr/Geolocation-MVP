@@ -59,6 +59,10 @@ export interface DealCreationState {
   startTime: string;
   endTime: string;
   standardOfferKind: 'percentage' | 'amount' | 'custom' | null;
+  // Deal type specific fields
+  bountyRewardAmount: number | null;
+  minReferralsRequired: number | null;
+  accessCode: string | null;
 }
 
 type Action =
@@ -110,6 +114,10 @@ const initialState: DealCreationState = {
   startTime: '',
   endTime: '',
   standardOfferKind: null,
+  // Deal type specific fields
+  bountyRewardAmount: null,
+  minReferralsRequired: null,
+  accessCode: null,
 };
 
 function reducer(state: DealCreationState, action: Action): DealCreationState {

@@ -32,16 +32,27 @@ export const HiddenDealPage = () => {
       }
       try {
         const res = await apiGet<HiddenDealResponse>(`/deals/hidden/${code.toUpperCase()}`);
-        if (!res.success || !res.data) {
-          throw new Error(res.error || 'Hidden deal not found');
+        
+        // apiGet returns { success, data, error }
+        // The backend response is in res.data
+        if (!res.success) {
+          throw new Error(res.error || 'Failed to fetch hidden deal');
         }
-        return res.data;
+        
+        // res.data contains the backend response: { success: true, deal: {...} }
+        const backendResponse = res.data;
+        
+        if (!backendResponse || !backendResponse.success || !backendResponse.deal) {
+          throw new Error(backendResponse?.error || 'Hidden deal not found');
+        }
+        
+        return backendResponse;
       } catch (err: any) {
-        // Handle network errors or 500 errors
-        if (err?.response?.status === 500) {
-          throw new Error('Server error. Please try again later.');
+        // Handle network errors or API errors
+        if (err?.message) {
+          throw err;
         }
-        throw err;
+        throw new Error('Failed to load hidden deal. Please try again.');
       }
     },
     enabled: !!code,
@@ -63,7 +74,7 @@ export const HiddenDealPage = () => {
             Hidden Deal Not Found
           </h2>
           <p className="mt-3 text-neutral-600">
-            {error?.message || 'This hidden deal could not be found. It may have expired or the access code is incorrect.'}
+            {error?.message || 'This hidden deal could not be found. It may have expired, not started yet, or the access code is incorrect.'}
           </p>
           <div className="mt-6 flex justify-center gap-3">
             <Button 

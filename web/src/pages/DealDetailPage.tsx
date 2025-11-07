@@ -24,6 +24,9 @@ import { PATHS } from '@/routing/paths';
 import { useSavedDeals } from '@/hooks/useSavedDeals';
 import { cn } from '@/lib/utils';
 import { useCheckIn } from '@/hooks/useCheckIn';
+import { DealPaymentButton } from '@/components/deals/DealPaymentButton';
+import { useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -56,8 +59,10 @@ const DetailSection = ({
 
 export const DealDetailPage = () => {
   const { dealId } = useParams<{ dealId: string }>();
+  const [searchParams] = useSearchParams();
   const { savedDealIds, saveDeal, unsaveDeal } = useSavedDeals();
   const { canGoBack, goBack } = useNavigationHistory();
+  const [paymentCompleted, setPaymentCompleted] = useState(false);
 
   const {
     data: deal,
@@ -73,6 +78,44 @@ export const DealDetailPage = () => {
   });
 
   const { isCheckingIn, checkIn } = useCheckIn();
+
+  // Check if payment was just completed (from redirect)
+  useEffect(() => {
+    const paymentSuccess = searchParams.get('payment') === 'success';
+    if (paymentSuccess) {
+      setPaymentCompleted(true);
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [searchParams]);
+
+  // Determine if deal requires payment
+  const requiresPayment = () => {
+    if (!deal) return false;
+    // Check if deal has a price/amount that requires payment
+    // For MVP: Check if deal type is "Redeem Now" or if it has originalValue
+    const dealType = deal.dealType;
+    const hasPrice = deal.originalValue && deal.originalValue > 0;
+    return dealType === 'Redeem Now' || dealType === 'REDEEM_NOW' || hasPrice;
+  };
+
+  // Get payment amount (use originalValue or a default)
+  const getPaymentAmount = () => {
+    if (!deal) return 0;
+    // Use originalValue if available, otherwise use a default based on deal type
+    if (deal.originalValue && deal.originalValue > 0) {
+      return deal.originalValue;
+    }
+    // Default amount for "Redeem Now" deals
+    if (deal.dealType === 'Redeem Now' || deal.dealType === 'REDEEM_NOW') {
+      return 10; // Default $10 for redeem now deals
+    }
+    return 0;
+  };
+
+  const dealRequiresPayment = requiresPayment();
+  const paymentAmount = getPaymentAmount();
+  const canCheckIn = !dealRequiresPayment || paymentCompleted;
 
   // Not found / error UI
   const NotFoundDeal = ({
@@ -185,9 +228,17 @@ export const DealDetailPage = () => {
 
           {/* Action Buttons */}
           <div className="mt-6 flex flex-col gap-4 sm:flex-row">
+            {dealRequiresPayment && !paymentCompleted && (
+              <DealPaymentButton
+                dealId={parseInt(dealId!, 10)}
+                amount={paymentAmount}
+                description={`Payment for ${deal.name}`}
+                className="w-full"
+              />
+            )}
             <Button
               onClick={() => checkIn(dealId!)}
-              disabled={isCheckingIn}
+              disabled={isCheckingIn || !canCheckIn}
               size="lg"
               className="w-full"
             >
@@ -196,7 +247,11 @@ export const DealDetailPage = () => {
               ) : (
                 <MapPin className="mr-2 h-5 w-5" />
               )}
-              {isCheckingIn ? 'Checking In...' : 'Check-in & Earn Points'}
+              {isCheckingIn 
+                ? 'Checking In...' 
+                : !canCheckIn 
+                  ? 'Complete Payment to Check-in' 
+                  : 'Check-in & Earn Points'}
             </Button>
             <Button asChild size="lg" variant="secondary" className="w-full">
               <a
@@ -209,6 +264,13 @@ export const DealDetailPage = () => {
               </a>
             </Button>
           </div>
+          {paymentCompleted && (
+            <div className="mt-4 rounded-lg bg-green-50 border border-green-200 p-4">
+              <p className="text-sm text-green-800 font-medium">
+                ✓ Payment completed! You can now check in to earn points.
+              </p>
+            </div>
+          )}
 
           {/* Details Sections */}
           <div className="mt-6 space-y-6">

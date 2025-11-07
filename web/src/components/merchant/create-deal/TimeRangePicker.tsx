@@ -134,7 +134,7 @@ export const TimeRangePicker = () => {
               animate={{ opacity: 1, y: 0 }}
               className={`rounded-xl border p-4 shadow-sm transition-all hover:shadow-md ${
                 validation.isValid 
-                  ? 'border-green-200 bg-green-50' 
+                  ? 'border-neutral-200 bg-white' 
                   : 'border-red-200 bg-red-50'
               }`}
             >
@@ -148,11 +148,11 @@ export const TimeRangePicker = () => {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock className={`h-4 w-4 ${validation.isValid ? 'text-green-500' : 'text-red-500'}`} />
+                    <Clock className={`h-4 w-4 ${validation.isValid ? 'text-neutral-500' : 'text-red-500'}`} />
                     <span className={`text-sm ${validation.isValid ? 'text-neutral-600' : 'text-red-600'}`}>
                       {formatTime(range.start)} - {formatTime(range.end)}
                     </span>
-                    <span className={`text-xs ${validation.isValid ? 'text-green-600' : 'text-red-500'}`}>
+                    <span className={`text-xs ${validation.isValid ? 'text-neutral-500' : 'text-red-500'}`}>
                       ({duration})
                     </span>
                     {!validation.isValid && (
