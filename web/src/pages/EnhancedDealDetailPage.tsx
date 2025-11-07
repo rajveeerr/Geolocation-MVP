@@ -21,7 +21,6 @@ import {
   Loader2,
   Share2,
   Users,
-  QrCode,
   ChevronLeft,
   ChevronRight,
   CheckCircle,
@@ -200,74 +199,6 @@ const MenuItemsSection = ({ menuItems }: { menuItems: DetailedDeal['menuItems'] 
   );
 };
 
-const QRCodeSection = ({ 
-  dealId, 
-  merchantName, 
-  dealType,
-  bountyQRCode 
-}: { 
-  dealId: number; 
-  merchantName: string;
-  dealType?: string;
-  bountyQRCode?: string | null;
-}) => {
-  // For bounty deals, use the bounty QR code if available
-  // Otherwise, use the deal link QR code
-  const isBountyDeal = dealType === 'Bounty Deal' || dealType === 'BOUNTY';
-  const qrCodeData = isBountyDeal && bountyQRCode 
-    ? bountyQRCode 
-    : `${window.location.origin}/deals/${dealId}`;
-  
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrCodeData)}`;
-
-  return (
-    <div className="text-center">
-      <div className="flex items-center justify-center gap-2 mb-3">
-        <QrCode className="h-4 w-4 text-brand-primary-600" />
-        <h3 className="text-sm font-semibold text-neutral-900">
-          {isBountyDeal ? 'Bounty Verification QR Code' : 'QR Code'}
-        </h3>
-      </div>
-      
-      <div className="mx-auto mb-3 h-32 w-32 rounded-lg border border-neutral-200 bg-white p-2">
-        <img
-          src={qrCodeUrl}
-          alt={`QR Code for ${merchantName}`}
-          className="h-full w-full object-contain"
-        />
-      </div>
-      
-      {isBountyDeal ? (
-        <>
-          <p className="text-xs text-neutral-600 mb-2">
-            Scan this QR code when redeeming to verify you brought friends
-          </p>
-          <p className="text-xs text-amber-600 font-medium mb-3">
-            ⚠️ Required for bounty rewards
-          </p>
-        </>
-      ) : (
-        <p className="text-xs text-neutral-600 mb-3">
-          Show at {merchantName} to redeem
-        </p>
-      )}
-      
-      <Button
-        variant="secondary"
-        size="sm"
-        className="w-full"
-        onClick={() => {
-          const link = document.createElement('a');
-          link.href = qrCodeUrl;
-          link.download = `${isBountyDeal ? 'bounty-' : ''}qr-code-${merchantName.replace(/\s+/g, '-').toLowerCase()}.png`;
-          link.click();
-        }}
-      >
-        Download
-      </Button>
-    </div>
-  );
-};
 
 const SocialProofSection = ({ socialProof }: { socialProof: DetailedDeal['socialProof'] }) => {
   if (!socialProof.totalSaves) return null;
@@ -488,11 +419,11 @@ export const EnhancedDealDetailPage = () => {
         </div>
       </div>
 
-      <div className="w-full max-w-7xl mx-auto px-4 pt-24 pb-6">
+      <div className="w-full max-w-7xl mx-auto px-4 pt-24 pb-12">
         {/* Split Layout: Content Left, Image Right */}
-        <div className="grid gap-0 lg:grid-cols-2 mt-4 bg-white rounded-2xl overflow-hidden">
+        <div className="grid gap-0 lg:grid-cols-2 mt-4 bg-white rounded-2xl overflow-hidden shadow-lg">
           {/* Left Side: Deal Details */}
-          <div className="p-8 lg:p-12 space-y-8">
+          <div className="p-8 lg:p-12 space-y-10">
             {/* Deal Title and Basic Info */}
             <div>
               <div className="flex items-center gap-2 mb-3">
@@ -503,9 +434,9 @@ export const EnhancedDealDetailPage = () => {
                 )}
                 <span className="text-sm font-medium text-neutral-600">{deal.category.label}</span>
               </div>
-              <h1 className="text-4xl lg:text-5xl font-bold text-neutral-900 mb-6 leading-tight">{deal.title}</h1>
+              <h1 className="text-4xl lg:text-5xl font-bold text-neutral-900 mb-8 leading-tight">{deal.title}</h1>
               
-              <div className="flex flex-wrap items-center gap-3 mb-6">
+              <div className="flex flex-wrap items-center gap-3 mb-8">
                 {deal.socialProof.totalSaves > 0 && (
                   <>
                     <div className="flex items-center gap-1.5">
@@ -548,7 +479,7 @@ export const EnhancedDealDetailPage = () => {
               </div>
 
               {/* Status and Type Badges */}
-              <div className="flex flex-wrap items-center gap-2 mb-8">
+              <div className="flex flex-wrap items-center gap-3 mb-10">
                 <div className={cn(
                   "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium",
                   deal.status.isActive && "bg-green-100 text-green-700",
@@ -589,7 +520,7 @@ export const EnhancedDealDetailPage = () => {
               </div>
 
               {/* Price and Offer - Prominent Display */}
-              <div className="mb-8 pb-8 border-b border-neutral-200">
+              <div className="mb-10 pb-10 border-b border-neutral-200">
                 <div className="flex items-baseline gap-3 mb-4">
                   <span className="text-4xl font-bold text-neutral-900">{deal.offerDisplay}</span>
                   {deal.offerTerms && (
@@ -707,24 +638,24 @@ export const EnhancedDealDetailPage = () => {
               <LoyaltySummary merchantId={deal.merchant.id} />
 
               {/* Deal Description */}
-              <div className="pt-8 border-t border-neutral-200">
-                <h2 className="text-xl font-semibold text-neutral-900 mb-4">About this deal</h2>
-                <p className="text-neutral-700 leading-relaxed">{deal.description}</p>
+              <div className="pt-10 border-t border-neutral-200">
+                <h2 className="text-xl font-semibold text-neutral-900 mb-6">About this deal</h2>
+                <p className="text-neutral-700 leading-relaxed text-base">{deal.description}</p>
               </div>
 
               {/* Menu Items */}
               {deal.hasMenuItems && (
-                <div className="pt-8 border-t border-neutral-200">
+                <div className="pt-10 border-t border-neutral-200">
                   <MenuItemsSection menuItems={deal.menuItems} />
                 </div>
               )}
 
               {/* Redemption Instructions */}
               {deal.redemptionInstructions && (
-                <div className="pt-8 border-t border-neutral-200">
-                  <h2 className="text-xl font-semibold text-neutral-900 mb-4">How to redeem</h2>
+                <div className="pt-10 border-t border-neutral-200">
+                  <h2 className="text-xl font-semibold text-neutral-900 mb-6">How to redeem</h2>
                   <div className="prose prose-neutral max-w-none">
-                    <p className="text-neutral-700 whitespace-pre-line leading-relaxed">
+                    <p className="text-neutral-700 whitespace-pre-line leading-relaxed text-base">
                       {deal.redemptionInstructions}
                     </p>
                   </div>
@@ -732,18 +663,18 @@ export const EnhancedDealDetailPage = () => {
               )}
 
               {/* Merchant Info */}
-              <div className="pt-8 border-t border-neutral-200">
-                <h2 className="text-xl font-semibold text-neutral-900 mb-4">Meet your host</h2>
+              <div className="pt-10 border-t border-neutral-200">
+                <h2 className="text-xl font-semibold text-neutral-900 mb-6">Meet your host</h2>
                 <MerchantInfoSection merchant={deal.merchant} />
               </div>
 
               {/* Social Proof */}
-              <div className="pt-8 border-t border-neutral-200">
+              <div className="pt-10 border-t border-neutral-200">
                 <SocialProofSection socialProof={deal.socialProof} />
               </div>
 
               {/* Things to Know */}
-              <div className="pt-8 border-t border-neutral-200">
+              <div className="pt-10 border-t border-neutral-200">
                 <h2 className="text-xl font-semibold text-neutral-900 mb-6">Things to know</h2>
                 <div className="grid gap-6 md:grid-cols-3">
                   <div>
@@ -817,29 +748,19 @@ export const EnhancedDealDetailPage = () => {
           {deal.images.length > 0 && (
             <div className="lg:sticky lg:top-20 lg:h-screen lg:overflow-y-auto order-first lg:order-last flex flex-col">
               {/* Image Carousel */}
-              <div className="flex items-center justify-center p-4 min-h-[60vh] lg:min-h-0">
+              <div className="flex items-center justify-center p-6 lg:p-8 min-h-[60vh] lg:min-h-0">
                 <div className="w-full max-w-md">
                   <ImageCarousel images={deal.images} title={deal.title} />
                 </div>
               </div>
               
-              {/* Quick Actions: QR, Check-in, Directions */}
-              <div className="p-4 lg:p-6 border-t border-neutral-200 bg-neutral-50 space-y-3">
-                {/* QR Code */}
-                <div className="mb-4">
-                  <QRCodeSection 
-                    dealId={deal.id} 
-                    merchantName={deal.merchant.businessName}
-                    dealType={typeof deal.dealType === 'string' ? deal.dealType : deal.dealType?.name}
-                    bountyQRCode={deal.bountyQRCode}
-                  />
-                </div>
-                
+              {/* Quick Actions: Check-in, Directions */}
+              <div className="p-6 lg:p-8 border-t border-neutral-200 bg-gradient-to-br from-white to-neutral-50 space-y-4">
                 {/* Check In Button */}
                 <Button
                   variant="primary"
                   size="lg"
-                  className="w-full rounded-full h-14 text-base font-semibold"
+                  className="w-full rounded-full h-14 text-base font-semibold shadow-lg"
                   onClick={handleCheckIn}
                   disabled={isCheckingIn || !deal.status.isActive}
                 >
@@ -856,7 +777,7 @@ export const EnhancedDealDetailPage = () => {
                   <Button
                     variant="secondary"
                     size="lg"
-                    className="w-full rounded-full h-12"
+                    className="w-full rounded-full h-12 font-semibold"
                     onClick={() => {
                       const url = `https://www.google.com/maps/dir/?api=1&destination=${deal.merchant.latitude},${deal.merchant.longitude}`;
                       window.open(url, '_blank');
