@@ -16,7 +16,8 @@ export interface HeistEligibilityCheck {
   targetNotProtected: boolean;
   notSelfTargeting: boolean;
   targetHasSufficientPoints: boolean;
-  belowDailyLimit: boolean;
+  withinDailyLimit: boolean;
+  notAlreadyRobbed: boolean;
 }
 
 export interface HeistEligibilityResponse {

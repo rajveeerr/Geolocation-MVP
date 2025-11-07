@@ -74,6 +74,14 @@ export function useHeistExecute() {
           title = 'Feature Disabled';
           description = 'Heist feature is currently disabled';
           break;
+        case 'ALREADY_ROBBED':
+          title = 'Already Robbed';
+          description = error.message || 'You have already robbed this user. You cannot rob the same person twice.';
+          break;
+        case 'DAILY_LIMIT_EXCEEDED':
+          title = 'Daily Limit Reached';
+          description = error.message || `You have reached the daily heist limit of ${error.details?.limit || 3}`;
+          break;
         default:
           title = 'Heist Failed';
           description = error.message || 'Unable to execute heist';

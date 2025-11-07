@@ -59,6 +59,11 @@ export function HeistActionButton({
     if (isLoadingEligibility) return 'Checking eligibility...';
     if (!eligibility) return 'Unable to check eligibility';
     if (!eligibility.eligible) {
+      // Check for specific failure reasons in order of priority
+      if (eligibility.reason) {
+        // If reason is provided, use it (includes "already robbed" message)
+        return eligibility.reason;
+      }
       if (!eligibility.checks.sufficientTokens) {
         return 'You need at least 1 Heist Token. Refer friends to earn tokens!';
       }
@@ -73,7 +78,13 @@ export function HeistActionButton({
       if (!eligibility.checks.targetHasSufficientPoints) {
         return `Target must have at least ${eligibility.details?.minimumRequired || 20} points`;
       }
-      return eligibility.reason || 'Cannot perform heist';
+      if (eligibility.checks.notAlreadyRobbed === false) {
+        return 'You have already robbed this user. You cannot rob the same person twice.';
+      }
+      if (!eligibility.checks.withinDailyLimit) {
+        return `You have reached the daily heist limit of ${eligibility.details?.limit || 3}`;
+      }
+      return 'Cannot perform heist';
     }
     return '';
   };

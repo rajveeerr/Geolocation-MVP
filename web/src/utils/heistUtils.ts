@@ -60,6 +60,14 @@ export function getEligibilityErrorMessage(eligibility: HeistEligibilityResponse
     return `Target must have at least ${eligibility.details?.minimumRequired || 20} points`;
   }
   
+  if (!eligibility.checks.notAlreadyRobbed) {
+    return eligibility.reason || 'You have already robbed this user. You cannot rob the same person twice.';
+  }
+  
+  if (!eligibility.checks.withinDailyLimit) {
+    return `You have reached the daily heist limit of ${eligibility.details?.limit || 3}`;
+  }
+  
   return 'Unable to perform heist at this time';
 }
 
