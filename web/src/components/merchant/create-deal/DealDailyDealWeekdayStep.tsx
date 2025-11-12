@@ -83,7 +83,7 @@ export const DealDailyDealWeekdayStep = () => {
             You can select multiple days. This will create one deal that appears on all selected days.
           </p>
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
             {weekdays.map((day, index) => {
               const isSelected = state.recurringDays.includes(day.key);
               return (
@@ -93,39 +93,31 @@ export const DealDailyDealWeekdayStep = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
                   onClick={() => handleToggleDay(day.key)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   className={cn(
-                    'group relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all duration-200 min-h-[100px]',
+                    'group relative flex flex-col items-center justify-center gap-1 rounded-xl border-2 p-3 transition-all duration-200 min-h-[90px]',
                     isSelected
-                      ? 'border-brand-primary-500 bg-brand-primary-50 shadow-md'
-                      : 'border-neutral-200 bg-white hover:border-brand-primary-300 hover:bg-brand-primary-25'
+                      ? 'border-brand-primary-500 bg-brand-primary-50 shadow-md ring-2 ring-brand-primary-200'
+                      : 'border-neutral-200 bg-white hover:border-brand-primary-300 hover:bg-neutral-50'
                   )}
                 >
                   {isSelected && (
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-brand-primary-500 text-white"
+                      className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-brand-primary-500 text-white shadow-sm"
                     >
                       <CheckCircle className="h-4 w-4" />
                     </motion.div>
                   )}
                   <span
                     className={cn(
-                      'text-xs font-bold uppercase',
-                      isSelected ? 'text-brand-primary-700' : 'text-neutral-500'
+                      'text-base font-bold uppercase tracking-wide',
+                      isSelected ? 'text-brand-primary-700' : 'text-neutral-700'
                     )}
                   >
                     {day.short}
-                  </span>
-                  <span
-                    className={cn(
-                      'text-sm font-medium',
-                      isSelected ? 'text-brand-primary-900' : 'text-neutral-700'
-                    )}
-                  >
-                    {day.label}
                   </span>
                 </motion.button>
               );

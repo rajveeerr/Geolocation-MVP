@@ -259,9 +259,10 @@ export const DealReviewStep = () => {
           ? state.recurringDays
           : undefined,
         // Backend expects activeDateRange with startDate and endDate
+        // For Daily Deal, use activeStartDate/activeEndDate if available, otherwise fall back to startTime/endTime
         activeDateRange: {
-          startDate: new Date(state.startTime).toISOString(),
-          endDate: new Date(state.endTime).toISOString(),
+          startDate: (state.activeStartDate ? new Date(state.activeStartDate) : new Date(state.startTime)).toISOString(),
+          endDate: (state.activeEndDate ? new Date(state.activeEndDate) : new Date(state.endTime)).toISOString(),
         },
         redemptionInstructions: state.redemptionInstructions,
         // Enhanced fields
@@ -410,6 +411,9 @@ export const DealReviewStep = () => {
         // For REDEEM_NOW deals, go back to schedule
         if (state.dealType === 'REDEEM_NOW') {
           navigate('/merchant/deals/create/schedule');
+        } else if (state.dealType === 'RECURRING') {
+          // Daily Deal goes back to config step
+          navigate('/merchant/deals/create/daily-deal/config');
         } else {
           navigate('/merchant/deals/create/instructions');
         }
@@ -585,11 +589,83 @@ export const DealReviewStep = () => {
               label="Ends"
               value={new Date(state.endTime).toLocaleString()}
             />
-            {state.dealType === 'RECURRING' && state.recurringDays.length > 0 && (
-              <ReviewItem
-                label="Daily Deal Days"
-                value={state.recurringDays.join(', ')}
-              />
+            {/* Daily Deal Specific Information */}
+            {state.dealType === 'RECURRING' && (
+              <>
+                {state.recurringDays.length > 0 && (
+                  <ReviewItem
+                    label="Active Days"
+                    value={state.recurringDays
+                      .map((day) => {
+                        const dayMap: Record<string, string> = {
+                          MONDAY: 'Monday',
+                          TUESDAY: 'Tuesday',
+                          WEDNESDAY: 'Wednesday',
+                          THURSDAY: 'Thursday',
+                          FRIDAY: 'Friday',
+                          SATURDAY: 'Saturday',
+                          SUNDAY: 'Sunday',
+                        };
+                        return dayMap[day] || day;
+                      })
+                      .join(', ')}
+                  />
+                )}
+                {state.recurringFrequency && (
+                  <ReviewItem
+                    label="Frequency"
+                    value={`Every ${state.recurringFrequency}`}
+                  />
+                )}
+                {state.activeStartDate && state.activeEndDate && (
+                  <>
+                    <ReviewItem
+                      label="Start Date"
+                      value={new Date(state.activeStartDate).toLocaleDateString()}
+                    />
+                    <ReviewItem
+                      label="End Date"
+                      value={new Date(state.activeEndDate).toLocaleDateString()}
+                    />
+                  </>
+                )}
+                {state.streakEnabled && (
+                  <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                    <h4 className="mb-2 font-semibold text-amber-900">Streak Rewards</h4>
+                    <ReviewItem
+                      label="Minimum Consecutive Visits"
+                      value={state.streakMinVisits || 'Not set'}
+                    />
+                    <ReviewItem
+                      label="Reward Type"
+                      value={state.streakRewardType || 'Not set'}
+                    />
+                    <ReviewItem
+                      label="Reward Value"
+                      value={
+                        state.streakRewardValue !== null
+                          ? state.streakRewardType === 'percentage'
+                            ? `${state.streakRewardValue}%`
+                            : `$${state.streakRewardValue.toFixed(2)}`
+                          : 'Not set'
+                      }
+                    />
+                  </div>
+                )}
+                {state.bountyRewardAmount && state.bountyRewardAmount > 0 && (
+                  <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
+                    <h4 className="mb-2 font-semibold text-blue-900">Bounty Rewards</h4>
+                    <ReviewItem
+                      label="Reward Per Friend"
+                      value={`$${state.bountyRewardAmount.toFixed(2)}`}
+                    />
+                    <ReviewItem
+                      label="Minimum Friends Required"
+                      value={state.minReferralsRequired || 'Not set'}
+                    />
+                  </div>
+                )}
+              </>
             )}
           </div>
 

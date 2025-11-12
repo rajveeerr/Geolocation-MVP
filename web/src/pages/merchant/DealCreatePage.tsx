@@ -80,6 +80,11 @@ export const CreateDealPage = () => {
           <Route path="bounty" element={<DealBountyStep />} />
           <Route path="hidden" element={<DealHiddenStep />} />
           <Route path="redeem-now" element={<DealRedeemNowStep />} />
+          
+          {/* Daily Deal routes */}
+          <Route path="daily-deal/weekdays" element={<DealDailyDealWeekdayStep />} />
+          <Route path="daily-deal/config" element={<DealDailyDealConfigStep />} />
+          <Route path="daily-deal/review" element={<DealReviewStep />} />
 
           {/* --- Route group for the happy hour flow --- */}
           {/* This requires its own provider for its more complex state */}

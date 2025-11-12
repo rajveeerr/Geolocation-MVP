@@ -117,10 +117,49 @@ export function validateDealTypeData(
     }
   }
 
-  // Recurring Deal validation
+  // Recurring Deal / Daily Deal validation
   if (dealType === 'RECURRING') {
     if (!state.recurringDays || state.recurringDays.length === 0) {
       errors.push('Please select at least one day for recurring deals');
+    }
+    
+    // Frequency is required for Daily Deals
+    if (!state.recurringFrequency) {
+      errors.push('Please select a frequency (week/month/year) for your daily deal');
+    }
+    
+    // Date range is required
+    if (!state.activeStartDate || !state.activeEndDate) {
+      errors.push('Please set a start and end date for your daily deal');
+    }
+    
+    // Validate date range
+    if (state.activeStartDate && state.activeEndDate) {
+      const start = new Date(state.activeStartDate);
+      const end = new Date(state.activeEndDate);
+      if (end <= start) {
+        errors.push('End date must be after start date');
+      }
+    }
+    
+    // Streak validation (if enabled)
+    if (state.streakEnabled) {
+      if (!state.streakMinVisits || state.streakMinVisits < 2) {
+        errors.push('Minimum consecutive visits must be at least 2');
+      }
+      if (!state.streakRewardType) {
+        errors.push('Please select a streak reward type (percentage or amount)');
+      }
+      if (!state.streakRewardValue || state.streakRewardValue <= 0) {
+        errors.push('Streak reward value must be greater than 0');
+      }
+    }
+    
+    // Bounty validation (if enabled)
+    if (state.bountyRewardAmount && state.bountyRewardAmount > 0) {
+      if (!state.minReferralsRequired || state.minReferralsRequired < 1) {
+        errors.push('Minimum referrals required must be at least 1 when bounty is enabled');
+      }
     }
   }
 
