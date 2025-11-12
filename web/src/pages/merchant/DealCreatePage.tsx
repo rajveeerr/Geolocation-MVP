@@ -18,7 +18,10 @@ import { DealAdvancedStep } from '@/components/merchant/create-deal/DealAdvanced
 import { DealReviewStep } from '@/components/merchant/create-deal/DealReviewStep';
 import { DealBountyStep } from '@/components/merchant/create-deal/DealBountyStep';
 import { DealHiddenStep } from '@/components/merchant/create-deal/DealHiddenStep';
+import { DealRedeemNowStep } from '@/components/merchant/create-deal/DealRedeemNowStep';
 import { DealLocationStep } from '@/components/merchant/create-deal/DealLocationStep';
+import { DealDailyDealWeekdayStep } from '@/components/merchant/create-deal/DealDailyDealWeekdayStep';
+import { DealDailyDealConfigStep } from '@/components/merchant/create-deal/DealDailyDealConfigStep';
 import { HappyHourEditorPage } from './HappyHourEditorPage';
 import { AddMenuItemPage } from './AddMenuItemPage';
 
@@ -40,10 +43,13 @@ const InitialStepHandler = () => {
             // Hidden deals go to hidden step first
             navigate('/merchant/deals/create/hidden');
         } else if (state.dealType === 'REDEEM_NOW') {
-            // Redeem Now goes directly to basics (offer step will handle validation)
-            navigate('/merchant/deals/create/basics');
+            // Redeem Now goes to dedicated redeem-now step
+            navigate('/merchant/deals/create/redeem-now');
+        } else if (state.dealType === 'RECURRING') {
+            // Daily Deal goes directly to weekday selection
+            navigate('/merchant/deals/create/daily-deal/weekdays');
         } else {
-            // For 'STANDARD' and 'RECURRING', start the simple multi-step flow
+            // For 'STANDARD', start the simple multi-step flow
             navigate('/merchant/deals/create/basics');
         }
     };
@@ -73,6 +79,7 @@ export const CreateDealPage = () => {
           {/* Deal type specific routes */}
           <Route path="bounty" element={<DealBountyStep />} />
           <Route path="hidden" element={<DealHiddenStep />} />
+          <Route path="redeem-now" element={<DealRedeemNowStep />} />
 
           {/* --- Route group for the happy hour flow --- */}
           {/* This requires its own provider for its more complex state */}

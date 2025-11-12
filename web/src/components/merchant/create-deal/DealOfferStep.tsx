@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Percent, Minus, Sparkles, DollarSign, Calculator, TrendingUp, Target, Lightbulb, CheckCircle, AlertCircle, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AmountSlider } from '@/components/ui/AmountSlider';
 
 // Premium square card component with consistent brand styling
 const OfferCard = ({
@@ -120,6 +121,56 @@ export const DealOfferStep = () => {
     return 'Your Deal';
   };
 
+  // For REDEEM_NOW deals, discount is already configured in the redeem-now step
+  // Show a simplified view with what's already set
+  if (state.dealType === 'REDEEM_NOW') {
+    return (
+      <OnboardingStepLayout
+        title="Offer Configuration"
+        subtitle="Your Redeem Now deal discount is already configured"
+        onNext={() => navigate('/merchant/deals/create/images')}
+        onBack={() => navigate('/merchant/deals/create/menu')}
+        isNextDisabled={false}
+        progress={45}
+      >
+        <div className="space-y-8 max-w-3xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-xl border-2 border-brand-primary-200 bg-gradient-to-br from-brand-primary-50 to-white p-6 shadow-lg"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-brand-primary-500 to-brand-primary-600 text-white">
+                <Zap className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-neutral-900">Redeem Now Deal Configured</h3>
+                <p className="text-sm text-neutral-600">Your discount settings were set in the Redeem Now step</p>
+              </div>
+            </div>
+            
+            {state.minOrderAmount && state.discountPercentage && (
+              <div className="rounded-lg border border-neutral-200 bg-white p-4 space-y-2">
+                <div className="text-center">
+                  <div className="text-2xl font-bold bg-gradient-to-br from-brand-primary-500 to-brand-primary-600 bg-clip-text text-transparent mb-1">
+                    Spend ${state.minOrderAmount.toFixed(2)}
+                  </div>
+                  <div className="text-lg font-semibold text-neutral-700">
+                    Get {state.discountPercentage}% OFF
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <p className="text-sm text-neutral-500 mt-4 text-center">
+              You can continue to the next step to add images to your deal.
+            </p>
+          </motion.div>
+        </div>
+      </OnboardingStepLayout>
+    );
+  }
+
   return (
     <OnboardingStepLayout
       title="Make it irresistible"
@@ -184,58 +235,31 @@ export const DealOfferStep = () => {
               </p>
 
               <div className="space-y-4">
-                <div className="relative">
-                <Input
-                  id="percentage"
-                  type="number"
-                  min={1}
-                  max={100}
-                  value={state.discountPercentage ?? ''}
-                  onChange={(e) => {
-                    const v = parseInt(e.target.value);
-                    const newValue = Number.isFinite(v)
-                      ? Math.max(1, Math.min(100, v))
-                      : null;
-                    
-                    // Update the percentage value
-                    dispatch({
-                      type: 'UPDATE_FIELD',
-                      field: 'discountPercentage',
-                      value: newValue,
-                    });
-                    
-                    // Auto-set the offer kind if not already set
-                    if (newValue && state.standardOfferKind !== 'percentage') {
+                {/* Premium Percentage Slider */}
+                <div className="rounded-xl border-2 border-neutral-200 bg-white p-6 shadow-sm">
+                  <AmountSlider
+                    value={state.discountPercentage}
+                    onChange={(value) => {
                       dispatch({
-                        type: 'SET_STANDARD_OFFER_KIND',
-                        kind: 'percentage'
+                        type: 'UPDATE_FIELD',
+                        field: 'discountPercentage',
+                        value: value,
                       });
-                    }
-                  }}
-                  className={cn(
-                    'h-12 max-w-xs text-lg transition-all rounded-lg border-2',
-                    state.discountPercentage !== null && !percentageValidation.isValid 
-                      ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' 
-                      : state.discountPercentage !== null && percentageValidation.isValid
-                      ? 'border-green-300 focus:border-green-500 focus:ring-green-500/20'
-                      : 'border-neutral-200 focus:border-brand-primary-500 focus:ring-brand-primary-500/20'
-                  )}
-                  placeholder="e.g., 25"
-                  aria-label="Discount percentage"
-                />
-                  {state.discountPercentage !== null && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2"
-                    >
-                      {percentageValidation.isValid ? (
-                        <CheckCircle className="h-5 w-5 text-green-500" />
-                      ) : (
-                        <AlertCircle className="h-5 w-5 text-red-500" />
-                      )}
-                    </motion.div>
-                  )}
+                      
+                      // Auto-set the offer kind if not already set
+                      if (state.standardOfferKind !== 'percentage') {
+                        dispatch({
+                          type: 'SET_STANDARD_OFFER_KIND',
+                          kind: 'percentage'
+                        });
+                      }
+                    }}
+                    min={1}
+                    max={100}
+                    step={1}
+                    suffix="%"
+                    showEditButton={true}
+                  />
                 </div>
 
                 {/* Validation feedback */}
@@ -320,58 +344,31 @@ export const DealOfferStep = () => {
               </p>
 
               <div className="space-y-4">
-                <div className="relative">
-                <Input
-                  id="amount"
-                  type="number"
-                  step="0.01"
-                  min={0.01}
-                  value={state.discountAmount ?? ''}
-                  onChange={(e) => {
-                    const v = parseFloat(e.target.value);
-                    const newValue = Number.isFinite(v)
-                      ? Math.max(0.01, Number(v.toFixed(2)))
-                      : null;
-                    
-                    // Update the amount value
-                    dispatch({
-                      type: 'UPDATE_FIELD',
-                      field: 'discountAmount',
-                      value: newValue,
-                    });
-                    
-                    // Auto-set the offer kind if not already set
-                    if (newValue && state.standardOfferKind !== 'amount') {
+                {/* Premium Amount Slider */}
+                <div className="rounded-xl border-2 border-neutral-200 bg-white p-6 shadow-sm">
+                  <AmountSlider
+                    value={state.discountAmount}
+                    onChange={(value) => {
                       dispatch({
-                        type: 'SET_STANDARD_OFFER_KIND',
-                        kind: 'amount'
+                        type: 'UPDATE_FIELD',
+                        field: 'discountAmount',
+                        value: value,
                       });
-                    }
-                  }}
-                    className={cn(
-                      'h-12 max-w-xs text-lg transition-all rounded-lg border-2',
-                      state.discountAmount !== null && !amountValidation.isValid 
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' 
-                        : state.discountAmount !== null && amountValidation.isValid
-                        ? 'border-green-300 focus:border-green-500 focus:ring-green-500/20'
-                        : 'border-neutral-200 focus:border-brand-primary-500 focus:ring-brand-primary-500/20'
-                    )}
-                  placeholder="e.g., 5.00"
-                  aria-label="Discount amount"
-                />
-                  {state.discountAmount !== null && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2"
-                    >
-                      {amountValidation.isValid ? (
-                        <CheckCircle className="h-5 w-5 text-green-500" />
-                      ) : (
-                        <AlertCircle className="h-5 w-5 text-red-500" />
-                      )}
-                    </motion.div>
-                  )}
+                      
+                      // Auto-set the offer kind if not already set
+                      if (state.standardOfferKind !== 'amount') {
+                        dispatch({
+                          type: 'SET_STANDARD_OFFER_KIND',
+                          kind: 'amount'
+                        });
+                      }
+                    }}
+                    min={0.5}
+                    max={100}
+                    step={0.5}
+                    prefix="$"
+                    showEditButton={true}
+                  />
                 </div>
 
                 {/* Validation feedback */}
@@ -620,7 +617,7 @@ export const DealOfferStep = () => {
                 <div className="text-xs text-neutral-500">
                   {state.dealType === 'HAPPY_HOUR' ? 'Happy Hour' :
                    state.dealType === 'RECURRING' ? 'Daily Deal' :
-                   'Standard Deal'}
+                   'Item Deal'}
                 </div>
               </div>
             </div>

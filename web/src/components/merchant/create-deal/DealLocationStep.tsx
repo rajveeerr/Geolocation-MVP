@@ -13,8 +13,12 @@ import { cn } from '@/lib/utils';
 export const DealLocationStep = () => {
   const { state, dispatch } = useDealCreation();
   const navigate = useNavigate();
-  const { data: stores = [], isLoading: isLoadingStores } = useMerchantStores();
-  const { data: cities = [], isLoading: isLoadingCities } = useMerchantCities();
+  const { data: storesData, isLoading: isLoadingStores } = useMerchantStores();
+  const { data: citiesData, isLoading: isLoadingCities } = useMerchantCities();
+  
+  // Ensure stores and cities are arrays
+  const stores = Array.isArray(storesData) ? storesData : [];
+  const cities = Array.isArray(citiesData) ? citiesData : [];
 
   const applyToAllStores = state.storeIds === null || state.storeIds.length === 0;
   const applyToAllCities = state.cityIds === null || state.cityIds.length === 0;

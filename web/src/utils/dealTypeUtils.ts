@@ -27,6 +27,34 @@ export function mapDealTypeToBackend(frontendType: string | null): string {
 }
 
 /**
+ * Formats deal type name for frontend display
+ * Converts backend names to user-friendly frontend labels
+ */
+export function formatDealTypeForDisplay(dealType: string | { name: string } | null | undefined): string {
+  if (!dealType) return 'Item Deal';
+  
+  const typeName = typeof dealType === 'string' ? dealType : dealType.name;
+  
+  // Map backend names to frontend display names
+  const displayMapping: Record<string, string> = {
+    'Standard': 'Item Deal',
+    'STANDARD': 'Item Deal',
+    'Happy Hour': 'Happy Hour',
+    'HAPPY_HOUR': 'Happy Hour',
+    'Recurring Deal': 'Daily Deal',
+    'RECURRING': 'Daily Deal',
+    'Bounty Deal': 'Bounty Deal',
+    'BOUNTY': 'Bounty Deal',
+    'Hidden Deal': 'Hidden Deal',
+    'HIDDEN': 'Hidden Deal',
+    'Redeem Now': 'Redeem Now',
+    'REDEEM_NOW': 'Redeem Now',
+  };
+  
+  return displayMapping[typeName] || typeName || 'Item Deal';
+}
+
+/**
  * Gets required fields for a specific deal type
  */
 export function getDealTypeRequirements(dealType: string | null): string[] {
@@ -35,7 +63,7 @@ export function getDealTypeRequirements(dealType: string | null): string[] {
   const requirements: Record<string, string[]> = {
     'BOUNTY': ['bountyRewardAmount', 'minReferralsRequired'],
     'HIDDEN': [], // accessCode is optional (auto-generated)
-    'REDEEM_NOW': ['discountPercentage'],
+    'REDEEM_NOW': ['discountPercentage', 'minOrderAmount'],
     'RECURRING': ['recurringDays'],
   };
 
@@ -67,8 +95,14 @@ export function validateDealTypeData(
 
   // Redeem Now validation
   if (dealType === 'REDEEM_NOW') {
-    if (!state.discountPercentage || state.discountPercentage <= 0) {
-      errors.push('Discount percentage is required for Redeem Now deals');
+    // Redeem Now deals are fixed at 50% off
+    if (!state.discountPercentage || state.discountPercentage !== 50) {
+      errors.push('Redeem Now deals must have exactly 50% discount');
+    }
+    
+    // Validate minimum order amount is required
+    if (!state.minOrderAmount || state.minOrderAmount <= 0) {
+      errors.push('Minimum order amount is required for Redeem Now deals');
     }
     
     // Validate 24-hour duration

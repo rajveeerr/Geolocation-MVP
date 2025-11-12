@@ -63,6 +63,15 @@ export interface DealCreationState {
   bountyRewardAmount: number | null;
   minReferralsRequired: number | null;
   accessCode: string | null;
+  // Menu collection fields
+  useMenuCollection: boolean;
+  menuCollectionId: number | null;
+  // Daily Deal / Streak fields
+  streakEnabled: boolean;
+  streakMinVisits: number | null;
+  streakRewardType: 'percentage' | 'amount' | null;
+  streakRewardValue: number | null;
+  recurringFrequency: 'week' | 'month' | 'year' | null;
 }
 
 type Action =
@@ -75,7 +84,8 @@ type Action =
   | { type: 'TOGGLE_RECURRING_DAY'; payload: string }
   | { type: 'SET_DEAL_TYPE'; dealType: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' }
   | { type: 'SET_STANDARD_OFFER_KIND'; kind: 'percentage' | 'amount' | 'custom' | null }
-  | { type: 'SET_IMAGE_URLS'; payload: string[] };
+  | { type: 'SET_IMAGE_URLS'; payload: string[] }
+  | { type: 'SET_MENU_COLLECTION'; collectionId: number | null };
 
 const initialState: DealCreationState = {
   dealType: null,
@@ -118,6 +128,15 @@ const initialState: DealCreationState = {
   bountyRewardAmount: null,
   minReferralsRequired: null,
   accessCode: null,
+  // Menu collection fields
+  useMenuCollection: false,
+  menuCollectionId: null,
+  // Daily Deal / Streak fields
+  streakEnabled: false,
+  streakMinVisits: null,
+  streakRewardType: null,
+  streakRewardValue: null,
+  recurringFrequency: null,
 };
 
 function reducer(state: DealCreationState, action: Action): DealCreationState {
@@ -158,6 +177,15 @@ function reducer(state: DealCreationState, action: Action): DealCreationState {
         newPrimaryImageIndex = 0;
       }
       return { ...state, imageUrls: newImageUrls, primaryImageIndex: newPrimaryImageIndex };
+    }
+    case 'SET_MENU_COLLECTION': {
+      return { 
+        ...state, 
+        menuCollectionId: action.collectionId,
+        useMenuCollection: action.collectionId !== null,
+        // Clear selected items when switching to collection mode
+        selectedMenuItems: action.collectionId !== null ? [] : state.selectedMenuItems
+      };
     }
     default:
       return state;

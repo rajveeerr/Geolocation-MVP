@@ -8,6 +8,7 @@ import { Trophy, Users, DollarSign, Gift, CheckCircle, AlertCircle } from 'lucid
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { validateDealTypeData } from '@/utils/dealTypeUtils';
+import { AmountSlider } from '@/components/ui/AmountSlider';
 
 export const DealBountyStep = () => {
   const { state, dispatch } = useDealCreation();
@@ -68,45 +69,23 @@ export const DealBountyStep = () => {
             How much cash back will customers earn for each friend they bring?
           </p>
           
-          <div className="relative">
-            <Input
-              id="bountyRewardAmount"
-              type="number"
-              step="0.01"
-              min="0.01"
-              value={state.bountyRewardAmount ?? ''}
-              onChange={(e) => {
-                const value = e.target.value;
-                const numValue = value === '' ? null : parseFloat(value);
+          {/* Premium Amount Slider */}
+          <div className="rounded-xl border-2 border-neutral-200 bg-white p-6 shadow-sm">
+            <AmountSlider
+              value={state.bountyRewardAmount}
+              onChange={(value) =>
                 dispatch({
                   type: 'UPDATE_FIELD',
                   field: 'bountyRewardAmount',
-                  value: numValue && numValue > 0 ? numValue : null,
-                });
-              }}
-              placeholder="e.g., 5.00"
-              className={`h-12 text-lg transition-all ${
-                state.bountyRewardAmount !== null && !isBountyRewardValid
-                  ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
-                  : state.bountyRewardAmount !== null && isBountyRewardValid
-                  ? 'border-green-300 focus:border-green-500 focus:ring-green-500/20'
-                  : 'focus:ring-brand-primary-500/20'
-              }`}
+                  value: value,
+                })
+              }
+              min={1}
+              max={100}
+              step={0.5}
+              prefix="$"
+              showEditButton={true}
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500">$</span>
-            {state.bountyRewardAmount !== null && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="absolute right-12 top-1/2 -translate-y-1/2"
-              >
-                {isBountyRewardValid ? (
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                ) : (
-                  <AlertCircle className="h-5 w-5 text-red-500" />
-                )}
-              </motion.div>
-            )}
           </div>
 
           <AnimatePresence>

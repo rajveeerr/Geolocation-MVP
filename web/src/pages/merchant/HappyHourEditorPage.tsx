@@ -4,9 +4,8 @@ import { useHappyHour } from '@/context/HappyHourContext'; // <-- Use the new ho
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useDealCreation } from '@/context/DealCreationContext';
 import { Button } from '@/components/common/Button';
-import { ArrowLeft, Plus, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, ShoppingBag, UtensilsCrossed } from 'lucide-react';
 import { FormSection } from '@/components/merchant/create-deal/FormSection';
-import { DayOfWeekSelector } from '@/components/merchant/create-deal/DayOfWeekSelector';
 import { TimeRangePicker } from '@/components/merchant/create-deal/TimeRangePicker';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Label } from '@/components/ui/label';
@@ -15,7 +14,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { apiPost } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 import { PATHS } from '@/routing/paths';
-import clsx from 'clsx';
 import { MerchantProtectedRoute } from '@/components/auth/MerchantProtectedRoute';
 import { cn } from '@/lib/utils';
 import { mapDealTypeToBackend } from '@/utils/dealTypeUtils';
@@ -38,8 +36,9 @@ const HappyHourEditorContent = () => {
   const { data: merchantData, isLoading: isLoadingMerchant } = useMerchantStatus();
   
   // Fetch stores and cities for location targeting
-  const { data: stores = [] } = useMerchantStores();
+  const { data: storesData } = useMerchantStores();
   const { data: cities = [] } = useMerchantCities();
+  const stores = storesData?.stores || [];
 
   // Preset information based on deal type
   useEffect(() => {
@@ -281,6 +280,65 @@ const HappyHourEditorContent = () => {
         ? mapDealTypeToBackend(dealCreationState.dealType)
         : 'Happy Hour';
 
+      // Extract recurring days from timeRanges
+      const extractRecurringDays = (): string[] => {
+        const daysSet = new Set<string>();
+        
+        state.timeRanges.forEach(range => {
+          if (range.day === 'All') {
+            // Everyday means all days - add all days to set
+            ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'].forEach(day => daysSet.add(day));
+          } else if (range.day === 'Mon-Fri') {
+            daysSet.add('MONDAY');
+            daysSet.add('TUESDAY');
+            daysSet.add('WEDNESDAY');
+            daysSet.add('THURSDAY');
+            daysSet.add('FRIDAY');
+          } else if (range.day === 'Weekends') {
+            daysSet.add('SATURDAY');
+            daysSet.add('SUNDAY');
+          } else if (range.day) {
+            // Individual day - map to backend format
+            const dayMap: Record<string, string> = {
+              'Mon': 'MONDAY',
+              'Tue': 'TUESDAY',
+              'Wed': 'WEDNESDAY',
+              'Thu': 'THURSDAY',
+              'Fri': 'FRIDAY',
+              'Sat': 'SATURDAY',
+              'Sun': 'SUNDAY',
+            };
+            const backendDay = dayMap[range.day];
+            if (backendDay) {
+              daysSet.add(backendDay);
+            }
+          }
+        });
+        
+        return Array.from(daysSet);
+      };
+
+      const recurringDaysArray = extractRecurringDays();
+      
+      // Format validHours from timeRanges (e.g., "17:00-19:00" or JSON string)
+      const formatValidHours = (): string | null => {
+        if (state.timeRanges.length === 0) return null;
+        
+        // If all ranges have the same time, use simple format
+        const firstRange = state.timeRanges[0];
+        if (state.timeRanges.length === 1 && firstRange.start && firstRange.end) {
+          return `${firstRange.start}-${firstRange.end}`;
+        }
+        
+        // For multiple ranges, format as JSON or comma-separated
+        const ranges = state.timeRanges
+          .filter(r => r.start && r.end)
+          .map(r => `${r.start}-${r.end}`)
+          .join(',');
+        
+        return ranges || null;
+      };
+
       const payload: any = {
         title: state.title || `${state.happyHourType} Happy Hour`,
         description: state.description || `Special offers available during our ${state.happyHourType} happy hour.`,
@@ -295,9 +353,11 @@ const HappyHourEditorContent = () => {
             ? `${state.activeEndDate}T23:59:59.999Z`
             : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         },
-        // Convert recurring days to comma-separated string as backend expects
+        // Extract recurring days from timeRanges
         recurringDays:
-          state.periodType === 'Recurring' && state.recurringDays.length > 0 ? state.recurringDays.join(',') : undefined,
+          recurringDaysArray.length > 0 ? recurringDaysArray.join(',') : undefined,
+        // Format time ranges as validHours
+        validHours: formatValidHours(),
 
         // Ensure redemption instructions are always included (backend requires this)
         redemptionInstructions: state.redemptionInstructions || 'Show this screen to your server to redeem the happy hour offer.',
@@ -321,8 +381,7 @@ const HappyHourEditorContent = () => {
         imageUrls: state.imageUrls || [],
         primaryImageIndex: state.primaryImageIndex || null,
         offerTerms: state.offerTerms || null,
-        validDaysOfWeek: state.validDaysOfWeek || null,
-        validHours: state.validHours || null,
+        validDaysOfWeek: recurringDaysArray.length > 0 ? recurringDaysArray : null,
         storeIds: state.storeIds || null,
         cityIds: state.cityIds || null,
       };
@@ -374,7 +433,7 @@ const HappyHourEditorContent = () => {
                 {state.selectedMenuItems.length === 0 ? (
                   <div className="bg-white rounded-lg border-2 border-dashed border-neutral-300 p-8 text-center">
                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-neutral-100 flex items-center justify-center">
-                      <Plus className="h-8 w-8 text-neutral-400" />
+                      <UtensilsCrossed className="h-8 w-8 text-neutral-400" />
                     </div>
                     <h3 className="font-semibold text-neutral-900 mb-2">No items selected yet</h3>
                     <p className="text-sm text-neutral-500 mb-4">Start by adding items from your happy hour menu</p>
@@ -382,7 +441,7 @@ const HappyHourEditorContent = () => {
                       onClick={() => navigate('/merchant/deals/create/happy-hour/add-menu')} 
                       className="bg-brand-primary-500 hover:bg-brand-primary-600 text-white"
                     >
-                      <Plus className="mr-2 h-4 w-4" /> Add Menu Items
+                      <ShoppingBag className="mr-2 h-4 w-4" /> Add Menu Items
                     </Button>
                   </div>
                 ) : (
@@ -397,7 +456,7 @@ const HappyHourEditorContent = () => {
                         variant="secondary"
                         size="sm"
                       >
-                        <Plus className="mr-2 h-4 w-4" /> Add More
+                        <ShoppingBag className="mr-2 h-4 w-4" /> Add More
                       </Button>
                     </div>
                     
@@ -490,36 +549,6 @@ const HappyHourEditorContent = () => {
               {/* STEP 2: Schedule */}
               <FormSection title="Schedule" subtitle="Configure when your happy hour is active">
                 <div className="space-y-6">
-                  {/* Schedule Type */}
-                  <div>
-                    <Label className="text-sm font-medium text-neutral-700 mb-2 block">Schedule Type</Label>
-                    <div className="flex items-center justify-between rounded-lg bg-neutral-100 p-2">
-                      {['Single day', 'Recurring'].map((type) => (
-                        <button 
-                          key={type} 
-                          onClick={() => dispatch({ type: 'SET_FIELD', field: 'periodType', value: type as any })} 
-                          className={clsx(
-                            "flex-1 rounded-md py-2 text-sm font-semibold transition-all",
-                            state.periodType === type 
-                              ? "bg-black text-white shadow" 
-                              : "text-neutral-600 hover:bg-neutral-200"
-                          )}
-                        >
-                          {type}
-                        </button>
-                      ))}
-                    </div>
-                    {state.periodType === 'Recurring' && (
-                      <div className="mt-4">
-                        <Label className="text-sm font-medium text-neutral-700 mb-2 block">Recurring Days</Label>
-                        <DayOfWeekSelector 
-                          selectedDays={state.recurringDays}
-                          onDayToggle={(day: string) => dispatch({ type: 'TOGGLE_RECURRING_DAY', payload: day })}
-                        />
-                      </div>
-                    )}
-                  </div>
-
                   {/* Active Dates */}
                   <div>
                     <Label className="text-sm font-medium text-neutral-700 mb-2 block">Active Dates</Label>
@@ -703,7 +732,7 @@ const HappyHourEditorContent = () => {
               </FormSection>
 
 
-              <FormSection title="Deal Images" subtitle="Add images to showcase your Happy Hour deal">
+              <FormSection title="Featured Media" subtitle="Add images to showcase your Happy Hour deal">
                 <DealImageUpload
                   images={state.imageUrls || []}
                   onImagesChange={(images) => {

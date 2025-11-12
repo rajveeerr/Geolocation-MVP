@@ -332,11 +332,21 @@ export const DealMenuStep = () => {
   };
 
   const handleNext = () => {
-    navigate('/merchant/deals/create/offer');
+    // For REDEEM_NOW deals, skip offer step and go directly to schedule
+    if (state.dealType === 'REDEEM_NOW') {
+      navigate('/merchant/deals/create/schedule');
+    } else {
+      navigate('/merchant/deals/create/offer');
+    }
   };
 
   const handleBack = () => {
-    navigate('/merchant/deals/create/basics');
+    // For REDEEM_NOW deals, go back to redeem-now step
+    if (state.dealType === 'REDEEM_NOW') {
+      navigate('/merchant/deals/create/redeem-now');
+    } else {
+      navigate('/merchant/deals/create/basics');
+    }
   };
 
   if (isLoading) {
@@ -393,7 +403,11 @@ export const DealMenuStep = () => {
       subtitle="Choose which items to include in your deal"
       onNext={handleNext}
       onBack={handleBack}
-      isNextDisabled={false}
+      isNextDisabled={
+        !useCollection 
+          ? selectedMenuItems.length === 0 
+          : !selectedCollectionId
+      }
       progress={40}
     >
       <div className="space-y-6">
@@ -428,8 +442,23 @@ export const DealMenuStep = () => {
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => {
-                dispatch({ type: 'TOGGLE_USE_COLLECTION', useCollection: false });
-                dispatch({ type: 'SET_MENU_COLLECTION', collectionId: null });
+                dispatch({ 
+                  type: 'UPDATE_FIELD', 
+                  field: 'useMenuCollection', 
+                  value: false 
+                });
+                dispatch({ 
+                  type: 'SET_MENU_COLLECTION', 
+                  collectionId: null 
+                });
+                // Clear selected items when switching to manual mode
+                if (selectedMenuItems.length > 0 && selectedCollectionId) {
+                  dispatch({ 
+                    type: 'SET_FIELD', 
+                    field: 'selectedMenuItems', 
+                    value: [] 
+                  });
+                }
               }}
               className={cn(
                 'rounded-lg border-2 p-4 text-left transition-all',
@@ -461,7 +490,19 @@ export const DealMenuStep = () => {
             </button>
             <button
               onClick={() => {
-                dispatch({ type: 'TOGGLE_USE_COLLECTION', useCollection: true });
+                dispatch({ 
+                  type: 'UPDATE_FIELD', 
+                  field: 'useMenuCollection', 
+                  value: true 
+                });
+                // Clear selected items when switching to collection mode
+                if (selectedMenuItems.length > 0) {
+                  dispatch({ 
+                    type: 'SET_FIELD', 
+                    field: 'selectedMenuItems', 
+                    value: [] 
+                  });
+                }
               }}
               className={cn(
                 'rounded-lg border-2 p-4 text-left transition-all',

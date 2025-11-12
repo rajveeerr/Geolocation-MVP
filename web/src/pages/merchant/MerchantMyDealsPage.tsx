@@ -408,7 +408,7 @@ const MerchantMyDealsContent = () => {
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="happy_hour">Happy Hour</SelectItem>
-                <SelectItem value="standard">Standard</SelectItem>
+                <SelectItem value="standard">Item Deal</SelectItem>
                 <SelectItem value="recurring">Recurring</SelectItem>
               </SelectContent>
             </Select>
@@ -520,7 +520,7 @@ const MerchantMyDealsContent = () => {
               <Link to={PATHS.MERCHANT_DEALS_CREATE}>
                 <Button size="sm" className="rounded-lg">
                   <Plus className="mr-1 h-3 w-3" />
-                  Standard Deal
+                  Item Deal
                 </Button>
               </Link>
               <Link to={PATHS.MERCHANT_HAPPY_HOUR_CREATE}>

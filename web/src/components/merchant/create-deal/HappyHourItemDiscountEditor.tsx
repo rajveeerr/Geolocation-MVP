@@ -4,7 +4,7 @@ import { useHappyHour, type SelectedMenuItem } from '@/context/HappyHourContext'
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/common/Button';
-import { X, DollarSign, Percent, Tag, RotateCcw } from 'lucide-react';
+import { X, Percent, Tag, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -76,9 +76,12 @@ export const HappyHourItemDiscountEditor = ({
   
   // Determine current discount type
   const getCurrentDiscountType = (): DiscountType => {
+    // Check for customDiscount first (now represents "Percentage Off" using customPrice type)
+    if (item.customDiscount !== null && item.customDiscount !== undefined) return 'customPrice';
+    // Legacy: check for customPrice (fixed price) - but we're not using this anymore
     if (item.customPrice !== null && item.customPrice !== undefined) return 'customPrice';
-    if (item.customDiscount !== null && item.customDiscount !== undefined) return 'percentage';
-    if (item.discountAmount !== null && item.discountAmount !== undefined) return 'fixedAmount';
+    // Legacy: check for discountAmount - but we're not using this anymore
+    if (item.discountAmount !== null && item.discountAmount !== undefined) return 'customPrice';
     return 'global';
   };
 
@@ -95,12 +98,12 @@ export const HappyHourItemDiscountEditor = ({
 
   const priceCalculation = calculateFinalPrice(
     item.price,
-    discountType,
+    discountType === 'customPrice' ? 'percentage' : discountType,
     globalDiscountPercentage,
     globalDiscountAmount,
-    discountType === 'customPrice' ? parseFloat(customPrice) : null,
-    discountType === 'percentage' ? parseFloat(customDiscount) : null,
-    discountType === 'fixedAmount' ? parseFloat(discountAmount) : null
+    null,
+    discountType === 'customPrice' ? parseFloat(customDiscount) : null,
+    null
   );
 
   const handleSave = () => {
@@ -112,11 +115,8 @@ export const HappyHourItemDiscountEditor = ({
     };
 
     if (discountType === 'customPrice') {
-      discountData.customPrice = customPrice ? parseFloat(customPrice) : null;
-    } else if (discountType === 'percentage') {
+      // When "Percentage Off" is selected, use customDiscount
       discountData.customDiscount = customDiscount ? parseFloat(customDiscount) : null;
-    } else if (discountType === 'fixedAmount') {
-      discountData.discountAmount = discountAmount ? parseFloat(discountAmount) : null;
     }
 
     dispatch({
@@ -173,9 +173,7 @@ export const HappyHourItemDiscountEditor = ({
             <div className="grid grid-cols-2 gap-2">
               {[
                 { type: 'global' as DiscountType, label: 'Use Global', icon: Tag },
-                { type: 'customPrice' as DiscountType, label: 'Fixed Price', icon: DollarSign },
-                { type: 'percentage' as DiscountType, label: 'Percentage', icon: Percent },
-                { type: 'fixedAmount' as DiscountType, label: 'Amount Off', icon: DollarSign },
+                { type: 'customPrice' as DiscountType, label: 'Percentage Off', icon: Percent },
               ].map(({ type, label, icon: Icon }) => (
                 <button
                   key={type}
@@ -194,38 +192,14 @@ export const HappyHourItemDiscountEditor = ({
             </div>
           </div>
 
-          {/* Custom Price Input */}
+          {/* Percentage Off Input */}
           {discountType === 'customPrice' && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
             >
-              <Label htmlFor="custom-price">Fixed Price</Label>
-              <div className="relative mt-1">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">$</span>
-                <Input
-                  id="custom-price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={customPrice}
-                  onChange={(e) => setCustomPrice(e.target.value)}
-                  placeholder="0.00"
-                  className="pl-8"
-                />
-              </div>
-            </motion.div>
-          )}
-
-          {/* Custom Discount Percentage */}
-          {discountType === 'percentage' && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-            >
-              <Label htmlFor="custom-discount">Discount Percentage</Label>
+              <Label htmlFor="custom-discount">Percentage Off</Label>
               <div className="relative mt-1">
                 <Input
                   id="custom-discount"
@@ -238,30 +212,6 @@ export const HappyHourItemDiscountEditor = ({
                   className="pr-12"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500">%</span>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Discount Amount */}
-          {discountType === 'fixedAmount' && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-            >
-              <Label htmlFor="discount-amount">Discount Amount</Label>
-              <div className="relative mt-1">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">$</span>
-                <Input
-                  id="discount-amount"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={discountAmount}
-                  onChange={(e) => setDiscountAmount(e.target.value)}
-                  placeholder="0.00"
-                  className="pl-8"
-                />
               </div>
             </motion.div>
           )}

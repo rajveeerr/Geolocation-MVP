@@ -10,6 +10,7 @@ import { useDealDetail, type DetailedDeal } from '@/hooks/useDealDetail';
 import { cn } from '@/lib/utils';
 import { MerchantLogo } from '@/components/common/MerchantLogo';
 import { useLoyaltyBalance, useLoyaltyProgram } from '@/hooks/useLoyalty';
+import { formatDealTypeForDisplay } from '@/utils/dealTypeUtils';
 
 // Icons
 import {
@@ -496,7 +497,7 @@ export const EnhancedDealDetailPage = () => {
                 
                 <div className="flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1.5 text-sm font-medium text-blue-700">
                   <Zap className="h-4 w-4" />
-                  {typeof deal.dealType === 'string' ? deal.dealType : deal.dealType.name}
+                  {formatDealTypeForDisplay(deal.dealType)}
                 </div>
                 
                 {deal.context.isPopular && (

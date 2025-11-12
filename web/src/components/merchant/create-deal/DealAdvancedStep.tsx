@@ -106,82 +106,58 @@ export const DealAdvancedStep = () => {
             )}
           </div>
 
-          {/* Minimum Order Amount */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-brand-primary-600" />
-              <Label htmlFor="minOrderAmount" className="text-lg font-semibold text-neutral-900">
-                Minimum Order Amount
-              </Label>
-            </div>
-            <p className="text-sm text-neutral-600">
-              Set a minimum order amount for customers to qualify for this deal.
-            </p>
-            <div className="relative">
-              <Input
-                id="minOrderAmount"
-                type="number"
-                step="0.01"
-                min="0"
-                value={state.minOrderAmount || ''}
-                onChange={(e) =>
-                  dispatch({
-                    type: 'UPDATE_FIELD',
-                    field: 'minOrderAmount',
-                    value: e.target.value ? parseFloat(e.target.value) : null,
-                  })
-                }
-                placeholder="e.g., 25.00"
-                className="h-12 text-base"
-              />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500">$</span>
-            </div>
-          </div>
-
-          {/* Max Redemptions - Only for Redeem Now deals */}
-          {state.dealType === 'REDEEM_NOW' && (
+          {/* Minimum Order Amount - Hidden for REDEEM_NOW (configured in dedicated step) */}
+          {state.dealType !== 'REDEEM_NOW' && (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-brand-primary-600" />
-                <Label htmlFor="maxRedemptions" className="text-lg font-semibold text-neutral-900">
-                  Maximum Redemptions
+                <Users className="h-5 w-5 text-brand-primary-600" />
+                <Label htmlFor="minOrderAmount" className="text-lg font-semibold text-neutral-900">
+                  Minimum Order Amount
                 </Label>
               </div>
               <p className="text-sm text-neutral-600">
-                Limit how many times this Redeem Now deal can be redeemed. Enter 0 for unlimited redemptions.
+                Set a minimum order amount for customers to qualify for this deal.
               </p>
-              <Input
-                id="maxRedemptions"
-                type="number"
-                min="0"
-                value={state.maxRedemptions !== null ? state.maxRedemptions : ''}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value === '') {
+              <div className="relative">
+                <Input
+                  id="minOrderAmount"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={state.minOrderAmount || ''}
+                  onChange={(e) =>
                     dispatch({
                       type: 'UPDATE_FIELD',
-                      field: 'maxRedemptions',
-                      value: null,
-                    });
-                  } else {
-                    const numValue = parseInt(value);
-                    if (!isNaN(numValue) && numValue >= 0) {
-                      dispatch({
-                        type: 'UPDATE_FIELD',
-                        field: 'maxRedemptions',
-                        value: numValue,
-                      });
-                    }
+                      field: 'minOrderAmount',
+                      value: e.target.value ? parseFloat(e.target.value) : null,
+                    })
                   }
-                }}
-                placeholder="0 for unlimited, or enter a number"
-                className="h-12 text-base"
-              />
-              <p className="text-xs text-neutral-500">
-                💡 Tip: Set to 0 for unlimited redemptions, or enter a specific number to limit usage (e.g., 100)
-              </p>
+                  placeholder="e.g., 25.00"
+                  className="h-12 text-base"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500">$</span>
+              </div>
             </div>
           )}
+
+          {/* Max Redemptions - Hidden for REDEEM_NOW (configured in dedicated step) */}
+          {state.dealType === 'REDEEM_NOW' && (
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-blue-900">Redeem Now Settings</h4>
+                  <p className="text-sm text-blue-700 mt-1">
+                    Minimum spend amount and max redemptions are configured in the Redeem Now step. 
+                    These settings cannot be changed here.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Max Redemptions - Removed for REDEEM_NOW (configured in dedicated step) */}
+          {/* This section intentionally left empty - max redemptions for REDEEM_NOW is in DealRedeemNowStep */}
         </motion.div>
 
         {/* Toggle for Advanced Settings */}

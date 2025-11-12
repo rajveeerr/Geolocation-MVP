@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDealCreation } from '@/context/DealCreationContext';
-import { useMenuCollections } from '@/hooks/useMenuCollections';
+import { useMenuCollections, useMenuCollection } from '@/hooks/useMenuCollections';
 import { Button } from '@/components/common/Button';
 import { 
   Package, 
@@ -24,11 +24,13 @@ interface MenuCollectionSelectorProps {
 export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSelectorProps) => {
   const { state, dispatch } = useDealCreation();
   const { data: collectionsData, isLoading, error } = useMenuCollections();
+  const selectedCollectionId = state.menuCollectionId;
+  const { data: selectedCollectionData } = useMenuCollection(selectedCollectionId);
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   const collections = collectionsData?.collections || [];
-  const selectedCollectionId = state.menuCollectionId;
+  const selectedCollection = selectedCollectionData?.collection || collections.find(c => c.id === selectedCollectionId);
 
   // Filter collections by search term
   const filteredCollections = collections.filter(collection =>
@@ -36,37 +38,42 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
     collection.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const selectedCollection = collections.find(c => c.id === selectedCollectionId);
+  // When a collection is selected, load its items
+  useEffect(() => {
+    if (!onCollectionSelect) return;
+    
+    if (selectedCollectionId && selectedCollection?.items) {
+      const items = selectedCollection.items
+        .filter(item => item.isActive)
+        .map(item => ({
+          id: item.menuItem.id,
+          name: item.menuItem.name,
+          price: item.menuItem.price,
+          category: item.menuItem.category,
+          description: item.menuItem.description || '',
+          imageUrl: item.menuItem.imageUrl || item.menuItem.images?.[0]?.url || '',
+          images: item.menuItem.images || [],
+          isHidden: false,
+          customPrice: item.customPrice,
+          customDiscount: item.customDiscount,
+          discountAmount: null,
+        }));
+      onCollectionSelect(selectedCollectionId, items);
+    } else if (!selectedCollectionId) {
+      onCollectionSelect(null, []);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCollectionId, selectedCollectionData]);
 
   const handleSelectCollection = (collectionId: number | null) => {
-    const collection = collections.find(c => c.id === collectionId);
     dispatch({ type: 'SET_MENU_COLLECTION', collectionId });
-    if (onCollectionSelect) {
-      // Pass collection items if available
-      const items = collection?.items?.filter(item => item.isActive).map(item => ({
-        id: item.menuItem.id,
-        name: item.menuItem.name,
-        price: item.menuItem.price,
-        category: item.menuItem.category,
-        description: item.menuItem.description,
-        imageUrl: item.menuItem.imageUrl || '',
-        isHidden: false,
-        customPrice: item.customPrice,
-        customDiscount: item.customDiscount,
-        discountAmount: null,
-        useGlobalDiscount: !item.customPrice && !item.customDiscount
-      })) || [];
-      onCollectionSelect(collectionId, items);
-    }
     setIsOpen(false);
     setSearchTerm('');
   };
 
   const handleClearSelection = () => {
     dispatch({ type: 'SET_MENU_COLLECTION', collectionId: null });
-    if (onCollectionSelect) {
-      onCollectionSelect(null, []);
-    }
+    // Items will be cleared via useEffect
   };
 
   if (isLoading) {

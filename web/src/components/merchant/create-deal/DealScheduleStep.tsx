@@ -222,13 +222,37 @@ export const DealScheduleStep = () => {
     return true;
   };
 
+  const handleNext = () => {
+    // For REDEEM_NOW deals, skip location, instructions, advanced and go directly to review
+    if (state.dealType === 'REDEEM_NOW') {
+      // Set default values if not already set
+      if (!state.storeIds && !state.cityIds) {
+        // Apply to all stores/cities by default
+        dispatch({ type: 'UPDATE_FIELD', field: 'storeIds', value: null });
+        dispatch({ type: 'UPDATE_FIELD', field: 'cityIds', value: null });
+      }
+      navigate('/merchant/deals/create/review');
+    } else {
+      navigate('/merchant/deals/create/location');
+    }
+  };
+
+  const handleBack = () => {
+    // For REDEEM_NOW deals, go back to menu
+    if (state.dealType === 'REDEEM_NOW') {
+      navigate('/merchant/deals/create/menu');
+    } else {
+      navigate('/merchant/deals/create/images');
+    }
+  };
+
   return (
     <OnboardingStepLayout
       title="When will your deal be available?"
-      onNext={() => navigate('/merchant/deals/create/location')}
-      onBack={() => navigate('/merchant/deals/create/images')}
+      onNext={handleNext}
+      onBack={handleBack}
       isNextDisabled={!isDateValid() || exceeds24Hours}
-      progress={65}
+      progress={state.dealType === 'REDEEM_NOW' ? 80 : 65}
     >
       <div className="space-y-8">
         {/* Quick Options */}

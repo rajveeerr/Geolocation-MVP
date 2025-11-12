@@ -204,20 +204,20 @@ export const DealReviewStep = () => {
       }
 
       if (state.dealType === 'REDEEM_NOW') {
-        if (!state.discountPercentage) {
+        // Redeem Now deals are fixed at 50% off
+        if (!state.discountPercentage || state.discountPercentage !== 50) {
           toast({
             title: 'Error',
-            description: 'Discount percentage is required for Redeem Now deals.',
+            description: 'Redeem Now deals must have exactly 50% discount.',
             variant: 'destructive',
           });
           return;
         }
-        const validPresets = [15, 30, 45, 50, 75];
-        const discount = state.discountPercentage;
-        if (!validPresets.includes(discount) && (discount < 1 || discount > 100)) {
+        // Validate minimum order amount is required
+        if (!state.minOrderAmount || state.minOrderAmount <= 0) {
           toast({
             title: 'Error',
-            description: 'Redeem Now deals must use preset discounts (15%, 30%, 45%, 50%, 75%) or custom (1-100%).',
+            description: 'Minimum order amount is required for Redeem Now deals.',
             variant: 'destructive',
           });
           return;
@@ -406,7 +406,14 @@ export const DealReviewStep = () => {
     <OnboardingStepLayout
       title="Ready to publish?"
       onNext={handlePublish}
-      onBack={() => navigate('/merchant/deals/create/instructions')}
+      onBack={() => {
+        // For REDEEM_NOW deals, go back to schedule
+        if (state.dealType === 'REDEEM_NOW') {
+          navigate('/merchant/deals/create/schedule');
+        } else {
+          navigate('/merchant/deals/create/instructions');
+        }
+      }}
       progress={100}
       nextButtonText="Publish Deal"
       isNextDisabled={isPublishing}
@@ -521,24 +528,44 @@ export const DealReviewStep = () => {
           {/* Offer Details */}
           <div className="rounded-lg border bg-white p-4">
             <h3 className="mb-4 font-semibold text-neutral-900">Offer Details</h3>
-            <ReviewItem
-              label="Offer"
-              value={
-                state.discountPercentage
-                  ? `${state.discountPercentage}% off`
-                  : state.discountAmount
-                    ? `$${state.discountAmount} off`
-                    : state.customOfferDisplay
-                      ? state.customOfferDisplay
-                      : 'Not set'
-              }
-            />
+            
+            {/* Special display for REDEEM_NOW deals */}
+            {state.dealType === 'REDEEM_NOW' && state.minOrderAmount && state.discountPercentage ? (
+              <div className="mb-4 rounded-xl border-2 border-brand-primary-200 bg-gradient-to-br from-brand-primary-50 to-white p-5 text-center">
+                <div className="text-2xl font-bold bg-gradient-to-br from-brand-primary-500 to-brand-primary-600 bg-clip-text text-transparent mb-1">
+                  Spend ${state.minOrderAmount.toFixed(2)}
+                </div>
+                <div className="text-lg font-semibold text-neutral-700">
+                  Get {state.discountPercentage}% OFF
+                </div>
+                <p className="text-sm text-neutral-500 mt-2">
+                  Customers must spend ${state.minOrderAmount.toFixed(2)} to unlock this discount
+                </p>
+              </div>
+            ) : (
+              <ReviewItem
+                label="Offer"
+                value={
+                  state.discountPercentage
+                    ? `${state.discountPercentage}% off`
+                    : state.discountAmount
+                      ? `$${state.discountAmount} off`
+                      : state.customOfferDisplay
+                        ? state.customOfferDisplay
+                        : 'Not set'
+                }
+              />
+            )}
+            
             {state.offerTerms && (
               <ReviewItem label="Terms & Conditions" value={state.offerTerms} />
             )}
-            {state.minOrderAmount && (
+            
+            {/* Show minOrderAmount for non-REDEEM_NOW deals or as additional info */}
+            {state.dealType !== 'REDEEM_NOW' && state.minOrderAmount && (
               <ReviewItem label="Minimum Order" value={`$${state.minOrderAmount}`} />
             )}
+            
             {state.maxRedemptions !== null && (
               <ReviewItem 
                 label="Max Redemptions" 

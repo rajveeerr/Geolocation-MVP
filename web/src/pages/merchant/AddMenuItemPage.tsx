@@ -8,6 +8,8 @@ import { cn } from '@/lib/utils';
 import MenuItemCard from '@/components/common/MenuItemCard';
 import { useMerchantMenu, type MenuItem as APIMenuItem } from '@/hooks/useMerchantMenu';
 import { useToast } from '@/hooks/use-toast';
+import { HappyHourItemDiscountEditor } from '@/components/merchant/create-deal/HappyHourItemDiscountEditor';
+import { AnimatePresence } from 'framer-motion';
 
 // Using shared MenuItemCard component for consistent premium UI
 
@@ -16,6 +18,7 @@ export const AddMenuItemPage = () => {
   const { state, dispatch } = useHappyHour();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'Bites' | 'Drinks' | 'All'>('All');
+  const [editingItemId, setEditingItemId] = useState<number | null>(null);
   
   // Fetch menu items from API
   const { data: menuData, isLoading, error } = useMerchantMenu();
@@ -67,19 +70,28 @@ export const AddMenuItemPage = () => {
       return;
     }
 
+    // Check if item is already selected
     const exists = state.selectedMenuItems.some((s) => s.id === item.id);
-    const newSelected: SelectedMenuItem[] = exists
-      ? state.selectedMenuItems.filter((s) => s.id !== item.id)
-      : [...state.selectedMenuItems, { 
-          ...item, 
-          isHidden: false,
-          useGlobalDiscount: true, // Default to using global discount
-          customPrice: null,
-          customDiscount: null,
-          discountAmount: null,
-        }];
-
-    dispatch({ type: 'SET_SELECTED_ITEMS', payload: newSelected });
+    
+    if (exists) {
+      // If already selected, remove it
+      const newSelected = state.selectedMenuItems.filter((s) => s.id !== item.id);
+      dispatch({ type: 'SET_SELECTED_ITEMS', payload: newSelected });
+    } else {
+      // If not selected, add it and immediately show discount popup
+      const newItem: SelectedMenuItem = { 
+        ...item, 
+        isHidden: false,
+        useGlobalDiscount: true, // Default to using global discount
+        customPrice: null,
+        customDiscount: null,
+        discountAmount: null,
+      };
+      const newSelected = [...state.selectedMenuItems, newItem];
+      dispatch({ type: 'SET_SELECTED_ITEMS', payload: newSelected });
+      // Show discount popup immediately
+      setEditingItemId(item.id);
+    }
   };
 
   const handleDone = () => navigate(-1);
@@ -184,6 +196,22 @@ export const AddMenuItemPage = () => {
           </Button>
         </div>
       </footer>
+
+      {/* Discount Editor Modal */}
+      <AnimatePresence>
+        {editingItemId !== null && (() => {
+          const item = state.selectedMenuItems.find(i => i.id === editingItemId);
+          if (!item) return null;
+          return (
+            <HappyHourItemDiscountEditor
+              item={item}
+              globalDiscountPercentage={state.discountPercentage}
+              globalDiscountAmount={state.discountAmount}
+              onClose={() => setEditingItemId(null)}
+            />
+          );
+        })()}
+      </AnimatePresence>
     </div>
   );
 };
