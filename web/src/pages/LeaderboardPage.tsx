@@ -12,7 +12,7 @@ import { StreakLeaderboardTable } from '@/components/gamification/streak/StreakL
 import { HeistActionButton } from '@/components/heist/HeistActionButton';
 import { HeistSuccessAnimation } from '@/components/heist/HeistSuccessAnimation';
 import { useQueryClient } from '@tanstack/react-query';
-import { useUserActivity } from '@/hooks/useUserActivity';
+import { useUserActivity, type UserActivity, type UserActivityResponse } from '@/hooks/useUserActivity';
 import { useNavigate } from 'react-router-dom';
 import { PATHS } from '@/routing/paths';
 import { Button } from '@/components/common/Button';
@@ -112,7 +112,6 @@ const LeaderboardContent = () => {
         <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-brand-primary-200 mb-4">
           <div className="flex items-start justify-between gap-4 mb-2">
             <div className="flex items-center gap-2">
-              <Trophy className="h-7 w-7 text-yellow-500 fill-yellow-400" />
               <h2 className="text-3xl font-bold text-brand-primary-700">
                 This Month's Leaderboard
               </h2>
@@ -127,12 +126,6 @@ const LeaderboardContent = () => {
               Item Shop
             </Button>
           </div>
-          <p className="text-neutral-600 mb-3 leading-relaxed">
-            The leaderboard showcases users who checked in the most this month.
-            Earn points by visiting merchants and checking in at their deals — your
-            points update on your profile and you'll move up the leaderboard. Top
-            performers may receive special rewards from participating merchants.
-          </p>
           
           {/* Active Items Display */}
           <div className="bg-brand-primary-50 rounded-lg border-2 border-brand-primary-200 p-3">
@@ -152,7 +145,7 @@ const LeaderboardContent = () => {
                 userId: user.userId,
                 rank: user.rank,
                 name: isCurrentUserRow ? 'You' : user.name,
-                points: user.points || user.periodPoints || 0,
+                points: user.points ?? user.periodPoints ?? 0,
                 isCurrentUser: isCurrentUserRow,
               }}
               pointBreakdown={userBreakdown}
@@ -201,6 +194,9 @@ const LeaderboardRow = ({
     10,
     0
   );
+
+  // Type-safe access to activities with proper type assertion
+  const activities = (activityData as UserActivityResponse)?.activities || [];
 
   const rankIcon =
     user.rank === 1 ? (
@@ -382,9 +378,9 @@ const LeaderboardRow = ({
                         <div key={i} className="h-10 bg-neutral-200 animate-pulse rounded-md" />
                       ))}
                     </div>
-                  ) : activityData && activityData.activities.length > 0 ? (
+                  ) : activities.length > 0 ? (
                     <div className="space-y-2">
-                      {activityData.activities.map((activity) => (
+                      {activities.map((activity: UserActivity) => (
                         <div key={activity.id} className="flex items-center justify-between text-sm p-2 rounded-md bg-neutral-50">
                           <div className="flex items-center gap-2">
                             {getActivityIcon(activity.type)}
