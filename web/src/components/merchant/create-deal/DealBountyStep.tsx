@@ -46,7 +46,11 @@ export const DealBountyStep = () => {
       onNext={() => {
         // Auto-enable kickback for bounty deals
         dispatch({ type: 'UPDATE_FIELD', field: 'kickbackEnabled', value: true });
-        navigate('/merchant/deals/create/basics');
+        // Ensure deal type is set
+        if (state.dealType !== 'BOUNTY') {
+          dispatch({ type: 'UPDATE_FIELD', field: 'dealType', value: 'BOUNTY' });
+        }
+        navigate('/merchant/deals/create/bounty/basics');
       }}
       onBack={() => navigate('/merchant/deals/create/type')}
       isNextDisabled={!canProceed}

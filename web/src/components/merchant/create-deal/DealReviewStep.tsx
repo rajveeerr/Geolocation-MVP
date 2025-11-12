@@ -8,11 +8,12 @@ import { useToast } from '@/hooks/use-toast';
 import { PATHS } from '@/routing/paths';
 import { useCountdown } from '@/hooks/useCountdown';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
-import { Sparkles, Trophy, EyeOff, MapPin, Building2, Clock, X } from 'lucide-react';
+import { Sparkles, Trophy, EyeOff, MapPin, Clock, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { mapDealTypeToBackend } from '@/utils/dealTypeUtils';
 import { BountyQRCodeDisplay } from './BountyQRCodeDisplay';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/common/Button';
 
 const ReviewItem = ({
   label,
@@ -145,7 +146,8 @@ export const DealReviewStep = () => {
         return;
       }
 
-      if (!state.discountPercentage && !state.discountAmount && !state.customOfferDisplay) {
+      // Bounty deals don't require discount fields - they have bounty rewards instead
+      if (state.dealType !== 'BOUNTY' && !state.discountPercentage && !state.discountAmount && !state.customOfferDisplay) {
         toast({
           title: 'Error',
           description: 'Please specify either a discount percentage, discount amount, or custom offer display.',
@@ -315,25 +317,51 @@ export const DealReviewStep = () => {
           let startDate: Date;
           let endDate: Date;
           
-          if (state.activeStartDate) {
-            startDate = new Date(state.activeStartDate);
-            startDate.setHours(0, 0, 0, 0);
-          } else if (state.startTime) {
-            startDate = new Date(state.startTime);
+          // For bounty deals, prioritize startTime/endTime (datetime-local inputs)
+          // For other deals, prioritize activeStartDate/activeEndDate (date inputs)
+          if (state.dealType === 'BOUNTY') {
+            if (state.startTime) {
+              startDate = new Date(state.startTime);
+            } else if (state.activeStartDate) {
+              startDate = new Date(state.activeStartDate);
+              startDate.setHours(0, 0, 0, 0);
+            } else {
+              startDate = new Date();
+              startDate.setHours(0, 0, 0, 0);
+            }
+            
+            if (state.endTime) {
+              endDate = new Date(state.endTime);
+            } else if (state.activeEndDate) {
+              endDate = new Date(state.activeEndDate);
+              endDate.setHours(23, 59, 59, 999);
+            } else {
+              endDate = new Date(startDate);
+              endDate.setDate(endDate.getDate() + 30); // Default 30 days
+              endDate.setHours(23, 59, 59, 999);
+            }
           } else {
-            startDate = new Date();
-            startDate.setHours(0, 0, 0, 0);
-          }
-          
-          if (state.activeEndDate) {
-            endDate = new Date(state.activeEndDate);
-            endDate.setHours(23, 59, 59, 999);
-          } else if (state.endTime) {
-            endDate = new Date(state.endTime);
-          } else {
-            endDate = new Date(startDate);
-            endDate.setDate(endDate.getDate() + 30); // Default 30 days
-            endDate.setHours(23, 59, 59, 999);
+            // For non-bounty deals, use date inputs
+            if (state.activeStartDate) {
+              startDate = new Date(state.activeStartDate);
+              startDate.setHours(0, 0, 0, 0);
+            } else if (state.startTime) {
+              startDate = new Date(state.startTime);
+            } else {
+              startDate = new Date();
+              startDate.setHours(0, 0, 0, 0);
+            }
+            
+            if (state.activeEndDate) {
+              endDate = new Date(state.activeEndDate);
+              endDate.setHours(23, 59, 59, 999);
+            } else if (state.endTime) {
+              endDate = new Date(state.endTime);
+            } else {
+              endDate = new Date(startDate);
+              endDate.setDate(endDate.getDate() + 30); // Default 30 days
+              endDate.setHours(23, 59, 59, 999);
+            }
           }
           
           // Validate dates
@@ -362,6 +390,69 @@ export const DealReviewStep = () => {
       // Final validation before creating payload - CRITICAL: Check state right before API call
       // Store normalized recurringDays for use in payload
       let validatedRecurringDays: string[] | undefined = undefined;
+      
+      if (state.dealType === 'BOUNTY') {
+        // Validate bounty-specific required fields
+        if (!state.title || state.title.trim().length < 3) {
+          toast({
+            title: 'Error',
+            description: 'Deal title is required and must be at least 3 characters.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (!state.bountyRewardAmount || state.bountyRewardAmount <= 0) {
+          toast({
+            title: 'Error',
+            description: 'Bounty reward amount is required and must be greater than $0.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (!state.minReferralsRequired || state.minReferralsRequired < 1) {
+          toast({
+            title: 'Error',
+            description: 'Minimum referrals required must be at least 1.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (!state.activeStartDate || !state.activeEndDate) {
+          toast({
+            title: 'Error',
+            description: 'Please set both start and end dates for your bounty deal.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        // Validate date range
+        try {
+          const startDate = new Date(state.activeStartDate);
+          const endDate = new Date(state.activeEndDate);
+          if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            throw new Error('Invalid dates');
+          }
+          if (endDate <= startDate) {
+            toast({
+              title: 'Error',
+              description: 'End date must be after start date.',
+              variant: 'destructive',
+            });
+            return;
+          }
+        } catch (error) {
+          toast({
+            title: 'Error',
+            description: 'Invalid date range. Please check your start and end dates.',
+            variant: 'destructive',
+          });
+          return;
+        }
+      }
       
       if (state.dealType === 'RECURRING') {
         // Log state for debugging in development
@@ -689,8 +780,10 @@ export const DealReviewStep = () => {
       title="Ready to publish?"
       onNext={handlePublish}
       onBack={() => {
-        // For REDEEM_NOW deals, go back to schedule
-        if (state.dealType === 'REDEEM_NOW') {
+        // Check deal type and navigate back accordingly
+        if (state.dealType === 'BOUNTY') {
+          navigate('/merchant/deals/create/bounty/images');
+        } else if (state.dealType === 'REDEEM_NOW') {
           navigate('/merchant/deals/create/schedule');
         } else if (state.dealType === 'RECURRING') {
           // Daily Deal goes back to config step
@@ -1165,7 +1258,7 @@ export const DealReviewStep = () => {
                   Go to Dashboard
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   size="lg"
                   onClick={() => setShowQRModal(false)}
                 >

@@ -332,8 +332,10 @@ export const DealMenuStep = () => {
   };
 
   const handleNext = () => {
-    // For REDEEM_NOW deals, skip offer step and go directly to schedule
-    if (state.dealType === 'REDEEM_NOW') {
+    // Check deal type and navigate accordingly
+    if (state.dealType === 'BOUNTY') {
+      navigate('/merchant/deals/create/bounty/schedule');
+    } else if (state.dealType === 'REDEEM_NOW') {
       navigate('/merchant/deals/create/schedule');
     } else {
       navigate('/merchant/deals/create/offer');
@@ -341,8 +343,10 @@ export const DealMenuStep = () => {
   };
 
   const handleBack = () => {
-    // For REDEEM_NOW deals, go back to redeem-now step
-    if (state.dealType === 'REDEEM_NOW') {
+    // Check deal type and navigate accordingly
+    if (state.dealType === 'BOUNTY') {
+      navigate('/merchant/deals/create/bounty/basics');
+    } else if (state.dealType === 'REDEEM_NOW') {
       navigate('/merchant/deals/create/redeem-now');
     } else {
       navigate('/merchant/deals/create/basics');
@@ -357,7 +361,7 @@ export const DealMenuStep = () => {
         onNext={handleNext}
         onBack={handleBack}
         isNextDisabled={false}
-        progress={35}
+        progress={state.dealType === 'BOUNTY' ? 40 : 35}
       >
         <div className="space-y-4">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -376,7 +380,7 @@ export const DealMenuStep = () => {
         onNext={handleNext}
         onBack={handleBack}
         isNextDisabled={false}
-        progress={35}
+        progress={state.dealType === 'BOUNTY' ? 40 : 35}
       >
         <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
           <Utensils className="mx-auto mb-4 h-12 w-12 text-red-500" />
@@ -404,11 +408,13 @@ export const DealMenuStep = () => {
       onNext={handleNext}
       onBack={handleBack}
       isNextDisabled={
+        // Menu is optional for bounty deals
+        state.dealType === 'BOUNTY' ? false :
         !useCollection 
           ? selectedMenuItems.length === 0 
           : !selectedCollectionId
       }
-      progress={40}
+      progress={state.dealType === 'BOUNTY' ? 40 : 40}
     >
       <div className="space-y-6">
         {/* Hidden Deal Warning */}
