@@ -44,6 +44,11 @@ const CreateDealPage = React.lazy(() =>
     default: m.CreateDealPage,
   })),
 );
+const DealEditPage = React.lazy(() =>
+  import('./pages/merchant/DealEditPage').then((m) => ({
+    default: m.DealEditPage,
+  })),
+);
 const EnhancedDealDetailPage = React.lazy(() =>
   import('./pages/EnhancedDealDetailPage').then((m) => ({ default: m.EnhancedDealDetailPage })),
 );
@@ -324,6 +329,18 @@ function App() {
                     <MerchantLayout>
                       <Suspense fallback={<LoadingOverlay />}>
                         <CreateDealPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/merchant/deals/:dealId/edit"
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <DealEditPage />
                       </Suspense>
                     </MerchantLayout>
                   </ProtectedRoute>

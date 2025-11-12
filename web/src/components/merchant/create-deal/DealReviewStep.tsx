@@ -359,8 +359,23 @@ export const DealReviewStep = () => {
         return;
       }
       
-      // Final validation before creating payload
+      // Final validation before creating payload - CRITICAL: Check state right before API call
+      // Store normalized recurringDays for use in payload
+      let validatedRecurringDays: string[] | undefined = undefined;
+      
       if (state.dealType === 'RECURRING') {
+        // Log state for debugging in development
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Final validation - RECURRING deal state:', {
+            dealType: state.dealType,
+            recurringDays: state.recurringDays,
+            recurringDaysType: typeof state.recurringDays,
+            isArray: Array.isArray(state.recurringDays),
+            length: Array.isArray(state.recurringDays) ? state.recurringDays.length : 'N/A',
+            stringified: JSON.stringify(state.recurringDays),
+          });
+        }
+        
         // Double-check all required fields
         if (!state.title || state.title.trim().length < 3) {
           toast({
@@ -371,13 +386,25 @@ export const DealReviewStep = () => {
           return;
         }
         
-        if (!Array.isArray(state.recurringDays) || state.recurringDays.length === 0) {
+        // CRITICAL: Ensure recurringDays is an array and not empty
+        const recurringDaysArray = Array.isArray(state.recurringDays) 
+          ? state.recurringDays 
+          : (typeof state.recurringDays === 'string' ? [state.recurringDays] : []);
+        
+        if (recurringDaysArray.length === 0) {
           toast({
             title: 'Error',
-            description: 'Please select at least one weekday for your daily deal.',
+            description: 'Please select at least one weekday for your daily deal. Go back to the weekday selection step to choose days.',
             variant: 'destructive',
           });
           return;
+        }
+        
+        // Normalize and store for payload - backend expects uppercase: ['MONDAY', 'FRIDAY', 'SUNDAY']
+        validatedRecurringDays = recurringDaysArray.map(day => String(day).trim().toUpperCase());
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Validated and normalized recurringDays for payload:', validatedRecurringDays);
         }
         
         if (!state.recurringFrequency) {
@@ -427,9 +454,37 @@ export const DealReviewStep = () => {
         dealType: mapDealTypeToBackend(state.dealType),
         category: state.category ?? 'FOOD_AND_BEVERAGE',
         // For RECURRING deals, always send recurringDays as array (validation ensures it's not empty)
-        recurringDays: state.dealType === 'RECURRING' && Array.isArray(state.recurringDays) && state.recurringDays.length > 0
-          ? state.recurringDays
-          : (state.dealType === 'RECURRING' ? [] : undefined),
+        // CRITICAL: Backend expects array of uppercase day names: ['MONDAY', 'FRIDAY', 'SUNDAY']
+        // Use the validated and normalized array from validation above
+        // FALLBACK: If somehow validatedRecurringDays is undefined, try to get it from state directly
+        recurringDays: (() => {
+          if (state.dealType !== 'RECURRING') {
+            return undefined; // Don't send for non-RECURRING deals
+          }
+          
+          // Use validated array if available
+          if (validatedRecurringDays && validatedRecurringDays.length > 0) {
+            return validatedRecurringDays;
+          }
+          
+          // Fallback: normalize from state directly (shouldn't happen, but safety net)
+          const daysArray = Array.isArray(state.recurringDays) 
+            ? state.recurringDays 
+            : (typeof state.recurringDays === 'string' ? [state.recurringDays] : []);
+          
+          if (daysArray.length === 0) {
+            console.error('CRITICAL: recurringDays is empty after all validation!', {
+              state: state.recurringDays,
+              validated: validatedRecurringDays,
+              dealType: state.dealType,
+            });
+            // This should never happen due to validation above, but send empty array
+            // Backend will catch it and return proper error
+            return [];
+          }
+          
+          return daysArray.map(day => String(day).trim().toUpperCase());
+        })(),
         // Backend expects activeDateRange with startDate and endDate
         activeDateRange,
         redemptionInstructions: state.redemptionInstructions,
@@ -461,9 +516,6 @@ export const DealReviewStep = () => {
           : undefined,
         // Hidden Deal fields
         accessCode: state.dealType === 'HIDDEN' ? (state.accessCode || undefined) : undefined,
-        // Advanced scheduling
-        validDaysOfWeek: state.validDaysOfWeek || null,
-        validHours: state.validHours || null,
         // Menu items if any - format for API
         menuItems: state.selectedMenuItems?.length > 0 
           ? state.selectedMenuItems.map(item => ({
@@ -478,7 +530,68 @@ export const DealReviewStep = () => {
         menuCollectionId: state.useMenuCollection && state.menuCollectionId ? state.menuCollectionId : undefined,
       };
 
-      console.log('API Payload:', payload);
+      // CRITICAL: Final check - Ensure recurringDays is sent for RECURRING deals
+      if (state.dealType === 'RECURRING') {
+        // Double-check that recurringDays is in the payload
+        if (!payload.recurringDays) {
+          console.error('ERROR: recurringDays is missing in payload!', {
+            stateRecurringDays: state.recurringDays,
+            payloadRecurringDays: payload.recurringDays,
+            validatedRecurringDays,
+            dealType: payload.dealType,
+            stateDealType: state.dealType,
+            fullPayload: payload,
+          });
+          toast({
+            title: 'Error',
+            description: 'Weekday selection is missing. Please go back to select weekdays.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (Array.isArray(payload.recurringDays) && payload.recurringDays.length === 0) {
+          console.error('ERROR: recurringDays is empty array in payload!', {
+            stateRecurringDays: state.recurringDays,
+            payloadRecurringDays: payload.recurringDays,
+            validatedRecurringDays,
+            dealType: payload.dealType,
+          });
+          toast({
+            title: 'Error',
+            description: 'Weekday selection is empty. Please go back to select weekdays.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        // Ensure it's an array (not a string or other type)
+        if (!Array.isArray(payload.recurringDays)) {
+          console.error('ERROR: recurringDays is not an array in payload!', {
+            type: typeof payload.recurringDays,
+            value: payload.recurringDays,
+          });
+          // Convert to array if it's a string
+          if (typeof payload.recurringDays === 'string') {
+            payload.recurringDays = [payload.recurringDays];
+          } else {
+            toast({
+              title: 'Error',
+              description: 'Invalid weekday format. Please go back to select weekdays.',
+              variant: 'destructive',
+            });
+            return;
+          }
+        }
+      }
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log('API Payload:', JSON.stringify(payload, null, 2));
+        console.log('Payload recurringDays:', payload.recurringDays);
+        console.log('Payload recurringDays type:', typeof payload.recurringDays);
+        console.log('Payload recurringDays isArray:', Array.isArray(payload.recurringDays));
+        console.log('Payload dealType:', payload.dealType);
+      }
 
       // 2. Make the API call
       const response = await apiPost('/deals', payload);

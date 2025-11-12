@@ -350,12 +350,6 @@ const MerchantMyDealsContent = () => {
                 Create New Deal
               </Button>
             </Link>
-            <Link to={PATHS.MERCHANT_HAPPY_HOUR_CREATE}>
-              <Button size="lg" variant="outline" className="rounded-lg w-full sm:w-auto">
-                <ClockIcon className="mr-2 h-4 w-4" />
-                Quick Happy Hour
-              </Button>
-            </Link>
           </div>
         </div>
       </div>
