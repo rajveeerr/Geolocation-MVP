@@ -91,6 +91,9 @@ const HeistHistoryPage = React.lazy(() =>
 const HeistNotificationsPage = React.lazy(() =>
   import('./pages/HeistNotificationsPage').then((m) => ({ default: m.HeistNotificationsPage })),
 );
+const HeistItemShopPage = React.lazy(() =>
+  import('./pages/HeistItemShopPage').then((m) => ({ default: m.HeistItemShopPage })),
+);
 const KickbackEarningsPage = React.lazy(() =>
   import('./pages/merchant/KickbackEarningsPage').then((m) => ({ default: m.KickbackEarningsPage })),
 );
@@ -237,6 +240,16 @@ function App() {
                     <ProtectedRoute>
                       <Suspense fallback={<LoadingOverlay />}>
                         <HeistNotificationsPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.HEIST_ITEM_SHOP}
+                  element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <HeistItemShopPage />
                       </Suspense>
                     </ProtectedRoute>
                   }
