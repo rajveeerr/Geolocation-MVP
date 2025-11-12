@@ -39,11 +39,11 @@ export const LeaderboardPage = () => {
           
           <div className="relative">
             <div className="flex items-center justify-center gap-3 mb-2">
-              <Crown className="h-10 w-10 text-yellow-500 fill-yellow-400 animate-bounce" />
+
               <h1 className="text-5xl font-bold text-brand-primary-700">
                 Grow your influence
               </h1>
-              <Award className="h-10 w-10 text-yellow-500 fill-yellow-400 animate-bounce" style={{ animationDelay: '0.2s' }} />
+              
             </div>
             <p className="mt-2 text-neutral-700 max-w-md mx-auto font-medium">
               You deserve an experience that does it all. Climb the ranks or discover your next favorite spot.
