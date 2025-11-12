@@ -266,11 +266,6 @@ export const MerchantDashboardPage = () => {
                 View Analytics
               </Button>
             </Link>
-            <Link to={PATHS.MERCHANT_DEALS_CREATE}>
-              <Button size="lg" className="rounded-lg">
-                Create New Deal
-              </Button>
-            </Link>
           </div>
         )}
       </div>

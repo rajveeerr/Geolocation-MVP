@@ -235,10 +235,73 @@ export const DealReviewStep = () => {
       }
 
       if (state.dealType === 'RECURRING') {
+        // Ensure recurringDays is an array
+        if (!Array.isArray(state.recurringDays)) {
+          toast({
+            title: 'Error',
+            description: 'Invalid weekday selection. Please go back to the weekday selection step and try again.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log('RECURRING Deal - Checking recurringDays:', {
+            recurringDays: state.recurringDays,
+            length: state.recurringDays?.length,
+            type: typeof state.recurringDays,
+            isArray: Array.isArray(state.recurringDays),
+          });
+        }
+        
         if (!state.recurringDays || state.recurringDays.length === 0) {
           toast({
             title: 'Error',
-            description: 'Please select at least one day for recurring deals.',
+            description: 'Please select at least one day for recurring deals. Go back to the weekday selection step to choose days.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        // Validate frequency for RECURRING deals
+        if (!state.recurringFrequency) {
+          toast({
+            title: 'Error',
+            description: 'Please select a frequency (week/month/year) for your daily deal.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        // Validate date range for RECURRING deals
+        if (!state.activeStartDate || !state.activeEndDate) {
+          toast({
+            title: 'Error',
+            description: 'Please set both start and end dates for your daily deal.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        // Validate end date is after start date
+        try {
+          const startDate = new Date(state.activeStartDate);
+          const endDate = new Date(state.activeEndDate);
+          if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            throw new Error('Invalid dates');
+          }
+          if (endDate <= startDate) {
+            toast({
+              title: 'Error',
+              description: 'End date must be after start date.',
+              variant: 'destructive',
+            });
+            return;
+          }
+        } catch (error) {
+          toast({
+            title: 'Error',
+            description: 'Invalid date range. Please check your start and end dates.',
             variant: 'destructive',
           });
           return;
@@ -246,24 +309,129 @@ export const DealReviewStep = () => {
       }
 
       // 1. Prepare comprehensive payload for the API
+      let activeDateRange;
+      try {
+        activeDateRange = (() => {
+          let startDate: Date;
+          let endDate: Date;
+          
+          if (state.activeStartDate) {
+            startDate = new Date(state.activeStartDate);
+            startDate.setHours(0, 0, 0, 0);
+          } else if (state.startTime) {
+            startDate = new Date(state.startTime);
+          } else {
+            startDate = new Date();
+            startDate.setHours(0, 0, 0, 0);
+          }
+          
+          if (state.activeEndDate) {
+            endDate = new Date(state.activeEndDate);
+            endDate.setHours(23, 59, 59, 999);
+          } else if (state.endTime) {
+            endDate = new Date(state.endTime);
+          } else {
+            endDate = new Date(startDate);
+            endDate.setDate(endDate.getDate() + 30); // Default 30 days
+            endDate.setHours(23, 59, 59, 999);
+          }
+          
+          // Validate dates
+          if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            throw new Error('Invalid date range');
+          }
+          
+          if (endDate <= startDate) {
+            throw new Error('End date must be after start date');
+          }
+          
+          return {
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
+          };
+        })();
+      } catch (error) {
+        toast({
+          title: 'Error',
+          description: error instanceof Error ? error.message : 'Invalid date range. Please check your dates.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
+      // Final validation before creating payload
+      if (state.dealType === 'RECURRING') {
+        // Double-check all required fields
+        if (!state.title || state.title.trim().length < 3) {
+          toast({
+            title: 'Error',
+            description: 'Deal title is required and must be at least 3 characters.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (!Array.isArray(state.recurringDays) || state.recurringDays.length === 0) {
+          toast({
+            title: 'Error',
+            description: 'Please select at least one weekday for your daily deal.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (!state.recurringFrequency) {
+          toast({
+            title: 'Error',
+            description: 'Please select a frequency (week/month/year) for your daily deal.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (!state.activeStartDate || !state.activeEndDate) {
+          toast({
+            title: 'Error',
+            description: 'Please set both start and end dates for your daily deal.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if ((!state.selectedMenuItems || state.selectedMenuItems.length === 0) && !state.menuCollectionId) {
+          toast({
+            title: 'Error',
+            description: 'Please select at least one menu item or collection for your deal.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (!state.discountPercentage && !state.discountAmount && !state.customOfferDisplay) {
+          toast({
+            title: 'Error',
+            description: 'Please set a discount percentage, amount, or custom offer.',
+            variant: 'destructive',
+          });
+          return;
+        }
+      }
+      
       const payload = {
-        title: state.title,
-        description: state.description,
+        title: state.title.trim(),
+        description: state.description || '',
         // Send whatever discount fields the merchant provided
         discountPercentage: state.discountPercentage ?? null,
         discountAmount: state.discountAmount ?? null,
         // Map deal type to backend format
         dealType: mapDealTypeToBackend(state.dealType),
         category: state.category ?? 'FOOD_AND_BEVERAGE',
-        recurringDays: state.recurringDays?.length
+        // For RECURRING deals, always send recurringDays as array (validation ensures it's not empty)
+        recurringDays: state.dealType === 'RECURRING' && Array.isArray(state.recurringDays) && state.recurringDays.length > 0
           ? state.recurringDays
-          : undefined,
+          : (state.dealType === 'RECURRING' ? [] : undefined),
         // Backend expects activeDateRange with startDate and endDate
-        // For Daily Deal, use activeStartDate/activeEndDate if available, otherwise fall back to startTime/endTime
-        activeDateRange: {
-          startDate: (state.activeStartDate ? new Date(state.activeStartDate) : new Date(state.startTime)).toISOString(),
-          endDate: (state.activeEndDate ? new Date(state.activeEndDate) : new Date(state.endTime)).toISOString(),
-        },
+        activeDateRange,
         redemptionInstructions: state.redemptionInstructions,
         // Enhanced fields
         imageUrls: state.imageUrls || [],

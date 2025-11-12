@@ -29,9 +29,10 @@ export const DealDailyDealWeekdayStep = () => {
   }, [state.dealType, dispatch]);
 
   const handleToggleDay = (dayKey: string) => {
-    const updatedDays = state.recurringDays.includes(dayKey)
-      ? state.recurringDays.filter((d) => d !== dayKey)
-      : [...state.recurringDays, dayKey];
+    const currentDays = Array.isArray(state.recurringDays) ? state.recurringDays : [];
+    const updatedDays = currentDays.includes(dayKey)
+      ? currentDays.filter((d) => d !== dayKey)
+      : [...currentDays, dayKey];
     dispatch({
       type: 'UPDATE_FIELD',
       field: 'recurringDays',
@@ -39,7 +40,7 @@ export const DealDailyDealWeekdayStep = () => {
     });
   };
 
-  const canProceed = state.recurringDays.length > 0;
+  const canProceed = Array.isArray(state.recurringDays) && state.recurringDays.length > 0;
 
   return (
     <OnboardingStepLayout
@@ -85,7 +86,8 @@ export const DealDailyDealWeekdayStep = () => {
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
             {weekdays.map((day, index) => {
-              const isSelected = state.recurringDays.includes(day.key);
+              const currentDays = Array.isArray(state.recurringDays) ? state.recurringDays : [];
+              const isSelected = currentDays.includes(day.key);
               return (
                 <motion.button
                   key={day.key}
@@ -125,7 +127,7 @@ export const DealDailyDealWeekdayStep = () => {
           </div>
 
           {/* Selection Summary */}
-          {state.recurringDays.length > 0 && (
+          {Array.isArray(state.recurringDays) && state.recurringDays.length > 0 && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
@@ -144,7 +146,7 @@ export const DealDailyDealWeekdayStep = () => {
           )}
 
           {/* Validation Message */}
-          {state.recurringDays.length === 0 && (
+          {(!Array.isArray(state.recurringDays) || state.recurringDays.length === 0) && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
