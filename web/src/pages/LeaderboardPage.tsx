@@ -100,11 +100,21 @@ const LeaderboardContent = () => {
     return <div className="text-center py-20 text-status-expired">Failed to load leaderboard.</div>;
   }
   
-  let displayUsers = [...(leaderboardData?.top || [])];
+  const displayUsers = [...(leaderboardData?.top || [])];
   if (leaderboardData?.me && !leaderboardData.me.inTop) {
     displayUsers.push(leaderboardData.me);
   }
   displayUsers.sort((a, b) => a.rank - b.rank);
+
+  // Ensure ranks are properly set (1, 2, 3, ...) if backend doesn't provide them
+  displayUsers.forEach((user, index) => {
+    if (!user.rank || user.rank === 0) {
+      user.rank = index + 1;
+    }
+  });
+
+  // Debug: Log the ranks
+  console.log('Leaderboard users:', displayUsers.map(u => ({ name: u.name, rank: u.rank, points: u.points })));
 
   return (
     <div className="max-w-2xl mx-auto space-y-3 mt-6">
