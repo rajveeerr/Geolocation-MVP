@@ -76,6 +76,11 @@ const LeaderboardPage = React.lazy(() =>
     default: m.LeaderboardPage,
   })),
 );
+const ComprehensiveLeaderboardPage = React.lazy(() =>
+  import('./pages/ComprehensiveLeaderboardPage').then((m) => ({
+    default: m.ComprehensiveLeaderboardPage,
+  })),
+);
 const ReferralPage = React.lazy(() =>
   import('./pages/ReferralPage').then((m) => ({ default: m.ReferralPage })),
 );
@@ -190,6 +195,14 @@ function App() {
                   element={
                     <Suspense fallback={<LoadingOverlay />}>
                       <LeaderboardPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path={PATHS.LEADERBOARD_COMPREHENSIVE}
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <ComprehensiveLeaderboardPage />
                     </Suspense>
                   }
                 />

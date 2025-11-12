@@ -36,6 +36,7 @@ export const PATHS = {
   PROFILE_EDIT: '/profile/edit',
   SETTINGS: '/settings',
   LEADERBOARD: '/leaderboard',
+  LEADERBOARD_COMPREHENSIVE: '/leaderboard/comprehensive',
   STREAK_LEADERBOARD: '/streaks/leaderboard',
   GAMIFICATION: '/gamification',
   HEIST_HISTORY: '/heist/history',
