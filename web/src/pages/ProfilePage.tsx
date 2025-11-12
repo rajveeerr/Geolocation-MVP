@@ -26,6 +26,7 @@ import { StreakCard } from '@/components/gamification/streak/StreakCard';
 import { useStreak } from '@/hooks/useStreak';
 import { StreakDiscountBreakdown } from '@/components/gamification/streak/StreakDiscountBreakdown';
 import { LoyaltyWallet } from '@/components/gamification/loyalty/LoyaltyWallet';
+import { ActiveItemsBadge } from '@/components/heist/ActiveItemsBadge';
 
 export const ProfilePage = () => {
   const { user } = useAuth();
@@ -105,6 +106,13 @@ export const ProfilePage = () => {
                     {user.points.toLocaleString()}
                   </span>
                   <span className="text-sm text-amber-600">Points</span>
+                </div>
+              )}
+
+              {/* Active Heist Items */}
+              {!isMerchant && (
+                <div className="mt-3">
+                  <ActiveItemsBadge variant="detailed" />
                 </div>
               )}
             </div>

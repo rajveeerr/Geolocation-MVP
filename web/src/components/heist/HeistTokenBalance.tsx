@@ -1,10 +1,13 @@
 // Full Token Balance Display Component
 // Shows detailed token information
 
-import { Trophy, TrendingUp, TrendingDown, Gift } from 'lucide-react';
+import { Trophy, TrendingUp, TrendingDown, Gift, ShoppingBag } from 'lucide-react';
 import { useHeistTokens } from '@/hooks/useHeistTokens';
 import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
+import { PATHS } from '@/routing/paths';
+import { Button } from '@/components/common/Button';
 
 interface HeistTokenBalanceProps {
   onClose?: () => void;
@@ -12,6 +15,7 @@ interface HeistTokenBalanceProps {
 
 export function HeistTokenBalance({ onClose: _onClose }: HeistTokenBalanceProps) {
   const { data: tokens, isLoading } = useHeistTokens();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return (
@@ -122,6 +126,22 @@ export function HeistTokenBalance({ onClose: _onClose }: HeistTokenBalanceProps)
             <p className="text-sm text-neutral-500">No activity yet</p>
           </div>
         )}
+      </div>
+
+      {/* Item Shop Link */}
+      <div className="pt-4 border-t border-neutral-200">
+        <Button
+          variant="primary"
+          size="sm"
+          className="w-full"
+          onClick={() => navigate(PATHS.HEIST_ITEM_SHOP)}
+          icon={<ShoppingBag className="h-4 w-4" />}
+        >
+          Visit Item Shop
+        </Button>
+        <p className="text-xs text-neutral-500 text-center mt-2">
+          Purchase items to enhance your heists
+        </p>
       </div>
 
     </div>

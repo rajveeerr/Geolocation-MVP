@@ -1,10 +1,11 @@
 // Heist Confirmation Modal
 // Shows confirmation dialog before executing heist
 
-import { Trophy, AlertTriangle, X } from 'lucide-react';
+import { Trophy, AlertTriangle, X, Sword, Hammer, Shield } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useHeistTokens } from '@/hooks/useHeistTokens';
+import { useHeistInventory } from '@/hooks/useHeistItems';
 
 interface HeistConfirmModalProps {
   victimId: number;
@@ -25,7 +26,26 @@ export function HeistConfirmModal({
   isExecuting,
 }: HeistConfirmModalProps) {
   const { data: tokens } = useHeistTokens();
+  const { data: inventory } = useHeistInventory();
   const currentBalance = tokens?.balance || 0;
+
+  // Get active attacker items (Sword, Hammer)
+  const attackerItems = inventory?.filter(
+    (item) => item.type === 'SWORD' || item.type === 'HAMMER'
+  ) || [];
+
+  const getItemIcon = (type: string) => {
+    switch (type) {
+      case 'SWORD':
+        return <Sword className="h-4 w-4 text-red-600" />;
+      case 'HAMMER':
+        return <Hammer className="h-4 w-4 text-orange-600" />;
+      case 'SHIELD':
+        return <Shield className="h-4 w-4 text-blue-600" />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -71,6 +91,29 @@ export function HeistConfirmModal({
                 <span className="text-lg font-bold text-amber-600">{potentialSteal}</span>
               </div>
             </div>
+
+            {/* Active Items */}
+            {attackerItems.length > 0 && (
+              <div className="rounded-lg border border-purple-200 bg-purple-50 p-4">
+                <div className="text-sm font-medium text-purple-700 mb-2">Active Items</div>
+                <div className="space-y-2">
+                  {attackerItems.map((item) => (
+                    <div key={item.id} className="flex items-center gap-2 text-sm">
+                      {getItemIcon(item.type)}
+                      <span className="text-neutral-700">{item.name}</span>
+                      {item.usesRemaining !== null && (
+                        <span className="text-xs text-neutral-500 ml-auto">
+                          ({item.usesRemaining} uses left)
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-purple-600 mt-2">
+                  Your items will enhance this heist!
+                </p>
+              </div>
+            )}
 
             {/* Cost Info */}
             <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">

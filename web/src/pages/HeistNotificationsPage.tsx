@@ -2,13 +2,13 @@
 // Displays all heist-related notifications
 
 import { useState } from 'react';
-import { Bell, Check, CheckCheck, Trophy, Shield, Gift, Filter, History } from 'lucide-react';
+import { Bell, Check, CheckCheck, Trophy, Shield, Gift, Filter, History, ShoppingBag } from 'lucide-react';
 import { useHeistNotifications, useMarkHeistNotificationsRead } from '@/hooks/useHeistNotifications';
 import { HeistNotification } from '@/components/heist/HeistNotification';
 import { Button } from '@/components/common/Button';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { PATHS } from '@/routing/paths';
 import type { HeistNotificationType } from '@/types/heist';
 
@@ -17,6 +17,7 @@ export function HeistNotificationsPage() {
   const [typeFilter, setTypeFilter] = useState<HeistNotificationType | 'all'>('all');
   const [offset, setOffset] = useState(0);
   const limit = 20;
+  const navigate = useNavigate();
 
   const { data: notificationsData, isLoading } = useHeistNotifications({
     unreadOnly: unreadOnly ? true : undefined, // Only pass if true, otherwise show all
@@ -89,6 +90,14 @@ export function HeistNotificationsPage() {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => navigate(PATHS.HEIST_ITEM_SHOP)}
+                icon={<ShoppingBag className="h-4 w-4" />}
+              >
+                Item Shop
+              </Button>
               <Link
                 to={PATHS.HEIST_HISTORY}
                 className="flex items-center gap-2 px-4 py-2 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors text-sm font-medium text-neutral-700"

@@ -2,12 +2,14 @@
 // Displays user's heist history as attacker and victim
 
 import { useState } from 'react';
-import { Trophy, Shield, ArrowUp, ArrowDown, Filter, Clock } from 'lucide-react';
+import { Trophy, Shield, ArrowUp, ArrowDown, Filter, Clock, ShoppingBag } from 'lucide-react';
 import { useHeistHistory } from '@/hooks/useHeistHistory';
 import { HeistHistoryRow } from '@/components/heist/HeistHistoryRow';
 import { Button } from '@/components/common/Button';
 import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
+import { PATHS } from '@/routing/paths';
 import type { HeistRole } from '@/types/heist';
 
 export function HeistHistoryPage() {
@@ -15,6 +17,7 @@ export function HeistHistoryPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [offset, setOffset] = useState(0);
   const limit = 20;
+  const navigate = useNavigate();
 
   const { data: history, isLoading, error } = useHeistHistory({
     role: roleFilter === 'both' ? undefined : roleFilter,
@@ -59,11 +62,22 @@ export function HeistHistoryPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-neutral-900 mb-2">Heist History</h1>
-            <p className="text-neutral-600">
-              View all your heist attempts and when you were targeted
-            </p>
+          <div className="mb-8 flex items-start justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-neutral-900 mb-2">Heist History</h1>
+              <p className="text-neutral-600">
+                View all your heist attempts and when you were targeted
+              </p>
+            </div>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => navigate(PATHS.HEIST_ITEM_SHOP)}
+              icon={<ShoppingBag className="h-4 w-4" />}
+              className="ml-4 flex-shrink-0"
+            >
+              Item Shop
+            </Button>
           </div>
 
           {/* Filters */}

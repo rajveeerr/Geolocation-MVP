@@ -29,12 +29,20 @@ export function useHeistExecute() {
   return useMutation<HeistExecuteResponse, ExecuteHeistError, number>({
     mutationFn: (victimId: number) => executeHeist(victimId),
     onSuccess: (data, variables, context) => {
-      // Invalidate related queries
+      // Invalidate heist-related queries
       queryClient.invalidateQueries({ queryKey: ['heist', 'tokens'] });
       queryClient.invalidateQueries({ queryKey: ['heist', 'history'] });
       queryClient.invalidateQueries({ queryKey: ['heist', 'stats'] });
       queryClient.invalidateQueries({ queryKey: ['heist', 'notifications'] });
+      
+      // Invalidate points/balance queries to reflect stolen points
+      queryClient.invalidateQueries({ queryKey: ['gamification', 'profile'] });
+      queryClient.invalidateQueries({ queryKey: ['user'] });
       queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+      
+      // Refetch profile immediately to show updated points
+      queryClient.refetchQueries({ queryKey: ['gamification', 'profile'] });
+      queryClient.refetchQueries({ queryKey: ['user'] });
       
       // Show success toast
       toast({

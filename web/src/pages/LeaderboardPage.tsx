@@ -13,6 +13,11 @@ import { HeistActionButton } from '@/components/heist/HeistActionButton';
 import { HeistSuccessAnimation } from '@/components/heist/HeistSuccessAnimation';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUserActivity } from '@/hooks/useUserActivity';
+import { useNavigate } from 'react-router-dom';
+import { PATHS } from '@/routing/paths';
+import { Button } from '@/components/common/Button';
+import { ShoppingBag } from 'lucide-react';
+import { ActiveItemsBadge } from '@/components/heist/ActiveItemsBadge';
 
 const tabs = [
   { id: 'leaderboard', label: 'Leaderboard' },
@@ -59,6 +64,7 @@ export const LeaderboardPage = () => {
 const LeaderboardContent = () => {
   const { user: currentUser } = useAuth();
   const { data: leaderboardData, isLoading, error } = useLeaderboard();
+  const navigate = useNavigate();
   // --- NEW: State to track the currently expanded row ---
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
@@ -77,13 +83,31 @@ const LeaderboardContent = () => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-3 mt-6">
-      <h2 className="text-2xl font-semibold text-neutral-900 text-center">This Month's Leaderboard</h2>
-      <p className="mx-auto mt-2 max-w-xl text-neutral-500 text-center">
-        The leaderboard showcases users who checked in the most this month.
-        Earn points by visiting merchants and checking in at their deals — your
-        points update on your profile and you'll move up the leaderboard. Top
-        performers may receive special rewards from participating merchants.
-      </p>
+      <div className="mb-4">
+        <div className="flex items-start justify-between gap-4 mb-2">
+          <h2 className="text-2xl font-semibold text-neutral-900">This Month's Leaderboard</h2>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => navigate(PATHS.HEIST_ITEM_SHOP)}
+            icon={<ShoppingBag className="h-4 w-4" />}
+            className="flex-shrink-0"
+          >
+            Item Shop
+          </Button>
+        </div>
+        <p className="text-neutral-500 mb-3">
+          The leaderboard showcases users who checked in the most this month.
+          Earn points by visiting merchants and checking in at their deals — your
+          points update on your profile and you'll move up the leaderboard. Top
+          performers may receive special rewards from participating merchants.
+        </p>
+        
+        {/* Active Items Display */}
+        <div className="bg-white rounded-lg border border-neutral-200 p-3">
+          <ActiveItemsBadge variant="detailed" />
+        </div>
+      </div>
       {displayUsers.length > 0 ? (
         displayUsers.map((user) => {
           const isCurrentUserRow = currentUser?.id === user.userId;
@@ -168,6 +192,11 @@ const LeaderboardRow = ({ user, isExpanded, onToggle, isCurrentUser }: { user: a
               {user.name}
               {user.isCurrentUser && <span className="text-xs font-bold text-white bg-brand-primary-500 rounded-full px-2 py-0.5">You</span>}
             </p>
+            {user.isCurrentUser && (
+              <div className="mt-1">
+                <ActiveItemsBadge variant="compact" className="text-xs" />
+              </div>
+            )}
           </div>
           <div className="text-right mr-4">
             <p className="font-bold text-lg text-brand-primary-600">{user.points.toLocaleString()}</p>

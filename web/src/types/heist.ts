@@ -162,3 +162,29 @@ export interface MarkNotificationReadResponse {
   notificationId?: number;
 }
 
+// Heist Item Types
+export interface HeistItem {
+  id: number;
+  name: string;
+  type: 'SWORD' | 'HAMMER' | 'SHIELD';
+  description: string;
+  coinCost: number;
+  effectType: string;
+  effectValue: number;
+  durationHours: number | null;
+  maxUses: number | null;
+  isActive: boolean;
+  icon: string | null;
+}
+
+export interface HeistInventoryItem {
+  id: number;
+  itemId: number;
+  name: string;
+  type: 'SWORD' | 'HAMMER' | 'SHIELD';
+  effectType: string;
+  effectValue: number;
+  usesRemaining: number | null;
+  expiresAt: string | null;
+}
+

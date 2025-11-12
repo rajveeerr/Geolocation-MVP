@@ -12,6 +12,8 @@ import type {
   HeistNotificationsResponse,
   MarkNotificationReadRequest,
   MarkNotificationReadResponse,
+  HeistItem,
+  HeistInventoryItem,
 } from '@/types/heist';
 
 interface ApiResponse<T> {
@@ -180,6 +182,48 @@ export async function markHeistNotificationsRead(
       return { markedCount: 0 };
     }
     return { notificationId: request.notificationId };
+  }
+  
+  return response.data.data;
+}
+
+/**
+ * Get available heist items for purchase
+ */
+export async function getHeistItems(): Promise<HeistItem[]> {
+  const response = await apiGet<ApiResponse<HeistItem[]>>('/heist/items');
+  
+  if (!response.success || !response.data?.data) {
+    throw new Error(response.error || 'Failed to fetch items');
+  }
+  
+  return response.data.data;
+}
+
+/**
+ * Get user's heist item inventory
+ */
+export async function getHeistInventory(): Promise<HeistInventoryItem[]> {
+  const response = await apiGet<ApiResponse<HeistInventoryItem[]>>('/heist/items/inventory');
+  
+  if (!response.success || !response.data?.data) {
+    throw new Error(response.error || 'Failed to fetch inventory');
+  }
+  
+  return response.data.data;
+}
+
+/**
+ * Purchase a heist item
+ */
+export async function purchaseHeistItem(itemId: number): Promise<{ inventory: HeistInventoryItem[]; message: string }> {
+  const response = await apiPost<ApiResponse<{ inventory: HeistInventoryItem[]; message: string }>, { itemId: number }>(
+    '/heist/items/purchase',
+    { itemId }
+  );
+  
+  if (!response.success || !response.data?.data) {
+    throw new Error(response.data?.message || response.error || 'Failed to purchase item');
   }
   
   return response.data.data;

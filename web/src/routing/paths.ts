@@ -41,6 +41,7 @@ export const PATHS = {
   HEIST_HISTORY: '/heist/history',
   HEIST_NOTIFICATIONS: '/heist/notifications',
   HEIST_STATS: '/heist/stats',
+  HEIST_ITEM_SHOP: '/heist/shop',
 
   // Loyalty (user)
   LOYALTY_WALLET: '/loyalty',
