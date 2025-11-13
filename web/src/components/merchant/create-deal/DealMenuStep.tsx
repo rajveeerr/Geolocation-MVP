@@ -337,6 +337,9 @@ export const DealMenuStep = () => {
       navigate('/merchant/deals/create/bounty/schedule');
     } else if (state.dealType === 'REDEEM_NOW') {
       navigate('/merchant/deals/create/schedule');
+    } else if (state.dealType === 'HIDDEN') {
+      // For hidden deals, skip offer/images and go directly to schedule
+      navigate('/merchant/deals/create/hidden/schedule');
     } else {
       navigate('/merchant/deals/create/offer');
     }
@@ -346,6 +349,8 @@ export const DealMenuStep = () => {
     // Check deal type and navigate accordingly
     if (state.dealType === 'BOUNTY') {
       navigate('/merchant/deals/create/bounty/basics');
+    } else if (state.dealType === 'HIDDEN') {
+      navigate('/merchant/deals/create/hidden/basics');
     } else if (state.dealType === 'REDEEM_NOW') {
       navigate('/merchant/deals/create/redeem-now');
     } else {
@@ -404,7 +409,9 @@ export const DealMenuStep = () => {
   return (
     <OnboardingStepLayout
       title="Select Menu Items"
-      subtitle="Choose which items to include in your deal"
+      subtitle={state.dealType === 'HIDDEN' 
+        ? "Choose which items to include in your hidden deal (items will be hidden from public view)"
+        : "Choose which items to include in your deal"}
       onNext={handleNext}
       onBack={handleBack}
       isNextDisabled={

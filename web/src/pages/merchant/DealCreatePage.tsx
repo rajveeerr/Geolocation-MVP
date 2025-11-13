@@ -20,6 +20,7 @@ import { DealBountyStep } from '@/components/merchant/create-deal/DealBountyStep
 import { DealBountyBasicsStep } from '@/components/merchant/create-deal/DealBountyBasicsStep';
 import { DealBountyScheduleStep } from '@/components/merchant/create-deal/DealBountyScheduleStep';
 import { DealHiddenStep } from '@/components/merchant/create-deal/DealHiddenStep';
+import { DealHiddenVisibilityStep } from '@/components/merchant/create-deal/DealHiddenVisibilityStep';
 import { DealRedeemNowStep } from '@/components/merchant/create-deal/DealRedeemNowStep';
 import { DealLocationStep } from '@/components/merchant/create-deal/DealLocationStep';
 import { DealDailyDealWeekdayStep } from '@/components/merchant/create-deal/DealDailyDealWeekdayStep';
@@ -86,6 +87,11 @@ export const CreateDealPage = () => {
           <Route path="bounty/images" element={<DealImagesStep />} />
           <Route path="bounty/review" element={<DealReviewStep />} />
           <Route path="hidden" element={<DealHiddenStep />} />
+          <Route path="hidden/visibility" element={<DealHiddenVisibilityStep />} />
+          <Route path="hidden/basics" element={<DealBasicsStep />} />
+          <Route path="hidden/menu" element={<DealMenuStep />} />
+          <Route path="hidden/schedule" element={<DealScheduleStep />} />
+          <Route path="hidden/review" element={<DealReviewStep />} />
           <Route path="redeem-now" element={<DealRedeemNowStep />} />
           
           {/* Daily Deal routes */}

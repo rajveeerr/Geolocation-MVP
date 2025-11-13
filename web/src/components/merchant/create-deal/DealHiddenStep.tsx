@@ -7,13 +7,25 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/common/Button';
 import { EyeOff, RefreshCw, Copy, Check, Link2, QrCode, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { generateAccessCode } from '@/utils/dealTypeUtils';
 
 export const DealHiddenStep = () => {
   const { state, dispatch } = useDealCreation();
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
+
+  // Ensure access code is set in state (auto-generate if not set)
+  useEffect(() => {
+    if (!state.accessCode || state.accessCode.trim().length === 0) {
+      const newCode = generateAccessCode();
+      dispatch({
+        type: 'UPDATE_FIELD',
+        field: 'accessCode',
+        value: newCode,
+      });
+    }
+  }, [state.accessCode, dispatch]);
 
   const accessCode = state.accessCode || generateAccessCode();
   const shareableLink = `${window.location.origin}/deals/hidden/${accessCode}`;
@@ -41,7 +53,7 @@ export const DealHiddenStep = () => {
     <OnboardingStepLayout
       title="Create your hidden deal"
       subtitle="Set up an exclusive access code for this special deal"
-      onNext={() => navigate('/merchant/deals/create/basics')}
+      onNext={() => navigate('/merchant/deals/create/hidden/visibility')}
       onBack={() => navigate('/merchant/deals/create/type')}
       isNextDisabled={false}
       progress={20}
@@ -83,7 +95,7 @@ export const DealHiddenStep = () => {
               />
             </div>
             <Button
-              variant="outline"
+              variant="secondary"
               onClick={handleGenerateCode}
               className="h-12 px-4"
             >
@@ -127,7 +139,7 @@ export const DealHiddenStep = () => {
                 className="h-12 text-sm font-mono bg-neutral-50"
               />
               <Button
-                variant="outline"
+                variant="secondary"
                 onClick={handleCopyLink}
                 className="h-12 px-4"
               >

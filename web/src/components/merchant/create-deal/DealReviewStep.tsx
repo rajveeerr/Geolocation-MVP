@@ -10,7 +10,7 @@ import { useCountdown } from '@/hooks/useCountdown';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { Sparkles, Trophy, EyeOff, MapPin, Clock, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { mapDealTypeToBackend } from '@/utils/dealTypeUtils';
+import { mapDealTypeToBackend, generateAccessCode } from '@/utils/dealTypeUtils';
 import { BountyQRCodeDisplay } from './BountyQRCodeDisplay';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/common/Button';
@@ -37,7 +37,7 @@ const ReviewItem = ({
 };
 
 export const DealReviewStep = () => {
-  const { state } = useDealCreation();
+  const { state, dispatch } = useDealCreation();
   const countdown = useCountdown(state.endTime || '');
   const { days = 0, hours = 0, minutes = 0, seconds = 0 } = countdown || {};
   const navigate = useNavigate();
@@ -146,8 +146,8 @@ export const DealReviewStep = () => {
         return;
       }
 
-      // Bounty deals don't require discount fields - they have bounty rewards instead
-      if (state.dealType !== 'BOUNTY' && !state.discountPercentage && !state.discountAmount && !state.customOfferDisplay) {
+      // Bounty and Hidden deals don't require discount fields - they have their own reward mechanisms
+      if (state.dealType !== 'BOUNTY' && state.dealType !== 'HIDDEN' && !state.discountPercentage && !state.discountAmount && !state.customOfferDisplay) {
         toast({
           title: 'Error',
           description: 'Please specify either a discount percentage, discount amount, or custom offer display.',
@@ -194,14 +194,16 @@ export const DealReviewStep = () => {
         }
       }
 
+      // For hidden deals, ensure access code is set (auto-generate if needed)
+      let finalAccessCode = state.accessCode;
       if (state.dealType === 'HIDDEN') {
-        if (!state.accessCode || state.accessCode.trim().length === 0) {
-          toast({
-            title: 'Error',
-            description: 'Access code is required for hidden deals.',
-            variant: 'destructive',
+        if (!finalAccessCode || finalAccessCode.trim().length === 0) {
+          finalAccessCode = generateAccessCode();
+          dispatch({
+            type: 'UPDATE_FIELD',
+            field: 'accessCode',
+            value: finalAccessCode,
           });
-          return;
         }
       }
 
@@ -606,7 +608,17 @@ export const DealReviewStep = () => {
           ? (state.minReferralsRequired ?? undefined)
           : undefined,
         // Hidden Deal fields
-        accessCode: state.dealType === 'HIDDEN' ? (state.accessCode || undefined) : undefined,
+        accessCode: state.dealType === 'HIDDEN' ? (finalAccessCode || undefined) : undefined,
+        // Hidden Deal Visibility Configuration
+        hiddenDealVisibility: state.dealType === 'HIDDEN' && state.hiddenDealVisibility ? {
+          accessCode: state.hiddenDealVisibility.accessCode,
+          qrCode: state.hiddenDealVisibility.qrCode,
+          tapIns: state.hiddenDealVisibility.tapIns,
+          socialSharing: state.hiddenDealVisibility.socialSharing,
+          tapInConfig: state.hiddenDealVisibility.tapInConfig,
+          tapInMenuItems: state.hiddenDealVisibility.tapInMenuItems,
+          tapInMenuCollectionId: state.hiddenDealVisibility.tapInMenuCollectionId,
+        } : undefined,
         // Menu items if any - format for API
         menuItems: state.selectedMenuItems?.length > 0 
           ? state.selectedMenuItems.map(item => ({
@@ -789,7 +801,12 @@ export const DealReviewStep = () => {
           // Daily Deal goes back to config step
           navigate('/merchant/deals/create/daily-deal/config');
         } else {
-          navigate('/merchant/deals/create/instructions');
+          // For hidden deals, go back to schedule (skipped instructions/advanced)
+          if (state.dealType === 'HIDDEN') {
+            navigate('/merchant/deals/create/hidden/schedule');
+          } else {
+            navigate('/merchant/deals/create/instructions');
+          }
         }
       }}
       progress={100}
@@ -1130,6 +1147,58 @@ export const DealReviewStep = () => {
                 <div className="rounded-lg bg-neutral-50 p-3 font-mono text-xs break-all">
                   {window.location.origin}/deals/hidden/{state.accessCode}
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Hidden Deal Visibility Configuration */}
+          {state.dealType === 'HIDDEN' && state.hiddenDealVisibility && (
+            <div className="rounded-lg border bg-white p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <EyeOff className="h-5 w-5 text-purple-600" />
+                <h3 className="font-semibold text-neutral-900">Visibility Configuration</h3>
+              </div>
+              <div className="space-y-2">
+                <ReviewItem 
+                  label="Access Code / Link" 
+                  value={state.hiddenDealVisibility.accessCode ? 'Enabled' : 'Disabled'} 
+                />
+                {state.hiddenDealVisibility.qrCode && (
+                  <ReviewItem label="QR Code" value="Enabled" />
+                )}
+                {state.hiddenDealVisibility.tapIns && (
+                  <>
+                    <ReviewItem label="Tap-ins / Check-ins" value="Enabled" />
+                    {state.hiddenDealVisibility.tapInConfig && (
+                      <div className="ml-4 space-y-1 text-sm">
+                        {state.hiddenDealVisibility.tapInConfig.showInAllCheckIns && (
+                          <p className="text-neutral-600">• Show in all check-ins</p>
+                        )}
+                        {state.hiddenDealVisibility.tapInConfig.specificTimes && (
+                          <p className="text-neutral-600">• Time restriction: {state.hiddenDealVisibility.tapInConfig.specificTimes}</p>
+                        )}
+                        {state.hiddenDealVisibility.tapInConfig.specificDays && state.hiddenDealVisibility.tapInConfig.specificDays.length > 0 && (
+                          <p className="text-neutral-600">• Days: {state.hiddenDealVisibility.tapInConfig.specificDays.join(', ')}</p>
+                        )}
+                        {state.hiddenDealVisibility.tapInConfig.firstTimeOnly && (
+                          <p className="text-neutral-600">• First-time visitors only</p>
+                        )}
+                        {state.hiddenDealVisibility.tapInConfig.returningOnly && (
+                          <p className="text-neutral-600">• Returning customers only</p>
+                        )}
+                        {state.hiddenDealVisibility.tapInMenuItems && state.hiddenDealVisibility.tapInMenuItems.length > 0 && (
+                          <p className="text-neutral-600">• Selected items for tap-ins: {state.hiddenDealVisibility.tapInMenuItems.length} items</p>
+                        )}
+                        {state.hiddenDealVisibility.tapInMenuCollectionId && (
+                          <p className="text-neutral-600">• Using menu collection for tap-ins</p>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+                {state.hiddenDealVisibility.socialSharing && (
+                  <ReviewItem label="Social Media Sharing" value="Enabled" />
+                )}
               </div>
             </div>
           )}

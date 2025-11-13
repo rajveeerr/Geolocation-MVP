@@ -232,6 +232,9 @@ export const DealScheduleStep = () => {
         dispatch({ type: 'UPDATE_FIELD', field: 'cityIds', value: null });
       }
       navigate('/merchant/deals/create/review');
+    } else if (state.dealType === 'HIDDEN') {
+      // For hidden deals, skip location, instructions, advanced and go directly to review
+      navigate('/merchant/deals/create/hidden/review');
     } else {
       navigate('/merchant/deals/create/location');
     }
@@ -241,6 +244,9 @@ export const DealScheduleStep = () => {
     // For REDEEM_NOW deals, go back to menu
     if (state.dealType === 'REDEEM_NOW') {
       navigate('/merchant/deals/create/menu');
+    } else if (state.dealType === 'HIDDEN') {
+      // For hidden deals, go back to menu
+      navigate('/merchant/deals/create/hidden/menu');
     } else {
       navigate('/merchant/deals/create/images');
     }

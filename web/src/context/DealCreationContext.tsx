@@ -72,6 +72,22 @@ export interface DealCreationState {
   streakRewardType: 'percentage' | 'amount' | null;
   streakRewardValue: number | null;
   recurringFrequency: 'week' | 'month' | 'year' | null;
+  // Hidden deal visibility configuration
+  hiddenDealVisibility: {
+    accessCode: boolean; // always true
+    qrCode: boolean;
+    tapIns: boolean;
+    socialSharing: boolean;
+    tapInConfig?: {
+      showInAllCheckIns: boolean;
+      specificTimes?: string; // validHours format
+      specificDays?: string[]; // validDaysOfWeek
+      firstTimeOnly?: boolean;
+      returningOnly?: boolean;
+    };
+    tapInMenuItems?: number[]; // selected item IDs to show in tap-ins
+    tapInMenuCollectionId?: number | null;
+  };
 }
 
 type Action =
@@ -137,6 +153,18 @@ const initialState: DealCreationState = {
   streakRewardType: null,
   streakRewardValue: null,
   recurringFrequency: null,
+  // Hidden deal visibility configuration
+  hiddenDealVisibility: {
+    accessCode: true, // always true
+    qrCode: false,
+    tapIns: false,
+    socialSharing: false,
+    tapInConfig: {
+      showInAllCheckIns: true,
+    },
+    tapInMenuItems: undefined,
+    tapInMenuCollectionId: null,
+  },
 };
 
 function reducer(state: DealCreationState, action: Action): DealCreationState {
