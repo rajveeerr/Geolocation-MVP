@@ -232,12 +232,27 @@ export const MenuTab = ({ deal, onNavigateToTab }: MenuTabProps) => {
     }
     
     if (selectedSubMenu === 'drinks') {
-      // Show items where category includes "drink"
-      return menuItems.filter(item => 
-        item.category?.toLowerCase().includes('drink') || 
-        item.category?.toLowerCase().includes('beverage') ||
-        item.category?.toLowerCase().includes('cocktail')
-      );
+      // Show items where category includes drink-related terms
+      return menuItems.filter(item => {
+        const category = item.category?.toLowerCase() || '';
+        const name = item.name?.toLowerCase() || '';
+        return (
+          category.includes('drink') || 
+          category.includes('beverage') ||
+          category.includes('cocktail') ||
+          category.includes('coffee') ||
+          category.includes('tea') ||
+          category.includes('juice') ||
+          category.includes('smoothie') ||
+          name.includes('coffee') ||
+          name.includes('latte') ||
+          name.includes('espresso') ||
+          name.includes('cappuccino') ||
+          name.includes('tea') ||
+          name.includes('juice') ||
+          name.includes('smoothie')
+        );
+      });
     }
     
     // Dynamic category tabs - show items matching the selected category

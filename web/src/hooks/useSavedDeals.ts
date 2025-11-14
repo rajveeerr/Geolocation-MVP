@@ -48,11 +48,13 @@ export const useSavedDeals = () => {
 
   const saveDealMutation = useMutation({
     mutationFn: (dealId: number) => apiPost('/users/save-deal', { dealId }),
-    onSuccess: (response: ApiResponse<any>) => {
+    onSuccess: (response: ApiResponse<any>, dealId: number) => {
       if (!response || response.success === false) {
         throw new Error(response?.error || 'Failed to save deal');
       }
       queryClient.invalidateQueries({ queryKey: ['savedDeals'] });
+      queryClient.invalidateQueries({ queryKey: ['deal-detail', dealId.toString()] });
+      queryClient.invalidateQueries({ queryKey: ['deals'] });
       toast({
         title: 'Deal Saved!',
         description: 'You can find it in your profile.',
@@ -69,11 +71,13 @@ export const useSavedDeals = () => {
 
   const unsaveDealMutation = useMutation({
     mutationFn: (dealId: number) => apiDelete(`/users/save-deal/${dealId}`),
-    onSuccess: (response: ApiResponse<any>) => {
+    onSuccess: (response: ApiResponse<any>, dealId: number) => {
       if (!response || response.success === false) {
         throw new Error(response?.error || 'Failed to unsave deal');
       }
       queryClient.invalidateQueries({ queryKey: ['savedDeals'] });
+      queryClient.invalidateQueries({ queryKey: ['deal-detail', dealId.toString()] });
+      queryClient.invalidateQueries({ queryKey: ['deals'] });
       toast({ title: 'Deal Unsaved' });
     },
     onError: (err: any) => {
