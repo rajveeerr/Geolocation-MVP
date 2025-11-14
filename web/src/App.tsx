@@ -49,8 +49,8 @@ const DealEditPage = React.lazy(() =>
     default: m.DealEditPage,
   })),
 );
-const EnhancedDealDetailPage = React.lazy(() =>
-  import('./pages/EnhancedDealDetailPage').then((m) => ({ default: m.EnhancedDealDetailPage })),
+const DealDetailPage = React.lazy(() =>
+  import('./pages/DealDetailPage').then((m) => ({ default: m.DealDetailPage })),
 );
 const HiddenDealPage = React.lazy(() =>
   import('./pages/HiddenDealPage').then((module) => ({ default: module.HiddenDealPage })),
@@ -276,7 +276,7 @@ function App() {
                   path={PATHS.DEAL_DETAIL}
                   element={
                     <Suspense fallback={<LoadingOverlay />}>
-                      <EnhancedDealDetailPage />
+                      <DealDetailPage />
                     </Suspense>
                   }
                 />

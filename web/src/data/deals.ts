@@ -17,7 +17,7 @@ export interface Deal {
   tag?: string;
 
   // --- NEW DEAL-SPECIFIC FIELDS ---
-  dealType?: 'Discount' | 'Happy Hour' | 'Kickback' | 'Recurring' | 'Redeem Now' | 'Hidden Deal' | 'Bounty Deal' | 'REDEEM_NOW' | 'HIDDEN' | 'BOUNTY';
+  dealType?: 'Discount' | 'Happy Hour' | 'Kickback' | 'Recurring' | 'Redeem Now' | 'Hidden Deal' | 'Bounty Deal' | 'REDEEM_NOW' | 'HIDDEN' | 'BOUNTY' | { name: string };
   dealValue?: string; // e.g., "50% OFF", "$5 Per Friend"
   offerTerms?: string; // new fine-print field from backend
   claimedBy?: {
@@ -31,6 +31,21 @@ export interface Deal {
   discountAmount?: number | null;
   isBooking?: boolean;
   expiresAt?: string; // ISO String for countdown timer
+  // Happy Hour specific fields
+  startTime?: string; // ISO String for deal start time
+  endTime?: string; // ISO String for deal end time
+  recurringDays?: string[]; // Array of recurring days (e.g., ['MONDAY', 'TUESDAY'])
+  status?: {
+    isActive: boolean;
+    isExpired: boolean;
+    isUpcoming: boolean;
+    timeRemaining?: {
+      total: number;
+      hours: number;
+      minutes: number;
+      formatted: string;
+    };
+  };
   
   // --- MERCHANT INFORMATION ---
   merchantId?: number;

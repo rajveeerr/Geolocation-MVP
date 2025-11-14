@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import type { Deal, Offer } from '@/data/deals';
 import { useCountdown } from '@/hooks/useCountdown';
+import { useHappyHourTimer } from '@/hooks/useHappyHourTimer';
 import { useSavedDeals } from '@/hooks/useSavedDeals';
 import { useAuth } from '@/context/useAuth';
 import { useModal } from '@/context/ModalContext';
@@ -207,16 +208,29 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
     return realOffers.filter((offer) => offer.category === activeOfferTab);
   }, [realOffers, activeOfferTab]);
 
-  const countdown = useCountdown(deal.expiresAt || '');
-  // Format countdown to show HH.MM.SS format like 06.45.22
-  const formattedCountdown = `${String(countdown.hours).padStart(2, '0')}.${String(countdown.minutes).padStart(2, '0')}.${String(countdown.seconds).padStart(2, '0')}`;
-
-  const normalizedDealType = String(deal.dealType).toLowerCase();
+  // Use Happy Hour timer for happy hour deals, regular countdown for others
+  const normalizedDealType = typeof deal.dealType === 'string' 
+    ? deal.dealType.toLowerCase() 
+    : deal.dealType?.name?.toLowerCase() || '';
   const isHappyHour = normalizedDealType.includes('happy');
-  const showCountdown =
-    isHappyHour &&
-    deal.expiresAt &&
-    (countdown.hours > 0 || countdown.minutes > 0 || countdown.seconds > 0);
+  
+  const happyHourTimer = useHappyHourTimer(isHappyHour ? deal as any : null);
+  const regularCountdown = useCountdown(deal.expiresAt || '');
+  
+  // Use appropriate timer based on deal type
+  const countdown = isHappyHour ? happyHourTimer : regularCountdown;
+  
+  // Format countdown to show HH.MM.SS format like 06.45.22
+  const formattedCountdown = isHappyHour 
+    ? happyHourTimer.formatted
+    : `${String(countdown.hours).padStart(2, '0')}.${String(countdown.minutes).padStart(2, '0')}.${String(countdown.seconds).padStart(2, '0')}`;
+
+  // Show countdown for happy hour deals if timer has valid time (always show for happy hour if timer is working)
+  // For other deals, show if expiresAt exists and has time remaining
+  const showCountdown = isHappyHour
+    ? (happyHourTimer.formatted !== '00.00.00' && 
+       (happyHourTimer.hours > 0 || happyHourTimer.minutes > 0 || happyHourTimer.seconds > 0))
+    : (deal.expiresAt && (countdown.hours > 0 || countdown.minutes > 0 || countdown.seconds > 0));
 
   const isHighValueDiscount = (deal.discountPercentage ?? 0) >= 50;
   

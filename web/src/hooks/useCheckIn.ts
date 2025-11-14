@@ -18,7 +18,11 @@ interface CheckInResponse {
   withinRange: boolean;
 }
 
-export const useCheckIn = () => {
+interface UseCheckInOptions {
+  onSuccess?: (data: { pointsEarned: number; withinRange: boolean }) => void;
+}
+
+export const useCheckIn = (options?: UseCheckInOptions) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -61,10 +65,21 @@ export const useCheckIn = () => {
       }
 
       // Success - user is within range
-      toast({
-        title: 'Check-in Successful!',
-        description: `You earned ${response.data.pointsAwarded || 0} points!`,
+      const pointsEarned = response.data.pointsAwarded || 0;
+      
+      // Call success callback if provided
+      options?.onSuccess?.({
+        pointsEarned,
+        withinRange: response.data.withinRange,
       });
+      
+      // Don't show toast if callback is provided (modal will handle it)
+      if (!options?.onSuccess) {
+        toast({
+          title: 'Check-in Successful!',
+          description: `You earned ${pointsEarned} points!`,
+        });
+      }
 
       // If streak data is returned, update cache and show contextual notifications
       if (response.data.streak) {
