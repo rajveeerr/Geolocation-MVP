@@ -135,7 +135,7 @@ export const DealDetailPage = () => {
   };
 
   return (
-    <div className="bg-white min-h-screen pt-20">
+    <div className="bg-white min-h-screen py-20">
       {/* Back Button - Top Left */}
       <div className="container mx-auto max-w-7xl px-4 pt-6">
           <Button
@@ -574,7 +574,7 @@ export const DealDetailPage = () => {
       )}
 
       {/* Sticky Footer */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-neutral-900 text-white">
+      <div className="fixed bottom-0 left-0 right-0 z-[9999] bg-neutral-900 text-white">
         <div className="container mx-auto max-w-7xl px-4 py-4">
           <div className="flex items-center justify-between">
             <p className="text-sm">Ready to dine with us? Reserve your table now</p>

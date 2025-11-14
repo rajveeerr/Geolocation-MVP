@@ -147,6 +147,78 @@ export const MenuTab = ({ deal, onNavigateToTab }: MenuTabProps) => {
     }
   }, [subMenus, selectedSubMenu, deal.context.isHappyHour]);
 
+  // Organize menu items by meal type for Daily Menu
+  const organizeByMealType = (items: typeof menuItems) => {
+    const breakfastItems: typeof menuItems = [];
+    const brunchItems: typeof menuItems = [];
+    const dinnerItems: typeof menuItems = [];
+    const otherItems: typeof menuItems = [];
+
+    items.forEach(item => {
+      const category = item.category?.toLowerCase() || '';
+      const name = item.name?.toLowerCase() || '';
+      const description = item.description?.toLowerCase() || '';
+      
+      // Check if item belongs to breakfast
+      if (
+        category.includes('breakfast') ||
+        name.includes('breakfast') ||
+        name.includes('pancake') ||
+        name.includes('waffle') ||
+        name.includes('french toast') ||
+        name.includes('omelette') ||
+        name.includes('eggs') ||
+        name.includes('bacon') ||
+        name.includes('hash brown') ||
+        description.includes('breakfast') ||
+        description.includes('morning')
+      ) {
+        breakfastItems.push(item);
+      }
+      // Check if item belongs to brunch
+      else if (
+        category.includes('brunch') ||
+        name.includes('brunch') ||
+        name.includes('avocado toast') ||
+        name.includes('eggs benedict') ||
+        description.includes('brunch')
+      ) {
+        brunchItems.push(item);
+      }
+      // Check if item belongs to dinner
+      else if (
+        category.includes('dinner') ||
+        category.includes('main') ||
+        category.includes('entree') ||
+        name.includes('steak') ||
+        name.includes('pasta') ||
+        name.includes('burger') ||
+        name.includes('pizza') ||
+        description.includes('dinner') ||
+        description.includes('evening')
+      ) {
+        dinnerItems.push(item);
+      }
+      // Everything else goes to "other" or we can categorize based on common patterns
+      else {
+        // Try to infer from common patterns
+        if (
+          name.includes('salad') ||
+          name.includes('soup') ||
+          name.includes('appetizer') ||
+          category.includes('appetizer') ||
+          category.includes('starter')
+        ) {
+          dinnerItems.push(item); // Appetizers typically for dinner
+        } else {
+          otherItems.push(item);
+        }
+      }
+    });
+
+    return { breakfastItems, brunchItems, dinnerItems, otherItems };
+  };
+
   // Filter menu items based on selected tab
   const filteredMenuItems = useMemo(() => {
     if (selectedSubMenu === 'happy-hour' && deal.context.isHappyHour) {
@@ -155,9 +227,7 @@ export const MenuTab = ({ deal, onNavigateToTab }: MenuTabProps) => {
     }
     
     if (selectedSubMenu === 'daily') {
-      // Show all items for daily menu
-      // Merchants organize items via categories, so daily menu shows everything
-      // (Happy Hour Menu will show all items when it's a happy hour deal)
+      // For daily menu, return all items (will be organized by meal type in UI)
       return menuItems;
     }
     
@@ -178,6 +248,64 @@ export const MenuTab = ({ deal, onNavigateToTab }: MenuTabProps) => {
     // Default: show all items
     return menuItems;
   }, [menuItems, selectedSubMenu, deal.context.isHappyHour, uniqueCategories]);
+
+  // Render menu item card component
+  const renderMenuItemCard = (item: typeof menuItems[0]) => {
+    const discount = deal.discountPercentage || 0;
+    const discountAmount = item.originalPrice - item.discountedPrice;
+    const discountPercent = Math.round((discountAmount / item.originalPrice) * 100);
+
+    return (
+      <div
+        key={item.id}
+        className="relative bg-white rounded-xl overflow-hidden border border-neutral-200 hover:shadow-lg transition-all hover:scale-[1.02]"
+      >
+        {/* Image Section */}
+        {item.imageUrl && (
+          <div className="relative h-56 overflow-hidden bg-neutral-100">
+            <img
+              src={item.imageUrl}
+              alt={item.name}
+              className="w-full h-full object-cover"
+            />
+            {discountPercent > 0 && (
+              <div className="absolute top-3 right-3 bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-lg">
+                {discountPercent}% OFF
+              </div>
+            )}
+          </div>
+        )}
+        
+        {/* Content Section */}
+        <div className="p-5">
+          <h4 className="font-bold text-xl text-neutral-900 mb-2">{item.name}</h4>
+          {item.description && (
+            <p className="text-sm text-neutral-600 mb-4 line-clamp-2 leading-relaxed">
+              {item.description}
+            </p>
+          )}
+          
+          {/* Pricing */}
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl font-bold text-neutral-900">
+              ${item.discountedPrice.toFixed(2)}
+            </span>
+            {item.originalPrice > item.discountedPrice && (
+              <span className="text-base text-neutral-500 line-through">
+                ${item.originalPrice.toFixed(2)}
+              </span>
+            )}
+          </div>
+          
+          {/* Add to Cart Button */}
+          <button className="w-full bg-neutral-900 text-white rounded-lg px-4 py-3 font-semibold hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2">
+            <ShoppingCart className="h-5 w-5" />
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -286,6 +414,16 @@ export const MenuTab = ({ deal, onNavigateToTab }: MenuTabProps) => {
         />
       )}
 
+      {/* Daily Menu Banner */}
+      {selectedSubMenu === 'daily' && (
+        <div className="bg-blue-600 text-white rounded-xl p-4">
+          <h3 className="text-lg font-bold mb-2">Daily Menu</h3>
+          <p className="text-sm opacity-90">
+            Breakfast (6am-11am) • Brunch (11am-3pm) • Dinner (5pm-10pm)
+          </p>
+        </div>
+      )}
+
       {/* Sub-menu Navigation */}
       <div className="flex gap-2 overflow-x-auto scrollbar-hide border-b border-neutral-200">
         {subMenus.map((menu) => (
@@ -308,65 +446,45 @@ export const MenuTab = ({ deal, onNavigateToTab }: MenuTabProps) => {
         ))}
       </div>
 
-      {/* Menu Items Grid */}
-      {filteredMenuItems.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMenuItems.map((item) => {
-            const discount = deal.discountPercentage || 0;
-            const discountAmount = item.originalPrice - item.discountedPrice;
-            const discountPercent = Math.round((discountAmount / item.originalPrice) * 100);
+      {/* Menu Items - Organized by meal type for Daily Menu */}
+      {selectedSubMenu === 'daily' && filteredMenuItems.length > 0 ? (
+        <div className="space-y-8">
+          {(() => {
+            const { breakfastItems, brunchItems, dinnerItems, otherItems } = organizeByMealType(filteredMenuItems);
+            const sections = [
+              { title: 'Breakfast', items: breakfastItems, timeRange: 'Available 6:00 AM - 11:00 AM' },
+              { title: 'Brunch', items: brunchItems, timeRange: 'Available 11:00 AM - 3:00 PM' },
+              { title: 'Dinner', items: dinnerItems, timeRange: 'Available 5:00 PM - 10:00 PM' },
+            ].filter(section => section.items.length > 0);
 
-            return (
-              <div
-                key={item.id}
-                className="relative bg-white rounded-xl overflow-hidden border border-neutral-200 hover:shadow-lg transition-all hover:scale-[1.02]"
-              >
-                {/* Image Section */}
-                {item.imageUrl && (
-                  <div className="relative h-56 overflow-hidden bg-neutral-100">
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
-                    {discountPercent > 0 && (
-                      <div className="absolute top-3 right-3 bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-lg">
-                        {discountPercent}% OFF
-                      </div>
-                    )}
+            // If no items match meal types, show all items in a single section
+            if (sections.length === 0 && filteredMenuItems.length > 0) {
+              return (
+                <div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredMenuItems.map((item) => renderMenuItemCard(item))}
                   </div>
-                )}
-                
-                {/* Content Section */}
-                <div className="p-5">
-                  <h4 className="font-bold text-xl text-neutral-900 mb-2">{item.name}</h4>
-                  {item.description && (
-                    <p className="text-sm text-neutral-600 mb-4 line-clamp-2 leading-relaxed">
-                      {item.description}
-                    </p>
-                  )}
-                  
-                  {/* Pricing */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-2xl font-bold text-neutral-900">
-                      ${item.discountedPrice.toFixed(2)}
-                    </span>
-                    {item.originalPrice > item.discountedPrice && (
-                      <span className="text-base text-neutral-500 line-through">
-                        ${item.originalPrice.toFixed(2)}
-                      </span>
-                    )}
-                  </div>
-                  
-                  {/* Add to Cart Button */}
-                  <button className="w-full bg-neutral-900 text-white rounded-lg px-4 py-3 font-semibold hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2">
-                    <ShoppingCart className="h-5 w-5" />
-                    Add to Cart
-                  </button>
+                </div>
+              );
+            }
+
+            return sections.map((section) => (
+              <div key={section.title} className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full" />
+                  <h3 className="text-xl font-bold text-neutral-900">{section.title}</h3>
+                </div>
+                <p className="text-sm text-neutral-600 mb-4">{section.timeRange}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {section.items.map((item) => renderMenuItemCard(item))}
                 </div>
               </div>
-            );
-          })}
+            ));
+          })()}
+        </div>
+      ) : filteredMenuItems.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredMenuItems.map((item) => renderMenuItemCard(item))}
         </div>
       ) : (
         <div className="text-center py-12 text-neutral-500">
