@@ -7,7 +7,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
-  Phone, 
   MapPin, 
   Award,
   Fish,
@@ -134,32 +133,55 @@ export const LeaderboardSection = () => {
     }
   };
 
-  if (isLoadingLeaderboard && isLoadingFeatured && isLoadingPopular) {
-    return (
-      <div className="bg-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-gray-50 rounded-2xl p-6 border border-gray-100 animate-pulse">
-                <div className="h-8 bg-gray-200 rounded mb-4"></div>
-                <div className="space-y-2">
-                  {[1, 2, 3].map((j) => (
-                    <div key={j} className="h-16 bg-gray-100 rounded-lg"></div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+  // Skeleton loader component for leaderboard items
+  const LeaderboardItemSkeleton = () => (
+    <div className="flex items-center gap-3 p-3 rounded-lg bg-white border border-gray-100 animate-pulse">
+      <div className="relative shrink-0">
+        <div className="w-10 h-10 rounded-full bg-gray-200 border-2 border-gray-200"></div>
+        <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gray-300"></div>
       </div>
-    );
-  }
+      <div className="flex-1 min-w-0 space-y-2">
+        <div className="h-4 w-24 bg-gray-200 rounded"></div>
+        <div className="h-3 w-32 bg-gray-200 rounded"></div>
+      </div>
+      <div className="flex items-center gap-2 shrink-0">
+        <div className="h-3 w-8 bg-gray-200 rounded"></div>
+        <div className="h-4 w-4 bg-gray-200 rounded"></div>
+      </div>
+    </div>
+  );
+
+  // Skeleton loader for each column
+  const ColumnSkeleton = ({ title, showDropdown = false }: { title: string; showDropdown?: boolean }) => (
+    <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-4 h-4 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-6 w-40 bg-gray-200 rounded animate-pulse"></div>
+        </div>
+        <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+      </div>
+      {showDropdown && (
+        <div className="relative mb-4">
+          <div className="w-full h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+        </div>
+      )}
+      <div className="space-y-2">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <LeaderboardItemSkeleton key={i} />
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <section className="bg-white py-12 border-t border-gray-100">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           {/* Column 1: Top People Checking In */}
+          {isLoadingLeaderboard ? (
+            <ColumnSkeleton title="Top people checking in" showDropdown={true} />
+          ) : (
           <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
@@ -282,8 +304,12 @@ export const LeaderboardSection = () => {
               })}
             </div>
           </div>
+          )}
 
           {/* Column 2: New Restaurants */}
+          {isLoadingFeatured ? (
+            <ColumnSkeleton title="New restaurants" />
+          ) : (
           <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
@@ -406,19 +432,7 @@ export const LeaderboardSection = () => {
                             )}
 
                             {/* CTA Buttons */}
-                            <div className="grid grid-cols-3 gap-2">
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="text-xs h-9"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate(PATHS.DEAL_DETAIL.replace(':dealId', deal.id));
-                                }}
-                              >
-                                <Phone className="w-3 h-3 mr-1" />
-                                Call
-                              </Button>
+                            <div className="grid grid-cols-2 gap-2">
                               <Button 
                                 size="sm" 
                                 variant="outline" 
@@ -453,8 +467,12 @@ export const LeaderboardSection = () => {
               })}
             </div>
           </div>
+          )}
 
           {/* Column 3: Trending on Site */}
+          {isLoadingPopular ? (
+            <ColumnSkeleton title="Trending on site" />
+          ) : (
           <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
@@ -576,19 +594,7 @@ export const LeaderboardSection = () => {
                             )}
 
                             {/* CTA Buttons */}
-                            <div className="grid grid-cols-3 gap-2">
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="text-xs h-9"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate(PATHS.DEAL_DETAIL.replace(':dealId', deal.id));
-                                }}
-                              >
-                                <Phone className="w-3 h-3 mr-1" />
-                                Call
-                              </Button>
+                            <div className="grid grid-cols-2 gap-2">
                               <Button 
                                 size="sm" 
                                 variant="outline" 
@@ -623,6 +629,7 @@ export const LeaderboardSection = () => {
               })}
             </div>
           </div>
+          )}
         </div>
       </div>
     </section>
