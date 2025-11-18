@@ -53,6 +53,10 @@ export interface Deal {
   merchantAddress?: string;
   merchantLogo?: string;
   description?: string;
+  
+  // --- BOUNTY/REFERRAL FIELDS ---
+  bountyRewardAmount?: number | null;
+  minReferralsRequired?: number | null;
 }
 
 // Function to get a future date for mock data

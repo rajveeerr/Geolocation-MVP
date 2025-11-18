@@ -1,7 +1,7 @@
 
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/common/Button';
-import { PATHS } from '@/routing/paths';
+// import { Link } from 'react-router-dom';
+// import { Button } from '@/components/common/Button';
+// import { PATHS } from '@/routing/paths';
 import type { ReactNode } from 'react';
 
 interface EnhancedSectionHeaderProps {
@@ -20,41 +20,41 @@ export const EnhancedSectionHeader = ({
   icon,
   title,
   subtitle,
-  description,
-  showAllLink = true,
-  onScrollLeft,
-  onScrollRight,
-  showNavigation = true,
+  showAllLink: _showAllLink = true,
+  onScrollLeft: _onScrollLeft,
+  onScrollRight: _onScrollRight,
+  showNavigation: _showNavigation = true,
   variant = 'simple',
 }: EnhancedSectionHeaderProps) => {
   // Determine layout based on variant
   const isMinimal = variant === 'minimal';
-  const isDetailed = variant === 'detailed' && (subtitle || description);
 
   return (
     <div className="mb-6 sm:mb-8">
-      {/* Header Content */}
-      <div className="flex items-center justify-between">
-        {/* Left side - Title with icon */}
-        <div className="flex items-center gap-3 sm:gap-4">
+      {/* Header Content - Left aligned like Figma */}
+      <div className="flex flex-col">
+        {/* Title with icon - Horizontal layout */}
+        <div className="flex items-center gap-3 sm:gap-4 mb-2">
           <div className="flex-shrink-0">
             {icon}
           </div>
-          <div className="flex-1">
-            <h2 className="text-xl font-bold tracking-tight text-neutral-900 sm:text-2xl lg:text-3xl">
-              {title}
-            </h2>
-            {/* Subtitle - only show if not minimal and subtitle exists */}
-            {!isMinimal && subtitle && (
-              <p className="text-neutral-600 text-sm sm:text-base mt-1">
-                {subtitle}
-              </p>
-            )}
-          </div>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900">
+            {title}
+          </h2>
         </div>
+        
+        {/* Subtitle - Left aligned, styled like Figma */}
+        {!isMinimal && subtitle && (
+          <p className="text-gray-600 text-base sm:text-lg mt-1 ml-0">
+            {subtitle}
+          </p>
+        )}
+      </div>
 
-        {/* Right side - Actions */}
-        <div className="flex items-center gap-2 sm:gap-3">
+      {/* Right side - Actions (commented out per user request) */}
+      {/* 
+      {(showAllLink || (showNavigation && onScrollLeft && onScrollRight)) && (
+        <div className="flex items-center justify-end gap-2 sm:gap-3 mt-4">
           {showAllLink && (
             <Link to={PATHS.ALL_DEALS}>
               <Button
@@ -67,7 +67,6 @@ export const EnhancedSectionHeader = ({
             </Link>
           )}
           
-          {/* Navigation buttons */}
           {showNavigation && onScrollLeft && onScrollRight && (
             <>
               <button
@@ -91,14 +90,8 @@ export const EnhancedSectionHeader = ({
             </>
           )}
         </div>
-      </div>
-
-      {/* Description - only show for detailed variant */}
-      {isDetailed && description && (
-        <p className="text-neutral-500 text-sm mt-3 max-w-2xl">
-          {description}
-        </p>
       )}
+      */}
     </div>
   );
 };
