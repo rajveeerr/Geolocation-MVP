@@ -111,7 +111,7 @@ export const HomePage = () => {
 
       <SectionDivider />
 
-      <DiscoverSection />
+      {/* <DiscoverSection /> */}
     </div>
     </>
   );
