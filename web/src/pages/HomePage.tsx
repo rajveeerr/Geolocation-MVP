@@ -5,6 +5,8 @@ import { ContentCarousel } from '@/components/common/ContentCarousel';
 import { CarouselSkeleton } from '@/components/common/DealCardSkeleton';
 // import type { Deal } from '@/data/deals';
 import { DiscoverSection } from '@/components/landing/DiscoverSection';
+import { NewHeroSection } from '@/components/landing/NewHeroSection';
+import { LeaderboardSection } from '@/components/landing/LeaderboardSection';
 import { premiumDeals, happyHourDeals, experiencesData } from '@/data/deals'; // Fallback mock data
 import { AnimatePresence } from 'framer-motion';
 import { useFeaturedDeals } from '@/hooks/useFeaturedDeals';
@@ -36,14 +38,11 @@ export const HomePage = () => {
         name="description"
         content="Discover real-time deals, exclusive happy hours, and unique local experiences. Yohop is your live map to the best moments in your city."
       />
-      <div className="bg-white pt-16 sm:pt-20">
-      {/* <section className="border-b border-neutral-200 bg-white pb-6 pt-6 sm:pb-8 sm:pt-8 lg:pb-10 lg:pt-12">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <DealFinder activeTab={activeTab} onTabChange={setActiveTab} />
-        </div>
-      </section> */}
+      <div className="bg-white">
+        {/* Hero Section */}
+        <NewHeroSection />
 
-      {/* Today's Top Deals */}
+        {/* Today's Top Deals */}
       {isLoadingTodays ? (
         <CarouselSkeleton title="Today's Top Deals" />
       ) : (
@@ -107,7 +106,12 @@ export const HomePage = () => {
 
       <SectionDivider />
 
-      <DiscoverSection />
+      {/* Leaderboard Section */}
+      <LeaderboardSection />
+
+      <SectionDivider />
+
+      {/* <DiscoverSection /> */}
     </div>
     </>
   );

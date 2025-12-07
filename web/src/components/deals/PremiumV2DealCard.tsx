@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import type { Deal, Offer } from '@/data/deals';
 import { useCountdown } from '@/hooks/useCountdown';
+import { useHappyHourTimer } from '@/hooks/useHappyHourTimer';
 import { useSavedDeals } from '@/hooks/useSavedDeals';
 import { useAuth } from '@/context/useAuth';
 import { useModal } from '@/context/ModalContext';
@@ -97,14 +98,14 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
     useSavedDeals();
 
   // Fetch today's availability for this merchant
-  // Only fetch availability if merchantId is defined
-  const shouldFetchAvailability = deal.merchantId !== undefined && deal.merchantId !== null;
+  // Check both deal.merchantId and deal.merchant?.id (handle both flat and nested structures)
+  const merchantIdFromDeal = deal.merchantId || (deal as any).merchant?.id;
+  const effectiveMerchantId = merchantIdFromDeal && merchantIdFromDeal > 0 ? Number(merchantIdFromDeal) : undefined;
   
   const { data: todayAvailability, isLoading: isLoadingAvailability, error: availabilityError } = useTodayAvailability(
-    deal.merchantId || 0, // Use 0 if undefined (will not fetch due to enabled condition)
+    effectiveMerchantId, // Pass undefined if invalid - hook will disable fetch
     2 // default party size
   );
-
   // State for booking modal
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [preselectedTimeSlot, setPreselectedTimeSlot] = useState<any>(null);
@@ -141,7 +142,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
   const finalClaimedUsers = realClaimedUsers;
 
   // State to control visibility of offers dropdown/list
-  const [offersVisible, setOffersVisible] = useState(true);
+  const [offersVisible, setOffersVisible] = useState(false);
   
   // Get unique categories from real offers and always add Tables
   const availableCategories = useMemo(() => {
@@ -170,16 +171,29 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
     return realOffers.filter((offer) => offer.category === activeOfferTab);
   }, [realOffers, activeOfferTab]);
 
-  const countdown = useCountdown(deal.expiresAt || '');
-  // Format countdown to show HH.MM.SS format like 06.45.22
-  const formattedCountdown = `${String(countdown.hours).padStart(2, '0')}.${String(countdown.minutes).padStart(2, '0')}.${String(countdown.seconds).padStart(2, '0')}`;
-
-  const normalizedDealType = String(deal.dealType).toLowerCase();
+  // Use Happy Hour timer for happy hour deals, regular countdown for others
+  const normalizedDealType = typeof deal.dealType === 'string' 
+    ? deal.dealType.toLowerCase() 
+    : deal.dealType?.name?.toLowerCase() || '';
   const isHappyHour = normalizedDealType.includes('happy');
-  const showCountdown =
-    isHappyHour &&
-    deal.expiresAt &&
-    (countdown.hours > 0 || countdown.minutes > 0 || countdown.seconds > 0);
+  
+  const happyHourTimer = useHappyHourTimer(isHappyHour ? deal as any : null);
+  const regularCountdown = useCountdown(deal.expiresAt || '');
+  
+  // Use appropriate timer based on deal type
+  const countdown = isHappyHour ? happyHourTimer : regularCountdown;
+  
+  // Format countdown to show HH.MM.SS format like 06.45.22
+  const formattedCountdown = isHappyHour 
+    ? happyHourTimer.formatted
+    : `${String(countdown.hours).padStart(2, '0')}.${String(countdown.minutes).padStart(2, '0')}.${String(countdown.seconds).padStart(2, '0')}`;
+
+  // Show countdown for happy hour deals if timer has valid time (always show for happy hour if timer is working)
+  // For other deals, show if expiresAt exists and has time remaining
+  const showCountdown = isHappyHour
+    ? (happyHourTimer.formatted !== '00.00.00' && 
+       (happyHourTimer.hours > 0 || happyHourTimer.minutes > 0 || happyHourTimer.seconds > 0))
+    : (deal.expiresAt && (countdown.hours > 0 || countdown.minutes > 0 || countdown.seconds > 0));
 
   const isHighValueDiscount = (deal.discountPercentage ?? 0) >= 50;
   
@@ -535,7 +549,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                                                 {todayAvailability.availableTimeSlots.slice(0, 3).map((slot) => (
                     <TimeSlotQuickCard
                       key={slot.id}
-                      merchantId={deal.merchantId!}
+                      merchantId={effectiveMerchantId!}
                       merchantName={deal.merchantName || deal.name}
                       slot={slot}
                       date={todayAvailability.date}
@@ -592,7 +606,7 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
                                               </summary>
                                               <div className="mt-2">
                   <AvailableTablesList
-                    merchantId={deal.merchantId!}
+                    merchantId={effectiveMerchantId!}
                     merchantName={deal.merchantName || deal.name}
                   />
                                               </div>
@@ -682,11 +696,11 @@ export const PremiumV2DealCard = ({ deal }: { deal: PremiumDeal }) => {
       </div>
 
       {/* Table Booking Modal */}
-      {isBookingModalOpen && (
+      {isBookingModalOpen && effectiveMerchantId && (
         <TableBookingModal
           isOpen={isBookingModalOpen}
           onClose={handleCloseBookingModal}
-          merchantId={deal.merchantId!}
+          merchantId={effectiveMerchantId}
           merchantName={deal.merchantName || deal.name}
           preselectedTimeSlot={preselectedTimeSlot}
         />

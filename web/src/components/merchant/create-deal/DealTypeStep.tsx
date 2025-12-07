@@ -48,11 +48,28 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
   const { state, dispatch } = useDealCreation();
   const navigate = useNavigate();
 
+  const handleNext = () => {
+    // Navigate to deal-type-specific steps
+    if (state.dealType === 'BOUNTY') {
+      navigate('/merchant/deals/create/bounty');
+    } else if (state.dealType === 'HIDDEN') {
+      navigate('/merchant/deals/create/hidden');
+    } else if (state.dealType === 'REDEEM_NOW') {
+      navigate('/merchant/deals/create/redeem-now');
+    } else if (state.dealType === 'RECURRING') {
+      // Daily Deal goes directly to weekday selection
+      navigate('/merchant/deals/create/daily-deal/weekdays');
+    } else {
+      // For STANDARD, HAPPY_HOUR, go to basics
+      onNext();
+    }
+  };
+
   return (
     <OnboardingStepLayout
       title="What kind of deal are you creating?"
       subtitle="Choose the type that best fits your business goals"
-      onNext={onNext}
+      onNext={handleNext}
       onBack={() => navigate(PATHS.MERCHANT_DASHBOARD)}
       isNextDisabled={!state.dealType}
       progress={15}
@@ -73,7 +90,7 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
           {/* First row - Basic deal types */}
           <DealTypeButton
             icon={<Tag className="h-5 w-5" />}
-            title="Standard Deal"
+            title="Item Deal"
             isSelected={state.dealType === 'STANDARD'}
             onClick={() =>
               dispatch({ type: 'SET_FIELD', field: 'dealType', value: 'STANDARD' })
@@ -93,7 +110,7 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
           
           <DealTypeButton
             icon={<Repeat className="h-5 w-5" />}
-            title="Recurring Deal"
+            title="Daily Deal"
             isSelected={state.dealType === 'RECURRING'}
             onClick={() =>
               dispatch({ type: 'SET_FIELD', field: 'dealType', value: 'RECURRING' })
@@ -143,9 +160,9 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
           >
             <div className="text-center">
               <h4 className="font-semibold text-neutral-900 mb-3">
-                {state.dealType === 'STANDARD' && 'Standard Deal'}
+                {state.dealType === 'STANDARD' && 'Item Deal'}
                 {state.dealType === 'HAPPY_HOUR' && 'Happy Hour'}
-                {state.dealType === 'RECURRING' && 'Recurring Deal'}
+                {state.dealType === 'RECURRING' && 'Daily Deal'}
                 {state.dealType === 'REDEEM_NOW' && 'Redeem Now Deal'}
                 {state.dealType === 'HIDDEN' && 'Hidden Deal'}
                 {state.dealType === 'BOUNTY' && 'Bounty Deal'}
@@ -153,8 +170,8 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
               <p className="text-neutral-600 leading-relaxed">
                 {state.dealType === 'STANDARD' && 'Perfect for promotions, sales, and special offers that run for a specific time period.'}
                 {state.dealType === 'HAPPY_HOUR' && 'Create urgency with time-limited offers during specific hours to boost traffic.'}
-                {state.dealType === 'RECURRING' && 'Set up weekly repeating offers to build customer habits and consistent foot traffic.'}
-                {state.dealType === 'REDEEM_NOW' && 'Immediate redemption deals that customers can claim and use right away without waiting.'}
+                {state.dealType === 'RECURRING' && 'Set up daily repeating offers to build customer habits and consistent foot traffic.'}
+                {state.dealType === 'REDEEM_NOW' && 'Spend-based deals where customers spend a minimum amount to unlock instant discounts (e.g., Spend $25 to get 50% off).'}
                 {state.dealType === 'HIDDEN' && 'Exclusive deals that are only visible to customers who have special access or codes.'}
                 {state.dealType === 'BOUNTY' && 'Reward-based deals where customers earn points or rewards for completing specific actions.'}
               </p>
@@ -174,8 +191,8 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
             <div>
               <h4 className="font-semibold text-neutral-900 mb-2">Need help choosing?</h4>
               <p className="text-neutral-600 leading-relaxed">
-                <strong>Standard</strong> for one-time promotions, <strong>Happy Hour</strong> for daily specials, 
-                or <strong>Recurring</strong> for weekly deals like "Taco Tuesday" or "Wine Wednesday".
+                <strong>Item Deal</strong> for one-time promotions, <strong>Happy Hour</strong> for daily specials, 
+                or <strong>Daily Deal</strong> for repeating deals like "Taco Tuesday" or "Wine Wednesday".
               </p>
             </div>
           </div>

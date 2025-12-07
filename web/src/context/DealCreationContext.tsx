@@ -59,6 +59,35 @@ export interface DealCreationState {
   startTime: string;
   endTime: string;
   standardOfferKind: 'percentage' | 'amount' | 'custom' | null;
+  // Deal type specific fields
+  bountyRewardAmount: number | null;
+  minReferralsRequired: number | null;
+  accessCode: string | null;
+  // Menu collection fields
+  useMenuCollection: boolean;
+  menuCollectionId: number | null;
+  // Daily Deal / Streak fields
+  streakEnabled: boolean;
+  streakMinVisits: number | null;
+  streakRewardType: 'percentage' | 'amount' | null;
+  streakRewardValue: number | null;
+  recurringFrequency: 'week' | 'month' | 'year' | null;
+  // Hidden deal visibility configuration
+  hiddenDealVisibility: {
+    accessCode: boolean; // always true
+    qrCode: boolean;
+    tapIns: boolean;
+    socialSharing: boolean;
+    tapInConfig?: {
+      showInAllCheckIns: boolean;
+      specificTimes?: string; // validHours format
+      specificDays?: string[]; // validDaysOfWeek
+      firstTimeOnly?: boolean;
+      returningOnly?: boolean;
+    };
+    tapInMenuItems?: number[]; // selected item IDs to show in tap-ins
+    tapInMenuCollectionId?: number | null;
+  };
 }
 
 type Action =
@@ -71,7 +100,8 @@ type Action =
   | { type: 'TOGGLE_RECURRING_DAY'; payload: string }
   | { type: 'SET_DEAL_TYPE'; dealType: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' }
   | { type: 'SET_STANDARD_OFFER_KIND'; kind: 'percentage' | 'amount' | 'custom' | null }
-  | { type: 'SET_IMAGE_URLS'; payload: string[] };
+  | { type: 'SET_IMAGE_URLS'; payload: string[] }
+  | { type: 'SET_MENU_COLLECTION'; collectionId: number | null };
 
 const initialState: DealCreationState = {
   dealType: null,
@@ -110,6 +140,31 @@ const initialState: DealCreationState = {
   startTime: '',
   endTime: '',
   standardOfferKind: null,
+  // Deal type specific fields
+  bountyRewardAmount: null,
+  minReferralsRequired: null,
+  accessCode: null,
+  // Menu collection fields
+  useMenuCollection: false,
+  menuCollectionId: null,
+  // Daily Deal / Streak fields
+  streakEnabled: false,
+  streakMinVisits: null,
+  streakRewardType: null,
+  streakRewardValue: null,
+  recurringFrequency: null,
+  // Hidden deal visibility configuration
+  hiddenDealVisibility: {
+    accessCode: true, // always true
+    qrCode: false,
+    tapIns: false,
+    socialSharing: false,
+    tapInConfig: {
+      showInAllCheckIns: true,
+    },
+    tapInMenuItems: undefined,
+    tapInMenuCollectionId: null,
+  },
 };
 
 function reducer(state: DealCreationState, action: Action): DealCreationState {
@@ -150,6 +205,15 @@ function reducer(state: DealCreationState, action: Action): DealCreationState {
         newPrimaryImageIndex = 0;
       }
       return { ...state, imageUrls: newImageUrls, primaryImageIndex: newPrimaryImageIndex };
+    }
+    case 'SET_MENU_COLLECTION': {
+      return { 
+        ...state, 
+        menuCollectionId: action.collectionId,
+        useMenuCollection: action.collectionId !== null,
+        // Clear selected items when switching to collection mode
+        selectedMenuItems: action.collectionId !== null ? [] : state.selectedMenuItems
+      };
     }
     default:
       return state;

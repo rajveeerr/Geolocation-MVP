@@ -6,17 +6,17 @@ export type ApiDeal = {
   id: string;
   title: string;
   description: string;
-  imageUrl?: string | null;
-  images?: string[];
-  merchantId?: number | null; // Add merchantId field
+  imageUrl?: string | null; // Deprecated - use images array instead
+  images?: string[]; // Primary field - array of image URLs
+  merchantId?: number | null; // Optional top-level merchantId for backward compatibility
   merchant: {
-    id?: number | null; // Add merchant id
+    id?: number | null; // Merchant ID for table booking
     businessName: string;
     address: string;
     latitude?: number | null;
     longitude?: number | null;
-    logoUrl?: string | null; // Add logoUrl
-    phoneNumber?: string | null; // Add phoneNumber
+    logoUrl?: string | null;
+    phoneNumber?: string | null; // Optional phone number
   };
   discountPercentage?: number | null;
   discountAmount?: number | null;
@@ -81,18 +81,36 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
     dealValue = `$${apiDeal.discountAmount} OFF`;
   }
 
+  // Handle category - can be string or object
+  let categoryString: string = 'Restaurant';
+  if (typeof apiDeal.category === 'string') {
+    categoryString = apiDeal.category;
+  } else if (apiDeal.category && typeof apiDeal.category === 'object') {
+    // Handle category object with name, label, or value property
+    categoryString = (apiDeal.category as any).name || 
+                     (apiDeal.category as any).label || 
+                     (apiDeal.category as any).value || 
+                     'Restaurant';
+  }
+
+  // Handle images - backend returns both `images` array and `imageUrl` (singular)
+  // Priority: use `images` array if available, otherwise use `imageUrl`, otherwise fallback
+  let imagesArray: string[] = [];
+  if (apiDeal.images && Array.isArray(apiDeal.images) && apiDeal.images.length > 0) {
+    imagesArray = apiDeal.images;
+  } else if (apiDeal.imageUrl) {
+    imagesArray = [apiDeal.imageUrl];
+  } else {
+    imagesArray = ['https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80'];
+  }
+
   return {
   id: apiDeal.id,
   name: apiDeal.title,
-  image:
-    apiDeal.imageUrl ||
-    'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
-  images:
-    apiDeal.images && apiDeal.images.length > 0
-      ? apiDeal.images
-      : [apiDeal.imageUrl || 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80'],
+  image: imagesArray[0] || 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
+  images: imagesArray,
   rating: apiDeal.rating ?? 4.2,
-  category: apiDeal.category || 'Restaurant',
+  category: categoryString,
 
   // Map required DealWithLocation fields
   price: apiDeal.price || '$$',
@@ -104,7 +122,8 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
   ],
 
   // Add merchant information for dynamic display
-  merchantId: apiDeal.merchantId, // Pass through merchantId
+  // Support both top-level merchantId and nested merchant.id for flexibility
+  merchantId: apiDeal.merchantId || apiDeal.merchant.id || undefined,
   merchantName: apiDeal.merchant.businessName,
   merchantAddress: apiDeal.merchant.address,
   merchantLogo: apiDeal.merchant.logoUrl,

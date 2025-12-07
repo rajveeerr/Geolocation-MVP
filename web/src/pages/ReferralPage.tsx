@@ -52,6 +52,7 @@ export const ReferralPage = () => {
         <ReferralCard
           code={referralData.referralCode}
           count={referralData.referralCount}
+          referredUsers={referralData.referredUsers || []}
         />
       </div>
     </div>

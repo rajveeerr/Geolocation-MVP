@@ -22,6 +22,11 @@ import { Button } from '@/components/common/Button';
 import { PATHS } from '@/routing/paths';
 import { ProfilePictureUpload } from '@/components/profile/ProfilePictureUpload';
 import { useUpdateAvatar } from '@/hooks/useUpdateProfile';
+import { StreakCard } from '@/components/gamification/streak/StreakCard';
+import { useStreak } from '@/hooks/useStreak';
+import { StreakDiscountBreakdown } from '@/components/gamification/streak/StreakDiscountBreakdown';
+import { LoyaltyWallet } from '@/components/gamification/loyalty/LoyaltyWallet';
+import { ActiveItemsBadge } from '@/components/heist/ActiveItemsBadge';
 
 export const ProfilePage = () => {
   const { user } = useAuth();
@@ -51,6 +56,8 @@ export const ProfilePage = () => {
     updateAvatar.mutate(newAvatarUrl);
   };
 
+  const avatarUrl: string | undefined = ((user as any)?.avatarUrl ?? undefined) as string | undefined;
+
   const TabButton = ({
     tabName,
     label,
@@ -78,9 +85,9 @@ export const ProfilePage = () => {
         <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
           <div className="flex flex-col items-center gap-6 sm:flex-row">
             <ProfilePictureUpload
-              currentAvatarUrl={(user as any)?.avatarUrl}
-              userName={user?.name}
-              userEmail={user?.email}
+              currentAvatarUrl={avatarUrl as unknown as string | undefined}
+              userName={user?.name ?? undefined}
+              userEmail={user?.email ?? undefined}
               onAvatarUpdate={handleAvatarUpdate}
               size="lg"
               showUploadButton={true}
@@ -101,6 +108,13 @@ export const ProfilePage = () => {
                   <span className="text-sm text-amber-600">Points</span>
                 </div>
               )}
+
+              {/* Active Heist Items */}
+              {!isMerchant && (
+                <div className="mt-3">
+                  <ActiveItemsBadge variant="detailed" />
+                </div>
+              )}
             </div>
             <div className="sm:ml-auto">
               <Button variant="secondary" size="md">
@@ -109,6 +123,19 @@ export const ProfilePage = () => {
               </Button>
             </div>
           </div>
+        </div>
+
+        <div className="mt-6 space-y-6">
+          {(() => {
+            const { streak, isLoading } = useStreak();
+            return (
+              <>
+                <StreakCard streak={streak} loading={isLoading} />
+                <StreakDiscountBreakdown />
+                {!isMerchant && <LoyaltyWallet />}
+              </>
+            );
+          })()}
         </div>
 
         <div className="mt-12">

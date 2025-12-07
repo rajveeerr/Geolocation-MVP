@@ -4,16 +4,18 @@ import { Link } from 'react-router-dom';
 import { PATHS } from '@/routing/paths';
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
-import { CalendarIcon, ClockIcon, DollarSign, Percent, BarChart3, Users, Settings } from 'lucide-react';
+import { CalendarIcon, ClockIcon, DollarSign, Percent, BarChart3, Users, Settings, Gift } from 'lucide-react';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useMerchantDashboardStats } from '@/hooks/useMerchantDashboardStats';
 import { useMerchantStores } from '@/hooks/useMerchantStores';
+import { useMerchantLoyaltyProgram } from '@/hooks/useMerchantLoyalty';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { ExploreDealsPreview } from '@/components/merchant/ExploreDealsPreview';
 // Removed shadcn tabs import - using custom styling like kickback page
 import { MerchantTableBookingDashboard } from '@/components/table-booking/MerchantTableBookingDashboard';
 import { BusinessTypeCard } from '@/components/merchant/BusinessTypeCard';
+import { CheckInFeed } from '@/components/merchant/CheckInFeed';
 
 interface Deal {
   id: string;
@@ -110,6 +112,60 @@ const DealsSkeleton = () => (
     ))}
   </div>
 );
+
+const LoyaltyProgramCard = () => {
+  const { data: loyaltyProgram, isLoading } = useMerchantLoyaltyProgram();
+  const hasProgram = loyaltyProgram?.program && !loyaltyProgram.error;
+
+  return (
+    <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-primary-100">
+            <Gift className="h-6 w-6 text-brand-primary-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-neutral-900">Loyalty Program</h3>
+            <p className="mt-1 text-sm text-neutral-600">
+              {isLoading 
+                ? 'Checking status...' 
+                : hasProgram 
+                  ? 'Reward your customers with points' 
+                  : 'Set up a loyalty program to reward your customers'}
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div className="mt-4">
+        {isLoading ? (
+          <div className="animate-pulse">
+            <div className="h-10 w-32 rounded-md bg-neutral-200" />
+          </div>
+        ) : hasProgram ? (
+          <div className="flex gap-3">
+            <Link to={PATHS.MERCHANT_LOYALTY_ANALYTICS}>
+              <Button variant="primary" size="sm" className="rounded-lg">
+                View Program
+              </Button>
+            </Link>
+            <Link to={PATHS.MERCHANT_LOYALTY_PROGRAM}>
+              <Button variant="secondary" size="sm" className="rounded-lg">
+                Manage Settings
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <Link to={PATHS.MERCHANT_LOYALTY_SETUP}>
+            <Button variant="primary" size="sm" className="rounded-lg">
+              Set Up Loyalty Program
+            </Button>
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export const MerchantDashboardPage = () => {
   type DealStatusFilter = 'all' | 'active' | 'scheduled' | 'expired';
@@ -208,11 +264,6 @@ export const MerchantDashboardPage = () => {
               <Button variant="secondary" size="lg" className="rounded-lg">
                 <BarChart3 className="h-4 w-4 mr-2" />
                 View Analytics
-              </Button>
-            </Link>
-            <Link to={PATHS.MERCHANT_DEALS_CREATE}>
-              <Button size="lg" className="rounded-lg">
-                Create New Deal
               </Button>
             </Link>
           </div>
@@ -374,6 +425,11 @@ export const MerchantDashboardPage = () => {
             <BusinessTypeCard />
           </div>
 
+          {/* Loyalty Program Card */}
+          <div className="mb-6">
+            <LoyaltyProgramCard />
+          </div>
+
           {/* Dynamic Region badges - using real merchant store data */}
           <div className="mb-6 flex flex-wrap items-center gap-3">
             {storesLoading ? (
@@ -384,19 +440,21 @@ export const MerchantDashboardPage = () => {
                   <div className="h-3 w-16 bg-neutral-300 rounded"></div>
                 </div>
               ))
-            ) : storesData && storesData.stores.length > 0 ? (
+            ) : storesData && storesData.length > 0 ? (
               // Show only cities where merchant has stores
-              storesData.stores.map((store) => (
-                <div key={store.id} className="rounded-md bg-neutral-900 px-4 py-2 text-white text-sm">
-                  <div className="font-semibold">{store.city.name}</div>
-                  <div className="text-xs text-neutral-200">
-                    {store.active ? 'Active' : 'Inactive'} 
-                    <span className="text-green-400 ml-2">
-                      {store.active ? '100%' : '0%'}
-                    </span>
+              storesData
+                .filter((store) => store.city) // Filter out stores without city data
+                .map((store) => (
+                  <div key={store.id} className="rounded-md bg-neutral-900 px-4 py-2 text-white text-sm">
+                    <div className="font-semibold">{store.city?.name || 'Unknown City'}</div>
+                    <div className="text-xs text-neutral-200">
+                      {store.active ? 'Active' : 'Inactive'} 
+                      <span className="text-green-400 ml-2">
+                        {store.active ? '100%' : '0%'}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))
+                ))
             ) : (
               // No stores state
               <div className="rounded-md bg-neutral-100 px-4 py-2 text-sm text-neutral-600">
@@ -440,9 +498,9 @@ export const MerchantDashboardPage = () => {
                     </div>
                   ))}
                 </div>
-              ) : storesData && storesData.stores.length > 0 ? (
+              ) : storesData && storesData.length > 0 ? (
                 <ul className="space-y-3">
-                  {storesData.stores.map((store) => (
+                  {storesData.map((store) => (
                     <li key={store.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <span className={`h-3 w-3 rounded-full inline-block ${
@@ -475,6 +533,11 @@ export const MerchantDashboardPage = () => {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Check-in Feed */}
+          <div className="mb-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <CheckInFeed limit={10} autoRefresh={true} refreshInterval={30000} />
           </div>
             </div>
           )}

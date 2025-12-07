@@ -16,6 +16,15 @@ import { DealScheduleStep } from '@/components/merchant/create-deal/DealSchedule
 import { DealInstructionsStep } from '@/components/merchant/create-deal/DealInstructionsStep';
 import { DealAdvancedStep } from '@/components/merchant/create-deal/DealAdvancedStep';
 import { DealReviewStep } from '@/components/merchant/create-deal/DealReviewStep';
+import { DealBountyStep } from '@/components/merchant/create-deal/DealBountyStep';
+import { DealBountyBasicsStep } from '@/components/merchant/create-deal/DealBountyBasicsStep';
+import { DealBountyScheduleStep } from '@/components/merchant/create-deal/DealBountyScheduleStep';
+import { DealHiddenStep } from '@/components/merchant/create-deal/DealHiddenStep';
+import { DealHiddenVisibilityStep } from '@/components/merchant/create-deal/DealHiddenVisibilityStep';
+import { DealRedeemNowStep } from '@/components/merchant/create-deal/DealRedeemNowStep';
+import { DealLocationStep } from '@/components/merchant/create-deal/DealLocationStep';
+import { DealDailyDealWeekdayStep } from '@/components/merchant/create-deal/DealDailyDealWeekdayStep';
+import { DealDailyDealConfigStep } from '@/components/merchant/create-deal/DealDailyDealConfigStep';
 import { HappyHourEditorPage } from './HappyHourEditorPage';
 import { AddMenuItemPage } from './AddMenuItemPage';
 
@@ -30,11 +39,20 @@ const InitialStepHandler = () => {
         // Based on the deal type chosen, navigate to the correct flow's first step
         if (state.dealType === 'HAPPY_HOUR') {
             navigate('/merchant/deals/create/happy-hour/edit');
-        } else if (state.dealType === 'REDEEM_NOW' || state.dealType === 'HIDDEN' || state.dealType === 'BOUNTY') {
-            // For new deal types, use the happy hour flow with preset information
-            navigate('/merchant/deals/create/happy-hour/edit');
+        } else if (state.dealType === 'BOUNTY') {
+            // Bounty deals go to bounty step first
+            navigate('/merchant/deals/create/bounty');
+        } else if (state.dealType === 'HIDDEN') {
+            // Hidden deals go to hidden step first
+            navigate('/merchant/deals/create/hidden');
+        } else if (state.dealType === 'REDEEM_NOW') {
+            // Redeem Now goes to dedicated redeem-now step
+            navigate('/merchant/deals/create/redeem-now');
+        } else if (state.dealType === 'RECURRING') {
+            // Daily Deal goes directly to weekday selection
+            navigate('/merchant/deals/create/daily-deal/weekdays');
         } else {
-            // For 'STANDARD' and 'RECURRING', start the simple multi-step flow
+            // For 'STANDARD', start the simple multi-step flow
             navigate('/merchant/deals/create/basics');
         }
     };
@@ -56,9 +74,30 @@ export const CreateDealPage = () => {
           <Route path="offer" element={<DealOfferStep />} />
           <Route path="images" element={<DealImagesStep />} />
           <Route path="schedule" element={<DealScheduleStep />} />
+          <Route path="location" element={<DealLocationStep />} />
           <Route path="instructions" element={<DealInstructionsStep />} />
           <Route path="advanced" element={<DealAdvancedStep />} />
           <Route path="review" element={<DealReviewStep />} />
+          
+          {/* Deal type specific routes */}
+          <Route path="bounty" element={<DealBountyStep />} />
+          <Route path="bounty/basics" element={<DealBountyBasicsStep />} />
+          <Route path="bounty/menu" element={<DealMenuStep />} />
+          <Route path="bounty/schedule" element={<DealBountyScheduleStep />} />
+          <Route path="bounty/images" element={<DealImagesStep />} />
+          <Route path="bounty/review" element={<DealReviewStep />} />
+          <Route path="hidden" element={<DealHiddenStep />} />
+          <Route path="hidden/visibility" element={<DealHiddenVisibilityStep />} />
+          <Route path="hidden/basics" element={<DealBasicsStep />} />
+          <Route path="hidden/menu" element={<DealMenuStep />} />
+          <Route path="hidden/schedule" element={<DealScheduleStep />} />
+          <Route path="hidden/review" element={<DealReviewStep />} />
+          <Route path="redeem-now" element={<DealRedeemNowStep />} />
+          
+          {/* Daily Deal routes */}
+          <Route path="daily-deal/weekdays" element={<DealDailyDealWeekdayStep />} />
+          <Route path="daily-deal/config" element={<DealDailyDealConfigStep />} />
+          <Route path="daily-deal/review" element={<DealReviewStep />} />
 
           {/* --- Route group for the happy hour flow --- */}
           {/* This requires its own provider for its more complex state */}

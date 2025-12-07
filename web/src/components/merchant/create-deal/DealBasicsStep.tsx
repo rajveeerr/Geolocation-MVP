@@ -63,8 +63,22 @@ export const DealBasicsStep = () => {
     <OnboardingStepLayout
       title="Describe your deal"
       subtitle="Create an attractive offer that customers will love"
-      onNext={() => navigate('/merchant/deals/create/menu')}
-      onBack={() => navigate('/merchant/deals/create')}
+      onNext={() => {
+        // For hidden deals, go to hidden menu route
+        if (state.dealType === 'HIDDEN') {
+          navigate('/merchant/deals/create/hidden/menu');
+        } else {
+          navigate('/merchant/deals/create/menu');
+        }
+      }}
+      onBack={() => {
+        // For hidden deals, go back to visibility step
+        if (state.dealType === 'HIDDEN') {
+          navigate('/merchant/deals/create/hidden/visibility');
+        } else {
+          navigate('/merchant/deals/create');
+        }
+      }}
       isNextDisabled={!isFormValid}
       progress={25}
     >

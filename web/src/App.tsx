@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet, useLocation } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { SignUpPage } from './pages/SignUpPage';
@@ -44,8 +44,16 @@ const CreateDealPage = React.lazy(() =>
     default: m.CreateDealPage,
   })),
 );
-const EnhancedDealDetailPage = React.lazy(() =>
-  import('./pages/EnhancedDealDetailPage').then((m) => ({ default: m.EnhancedDealDetailPage })),
+const DealEditPage = React.lazy(() =>
+  import('./pages/merchant/DealEditPage').then((m) => ({
+    default: m.DealEditPage,
+  })),
+);
+const DealDetailPage = React.lazy(() =>
+  import('./pages/DealDetailPage').then((m) => ({ default: m.DealDetailPage })),
+);
+const HiddenDealPage = React.lazy(() =>
+  import('./pages/HiddenDealPage').then((module) => ({ default: module.HiddenDealPage })),
 );
 const AdminLoginPage = React.lazy(() =>
   import('./pages/admin/AdminLoginPage').then((m) => ({ default: m.AdminLoginPage })),
@@ -73,8 +81,28 @@ const LeaderboardPage = React.lazy(() =>
     default: m.LeaderboardPage,
   })),
 );
+const ComprehensiveLeaderboardPage = React.lazy(() =>
+  import('./pages/ComprehensiveLeaderboardPage').then((m) => ({
+    default: m.ComprehensiveLeaderboardPage,
+  })),
+);
 const ReferralPage = React.lazy(() =>
   import('./pages/ReferralPage').then((m) => ({ default: m.ReferralPage })),
+);
+const GamificationPage = React.lazy(() =>
+  import('./pages/GamificationPage').then((m) => ({ default: m.GamificationPage })),
+);
+const StreakLeaderboardPage = React.lazy(() =>
+  import('./pages/StreakLeaderboard').then((m) => ({ default: m.StreakLeaderboardPage })),
+);
+const HeistHistoryPage = React.lazy(() =>
+  import('./pages/HeistHistoryPage').then((m) => ({ default: m.HeistHistoryPage })),
+);
+const HeistNotificationsPage = React.lazy(() =>
+  import('./pages/HeistNotificationsPage').then((m) => ({ default: m.HeistNotificationsPage })),
+);
+const HeistItemShopPage = React.lazy(() =>
+  import('./pages/HeistItemShopPage').then((m) => ({ default: m.HeistItemShopPage })),
 );
 const KickbackEarningsPage = React.lazy(() =>
   import('./pages/merchant/KickbackEarningsPage').then((m) => ({ default: m.KickbackEarningsPage })),
@@ -94,6 +122,9 @@ const MenuItemFormPage = React.lazy(() =>
 const MenuItemDetailPage = React.lazy(() =>
   import('./pages/merchant/MenuItemDetailPage').then((m) => ({ default: m.MenuItemDetailPage })),
 );
+const MenuCollectionsPage = React.lazy(() =>
+  import('./components/merchant/menu-collections/MenuCollectionsPage').then((m) => ({ default: m.MenuCollectionsPage })),
+);
 const StoreDetailPage = React.lazy(() =>
   import('./pages/merchant/StoreDetailPage').then((m) => ({ default: m.StoreDetailPage })),
 );
@@ -102,16 +133,41 @@ const MerchantMyDealsPage = React.lazy(() =>
 );
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
-
-const DefaultLayout = () => (
-  <>
-    <Header />
-    <main>
-      <Outlet />
-    </main>
-    <Footer />
-  </>
+import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
+import { PaymentCancelPage } from './pages/PaymentCancelPage';
+const LoyaltyHistoryPage = React.lazy(() =>
+  import('./pages/LoyaltyHistoryPage').then((m) => ({ default: m.LoyaltyHistoryPage }))
 );
+const MerchantLoyaltySetupPage = React.lazy(() =>
+  import('./pages/merchant/loyalty/MerchantLoyaltySetupPage').then((m) => ({ default: m.MerchantLoyaltySetupPage }))
+);
+const MerchantLoyaltyProgramPage = React.lazy(() =>
+  import('./pages/merchant/loyalty/MerchantLoyaltyProgramPage').then((m) => ({ default: m.MerchantLoyaltyProgramPage }))
+);
+const MerchantLoyaltyAnalyticsPage = React.lazy(() =>
+  import('./pages/merchant/loyalty/MerchantLoyaltyAnalyticsPage').then((m) => ({ default: m.MerchantLoyaltyAnalyticsPage }))
+);
+const MerchantLoyaltyCustomersPage = React.lazy(() =>
+  import('./pages/merchant/loyalty/MerchantLoyaltyCustomersPage').then((m) => ({ default: m.MerchantLoyaltyCustomersPage }))
+);
+const MerchantLoyaltyTransactionsPage = React.lazy(() =>
+  import('./pages/merchant/loyalty/MerchantLoyaltyTransactionsPage').then((m) => ({ default: m.MerchantLoyaltyTransactionsPage }))
+);
+
+const DefaultLayout = () => {
+  const location = useLocation();
+  const isDealDetailPage = location.pathname.startsWith('/deals/') && location.pathname.split('/').length === 3;
+  
+  return (
+    <>
+      <Header />
+      <main>
+        <Outlet />
+      </main>
+      {!isDealDetailPage && <Footer />}
+    </>
+  );
+};
 
 function App() {
   return (
@@ -137,6 +193,14 @@ function App() {
                 />
                 <Route path={PATHS.ABOUT} element={<AboutPage />} />
                 <Route
+                  path={PATHS.STREAK_LEADERBOARD}
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <StreakLeaderboardPage />
+                    </Suspense>
+                  }
+                />
+                <Route
                   path={PATHS.LEADERBOARD}
                   element={
                     <Suspense fallback={<LoadingOverlay />}>
@@ -144,7 +208,25 @@ function App() {
                     </Suspense>
                   }
                 />
+                <Route
+                  path={PATHS.LEADERBOARD_COMPREHENSIVE}
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <ComprehensiveLeaderboardPage />
+                    </Suspense>
+                  }
+                />
                 <Route path={PATHS.ALL_DEALS} element={<AllDealsPage />} />
+                <Route
+                  path={PATHS.LOYALTY_HISTORY}
+                  element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <LoyaltyHistoryPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  }
+                />
                 <Route
                   path={PATHS.REFERRALS}
                   element={
@@ -156,10 +238,58 @@ function App() {
                   }
                 />
                 <Route
+                  path={PATHS.GAMIFICATION}
+                  element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <GamificationPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.HEIST_HISTORY}
+                  element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <HeistHistoryPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.HEIST_NOTIFICATIONS}
+                  element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <HeistNotificationsPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.HEIST_ITEM_SHOP}
+                  element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <HeistItemShopPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path={PATHS.DEAL_DETAIL}
                   element={
                     <Suspense fallback={<LoadingOverlay />}>
-                      <EnhancedDealDetailPage />
+                      <DealDetailPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/deals/hidden/:code"
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <HiddenDealPage />
                     </Suspense>
                   }
                 />
@@ -169,6 +299,8 @@ function App() {
                 />
                 <Route path={PATHS.PRIVACY} element={<PrivacyPage />} />
                 <Route path={PATHS.TERMS} element={<TermsPage />} />
+                <Route path={PATHS.PAYMENT_SUCCESS} element={<PaymentSuccessPage />} />
+                <Route path={PATHS.PAYMENT_CANCEL} element={<PaymentCancelPage />} />
               </Route>
 
               <Route
@@ -202,6 +334,18 @@ function App() {
                     <MerchantLayout>
                       <Suspense fallback={<LoadingOverlay />}>
                         <CreateDealPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/merchant/deals/:dealId/edit"
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <DealEditPage />
                       </Suspense>
                     </MerchantLayout>
                   </ProtectedRoute>
@@ -330,6 +474,18 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path={PATHS.MERCHANT_MENU_COLLECTIONS}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MenuCollectionsPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
 
               <Route
                 path={PATHS.MERCHANT_ANALYTICS}
@@ -338,6 +494,68 @@ function App() {
                     <MerchantLayout>
                       <Suspense fallback={<LoadingOverlay />}>
                         <MerchantAnalyticsPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Merchant Loyalty */}
+              <Route
+                path={PATHS.MERCHANT_LOYALTY_SETUP}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MerchantLoyaltySetupPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={PATHS.MERCHANT_LOYALTY_PROGRAM}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MerchantLoyaltyProgramPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={PATHS.MERCHANT_LOYALTY_ANALYTICS}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MerchantLoyaltyAnalyticsPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={PATHS.MERCHANT_LOYALTY_CUSTOMERS}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MerchantLoyaltyCustomersPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={PATHS.MERCHANT_LOYALTY_TRANSACTIONS}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MerchantLoyaltyTransactionsPage />
                       </Suspense>
                     </MerchantLayout>
                   </ProtectedRoute>

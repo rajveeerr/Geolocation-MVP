@@ -194,19 +194,25 @@ import { Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
 import { PATHS } from '@/routing/paths';
+import { StreakBadge } from '@/components/gamification/streak/StreakBadge';
+import { useStreak } from '@/hooks/useStreak';
 import { Logo } from '../common/Logo';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/useAuth';
 import { ProfileDropDown } from './ProfileDropDown';
 import { NavbarSearch } from './NavbarSearch';
 import { SearchModal } from './SearchModal';
+import CoinDisplay from '../gamification/CoinDisplay';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
+import { HeistTokenBadge } from '@/components/heist/HeistTokenBadge';
+import { HeistNotificationBadge } from '@/components/heist/HeistNotificationBadge';
 
 const navigationItems = [
   { id: 'deals', label: 'Hot Deals', path: PATHS.ALL_DEALS },
   { id: 'leaderboard', label: 'Leaderboard', path: PATHS.LEADERBOARD },
   { id: 'referral', label: 'Referral', path: PATHS.REFERRALS },
+  { id: 'gamification', label: 'Coins', path: PATHS.GAMIFICATION },
 ];
 
 export const Header = () => {
@@ -219,11 +225,6 @@ export const Header = () => {
 
   // Check if user has a merchant profile (any status)
   const hasMerchantProfile = !!merchantData?.data?.merchant;
-
-  // Where the business CTA should navigate
-  const businessLink = hasMerchantProfile
-    ? PATHS.MERCHANT_DASHBOARD
-    : PATHS.MERCHANT_ONBOARDING;
 
   const openSearchModal = () => setIsSearchModalOpen(true);
   const closeSearchModal = () => setIsSearchModalOpen(false);
@@ -247,6 +248,8 @@ export const Header = () => {
       transition: { duration: 0.2, ease: 'easeInOut' },
     },
   };
+
+  const { streak, isLoading: isLoadingStreak } = useStreak();
 
   return (
     <>
@@ -275,7 +278,7 @@ export const Header = () => {
                       <Link
                         key={item.id}
                         to={item.path}
-                        className="rounded-full px-4 py-2 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-100"
+                        className="rounded-full px-4 py-2 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-100 whitespace-nowrap"
                       >
                         {item.label}
                       </Link>
@@ -287,23 +290,47 @@ export const Header = () => {
           </div>
 
           <div className="hidden items-center justify-end gap-2 lg:flex">
-            {!isAdmin && (
+            {/* {!isAdmin && (
               <Link to={businessLink}>
                 <Button variant="secondary" size="md" className="rounded-full">
                   {hasMerchantProfile ? 'Business Dashboard' : 'Yohop for Business'}
                 </Button>
               </Link>
-            )}
+            )} */}
             {isLoadingUser ? (
               <div className="h-10 w-24 animate-pulse rounded-full bg-neutral-200" />
             ) : user ? (
-              <ProfileDropDown isMerchant={hasMerchantProfile} />
+              <div className="flex items-center gap-3">
+                {hasMerchantProfile && (
+                  <Link to={PATHS.MERCHANT_DASHBOARD}>
+                    <Button variant="secondary" size="md" className="rounded-full">
+                      Business Dashboard
+                    </Button>
+                  </Link>
+                )}
+                {!hasMerchantProfile && (
+                  <div className="flex items-center gap-2">
+                    <StreakBadge streak={streak} loading={isLoadingStreak} />
+                    <CoinDisplay />
+                    <HeistTokenBadge />
+                    <HeistNotificationBadge />
+                  </div>
+                )}
+                <ProfileDropDown isMerchant={hasMerchantProfile} />
+              </div>
             ) : (
-              <Link to={PATHS.LOGIN}>
-                <Button variant="primary" size="md" className="rounded-full">
-                  Log in
-                </Button>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link to={PATHS.MERCHANT_ONBOARDING}>
+                  <Button variant="secondary" size="md" className="rounded-full">
+                    CitySpark for Business
+                  </Button>
+                </Link>
+                <Link to={PATHS.LOGIN}>
+                  <Button variant="primary" size="md" className="rounded-full">
+                    Log in
+                  </Button>
+                </Link>
+              </div>
             )}
           </div>
 
@@ -366,6 +393,20 @@ export const Header = () => {
                         Sign up / Log in
                       </Button>
                     </Link>
+                    <div className="mt-3">
+                      <Link
+                        to={PATHS.MERCHANT_ONBOARDING}
+                        className="flex w-full items-center justify-center"
+                      >
+                        <Button
+                          variant="secondary"
+                          size="md"
+                          className="rounded-full w-full"
+                        >
+                          CitySpark for Business
+                        </Button>
+                      </Link>
+                    </div>
                     {!isAdmin && (
                       <p className="mt-6 text-center text-base font-medium text-gray-500">
                         {hasMerchantProfile ? (

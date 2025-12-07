@@ -350,12 +350,6 @@ const MerchantMyDealsContent = () => {
                 Create New Deal
               </Button>
             </Link>
-            <Link to={PATHS.MERCHANT_HAPPY_HOUR_CREATE}>
-              <Button size="lg" variant="outline" className="rounded-lg w-full sm:w-auto">
-                <ClockIcon className="mr-2 h-4 w-4" />
-                Quick Happy Hour
-              </Button>
-            </Link>
           </div>
         </div>
       </div>
@@ -408,8 +402,8 @@ const MerchantMyDealsContent = () => {
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="happy_hour">Happy Hour</SelectItem>
-                <SelectItem value="standard">Standard</SelectItem>
-                <SelectItem value="recurring">Daily Deals</SelectItem>
+                <SelectItem value="standard">Item Deal</SelectItem>
+                <SelectItem value="recurring">Recurring</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -520,7 +514,7 @@ const MerchantMyDealsContent = () => {
               <Link to={PATHS.MERCHANT_DEALS_CREATE}>
                 <Button size="sm" className="rounded-lg">
                   <Plus className="mr-1 h-3 w-3" />
-                  Standard Deal
+                  Item Deal
                 </Button>
               </Link>
               <Link to={PATHS.MERCHANT_HAPPY_HOUR_CREATE}>

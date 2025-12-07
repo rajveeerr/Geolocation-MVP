@@ -501,6 +501,12 @@ export const MenuManagementPage = () => {
           </div>
           
         <div className="flex gap-3">
+          <Link to={PATHS.MERCHANT_MENU_COLLECTIONS}>
+            <Button size="lg" variant="secondary" className="rounded-lg">
+              <Table className="mr-2 h-5 w-5" />
+              Collections
+            </Button>
+          </Link>
           <Link to={PATHS.MERCHANT_MENU_CREATE}>
             <Button size="lg" className="rounded-lg">
               <Plus className="mr-2 h-5 w-5" />

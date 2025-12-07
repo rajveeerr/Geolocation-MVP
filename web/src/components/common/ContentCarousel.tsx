@@ -1,8 +1,8 @@
 // web/src/components/common/ContentCarousel.tsx
 
 import { useRef, useState, useEffect } from 'react'; // Import useState and useEffect
-import { Star, Zap, Heart, MapPin, Clock, Sparkles } from 'lucide-react';
-import { PremiumV2DealCard } from '@/components/deals/PremiumV2DealCard'; // <-- Import the NEW card
+import { Star, Zap, Heart, MapPin, Clock, Sparkles, Fish } from 'lucide-react';
+import { NewDealCard } from '@/components/landing/NewDealCard';
 import { cn } from '@/lib/utils';
 import { EnhancedSectionHeader } from '@/components/common/EnhancedSectionHeader';
 import type { Deal } from '@/data/deals';
@@ -25,55 +25,63 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
     viewport.scrollBy({ left: value, behavior: 'smooth' });
   };
 
-  // Get appropriate icon and styling based on title
+  // Get appropriate icon and styling based on title - Updated with catchy descriptions
   const getSectionConfig = (title: string) => {
     const titleLower = title.toLowerCase();
     
     if (titleLower.includes('featured') || titleLower.includes('top')) {
       return {
-        icon: <Star className="h-6 w-6 text-amber-500 sm:h-7 sm:w-7" />,
+        icon: <Star className="h-7 w-7 text-amber-500 sm:h-8 sm:w-8" />,
         subtitle: "Handpicked by our team",
-        variant: 'simple' as const
+        variant: 'simple' as const,
       };
     }
     
     if (titleLower.includes('happy hour') || titleLower.includes('happy hours')) {
       return {
-        icon: <Clock className="h-6 w-6 text-orange-500 sm:h-7 sm:w-7" />,
-        subtitle: "Time to unwind",
-        variant: 'simple' as const
+        icon: <Clock className="h-7 w-7 text-orange-500 sm:h-8 sm:w-8" />,
+        subtitle: "Happy hour never tasted this good",
+        variant: 'simple' as const,
       };
     }
     
     if (titleLower.includes('latest') || titleLower.includes('new')) {
       return {
-        icon: <Zap className="h-6 w-6 text-yellow-500 sm:h-7 sm:w-7" />,
+        icon: <Zap className="h-7 w-7 text-yellow-500 sm:h-8 sm:w-8" />,
         subtitle: "Fresh from our partners",
-        variant: 'simple' as const
+        variant: 'simple' as const,
       };
     }
     
     if (titleLower.includes('popular') || titleLower.includes('trending')) {
       return {
-        icon: <Heart className="h-6 w-6 text-red-500 sm:h-7 sm:w-7" />,
+        icon: <Heart className="h-7 w-7 text-red-500 sm:h-8 sm:w-8" />,
         subtitle: "Loved by locals",
-        variant: 'simple' as const
+        variant: 'simple' as const,
       };
     }
     
     if (titleLower.includes('experience') || titleLower.includes('events')) {
       return {
-        icon: <Sparkles className="h-6 w-6 text-purple-500 sm:h-7 sm:w-7" />,
+        icon: <Sparkles className="h-7 w-7 text-purple-500 sm:h-8 sm:w-8" />,
         subtitle: "Unforgettable moments",
-        variant: 'detailed' as const,
-        description: "Special events and unique experiences you won't find anywhere else."
+        variant: 'simple' as const,
       };
     }
     
-    // Default configuration - minimal for generic sections
+    if (titleLower.includes('seafood') || titleLower.includes('fresh')) {
+      return {
+        icon: <Fish className="h-7 w-7 text-blue-500 sm:h-8 sm:w-8" />,
+        subtitle: "Happy hour never tasted this good",
+        variant: 'simple' as const,
+      };
+    }
+    
+    // Default configuration
     return {
-      icon: <MapPin className="h-6 w-6 text-brand-primary-500 sm:h-7 sm:w-7" />,
-      variant: 'minimal' as const
+      icon: <MapPin className="h-7 w-7 text-blue-500 sm:h-8 sm:w-8" />,
+      variant: 'simple' as const,
+      subtitle: "Discover amazing deals near you",
     };
   };
 
@@ -111,10 +119,9 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
           icon={sectionConfig.icon}
           title={title}
           subtitle={sectionConfig.subtitle}
-          description={sectionConfig.description}
           variant={sectionConfig.variant}
-          onScrollLeft={() => scroll(-360)}
-          onScrollRight={() => scroll(360)}
+          onScrollLeft={() => scroll(-380)}
+          onScrollRight={() => scroll(380)}
         />
         
 
@@ -132,7 +139,7 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
           >
             {deals.map((deal) => (
               <div key={deal.id} className="w-[340px] flex-shrink-0 sm:w-[360px]">
-                <PremiumV2DealCard deal={deal} />
+                <NewDealCard deal={deal} />
               </div>
             ))}
           </motion.div>

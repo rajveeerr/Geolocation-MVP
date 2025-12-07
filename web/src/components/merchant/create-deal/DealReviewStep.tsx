@@ -8,26 +8,41 @@ import { useToast } from '@/hooks/use-toast';
 import { PATHS } from '@/routing/paths';
 import { useCountdown } from '@/hooks/useCountdown';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Trophy, EyeOff, MapPin, Clock, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { mapDealTypeToBackend, generateAccessCode } from '@/utils/dealTypeUtils';
+import { BountyQRCodeDisplay } from './BountyQRCodeDisplay';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/common/Button';
 
 const ReviewItem = ({
   label,
   value,
 }: {
   label: string;
-  value: string | number | null | undefined;
-}) => (
-  <div className="flex justify-between border-b border-neutral-200 py-3">
-    <p className="text-neutral-600">{label}</p>
-    <p className="font-semibold text-neutral-800">{value || 'Not set'}</p>
-  </div>
-);
+  value: string | number | null | undefined | { name?: string; label?: string; value?: string };
+}) => {
+  // Handle category object - extract name/label/value
+  let displayValue: string | number | null | undefined = value;
+  if (typeof value === 'object' && value !== null) {
+    displayValue = value.name || value.label || value.value || 'Not set';
+  }
+  
+  return (
+    <div className="flex justify-between border-b border-neutral-200 py-3">
+      <p className="text-neutral-600">{label}</p>
+      <p className="font-semibold text-neutral-800">{displayValue || 'Not set'}</p>
+    </div>
+  );
+};
 
 export const DealReviewStep = () => {
-  const { state } = useDealCreation();
+  const { state, dispatch } = useDealCreation();
   const countdown = useCountdown(state.endTime || '');
   const { days = 0, hours = 0, minutes = 0, seconds = 0 } = countdown || {};
   const navigate = useNavigate();
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [bountyQRCode, setBountyQRCode] = useState<string | null>(null);
   const { toast } = useToast();
   const [isPublishing, setIsPublishing] = useState(false);
   
@@ -131,7 +146,8 @@ export const DealReviewStep = () => {
         return;
       }
 
-      if (!state.discountPercentage && !state.discountAmount && !state.customOfferDisplay) {
+      // Bounty and Hidden deals don't require discount fields - they have their own reward mechanisms
+      if (state.dealType !== 'BOUNTY' && state.dealType !== 'HIDDEN' && !state.discountPercentage && !state.discountAmount && !state.customOfferDisplay) {
         toast({
           title: 'Error',
           description: 'Please specify either a discount percentage, discount amount, or custom offer display.',
@@ -158,24 +174,412 @@ export const DealReviewStep = () => {
         return;
       }
 
+      // Deal type specific validation
+      if (state.dealType === 'BOUNTY') {
+        if (!state.bountyRewardAmount || state.bountyRewardAmount <= 0) {
+          toast({
+            title: 'Error',
+            description: 'Bounty reward amount is required and must be greater than 0.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        if (!state.minReferralsRequired || state.minReferralsRequired < 1) {
+          toast({
+            title: 'Error',
+            description: 'Minimum referrals required must be at least 1.',
+            variant: 'destructive',
+          });
+          return;
+        }
+      }
+
+      // For hidden deals, ensure access code is set (auto-generate if needed)
+      let finalAccessCode = state.accessCode;
+      if (state.dealType === 'HIDDEN') {
+        if (!finalAccessCode || finalAccessCode.trim().length === 0) {
+          finalAccessCode = generateAccessCode();
+          dispatch({
+            type: 'UPDATE_FIELD',
+            field: 'accessCode',
+            value: finalAccessCode,
+          });
+        }
+      }
+
+      if (state.dealType === 'REDEEM_NOW') {
+        // Redeem Now deals are fixed at 50% off
+        if (!state.discountPercentage || state.discountPercentage !== 50) {
+          toast({
+            title: 'Error',
+            description: 'Redeem Now deals must have exactly 50% discount.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        // Validate minimum order amount is required
+        if (!state.minOrderAmount || state.minOrderAmount <= 0) {
+          toast({
+            title: 'Error',
+            description: 'Minimum order amount is required for Redeem Now deals.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        // Validate duration (max 24 hours)
+        const durationHours = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
+        if (durationHours > 24) {
+          toast({
+            title: 'Error',
+            description: 'Redeem Now deals must be 24 hours or less.',
+            variant: 'destructive',
+          });
+          return;
+        }
+      }
+
+      if (state.dealType === 'RECURRING') {
+        // Ensure recurringDays is an array
+        if (!Array.isArray(state.recurringDays)) {
+          toast({
+            title: 'Error',
+            description: 'Invalid weekday selection. Please go back to the weekday selection step and try again.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log('RECURRING Deal - Checking recurringDays:', {
+            recurringDays: state.recurringDays,
+            length: state.recurringDays?.length,
+            type: typeof state.recurringDays,
+            isArray: Array.isArray(state.recurringDays),
+          });
+        }
+        
+        if (!state.recurringDays || state.recurringDays.length === 0) {
+          toast({
+            title: 'Error',
+            description: 'Please select at least one day for recurring deals. Go back to the weekday selection step to choose days.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        // Validate frequency for RECURRING deals
+        if (!state.recurringFrequency) {
+          toast({
+            title: 'Error',
+            description: 'Please select a frequency (week/month/year) for your daily deal.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        // Validate date range for RECURRING deals
+        if (!state.activeStartDate || !state.activeEndDate) {
+          toast({
+            title: 'Error',
+            description: 'Please set both start and end dates for your daily deal.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        // Validate end date is after start date
+        try {
+          const startDate = new Date(state.activeStartDate);
+          const endDate = new Date(state.activeEndDate);
+          if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            throw new Error('Invalid dates');
+          }
+          if (endDate <= startDate) {
+            toast({
+              title: 'Error',
+              description: 'End date must be after start date.',
+              variant: 'destructive',
+            });
+            return;
+          }
+        } catch (error) {
+          toast({
+            title: 'Error',
+            description: 'Invalid date range. Please check your start and end dates.',
+            variant: 'destructive',
+          });
+          return;
+        }
+      }
+
       // 1. Prepare comprehensive payload for the API
+      let activeDateRange;
+      try {
+        activeDateRange = (() => {
+          let startDate: Date;
+          let endDate: Date;
+          
+          // For bounty deals, prioritize startTime/endTime (datetime-local inputs)
+          // For other deals, prioritize activeStartDate/activeEndDate (date inputs)
+          if (state.dealType === 'BOUNTY') {
+            if (state.startTime) {
+              startDate = new Date(state.startTime);
+            } else if (state.activeStartDate) {
+              startDate = new Date(state.activeStartDate);
+              startDate.setHours(0, 0, 0, 0);
+            } else {
+              startDate = new Date();
+              startDate.setHours(0, 0, 0, 0);
+            }
+            
+            if (state.endTime) {
+              endDate = new Date(state.endTime);
+            } else if (state.activeEndDate) {
+              endDate = new Date(state.activeEndDate);
+              endDate.setHours(23, 59, 59, 999);
+            } else {
+              endDate = new Date(startDate);
+              endDate.setDate(endDate.getDate() + 30); // Default 30 days
+              endDate.setHours(23, 59, 59, 999);
+            }
+          } else {
+            // For non-bounty deals, use date inputs
+            if (state.activeStartDate) {
+              startDate = new Date(state.activeStartDate);
+              startDate.setHours(0, 0, 0, 0);
+            } else if (state.startTime) {
+              startDate = new Date(state.startTime);
+            } else {
+              startDate = new Date();
+              startDate.setHours(0, 0, 0, 0);
+            }
+            
+            if (state.activeEndDate) {
+              endDate = new Date(state.activeEndDate);
+              endDate.setHours(23, 59, 59, 999);
+            } else if (state.endTime) {
+              endDate = new Date(state.endTime);
+            } else {
+              endDate = new Date(startDate);
+              endDate.setDate(endDate.getDate() + 30); // Default 30 days
+              endDate.setHours(23, 59, 59, 999);
+            }
+          }
+          
+          // Validate dates
+          if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            throw new Error('Invalid date range');
+          }
+          
+          if (endDate <= startDate) {
+            throw new Error('End date must be after start date');
+          }
+          
+          return {
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
+          };
+        })();
+      } catch (error) {
+        toast({
+          title: 'Error',
+          description: error instanceof Error ? error.message : 'Invalid date range. Please check your dates.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
+      // Final validation before creating payload - CRITICAL: Check state right before API call
+      // Store normalized recurringDays for use in payload
+      let validatedRecurringDays: string[] | undefined = undefined;
+      
+      if (state.dealType === 'BOUNTY') {
+        // Validate bounty-specific required fields
+        if (!state.title || state.title.trim().length < 3) {
+          toast({
+            title: 'Error',
+            description: 'Deal title is required and must be at least 3 characters.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (!state.bountyRewardAmount || state.bountyRewardAmount <= 0) {
+          toast({
+            title: 'Error',
+            description: 'Bounty reward amount is required and must be greater than $0.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (!state.minReferralsRequired || state.minReferralsRequired < 1) {
+          toast({
+            title: 'Error',
+            description: 'Minimum referrals required must be at least 1.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (!state.activeStartDate || !state.activeEndDate) {
+          toast({
+            title: 'Error',
+            description: 'Please set both start and end dates for your bounty deal.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        // Validate date range
+        try {
+          const startDate = new Date(state.activeStartDate);
+          const endDate = new Date(state.activeEndDate);
+          if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            throw new Error('Invalid dates');
+          }
+          if (endDate <= startDate) {
+            toast({
+              title: 'Error',
+              description: 'End date must be after start date.',
+              variant: 'destructive',
+            });
+            return;
+          }
+        } catch (error) {
+          toast({
+            title: 'Error',
+            description: 'Invalid date range. Please check your start and end dates.',
+            variant: 'destructive',
+          });
+          return;
+        }
+      }
+      
+      if (state.dealType === 'RECURRING') {
+        // Log state for debugging in development
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Final validation - RECURRING deal state:', {
+            dealType: state.dealType,
+            recurringDays: state.recurringDays,
+            recurringDaysType: typeof state.recurringDays,
+            isArray: Array.isArray(state.recurringDays),
+            length: Array.isArray(state.recurringDays) ? state.recurringDays.length : 'N/A',
+            stringified: JSON.stringify(state.recurringDays),
+          });
+        }
+        
+        // Double-check all required fields
+        if (!state.title || state.title.trim().length < 3) {
+          toast({
+            title: 'Error',
+            description: 'Deal title is required and must be at least 3 characters.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        // CRITICAL: Ensure recurringDays is an array and not empty
+        const recurringDaysArray = Array.isArray(state.recurringDays) 
+          ? state.recurringDays 
+          : (typeof state.recurringDays === 'string' ? [state.recurringDays] : []);
+        
+        if (recurringDaysArray.length === 0) {
+          toast({
+            title: 'Error',
+            description: 'Please select at least one weekday for your daily deal. Go back to the weekday selection step to choose days.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        // Normalize and store for payload - backend expects uppercase: ['MONDAY', 'FRIDAY', 'SUNDAY']
+        validatedRecurringDays = recurringDaysArray.map(day => String(day).trim().toUpperCase());
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Validated and normalized recurringDays for payload:', validatedRecurringDays);
+        }
+        
+        if (!state.recurringFrequency) {
+          toast({
+            title: 'Error',
+            description: 'Please select a frequency (week/month/year) for your daily deal.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (!state.activeStartDate || !state.activeEndDate) {
+          toast({
+            title: 'Error',
+            description: 'Please set both start and end dates for your daily deal.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if ((!state.selectedMenuItems || state.selectedMenuItems.length === 0) && !state.menuCollectionId) {
+          toast({
+            title: 'Error',
+            description: 'Please select at least one menu item or collection for your deal.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (!state.discountPercentage && !state.discountAmount && !state.customOfferDisplay) {
+          toast({
+            title: 'Error',
+            description: 'Please set a discount percentage, amount, or custom offer.',
+            variant: 'destructive',
+          });
+          return;
+        }
+      }
+      
       const payload = {
-        title: state.title,
-        description: state.description,
+        title: state.title.trim(),
+        description: state.description || '',
         // Send whatever discount fields the merchant provided
         discountPercentage: state.discountPercentage ?? null,
         discountAmount: state.discountAmount ?? null,
-        // New fields expected by the backend
-        dealType: state.dealType ?? 'STANDARD',
+        // Map deal type to backend format
+        dealType: mapDealTypeToBackend(state.dealType),
         category: state.category ?? 'FOOD_AND_BEVERAGE',
-        recurringDays: state.recurringDays?.length
-          ? state.recurringDays
-          : undefined,
+        // For RECURRING deals, always send recurringDays as array (validation ensures it's not empty)
+        // CRITICAL: Backend expects array of uppercase day names: ['MONDAY', 'FRIDAY', 'SUNDAY']
+        // Use the validated and normalized array from validation above
+        // FALLBACK: If somehow validatedRecurringDays is undefined, try to get it from state directly
+        recurringDays: (() => {
+          if (state.dealType !== 'RECURRING') {
+            return undefined; // Don't send for non-RECURRING deals
+          }
+          
+          // Use validated array if available
+          if (validatedRecurringDays && validatedRecurringDays.length > 0) {
+            return validatedRecurringDays;
+          }
+          
+          // Fallback: normalize from state directly (shouldn't happen, but safety net)
+          const daysArray = Array.isArray(state.recurringDays) 
+            ? state.recurringDays 
+            : (typeof state.recurringDays === 'string' ? [state.recurringDays] : []);
+          
+          if (daysArray.length === 0) {
+            console.error('CRITICAL: recurringDays is empty after all validation!', {
+              state: state.recurringDays,
+              validated: validatedRecurringDays,
+              dealType: state.dealType,
+            });
+            // This should never happen due to validation above, but send empty array
+            // Backend will catch it and return proper error
+            return [];
+          }
+          
+          return daysArray.map(day => String(day).trim().toUpperCase());
+        })(),
         // Backend expects activeDateRange with startDate and endDate
-        activeDateRange: {
-          startDate: new Date(state.startTime).toISOString(),
-          endDate: new Date(state.endTime).toISOString(),
-        },
+        activeDateRange,
         redemptionInstructions: state.redemptionInstructions,
         // Enhanced fields
         imageUrls: state.imageUrls || [],
@@ -196,11 +600,101 @@ export const DealReviewStep = () => {
         tags: state.tags || [],
         notes: state.notes || null,
         externalUrl: state.externalUrl || null,
-        // Menu items if any
-        menuItems: state.selectedMenuItems?.length > 0 ? state.selectedMenuItems : undefined,
+        // Bounty Deal fields (required for BOUNTY, optional for HIDDEN)
+        bountyRewardAmount: (state.dealType === 'BOUNTY' || state.dealType === 'HIDDEN') 
+          ? (state.bountyRewardAmount ?? undefined) 
+          : undefined,
+        minReferralsRequired: (state.dealType === 'BOUNTY' || state.dealType === 'HIDDEN')
+          ? (state.minReferralsRequired ?? undefined)
+          : undefined,
+        // Hidden Deal fields
+        accessCode: state.dealType === 'HIDDEN' ? (finalAccessCode || undefined) : undefined,
+        // Hidden Deal Visibility Configuration
+        hiddenDealVisibility: state.dealType === 'HIDDEN' && state.hiddenDealVisibility ? {
+          accessCode: state.hiddenDealVisibility.accessCode,
+          qrCode: state.hiddenDealVisibility.qrCode,
+          tapIns: state.hiddenDealVisibility.tapIns,
+          socialSharing: state.hiddenDealVisibility.socialSharing,
+          tapInConfig: state.hiddenDealVisibility.tapInConfig,
+          tapInMenuItems: state.hiddenDealVisibility.tapInMenuItems,
+          tapInMenuCollectionId: state.hiddenDealVisibility.tapInMenuCollectionId,
+        } : undefined,
+        // Menu items if any - format for API
+        menuItems: state.selectedMenuItems?.length > 0 
+          ? state.selectedMenuItems.map(item => ({
+              id: item.id,
+              isHidden: item.isHidden || false,
+              customPrice: item.customPrice !== null && item.customPrice !== undefined ? item.customPrice : undefined,
+              customDiscount: item.customDiscount !== null && item.customDiscount !== undefined ? item.customDiscount : undefined,
+              discountAmount: item.discountAmount !== null && item.discountAmount !== undefined ? item.discountAmount : undefined,
+            }))
+          : undefined,
+        // Menu collection if using collection
+        menuCollectionId: state.useMenuCollection && state.menuCollectionId ? state.menuCollectionId : undefined,
       };
 
-      console.log('API Payload:', payload);
+      // CRITICAL: Final check - Ensure recurringDays is sent for RECURRING deals
+      if (state.dealType === 'RECURRING') {
+        // Double-check that recurringDays is in the payload
+        if (!payload.recurringDays) {
+          console.error('ERROR: recurringDays is missing in payload!', {
+            stateRecurringDays: state.recurringDays,
+            payloadRecurringDays: payload.recurringDays,
+            validatedRecurringDays,
+            dealType: payload.dealType,
+            stateDealType: state.dealType,
+            fullPayload: payload,
+          });
+          toast({
+            title: 'Error',
+            description: 'Weekday selection is missing. Please go back to select weekdays.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        if (Array.isArray(payload.recurringDays) && payload.recurringDays.length === 0) {
+          console.error('ERROR: recurringDays is empty array in payload!', {
+            stateRecurringDays: state.recurringDays,
+            payloadRecurringDays: payload.recurringDays,
+            validatedRecurringDays,
+            dealType: payload.dealType,
+          });
+          toast({
+            title: 'Error',
+            description: 'Weekday selection is empty. Please go back to select weekdays.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        // Ensure it's an array (not a string or other type)
+        if (!Array.isArray(payload.recurringDays)) {
+          console.error('ERROR: recurringDays is not an array in payload!', {
+            type: typeof payload.recurringDays,
+            value: payload.recurringDays,
+          });
+          // Convert to array if it's a string
+          if (typeof payload.recurringDays === 'string') {
+            payload.recurringDays = [payload.recurringDays];
+          } else {
+            toast({
+              title: 'Error',
+              description: 'Invalid weekday format. Please go back to select weekdays.',
+              variant: 'destructive',
+            });
+            return;
+          }
+        }
+      }
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log('API Payload:', JSON.stringify(payload, null, 2));
+        console.log('Payload recurringDays:', payload.recurringDays);
+        console.log('Payload recurringDays type:', typeof payload.recurringDays);
+        console.log('Payload recurringDays isArray:', Array.isArray(payload.recurringDays));
+        console.log('Payload dealType:', payload.dealType);
+      }
 
       // 2. Make the API call
       const response = await apiPost('/deals', payload);
@@ -209,11 +703,35 @@ export const DealReviewStep = () => {
 
       // 3. Handle the response
       if (response.success) {
-        toast({
-          title: 'Deal Published!',
-          description: 'Your new deal is now live for customers to see.',
-        });
-        navigate(PATHS.MERCHANT_DASHBOARD);
+        // Check if response includes bounty QR code
+        const responseData = response.data as any;
+        const qrCode = responseData?.deal?.bountyQRCode || responseData?.bounty?.qrCode;
+        
+        if (state.dealType === 'BOUNTY' && qrCode) {
+          setBountyQRCode(qrCode);
+          setShowQRModal(true);
+          toast({
+            title: 'Deal Published!',
+            description: 'Your bounty deal is live! QR code has been generated for verification.',
+          });
+        } else if (state.dealType === 'HIDDEN' && responseData?.bounty?.qrCode) {
+          // Hidden deal with optional bounty
+          setBountyQRCode(responseData.bounty.qrCode);
+          setShowQRModal(true);
+          toast({
+            title: 'Deal Published!',
+            description: 'Your hidden deal is live! QR code has been generated for bounty verification.',
+          });
+        } else {
+          toast({
+            title: 'Deal Published!',
+            description: 'Your new deal is now live for customers to see.',
+          });
+          // Small delay to show toast before navigating
+          setTimeout(() => {
+            navigate(PATHS.MERCHANT_DASHBOARD);
+          }, 1500);
+        }
       } else {
         // Handle specific error cases
         let errorMessage = response.error || 'Unknown error occurred';
@@ -273,7 +791,24 @@ export const DealReviewStep = () => {
     <OnboardingStepLayout
       title="Ready to publish?"
       onNext={handlePublish}
-      onBack={() => navigate('/merchant/deals/create/advanced')}
+      onBack={() => {
+        // Check deal type and navigate back accordingly
+        if (state.dealType === 'BOUNTY') {
+          navigate('/merchant/deals/create/bounty/images');
+        } else if (state.dealType === 'REDEEM_NOW') {
+          navigate('/merchant/deals/create/schedule');
+        } else if (state.dealType === 'RECURRING') {
+          // Daily Deal goes back to config step
+          navigate('/merchant/deals/create/daily-deal/config');
+        } else {
+          // For hidden deals, go back to schedule (skipped instructions/advanced)
+          if (state.dealType === 'HIDDEN') {
+            navigate('/merchant/deals/create/hidden/schedule');
+          } else {
+            navigate('/merchant/deals/create/instructions');
+          }
+        }
+      }}
       progress={100}
       nextButtonText="Publish Deal"
       isNextDisabled={isPublishing}
@@ -298,24 +833,67 @@ export const DealReviewStep = () => {
             <div className="rounded-lg border bg-white p-4">
               <h3 className="mb-4 font-semibold text-neutral-900">Selected Menu Items</h3>
               <div className="space-y-3">
-                {state.selectedMenuItems.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between rounded-lg bg-neutral-50 p-3">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-neutral-900">{item.name}</span>
-                        {item.isHidden && (
-                          <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">
-                            Hidden
+                {state.selectedMenuItems.map((item) => {
+                  // Calculate final price
+                  let finalPrice = item.price;
+                  let discountInfo = '';
+                  
+                  if (item.customPrice !== null && item.customPrice !== undefined) {
+                    finalPrice = item.customPrice;
+                    discountInfo = `Fixed: $${finalPrice.toFixed(2)}`;
+                  } else if (item.customDiscount !== null && item.customDiscount !== undefined) {
+                    finalPrice = item.price * (1 - item.customDiscount / 100);
+                    discountInfo = `${item.customDiscount}% off`;
+                  } else if (item.discountAmount !== null && item.discountAmount !== undefined) {
+                    finalPrice = Math.max(0, item.price - item.discountAmount);
+                    discountInfo = `$${item.discountAmount.toFixed(2)} off`;
+                  } else if (state.discountPercentage !== null) {
+                    finalPrice = item.price * (1 - state.discountPercentage / 100);
+                    discountInfo = `${state.discountPercentage}% off (global)`;
+                  } else if (state.discountAmount !== null) {
+                    finalPrice = Math.max(0, item.price - state.discountAmount);
+                    discountInfo = `$${state.discountAmount.toFixed(2)} off (global)`;
+                  }
+                  
+                  const hasDiscount = finalPrice < item.price;
+                  
+                  return (
+                    <div key={item.id} className="flex items-center justify-between rounded-lg bg-neutral-50 p-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-neutral-900">{item.name}</span>
+                          {item.isHidden && (
+                            <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">
+                              Hidden
+                            </span>
+                          )}
+                          {(item.customPrice !== null || item.customDiscount !== null || item.discountAmount !== null) && (
+                            <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">
+                              Custom Price
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-1 flex items-center gap-2 text-sm">
+                          {hasDiscount && (
+                            <span className="text-neutral-400 line-through">${item.price.toFixed(2)}</span>
+                          )}
+                          <span className={cn(
+                            "font-semibold",
+                            hasDiscount ? "text-green-600" : "text-neutral-700"
+                          )}>
+                            ${finalPrice.toFixed(2)}
                           </span>
-                        )}
+                          {discountInfo && (
+                            <span className="text-xs text-neutral-500">({discountInfo})</span>
+                          )}
+                        </div>
                       </div>
-                      <span className="text-sm text-neutral-600">${item.price.toFixed(2)}</span>
+                      <span className="rounded-full bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-700">
+                        {item.category}
+                      </span>
                     </div>
-                    <span className="rounded-full bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-700">
-                      {item.category}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
                 <div className="mt-3 pt-3 border-t border-neutral-200">
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium text-neutral-700">Total Items:</span>
@@ -331,28 +909,58 @@ export const DealReviewStep = () => {
               </div>
             </div>
           )}
+          
+          {/* Menu Collection Info */}
+          {state.useMenuCollection && state.menuCollectionId && (
+            <div className="rounded-lg border bg-white p-4">
+              <h3 className="mb-2 font-semibold text-neutral-900">Menu Collection</h3>
+              <p className="text-sm text-neutral-600">
+                Using menu collection (ID: {state.menuCollectionId})
+              </p>
+            </div>
+          )}
 
           {/* Offer Details */}
           <div className="rounded-lg border bg-white p-4">
             <h3 className="mb-4 font-semibold text-neutral-900">Offer Details</h3>
-            <ReviewItem
-              label="Offer"
-              value={
-                state.discountPercentage
-                  ? `${state.discountPercentage}% off`
-                  : state.discountAmount
-                    ? `$${state.discountAmount} off`
-                    : state.customOfferDisplay
-                      ? state.customOfferDisplay
-                      : 'Not set'
-              }
-            />
+            
+            {/* Special display for REDEEM_NOW deals */}
+            {state.dealType === 'REDEEM_NOW' && state.minOrderAmount && state.discountPercentage ? (
+              <div className="mb-4 rounded-xl border-2 border-brand-primary-200 bg-gradient-to-br from-brand-primary-50 to-white p-5 text-center">
+                <div className="text-2xl font-bold bg-gradient-to-br from-brand-primary-500 to-brand-primary-600 bg-clip-text text-transparent mb-1">
+                  Spend ${state.minOrderAmount.toFixed(2)}
+                </div>
+                <div className="text-lg font-semibold text-neutral-700">
+                  Get {state.discountPercentage}% OFF
+                </div>
+                <p className="text-sm text-neutral-500 mt-2">
+                  Customers must spend ${state.minOrderAmount.toFixed(2)} to unlock this discount
+                </p>
+              </div>
+            ) : (
+              <ReviewItem
+                label="Offer"
+                value={
+                  state.discountPercentage
+                    ? `${state.discountPercentage}% off`
+                    : state.discountAmount
+                      ? `$${state.discountAmount} off`
+                      : state.customOfferDisplay
+                        ? state.customOfferDisplay
+                        : 'Not set'
+                }
+              />
+            )}
+            
             {state.offerTerms && (
               <ReviewItem label="Terms & Conditions" value={state.offerTerms} />
             )}
-            {state.minOrderAmount && (
+            
+            {/* Show minOrderAmount for non-REDEEM_NOW deals or as additional info */}
+            {state.dealType !== 'REDEEM_NOW' && state.minOrderAmount && (
               <ReviewItem label="Minimum Order" value={`$${state.minOrderAmount}`} />
             )}
+            
             {state.maxRedemptions !== null && (
               <ReviewItem 
                 label="Max Redemptions" 
@@ -372,11 +980,83 @@ export const DealReviewStep = () => {
               label="Ends"
               value={new Date(state.endTime).toLocaleString()}
             />
-            {state.dealType === 'RECURRING' && state.recurringDays.length > 0 && (
-              <ReviewItem
-                label="Recurring Days"
-                value={state.recurringDays.join(', ')}
-              />
+            {/* Daily Deal Specific Information */}
+            {state.dealType === 'RECURRING' && (
+              <>
+                {state.recurringDays.length > 0 && (
+                  <ReviewItem
+                    label="Active Days"
+                    value={state.recurringDays
+                      .map((day) => {
+                        const dayMap: Record<string, string> = {
+                          MONDAY: 'Monday',
+                          TUESDAY: 'Tuesday',
+                          WEDNESDAY: 'Wednesday',
+                          THURSDAY: 'Thursday',
+                          FRIDAY: 'Friday',
+                          SATURDAY: 'Saturday',
+                          SUNDAY: 'Sunday',
+                        };
+                        return dayMap[day] || day;
+                      })
+                      .join(', ')}
+                  />
+                )}
+                {state.recurringFrequency && (
+                  <ReviewItem
+                    label="Frequency"
+                    value={`Every ${state.recurringFrequency}`}
+                  />
+                )}
+                {state.activeStartDate && state.activeEndDate && (
+                  <>
+                    <ReviewItem
+                      label="Start Date"
+                      value={new Date(state.activeStartDate).toLocaleDateString()}
+                    />
+                    <ReviewItem
+                      label="End Date"
+                      value={new Date(state.activeEndDate).toLocaleDateString()}
+                    />
+                  </>
+                )}
+                {state.streakEnabled && (
+                  <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                    <h4 className="mb-2 font-semibold text-amber-900">Streak Rewards</h4>
+                    <ReviewItem
+                      label="Minimum Consecutive Visits"
+                      value={state.streakMinVisits || 'Not set'}
+                    />
+                    <ReviewItem
+                      label="Reward Type"
+                      value={state.streakRewardType || 'Not set'}
+                    />
+                    <ReviewItem
+                      label="Reward Value"
+                      value={
+                        state.streakRewardValue !== null
+                          ? state.streakRewardType === 'percentage'
+                            ? `${state.streakRewardValue}%`
+                            : `$${state.streakRewardValue.toFixed(2)}`
+                          : 'Not set'
+                      }
+                    />
+                  </div>
+                )}
+                {state.bountyRewardAmount && state.bountyRewardAmount > 0 && (
+                  <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
+                    <h4 className="mb-2 font-semibold text-blue-900">Bounty Rewards</h4>
+                    <ReviewItem
+                      label="Reward Per Friend"
+                      value={`$${state.bountyRewardAmount.toFixed(2)}`}
+                    />
+                    <ReviewItem
+                      label="Minimum Friends Required"
+                      value={state.minReferralsRequired || 'Not set'}
+                    />
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -408,6 +1088,162 @@ export const DealReviewStep = () => {
             <h3 className="mb-4 font-semibold text-neutral-900">Redemption Instructions</h3>
             <p className="text-neutral-700">{state.redemptionInstructions}</p>
           </div>
+
+          {/* Bounty Deal Info */}
+          {state.dealType === 'BOUNTY' && (state.bountyRewardAmount || state.minReferralsRequired) && (
+            <div className="rounded-lg border bg-white p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Trophy className="h-5 w-5 text-amber-600" />
+                <h3 className="font-semibold text-neutral-900">Bounty Rewards</h3>
+              </div>
+              <ReviewItem 
+                label="Reward Per Friend" 
+                value={state.bountyRewardAmount ? `$${state.bountyRewardAmount.toFixed(2)}` : 'Not set'} 
+              />
+              <ReviewItem 
+                label="Minimum Friends Required" 
+                value={state.minReferralsRequired ? `${state.minReferralsRequired} friend${state.minReferralsRequired > 1 ? 's' : ''}` : 'Not set'} 
+              />
+              {state.bountyRewardAmount && state.minReferralsRequired && (
+                <div className="mt-3 pt-3 border-t border-neutral-200">
+                  <p className="text-sm text-neutral-600">
+                    Customers will earn <span className="font-semibold text-brand-primary-600">
+                      ${(state.bountyRewardAmount * state.minReferralsRequired).toFixed(2)}
+                    </span> minimum by bringing {state.minReferralsRequired} friend{state.minReferralsRequired > 1 ? 's' : ''}.
+                  </p>
+                </div>
+              )}
+              {/* QR Code Preview - Will be generated by backend after deal creation */}
+              <div className="mt-4 pt-4 border-t border-neutral-200">
+                <p className="text-sm font-medium text-neutral-700 mb-2">Verification QR Code</p>
+                <p className="text-xs text-neutral-500 mb-3">
+                  A QR code will be generated after publishing. Customers scan this to verify they brought friends.
+                </p>
+                <div className="rounded-lg border border-dashed border-neutral-300 bg-neutral-50 p-4 text-center">
+                  <BountyQRCodeDisplay 
+                  dealId={undefined}
+                  merchantName="Your Business"
+                  showInfo={false}
+                  size="sm"
+                />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Hidden Deal Info */}
+          {state.dealType === 'HIDDEN' && state.accessCode && (
+            <div className="rounded-lg border bg-white p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <EyeOff className="h-5 w-5 text-purple-600" />
+                <h3 className="font-semibold text-neutral-900">Hidden Deal Access</h3>
+              </div>
+              <ReviewItem 
+                label="Access Code" 
+                value={state.accessCode || 'Auto-generated'} 
+              />
+              <div className="mt-3 pt-3 border-t border-neutral-200">
+                <p className="text-sm text-neutral-600 mb-2">Shareable Link:</p>
+                <div className="rounded-lg bg-neutral-50 p-3 font-mono text-xs break-all">
+                  {window.location.origin}/deals/hidden/{state.accessCode}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Hidden Deal Visibility Configuration */}
+          {state.dealType === 'HIDDEN' && state.hiddenDealVisibility && (
+            <div className="rounded-lg border bg-white p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <EyeOff className="h-5 w-5 text-purple-600" />
+                <h3 className="font-semibold text-neutral-900">Visibility Configuration</h3>
+              </div>
+              <div className="space-y-2">
+                <ReviewItem 
+                  label="Access Code / Link" 
+                  value={state.hiddenDealVisibility.accessCode ? 'Enabled' : 'Disabled'} 
+                />
+                {state.hiddenDealVisibility.qrCode && (
+                  <ReviewItem label="QR Code" value="Enabled" />
+                )}
+                {state.hiddenDealVisibility.tapIns && (
+                  <>
+                    <ReviewItem label="Tap-ins / Check-ins" value="Enabled" />
+                    {state.hiddenDealVisibility.tapInConfig && (
+                      <div className="ml-4 space-y-1 text-sm">
+                        {state.hiddenDealVisibility.tapInConfig.showInAllCheckIns && (
+                          <p className="text-neutral-600">• Show in all check-ins</p>
+                        )}
+                        {state.hiddenDealVisibility.tapInConfig.specificTimes && (
+                          <p className="text-neutral-600">• Time restriction: {state.hiddenDealVisibility.tapInConfig.specificTimes}</p>
+                        )}
+                        {state.hiddenDealVisibility.tapInConfig.specificDays && state.hiddenDealVisibility.tapInConfig.specificDays.length > 0 && (
+                          <p className="text-neutral-600">• Days: {state.hiddenDealVisibility.tapInConfig.specificDays.join(', ')}</p>
+                        )}
+                        {state.hiddenDealVisibility.tapInConfig.firstTimeOnly && (
+                          <p className="text-neutral-600">• First-time visitors only</p>
+                        )}
+                        {state.hiddenDealVisibility.tapInConfig.returningOnly && (
+                          <p className="text-neutral-600">• Returning customers only</p>
+                        )}
+                        {state.hiddenDealVisibility.tapInMenuItems && state.hiddenDealVisibility.tapInMenuItems.length > 0 && (
+                          <p className="text-neutral-600">• Selected items for tap-ins: {state.hiddenDealVisibility.tapInMenuItems.length} items</p>
+                        )}
+                        {state.hiddenDealVisibility.tapInMenuCollectionId && (
+                          <p className="text-neutral-600">• Using menu collection for tap-ins</p>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+                {state.hiddenDealVisibility.socialSharing && (
+                  <ReviewItem label="Social Media Sharing" value="Enabled" />
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Location Targeting */}
+          {(state.storeIds && state.storeIds.length > 0) || (state.cityIds && state.cityIds.length > 0) ? (
+            <div className="rounded-lg border bg-white p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <MapPin className="h-5 w-5 text-blue-600" />
+                <h3 className="font-semibold text-neutral-900">Location Targeting</h3>
+              </div>
+              {state.storeIds && state.storeIds.length > 0 && (
+                <div className="mb-3">
+                  <p className="text-sm font-medium text-neutral-700 mb-2">Selected Stores: {state.storeIds.length}</p>
+                </div>
+              )}
+              {state.cityIds && state.cityIds.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium text-neutral-700 mb-2">Selected Cities: {state.cityIds.length}</p>
+                </div>
+              )}
+            </div>
+          ) : null}
+
+          {/* Advanced Scheduling */}
+          {(state.validDaysOfWeek && state.validDaysOfWeek.length > 0) || state.validHours ? (
+            <div className="rounded-lg border bg-white p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Clock className="h-5 w-5 text-green-600" />
+                <h3 className="font-semibold text-neutral-900">Advanced Scheduling</h3>
+              </div>
+              {state.validDaysOfWeek && state.validDaysOfWeek.length > 0 && (
+                <ReviewItem 
+                  label="Valid Days" 
+                  value={state.validDaysOfWeek.join(', ')} 
+                />
+              )}
+              {state.validHours && (
+                <ReviewItem 
+                  label="Valid Hours" 
+                  value={state.validHours} 
+                />
+              )}
+            </div>
+          ) : null}
 
           {/* Additional Settings */}
           <div className="rounded-lg border bg-white p-4">
@@ -441,6 +1277,67 @@ export const DealReviewStep = () => {
           )}
         </div>
       </div>
+
+      {/* QR Code Modal for Bounty Deals */}
+      {showQRModal && bountyQRCode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative max-w-2xl w-full rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl"
+          >
+            <button
+              onClick={() => {
+                setShowQRModal(false);
+                navigate(PATHS.MERCHANT_DASHBOARD);
+              }}
+              className="absolute top-4 right-4 rounded-lg p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Trophy className="h-6 w-6 text-amber-600" />
+                <h2 className="text-2xl font-bold text-neutral-900">Bounty Deal Published!</h2>
+              </div>
+              
+              <p className="text-neutral-600 mb-6">
+                Your bounty deal is now live! Download and print the QR code below for verification at your location.
+              </p>
+
+              <div className="mb-6">
+                <BountyQRCodeDisplay
+                  qrCodeData={bountyQRCode}
+                  merchantName="Your Business"
+                  showInfo={true}
+                  size="lg"
+                />
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={() => {
+                    setShowQRModal(false);
+                    navigate(PATHS.MERCHANT_DASHBOARD);
+                  }}
+                >
+                  Go to Dashboard
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={() => setShowQRModal(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </OnboardingStepLayout>
   );
 };

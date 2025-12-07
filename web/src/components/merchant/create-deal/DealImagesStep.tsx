@@ -19,10 +19,24 @@ export const DealImagesStep = () => {
     <OnboardingStepLayout
       title="Add Images"
       subtitle="Showcase your deal with attractive images"
-      onNext={() => navigate('/merchant/deals/create/schedule')}
-      onBack={() => navigate('/merchant/deals/create/offer')}
+      onNext={() => {
+        // Check if we're in bounty flow
+        if (state.dealType === 'BOUNTY') {
+          navigate('/merchant/deals/create/bounty/review');
+        } else {
+          navigate('/merchant/deals/create/schedule');
+        }
+      }}
+      onBack={() => {
+        // Check if we're in bounty flow
+        if (state.dealType === 'BOUNTY') {
+          navigate('/merchant/deals/create/bounty/schedule');
+        } else {
+          navigate('/merchant/deals/create/offer');
+        }
+      }}
       isNextDisabled={false} // Images are optional
-      progress={55}
+      progress={state.dealType === 'BOUNTY' ? 67 : 55}
     >
       <DealImageUpload
         images={state.imageUrls || []}

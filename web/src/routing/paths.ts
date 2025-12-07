@@ -22,6 +22,7 @@ export const PATHS = {
   MERCHANT_MENU_CREATE: '/merchant/menu/create',
   MERCHANT_MENU_EDIT: '/merchant/menu/:itemId/edit',
   MERCHANT_MENU_DETAIL: '/merchant/menu/:itemId',
+  MERCHANT_MENU_COLLECTIONS: '/merchant/menu/collections',
   MERCHANT_ANALYTICS: '/merchant/analytics',
 
   LOGIN: '/login',
@@ -35,6 +36,28 @@ export const PATHS = {
   PROFILE_EDIT: '/profile/edit',
   SETTINGS: '/settings',
   LEADERBOARD: '/leaderboard',
+  LEADERBOARD_COMPREHENSIVE: '/leaderboard/comprehensive',
+  STREAK_LEADERBOARD: '/streaks/leaderboard',
+  GAMIFICATION: '/gamification',
+  HEIST_HISTORY: '/heist/history',
+  HEIST_NOTIFICATIONS: '/heist/notifications',
+  HEIST_STATS: '/heist/stats',
+  HEIST_ITEM_SHOP: '/heist/shop',
+
+  // Loyalty (user)
+  LOYALTY_WALLET: '/loyalty',
+  LOYALTY_HISTORY: '/loyalty/history',
+
+  // Loyalty (merchant)
+  MERCHANT_LOYALTY_SETUP: '/merchant/loyalty/setup',
+  MERCHANT_LOYALTY_PROGRAM: '/merchant/loyalty/program',
+  MERCHANT_LOYALTY_ANALYTICS: '/merchant/loyalty/analytics',
+  MERCHANT_LOYALTY_CUSTOMERS: '/merchant/loyalty/customers',
+  MERCHANT_LOYALTY_TRANSACTIONS: '/merchant/loyalty/transactions',
+
+  // Payments
+  PAYMENT_SUCCESS: '/payment/success',
+  PAYMENT_CANCEL: '/payment/cancel',
 
   // Admin
   ADMIN_LOGIN: '/admin/login',

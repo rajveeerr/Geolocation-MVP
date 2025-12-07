@@ -118,7 +118,7 @@ export const DealImageUpload = ({
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <Camera className="h-5 w-5 text-brand-primary-600" />
-          <h3 className="text-lg font-semibold text-neutral-900">Deal Images</h3>
+          <h3 className="text-lg font-semibold text-neutral-900">Featured Media</h3>
           <span className="text-sm text-neutral-500">({images.length}/{maxImages})</span>
         </div>
         <p className="text-sm text-neutral-600">

@@ -59,7 +59,7 @@ export const DealInstructionsStep = () => {
       title="Redemption Instructions"
       subtitle="Tell customers exactly how to claim their deal"
       onNext={() => navigate('/merchant/deals/create/advanced')}
-      onBack={() => navigate('/merchant/deals/create/schedule')}
+      onBack={() => navigate('/merchant/deals/create/location')}
       isNextDisabled={!instructionsValidation.isValid}
       progress={75}
     >

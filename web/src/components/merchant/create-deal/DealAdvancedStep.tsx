@@ -16,7 +16,9 @@ import {
   Share2, 
   Gift, 
   Clock,
-  Lightbulb
+  Lightbulb,
+  Trophy,
+  AlertCircle
 } from 'lucide-react';
 
 export const DealAdvancedStep = () => {
@@ -104,80 +106,58 @@ export const DealAdvancedStep = () => {
             )}
           </div>
 
-          {/* Minimum Order Amount */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-brand-primary-600" />
-              <Label htmlFor="minOrderAmount" className="text-lg font-semibold text-neutral-900">
-                Minimum Order Amount
-              </Label>
-            </div>
-            <p className="text-sm text-neutral-600">
-              Set a minimum order amount for customers to qualify for this deal.
-            </p>
-            <div className="relative">
-              <Input
-                id="minOrderAmount"
-                type="number"
-                step="0.01"
-                min="0"
-                value={state.minOrderAmount || ''}
-                onChange={(e) =>
-                  dispatch({
-                    type: 'UPDATE_FIELD',
-                    field: 'minOrderAmount',
-                    value: e.target.value ? parseFloat(e.target.value) : null,
-                  })
-                }
-                placeholder="e.g., 25.00"
-                className="h-12 text-base"
-              />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500">$</span>
-            </div>
-          </div>
-
-          {/* Max Redemptions */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-brand-primary-600" />
-              <Label htmlFor="maxRedemptions" className="text-lg font-semibold text-neutral-900">
-                Maximum Redemptions
-              </Label>
-            </div>
-            <p className="text-sm text-neutral-600">
-              Limit how many times this deal can be redeemed. Enter 0 for unlimited redemptions.
-            </p>
-            <Input
-              id="maxRedemptions"
-              type="number"
-              min="0"
-              value={state.maxRedemptions !== null ? state.maxRedemptions : ''}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === '') {
-                  dispatch({
-                    type: 'UPDATE_FIELD',
-                    field: 'maxRedemptions',
-                    value: null,
-                  });
-                } else {
-                  const numValue = parseInt(value);
-                  if (!isNaN(numValue) && numValue >= 0) {
+          {/* Minimum Order Amount - Hidden for REDEEM_NOW (configured in dedicated step) */}
+          {state.dealType !== 'REDEEM_NOW' && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-brand-primary-600" />
+                <Label htmlFor="minOrderAmount" className="text-lg font-semibold text-neutral-900">
+                  Minimum Order Amount
+                </Label>
+              </div>
+              <p className="text-sm text-neutral-600">
+                Set a minimum order amount for customers to qualify for this deal.
+              </p>
+              <div className="relative">
+                <Input
+                  id="minOrderAmount"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={state.minOrderAmount || ''}
+                  onChange={(e) =>
                     dispatch({
                       type: 'UPDATE_FIELD',
-                      field: 'maxRedemptions',
-                      value: numValue,
-                    });
+                      field: 'minOrderAmount',
+                      value: e.target.value ? parseFloat(e.target.value) : null,
+                    })
                   }
-                }
-              }}
-              placeholder="0 for unlimited, or enter a number"
-              className="h-12 text-base"
-            />
-            <p className="text-xs text-neutral-500">
-              💡 Tip: Set to 0 for unlimited redemptions, or enter a specific number to limit usage
-            </p>
-          </div>
+                  placeholder="e.g., 25.00"
+                  className="h-12 text-base"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500">$</span>
+              </div>
+            </div>
+          )}
+
+          {/* Max Redemptions - Hidden for REDEEM_NOW (configured in dedicated step) */}
+          {state.dealType === 'REDEEM_NOW' && (
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-blue-900">Redeem Now Settings</h4>
+                  <p className="text-sm text-blue-700 mt-1">
+                    Minimum spend amount and max redemptions are configured in the Redeem Now step. 
+                    These settings cannot be changed here.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Max Redemptions - Removed for REDEEM_NOW (configured in dedicated step) */}
+          {/* This section intentionally left empty - max redemptions for REDEEM_NOW is in DealRedeemNowStep */}
         </motion.div>
 
         {/* Toggle for Advanced Settings */}
@@ -365,6 +345,120 @@ export const DealAdvancedStep = () => {
             )}
           </AnimatePresence>
         </motion.div>
+
+        {/* Optional Bounty for Hidden Deals */}
+        {state.dealType === 'HIDDEN' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="space-y-6 rounded-xl border border-purple-200 bg-purple-50 p-6"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Trophy className="h-5 w-5 text-purple-600" />
+              <div>
+                <h3 className="text-lg font-semibold text-neutral-900">Optional: Bounty Rewards</h3>
+                <p className="text-sm text-neutral-600">
+                  Add bounty rewards to your hidden deal. Customers who bring friends will earn cash back.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              {/* Bounty Reward Amount */}
+              <div className="space-y-3">
+                <Label htmlFor="hiddenBountyReward" className="text-sm font-medium text-neutral-700">
+                  Reward Amount Per Friend
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="hiddenBountyReward"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    value={state.bountyRewardAmount ?? ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const numValue = value === '' ? null : parseFloat(value);
+                      dispatch({
+                        type: 'UPDATE_FIELD',
+                        field: 'bountyRewardAmount',
+                        value: numValue && numValue > 0 ? numValue : null,
+                      });
+                    }}
+                    placeholder="e.g., 5.00"
+                    className="h-12 text-base"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500">$</span>
+                </div>
+                <p className="text-xs text-neutral-500">
+                  How much cash back customers earn per friend they bring
+                </p>
+              </div>
+
+              {/* Min Referrals Required */}
+              <div className="space-y-3">
+                <Label htmlFor="hiddenMinReferrals" className="text-sm font-medium text-neutral-700">
+                  Minimum Friends Required
+                </Label>
+                <Input
+                  id="hiddenMinReferrals"
+                  type="number"
+                  min="1"
+                  value={state.minReferralsRequired ?? ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const numValue = value === '' ? null : parseInt(value);
+                    dispatch({
+                      type: 'UPDATE_FIELD',
+                      field: 'minReferralsRequired',
+                      value: numValue && numValue >= 1 ? numValue : null,
+                    });
+                  }}
+                  placeholder="e.g., 2"
+                  className="h-12 text-base"
+                />
+                <p className="text-xs text-neutral-500">
+                  Minimum number of friends customer must bring
+                </p>
+              </div>
+            </div>
+
+            {/* Bounty Preview */}
+            {state.bountyRewardAmount && state.bountyRewardAmount > 0 && state.minReferralsRequired && state.minReferralsRequired >= 1 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="mt-4 rounded-lg border border-purple-200 bg-white p-4"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Gift className="h-4 w-4 text-purple-600" />
+                  <span className="text-sm font-semibold text-neutral-900">Bounty Preview</span>
+                </div>
+                <p className="text-sm text-neutral-600">
+                  Customers will earn <span className="font-semibold text-purple-600">
+                    ${(state.bountyRewardAmount * state.minReferralsRequired).toFixed(2)}
+                  </span> minimum by bringing {state.minReferralsRequired} friend{state.minReferralsRequired > 1 ? 's' : ''}.
+                </p>
+                <p className="text-xs text-purple-600 mt-2">
+                  💡 A QR code will be generated for verification when you publish this deal.
+                </p>
+              </motion.div>
+            )}
+
+            {/* Info about kickback */}
+            {(state.bountyRewardAmount && state.bountyRewardAmount > 0 && state.minReferralsRequired && state.minReferralsRequired >= 1) && (
+              <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 text-blue-600 mt-0.5" />
+                  <p className="text-xs text-blue-700">
+                    <strong>Note:</strong> Kickback rewards will be automatically enabled when you add bounty rewards to a hidden deal.
+                  </p>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        )}
 
         {/* Tips */}
         <motion.div
