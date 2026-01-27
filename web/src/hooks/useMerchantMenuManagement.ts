@@ -163,7 +163,7 @@ export const useBulkUploadMenuItems = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.yohop.com/api';
       const response = await fetch(`${API_BASE_URL}/merchants/me/menu/bulk-upload`, {
         method: 'POST',
         headers: {

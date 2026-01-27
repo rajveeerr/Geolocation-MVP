@@ -14,7 +14,7 @@ import type {
   RedemptionOptionsResponse,
 } from '../types/loyalty';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.yohop.com/api';
 
 interface APIError extends Error {
   status?: number;

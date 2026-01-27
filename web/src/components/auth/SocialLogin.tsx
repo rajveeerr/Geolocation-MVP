@@ -6,7 +6,7 @@ export const SocialLogin = () => {
     const handleSocialLogin = (provider: 'google' | 'facebook' | 'instagram') => {
         const redirectUri = window.location.origin + '/auth/callback';
 
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const apiUrl = import.meta.env.VITE_API_URL || 'https://api.yohop.com';
 
         const targetUrl = `${apiUrl}/api/auth/${provider}/start?redirectUri=${encodeURIComponent(redirectUri)}`;
 

@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { useQuery, useMutation, useQueryClient, useQueries } from '@tanstack/react-query';
 import { apiGet, apiPost, apiPut, apiDelete } from '@/services/api';
 import { format } from 'date-fns';
@@ -164,7 +164,7 @@ async function fetchAvailability(merchantId: number, date: string, partySize: nu
   searchParams.append('partySize', partySize.toString());
 
   // Use environment variable or fallback
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.yohop.com/api';
   const url = `${API_BASE_URL}/table-booking/merchants/${merchantId}/availability?${searchParams.toString()}`;
 
   try {
@@ -259,7 +259,7 @@ export const useCreateBooking = () => {
       queryClient.invalidateQueries({
         queryKey: ['merchant-availability', variables.tableId, variables.bookingDate]
       });
-      
+
       // Invalidate any merchant booking queries
       queryClient.invalidateQueries({
         queryKey: ['merchant-bookings']
