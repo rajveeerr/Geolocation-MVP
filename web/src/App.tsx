@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Outlet, useLocation } from 'react-router-
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { SignUpPage } from './pages/SignUpPage';
+import { AuthCallbackPage } from './pages/AuthCallbackPage';
 import React, { Suspense } from 'react';
 import { AboutPage } from './pages/AboutPage';
 import { ForBusinessesPage } from './pages/ForBusinessesPage';
@@ -157,7 +158,7 @@ const MerchantLoyaltyTransactionsPage = React.lazy(() =>
 const DefaultLayout = () => {
   const location = useLocation();
   const isDealDetailPage = location.pathname.startsWith('/deals/') && location.pathname.split('/').length === 3;
-  
+
   return (
     <>
       <Header />
@@ -174,11 +175,12 @@ function App() {
     <BrowserRouter>
       <ScrollToTop />
       <RedirectProvider>
-          <AuthProvider>
-            <ModalProvider>
+        <AuthProvider>
+          <ModalProvider>
             <Routes>
               <Route element={<DefaultLayout />}>
                 <Route path={PATHS.HOME} element={<HomePage />} />
+                <Route path="/auth/callback" element={<AuthCallbackPage />} />
                 <Route path={PATHS.LOGIN} element={<LoginPage />} />
                 <Route path={PATHS.SIGNUP} element={<SignUpPage />} />
                 <Route
@@ -647,9 +649,9 @@ function App() {
               <Route path={PATHS.NOT_FOUND} element={<NotFoundPage />} />
             </Routes>
             <Toaster />
-            </ModalProvider>
-          </AuthProvider>
-        </RedirectProvider>
+          </ModalProvider>
+        </AuthProvider>
+      </RedirectProvider>
     </BrowserRouter>
   );
 }

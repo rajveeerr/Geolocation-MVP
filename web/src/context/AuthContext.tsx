@@ -118,6 +118,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     navigate(PATHS.HOME);
   };
 
+  const handleSocialToken = async (token: string) => {
+    localStorage.setItem('authToken', token);
+    await queryClient.invalidateQueries({ queryKey: ['user'] });
+    const redirectTo = consumeRedirectPath() || PATHS.HOME;
+    navigate(redirectTo, { replace: true });
+  };
+
   const value: AuthContextType = {
     user,
     isLoadingUser,
@@ -126,6 +133,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     signup,
     isSigningUp,
     logout,
+    handleSocialToken,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

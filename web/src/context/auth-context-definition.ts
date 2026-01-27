@@ -10,7 +10,7 @@ interface User {
   email: string;
   name: string | null;
   avatarUrl?: string | null;
-  points?: number; 
+  points?: number;
   role?: string;
 }
 
@@ -24,6 +24,7 @@ export interface AuthContextType {
   signup: (details: SignUpFormValues) => Promise<ApiResponse<unknown>>;
   isSigningUp: boolean;
   logout: () => void;
+  handleSocialToken: (token: string) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
