@@ -1,446 +1,418 @@
-// import { Link } from 'react-router-dom';
-// import { ChevronDown, Menu, X } from 'lucide-react';
-// import { useState, useEffect } from 'react';
-// import { Button } from '@/components/common/Button';
-// import { ArrowRight } from 'lucide-react';
-// import { PATHS } from '@/routing/paths';
-// import { Logo } from '../common/Logo';
-// import { motion, AnimatePresence } from 'framer-motion';
-// import { useAuth } from '@/context/useAuth';
-// import { ProfileDropDown } from './ProfileDropDown';
-
-// const navigationItems = [
-//   {
-//     id: 'hotDeals',
-//     label: 'Hot Deals',
-//     path: PATHS.HOT_DEALS,
-//     hasDropdown: true,
-//   },
-//   {
-//     id: 'map',
-//     label: 'Maps',
-//     path: PATHS.MAP,
-//     hasDropdown: false,
-//   },
-//   {
-//     id: 'pricing',
-//     label: 'Pricing',
-//     path: PATHS.PRICING,
-//     hasDropdown: false,
-//   },
-// ];
-
-// const ctaButtons = [
-//   {
-//     id: 'login',
-//     label: 'Login',
-//     variant: 'google' as const,
-//     path: PATHS.LOGIN,
-//     showOnMobile: true,
-//     showOnDesktop: true,
-//   },
-//   {
-//     id: 'business',
-//     label: 'For Businesses',
-//     variant: 'primary' as const,
-//     path: PATHS.FOR_BUSINESSES,
-//     icon: <ArrowRight className="h-4 w-4" />,
-//     iconPosition: 'right' as const,
-//     showOnMobile: true,
-//     showOnDesktop: true,
-//   },
-// ];
-
-// export const Header = () => {
-//   const [isScrolled, setIsScrolled] = useState(false);
-//   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-//   const { user, isLoadingUser } = useAuth();
-
-//   const loginButton = ctaButtons.find(b => b.id === 'login');
-
-//   useEffect(() => {
-//     const handleScroll = () => {
-//       setIsScrolled(window.scrollY > 20);
-//     };
-
-//     window.addEventListener('scroll', handleScroll);
-//     return () => window.removeEventListener('scroll', handleScroll);
-//   }, []);
-
-//   return (
-//     <header
-//       className={`fixed top-0 z-50 w-full transition-all duration-300 ${isScrolled || isMobileMenuOpen
-//           ? 'border-b border-neutral-border-light bg-white/50 backdrop-blur-lg'
-//           : 'bg-transparent'
-//         }`}
-//     >
-//       <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-//         <Logo />
-
-//         <nav className="hidden items-center gap-8 lg:flex">
-//           {navigationItems.map((item) => (
-//             <Link
-//               key={item.id}
-//               to={item.path}
-//               className="flex items-center gap-1 text-sm font-medium text-neutral-text-secondary transition-colors hover:text-neutral-text-primary"
-//             >
-//               {item.label}
-//               {item.hasDropdown && <ChevronDown className="h-4 w-4" />}
-//             </Link>
-//           ))}
-//         </nav>
-
-//         <div className="hidden items-center gap-3 lg:flex">
-//           {isLoadingUser ? (
-//             <div className="h-10 w-24 bg-neutral-200 animate-pulse rounded-full" />
-//           ) : user ? (
-//             <ProfileDropDown />
-//           ) : (
-//             loginButton && (
-//               <Link to={loginButton.path}>
-//                 <Button variant={loginButton.variant} size="md">
-//                   {loginButton.label}
-//                 </Button>
-//               </Link>
-//             )
-//           )}
-
-//           <Link to={PATHS.FOR_BUSINESSES}>
-//             <Button variant="primary" size="md" icon={<ArrowRight className="h-4 w-4" />} iconPosition="right">
-//               For Businesses
-//             </Button>
-//           </Link>
-//         </div>
-
-//         <div className="lg:hidden">
-//           <button
-//             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-//             className="p-2"
-//           >
-//             {isMobileMenuOpen ? (
-//               <X className="h-6 w-6 text-neutral-text-primary" />
-//             ) : (
-//               <Menu className="h-6 w-6 text-neutral-text-primary" />
-//             )}
-//           </button>
-//         </div>
-//       </div>
-
-//       <AnimatePresence>
-//         {isMobileMenuOpen && (
-//           <motion.div
-//             initial={{ opacity: 0, y: -20 }}
-//             animate={{ opacity: 1, y: 0 }}
-//             exit={{ opacity: 0, y: -20 }}
-//             transition={{ duration: 0.2 }}
-//             className="absolute left-0 top-full w-full border-b border-neutral-border-light bg-white/95 shadow-md backdrop-blur-md lg:hidden"
-//             onClick={() => setIsMobileMenuOpen(false)}
-//           >
-//             <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
-//               <nav className="flex flex-col gap-6">
-//                 {navigationItems.map((item) => (
-//                   <Link
-//                     key={item.id}
-//                     to={item.path}
-//                     className="flex items-center gap-2 text-lg font-medium text-neutral-text-primary"
-//                     onClick={() => setIsMobileMenuOpen(false)}
-//                   >
-//                     {item.label}
-//                     {item.hasDropdown && <ChevronDown className="h-4 w-4" />}
-//                   </Link>
-//                 ))}
-//               </nav>
-//               <div className="mt-6 space-y-3 border-t border-neutral-border-light/80 pt-6">
-//                 {isLoadingUser ? (
-//                   <div className="h-12 w-full bg-neutral-200 animate-pulse rounded-full" />
-//                 ) : user ? (
-//                   <ProfileDropDown />
-//                 ) : (
-//                   loginButton && (
-//                     <Link to={loginButton.path} className="block">
-//                       <Button
-//                         variant={loginButton.variant}
-//                         size="lg"
-//                         className="w-full"
-//                         onClick={() => setIsMobileMenuOpen(false)}
-//                       >
-//                         {loginButton.label}
-//                       </Button>
-//                     </Link>
-//                   )
-//                 )}
-//                 <Link to={PATHS.FOR_BUSINESSES} className="block">
-//                   <Button
-//                     variant="primary"
-//                     size="lg"
-//                     className="w-full"
-//                     icon={<ArrowRight className="h-4 w-4" />}
-//                     iconPosition="right"
-//                     onClick={() => setIsMobileMenuOpen(false)}
-//                   >
-//                     For Businesses
-//                   </Button>
-//                 </Link>
-//               </div>
-//             </div>
-//           </motion.div>
-//         )}
-//       </AnimatePresence>
-//     </header>
-// )}
-
 import { Link } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/common/Button';
+import { Menu, X, BookOpen, Compass, Coins, Briefcase, Shield, User, Settings, LogOut, Gift, Trophy, Flame, Users } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { PATHS } from '@/routing/paths';
-import { StreakBadge } from '@/components/gamification/streak/StreakBadge';
-import { useStreak } from '@/hooks/useStreak';
 import { Logo } from '../common/Logo';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '@/context/useAuth';
 import { ProfileDropDown } from './ProfileDropDown';
-import { NavbarSearch } from './NavbarSearch';
-import { SearchModal } from './SearchModal';
-import CoinDisplay from '../gamification/CoinDisplay';
+import { HeaderSearchBar } from './HeaderSearchBar';
+import { CitySelector } from './CitySelector';
+import { useGamificationProfile } from '@/hooks/useGamification';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
-import { HeistTokenBadge } from '@/components/heist/HeistTokenBadge';
-import { HeistNotificationBadge } from '@/components/heist/HeistNotificationBadge';
 
-const navigationItems = [
-  { id: 'deals', label: 'Hot Deals', path: PATHS.ALL_DEALS },
-  { id: 'leaderboard', label: 'Leaderboard', path: PATHS.LEADERBOARD },
-  { id: 'referral', label: 'Referral', path: PATHS.REFERRALS },
-  { id: 'gamification', label: 'Coins', path: PATHS.GAMIFICATION },
+// Navigation items for the hamburger/mobile menu
+const menuNavItems = [
+  { id: 'deals', label: 'Hot Deals', path: PATHS.ALL_DEALS, icon: Flame },
+  { id: 'leaderboard', label: 'Leaderboard', path: PATHS.LEADERBOARD, icon: Trophy },
+  { id: 'referral', label: 'Referrals', path: PATHS.REFERRALS, icon: Users },
+  { id: 'gamification', label: 'Coins & Rewards', path: PATHS.GAMIFICATION, icon: Coins },
+  { id: 'blog', label: 'Blog', path: PATHS.BLOG, icon: BookOpen },
+  { id: 'cityguide', label: 'City Guide', path: PATHS.CITY_GUIDE, icon: Compass },
 ];
 
 export const Header = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false); // <-- NEW STATE
-  const { user, isLoadingUser } = useAuth();
+  const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
+  const hamburgerRef = useRef<HTMLDivElement>(null);
+  const { user, isLoadingUser, logout } = useAuth();
   const { data: merchantData } = useMerchantStatus();
   const { isAdmin } = useAdminStatus();
+  const { data: gamificationProfile } = useGamificationProfile();
 
-  // Check if user has a merchant profile (any status)
   const hasMerchantProfile = !!merchantData?.data?.merchant;
+  const points = gamificationProfile?.coins ?? 0;
 
-  const openSearchModal = () => setIsSearchModalOpen(true);
-  const closeSearchModal = () => setIsSearchModalOpen(false);
-
+  // Close hamburger menu on outside click
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 100);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const handler = (e: MouseEvent) => {
+      if (hamburgerRef.current && !hamburgerRef.current.contains(e.target as Node)) {
+        setIsHamburgerMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const motionVariants = {
-    initial: { opacity: 0, y: -20 },
-    animate: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.3, ease: 'easeInOut' },
-    },
-    exit: {
-      opacity: 0,
-      y: -20,
-      transition: { duration: 0.2, ease: 'easeInOut' },
-    },
-  };
-
-  const { streak, isLoading: isLoadingStreak } = useStreak();
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isMobileMenuOpen]);
 
   return (
     <>
-      {/* <header
-        className={`fixed top-0 z-40 w-full border-b border-neutral-200/70 bg-white/80 backdrop-blur-lg transition-colors duration-300`}
-      > */}
-      <header
-        className={`fixed top-0 z-40 w-full border-b border-neutral-200/80 bg-white/95 backdrop-blur-lg`}
-      >
-        <div className="container mx-auto flex h-20 max-w-screen-xl items-center justify-between px-6 lg:grid lg:grid-cols-3">
-          <div className="flex justify-start">
+      <header className="fixed top-0 z-40 w-full border-b border-neutral-200/80 bg-white">
+        {/* ===== DESKTOP NAVBAR ===== */}
+        <div className="container mx-auto hidden h-16 max-w-screen-xl items-center gap-4 px-4 md:flex lg:px-6">
+          {/* Left: Logo */}
+          <div className="shrink-0">
             <Logo />
           </div>
 
-          <div className="hidden justify-center lg:flex">
-            <AnimatePresence mode="wait">
-              {isScrolled ? (
-                <motion.div key="search" {...motionVariants}>
-                  <NavbarSearch onClick={openSearchModal} />{' '}
-                  {/* <-- PASS ONCLICK */}
-                </motion.div>
-              ) : (
-                <motion.nav key="tabs" {...motionVariants}>
-                  <div className="flex items-center gap-2 rounded-full border border-neutral-200/90 bg-white/50 p-1 shadow-sm">
-                    {navigationItems.map((item) => (
-                      <Link
-                        key={item.id}
-                        to={item.path}
-                        className="rounded-full px-4 py-2 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-100 whitespace-nowrap"
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                </motion.nav>
-              )}
-            </AnimatePresence>
+          {/* Search bar */}
+          <div className="mx-4 flex-1 max-w-md">
+            <HeaderSearchBar />
           </div>
 
-          <div className="hidden items-center justify-end gap-2 lg:flex">
-            {/* {!isAdmin && (
-              <Link to={businessLink}>
-                <Button variant="secondary" size="md" className="rounded-full">
-                  {hasMerchantProfile ? 'Business Dashboard' : 'Yohop for Business'}
-                </Button>
+          {/* Right section: Blog, City Guide, City Selector, Points, Profile, Hamburger */}
+          <div className="flex items-center gap-1 lg:gap-2">
+            {/* Blog link */}
+            <Link
+              to={PATHS.BLOG}
+              className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50 hover:text-neutral-900"
+            >
+              <BookOpen className="h-4 w-4" />
+              <span className="hidden lg:inline">Blog</span>
+            </Link>
+
+            {/* City Guide link */}
+            <Link
+              to={PATHS.CITY_GUIDE}
+              className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50 hover:text-neutral-900"
+            >
+              <Compass className="h-4 w-4" />
+              <span className="hidden lg:inline">City Guide</span>
+            </Link>
+
+            {/* Divider */}
+            <div className="mx-1 h-6 w-px bg-neutral-200" />
+
+            {/* City selector dropdown */}
+            <CitySelector />
+
+            {/* Divider */}
+            <div className="mx-1 h-6 w-px bg-neutral-200" />
+
+            {/* Points display */}
+            {user && !isLoadingUser && (
+              <Link
+                to={PATHS.GAMIFICATION}
+                className="flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 transition-colors hover:bg-amber-100"
+              >
+                <Coins className="h-4 w-4 text-amber-500" />
+                <span className="text-sm font-semibold text-amber-700">
+                  {points.toLocaleString()} pts
+                </span>
               </Link>
-            )} */}
-            {isLoadingUser ? (
-              <div className="h-10 w-24 animate-pulse rounded-full bg-neutral-200" />
-            ) : user ? (
-              <div className="flex items-center gap-3">
-                {hasMerchantProfile && (
-                  <Link to={PATHS.MERCHANT_DASHBOARD}>
-                    <Button variant="secondary" size="md" className="rounded-full">
-                      Business Dashboard
-                    </Button>
-                  </Link>
-                )}
-                {!hasMerchantProfile && (
-                  <div className="flex items-center gap-2">
-                    <StreakBadge streak={streak} loading={isLoadingStreak} />
-                    <CoinDisplay />
-                    <HeistTokenBadge />
-                    <HeistNotificationBadge />
-                  </div>
-                )}
-                <ProfileDropDown isMerchant={hasMerchantProfile} />
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link to={PATHS.MERCHANT_ONBOARDING}>
-                  <Button variant="secondary" size="md" className="rounded-full">
-                    CitySpark for Business
-                  </Button>
-                </Link>
-                <Link to={PATHS.LOGIN}>
-                  <Button variant="primary" size="md" className="rounded-full">
-                    Log in
-                  </Button>
-                </Link>
-              </div>
             )}
-          </div>
 
-          <div className="flex justify-end lg:hidden">
+            {/* Profile or Login */}
+            {isLoadingUser ? (
+              <div className="h-8 w-8 animate-pulse rounded-full bg-neutral-200" />
+            ) : user ? (
+              <ProfileDropDown isMerchant={hasMerchantProfile} />
+            ) : (
+              <Link
+                to={PATHS.LOGIN}
+                className="rounded-full bg-neutral-900 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-neutral-800"
+              >
+                Log in
+              </Link>
+            )}
+
+            {/* Hamburger menu button */}
+            <div className="relative" ref={hamburgerRef}>
+              <button
+                onClick={() => setIsHamburgerMenuOpen(!isHamburgerMenuOpen)}
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 text-neutral-600 transition-colors hover:bg-neutral-50"
+                aria-label="Menu"
+              >
+                {isHamburgerMenuOpen ? (
+                  <X className="h-4.5 w-4.5" />
+                ) : (
+                  <Menu className="h-4.5 w-4.5" />
+                )}
+              </button>
+
+              {/* Desktop hamburger dropdown */}
+              <AnimatePresence>
+                {isHamburgerMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-xl"
+                  >
+                    <div className="py-2">
+                      {/* Yohop for Business CTA */}
+                      {!isAdmin && (
+                        <Link
+                          to={hasMerchantProfile ? PATHS.MERCHANT_DASHBOARD : PATHS.MERCHANT_ONBOARDING}
+                          onClick={() => setIsHamburgerMenuOpen(false)}
+                          className="mx-2 mb-2 flex items-center gap-3 rounded-lg bg-brand-primary-50 px-3 py-2.5 text-sm font-semibold text-brand-primary-700 transition-colors hover:bg-brand-primary-100"
+                        >
+                          <Briefcase className="h-4 w-4" />
+                          {hasMerchantProfile ? 'Business Dashboard' : 'Yohop for Business'}
+                        </Link>
+                      )}
+
+                      {isAdmin && (
+                        <Link
+                          to={PATHS.ADMIN_DASHBOARD}
+                          onClick={() => setIsHamburgerMenuOpen(false)}
+                          className="mx-2 mb-2 flex items-center gap-3 rounded-lg bg-red-50 px-3 py-2.5 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100"
+                        >
+                          <Shield className="h-4 w-4" />
+                          Admin Dashboard
+                        </Link>
+                      )}
+
+                      <div className="my-1 border-t border-neutral-100" />
+
+                      {/* Nav items */}
+                      {menuNavItems.map((item) => (
+                        <Link
+                          key={item.id}
+                          to={item.path}
+                          onClick={() => setIsHamburgerMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 transition-colors hover:bg-neutral-50"
+                        >
+                          <item.icon className="h-4 w-4 text-neutral-400" />
+                          {item.label}
+                        </Link>
+                      ))}
+
+                      {user && (
+                        <>
+                          <div className="my-1 border-t border-neutral-100" />
+                          <Link
+                            to={PATHS.PROFILE}
+                            onClick={() => setIsHamburgerMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 transition-colors hover:bg-neutral-50"
+                          >
+                            <User className="h-4 w-4 text-neutral-400" />
+                            Profile
+                          </Link>
+                          <Link
+                            to={PATHS.LOYALTY_HISTORY}
+                            onClick={() => setIsHamburgerMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 transition-colors hover:bg-neutral-50"
+                          >
+                            <Gift className="h-4 w-4 text-neutral-400" />
+                            Loyalty Wallet
+                          </Link>
+                          <Link
+                            to={PATHS.SETTINGS}
+                            onClick={() => setIsHamburgerMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 transition-colors hover:bg-neutral-50"
+                          >
+                            <Settings className="h-4 w-4 text-neutral-400" />
+                            Settings
+                          </Link>
+                          <div className="my-1 border-t border-neutral-100" />
+                          <button
+                            onClick={() => {
+                              setIsHamburgerMenuOpen(false);
+                              logout();
+                            }}
+                            className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 transition-colors hover:bg-red-50"
+                          >
+                            <LogOut className="h-4 w-4" />
+                            Log out
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+
+        {/* ===== MOBILE NAVBAR ===== */}
+        <div className="flex h-12 items-center justify-between px-4 md:hidden">
+          <Logo />
+          <div className="flex items-center gap-2">
+            {/* Points on mobile */}
+            {user && !isLoadingUser && (
+              <Link
+                to={PATHS.GAMIFICATION}
+                className="flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-1"
+              >
+                <Coins className="h-3.5 w-3.5 text-amber-500" />
+                <span className="text-xs font-semibold text-amber-700">
+                  {points.toLocaleString()}
+                </span>
+              </Link>
+            )}
+            {/* Profile avatar on mobile */}
+            {!isLoadingUser && user && (
+              <ProfileDropDown isMerchant={hasMerchantProfile} />
+            )}
+            {/* Hamburger for mobile */}
             <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="-mr-2 p-2"
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 text-neutral-600"
               aria-label="Open menu"
             >
-              <Menu className="h-6 w-6" />
+              <Menu className="h-5 w-5" />
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu Panel */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <div className="absolute inset-x-0 top-0 z-50 origin-top-right p-2 transition lg:hidden">
-              <div className="divide-y-2 divide-gray-50 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
-                <div className="px-5 pb-6 pt-5">
-                  <div className="flex items-center justify-between">
-                    <Logo />
-                    <div className="-mr-2">
-                      <button
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
-                        aria-label="Close menu"
-                      >
-                        <X className="h-6 w-6" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="mt-6">
-                    <nav className="grid gap-y-8">
-                      {navigationItems.map((item) => (
-                        <Link
-                          key={item.id}
-                          to={item.path}
-                          className="-m-3 flex items-center rounded-md p-3 hover:bg-gray-50"
-                        >
-                          <span className="ml-3 text-base font-medium text-gray-900">
-                            {item.label}
-                          </span>
-                        </Link>
-                      ))}
-                    </nav>
-                  </div>
-                </div>
-                <div className="space-y-6 px-5 py-6">
-                  <div>
-                    <Link
-                      to={PATHS.LOGIN}
-                      className="flex w-full items-center justify-center"
-                    >
-                      <Button
-                        variant="primary"
-                        size="md"
-                        className="rounded-full"
-                      >
-                        Sign up / Log in
-                      </Button>
-                    </Link>
-                    <div className="mt-3">
-                      <Link
-                        to={PATHS.MERCHANT_ONBOARDING}
-                        className="flex w-full items-center justify-center"
-                      >
-                        <Button
-                          variant="secondary"
-                          size="md"
-                          className="rounded-full w-full"
-                        >
-                          CitySpark for Business
-                        </Button>
-                      </Link>
-                    </div>
-                    {!isAdmin && (
-                      <p className="mt-6 text-center text-base font-medium text-gray-500">
-                        {hasMerchantProfile ? (
-                          <>
-                            Manage your business{' '}
-                            <Link
-                              to={PATHS.MERCHANT_DASHBOARD}
-                              className="text-primary hover:text-primary/90"
-                            >
-                              Go to Dashboard
-                            </Link>
-                          </>
-                        ) : (
-                          <>
-                            Are you a business owner?{' '}
-                            <Link
-                              to={PATHS.MERCHANT_ONBOARDING}
-                              className="text-primary hover:text-primary/90"
-                            >
-                              Get on the map
-                            </Link>
-                          </>
-                        )}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </AnimatePresence>
+        {/* Mobile search bar row */}
+        <div className="border-t border-neutral-100 px-4 py-1.5 md:hidden">
+          <HeaderSearchBar />
+        </div>
       </header>
 
-      <SearchModal isOpen={isSearchModalOpen} onClose={closeSearchModal} />
+      {/* Spacer to prevent content overlap — desktop: 64px, mobile: 14+search row ~112px */}
+      {/* This is handled by padding on <main> in the layout, see DefaultLayout */}
+
+      {/* ===== MOBILE FULL-SCREEN MENU ===== */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm md:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="absolute right-0 top-0 h-full w-[85%] max-w-sm overflow-y-auto bg-white shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Mobile menu header */}
+              <div className="flex items-center justify-between border-b border-neutral-100 px-5 py-4">
+                <Logo />
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="rounded-lg p-2 text-neutral-400 hover:bg-neutral-100"
+                  aria-label="Close menu"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* City Selector in mobile */}
+              <div className="border-b border-neutral-100 px-5 py-3">
+                <CitySelector />
+              </div>
+
+              {/* Yohop for Business CTA */}
+              {!isAdmin && (
+                <div className="border-b border-neutral-100 px-5 py-3">
+                  <Link
+                    to={hasMerchantProfile ? PATHS.MERCHANT_DASHBOARD : PATHS.MERCHANT_ONBOARDING}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 rounded-xl bg-brand-primary-50 px-4 py-3 text-sm font-semibold text-brand-primary-700"
+                  >
+                    <Briefcase className="h-5 w-5" />
+                    {hasMerchantProfile ? 'Business Dashboard' : 'Yohop for Business'}
+                  </Link>
+                </div>
+              )}
+
+              {isAdmin && (
+                <div className="border-b border-neutral-100 px-5 py-3">
+                  <Link
+                    to={PATHS.ADMIN_DASHBOARD}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
+                  >
+                    <Shield className="h-5 w-5" />
+                    Admin Dashboard
+                  </Link>
+                </div>
+              )}
+
+              {/* Navigation links */}
+              <nav className="px-2 py-2">
+                {menuNavItems.map((item) => (
+                  <Link
+                    key={item.id}
+                    to={item.path}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                  >
+                    <item.icon className="h-5 w-5 text-neutral-400" />
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+
+              {/* Account section */}
+              {user && (
+                <div className="border-t border-neutral-100 px-2 py-2">
+                  <Link
+                    to={PATHS.PROFILE}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                  >
+                    <User className="h-5 w-5 text-neutral-400" />
+                    Profile
+                  </Link>
+                  <Link
+                    to={PATHS.LOYALTY_HISTORY}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                  >
+                    <Gift className="h-5 w-5 text-neutral-400" />
+                    Loyalty Wallet
+                  </Link>
+                  <Link
+                    to={PATHS.SETTINGS}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                  >
+                    <Settings className="h-5 w-5 text-neutral-400" />
+                    Settings
+                  </Link>
+                </div>
+              )}
+
+              {/* Bottom actions */}
+              <div className="border-t border-neutral-100 px-5 py-4">
+                {!user && !isLoadingUser && (
+                  <Link
+                    to={PATHS.LOGIN}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block w-full rounded-full bg-neutral-900 py-3 text-center text-sm font-semibold text-white"
+                  >
+                    Sign up / Log in
+                  </Link>
+                )}
+                {user && (
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      logout();
+                    }}
+                    className="flex w-full items-center justify-center gap-2 rounded-full border border-red-200 py-3 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Log out
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Web Dev Server",
+			"type": "shell",
+			"command": "cd /Users/Rajveer/Desktop/Coding/100xDevs-Journey/Projects/Geolocation-MVP/web && npm run dev",
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}

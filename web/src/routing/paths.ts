@@ -3,6 +3,8 @@ export const PATHS = {
   ALL_DEALS: '/deals',
   MAP: '/map',
   PRICING: '/pricing',
+  BLOG: '/blog',
+  CITY_GUIDE: '/city-guide',
 
   FOR_BUSINESSES: '/business',
   BUSINESS_SIGNUP: '/business/signup',

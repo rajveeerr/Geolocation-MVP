@@ -25,20 +25,20 @@
     --ring: 222.2 84% 4.9%;
     --radius: 0.75rem;
 
-    /* Resy-inspired Orange: HSL(7, 99%, 59%) */
-    --brand-primary-50: 7 99% 97%;
-    --brand-primary-100: 7 99% 95%;
-    --brand-primary-200: 7 99% 90%;
-    --brand-primary-300: 7 99% 83%;
-    --brand-primary-400: 7 99% 65%;
-    --brand-primary-500: 7 99% 68%;
-    --brand-primary-600: 7 99% 60%;
-    --brand-primary-700: 7 99% 58%;
-    --brand-primary-800: 7 99% 48%;
-    --brand-primary-900: 7 99% 40%;
-    --brand-primary-main: 7 99% 59%;
-    --brand-primary-dark: 7 99% 58%;
-    --brand-primary-light: 7 99% 95%;
+    /* Brand Red: #B91C1C → HSL(0, 74%, 42%) */
+    --brand-primary-50: 0 86% 97%;
+    --brand-primary-100: 0 80% 92%;
+    --brand-primary-200: 0 76% 84%;
+    --brand-primary-300: 0 74% 71%;
+    --brand-primary-400: 0 74% 57%;
+    --brand-primary-500: 0 74% 47%;
+    --brand-primary-600: 0 74% 42%;
+    --brand-primary-700: 0 74% 36%;
+    --brand-primary-800: 0 74% 29%;
+    --brand-primary-900: 0 74% 22%;
+    --brand-primary-main: 0 74% 42%;
+    --brand-primary-dark: 0 74% 36%;
+    --brand-primary-light: 0 80% 92%;
   }
 
   .dark {
@@ -48,7 +48,7 @@
     --card-foreground: 210 40% 98.0392%;
     --popover: 222.2222 47.3684% 11.1765%;
     --popover-foreground: 210 40% 98.0392%;
-    --primary: 217.2193 91.2195% 59.8039%;
+    --primary: 0 74% 42%;
     --primary-foreground: 0 0% 100%;
     --secondary: 217.2414 32.5843% 17.451%;
     --secondary-foreground: 210 40% 98.0392%;

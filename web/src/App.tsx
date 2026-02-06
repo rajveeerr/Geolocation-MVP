@@ -20,6 +20,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from './context/AuthContext';
 import { RedirectProvider } from './context/RedirectContext';
 import { ModalProvider } from './context/ModalContext';
+import { CityProvider } from './context/CityContext';
 import { AllDealsPage } from './pages/AllDealsPage';
 
 const ProfilePage = React.lazy(() =>
@@ -176,6 +177,7 @@ function App() {
       <ScrollToTop />
       <RedirectProvider>
         <AuthProvider>
+          <CityProvider>
           <ModalProvider>
             <Routes>
               <Route element={<DefaultLayout />}>
@@ -650,6 +652,7 @@ function App() {
             </Routes>
             <Toaster />
           </ModalProvider>
+          </CityProvider>
         </AuthProvider>
       </RedirectProvider>
     </BrowserRouter>

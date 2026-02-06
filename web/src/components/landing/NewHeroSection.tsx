@@ -3,7 +3,7 @@ import { CategoryFilterBar } from '@/components/landing/CategoryFilterBar';
 export const NewHeroSection = () => {
 
   return (
-    <section className="bg-white pt-20 sm:pt-24 py-12 px-6 border-b border-gray-100">
+    <section className="bg-white pt-24 md:pt-20 py-12 px-6 border-b border-gray-100">
       <div className="max-w-7xl mx-auto">
         {/* Main Headline - Matching Figma Design */}
         <div className="mb-10">
