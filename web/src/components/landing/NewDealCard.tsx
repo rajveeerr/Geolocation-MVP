@@ -150,7 +150,7 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
   const discountPct = deal.discountPercentage ?? 0;
   const discountAmt = deal.discountAmount ?? 0;
   const hasDiscount = discountPct > 0 || discountAmt > 0;
-  const originalPrice = deal.originalValue ?? (discountAmt > 0 ? discountAmt * 2 : 0);
+  const originalPrice = deal.originalValue ?? 0;
   const salePrice =
     discountPct > 0 && originalPrice > 0
       ? +(originalPrice * (1 - discountPct / 100)).toFixed(2)
@@ -158,7 +158,7 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
         ? +(originalPrice - discountAmt).toFixed(2)
         : 0;
 
-  // Category label for capsule
+  // Category label for capsule — handle both string and Prisma relation object
   const categoryLabel =
     typeof deal.category === 'string'
       ? deal.category.toUpperCase()
@@ -264,45 +264,57 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
           />
 
           {/* ─────────────── TOP CAPSULE (Pricing Pill) ─────────────── */}
-          {(hasDiscount || categoryLabel) && (
+          {(hasDiscount || categoryLabel || dtype !== 'standard') && (
             <div className="absolute top-10 left-3 right-3 z-20">
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full px-3 py-1.5">
-                {/* Category label */}
-                {categoryLabel && (
-                  <span className="text-white font-bold text-[10px] leading-tight uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full px-3 py-1.5 max-w-full">
+                {/* Deal type badge for non-standard types */}
+                {dtype !== 'standard' && (
+                  <span className="text-white font-bold text-[10px] leading-tight uppercase tracking-wider flex-shrink-0">
+                    {meta.badge}
+                  </span>
+                )}
+                {/* Category label (only for standard to avoid clutter) */}
+                {dtype === 'standard' && categoryLabel && (
+                  <span className="text-white font-bold text-[10px] leading-tight uppercase tracking-wider truncate">
                     {categoryLabel}
                   </span>
                 )}
-                {/* Sale price */}
+                {/* Sale price (only when we have the original value to compute it) */}
                 {salePrice > 0 && (
-                  <span className="text-red-500 font-bold text-base">
+                  <span className="text-red-500 font-bold text-base flex-shrink-0">
                     ${salePrice.toFixed(2)}
                   </span>
                 )}
                 {/* Original price struck-through */}
                 {originalPrice > 0 && salePrice > 0 && (
-                  <span className="text-white/50 text-xs line-through">
+                  <span className="text-white/50 text-xs line-through flex-shrink-0">
                     ${originalPrice.toFixed(2)}
                   </span>
                 )}
-                {/* Discount percentage */}
+                {/* Discount percentage — always show if available */}
                 {discountPct > 0 && (
-                  <span className="text-white font-bold text-sm">
+                  <span className="text-white font-bold text-sm flex-shrink-0">
                     {discountPct}%
+                  </span>
+                )}
+                {/* Discount amount fallback when no percentage */}
+                {discountPct === 0 && discountAmt > 0 && (
+                  <span className="text-white font-bold text-sm flex-shrink-0">
+                    ${discountAmt} off
                   </span>
                 )}
                 {/* Trend icon */}
                 {hasDiscount && (
-                  <div className="w-7 h-7 rounded-full bg-red-600 flex items-center justify-center flex-shrink-0">
-                    <TrendingUp className="w-3.5 h-3.5 text-white" />
+                  <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center flex-shrink-0">
+                    <TrendingUp className="w-3 h-3 text-white" />
                   </div>
                 )}
               </div>
             </div>
           )}
 
-          {/* ─────────────── MIDDLE: Social Proof ─────────────── */}
-          <div className="absolute bottom-[180px] left-3 z-10">
+          {/* ─────────────── Social Proof ─────────────── */}
+          <div className="absolute bottom-[140px] left-3 z-10">
             {tappedInCount > 0 && (
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
@@ -345,94 +357,87 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
               )}
             </div>
 
-            {/* ── Bottom action row: countdown + icon buttons ── */}
-            <div className="flex items-center gap-2 pt-1">
-              {/* Countdown pill */}
-              {(isActive || isUpcoming) && timeDisplay && (
-                <div className="flex items-center gap-1.5 bg-[#8B1A1A]/80 backdrop-blur-sm rounded-full px-3 py-1.5">
+            {/* ── Bottom action row: status pill(s) + icon buttons ── */}
+            <div className="flex items-center gap-1.5 pt-1">
+              {/* Left side: ONE status pill (priority order — show only the most relevant) */}
+              {(isActive || isUpcoming) && timeDisplay ? (
+                <div className="flex items-center gap-1 bg-[#8B1A1A]/80 backdrop-blur-sm rounded-full px-2.5 py-1.5 flex-shrink-0">
                   <Clock className="w-3 h-3 text-white/80" />
-                  <span className="text-white text-[11px] font-semibold">
-                    {isUpcoming ? 'Starts' : 'Ends'} {timeDisplay}
+                  <span className="text-white text-[10px] font-semibold leading-tight">
+                    {isUpcoming ? 'Starts' : 'Ends'}<br />{timeDisplay}
                   </span>
                 </div>
-              )}
-
-              {/* Recurring days pill */}
-              {dtype === 'recurring' && deal.recurringDays && deal.recurringDays.length > 0 && (
-                <div className="flex items-center gap-1 bg-blue-600/60 backdrop-blur-sm rounded-full px-2.5 py-1.5">
+              ) : dtype === 'recurring' && deal.recurringDays && deal.recurringDays.length > 0 ? (
+                <div className="flex items-center gap-1 bg-blue-600/60 backdrop-blur-sm rounded-full px-2.5 py-1.5 flex-shrink-0">
                   <Repeat className="w-3 h-3 text-white/80" />
-                  <span className="text-white text-[11px] font-semibold">
-                    {deal.recurringDays.map((d) => d.slice(0, 3)).join(', ')}
+                  <span className="text-white text-[10px] font-semibold">
+                    {deal.recurringDays.map((d) => d.slice(0, 3)).join('/')}
                   </span>
                 </div>
-              )}
-
-              {/* Bounty reward pill */}
-              {hasBounty && maxCash > 0 && !isActive && !isUpcoming && (
-                <div className="flex items-center gap-1 bg-emerald-600/60 backdrop-blur-sm rounded-full px-2.5 py-1.5">
+              ) : hasBounty && maxCash > 0 ? (
+                <div className="flex items-center gap-1 bg-emerald-600/60 backdrop-blur-sm rounded-full px-2.5 py-1.5 flex-shrink-0">
                   <Banknote className="w-3 h-3 text-white/80" />
-                  <span className="text-white text-[11px] font-semibold">
-                    Up to ${maxCash}
-                  </span>
+                  <span className="text-white text-[10px] font-semibold">Up to ${maxCash}</span>
                 </div>
-              )}
+              ) : null}
 
-              {/* Hidden deal pill */}
+              {/* Secondary pill: deal type badge (Secret, Flash, etc.) — only if different from time pill */}
               {dtype === 'hidden' && (
-                <div className="flex items-center gap-1 bg-purple-600/60 backdrop-blur-sm rounded-full px-2.5 py-1.5">
+                <div className="flex items-center gap-1 bg-purple-600/60 backdrop-blur-sm rounded-full px-2.5 py-1.5 flex-shrink-0">
                   <Sparkles className="w-3 h-3 text-white/80" />
-                  <span className="text-white text-[11px] font-semibold">Secret</span>
+                  <span className="text-white text-[10px] font-semibold">Secret</span>
                 </div>
               )}
 
-              {/* Spacer */}
-              <div className="flex-1" />
+              {/* Spacer pushes icons right */}
+              <div className="flex-1 min-w-0" />
 
-              {/* Icon buttons row — Figma style */}
-              <button
-                className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center hover:bg-white/25 transition-all"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowShareSheet(true);
-                }}
-              >
-                <Share2 className="w-4 h-4 text-white" />
-              </button>
-              <button
-                className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center hover:bg-white/25 transition-all"
-                onClick={handleFavorite}
-              >
-                <Heart
-                  className={cn(
-                    'w-4 h-4',
-                    isSaved ? 'fill-red-500 text-red-500' : 'text-white',
-                  )}
-                />
-              </button>
-              {deal.merchantId && (
+              {/* Icon buttons — always show, flex-shrink-0 */}
+              <div className="flex items-center gap-1.5 flex-shrink-0">
                 <button
-                  className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center hover:bg-white/25 transition-all"
+                  className="w-8 h-8 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center hover:bg-white/25 transition-all"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setShowMenuPeek(true);
+                    setShowShareSheet(true);
                   }}
                 >
-                  <Scissors className="w-4 h-4 text-white" />
+                  <Share2 className="w-3.5 h-3.5 text-white" />
                 </button>
-              )}
-              {/* Purple send / navigate button */}
-              <button
-                className="w-9 h-9 rounded-full flex items-center justify-center transition-all"
-                style={{
-                  background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowIncentiveDetails(true);
-                }}
-              >
-                <Send className="w-4 h-4 text-white -rotate-12" />
-              </button>
+                <button
+                  className="w-8 h-8 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center hover:bg-white/25 transition-all"
+                  onClick={handleFavorite}
+                >
+                  <Heart
+                    className={cn(
+                      'w-3.5 h-3.5',
+                      isSaved ? 'fill-red-500 text-red-500' : 'text-white',
+                    )}
+                  />
+                </button>
+                {deal.merchantId && (
+                  <button
+                    className="w-8 h-8 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center hover:bg-white/25 transition-all"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowMenuPeek(true);
+                    }}
+                  >
+                    <Scissors className="w-3.5 h-3.5 text-white" />
+                  </button>
+                )}
+                <button
+                  className="w-8 h-8 rounded-full flex items-center justify-center transition-all"
+                  style={{
+                    background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowIncentiveDetails(true);
+                  }}
+                >
+                  <Send className="w-3.5 h-3.5 text-white -rotate-12" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
