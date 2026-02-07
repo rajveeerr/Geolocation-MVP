@@ -44,8 +44,8 @@ export const TimeSlotQuickCard = ({
         isFullyBooked 
           ? "border-red-200 bg-red-50 cursor-not-allowed opacity-60" 
           : isLowAvailability
-          ? "border-orange-200 bg-orange-50 hover:bg-orange-100 cursor-pointer"
-          : "border-orange-200 bg-orange-50 hover:bg-orange-100 cursor-pointer"
+          ? "border-red-200 bg-red-50 hover:bg-red-100 cursor-pointer"
+          : "border-red-200 bg-red-50 hover:bg-red-100 cursor-pointer"
       )}
       onClick={!isFullyBooked ? onBook : undefined}
     >
@@ -72,7 +72,7 @@ export const TimeSlotQuickCard = ({
         <Button 
           size={compact ? "sm" : "default"}
           className={cn(
-            "ml-3 flex-shrink-0 bg-orange-600 hover:bg-orange-700 text-white",
+            "ml-3 flex-shrink-0 bg-red-800 hover:bg-red-900 text-white",
             compact ? "h-7 px-2 text-xs" : "h-8 px-3 text-sm"
           )}
           onClick={(e) => {

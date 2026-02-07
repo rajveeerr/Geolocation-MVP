@@ -16,7 +16,7 @@ export const HappyHourDealCard = ({ deal, className, timeRange, onCardClick }: H
     <div className={cn('relative', className)}>
       <UnifiedDealCard deal={deal} className={className} onCardClick={onCardClick} />
       {timeRange && (
-        <div className="absolute top-16 left-3 z-10 bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 shadow-lg">
+        <div className="absolute top-16 left-3 z-10 bg-red-800 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 shadow-lg">
           <Clock className="h-3 w-3" />
           <span>{timeRange.start} - {timeRange.end}</span>
         </div>

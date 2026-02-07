@@ -185,7 +185,7 @@ export const DealDetailPage = () => {
                     </span>
                   )}
                   {popularity?.isTrending && (
-                    <span className="px-2 py-0.5 bg-orange-100 text-orange-700 rounded text-xs font-semibold">
+                    <span className="px-2 py-0.5 bg-red-100 text-red-800 rounded text-xs font-semibold">
                       Trending
                     </span>
                   )}
@@ -262,7 +262,7 @@ export const DealDetailPage = () => {
                 </span>
               ) : null}
               {deal.context?.isHappyHour && (
-                <span className="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg text-sm font-medium">
+                <span className="px-3 py-1.5 bg-red-100 text-red-800 rounded-lg text-sm font-medium">
                   Happy Hour
                 </span>
               )}
@@ -285,7 +285,7 @@ export const DealDetailPage = () => {
                   variant="primary"
                   size="lg"
                   disabled
-                  className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white opacity-50 cursor-not-allowed"
+                  className="flex-1 bg-gradient-to-r from-red-800 to-red-900 hover:from-red-900 hover:to-red-950 text-white opacity-50 cursor-not-allowed"
                 >
                   <Package className="h-4 w-4 mr-2" />
                   Order Pickup

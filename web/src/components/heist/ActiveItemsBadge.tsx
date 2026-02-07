@@ -53,7 +53,7 @@ export function ActiveItemsBadge({
       case 'SWORD':
         return <Sword className="h-4 w-4 text-red-600" />;
       case 'HAMMER':
-        return <Hammer className="h-4 w-4 text-orange-600" />;
+        return <Hammer className="h-4 w-4 text-red-800" />;
       case 'SHIELD':
         return <Shield className="h-4 w-4 text-blue-600" />;
       default:
@@ -66,7 +66,7 @@ export function ActiveItemsBadge({
       case 'SWORD':
         return 'bg-red-50 border-red-200 text-red-700';
       case 'HAMMER':
-        return 'bg-orange-50 border-orange-200 text-orange-700';
+        return 'bg-red-50 border-red-200 text-red-700';
       case 'SHIELD':
         return 'bg-blue-50 border-blue-200 text-blue-700';
       default:
@@ -108,7 +108,7 @@ export function ActiveItemsBadge({
                 </p>
               )}
               {expiresAt && (
-                <p className={cn('text-xs', isExpiringSoon ? 'text-orange-400 font-semibold' : 'text-neutral-300')}>
+                <p className={cn('text-xs', isExpiringSoon ? 'text-red-400 font-semibold' : 'text-neutral-300')}>
                   Expires {formatDistanceToNow(expiresAt, { addSuffix: true })}
                 </p>
               )}
@@ -124,7 +124,7 @@ export function ActiveItemsBadge({
                 className={cn(
                   'flex items-center justify-center h-8 w-8 rounded-full border-2 transition-all hover:scale-110 cursor-help',
                   getItemColor(item.type),
-                  isExpiringSoon && 'ring-2 ring-orange-400'
+                  isExpiringSoon && 'ring-2 ring-red-400'
                 )}
                 title={`${item.name}: ${formatEffect(item)}`}
               >
@@ -156,7 +156,7 @@ export function ActiveItemsBadge({
               className={cn(
                 'flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 text-sm font-medium transition-all',
                 getItemColor(item.type),
-                isExpiringSoon && 'ring-2 ring-orange-400'
+                isExpiringSoon && 'ring-2 ring-red-400'
               )}
             >
               {getItemIcon(item.type)}
@@ -165,7 +165,7 @@ export function ActiveItemsBadge({
                 <span className="text-xs opacity-75">({usesRemaining})</span>
               )}
               {expiresAt && (
-                <Clock className={cn('h-3 w-3', isExpiringSoon && 'text-orange-600')} />
+                <Clock className={cn('h-3 w-3', isExpiringSoon && 'text-red-800')} />
               )}
             </div>
           );

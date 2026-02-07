@@ -1,5 +1,5 @@
 // src/components/common/DealCardSkeleton.tsx
-import { Star, Zap, Heart, MapPin, Clock, Sparkles } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { EnhancedSectionHeader } from '@/components/common/EnhancedSectionHeader';
 
 export const DealCardSkeleton = () => {
@@ -35,78 +35,28 @@ export const DealCardSkeleton = () => {
   );
 };
 
-export const CarouselSkeleton = ({ title }: { title: string }) => {
-  // Get appropriate icon and styling based on title (same logic as ContentCarousel)
-  const getSectionConfig = (title: string) => {
-    const titleLower = title.toLowerCase();
-    
-    if (titleLower.includes('featured') || titleLower.includes('top')) {
-      return {
-        icon: <Star className="h-6 w-6 text-amber-500 sm:h-7 sm:w-7" />,
-        subtitle: "Handpicked by our team",
-        variant: 'simple' as const
-      };
-    }
-    
-    if (titleLower.includes('happy hour') || titleLower.includes('happy hours')) {
-      return {
-        icon: <Clock className="h-6 w-6 text-orange-500 sm:h-7 sm:w-7" />,
-        subtitle: "Time to unwind",
-        variant: 'simple' as const
-      };
-    }
-    
-    if (titleLower.includes('latest') || titleLower.includes('new')) {
-      return {
-        icon: <Zap className="h-6 w-6 text-yellow-500 sm:h-7 sm:w-7" />,
-        subtitle: "Fresh from our partners",
-        variant: 'simple' as const
-      };
-    }
-    
-    if (titleLower.includes('popular') || titleLower.includes('trending')) {
-      return {
-        icon: <Heart className="h-6 w-6 text-red-500 sm:h-7 sm:w-7" />,
-        subtitle: "Loved by locals",
-        variant: 'simple' as const
-      };
-    }
-    
-    if (titleLower.includes('experience') || titleLower.includes('events')) {
-      return {
-        icon: <Sparkles className="h-6 w-6 text-purple-500 sm:h-7 sm:w-7" />,
-        subtitle: "Unforgettable moments",
-        variant: 'detailed' as const,
-        description: "Special events and unique experiences you won't find anywhere else."
-      };
-    }
-    
-    // Default configuration - minimal for generic sections
-    return {
-      icon: <MapPin className="h-6 w-6 text-brand-primary-500 sm:h-7 sm:w-7" />,
-      variant: 'minimal' as const
-    };
-  };
+interface CarouselSkeletonProps {
+  title: string;
+  icon?: ReactNode;
+  subtitle?: string;
+}
 
-  const sectionConfig = getSectionConfig(title);
-
+export const CarouselSkeleton = ({ title, icon, subtitle }: CarouselSkeletonProps) => {
   return (
-    <section className="py-8 sm:py-12 lg:py-16">
+    <section className="py-6 sm:py-8">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Enhanced Section Header */}
         <EnhancedSectionHeader
-          icon={sectionConfig.icon}
+          icon={icon}
           title={title}
-          subtitle={sectionConfig.subtitle}
-          description={sectionConfig.description}
-          variant={sectionConfig.variant}
+          subtitle={subtitle}
           showAllLink={false}
-          showNavigation={false}
         />
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="flex gap-6 overflow-hidden">
           {Array.from({ length: 4 }).map((_, index) => (
-            <DealCardSkeleton key={index} />
+            <div key={index} className="w-[340px] flex-shrink-0 sm:w-[360px]">
+              <DealCardSkeleton />
+            </div>
           ))}
         </div>
       </div>

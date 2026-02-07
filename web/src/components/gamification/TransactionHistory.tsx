@@ -53,7 +53,7 @@ const TransactionHistory: React.FC = () => {
       case 'BONUS':
         return 'bg-purple-100 text-purple-800';
       case 'REFUND':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-amber-100 text-amber-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }

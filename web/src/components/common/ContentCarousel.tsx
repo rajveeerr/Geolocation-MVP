@@ -1,7 +1,7 @@
 // web/src/components/common/ContentCarousel.tsx
 
-import { useRef, useState, useEffect } from 'react'; // Import useState and useEffect
-import { Star, Zap, Heart, MapPin, Clock, Sparkles, Fish } from 'lucide-react';
+import { useRef, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { NewDealCard } from '@/components/landing/NewDealCard';
 import { cn } from '@/lib/utils';
 import { EnhancedSectionHeader } from '@/components/common/EnhancedSectionHeader';
@@ -11,81 +11,28 @@ import { motion } from 'framer-motion';
 interface ContentCarouselProps {
   title: string;
   deals: Deal[];
+  /** Section icon – rendered to the left of the title */
+  icon?: ReactNode;
+  /** Short one-liner below the title */
+  subtitle?: string;
+  /** Route for "See all offers →". Defaults to /deals */
+  allLink?: string;
+  /** Show the "See all offers" link? */
+  showAllLink?: boolean;
 }
 
-export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
-  // --- NEW: Refs and state for calculating drag constraints ---
+export const ContentCarousel = ({
+  title,
+  deals,
+  icon,
+  subtitle,
+  allLink = '/deals',
+  showAllLink = true,
+}: ContentCarouselProps) => {
+  // --- Refs and state for calculating drag constraints ---
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [dragConstraint, setDragConstraint] = useState(0);
-
-  const scroll = (value: number) => {
-    const viewport = viewportRef.current;
-    if (!viewport) return;
-    viewport.scrollBy({ left: value, behavior: 'smooth' });
-  };
-
-  // Get appropriate icon and styling based on title - Updated with catchy descriptions
-  const getSectionConfig = (title: string) => {
-    const titleLower = title.toLowerCase();
-    
-    if (titleLower.includes('featured') || titleLower.includes('top')) {
-      return {
-        icon: <Star className="h-7 w-7 text-amber-500 sm:h-8 sm:w-8" />,
-        subtitle: "Handpicked by our team",
-        variant: 'simple' as const,
-      };
-    }
-    
-    if (titleLower.includes('happy hour') || titleLower.includes('happy hours')) {
-      return {
-        icon: <Clock className="h-7 w-7 text-orange-500 sm:h-8 sm:w-8" />,
-        subtitle: "Happy hour never tasted this good",
-        variant: 'simple' as const,
-      };
-    }
-    
-    if (titleLower.includes('latest') || titleLower.includes('new')) {
-      return {
-        icon: <Zap className="h-7 w-7 text-yellow-500 sm:h-8 sm:w-8" />,
-        subtitle: "Fresh from our partners",
-        variant: 'simple' as const,
-      };
-    }
-    
-    if (titleLower.includes('popular') || titleLower.includes('trending')) {
-      return {
-        icon: <Heart className="h-7 w-7 text-red-500 sm:h-8 sm:w-8" />,
-        subtitle: "Loved by locals",
-        variant: 'simple' as const,
-      };
-    }
-    
-    if (titleLower.includes('experience') || titleLower.includes('events')) {
-      return {
-        icon: <Sparkles className="h-7 w-7 text-purple-500 sm:h-8 sm:w-8" />,
-        subtitle: "Unforgettable moments",
-        variant: 'simple' as const,
-      };
-    }
-    
-    if (titleLower.includes('seafood') || titleLower.includes('fresh')) {
-      return {
-        icon: <Fish className="h-7 w-7 text-blue-500 sm:h-8 sm:w-8" />,
-        subtitle: "Happy hour never tasted this good",
-        variant: 'simple' as const,
-      };
-    }
-    
-    // Default configuration
-    return {
-      icon: <MapPin className="h-7 w-7 text-blue-500 sm:h-8 sm:w-8" />,
-      variant: 'simple' as const,
-      subtitle: "Discover amazing deals near you",
-    };
-  };
-
-  const sectionConfig = getSectionConfig(title);
 
   // Measure track and viewport to compute drag constraint
   useEffect(() => {
@@ -107,25 +54,23 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
 
   return (
     <motion.div
-      className="bg-white py-6 sm:py-8"
+      className="py-6 sm:py-8"
       variants={carouselVariants}
       initial="hidden"
       animate="visible"
       exit="hidden"
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Enhanced Section Header */}
+        {/* Section Header */}
         <EnhancedSectionHeader
-          icon={sectionConfig.icon}
+          icon={icon}
           title={title}
-          subtitle={sectionConfig.subtitle}
-          variant={sectionConfig.variant}
-          onScrollLeft={() => scroll(-380)}
-          onScrollRight={() => scroll(380)}
+          subtitle={subtitle}
+          allLink={allLink}
+          showAllLink={showAllLink}
         />
-        
 
-        {/* --- MODIFIED: This is now the draggable carousel --- */}
+        {/* Draggable carousel */}
         <div ref={viewportRef} className="overflow-hidden">
           <motion.div
             ref={trackRef}
@@ -138,7 +83,7 @@ export const ContentCarousel = ({ title, deals }: ContentCarouselProps) => {
             dragElastic={0.2}
           >
             {deals.map((deal) => (
-              <div key={deal.id} className="w-[340px] flex-shrink-0 sm:w-[360px]">
+              <div key={deal.id} className="w-[280px] flex-shrink-0 sm:w-[300px]">
                 <NewDealCard deal={deal} />
               </div>
             ))}

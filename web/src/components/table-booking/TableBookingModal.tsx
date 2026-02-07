@@ -287,8 +287,8 @@ export const TableBookingModal = ({ isOpen, onClose, merchantId, merchantName, p
                       className={cn(
                         "flex items-center justify-center gap-2 h-12 text-sm font-medium",
                         selectedTimeSlotId === slot.id 
-                          ? "bg-orange-600 text-white hover:bg-orange-700" 
-                          : "border-neutral-300 text-neutral-700 hover:bg-orange-50 hover:border-orange-300"
+                          ? "bg-red-800 text-white hover:bg-red-900" 
+                          : "border-neutral-300 text-neutral-700 hover:bg-red-50 hover:border-red-300"
                       )}
                     >
                       <Clock className="h-4 w-4" />
@@ -327,8 +327,8 @@ export const TableBookingModal = ({ isOpen, onClose, merchantId, merchantName, p
                         className={cn(
                           "flex items-center justify-start gap-3 h-16 text-sm font-medium",
                           selectedTableId === table.id 
-                            ? "bg-orange-600 text-white hover:bg-orange-700" 
-                            : "border-neutral-300 text-neutral-700 hover:bg-orange-50 hover:border-orange-300"
+                            ? "bg-red-800 text-white hover:bg-red-900" 
+                            : "border-neutral-300 text-neutral-700 hover:bg-red-50 hover:border-red-300"
                         )}
                       >
                         <Users className="h-5 w-5" />

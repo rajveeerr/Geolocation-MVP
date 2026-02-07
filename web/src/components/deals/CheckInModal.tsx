@@ -74,7 +74,7 @@ export const CheckInModal = ({ isOpen, onClose, deal, pointsEarned, onCheckOut }
 
         {/* Happy Hour Timer */}
         {showHappyHourTimer && (
-          <div className="bg-gradient-to-r from-orange-600 to-red-600 rounded-2xl p-6 mb-6">
+          <div className="bg-gradient-to-r from-red-800 to-red-900 rounded-2xl p-6 mb-6">
             <p className="text-sm font-semibold mb-2 text-center">Happy Hour Ends In</p>
             <div className="text-4xl font-bold text-center">
               {String(happyHourTimer.hours).padStart(2, '0')}h{' '}

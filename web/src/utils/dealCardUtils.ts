@@ -28,9 +28,9 @@ export const getDealTypeBadgeConfig = (dealType: DealType | string): DealTypeBad
       return {
         label: 'Happy Hour',
         icon: Clock,
-        bgColor: 'bg-orange-100',
-        textColor: 'text-orange-700',
-        borderColor: 'border-orange-300',
+        bgColor: 'bg-red-100',
+        textColor: 'text-red-800',
+        borderColor: 'border-red-300',
       };
     case 'RECURRING':
       return {

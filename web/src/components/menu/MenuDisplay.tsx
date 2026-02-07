@@ -41,7 +41,7 @@ export const MenuDisplay = ({ merchantId, className }: MenuDisplayProps) => {
   const getCategoryIcon = (category: string) => {
     const categoryLower = category.toLowerCase();
     if (categoryLower.includes('appetizer') || categoryLower.includes('starter')) {
-      return <Utensils className="h-4 w-4 text-orange-500" />;
+      return <Utensils className="h-4 w-4 text-red-800" />;
     }
     if (categoryLower.includes('main') || categoryLower.includes('entree')) {
       return <Utensils className="h-4 w-4 text-red-500" />;
@@ -163,7 +163,7 @@ export const MenuDisplay = ({ merchantId, className }: MenuDisplayProps) => {
                     )}
                     {item.calories && (
                       <div className="flex items-center gap-1">
-                        <Zap className="h-4 w-4 text-orange-500" />
+                        <Zap className="h-4 w-4 text-red-800" />
                         <span className="text-sm">{item.calories} cal</span>
                       </div>
                     )}

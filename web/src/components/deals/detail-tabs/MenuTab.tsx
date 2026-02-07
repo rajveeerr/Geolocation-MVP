@@ -326,7 +326,7 @@ export const MenuTab = ({ deal, onNavigateToTab }: MenuTabProps) => {
     <div className="space-y-6">
       {/* Happy Hour Banner */}
       {deal.context.isHappyHour && (
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-orange-500 to-pink-500 p-6 text-white">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-800 to-red-900 p-6 text-white">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             {/* Left Section */}
             <div className="flex items-center gap-3 flex-1">
@@ -450,7 +450,7 @@ export const MenuTab = ({ deal, onNavigateToTab }: MenuTabProps) => {
               'px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors',
               !menu.enabled && 'cursor-not-allowed opacity-50',
               selectedSubMenu === menu.id && menu.enabled
-                ? 'border-orange-500 text-orange-600'
+                ? 'border-red-800 text-red-800'
                 : menu.enabled
                 ? 'border-transparent text-neutral-600 hover:text-neutral-900'
                 : 'border-transparent text-neutral-400'
@@ -486,7 +486,7 @@ export const MenuTab = ({ deal, onNavigateToTab }: MenuTabProps) => {
             return sections.map((section) => (
               <div key={section.title} className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full" />
+                  <div className="w-2 h-2 bg-red-800 rounded-full" />
                   <h3 className="text-xl font-bold text-neutral-900">{section.title}</h3>
                 </div>
                 <p className="text-sm text-neutral-600 mb-4">{section.timeRange}</p>

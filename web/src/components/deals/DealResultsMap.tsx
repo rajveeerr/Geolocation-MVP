@@ -143,7 +143,7 @@ const createCustomIcon = (isHovered: boolean) => {
     className: 'custom-map-marker',
     html: `
       <div class="${cn(
-        'flex items-center justify-center w-10 h-10 rounded-full bg-accent-orange border-2 border-white shadow-lg transition-all duration-200',
+        'flex items-center justify-center w-10 h-10 rounded-full bg-red-800 border-2 border-white shadow-lg transition-all duration-200',
         isHovered && 'scale-125 z-10',
       )}">
         <div class="text-white">

@@ -134,7 +134,7 @@ export const LeaderboardTab = ({ deal }: LeaderboardTabProps) => {
     <div className="space-y-6">
       {/* Restaurant BOSS Section */}
       {topUser && (
-        <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 rounded-2xl p-6 text-white">
+        <div className="bg-gradient-to-r from-red-700 via-red-800 to-red-900 rounded-2xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4 flex-1">
               <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
@@ -228,7 +228,7 @@ export const LeaderboardTab = ({ deal }: LeaderboardTabProps) => {
                           : rank === 2 
                           ? 'bg-green-500 text-white' 
                           : rank === 3
-                          ? 'bg-orange-500 text-white'
+                          ? 'bg-red-800 text-white'
                           : 'bg-neutral-300 text-neutral-700'
                       )}
                     >
@@ -338,7 +338,7 @@ export const LeaderboardTab = ({ deal }: LeaderboardTabProps) => {
           <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Coins className="h-5 w-5 text-orange-600" />
+                <Coins className="h-5 w-5 text-red-800" />
                 <h3 className="text-xl font-bold">Steal Coins</h3>
               </div>
               <button
@@ -419,7 +419,7 @@ export const LeaderboardTab = ({ deal }: LeaderboardTabProps) => {
                 </div>
                 {hasHammer ? (
                   <div className="mt-3 flex items-center gap-3 bg-white rounded-lg p-3">
-                    <Hammer className="h-6 w-6 text-orange-600" />
+                    <Hammer className="h-6 w-6 text-red-800" />
                     <div>
                       <p className="font-semibold text-neutral-900">Hammer</p>
                       <p className="text-xs text-neutral-600">One-time use</p>
@@ -436,7 +436,7 @@ export const LeaderboardTab = ({ deal }: LeaderboardTabProps) => {
                       <p className="text-xs text-neutral-600">Purchase required</p>
                     </div>
                     <div className="ml-auto">
-                      <p className="font-bold text-orange-600">500 coins</p>
+                      <p className="font-bold text-red-800">500 coins</p>
                     </div>
                   </div>
                 )}
@@ -468,7 +468,7 @@ export const LeaderboardTab = ({ deal }: LeaderboardTabProps) => {
               <button
                 onClick={handleStealConfirm}
                 disabled={!eligibility?.eligible || isExecuting || isLoadingEligibility}
-                className="flex-1 px-4 py-3 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-3 bg-red-800 text-white rounded-lg font-semibold hover:bg-red-900 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isExecuting ? (
                   <>
@@ -507,11 +507,11 @@ export const LeaderboardTab = ({ deal }: LeaderboardTabProps) => {
             </div>
 
             <p className="text-neutral-700 mb-6 text-lg">
-              You stole <span className="font-bold text-orange-600">{stolenAmount.toLocaleString()}</span> coins from {getUserName(selectedUser)}!
+              You stole <span className="font-bold text-red-800">{stolenAmount.toLocaleString()}</span> coins from {getUserName(selectedUser)}!
             </p>
 
-            <div className="bg-orange-50 border-2 border-orange-400 rounded-lg p-4 mb-6">
-              <p className="text-sm text-orange-900">
+            <div className="bg-red-50 border-2 border-red-400 rounded-lg p-4 mb-6">
+              <p className="text-sm text-red-900">
                 {getUserName(selectedUser)} has been notified. Watch your back - they might come for revenge!
               </p>
             </div>
@@ -521,7 +521,7 @@ export const LeaderboardTab = ({ deal }: LeaderboardTabProps) => {
                 setShowSuccessModal(false);
                 setSelectedUser(null);
               }}
-              className="w-full px-4 py-3 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition-colors"
+              className="w-full px-4 py-3 bg-red-800 text-white rounded-lg font-semibold hover:bg-red-900 transition-colors"
             >
               Close
             </button>

@@ -17,7 +17,7 @@ const CoinPurchase: React.FC = () => {
     if (coins >= 5000) return <Diamond className="h-6 w-6 text-blue-600" />;
     if (coins >= 2500) return <Crown className="h-6 w-6 text-purple-600" />;
     if (coins >= 1000) return <Star className="h-6 w-6 text-amber-600" />;
-    if (coins >= 500) return <Zap className="h-6 w-6 text-orange-600" />;
+    if (coins >= 500) return <Zap className="h-6 w-6 text-red-800" />;
     return <Coins className="h-6 w-6 text-green-600" />;
   };
 
@@ -25,7 +25,7 @@ const CoinPurchase: React.FC = () => {
     if (coins >= 5000) return 'bg-blue-100';
     if (coins >= 2500) return 'bg-purple-100';
     if (coins >= 1000) return 'bg-amber-100';
-    if (coins >= 500) return 'bg-orange-100';
+    if (coins >= 500) return 'bg-red-100';
     return 'bg-green-100';
   };
 

@@ -149,7 +149,7 @@ const MenuItemCard = ({ item, isSelected, isHidden, selectedItem, onToggle, onTo
                   </span>
                 )}
                 {item.isHappyHour && item.happyHourPrice && (
-                  <span className="rounded-full bg-orange-100 px-2 py-1 text-xs font-medium text-orange-700">
+                  <span className="rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800">
                     HH: ${item.happyHourPrice.toFixed(2)}
                   </span>
                 )}

@@ -2,35 +2,46 @@
 import type { DealWithLocation } from './deals';
 
 // This ApiDeal shape mirrors the backend payload used elsewhere in the app
+// The backend `formatDealForFrontend` passes dealType as the full Prisma
+// relation object: { id, name, description, active }.  We accept either
+// the object form or a plain string for backwards-compat with mock data.
 export type ApiDeal = {
   id: string;
   title: string;
   description: string;
-  imageUrl?: string | null; // Deprecated - use images array instead
-  images?: string[]; // Primary field - array of image URLs
-  merchantId?: number | null; // Optional top-level merchantId for backward compatibility
+  imageUrl?: string | null;
+  images?: string[];
+  merchantId?: number | null;
   merchant: {
-    id?: number | null; // Merchant ID for table booking
+    id?: number | null;
     businessName: string;
     address: string;
     latitude?: number | null;
     longitude?: number | null;
     logoUrl?: string | null;
-    phoneNumber?: string | null; // Optional phone number
+    phoneNumber?: string | null;
   };
   discountPercentage?: number | null;
   discountAmount?: number | null;
-  category: string;
-  dealType?: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING'; // Backend enum values
-  startTime?: string;
-  endTime?: string;
-  offerDisplay?: string; // "FREE" | "50% OFF" | etc from backend
-  offerTerms?: string; // fine print
+  category: string | { name: string; label?: string; value?: string };
+  // Backend sends the full DealTypeMaster relation object
+  dealType?: string | { id?: number; name: string; description?: string; active?: boolean };
+  startTime?: string | null;
+  endTime?: string | null;
+  offerDisplay?: string;
+  offerTerms?: string | null;
   claimedBy?: { totalCount: number; visibleUsers: { avatarUrl: string }[] };
   rating?: number;
   price?: '$$' | '$$$' | '$';
   bookingInfo?: string;
   offers?: { title: string; time: string }[];
+  // Bounty / Hidden / Redeem fields the backend may include
+  bountyRewardAmount?: number | null;
+  minReferralsRequired?: number | null;
+  accessCode?: string | null;
+  recurringDays?: string | null;
+  distance?: number;
+  redemptionInstructions?: string;
 };
 
 // A small set of high-quality placeholder deals
@@ -69,9 +80,30 @@ export const placeholderDeals: DealWithLocation[] = [
   },
 ];
 
+// ── Helper: normalise the dealType from backend to a frontend-friendly string ──
+function normalizeDealType(
+  dt: ApiDeal['dealType'],
+): string {
+  if (!dt) return 'Discount';
+  // Object form from Prisma relation
+  const raw = typeof dt === 'string' ? dt : dt.name;
+  const upper = raw.toUpperCase().replace(/\s+/g, '_');
+  const map: Record<string, string> = {
+    STANDARD: 'Discount',
+    HAPPY_HOUR: 'Happy Hour',
+    RECURRING: 'Recurring',
+    BOUNTY_DEAL: 'Bounty Deal',
+    BOUNTY: 'Bounty Deal',
+    HIDDEN_DEAL: 'Hidden Deal',
+    HIDDEN: 'Hidden Deal',
+    REDEEM_NOW: 'Redeem Now',
+  };
+  return map[upper] || raw; // fall back to original name
+}
+
 // Adapter function to convert an API deal into the format our components expect
 export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
-  // --- NEW: Dynamic Deal Value Logic ---
+  // --- Dynamic Deal Value Logic ---
   let dealValue: string | undefined = 'Special Offer';
   if (apiDeal.offerDisplay) {
     dealValue = apiDeal.offerDisplay;
@@ -86,7 +118,6 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
   if (typeof apiDeal.category === 'string') {
     categoryString = apiDeal.category;
   } else if (apiDeal.category && typeof apiDeal.category === 'object') {
-    // Handle category object with name, label, or value property
     categoryString = (apiDeal.category as any).name || 
                      (apiDeal.category as any).label || 
                      (apiDeal.category as any).value || 
@@ -94,7 +125,6 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
   }
 
   // Handle images - backend returns both `images` array and `imageUrl` (singular)
-  // Priority: use `images` array if available, otherwise use `imageUrl`, otherwise fallback
   let imagesArray: string[] = [];
   if (apiDeal.images && Array.isArray(apiDeal.images) && apiDeal.images.length > 0) {
     imagesArray = apiDeal.images;
@@ -104,67 +134,65 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
     imagesArray = ['https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80'];
   }
 
+  const normalizedType = normalizeDealType(apiDeal.dealType);
+
+  // Parse recurringDays from comma-separated string to array
+  let recurringDays: string[] | undefined;
+  if (apiDeal.recurringDays) {
+    recurringDays = apiDeal.recurringDays.split(',').map(s => s.trim().toUpperCase());
+  }
+
   return {
-  id: apiDeal.id,
-  name: apiDeal.title,
-  image: imagesArray[0] || 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
-  images: imagesArray,
-  rating: apiDeal.rating ?? 4.2,
-  category: categoryString,
+    id: apiDeal.id,
+    name: apiDeal.title,
+    image: imagesArray[0] || 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=500&q=80',
+    images: imagesArray,
+    rating: apiDeal.rating ?? 4.2,
+    category: categoryString,
 
-  // Map required DealWithLocation fields
-  price: apiDeal.price || '$$',
-  location: apiDeal.merchant.address,
-  description: apiDeal.description || '',
-  position: [
-    apiDeal.merchant.latitude ?? 40.7128,
-    apiDeal.merchant.longitude ?? -74.006,
-  ],
+    price: apiDeal.price || '$$',
+    location: apiDeal.merchant.address,
+    description: apiDeal.description || '',
+    position: [
+      apiDeal.merchant.latitude ?? 40.7128,
+      apiDeal.merchant.longitude ?? -74.006,
+    ],
 
-  // Add merchant information for dynamic display
-  // Support both top-level merchantId and nested merchant.id for flexibility
-  merchantId: apiDeal.merchantId || apiDeal.merchant.id || undefined,
-  merchantName: apiDeal.merchant.businessName,
-  merchantAddress: apiDeal.merchant.address,
-  merchantLogo: apiDeal.merchant.logoUrl,
+    merchantId: apiDeal.merchantId ?? apiDeal.merchant.id ?? undefined,
+    merchantName: apiDeal.merchant.businessName,
+    merchantAddress: apiDeal.merchant.address,
+    merchantLogo: apiDeal.merchant.logoUrl,
 
-  // Map deal type from backend enum to frontend format
-  dealType:
-    apiDeal.dealType === 'HAPPY_HOUR'
-      ? 'Happy Hour'
-      : apiDeal.dealType === 'RECURRING'
-        ? 'Recurring'
-        : 'Discount',
+    dealType: normalizedType,
 
-  // Set expiration for happy hour deals - use endTime if it's a happy hour deal
-  expiresAt:
-    apiDeal.dealType === 'HAPPY_HOUR' && apiDeal.endTime
-      ? apiDeal.endTime
+    // Set expiration / time window
+    startTime: apiDeal.startTime ?? undefined,
+    endTime: apiDeal.endTime ?? undefined,
+    expiresAt: apiDeal.endTime ?? undefined,
+
+    dealValue: dealValue,
+    discountPercentage: apiDeal.discountPercentage ?? null,
+    discountAmount: apiDeal.discountAmount ?? null,
+
+    offerTerms: apiDeal.offerTerms ?? undefined,
+    claimedBy: apiDeal.claimedBy,
+    offers: apiDeal.offers
+      ? apiDeal.offers.map((o) => ({ title: o.title, time: o.time, category: 'Drinks' as const }))
       : undefined,
 
-  // Map discount value for display
-  // prefer explicit `offerDisplay` when provided by backend
-  // Use the dynamically computed dealValue and also pass through raw discount fields
-  dealValue: dealValue,
-  discountPercentage: apiDeal.discountPercentage ?? null,
-  discountAmount: apiDeal.discountAmount ?? null,
+    // Bounty / Hidden / Redeem extras
+    bountyRewardAmount: apiDeal.bountyRewardAmount ?? null,
+    minReferralsRequired: apiDeal.minReferralsRequired ?? null,
+    recurringDays,
 
-  // new fine-print + social proof passthrough
-  offerTerms: apiDeal.offerTerms,
-  claimedBy: apiDeal.claimedBy,
-  // passthrough offers array when backend provides it, adapt to frontend Offer shape
-  offers: apiDeal.offers
-    ? apiDeal.offers.map((o) => ({ title: o.title, time: o.time, category: 'Drinks' as const }))
-    : undefined,
-
-  // Pricing fallbacks: if backend provides discountAmount/percentage try to use it
-  originalPrice: 100,
-  discountedPrice:
-    apiDeal.discountAmount ??
-    (apiDeal.discountPercentage
-      ? Math.round(100 * (1 - apiDeal.discountPercentage / 100))
-      : 80),
-  bookingInfo: apiDeal.bookingInfo || 'Reservations available',
+    // Pricing fallbacks
+    originalPrice: 100,
+    discountedPrice:
+      apiDeal.discountAmount ??
+      (apiDeal.discountPercentage
+        ? Math.round(100 * (1 - apiDeal.discountPercentage / 100))
+        : 80),
+    bookingInfo: apiDeal.bookingInfo || 'Reservations available',
   };
 };
 

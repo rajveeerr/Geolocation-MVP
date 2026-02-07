@@ -141,7 +141,7 @@ export const ActivityFeed = ({ activities, dealTitle, menuItems, className }: Ac
               key={uniqueKey}
               className="flex items-center gap-3 px-4 py-2.5 bg-white rounded-lg flex-shrink-0 mr-3 shadow-sm border border-neutral-200"
             >
-              <div className="w-10 h-10 rounded-full bg-neutral-100 border-2 border-orange-500 flex-shrink-0 overflow-hidden">
+              <div className="w-10 h-10 rounded-full bg-neutral-100 border-2 border-red-800 flex-shrink-0 overflow-hidden">
                 {activity.avatarUrl ? (
                   <img
                     src={activity.avatarUrl}
@@ -158,7 +158,7 @@ export const ActivityFeed = ({ activities, dealTitle, menuItems, className }: Ac
               </div>
               <div className="flex items-center gap-2 text-neutral-900 text-sm font-medium">
                 <span>{formatted.text}</span>
-                <span className="font-semibold text-orange-600">{formatted.highlight}</span>
+                <span className="font-semibold text-red-800">{formatted.highlight}</span>
                 <span className="text-base leading-none">{formatted.emoji}</span>
               </div>
             </div>

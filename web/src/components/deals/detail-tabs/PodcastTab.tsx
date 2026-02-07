@@ -88,7 +88,7 @@ export const PodcastTab = ({ deal }: PodcastTabProps) => {
       </div>
 
       {/* Featured Podcast */}
-      <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-6 text-white opacity-50 pointer-events-none">
+      <div className="bg-gradient-to-r from-red-800 to-red-900 rounded-2xl p-6 text-white opacity-50 pointer-events-none">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="relative h-64 rounded-lg overflow-hidden">
             <img
