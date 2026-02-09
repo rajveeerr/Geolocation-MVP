@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useFeaturedDeals } from '@/hooks/useFeaturedDeals';
 import { usePopularDeals } from '@/hooks/usePopularDeals';
+import { premiumDeals } from '@/data/deals';
+import type { Deal } from '@/data/deals';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -115,8 +117,29 @@ export const LeaderboardSection = () => {
   // Fetch popular/trending deals
   const { data: popularDeals, isLoading: isLoadingPopular } = usePopularDeals();
 
-  const topUsers = leaderboardData?.top || [];
-  const pointBreakdowns = leaderboardData?.pointBreakdowns || {};
+  // ── Mock fallback data ──
+  const mockUsers = [
+    { userId: 1, name: 'Sarah K.', rank: 1, points: 2340, avatarUrl: 'https://i.pravatar.cc/80?img=5' },
+    { userId: 2, name: 'Marcus D.', rank: 2, points: 1890, avatarUrl: 'https://i.pravatar.cc/80?img=12' },
+    { userId: 3, name: 'Priya R.', rank: 3, points: 1560, avatarUrl: 'https://i.pravatar.cc/80?img=25' },
+    { userId: 4, name: 'James W.', rank: 4, points: 1200, avatarUrl: 'https://i.pravatar.cc/80?img=33' },
+    { userId: 5, name: 'Luna C.', rank: 5, points: 980, avatarUrl: 'https://i.pravatar.cc/80?img=44' },
+  ];
+  const mockBreakdowns: Record<string, any[]> = {
+    '1': [{ eventType: 'CHECK_IN', eventTypeName: 'Check-in', points: 1200, count: 12 }, { eventType: 'REFERRAL', eventTypeName: 'Referral', points: 800, count: 4 }],
+    '2': [{ eventType: 'CHECK_IN', eventTypeName: 'Check-in', points: 900, count: 9 }, { eventType: 'SHARE', eventTypeName: 'Share', points: 600, count: 6 }],
+    '3': [{ eventType: 'CHECK_IN', eventTypeName: 'Check-in', points: 750, count: 8 }],
+    '4': [{ eventType: 'CHECK_IN', eventTypeName: 'Check-in', points: 600, count: 6 }],
+    '5': [{ eventType: 'CHECK_IN', eventTypeName: 'Check-in', points: 480, count: 5 }],
+  };
+
+  // Fallback: use mock data when API returns nothing
+  const topUsers = (leaderboardData?.top?.length ? leaderboardData.top : mockUsers);
+  const pointBreakdowns = (leaderboardData?.pointBreakdowns && Object.keys(leaderboardData.pointBreakdowns).length > 0)
+    ? leaderboardData.pointBreakdowns
+    : mockBreakdowns;
+  const displayFeaturedDeals: Deal[] = featuredDeals?.length ? featuredDeals : premiumDeals.slice(0, 5);
+  const displayPopularDeals: Deal[] = popularDeals?.length ? popularDeals : [...premiumDeals].reverse().slice(0, 5);
 
   // Generate placeholder avatar URL if avatarUrl is missing
   const getPlaceholderAvatar = (name: string | null | undefined): string => {
@@ -325,9 +348,9 @@ export const LeaderboardSection = () => {
             </div>
 
             <div className="space-y-2">
-              {featuredDeals?.slice(0, 5).map((deal, index) => {
+              {displayFeaturedDeals.slice(0, 5).map((deal, index) => {
                 const hasSpecialOffer = deal.bountyRewardAmount && deal.bountyRewardAmount > 0;
-                const category = deal.category?.toLowerCase() || '';
+                const category = typeof deal.category === 'string' ? deal.category.toLowerCase() : ((deal.category as any)?.name?.toLowerCase() || '');
                 const isExpanded = expandedIndex?.type === 'new' && expandedIndex?.index === index;
                 const dealImage = deal.image || deal.merchantLogo || '';
 
@@ -401,21 +424,9 @@ export const LeaderboardSection = () => {
                         >
                           <div className="ml-11 mr-3 mt-2 bg-white border border-gray-100 rounded-lg p-4 space-y-4">
                             {/* Happy Hour Specials */}
-                            {(deal.dealType === 'HAPPY_HOUR' || deal.dealType === 'Happy Hour' || (typeof deal.dealType === 'object' && deal.dealType?.name === 'Happy Hour')) && deal.offers && deal.offers.length > 0 && (
-                              <div>
-                                <div className="text-xs text-gray-900 mb-2">Happy Hour Specials:</div>
-                                <div className="space-y-2">
-                                  {deal.offers.slice(0, 3).map((offer, i) => (
-                                    <div key={i} className="flex items-center justify-between text-xs bg-gray-50 px-3 py-2 rounded">
-                                      <div>
-                                        <div className="text-gray-900">{offer.title}</div>
-                                        <div className="text-gray-500">{offer.time || offer.discount || ''}</div>
-                                      </div>
-                                      <div className="text-gray-900">{offer.price || ''}</div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
+                            {/* Deal details */}
+                            {deal.description && (
+                              <p className="text-xs text-gray-600">{deal.description}</p>
                             )}
 
                             {/* Limited Time Offer */}
@@ -439,8 +450,8 @@ export const LeaderboardSection = () => {
                                 className="text-xs h-9"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  if (deal.merchantAddress) {
-                                    window.open(`https://maps.google.com/?q=${encodeURIComponent(deal.merchantAddress)}`, '_blank');
+                                  if (deal.merchantAddress || deal.location) {
+                                    window.open(`https://maps.google.com/?q=${encodeURIComponent(deal.merchantAddress || deal.location || '')}`, '_blank');
                                   }
                                 }}
                               >
@@ -488,10 +499,10 @@ export const LeaderboardSection = () => {
             </div>
 
             <div className="space-y-2">
-              {popularDeals?.slice(0, 5).map((deal, index) => {
+              {displayPopularDeals.slice(0, 5).map((deal, index) => {
                 const checkInCount = deal.claimedBy?.totalCount || 0;
-                const views = checkInCount * 42; // Mock calculation for views
-                const category = deal.category?.toLowerCase() || '';
+                const views = checkInCount > 0 ? checkInCount * 42 : (120 + index * 87); // Fallback views
+                const category = typeof deal.category === 'string' ? deal.category.toLowerCase() : ((deal.category as any)?.name?.toLowerCase() || '');
                 const hasSpecialOffer = deal.bountyRewardAmount && deal.bountyRewardAmount > 0;
                 const isExpanded = expandedIndex?.type === 'trending' && expandedIndex?.index === index;
                 const dealImage = deal.image || deal.merchantLogo || '';
@@ -534,8 +545,8 @@ export const LeaderboardSection = () => {
                       <div className="flex-1 min-w-0">
                         <div className="text-sm text-gray-900 mb-0.5">{deal.name || deal.merchantName}</div>
                         <div className="text-xs text-gray-600">
-                          {deal.dealType === 'HIDDEN' || deal.dealType === 'Hidden Deal' ? 'Secret deal unlocked' : 
-                           deal.dealType === 'HAPPY_HOUR' || deal.dealType === 'Happy Hour' ? `Happy hour until ${deal.endTime ? new Date(deal.endTime).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '9 PM'}` :
+                          {(typeof deal.dealType === 'string' && (deal.dealType === 'HIDDEN' || deal.dealType === 'Hidden Deal')) || (typeof deal.dealType === 'object' && deal.dealType?.name === 'Hidden Deal') ? 'Secret deal unlocked' : 
+                           (typeof deal.dealType === 'string' && (deal.dealType === 'HAPPY_HOUR' || deal.dealType === 'Happy Hour')) || (typeof deal.dealType === 'object' && deal.dealType?.name === 'Happy Hour') ? `Happy hour until ${deal.endTime ? new Date(deal.endTime).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '9 PM'}` :
                            'Viral deal alert 🍔'}
                         </div>
                       </div>
@@ -562,22 +573,9 @@ export const LeaderboardSection = () => {
                           className="overflow-hidden"
                         >
                           <div className="ml-11 mr-3 mt-2 bg-white border border-gray-100 rounded-lg p-4 space-y-4">
-                            {/* Happy Hour Specials */}
-                            {(deal.dealType === 'HAPPY_HOUR' || deal.dealType === 'Happy Hour' || (typeof deal.dealType === 'object' && deal.dealType?.name === 'Happy Hour')) && deal.offers && deal.offers.length > 0 && (
-                              <div>
-                                <div className="text-xs text-gray-900 mb-2">Happy Hour Specials:</div>
-                                <div className="space-y-2">
-                                  {deal.offers.slice(0, 3).map((offer, i) => (
-                                    <div key={i} className="flex items-center justify-between text-xs bg-gray-50 px-3 py-2 rounded">
-                                      <div>
-                                        <div className="text-gray-900">{offer.title}</div>
-                                        <div className="text-gray-500">{offer.time || offer.discount || ''}</div>
-                                      </div>
-                                      <div className="text-gray-900">{offer.price || ''}</div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
+                            {/* Deal details */}
+                            {deal.description && (
+                              <p className="text-xs text-gray-600">{deal.description}</p>
                             )}
 
                             {/* Limited Time Offer */}
@@ -601,8 +599,8 @@ export const LeaderboardSection = () => {
                                 className="text-xs h-9"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  if (deal.merchantAddress) {
-                                    window.open(`https://maps.google.com/?q=${encodeURIComponent(deal.merchantAddress)}`, '_blank');
+                                  if (deal.merchantAddress || deal.location) {
+                                    window.open(`https://maps.google.com/?q=${encodeURIComponent(deal.merchantAddress || deal.location || '')}`, '_blank');
                                   }
                                 }}
                               >

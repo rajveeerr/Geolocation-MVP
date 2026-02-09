@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Outlet, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { SignUpPage } from './pages/SignUpPage';
@@ -157,16 +157,13 @@ const MerchantLoyaltyTransactionsPage = React.lazy(() =>
 );
 
 const DefaultLayout = () => {
-  const location = useLocation();
-  const isDealDetailPage = location.pathname.startsWith('/deals/') && location.pathname.split('/').length === 3;
-
   return (
     <>
       <Header />
       <main>
         <Outlet />
       </main>
-      {!isDealDetailPage && <Footer />}
+      <Footer />
     </>
   );
 };
