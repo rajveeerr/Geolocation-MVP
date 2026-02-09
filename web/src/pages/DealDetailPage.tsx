@@ -167,21 +167,22 @@ const BountyEarnCard = ({
   const recentSavers = deal.socialProof?.recentSavers || [];
 
   return (
-    <div className="rounded-3xl bg-gradient-to-br from-[#1a1a2e] to-[#16162a] p-6 md:p-8 text-white shadow-xl">
-      <div className="flex gap-6">
+    <div className="rounded-3xl bg-gradient-to-br from-[#1a1a2e] to-[#16162a] p-5 sm:p-6 md:p-8 text-white shadow-xl">
+      {/* Stacks vertically on mobile, side-by-side on md+ */}
+      <div className="flex flex-col md:flex-row gap-5 md:gap-6">
         {/* ---- Left content ---- */}
         <div className="flex-1 min-w-0">
           {/* Top badges */}
-          <div className="flex items-center gap-4 mb-4 flex-wrap">
+          <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4 flex-wrap">
             {endTimeFormatted && (
-              <span className="px-3 py-1.5 rounded-full border border-[#B91C1C]/40 text-[11px] font-bold uppercase tracking-wider text-[#B91C1C]">
+              <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-[#B91C1C]/40 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#B91C1C]">
                 Ends at {endTimeFormatted}
               </span>
             )}
             {deal.status?.isActive && (
               <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#B91C1C] animate-pulse" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-white/70">
+                <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#B91C1C] animate-pulse" />
+                <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/70">
                   Live Offer
                 </span>
               </div>
@@ -191,16 +192,16 @@ const BountyEarnCard = ({
           {/* Main offer heading */}
           {isBounty ? (
             <>
-              <h3 className="text-3xl md:text-4xl lg:text-5xl font-black italic tracking-tight leading-[1.1] mb-2">
+              <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black italic tracking-tight leading-[1.1] mb-1.5 sm:mb-2">
                 EARN ${bountyAmount}{' '}
                 <span className="text-[#B91C1C]">/</span>{' '}
                 <span className="not-italic">FRIEND</span>
               </h3>
-              <p className="text-sm md:text-base text-white/50 mb-0.5 leading-relaxed">
+              <p className="text-xs sm:text-sm md:text-base text-white/50 mb-0.5 leading-relaxed">
                 Boost your nightlife bank.
               </p>
               {minReferrals && (
-                <p className="text-sm md:text-base text-white/50 leading-relaxed">
+                <p className="text-xs sm:text-sm md:text-base text-white/50 leading-relaxed">
                   Invite {minReferrals} friends for an instant{' '}
                   <span className="font-bold text-white">
                     ${(bountyAmount * minReferrals).toFixed(0)} bonus
@@ -211,20 +212,73 @@ const BountyEarnCard = ({
             </>
           ) : (
             <>
-              <h3 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-[1.1] mb-2">
+              <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-[1.1] mb-1.5 sm:mb-2">
                 {deal.offerDisplay || `${deal.discountPercentage ?? 0}% OFF`}
               </h3>
-              <p className="text-sm md:text-base text-white/50">{deal.title}</p>
+              <p className="text-xs sm:text-sm md:text-base text-white/50">{deal.title}</p>
             </>
           )}
 
-          {/* CTA button + avatars – same row */}
-          <div className="flex items-center gap-4 mt-6">
+          {/* Stat boxes — show inline on small screens only (hidden md+) */}
+          <div className="flex gap-2.5 mt-4 md:hidden overflow-x-auto scrollbar-hide">
+            {/* Live Crowd – compact */}
+            <div className="rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-center min-w-[100px] flex-1">
+              <span className="text-[8px] text-white/40 uppercase tracking-[0.15em] font-bold block mb-1">
+                Live Crowd
+              </span>
+              <span className="text-2xl font-bold block leading-none">{fmtCount(liveCrowd)}+</span>
+              {(recentSavers.length > 0 || liveCrowd > 0) && (
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  {recentSavers.slice(0, 2).map((s: any, i: number) => (
+                    <div
+                      key={i}
+                      className="w-5 h-5 rounded-full bg-[#2a2a4a] flex items-center justify-center text-[7px] font-bold text-white/60"
+                    >
+                      {(s.name || '?').slice(0, 2).toUpperCase()}
+                    </div>
+                  ))}
+                  {liveCrowd > 2 && (
+                    <div className="w-5 h-5 rounded-full bg-[#2a2a4a] flex items-center justify-center text-[7px] font-bold text-white/50">
+                      +{fmtCount(liveCrowd - 2)}
+                    </div>
+                  )}
+                </div>
+              )}
+              <div className="h-1 bg-white/10 rounded-full mt-2 overflow-hidden">
+                <div className="h-full bg-[#B91C1C] rounded-full" style={{ width: '65%' }} />
+              </div>
+            </div>
+
+            {/* Ends In – compact */}
+            {hasCountdown && (
+              <div className="rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-center min-w-[100px] flex-1">
+                <span className="text-[8px] text-white/40 uppercase tracking-[0.15em] font-bold block mb-1">
+                  Ends In
+                </span>
+                <span className="text-2xl font-bold text-[#B91C1C] block leading-none">
+                  {String(hours).padStart(2, '0')}
+                  <span className="text-white/30">:</span>
+                  {String(minutes).padStart(2, '0')}
+                </span>
+                <div className="h-1 bg-white/10 rounded-full mt-2 overflow-hidden">
+                  <div
+                    className="h-full bg-white/80 rounded-full transition-all"
+                    style={{
+                      width: `${Math.max(5, 100 - ((hours * 3600 + minutes * 60 + seconds) / 864) * 10)}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* CTA button + avatars */}
+          <div className="flex items-center gap-3 sm:gap-4 mt-4 sm:mt-6">
             <button
               onClick={onCheckIn}
               disabled={isCheckingIn || !deal.status?.isActive}
               className={cn(
-                'px-10 py-4 rounded-2xl font-bold text-base uppercase tracking-wide transition-all',
+                'px-6 sm:px-10 py-3 sm:py-4 rounded-2xl font-bold text-sm sm:text-base uppercase tracking-wide transition-all',
                 deal.status?.isActive
                   ? 'bg-[#B91C1C] hover:bg-[#9B2020] active:scale-[0.98] shadow-lg shadow-red-900/30'
                   : 'bg-neutral-600 cursor-not-allowed opacity-60',
@@ -234,17 +288,17 @@ const BountyEarnCard = ({
             </button>
 
             {/* Avatar strip – inline with CTA */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <div className="flex -space-x-1.5">
                 {recentSavers.slice(0, 2).map((s: any, i: number) => (
                   <div
                     key={i}
-                    className="w-8 h-8 rounded-full border-2 border-[#1a1a2e] overflow-hidden bg-[#2a2a4a]"
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-[#1a1a2e] overflow-hidden bg-[#2a2a4a]"
                   >
                     {s.avatarUrl ? (
                       <img src={s.avatarUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[9px] font-bold text-white/70">
+                      <div className="w-full h-full flex items-center justify-center text-[8px] sm:text-[9px] font-bold text-white/70">
                         {(s.name || '?').slice(0, 2).toUpperCase()}
                       </div>
                     )}
@@ -252,21 +306,20 @@ const BountyEarnCard = ({
                 ))}
               </div>
               {liveCrowd > 2 && (
-                <span className="text-xs font-semibold text-white/50">+{fmtCount(liveCrowd - 2)}</span>
+                <span className="text-[10px] sm:text-xs font-semibold text-white/50">+{fmtCount(liveCrowd - 2)}</span>
               )}
             </div>
           </div>
         </div>
 
-        {/* ---- Right stat boxes ---- */}
-        <div className="flex flex-row gap-3 flex-shrink-0 self-center">
+        {/* ---- Right stat boxes – visible only on md+ ---- */}
+        <div className="hidden md:flex flex-row gap-3 flex-shrink-0 self-center">
           {/* Live Crowd */}
           <div className="rounded-2xl bg-white/5 border border-white/10 px-5 py-4 text-center min-w-[120px]">
             <span className="text-[9px] text-white/40 uppercase tracking-[0.15em] font-bold block mb-1.5">
               Live Crowd
             </span>
             <span className="text-3xl font-bold block leading-none">{fmtCount(liveCrowd)}+</span>
-            {/* Avatar initials inside stat box */}
             {(recentSavers.length > 0 || liveCrowd > 0) && (
               <div className="flex items-center justify-center gap-1 mt-2.5">
                 {recentSavers.slice(0, 2).map((s: any, i: number) => (
@@ -1025,13 +1078,14 @@ export const DealDetailPage = () => {
                         >
                           {/* Full-bleed image / slideshow */}
                           {(item.images && item.images.length > 0) || item.imageUrl ? (
-                            <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.05]">
+                            <div className="absolute inset-0">
                               <ImageSlideshow
-                                images={item.images && item.images.length > 0 ? item.images : [item.imageUrl!]}
+                                images={item.images && item.images.length > 0 ? item.images : (item.imageUrl ? [item.imageUrl] : [])}
                                 alt={item.name}
                                 className="w-full h-full"
                                 autoPlay={5000}
                                 maxImages={3}
+                                hoverScale
                               />
                             </div>
                           ) : (

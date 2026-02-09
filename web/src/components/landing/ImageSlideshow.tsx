@@ -10,6 +10,8 @@ interface ImageSlideshowProps {
   autoPlay?: number;
   /** Max images to show indicator bars for (capped). Default 3 */
   maxImages?: number;
+  /** Scale images on hover (parent must have `group` class). Default false */
+  hoverScale?: boolean;
 }
 
 export const ImageSlideshow = ({
@@ -18,9 +20,11 @@ export const ImageSlideshow = ({
   className,
   autoPlay = 5000,
   maxImages = 3,
+  hoverScale = false,
 }: ImageSlideshowProps) => {
-  // Cap images to maxImages
-  const displayImages = images.length > 0 ? images.slice(0, maxImages) : [];
+  // Filter out any falsy/empty image URLs, then cap to maxImages
+  const validImages = images.filter((src) => !!src && src.trim() !== '');
+  const displayImages = validImages.length > 0 ? validImages.slice(0, maxImages) : [];
   const hasMultiple = displayImages.length > 1;
 
   const [activeIndex, setActiveIndex] = useState(0);
@@ -35,6 +39,13 @@ export const ImageSlideshow = ({
       img.src = src;
     });
   }, [displayImages]);
+
+  // Reset active index if images change and current index is out of bounds
+  useEffect(() => {
+    if (activeIndex >= displayImages.length && displayImages.length > 0) {
+      setActiveIndex(0);
+    }
+  }, [displayImages.length, activeIndex]);
 
   const goTo = useCallback(
     (index: number, dir: number) => {
@@ -80,6 +91,11 @@ export const ImageSlideshow = ({
     }, 2000);
   };
 
+  // Scale class applied only to images, never indicators
+  const imgScaleClass = hoverScale
+    ? 'transition-transform duration-700 ease-out group-hover:scale-[1.05]'
+    : '';
+
   // If no images at all, show a placeholder gradient
   if (displayImages.length === 0) {
     return (
@@ -92,14 +108,14 @@ export const ImageSlideshow = ({
     );
   }
 
-  // Single image — no slideshow
+  // Single image — no slideshow, no indicator bars
   if (!hasMultiple) {
     return (
       <div className={cn('relative w-full h-full overflow-hidden', className)}>
         <img
           src={displayImages[0]}
           alt={alt}
-          className="w-full h-full object-cover"
+          className={cn('w-full h-full object-cover', imgScaleClass)}
           loading="lazy"
         />
       </div>
@@ -118,29 +134,31 @@ export const ImageSlideshow = ({
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
     >
-      {/* Image layer */}
-      <AnimatePresence initial={false} custom={direction} mode="popLayout">
-        <motion.img
-          key={activeIndex}
-          src={displayImages[activeIndex]}
-          alt={`${alt} ${activeIndex + 1}`}
-          className="absolute inset-0 w-full h-full object-cover"
-          custom={direction}
-          variants={variants}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          transition={{ duration: 0.35, ease: 'easeInOut' }}
-          drag={hasMultiple ? 'x' : false}
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.15}
-          onDragEnd={handleDragEnd}
-          loading="lazy"
-        />
-      </AnimatePresence>
+      {/* Image layer — only this scales on hover */}
+      <div className={cn('absolute inset-0', imgScaleClass)}>
+        <AnimatePresence initial={false} custom={direction} mode="popLayout">
+          <motion.img
+            key={activeIndex}
+            src={displayImages[activeIndex]}
+            alt={`${alt} ${activeIndex + 1}`}
+            className="absolute inset-0 w-full h-full object-cover"
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.35, ease: 'easeInOut' }}
+            drag={hasMultiple ? 'x' : false}
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.15}
+            onDragEnd={handleDragEnd}
+            loading="lazy"
+          />
+        </AnimatePresence>
+      </div>
 
-      {/* Indicator bars — top of card */}
-      <div className="absolute top-3 left-4 right-4 z-20 flex gap-1.5">
+      {/* Indicator bars — OUTSIDE the scaling wrapper so they stay fixed */}
+      <div className="absolute top-3 left-4 right-4 z-20 flex gap-1.5 pointer-events-auto">
         {displayImages.map((_, i) => (
           <button
             key={i}
