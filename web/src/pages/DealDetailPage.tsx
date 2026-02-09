@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo } from 'react';
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { Button } from '@/components/common/Button';
@@ -10,13 +10,14 @@ import { cn } from '@/lib/utils';
 import {
   Heart, ChevronLeft, ChevronRight, Share2, Phone, MapPin, Star,
   ShoppingCart, ExternalLink, Play, Lock, AlertCircle, Pencil,
-  ThumbsUp, Check,
+  ThumbsUp, Check, Search, SlidersHorizontal,
 } from 'lucide-react';
 import { useCheckIn } from '@/hooks/useCheckIn';
 import { CheckInModal } from '@/components/deals/CheckInModal';
 import { TableBookingModal } from '@/components/table-booking/TableBookingModal';
 import { LeaderboardTab } from '@/components/deals/detail-tabs/LeaderboardTab';
 import { EventsTab } from '@/components/deals/detail-tabs/EventsTab';
+import { ImageSlideshow } from '@/components/landing/ImageSlideshow';
 import {
   placeholderReviews, placeholderRatingsSummary, placeholderArticles,
   placeholderVibeTags, placeholderHours, placeholderThingsToKnow,
@@ -69,7 +70,7 @@ const HeroGallery = ({ images, title }: { images: string[]; title: string }) => 
   return (
     <div className="space-y-3">
       {/* Main image */}
-      <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-black">
+      <div className="relative w-full aspect-square rounded-3xl overflow-hidden bg-black">
         <img
           src={images[idx]}
           alt={`${title} ${idx + 1}`}
@@ -79,13 +80,6 @@ const HeroGallery = ({ images, title }: { images: string[]; title: string }) => 
         {/* VERIFIED VENUE badge */}
         <div className="absolute top-4 left-4 bg-[#8B1A1A] text-white rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider shadow-lg">
           Verified Venue
-        </div>
-
-        {/* Play button (placeholder – video not yet supported) */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-            <Play className="h-7 w-7 text-white fill-white" />
-          </div>
         </div>
 
         {/* Counter */}
@@ -170,40 +164,45 @@ const BountyEarnCard = ({
         .toUpperCase()
     : null;
 
+  const recentSavers = deal.socialProof?.recentSavers || [];
+
   return (
-    <div className="rounded-2xl bg-gradient-to-br from-[#1a1a2e] to-[#16162a] p-5 text-white shadow-xl">
-      <div className="flex gap-4">
+    <div className="rounded-3xl bg-gradient-to-br from-[#1a1a2e] to-[#16162a] p-6 md:p-8 text-white shadow-xl">
+      <div className="flex gap-6">
         {/* ---- Left content ---- */}
         <div className="flex-1 min-w-0">
           {/* Top badges */}
-          <div className="flex items-center gap-3 mb-3 flex-wrap">
+          <div className="flex items-center gap-4 mb-4 flex-wrap">
             {endTimeFormatted && (
-              <span className="px-2.5 py-1 rounded-full bg-[#8B1A1A] text-[10px] font-bold uppercase tracking-wider">
+              <span className="px-3 py-1.5 rounded-full border border-[#B91C1C]/40 text-[11px] font-bold uppercase tracking-wider text-[#B91C1C]">
                 Ends at {endTimeFormatted}
               </span>
             )}
             {deal.status?.isActive && (
               <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-[#B91C1C] animate-pulse" />
-                <span className="text-[10px] font-bold uppercase tracking-wider text-white/80">
+                <div className="w-2.5 h-2.5 rounded-full bg-[#B91C1C] animate-pulse" />
+                <span className="text-[11px] font-bold uppercase tracking-wider text-white/70">
                   Live Offer
                 </span>
               </div>
             )}
           </div>
 
-          {/* Main offer */}
+          {/* Main offer heading */}
           {isBounty ? (
             <>
-              <h3 className="text-2xl md:text-3xl font-black italic tracking-tight leading-tight mb-1">
+              <h3 className="text-3xl md:text-4xl lg:text-5xl font-black italic tracking-tight leading-[1.1] mb-2">
                 EARN ${bountyAmount}{' '}
-                <span className="text-lg font-black not-italic text-white/70">/FRIEND</span>
+                <span className="text-[#B91C1C]">/</span>{' '}
+                <span className="not-italic">FRIEND</span>
               </h3>
-              <p className="text-sm text-white/60 mb-0.5">Boost your nightlife bank.</p>
+              <p className="text-sm md:text-base text-white/50 mb-0.5 leading-relaxed">
+                Boost your nightlife bank.
+              </p>
               {minReferrals && (
-                <p className="text-xs text-white/60">
+                <p className="text-sm md:text-base text-white/50 leading-relaxed">
                   Invite {minReferrals} friends for an instant{' '}
-                  <span className="font-bold text-white/90">
+                  <span className="font-bold text-white">
                     ${(bountyAmount * minReferrals).toFixed(0)} bonus
                   </span>
                   .
@@ -212,70 +211,98 @@ const BountyEarnCard = ({
             </>
           ) : (
             <>
-              <h3 className="text-2xl md:text-3xl font-black tracking-tight leading-tight mb-1">
+              <h3 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-[1.1] mb-2">
                 {deal.offerDisplay || `${deal.discountPercentage ?? 0}% OFF`}
               </h3>
-              <p className="text-sm text-white/60">{deal.title}</p>
+              <p className="text-sm md:text-base text-white/50">{deal.title}</p>
             </>
           )}
 
-          {/* CTA button – RED per Figma */}
-          <button
-            onClick={onCheckIn}
-            disabled={isCheckingIn || !deal.status?.isActive}
-            className={cn(
-              'mt-4 px-8 py-3 rounded-full font-bold text-sm uppercase tracking-wide transition-all',
-              deal.status?.isActive
-                ? 'bg-[#B91C1C] hover:bg-[#9B2020] active:scale-[0.98]'
-                : 'bg-neutral-600 cursor-not-allowed opacity-60',
-            )}
-          >
-            {isCheckingIn ? 'CHECKING IN\u2026' : 'CHECK IN NOW'}
-          </button>
+          {/* CTA button + avatars – same row */}
+          <div className="flex items-center gap-4 mt-6">
+            <button
+              onClick={onCheckIn}
+              disabled={isCheckingIn || !deal.status?.isActive}
+              className={cn(
+                'px-10 py-4 rounded-2xl font-bold text-base uppercase tracking-wide transition-all',
+                deal.status?.isActive
+                  ? 'bg-[#B91C1C] hover:bg-[#9B2020] active:scale-[0.98] shadow-lg shadow-red-900/30'
+                  : 'bg-neutral-600 cursor-not-allowed opacity-60',
+              )}
+            >
+              {isCheckingIn ? 'CHECKING IN\u2026' : 'CHECK IN NOW'}
+            </button>
 
-          {/* Avatar strip */}
-          <div className="flex items-center gap-2 mt-4">
-            <div className="flex -space-x-1.5">
-              {(deal.socialProof?.recentSavers || []).slice(0, 3).map((s: any, i: number) => (
-                <div
-                  key={i}
-                  className="w-7 h-7 rounded-full border-2 border-[#1a1a2e] overflow-hidden bg-neutral-700"
-                >
-                  {s.avatarUrl ? (
-                    <img src={s.avatarUrl} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-[9px] font-bold text-white/70">
-                      {(s.name || '?').slice(0, 2).toUpperCase()}
-                    </div>
-                  )}
-                </div>
-              ))}
+            {/* Avatar strip – inline with CTA */}
+            <div className="flex items-center gap-2">
+              <div className="flex -space-x-1.5">
+                {recentSavers.slice(0, 2).map((s: any, i: number) => (
+                  <div
+                    key={i}
+                    className="w-8 h-8 rounded-full border-2 border-[#1a1a2e] overflow-hidden bg-[#2a2a4a]"
+                  >
+                    {s.avatarUrl ? (
+                      <img src={s.avatarUrl} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-[9px] font-bold text-white/70">
+                        {(s.name || '?').slice(0, 2).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {liveCrowd > 2 && (
+                <span className="text-xs font-semibold text-white/50">+{fmtCount(liveCrowd - 2)}</span>
+              )}
             </div>
-            {liveCrowd > 0 && (
-              <span className="text-[10px] font-semibold text-white/50">+{fmtCount(liveCrowd)}</span>
-            )}
           </div>
         </div>
 
         {/* ---- Right stat boxes ---- */}
-        <div className="flex flex-col gap-2 flex-shrink-0">
-          <div className="rounded-lg border border-white/20 px-4 py-2.5 text-center min-w-[90px]">
-            <span className="text-[9px] text-white/50 uppercase tracking-widest block mb-0.5">
+        <div className="flex flex-row gap-3 flex-shrink-0 self-center">
+          {/* Live Crowd */}
+          <div className="rounded-2xl bg-white/5 border border-white/10 px-5 py-4 text-center min-w-[120px]">
+            <span className="text-[9px] text-white/40 uppercase tracking-[0.15em] font-bold block mb-1.5">
               Live Crowd
             </span>
-            <span className="text-xl font-bold block">{fmtCount(liveCrowd)}+</span>
+            <span className="text-3xl font-bold block leading-none">{fmtCount(liveCrowd)}+</span>
+            {/* Avatar initials inside stat box */}
+            {(recentSavers.length > 0 || liveCrowd > 0) && (
+              <div className="flex items-center justify-center gap-1 mt-2.5">
+                {recentSavers.slice(0, 2).map((s: any, i: number) => (
+                  <div
+                    key={i}
+                    className="w-6 h-6 rounded-full bg-[#2a2a4a] flex items-center justify-center text-[8px] font-bold text-white/60"
+                  >
+                    {(s.name || '?').slice(0, 2).toUpperCase()}
+                  </div>
+                ))}
+                {liveCrowd > 2 && (
+                  <div className="w-6 h-6 rounded-full bg-[#2a2a4a] flex items-center justify-center text-[8px] font-bold text-white/50">
+                    +{fmtCount(liveCrowd - 2)}
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="h-1 bg-white/10 rounded-full mt-2.5 overflow-hidden">
+              <div className="h-full bg-[#B91C1C] rounded-full" style={{ width: '65%' }} />
+            </div>
           </div>
+
+          {/* Ends In */}
           {hasCountdown && (
-            <div className="rounded-lg border border-white/20 px-4 py-2.5 text-center min-w-[90px]">
-              <span className="text-[9px] text-white/50 uppercase tracking-widest block mb-0.5">
+            <div className="rounded-2xl bg-white/5 border border-white/10 px-5 py-4 text-center min-w-[120px]">
+              <span className="text-[9px] text-white/40 uppercase tracking-[0.15em] font-bold block mb-1.5">
                 Ends In
               </span>
-              <span className="text-xl font-bold text-[#B91C1C] block">
-                {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}
+              <span className="text-3xl font-bold text-[#B91C1C] block leading-none">
+                {String(hours).padStart(2, '0')}
+                <span className="text-white/30">:</span>
+                {String(minutes).padStart(2, '0')}
               </span>
-              <div className="h-1 bg-white/10 rounded-full mt-1.5 overflow-hidden">
+              <div className="h-1 bg-white/10 rounded-full mt-2.5 overflow-hidden">
                 <div
-                  className="h-full bg-blue-500 rounded-full transition-all"
+                  className="h-full bg-white/80 rounded-full transition-all"
                   style={{
                     width: `${Math.max(5, 100 - ((hours * 3600 + minutes * 60 + seconds) / 864) * 10)}%`,
                   }}
@@ -302,7 +329,7 @@ function TabBar<T extends string>({
   onChange: (id: T) => void;
 }) {
   return (
-    <div className="flex gap-1.5 overflow-x-auto scrollbar-hide py-2">
+    <div className="rounded-full bg-neutral-100 p-1 flex overflow-x-auto scrollbar-hide border border-neutral-200">
       {tabs.map((tab) => (
         <button
           key={tab.id}
@@ -310,12 +337,12 @@ function TabBar<T extends string>({
           disabled={!tab.enabled}
           title={tab.comingSoon ? 'Coming Soon' : undefined}
           className={cn(
-            'px-4 py-2 rounded-full text-xs font-bold tracking-wider whitespace-nowrap transition-all flex-shrink-0',
+            'flex-1 px-4 py-2.5 rounded-full text-xs font-bold tracking-wider whitespace-nowrap transition-all',
             !tab.enabled && 'cursor-not-allowed opacity-40',
             active === tab.id && tab.enabled
-              ? 'bg-[#1a1a2e] text-white shadow-sm'
+              ? 'bg-[#1a1a2e] text-white shadow-md'
               : tab.enabled
-                ? 'text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100'
+                ? 'text-neutral-500 hover:text-neutral-700'
                 : 'text-neutral-400',
           )}
         >
@@ -359,6 +386,7 @@ const ComingSoonOverlay = ({ feature }: { feature: string }) => (
 /* ================================================================== */
 export const DealDetailPage = () => {
   const { dealId } = useParams<{ dealId: string }>();
+  const navigate = useNavigate();
   const { canGoBack, goBack } = useNavigationHistory();
   const { savedDealIds, saveDeal, unsaveDeal } = useSavedDeals();
   const [leftTab, setLeftTab] = useState<LeftTab>('info');
@@ -539,35 +567,49 @@ export const DealDetailPage = () => {
                   )}
                 </div>
 
-                {/* Action buttons – bordered cards per Figma */}
-                <div className="flex justify-center gap-3">
-                  {deal.merchant.phoneNumber && (
+                {/* Action buttons – always show CALL/ROUTE/SHARE, equal width per Figma */}
+                <div className="flex gap-3">
+                  {deal.merchant.phoneNumber ? (
                     <a
                       href={`tel:${deal.merchant.phoneNumber.replace(/\D/g, '')}`}
-                      className="flex flex-col items-center gap-2 px-6 py-4 rounded-xl border border-neutral-200 hover:border-[#8B1A1A]/30 hover:bg-[#8B1A1A]/5 transition-all"
+                      className="flex-1 flex flex-col items-center gap-2 py-4 rounded-xl border border-neutral-200 hover:border-[#8B1A1A]/30 hover:bg-[#8B1A1A]/5 transition-all"
                     >
                       <Phone className="h-6 w-6 text-[#8B1A1A]" />
                       <span className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
                         Call
                       </span>
                     </a>
+                  ) : (
+                    <div className="flex-1 flex flex-col items-center gap-2 py-4 rounded-xl border border-neutral-200 opacity-40 cursor-not-allowed">
+                      <Phone className="h-6 w-6 text-neutral-400" />
+                      <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+                        Call
+                      </span>
+                    </div>
                   )}
-                  {deal.merchant.latitude && deal.merchant.longitude && (
+                  {deal.merchant.latitude && deal.merchant.longitude ? (
                     <a
                       href={`https://www.google.com/maps/dir/?api=1&destination=${deal.merchant.latitude},${deal.merchant.longitude}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex flex-col items-center gap-2 px-6 py-4 rounded-xl border border-neutral-200 hover:border-[#8B1A1A]/30 hover:bg-[#8B1A1A]/5 transition-all"
+                      className="flex-1 flex flex-col items-center gap-2 py-4 rounded-xl border border-neutral-200 hover:border-[#8B1A1A]/30 hover:bg-[#8B1A1A]/5 transition-all"
                     >
                       <MapPin className="h-6 w-6 text-[#8B1A1A]" />
                       <span className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
                         Route
                       </span>
                     </a>
+                  ) : (
+                    <div className="flex-1 flex flex-col items-center gap-2 py-4 rounded-xl border border-neutral-200 opacity-40 cursor-not-allowed">
+                      <MapPin className="h-6 w-6 text-neutral-400" />
+                      <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+                        Route
+                      </span>
+                    </div>
                   )}
                   <button
                     onClick={handleShare}
-                    className="flex flex-col items-center gap-2 px-6 py-4 rounded-xl border border-neutral-200 hover:border-[#8B1A1A]/30 hover:bg-[#8B1A1A]/5 transition-all"
+                    className="flex-1 flex flex-col items-center gap-2 py-4 rounded-xl border border-neutral-200 hover:border-[#8B1A1A]/30 hover:bg-[#8B1A1A]/5 transition-all"
                   >
                     <Share2 className="h-6 w-6 text-[#8B1A1A]" />
                     <span className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
@@ -653,7 +695,7 @@ export const DealDetailPage = () => {
                 {/* Book Table CTA – dark navy per Figma */}
                 <button
                   onClick={() => setShowBookingModal(true)}
-                  className="w-full py-3.5 rounded-xl bg-[#1a1a2e] hover:bg-[#252548] text-white font-bold text-sm tracking-wide transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-2xl bg-[#1a1a2e] hover:bg-[#252548] text-white font-bold text-sm tracking-wide transition-colors flex items-center justify-center gap-2"
                 >
                   Book Table <ChevronRight className="h-4 w-4" />
                 </button>
@@ -668,7 +710,7 @@ export const DealDetailPage = () => {
                         .filter(Boolean)
                         .map((line: string, i: number) => (
                           <li key={i} className="flex items-start gap-3">
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-sm font-bold shadow-sm">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full border-2 border-[#8B1A1A] flex items-center justify-center text-[#8B1A1A] text-sm font-bold">
                               {i + 1}
                             </div>
                             <p className="text-sm text-neutral-700 pt-1.5">
@@ -681,7 +723,7 @@ export const DealDetailPage = () => {
                     <ol className="space-y-3">
                       {placeholderThingsToKnow.map((item, i) => (
                         <li key={i} className="flex items-start gap-3">
-                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-sm font-bold shadow-sm">
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full border-2 border-[#8B1A1A] flex items-center justify-center text-[#8B1A1A] text-sm font-bold">
                             {i + 1}
                           </div>
                           <p className="text-sm text-neutral-700 pt-1.5">{item}</p>
@@ -918,10 +960,25 @@ export const DealDetailPage = () => {
                     <h3 className="text-2xl font-black text-neutral-900 uppercase tracking-tight">
                       Curated Menu
                     </h3>
-                    <p className="text-xs text-neutral-500 mt-0.5">
-                      {totalFilteredCount} item{totalFilteredCount !== 1 ? 's' : ''}
-                      {menuCategory !== 'all' ? ` in ${menuCategory}` : ''}
+                    <p className="text-xs text-neutral-400 mt-0.5">
+                      Auto-playing cinematic previews
                     </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      disabled
+                      className="w-10 h-10 rounded-xl bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-not-allowed opacity-50"
+                      title="Filter coming soon"
+                    >
+                      <SlidersHorizontal className="h-[18px] w-[18px] text-neutral-600" />
+                    </button>
+                    <button
+                      disabled
+                      className="w-10 h-10 rounded-xl bg-[#1a1a2e] flex items-center justify-center cursor-not-allowed opacity-70"
+                      title="Search coming soon"
+                    >
+                      <Search className="h-[18px] w-[18px] text-white" />
+                    </button>
                   </div>
                 </div>
 
@@ -956,76 +1013,90 @@ export const DealDetailPage = () => {
                   </div>
                 )}
 
-                {/* Menu grid – dark cards */}
+                {/* Menu grid – cards per Figma */}
                 {deal.hasMenuItems && deal.menuItems.length > 0 ? (
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {filteredMenuItems.map((item: any) => (
                         <div
                           key={item.id}
-                          className="rounded-xl overflow-hidden bg-[#1a1a2e] group"
+                          className="relative rounded-3xl overflow-hidden shadow-lg cursor-pointer group aspect-[3/5]"
+                          onClick={() => navigate(`/deals/${dealId}/menu/${item.id}`)}
                         >
-                          {/* Image area */}
-                          <div className="relative aspect-[3/4]">
-                            {item.imageUrl ? (
-                              <img
-                                src={item.imageUrl}
+                          {/* Full-bleed image / slideshow */}
+                          {(item.images && item.images.length > 0) || item.imageUrl ? (
+                            <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.05]">
+                              <ImageSlideshow
+                                images={item.images && item.images.length > 0 ? item.images : [item.imageUrl!]}
                                 alt={item.name}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                className="w-full h-full"
+                                autoPlay={5000}
+                                maxImages={3}
                               />
-                            ) : (
-                              <div className="w-full h-full bg-neutral-800 flex items-center justify-center">
-                                <ShoppingCart className="h-8 w-8 text-neutral-600" />
-                              </div>
-                            )}
-                            {/* Category badge */}
-                            {item.category && (
-                              <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                            </div>
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center bg-neutral-800">
+                              <ShoppingCart className="h-8 w-8 text-neutral-600" />
+                            </div>
+                          )}
+
+                          {/* Category badge – top left */}
+                          {item.category && (
+                            <div className="absolute top-3.5 left-3.5 z-10">
+                              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md">
                                 <div className="w-2 h-2 rounded-full bg-[#B91C1C]" />
-                                <span className="text-[10px] font-bold text-white uppercase tracking-wider drop-shadow-md">
+                                <span className="text-[10px] font-bold text-white uppercase tracking-wider">
                                   {item.category}
                                 </span>
                               </div>
-                            )}
-                            {/* Price */}
-                            <span className="absolute top-3 right-3 text-white font-bold text-sm drop-shadow-md">
+                            </div>
+                          )}
+
+                          {/* Price badge – top right */}
+                          <div className="absolute top-3.5 right-3.5 z-10">
+                            <span className="px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-white font-bold text-sm">
                               ${(item.discountedPrice || item.originalPrice || 0).toFixed(2)}
                             </span>
-                            {/* Name + description overlay */}
-                            <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
-                              <h4 className="text-base font-black text-white uppercase tracking-wide leading-tight">
-                                {item.name}
-                              </h4>
-                              {item.description && (
-                                <p className="text-[11px] text-white/70 mt-0.5 line-clamp-2">
-                                  {item.description}
-                                </p>
-                              )}
-                            </div>
                           </div>
-                          {/* Action row */}
-                          <div className="flex items-center justify-between px-3 py-2.5 border-t border-white/10">
-                            <button
-                              disabled
-                              className="text-xs font-semibold text-white/60 cursor-not-allowed"
-                              title="Online ordering coming soon"
-                            >
-                              Add to Basket
-                            </button>
-                            <div className="flex items-center gap-1.5">
+
+                          {/* Bottom gradient – smooth progressive fade */}
+                          <div className="absolute inset-x-0 bottom-0 h-3/5 pointer-events-none bg-gradient-to-t from-black via-black/70 to-transparent" />
+                          <div className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none bg-gradient-to-t from-black/50 to-transparent" />
+
+                          {/* Bottom content – all on top of image */}
+                          <div className="absolute inset-x-0 bottom-0 z-10 p-5 flex flex-col">
+                            {/* Name + description */}
+                            <h4 className="text-xl font-black text-white uppercase tracking-wide leading-tight">
+                              {item.name}
+                            </h4>
+                            {item.description && (
+                              <p className="text-[13px] text-white/50 mt-1 line-clamp-2 leading-relaxed">
+                                {item.description}
+                              </p>
+                            )}
+
+                            {/* Action row – overlaid on image */}
+                            <div className="flex items-center gap-2.5 mt-4">
+                              {/* Add to Basket + cart icon – single combined button, takes remaining space */}
                               <button
                                 disabled
-                                className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center cursor-not-allowed"
-                                title="Add to cart coming soon"
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex-1 flex items-center justify-between pl-5 pr-1.5 py-1.5 rounded-full bg-white cursor-not-allowed"
+                                title="Online ordering coming soon"
                               >
-                                <ShoppingCart className="h-3.5 w-3.5 text-white/60" />
+                                <span className="text-sm font-semibold text-[#1a1a2e] whitespace-nowrap">Add to Basket</span>
+                                <span className="w-10 h-10 rounded-full bg-[#1a1a2e] flex items-center justify-center flex-shrink-0">
+                                  <ShoppingCart className="h-[17px] w-[17px] text-white" />
+                                </span>
                               </button>
+                              {/* Heart – separate white circle */}
                               <button
                                 disabled
-                                className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center cursor-not-allowed"
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-11 h-11 rounded-full bg-white flex items-center justify-center cursor-not-allowed flex-shrink-0"
                                 title="Save item coming soon"
                               >
-                                <Heart className="h-3.5 w-3.5 text-white/60" />
+                                <Heart className="h-[18px] w-[18px] text-[#1a1a2e]" />
                               </button>
                             </div>
                           </div>

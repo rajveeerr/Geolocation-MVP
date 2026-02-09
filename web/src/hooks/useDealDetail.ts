@@ -48,6 +48,7 @@ export interface DetailedDeal {
     originalPrice: number;
     discountedPrice: number;
     imageUrl: string | null;
+    images?: string[];
     category: string;
   }>;
   hasMenuItems: boolean;
@@ -133,12 +134,14 @@ const createMockDeal = (id: string): DetailedDeal => {
       icon: "🍽️",
       color: "#FF6B6B"
     },
-    imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop",
+    imageUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&h=1200&fit=crop&q=80",
     images: [
-      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800&h=600&fit=crop"
+      "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&h=1200&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&h=1200&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=1200&h=1200&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1200&h=1200&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=1200&h=1200&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=1200&h=1200&fit=crop&q=80"
     ],
     offerDisplay: "30% OFF",
     discountPercentage: 30,
@@ -168,37 +171,74 @@ const createMockDeal = (id: string): DetailedDeal => {
       {
         id: 1,
         name: "Signature Steak",
-        description: "Premium ribeye steak with seasonal vegetables",
+        description: "Premium ribeye steak with seasonal vegetables & truffle jus",
         originalPrice: 45.00,
         discountedPrice: 31.50,
-        imageUrl: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=300&fit=crop",
-        category: "Main Course"
+        imageUrl: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800&h=1000&fit=crop&q=80",
+        images: [
+          "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800&h=1000&fit=crop&q=80",
+          "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=1000&fit=crop&q=80",
+          "https://images.unsplash.com/photo-1546833998-877b37c2e5c6?w=800&h=1000&fit=crop&q=80"
+        ],
+        category: "Chef's Signature"
       },
       {
         id: 2,
+        name: "Monster Wagyu",
+        description: "Truffle aioli, gold-leaf brioche & organic greens",
+        originalPrice: 32.00,
+        discountedPrice: 22.00,
+        imageUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=1000&fit=crop&q=80",
+        images: [
+          "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=1000&fit=crop&q=80",
+          "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&h=1000&fit=crop&q=80",
+          "https://images.unsplash.com/photo-1586816001966-79b736744398?w=800&h=1000&fit=crop&q=80"
+        ],
+        category: "Bestseller"
+      },
+      {
+        id: 3,
+        name: "Pepperoni Feast",
+        description: "Double-aged, hot honey drizzle & classic mozzarella",
+        originalPrice: 26.00,
+        discountedPrice: 18.00,
+        imageUrl: "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=800&h=1000&fit=crop&q=80",
+        images: [
+          "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=800&h=1000&fit=crop&q=80",
+          "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&h=1000&fit=crop&q=80"
+        ],
+        category: "Chef's Signature"
+      },
+      {
+        id: 4,
         name: "Lobster Pasta",
         description: "Fresh lobster with house-made pasta in cream sauce",
         originalPrice: 38.00,
         discountedPrice: 26.60,
-        imageUrl: "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=400&h=300&fit=crop",
+        imageUrl: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=800&h=1000&fit=crop&q=80",
+        images: [
+          "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=800&h=1000&fit=crop&q=80",
+          "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=800&h=1000&fit=crop&q=80",
+          "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800&h=1000&fit=crop&q=80"
+        ],
         category: "Main Course"
       },
       {
-        id: 3,
+        id: 5,
         name: "Truffle Risotto",
-        description: "Creamy risotto with black truffle and parmesan",
+        description: "Creamy risotto with black truffle shavings and aged parmesan",
         originalPrice: 32.00,
         discountedPrice: 22.40,
-        imageUrl: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=400&h=300&fit=crop",
+        imageUrl: "https://images.unsplash.com/photo-1633964913295-ceb43826e7c1?w=800&h=1000&fit=crop&q=80",
         category: "Main Course"
       },
       {
-        id: 4,
+        id: 6,
         name: "Chocolate Soufflé",
-        description: "Warm chocolate soufflé with vanilla ice cream",
+        description: "Warm chocolate soufflé with vanilla bean ice cream",
         originalPrice: 16.00,
         discountedPrice: 11.20,
-        imageUrl: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&h=300&fit=crop",
+        imageUrl: "https://images.unsplash.com/photo-1541783245831-57d6fb0926d3?w=800&h=1000&fit=crop&q=80",
         category: "Dessert"
       }
     ],

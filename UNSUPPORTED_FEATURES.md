@@ -78,8 +78,8 @@
 ### 10. Video Playback on Hero Image
 - **Figma shows:** Play button overlay on hero image suggesting video support
 - **Backend status:** No `videoUrl` field on Deal model. Event model has `videoUrl` but Deal does not.
-- **Frontend status:** Play button shows as a visual element but is non-functional (pointer-events-none).
-- **Action needed:** Add `videoUrl: String?` field to Deal model or `videoUrls: String[]` to Merchant model
+- **Frontend status:** Play button has been **removed** from the hero gallery since no video support exists. It should only be shown when an actual video URL is available.
+- **Action needed:** Add `videoUrl: String?` field to Deal model or `videoUrls: String[]` to Merchant model. Once added, conditionally render the play button in HeroGallery when a video URL is present.
 - **Onboarding requirement:** Merchant can optionally upload/link a promo video during onboarding
 
 ### 11. "Add to Basket" / Cart / Online Ordering
@@ -88,6 +88,20 @@
 - **Frontend status:** "Add to Basket" buttons shown but disabled with tooltip "Online ordering coming soon".
 - **Action needed:** Build full ordering system: Cart model, Order model, payment integration, order tracking
 - **Onboarding requirement:** Merchant opts into online ordering during setup (v2 feature)
+
+### 12. Multiple Images per Menu Item
+- **Figma shows:** Menu cards with image slideshow bars (like event cards on landing page), allowing multiple photos per dish
+- **Backend status:** MenuItem model only has a single `imageUrl: String?` field. No `images: String[]` array or separate `MenuItemImage` model exists in Prisma.
+- **Frontend status:** Image slideshow (ImageSlideshow component) is wired up on menu cards and will display multiple images with auto-advance bars when `images[]` array is provided. Currently uses mock data with multiple images; falls back to single `imageUrl` when no `images` array exists.
+- **Action needed:** Add `images: String[]` field to MenuItem model (or a separate `MenuItemImage` join table) and update the menu item CRUD endpoints to accept/return multiple images. Update the image upload flow for merchants to support multiple photos per dish.
+- **Onboarding requirement:** Merchant uploads 1-3 photos per menu item during dish creation
+
+### 13. Menu Search & Filter
+- **Figma shows:** Search icon (dark rounded button) and filter/sliders icon (light rounded button) next to the "Curated Menu" heading
+- **Backend status:** No dedicated menu search or advanced filter endpoint. Menu items can be filtered by category on the frontend.
+- **Frontend status:** Search and filter buttons are rendered but **disabled** with "coming soon" tooltips. Category filter pills work for basic filtering.
+- **Action needed:** Add search endpoint (`GET /api/menu-items?search=...&filters=...`) with text search on name/description, price range filtering, dietary filters, etc.
+- **Onboarding requirement:** Merchant tags menu items with dietary info, allergens, etc. during creation
 
 ### 12. Purchase History per Reviewer
 - **Figma shows:** "Pete's Purchases" section within a review showing what food items the reviewer ordered with photos

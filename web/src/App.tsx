@@ -54,6 +54,9 @@ const DealEditPage = React.lazy(() =>
 const DealDetailPage = React.lazy(() =>
   import('./pages/DealDetailPage').then((m) => ({ default: m.DealDetailPage })),
 );
+const MenuDetailPage = React.lazy(() =>
+  import('./pages/MenuDetailPage').then((m) => ({ default: m.MenuDetailPage })),
+);
 const HiddenDealPage = React.lazy(() =>
   import('./pages/HiddenDealPage').then((module) => ({ default: module.HiddenDealPage })),
 );
@@ -283,6 +286,14 @@ function App() {
                   element={
                     <Suspense fallback={<LoadingOverlay />}>
                       <DealDetailPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/deals/:dealId/menu/:itemId"
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <MenuDetailPage />
                     </Suspense>
                   }
                 />
