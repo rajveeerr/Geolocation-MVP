@@ -83,6 +83,16 @@ const tailwindConfig: Config = {
             main: 'hsl(var(--brand-primary-main))',
             dark: 'hsl(var(--brand-primary-dark))',
             light: 'hsl(var(--brand-primary-light))',
+            50: 'hsl(var(--brand-primary-50))',
+            100: 'hsl(var(--brand-primary-100))',
+            200: 'hsl(var(--brand-primary-200))',
+            300: 'hsl(var(--brand-primary-300))',
+            400: 'hsl(var(--brand-primary-400))',
+            500: 'hsl(var(--brand-primary-500))',
+            600: 'hsl(var(--brand-primary-600))',
+            700: 'hsl(var(--brand-primary-700))',
+            800: 'hsl(var(--brand-primary-800))',
+            900: 'hsl(var(--brand-primary-900))',
           },
         },
 
@@ -114,6 +124,10 @@ const tailwindConfig: Config = {
           800: 'hsl(var(--neutral-800))',
           900: 'hsl(var(--neutral-900))',
           950: 'hsl(var(--neutral-950))',
+          text: {
+            primary: 'hsl(var(--foreground))',
+            secondary: 'hsl(var(--neutral-500))',
+          },
         },
 
         // --- Semantic ---
