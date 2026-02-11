@@ -1,83 +1,237 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:wght@600;700&display=swap');
+/* ================================================================
+   Deal Hunt — Global Styles & Design Tokens
+   ================================================================
+   ALL colours, radii, shadows, and spacing MUST come from these
+   CSS custom properties so that a single change here propagates
+   everywhere. Never hard-code hex values in components.
+
+   See DESIGN_SYSTEM.md for full documentation.
+   ================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ----------------------------------------------------------------
+   1. DESIGN TOKENS  (light mode / default)
+   ---------------------------------------------------------------- */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 215.4 16.3% 46.9%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 215.4 16.3% 46.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.75rem;
+    /* ============================================================
+       BRAND PALETTE
+       The single source of truth for Deal Hunt red (#B91C1C).
+       ============================================================ */
+    --brand-primary: 0 74% 42%;          /* #B91C1C  — THE brand red */
+    --brand-primary-hover: 0 74% 36%;    /* #9B1B1B  — hover state */
+    --brand-primary-active: 0 74% 30%;   /* darker pressed state */
+    --brand-primary-subtle: 0 86% 97%;   /* #FEF2F2 — tinted backgrounds */
+    --brand-primary-muted: 0 80% 92%;    /* #FECACA — muted red fills */
 
-    /* Brand Red: #B91C1C → HSL(0, 74%, 42%) */
-    --brand-primary-50: 0 86% 97%;
-    --brand-primary-100: 0 80% 92%;
-    --brand-primary-200: 0 76% 84%;
-    --brand-primary-300: 0 74% 71%;
-    --brand-primary-400: 0 74% 57%;
-    --brand-primary-500: 0 74% 47%;
-    --brand-primary-600: 0 74% 42%;
-    --brand-primary-700: 0 74% 36%;
-    --brand-primary-800: 0 74% 29%;
-    --brand-primary-900: 0 74% 22%;
-    --brand-primary-main: 0 74% 42%;
-    --brand-primary-dark: 0 74% 36%;
-    --brand-primary-light: 0 80% 92%;
+    /* Full brand scale (50 → 950) */
+    --brand-50:  0 86% 97%;
+    --brand-100: 0 80% 92%;
+    --brand-200: 0 76% 84%;
+    --brand-300: 0 74% 71%;
+    --brand-400: 0 74% 57%;
+    --brand-500: 0 74% 47%;
+    --brand-600: 0 74% 42%;              /* = main brand */
+    --brand-700: 0 74% 36%;
+    --brand-800: 0 74% 29%;
+    --brand-900: 0 74% 22%;
+    --brand-950: 0 74% 12%;
+
+    /* Legacy aliases (keep for backward-compat, migrate away) */
+    --brand-primary-main:  var(--brand-600);
+    --brand-primary-dark:  var(--brand-700);
+    --brand-primary-light: var(--brand-100);
+    --brand-primary-50:  var(--brand-50);
+    --brand-primary-100: var(--brand-100);
+    --brand-primary-200: var(--brand-200);
+    --brand-primary-300: var(--brand-300);
+    --brand-primary-400: var(--brand-400);
+    --brand-primary-500: var(--brand-500);
+    --brand-primary-600: var(--brand-600);
+    --brand-primary-700: var(--brand-700);
+    --brand-primary-800: var(--brand-800);
+    --brand-primary-900: var(--brand-900);
+
+    /* ============================================================
+       DARK SURFACE PALETTE  (deal cards, bounty cards, modals)
+       ============================================================ */
+    --surface-dark:       240 26% 14%;   /* #1a1a2e */
+    --surface-dark-alt:   240 26% 12%;   /* #16162a */
+    --surface-dark-muted: 240 21% 22%;   /* #2a2a4a */
+    --surface-dark-fg:         0 0% 100%;
+    --surface-dark-fg-muted:   0 0% 100%;  /* use with /50 opacity */
+
+    /* ============================================================
+       NEUTRAL PALETTE
+       ============================================================ */
+    --background: 0 0% 100%;
+    --foreground: 220 14% 10%;           /* #1a1a24 */
+
+    --surface:           0 0% 100%;
+    --surface-secondary: 220 14% 96%;    /* #F4F5F7 */
+    --surface-tertiary:  220 14% 98%;    /* #FAFAFA */
+
+    --neutral-50:  210 20% 98%;
+    --neutral-100: 220 14% 96%;
+    --neutral-200: 220 13% 91%;
+    --neutral-300: 216 12% 84%;
+    --neutral-400: 218 11% 65%;
+    --neutral-500: 220 9% 46%;
+    --neutral-600: 215 14% 34%;
+    --neutral-700: 217 19% 27%;
+    --neutral-800: 215 28% 17%;
+    --neutral-900: 221 39% 11%;
+    --neutral-950: 224 50% 6%;
+
+    /* ============================================================
+       SEMANTIC COLOURS
+       ============================================================ */
+    --success:    152 69% 31%;           /* #059669 */
+    --success-fg: 0 0% 100%;
+    --warning:    38 92% 50%;            /* #D97706 */
+    --warning-fg: 0 0% 100%;
+    --error:      0 72% 51%;             /* #DC2626 */
+    --error-fg:   0 0% 100%;
+    --info:       217 91% 60%;           /* #3B82F6 */
+    --info-fg:    0 0% 100%;
+
+    /* ============================================================
+       SHADCN / RADIX MAPPED TOKENS
+       ============================================================ */
+    --card:               var(--surface);
+    --card-foreground:    var(--foreground);
+    --popover:            var(--surface);
+    --popover-foreground: var(--foreground);
+    --primary:            var(--brand-primary);
+    --primary-foreground: 0 0% 100%;
+    --secondary:          var(--neutral-100);
+    --secondary-foreground: var(--neutral-700);
+    --muted:              var(--neutral-100);
+    --muted-foreground:   var(--neutral-500);
+    --accent:             var(--neutral-100);
+    --accent-foreground:  var(--neutral-900);
+    --destructive:        var(--error);
+    --destructive-foreground: var(--error-fg);
+    --border:             var(--neutral-200);
+    --input:              var(--neutral-200);
+    --ring:               var(--brand-primary);
+
+    /* ============================================================
+       RADII  — use via Tailwind: rounded-dh-sm, rounded-dh-lg, etc.
+       Also sets the shadcn --radius mapping.
+       ============================================================ */
+    --radius-xs:   4px;
+    --radius-sm:   8px;
+    --radius-md:   12px;
+    --radius-lg:   16px;
+    --radius-xl:   20px;
+    --radius-2xl:  24px;
+    --radius-3xl:  32px;
+    --radius-full: 9999px;
+    --radius:      12px;                 /* shadcn default (=md) */
+
+    /* ============================================================
+       SHADOWS
+       ============================================================ */
+    --shadow-xs:         0 1px 2px 0 rgb(0 0 0 / 0.04);
+    --shadow-sm:         0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+    --shadow-md:         0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --shadow-lg:         0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+    --shadow-xl:         0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+    --shadow-2xl:        0 25px 50px -12px rgb(0 0 0 / 0.2);
+    --shadow-card:       0 2px 8px rgb(0 0 0 / 0.06);
+    --shadow-card-hover: 0 8px 24px rgb(0 0 0 / 0.12);
+
+    /* ============================================================
+       TYPOGRAPHY
+       ============================================================ */
+    --font-heading: 'Poppins', 'Helvetica Neue', sans-serif;
+    --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+
+    /* ============================================================
+       TRANSITIONS
+       ============================================================ */
+    --transition-fast:   150ms ease-in-out;
+    --transition-base:   200ms ease-in-out;
+    --transition-slow:   350ms ease-in-out;
+    --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* ============================================================
+       Z-INDEX SCALE
+       ============================================================ */
+    --z-base:     0;
+    --z-dropdown: 10;
+    --z-sticky:   20;
+    --z-overlay:  30;
+    --z-modal:    40;
+    --z-toast:    50;
   }
 
+  /* ---- Dark mode overrides ---- */
   .dark {
-    --background: 222.2222 47.3684% 11.1765%;
-    --foreground: 210 40% 98.0392%;
-    --card: 222.2222 47.3684% 11.1765%;
-    --card-foreground: 210 40% 98.0392%;
-    --popover: 222.2222 47.3684% 11.1765%;
-    --popover-foreground: 210 40% 98.0392%;
-    --primary: 0 74% 42%;
+    --background: 224 50% 6%;
+    --foreground: 210 20% 98%;
+
+    --surface:           240 26% 14%;
+    --surface-secondary: 240 21% 18%;
+    --surface-tertiary:  240 21% 22%;
+
+    --card:               var(--surface);
+    --card-foreground:    var(--foreground);
+    --popover:            var(--surface);
+    --popover-foreground: var(--foreground);
+    --primary:            var(--brand-primary);
     --primary-foreground: 0 0% 100%;
-    --secondary: 217.2414 32.5843% 17.451%;
-    --secondary-foreground: 210 40% 98.0392%;
-    --muted: 217.2414 32.5843% 17.451%;
-    --muted-foreground: 215 20.2247% 65.098%;
-    --accent: 217.2414 32.5843% 17.451%;
-    --accent-foreground: 210 40% 98.0392%;
-    --destructive: 0 84.2365% 60.1961%;
-    --destructive-foreground: 210 40% 98.0392%;
-    --border: 217.2414 32.5843% 17.451%;
-    --input: 217.2414 32.5843% 17.451%;
-    --ring: 217.2193 91.2195% 59.8039%;
-    --radius: 0.75rem;
+    --secondary:          var(--neutral-800);
+    --secondary-foreground: var(--neutral-200);
+    --muted:              var(--neutral-800);
+    --muted-foreground:   var(--neutral-400);
+    --accent:             var(--neutral-800);
+    --accent-foreground:  var(--neutral-100);
+    --destructive:        var(--error);
+    --destructive-foreground: var(--error-fg);
+    --border:             var(--neutral-700);
+    --input:              var(--neutral-700);
+    --ring:               var(--brand-primary);
+    --radius:             12px;
   }
 }
 
+/* ----------------------------------------------------------------
+   2. BASE RESETS & GLOBAL STYLES
+   ---------------------------------------------------------------- */
 @layer base {
   * {
     @apply border-border;
   }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings:
-      'rlig' 1,
-      'calt' 1;
+    font-family: var(--font-body);
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
   }
 }
 
+/* ----------------------------------------------------------------
+   3. UTILITY CLASSES
+   ---------------------------------------------------------------- */
 @layer utilities {
+  /* Hide scrollbars */
   .scrollbar-hide {
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -91,4 +245,21 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23ffffff'/%3E%3Crect width='1' height='1' fill='%23000000' fill-opacity='0.02'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23000000' fill-opacity='0.015'/%3E%3C/svg%3E");
     background-repeat: repeat;
   }
+
+  /* Section container (consistent max-w + padding) */
+  .section-container {
+    @apply mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Dark card surface (deal cards, bounty cards) */
+  .card-dark {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--surface-dark)) 0%,
+      hsl(var(--surface-dark-alt)) 100%
+    );
+    color: hsl(var(--surface-dark-fg));
+    border-radius: var(--radius-2xl);
+  }
 }
+

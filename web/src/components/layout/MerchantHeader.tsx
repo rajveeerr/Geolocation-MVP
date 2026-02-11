@@ -2,7 +2,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { Logo } from '../common/Logo';
 import { Button } from '../common/Button';
 import { PATHS } from '@/routing/paths';
-import { PlusCircle, Menu, X, Gift } from 'lucide-react';
+import { PlusCircle, Menu, X, Gift, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
@@ -39,6 +39,9 @@ export const MerchantHeader = () => {
             </NavLink>
             <NavLink to={PATHS.MERCHANT_DEALS} className={navLinkClass}>
               My Deals
+            </NavLink>
+            <NavLink to={PATHS.MERCHANT_EVENTS} className={navLinkClass}>
+              My Events
             </NavLink>
             <NavLink to={PATHS.MERCHANT_STORES} className={navLinkClass}>
               My Stores
@@ -99,6 +102,13 @@ export const MerchantHeader = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 My Deals
+              </NavLink>
+              <NavLink 
+                to={PATHS.MERCHANT_EVENTS} 
+                className={mobileNavLinkClass}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                My Events
               </NavLink>
               <NavLink 
                 to={PATHS.MERCHANT_STORES} 

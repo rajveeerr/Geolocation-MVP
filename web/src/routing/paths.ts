@@ -68,6 +68,19 @@ export const PATHS = {
   ADMIN_CITIES: '/admin/cities', // New route for the city management table
   ADMIN_CUSTOMERS: '/admin/customers', // New route for the customer list
 
+  // Merchant Events
+  MERCHANT_EVENTS: '/merchant/events',
+  MERCHANT_EVENTS_CREATE: '/merchant/events/create',
+  MERCHANT_EVENTS_MANAGE: '/merchant/events/:eventId',
+  MERCHANT_EVENTS_CHECKIN: '/merchant/events/:eventId/checkin',
+
+  // Events
+  EVENT_DETAIL: '/events/:eventId',
+  DISCOVER_EVENTS: '/discover/events',
+
+  // My Tickets (consumer)
+  MY_TICKETS: '/my-tickets',
+
   DEAL_DETAIL: '/deals/:dealId',
   LOCATION_DETAIL: '/locations/:locationId',
   CATEGORY: '/category/:categoryId',

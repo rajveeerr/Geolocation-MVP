@@ -54,6 +54,9 @@ const DealEditPage = React.lazy(() =>
 const DealDetailPage = React.lazy(() =>
   import('./pages/DealDetailPage').then((m) => ({ default: m.DealDetailPage })),
 );
+const EventDetailPage = React.lazy(() =>
+  import('./pages/EventDetailPage').then((m) => ({ default: m.EventDetailPage })),
+);
 const MenuDetailPage = React.lazy(() =>
   import('./pages/MenuDetailPage').then((m) => ({ default: m.MenuDetailPage })),
 );
@@ -135,6 +138,24 @@ const StoreDetailPage = React.lazy(() =>
 );
 const MerchantMyDealsPage = React.lazy(() =>
   import('./pages/merchant/MerchantMyDealsPage').then((m) => ({ default: m.MerchantMyDealsPage })),
+);
+const MerchantMyEventsPage = React.lazy(() =>
+  import('./pages/merchant/MerchantMyEventsPage').then((m) => ({ default: m.MerchantMyEventsPage })),
+);
+const CreateEventPage = React.lazy(() =>
+  import('./pages/merchant/EventCreatePage').then((m) => ({ default: m.CreateEventPage })),
+);
+const EventManagePage = React.lazy(() =>
+  import('./pages/merchant/EventManagePage').then((m) => ({ default: m.EventManagePage })),
+);
+const EventCheckInPage = React.lazy(() =>
+  import('./pages/merchant/EventCheckInPage').then((m) => ({ default: m.EventCheckInPage })),
+);
+const MyTicketsPage = React.lazy(() =>
+  import('./pages/MyTicketsPage').then((m) => ({ default: m.MyTicketsPage })),
+);
+const DiscoverEventsPage = React.lazy(() =>
+  import('./pages/DiscoverEventsPage').then((m) => ({ default: m.DiscoverEventsPage })),
 );
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
@@ -290,6 +311,32 @@ function App() {
                   }
                 />
                 <Route
+                  path={PATHS.EVENT_DETAIL}
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <EventDetailPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path={PATHS.DISCOVER_EVENTS}
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <DiscoverEventsPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path={PATHS.MY_TICKETS}
+                  element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MyTicketsPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/deals/:dealId/menu/:itemId"
                   element={
                     <Suspense fallback={<LoadingOverlay />}>
@@ -358,6 +405,55 @@ function App() {
                     <MerchantLayout>
                       <Suspense fallback={<LoadingOverlay />}>
                         <DealEditPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              {/* Merchant Events */}
+              <Route
+                path={PATHS.MERCHANT_EVENTS}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MerchantMyEventsPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={PATHS.MERCHANT_EVENTS_CREATE}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <CreateEventPage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={PATHS.MERCHANT_EVENTS_MANAGE}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <EventManagePage />
+                      </Suspense>
+                    </MerchantLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={PATHS.MERCHANT_EVENTS_CHECKIN}
+                element={
+                  <ProtectedRoute>
+                    <MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <EventCheckInPage />
                       </Suspense>
                     </MerchantLayout>
                   </ProtectedRoute>

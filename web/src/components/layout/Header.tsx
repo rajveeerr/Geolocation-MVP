@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Menu, X, BookOpen, Compass, Coins, Briefcase, Shield, User, Settings, LogOut, Gift, Trophy, Flame, Users } from 'lucide-react';
+import { Menu, X, BookOpen, Compass, Coins, Briefcase, Shield, User, Settings, LogOut, Gift, Trophy, Flame, Users, CalendarDays, Ticket } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { PATHS } from '@/routing/paths';
 import { Logo } from '../common/Logo';
@@ -15,6 +15,7 @@ import { useAdminStatus } from '@/hooks/useAdminStatus';
 // Navigation items for the hamburger/mobile menu
 const menuNavItems = [
   { id: 'deals', label: 'Hot Deals', path: PATHS.ALL_DEALS, icon: Flame },
+  { id: 'events', label: 'Discover Events', path: PATHS.DISCOVER_EVENTS, icon: CalendarDays },
   { id: 'leaderboard', label: 'Leaderboard', path: PATHS.LEADERBOARD, icon: Trophy },
   { id: 'referral', label: 'Referrals', path: PATHS.REFERRALS, icon: Users },
   { id: 'gamification', label: 'Coins & Rewards', path: PATHS.GAMIFICATION, icon: Coins },
@@ -207,6 +208,14 @@ export const Header = () => {
                           >
                             <Gift className="h-4 w-4 text-neutral-400" />
                             Loyalty Wallet
+                          </Link>
+                          <Link
+                            to={PATHS.MY_TICKETS}
+                            onClick={() => setIsHamburgerMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 transition-colors hover:bg-neutral-50"
+                          >
+                            <Ticket className="h-4 w-4 text-neutral-400" />
+                            My Tickets
                           </Link>
                           <Link
                             to={PATHS.SETTINGS}
