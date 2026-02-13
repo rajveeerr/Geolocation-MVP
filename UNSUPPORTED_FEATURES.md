@@ -112,6 +112,26 @@
 
 ---
 
+## ❌ Event Detail Page — Unsupported Features
+
+> These apply specifically to the **EventDetailPage** (`/events/:eventId`).
+
+### E1. Event Merchandise
+- **Figma shows:** 3 product cards (Midnight Oversized Hoodie $65, Vanguard Street Cap $24 × 2) with "BEST SELLER" badges, heart/save icon, "+ ADD TO BASKET" button
+- **Backend status:** No `EventProduct` / merchandise model in Prisma. No event merchandise endpoints.
+- **Frontend status:** Rendered as disabled placeholder cards with a "Coming Soon" overlay. Matches Figma layout but is non-functional.
+- **Action needed:** Create `EventProduct` model: `{ id, eventId, name, description, imageUrl, price, originalPrice, stockQuantity, category, isBestSeller, isActive }`. Add CRUD endpoints under `/api/events/:id/merchandise`. Wire to EventDetailPage.
+- **Onboarding requirement:** Event organizer adds merchandise items during event creation (v2)
+
+### E2. Per-Artist Bios / Livestream Data in Lineup
+- **Figma shows:** Artist avatars with names and roles in "THE LINEUP" section
+- **Backend status:** No `EventPerformer` or `EventLineupSlot` model. Lineup is inferred from event organizer + merchant + tags. No per-artist bio, social links, or livestream data.
+- **Frontend status:** Lineup section renders organizer as headliner (red ring per Figma), merchant as venue partner, and tags as featured acts. No bios or social links.
+- **Action needed:** Create `EventPerformer` model: `{ id, eventId, name, role, bio, avatarUrl, socialUrl, isHeadliner, sortOrder }`. Add to event create/update endpoints.
+- **Onboarding requirement:** Event organizer adds performer details during event creation
+
+---
+
 ## ⚠️ Partially Supported Features
 
 ### A. Events Tab
