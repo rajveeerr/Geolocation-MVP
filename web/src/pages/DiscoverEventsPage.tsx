@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
@@ -16,16 +16,12 @@ import {
   Clock,
   Music,
   Star,
-  Users,
-  ArrowRight,
   Loader2,
   Zap,
-  ShieldCheck,
 } from 'lucide-react';
 import {
   useDiscoverEvents,
   useBrowseEvents,
-  type EventDetail,
 } from '@/hooks/useEventDetail';
 import {
   useTicketmasterSearch,
@@ -35,6 +31,7 @@ import {
   type TicketmasterVenue,
   type TicketmasterAttraction,
 } from '@/hooks/useTickets';
+import { EventCard } from '@/components/events/EventCard';
 import { PATHS } from '@/routing/paths';
 import { cn } from '@/lib/utils';
 
@@ -56,31 +53,7 @@ function formatTime(dateStr: string) {
   });
 }
 
-function getLowestPrice(event: EventDetail): string {
-  if (event.isFreeEvent) return 'Free';
-  const prices = event.ticketTiers
-    ?.filter((t) => t.isActive && t.price > 0)
-    .map((t) => t.price);
-  if (!prices || prices.length === 0) return 'Free';
-  const min = Math.min(...prices);
-  return `$${min.toFixed(0)}`;
-}
-
-function getEventTypeLabel(eventType: string): string {
-  const map: Record<string, string> = {
-    CONCERT: 'Concert',
-    FESTIVAL: 'Festival',
-    COMEDY: 'Comedy',
-    SPORTS: 'Sports',
-    FOOD_AND_DRINK: 'Food & Drink',
-    NIGHTLIFE: 'Nightlife',
-    ARTS: 'Arts',
-    NETWORKING: 'Networking',
-    WORKSHOP: 'Workshop',
-    OTHER: 'Event',
-  };
-  return map[eventType] || eventType.replace(/_/g, ' ');
-}
+/* getLowestPrice & getEventTypeLabel moved to shared EventCard component */
 
 /* ─── Tab config ───────────────────────────────────────────────── */
 
@@ -116,274 +89,9 @@ const SORT_OPTIONS = [
 ];
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   Local Event Card  — matches EventDetailPage aesthetic
+   LocalEventCard & HybridEventCard → replaced by shared EventCard
+   from @/components/events/EventCard
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-function LocalEventCard({ event }: { event: EventDetail }) {
-  const navigate = useNavigate();
-  const price = getLowestPrice(event);
-  const typeLabel = getEventTypeLabel(event.eventType);
-  const spotsLeft =
-    event.maxAttendees && event.maxAttendees > 0
-      ? event.maxAttendees - event.currentAttendees
-      : null;
-
-  return (
-    <div
-      onClick={() =>
-        navigate(PATHS.EVENT_DETAIL.replace(':eventId', String(event.id)))
-      }
-      className="group cursor-pointer bg-white rounded-2xl border border-neutral-200 overflow-hidden hover:border-[#B91C1C]/30 hover:shadow-lg hover:shadow-red-900/5 transition-all duration-200"
-    >
-      {/* Image */}
-      <div className="relative aspect-[16/10] overflow-hidden bg-neutral-100">
-        {event.coverImageUrl ? (
-          <img
-            src={event.coverImageUrl}
-            alt={event.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600';
-            }}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
-            <Ticket className="w-10 h-10 text-neutral-300" />
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-
-        {/* Top-left: type badge */}
-        <div className="absolute top-3 left-3 flex items-center gap-2">
-          <span className="bg-[#1a1a2e] text-white text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
-            {typeLabel}
-          </span>
-          {event.isFreeEvent && (
-            <span className="bg-emerald-600 text-white text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
-              Free
-            </span>
-          )}
-        </div>
-
-        {/* Top-right: price */}
-        {!event.isFreeEvent && (
-          <span className="absolute top-3 right-3 bg-white text-[#1a1a2e] text-xs font-black px-2.5 py-1 rounded-full shadow-sm">
-            From {price}
-          </span>
-        )}
-
-        {/* Bottom-left: date badge */}
-        <div className="absolute bottom-3 left-3">
-          <span className="bg-white/90 backdrop-blur-sm text-[#1a1a2e] text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5">
-            <Calendar className="h-3 w-3 text-[#B91C1C]" />
-            {formatDate(event.startDate)}
-          </span>
-        </div>
-
-        {/* Sold out / low spots */}
-        {event.isSoldOut && (
-          <div className="absolute bottom-3 right-3">
-            <span className="bg-[#B91C1C] text-white text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
-              Sold Out
-            </span>
-          </div>
-        )}
-        {!event.isSoldOut && spotsLeft !== null && spotsLeft <= 20 && (
-          <div className="absolute bottom-3 right-3">
-            <span className="bg-amber-500 text-white text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
-              {spotsLeft} left
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="p-4">
-        <h3 className="font-heading text-base font-bold text-[#1a1a2e] group-hover:text-[#B91C1C] transition-colors line-clamp-1">
-          {event.title}
-        </h3>
-
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
-          <span className="flex items-center gap-1 text-xs text-neutral-500">
-            <Clock className="w-3.5 h-3.5 text-[#8B1A1A]" />
-            {formatTime(event.startDate)}
-          </span>
-          {event.venueName && (
-            <span className="flex items-center gap-1 text-xs text-neutral-500">
-              <MapPin className="w-3.5 h-3.5 text-[#8B1A1A]" />
-              <span className="line-clamp-1">{event.venueName}</span>
-            </span>
-          )}
-          {event.currentAttendees > 0 && (
-            <span className="flex items-center gap-1 text-xs text-neutral-500">
-              <Users className="w-3.5 h-3.5 text-[#8B1A1A]" />
-              {event.currentAttendees} going
-            </span>
-          )}
-        </div>
-
-        {event.shortDescription && (
-          <p className="text-xs text-neutral-400 mt-2 line-clamp-2 leading-relaxed">
-            {event.shortDescription}
-          </p>
-        )}
-
-        {/* Tags */}
-        {event.tags && event.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mt-3">
-            {event.tags.slice(0, 3).map((tag) => (
-              <span
-                key={tag}
-                className="text-[9px] font-bold uppercase tracking-wider bg-neutral-100 text-neutral-500 px-2 py-0.5 rounded"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Footer: organizer + CTA */}
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-neutral-100">
-          <div className="flex items-center gap-2 min-w-0">
-            {event.organizer?.avatarUrl ? (
-              <img
-                src={event.organizer.avatarUrl}
-                alt={event.organizer.name || ''}
-                className="h-5 w-5 rounded-full object-cover"
-              />
-            ) : (
-              <div className="h-5 w-5 rounded-full bg-neutral-200 flex items-center justify-center">
-                <span className="text-[8px] font-bold text-neutral-400">
-                  {(event.organizer?.name || 'O').charAt(0).toUpperCase()}
-                </span>
-              </div>
-            )}
-            <span className="text-[10px] font-medium text-neutral-400 truncate">
-              {event.organizer?.name || 'Organizer'}
-            </span>
-            {event.merchant && (
-              <ShieldCheck className="h-3 w-3 text-[#B91C1C] flex-shrink-0" />
-            )}
-          </div>
-          <span className="text-[10px] font-bold text-[#B91C1C] uppercase tracking-wider flex items-center gap-1 flex-shrink-0">
-            View
-            <ArrowRight className="h-3 w-3" />
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   Hybrid Event Card (from /discover — can be local or TM)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-function HybridEventCard({ event }: { event: any }) {
-  const navigate = useNavigate();
-  const isLocal = event.source !== 'ticketmaster';
-  const imageUrl =
-    event.coverImageUrl ||
-    event.images?.find((i: any) => i.width > 400)?.url ||
-    event.images?.[0]?.url;
-
-  const handleClick = () => {
-    if (isLocal) {
-      navigate(PATHS.EVENT_DETAIL.replace(':eventId', String(event.id)));
-    } else if (event.url) {
-      window.open(event.url, '_blank', 'noopener,noreferrer');
-    }
-  };
-
-  return (
-    <div
-      onClick={handleClick}
-      className="group cursor-pointer bg-white rounded-2xl border border-neutral-200 overflow-hidden hover:border-[#B91C1C]/30 hover:shadow-lg hover:shadow-red-900/5 transition-all duration-200"
-    >
-      <div className="relative aspect-[16/10] overflow-hidden bg-neutral-100">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={event.title || event.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600';
-            }}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
-            <Ticket className="w-10 h-10 text-neutral-300" />
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-
-        {/* Source badge */}
-        <div className="absolute top-3 left-3">
-          {event.source === 'ticketmaster' ? (
-            <span className="bg-blue-600 text-white text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full flex items-center gap-1">
-              <Globe className="h-3 w-3" />
-              Ticketmaster
-            </span>
-          ) : (
-            <span className="bg-[#B91C1C] text-white text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full flex items-center gap-1">
-              <Sparkles className="h-3 w-3" />
-              Local
-            </span>
-          )}
-        </div>
-
-        {event.isFreeEvent && (
-          <span className="absolute top-3 right-3 bg-emerald-600 text-white text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
-            Free
-          </span>
-        )}
-
-        <div className="absolute bottom-3 left-3">
-          <span className="bg-white/90 backdrop-blur-sm text-[#1a1a2e] text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5">
-            <Calendar className="h-3 w-3 text-[#B91C1C]" />
-            {formatDate(event.startDate || event.dates?.start?.localDate || '')}
-          </span>
-        </div>
-      </div>
-
-      <div className="p-4">
-        <h3 className="font-heading text-base font-bold text-[#1a1a2e] group-hover:text-[#B91C1C] transition-colors line-clamp-1">
-          {event.title || event.name}
-        </h3>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
-          {(event.venueName || event._embedded?.venues?.[0]?.name) && (
-            <span className="flex items-center gap-1 text-xs text-neutral-500">
-              <MapPin className="w-3.5 h-3.5 text-[#8B1A1A]" />
-              <span className="line-clamp-1">
-                {event.venueName || event._embedded?.venues?.[0]?.name}
-              </span>
-            </span>
-          )}
-        </div>
-        {(event.shortDescription || event.description) && (
-          <p className="text-xs text-neutral-400 mt-2 line-clamp-2 leading-relaxed">
-            {event.shortDescription || event.description}
-          </p>
-        )}
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-neutral-100">
-          <span className="text-[10px] font-medium text-neutral-400">
-            {event.source === 'ticketmaster' ? 'via Ticketmaster' : 'Local Event'}
-          </span>
-          <span className="text-[10px] font-bold text-[#B91C1C] uppercase tracking-wider flex items-center gap-1">
-            {isLocal ? 'View' : 'Open'}
-            {isLocal ? (
-              <ArrowRight className="h-3 w-3" />
-            ) : (
-              <ExternalLink className="h-3 w-3" />
-            )}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    Ticketmaster Event Card
@@ -968,9 +676,9 @@ export function DiscoverEventsPage() {
                     events found
                   </p>
                 </div>
-                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                   {browseQuery.data.events.map((event) => (
-                    <LocalEventCard key={event.id} event={event} />
+                    <EventCard key={event.id} event={event} />
                   ))}
                 </div>
                 <Pagination
@@ -1017,9 +725,9 @@ export function DiscoverEventsPage() {
                 </div>
 
                 {discoverQuery.data.events.length > 0 ? (
-                  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                     {discoverQuery.data.events.map((event: any) => (
-                      <HybridEventCard key={event.id} event={event} />
+                      <EventCard key={event.id} event={event} />
                     ))}
                   </div>
                 ) : (
