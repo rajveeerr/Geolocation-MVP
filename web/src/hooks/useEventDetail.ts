@@ -489,7 +489,7 @@ export function getMockEvents(): EventDetail[] {
 
 // ─── Hooks ──────────────────────────────────────────────────────────
 
-export function useEventDetail(eventId: number | undefined) {
+export function useEventDetail(eventId: string | number | undefined) {
   return useQuery<EventDetail>({
     queryKey: ['event', eventId],
     queryFn: async () => {
@@ -503,7 +503,9 @@ export function useEventDetail(eventId: number | undefined) {
       } catch (error) {
         // If API fails, fall back to mock data for development
         console.warn('Event API call failed, using mock data:', error);
-        return createMockEvent(eventId!);
+        // Ensure we pass a number to createMockEvent if possible, or default to 1
+        const mockId = typeof eventId === 'number' ? eventId : 1;
+        return createMockEvent(mockId);
       }
     },
     enabled: !!eventId,
@@ -512,7 +514,7 @@ export function useEventDetail(eventId: number | undefined) {
   });
 }
 
-export function usePurchaseTickets(eventId: number) {
+export function usePurchaseTickets(eventId: string | number) {
   const queryClient = useQueryClient();
 
   return useMutation<PurchaseResponse, Error, { ticketTierId: number; quantity: number; paymentIntentId?: string }>({
@@ -530,7 +532,7 @@ export function usePurchaseTickets(eventId: number) {
   });
 }
 
-export function useJoinWaitlist(eventId: number) {
+export function useJoinWaitlist(eventId: string | number) {
   const queryClient = useQueryClient();
 
   return useMutation<WaitlistResponse, Error, { phoneNumber?: string; smsNotifications?: boolean }>({

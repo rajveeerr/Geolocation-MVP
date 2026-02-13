@@ -337,7 +337,7 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
           {/* ─────────────── BOTTOM CONTENT ─────────────── */}
           <div className="absolute bottom-0 inset-x-0 p-3.5 space-y-1.5">
             {/* Title — large bold serif-like */}
-            <h3 className="text-white text-[22px] font-extrabold leading-[1.15] line-clamp-2 drop-shadow-lg tracking-tight">
+            <h3 className="text-white text-[22px] font-extrabold leading-[1.15] truncate drop-shadow-lg tracking-tight">
               {deal.name}
             </h3>
 

@@ -29,7 +29,6 @@ import {
   Lock,
   X,
   Heart,
-  ShoppingCart,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -44,6 +43,7 @@ import { useToast } from '@/hooks/use-toast';
 import { PATHS } from '@/routing/paths';
 import { useDealsByCategory } from '@/hooks/useDealsByCategory';
 import type { Deal } from '@/data/deals';
+import { NewDealCard } from '@/components/landing/NewDealCard';
 
 /* ─── Extended types ──────────────────────────────────────────── */
 
@@ -979,72 +979,6 @@ function MerchandiseSection() {
    SECTION 9 — Deals Near This Event  (real data from API)
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-function NearbyDealCard({ deal }: { deal: Deal }) {
-  const navigate = useNavigate();
-  const categoryLabel =
-    typeof deal.category === 'string'
-      ? deal.category.replace(/_/g, ' ')
-      : (deal.category as { name?: string })?.name || 'DEAL';
-
-  const price = deal.originalValue ?? 15;
-
-  return (
-    <div
-      onClick={() => navigate(PATHS.DEAL_DETAIL.replace(':dealId', deal.id))}
-      className="min-w-[200px] max-w-[200px] rounded-2xl overflow-hidden cursor-pointer group flex-shrink-0 border-2 border-transparent hover:border-blue-300 transition-all bg-white shadow-sm"
-    >
-      {/* Image area */}
-      <div className="relative h-[260px] overflow-hidden">
-        <img
-          src={deal.image || deal.images?.[0] || 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400'}
-          alt={deal.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400';
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-        {/* Top: category badge + price */}
-        <div className="absolute top-3 left-2 right-2 flex items-center justify-between">
-          <span className="bg-[#1a1a2e] text-white text-[7px] font-bold uppercase tracking-wider px-2 py-0.5 rounded flex items-center gap-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-            {categoryLabel}
-          </span>
-          <span className="bg-white text-[#1a1a2e] text-[10px] font-black px-2 py-0.5 rounded shadow-sm">
-            ${price.toFixed(2)}
-          </span>
-        </div>
-
-        {/* Bottom content */}
-        <div className="absolute bottom-3 left-2 right-2">
-          <h4 className="text-white font-black text-xs uppercase tracking-wide leading-tight">
-            {deal.name}
-          </h4>
-          {deal.description && (
-            <p className="text-white/60 text-[9px] mt-0.5 line-clamp-2 leading-snug">
-              {deal.description}
-            </p>
-          )}
-          <span className="inline-block mt-1.5 bg-[#B91C1C] text-white text-[7px] font-bold uppercase tracking-wider px-2 py-0.5 rounded">
-            Best Deal Within 5 Miles
-          </span>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="px-3 py-2.5 flex items-center justify-between border-t border-neutral-100">
-        <span className="text-[10px] font-bold text-[#1a1a2e]">Add to Basket</span>
-        <div className="flex items-center gap-2">
-          <ShoppingCart className="h-3.5 w-3.5 text-neutral-400" />
-          <Heart className="h-3.5 w-3.5 text-neutral-400" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function DealsNearEvent({ event }: { event: FullEventDetail }) {
   const { data: nearbyDeals, isLoading } = useDealsByCategory({
     latitude: event.latitude || undefined,
@@ -1070,18 +1004,20 @@ function DealsNearEvent({ event }: { event: FullEventDetail }) {
       </div>
 
       {isLoading ? (
-        <div className="flex gap-4 overflow-hidden">
+        <div className="flex gap-6 overflow-hidden">
           {[1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
-              className="min-w-[200px] h-[300px] rounded-2xl bg-neutral-100 animate-pulse flex-shrink-0"
+              className="w-[280px] sm:w-[300px] h-[420px] rounded-2xl bg-neutral-100 animate-pulse flex-shrink-0"
             />
           ))}
         </div>
       ) : nearbyDeals && nearbyDeals.length > 0 ? (
-        <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-1 px-1">
+        <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 -mx-1 px-1">
           {nearbyDeals.slice(0, 8).map((deal) => (
-            <NearbyDealCard key={deal.id} deal={deal} />
+            <div key={deal.id} className="w-[280px] flex-shrink-0 sm:w-[300px]">
+              <NewDealCard deal={deal} />
+            </div>
           ))}
         </div>
       ) : (
