@@ -160,8 +160,8 @@ const BountyEarnCard = ({
 
   const endTimeFormatted = deal.endTime
     ? new Date(deal.endTime)
-        .toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
-        .toUpperCase()
+      .toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+      .toUpperCase()
     : null;
 
   const recentSavers = deal.socialProof?.recentSavers || [];

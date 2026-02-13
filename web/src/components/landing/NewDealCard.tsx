@@ -266,7 +266,7 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
           {/* ─────────────── TOP CAPSULE (Pricing Pill) ─────────────── */}
           {(hasDiscount || categoryLabel || dtype !== 'standard') && (
             <div className="absolute top-10 left-3 right-3 z-20">
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full px-3 py-1.5 max-w-full">
+              <div className="inline-flex items-center gap-2 bg-[#1a1a2e]/80 backdrop-blur-sm rounded-full px-3 py-1.5 max-w-full">
                 {/* Deal type badge for non-standard types */}
                 {dtype !== 'standard' && (
                   <span className="text-white font-bold text-[10px] leading-tight uppercase tracking-wider flex-shrink-0">
@@ -363,8 +363,8 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
               {(isActive || isUpcoming) && timeDisplay ? (
                 <div className="flex items-center gap-1 bg-[#8B1A1A]/80 backdrop-blur-sm rounded-full px-2.5 py-1.5 flex-shrink-0">
                   <Clock className="w-3 h-3 text-white/80" />
-                  <span className="text-white text-[10px] font-semibold leading-tight">
-                    {isUpcoming ? 'Starts' : 'Ends'}<br />{timeDisplay}
+                  <span className="text-white text-[10px] font-semibold leading-tight whitespace-nowrap">
+                    {isUpcoming ? 'Starts' : 'Ends'} {timeDisplay}
                   </span>
                 </div>
               ) : dtype === 'recurring' && deal.recurringDays && deal.recurringDays.length > 0 ? (
