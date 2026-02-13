@@ -58,7 +58,7 @@ const HeroGallery = ({ images, title }: { images: string[]; title: string }) => 
 
   if (!images.length) {
     return (
-      <div className="w-full aspect-square rounded-2xl bg-neutral-900 flex items-center justify-center">
+      <div className="w-full aspect-[9/16] max-h-[600px] rounded-2xl bg-neutral-900 flex items-center justify-center">
         <span className="text-neutral-500 text-sm">No images available</span>
       </div>
     );
@@ -70,7 +70,7 @@ const HeroGallery = ({ images, title }: { images: string[]; title: string }) => 
   return (
     <div className="space-y-3">
       {/* Main image */}
-      <div className="relative w-full aspect-square rounded-3xl overflow-hidden bg-black">
+      <div className="relative w-full aspect-[9/16] max-h-[600px] rounded-3xl overflow-hidden bg-black">
         <img
           src={images[idx]}
           alt={`${title} ${idx + 1}`}

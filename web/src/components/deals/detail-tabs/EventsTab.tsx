@@ -1,6 +1,6 @@
 // web/src/components/deals/detail-tabs/EventsTab.tsx
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   Calendar,
   Music,
@@ -8,9 +8,12 @@ import {
   Users,
   TrendingUp,
   Loader2,
-  ArrowRight,
+  ArrowUpRight,
   PartyPopper,
   Beer,
+  Heart,
+  Ticket,
+  Clock,
 } from 'lucide-react';
 import type { DetailedDeal } from '@/hooks/useDealDetail';
 import { useBrowseEvents } from '@/hooks/useEventDetail';
@@ -27,7 +30,6 @@ function formatEventDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
-    year: 'numeric',
   });
 }
 
@@ -39,10 +41,12 @@ function formatEventTime(dateStr: string) {
   });
 }
 
-function getLowestPrice(event: EventDetail): number | null {
+function getLowestPrice(event: EventDetail): string {
+  if (event.isFreeEvent) return 'FREE';
   const activeTiers = event.ticketTiers?.filter((t) => t.isActive) ?? [];
-  if (activeTiers.length === 0) return null;
-  return Math.min(...activeTiers.map((t) => t.price));
+  if (activeTiers.length === 0) return 'FREE';
+  const min = Math.min(...activeTiers.map((t) => t.price));
+  return `$${min.toFixed(2)}`;
 }
 
 function getTotalAvailable(event: EventDetail): number {
@@ -52,22 +56,34 @@ function getTotalAvailable(event: EventDetail): number {
   );
 }
 
-const EVENT_TYPE_ICONS: Record<string, React.ElementType> = {
-  PARTY: PartyPopper,
-  BAR_CRAWL: Beer,
-  FESTIVAL: Music,
-  RSVP_EVENT: Calendar,
-  SPORTS_TOURNAMENT: TrendingUp,
-  WAGBT: Users,
-};
-
 const EVENT_TYPE_LABELS: Record<string, string> = {
   PARTY: 'Party',
   BAR_CRAWL: 'Bar Crawl',
   FESTIVAL: 'Festival',
   RSVP_EVENT: 'RSVP Event',
+  CONCERT: 'Concert',
+  COMEDY: 'Comedy',
+  NIGHTLIFE: 'Nightlife',
+  SPORTS: 'Sports',
   SPORTS_TOURNAMENT: 'Tournament',
+  FOOD_AND_DRINK: 'Food & Drink',
+  ARTS: 'Arts',
+  NETWORKING: 'Networking',
+  WORKSHOP: 'Workshop',
   WAGBT: 'WAGBT',
+  OTHER: 'Event',
+};
+
+const EVENT_TYPE_DOT_COLORS: Record<string, string> = {
+  PARTY: 'bg-pink-500',
+  BAR_CRAWL: 'bg-amber-500',
+  FESTIVAL: 'bg-purple-500',
+  RSVP_EVENT: 'bg-blue-500',
+  CONCERT: 'bg-[#B91C1C]',
+  COMEDY: 'bg-yellow-500',
+  NIGHTLIFE: 'bg-indigo-500',
+  SPORTS: 'bg-emerald-500',
+  FOOD_AND_DRINK: 'bg-orange-500',
 };
 
 const FILTERS = [
@@ -78,109 +94,154 @@ const FILTERS = [
   { id: 'FESTIVAL', label: 'Festival', icon: Music },
 ];
 
-// ─── Event Card ──────────────────────────────────────────────────
+// ─── Tall Event Card (matches Figma menu card design) ─────────────
 
 function EventCard({ event }: { event: EventDetail }) {
-  const lowestPrice = getLowestPrice(event);
+  const navigate = useNavigate();
+  const price = getLowestPrice(event);
   const available = getTotalAvailable(event);
   const isTrending = event.trendingScore > 50 || event.socialProofCount > 20;
-  const Icon = EVENT_TYPE_ICONS[event.eventType] ?? Calendar;
+  const typeLabel = EVENT_TYPE_LABELS[event.eventType] ?? event.eventType?.replace(/_/g, ' ');
+  const dotColor = EVENT_TYPE_DOT_COLORS[event.eventType] ?? 'bg-[#B91C1C]';
 
   return (
-    <Link
-      to={`/events/${event.id}`}
-      className="group bg-white rounded-xl overflow-hidden border border-neutral-200 hover:shadow-lg hover:border-neutral-300 transition-all duration-200"
+    <div
+      className="relative rounded-3xl overflow-hidden shadow-lg cursor-pointer group aspect-[3/5]"
+      onClick={() => navigate(`/events/${event.id}`)}
     >
-      {/* Image */}
-      <div className="relative h-44 overflow-hidden">
-        <img
-          src={
-            event.coverImageUrl ||
-            'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600'
-          }
-          alt={event.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-
-        {/* Type badge */}
-        <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-lg">
-          <Icon className="h-3.5 w-3.5 text-neutral-700" />
-          <span className="text-[11px] font-semibold text-neutral-700">
-            {EVENT_TYPE_LABELS[event.eventType] ?? event.eventType}
-          </span>
+      {/* Full-bleed cover image */}
+      {event.coverImageUrl ? (
+        <div className="absolute inset-0">
+          <img
+            src={event.coverImageUrl}
+            alt={event.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src =
+                'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600';
+            }}
+          />
         </div>
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-neutral-800">
+          <Ticket className="h-8 w-8 text-neutral-600" />
+        </div>
+      )}
 
-        {/* Trending badge */}
-        {isTrending && (
-          <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-brand text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">
-            <TrendingUp className="h-3 w-3" />
-            Trending
-          </div>
-        )}
-
-        {/* Price tag */}
-        <div className="absolute bottom-2.5 right-2.5">
-          {event.isFreeEvent ? (
-            <span className="bg-success text-white text-xs font-bold px-2.5 py-1 rounded-lg">
-              Free
-            </span>
-          ) : lowestPrice !== null ? (
-            <span className="bg-white/90 backdrop-blur-sm text-neutral-900 text-xs font-bold px-2.5 py-1 rounded-lg">
-              From ${lowestPrice.toFixed(0)}
-            </span>
-          ) : null}
+      {/* Category badge – top left */}
+      <div className="absolute top-3.5 left-3.5 z-10">
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md">
+          <div className={cn('w-2 h-2 rounded-full', dotColor)} />
+          <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+            {typeLabel}
+          </span>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-4">
-        <h4 className="font-heading font-bold text-base text-neutral-900 mb-1 line-clamp-1 group-hover:text-brand transition-colors">
+      {/* Price badge – top right */}
+      <div className="absolute top-3.5 right-3.5 z-10">
+        <span className="px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-white font-bold text-sm">
+          {price}
+        </span>
+      </div>
+
+      {/* Trending badge */}
+      {isTrending && (
+        <div className="absolute top-14 right-3.5 z-10">
+          <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/80 backdrop-blur-md">
+            <TrendingUp className="h-3 w-3 text-white" />
+            <span className="text-[9px] font-bold text-white uppercase tracking-wider">
+              Trending
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Sold out overlay */}
+      {available <= 0 && !event.isFreeEvent && (
+        <div className="absolute top-14 left-3.5 z-10">
+          <span className="px-2.5 py-1 rounded-full bg-red-600/80 backdrop-blur-md text-white text-[9px] font-bold uppercase tracking-wider">
+            Sold Out
+          </span>
+        </div>
+      )}
+
+      {/* Bottom gradient – smooth progressive fade */}
+      <div className="absolute inset-x-0 bottom-0 h-3/5 pointer-events-none bg-gradient-to-t from-black via-black/70 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none bg-gradient-to-t from-black/50 to-transparent" />
+
+      {/* Bottom content – all on top of image */}
+      <div className="absolute inset-x-0 bottom-0 z-10 p-5 flex flex-col">
+        {/* Title */}
+        <h4 className="text-xl font-black text-white uppercase tracking-wide leading-tight line-clamp-2">
           {event.title}
         </h4>
-        {event.shortDescription && (
-          <p className="text-xs text-neutral-500 mb-3 line-clamp-2">{event.shortDescription}</p>
-        )}
 
-        <div className="space-y-1.5 mb-3">
-          <div className="flex items-center gap-1.5 text-xs text-neutral-600">
-            <Calendar className="h-3.5 w-3.5 text-neutral-400 flex-shrink-0" />
-            <span>{formatEventDate(event.startDate)}</span>
-            <span className="text-neutral-300">•</span>
-            <span>{formatEventTime(event.startDate)}</span>
-          </div>
-
+        {/* Date + Time + Venue */}
+        <div className="mt-1.5 space-y-0.5">
+          <p className="text-[13px] text-white/60 flex items-center gap-1.5">
+            <Calendar className="h-3 w-3 flex-shrink-0" />
+            {formatEventDate(event.startDate)} · {formatEventTime(event.startDate)}
+          </p>
           {event.venueName && (
-            <div className="flex items-center gap-1.5 text-xs text-neutral-600">
-              <MapPin className="h-3.5 w-3.5 text-neutral-400 flex-shrink-0" />
+            <p className="text-[13px] text-white/50 flex items-center gap-1.5">
+              <MapPin className="h-3 w-3 flex-shrink-0" />
               <span className="truncate">{event.venueName}</span>
-            </div>
+            </p>
           )}
         </div>
 
-        {/* Footer row */}
-        <div className="flex items-center justify-between pt-3 border-t border-neutral-100">
-          <div className="flex items-center gap-3 text-xs text-neutral-500">
+        {/* Short desc */}
+        {event.shortDescription && (
+          <p className="text-[13px] text-white/40 mt-1.5 line-clamp-2 leading-relaxed">
+            {event.shortDescription}
+          </p>
+        )}
+
+        {/* Spots + attendees info */}
+        {(event.currentAttendees > 0 || (available > 0 && available <= 30)) && (
+          <div className="flex items-center gap-3 mt-2">
             {event.currentAttendees > 0 && (
-              <span className="flex items-center gap-1">
-                <Users className="h-3.5 w-3.5" />
+              <span className="text-[11px] text-white/50 flex items-center gap-1">
+                <Users className="h-3 w-3" />
                 {event.currentAttendees} going
               </span>
             )}
-            {available > 0 && available <= 20 && (
-              <span className="text-brand font-semibold">{available} left</span>
-            )}
-            {available <= 0 && (
-              <span className="text-neutral-400 font-semibold">Sold out</span>
+            {available > 0 && available <= 30 && (
+              <span className="text-[11px] text-amber-400 font-semibold">
+                {available} spots left
+              </span>
             )}
           </div>
-          <span className="text-xs font-semibold text-brand flex items-center gap-1 group-hover:gap-2 transition-all">
-            View
-            <ArrowRight className="h-3 w-3" />
-          </span>
+        )}
+
+        {/* Action row – matches menu card "Add to Basket" design */}
+        <div className="flex items-center gap-2.5 mt-4">
+          {/* View Event – main CTA */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/events/${event.id}`);
+            }}
+            className="flex-1 flex items-center justify-between pl-5 pr-1.5 py-1.5 rounded-full bg-white group/cta"
+          >
+            <span className="text-sm font-semibold text-[#1a1a2e] whitespace-nowrap">
+              View Event
+            </span>
+            <span className="w-10 h-10 rounded-full bg-[#1a1a2e] flex items-center justify-center flex-shrink-0 group-hover/cta:scale-110 transition-transform">
+              <ArrowUpRight className="h-[17px] w-[17px] text-white" />
+            </span>
+          </button>
+          {/* Heart – separate white circle */}
+          <button
+            onClick={(e) => e.stopPropagation()}
+            className="w-11 h-11 rounded-full bg-white flex items-center justify-center flex-shrink-0 hover:bg-neutral-100 transition-colors"
+          >
+            <Heart className="h-[18px] w-[18px] text-[#1a1a2e]" />
+          </button>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
 
@@ -198,20 +259,20 @@ export const EventsTab = ({ deal }: EventsTabProps) => {
   const events = data?.events ?? [];
 
   return (
-    <div className="space-y-6">
-      {/* Events Banner */}
-      <div className="bg-gradient-to-r from-brand to-pink-600 rounded-2xl p-6 text-white">
-        <div className="flex items-center gap-3 mb-2">
-          <Calendar className="h-7 w-7" />
-          <h2 className="text-2xl font-heading font-bold">Upcoming Events</h2>
+    <div className="space-y-5">
+      {/* Section header – matches "CURATED MENU" style */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-heading text-2xl font-black text-[#1a1a2e] uppercase tracking-tight">
+            Upcoming Events
+          </h2>
+          <p className="text-neutral-400 text-sm mt-0.5">
+            Live happenings near this venue
+          </p>
         </div>
-        <p className="text-white/80 text-sm">
-          Discover exclusive events, live music, bar crawls, and more. Book your tickets and earn
-          bonus points!
-        </p>
       </div>
 
-      {/* Filter Buttons */}
+      {/* Filter pills */}
       <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
         {FILTERS.map((filter) => {
           const Icon = filter.icon;
@@ -220,10 +281,10 @@ export const EventsTab = ({ deal }: EventsTabProps) => {
               key={filter.id}
               onClick={() => setSelectedFilter(filter.id)}
               className={cn(
-                'px-4 py-2 rounded-lg font-medium whitespace-nowrap flex items-center gap-2 transition-all duration-200 text-sm',
+                'px-4 py-2 rounded-full font-medium whitespace-nowrap flex items-center gap-2 transition-all duration-200 text-sm border',
                 selectedFilter === filter.id
-                  ? 'bg-brand text-white shadow-sm'
-                  : 'bg-white border border-neutral-200 text-neutral-700 hover:bg-neutral-50',
+                  ? 'bg-[#1a1a2e] text-white border-[#1a1a2e]'
+                  : 'bg-white border-neutral-200 text-neutral-600 hover:border-neutral-400',
               )}
             >
               {Icon && <Icon className="h-4 w-4" />}
@@ -235,14 +296,14 @@ export const EventsTab = ({ deal }: EventsTabProps) => {
 
       {/* Loading state */}
       {isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-6 w-6 animate-spin text-brand" />
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="h-6 w-6 animate-spin text-[#B91C1C]" />
         </div>
       )}
 
-      {/* Events Grid */}
+      {/* Events Grid – tall cards like menu items */}
       {!isLoading && events.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {events.map((event) => (
             <EventCard key={event.id} event={event} />
           ))}
@@ -251,7 +312,7 @@ export const EventsTab = ({ deal }: EventsTabProps) => {
 
       {/* Empty state */}
       {!isLoading && events.length === 0 && (
-        <div className="text-center py-12">
+        <div className="text-center py-16">
           <Calendar className="h-12 w-12 text-neutral-300 mx-auto mb-3" />
           <h3 className="font-heading font-bold text-lg text-neutral-700 mb-1">No events found</h3>
           <p className="text-sm text-neutral-500">
@@ -263,7 +324,7 @@ export const EventsTab = ({ deal }: EventsTabProps) => {
       )}
 
       {/* Private Events Section */}
-      <div className="bg-neutral-50 rounded-xl p-6 border border-neutral-200">
+      <div className="bg-neutral-50 rounded-2xl p-6 border border-neutral-200">
         <h3 className="font-heading text-lg font-bold text-neutral-900 mb-3">
           Host Your Private Event
         </h3>
@@ -279,25 +340,15 @@ export const EventsTab = ({ deal }: EventsTabProps) => {
             'AV equipment and entertainment options',
           ].map((item) => (
             <li key={item} className="flex items-start gap-2">
-              <span className="text-brand mt-0.5">•</span>
+              <span className="text-[#B91C1C] mt-0.5">•</span>
               <span>{item}</span>
             </li>
           ))}
         </ul>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button className="h-10 rounded-lg bg-brand text-white font-semibold text-sm hover:bg-brand-hover transition-colors">
-            Inquire About Private Events
-          </button>
-          <div className="bg-white rounded-lg p-4 border border-neutral-200">
-            <p className="text-sm font-semibold text-neutral-800 mb-1">Contact Events Team</p>
-            <p className="text-xs text-neutral-600">
-              events@{deal.merchant.businessName.toLowerCase().replace(/\s+/g, '')}.com
-            </p>
-            <p className="text-xs text-neutral-600">
-              {deal.merchant.phoneNumber || '(555) 123-4568'}
-            </p>
-          </div>
-        </div>
+        <button className="w-full h-12 rounded-full bg-[#1a1a2e] text-white font-semibold text-sm hover:bg-[#2a2a3e] transition-colors flex items-center justify-center gap-2">
+          <Calendar className="h-4 w-4" />
+          Inquire About Private Events
+        </button>
       </div>
     </div>
   );
