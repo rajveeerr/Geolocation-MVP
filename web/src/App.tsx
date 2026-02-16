@@ -161,6 +161,7 @@ import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
 import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
 import { PaymentCancelPage } from './pages/PaymentCancelPage';
+import { NudgeToast } from '@/components/nudges/NudgeToast';
 const LoyaltyHistoryPage = React.lazy(() =>
   import('./pages/LoyaltyHistoryPage').then((m) => ({ default: m.LoyaltyHistoryPage }))
 );
@@ -178,6 +179,12 @@ const MerchantLoyaltyCustomersPage = React.lazy(() =>
 );
 const MerchantLoyaltyTransactionsPage = React.lazy(() =>
   import('./pages/merchant/loyalty/MerchantLoyaltyTransactionsPage').then((m) => ({ default: m.MerchantLoyaltyTransactionsPage }))
+);
+const AdminNudgesPage = React.lazy(() =>
+  import('./pages/admin/AdminNudgesPage').then((m) => ({ default: m.AdminNudgesPage }))
+);
+const NudgeHistoryPage = React.lazy(() =>
+  import('./pages/NudgeHistoryPage').then((m) => ({ default: m.NudgeHistoryPage }))
 );
 
 const DefaultLayout = () => {
@@ -199,563 +206,587 @@ function App() {
       <RedirectProvider>
         <AuthProvider>
           <CityProvider>
-          <ModalProvider>
-            <Routes>
-              <Route element={<DefaultLayout />}>
-                <Route path={PATHS.HOME} element={<HomePage />} />
-                <Route path="/auth/callback" element={<AuthCallbackPage />} />
-                <Route path={PATHS.LOGIN} element={<LoginPage />} />
-                <Route path={PATHS.SIGNUP} element={<SignUpPage />} />
+            <ModalProvider>
+              <Routes>
+                <Route element={<DefaultLayout />}>
+                  <Route path={PATHS.HOME} element={<HomePage />} />
+                  <Route path="/auth/callback" element={<AuthCallbackPage />} />
+                  <Route path={PATHS.LOGIN} element={<LoginPage />} />
+                  <Route path={PATHS.SIGNUP} element={<SignUpPage />} />
+                  <Route
+                    path={PATHS.PROFILE}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <ProfilePage />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route path={PATHS.ABOUT} element={<AboutPage />} />
+                  <Route
+                    path={PATHS.STREAK_LEADERBOARD}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <StreakLeaderboardPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={PATHS.LEADERBOARD}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <LeaderboardPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={PATHS.LEADERBOARD_COMPREHENSIVE}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <ComprehensiveLeaderboardPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route path={PATHS.ALL_DEALS} element={<AllDealsPage />} />
+                  <Route
+                    path={PATHS.LOYALTY_HISTORY}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <LoyaltyHistoryPage />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path={PATHS.REFERRALS}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <ReferralPage />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path={PATHS.GAMIFICATION}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <GamificationPage />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path={PATHS.HEIST_HISTORY}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <HeistHistoryPage />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path={PATHS.HEIST_NOTIFICATIONS}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <HeistNotificationsPage />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path={PATHS.HEIST_ITEM_SHOP}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <HeistItemShopPage />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path={PATHS.DEAL_DETAIL}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <DealDetailPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={PATHS.EVENT_DETAIL}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <EventDetailPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={PATHS.DISCOVER_EVENTS}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <DiscoverEventsPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={PATHS.MY_TICKETS}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MyTicketsPage />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/deals/:dealId/menu/:itemId"
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MenuDetailPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/deals/hidden/:code"
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <HiddenDealPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={PATHS.FOR_BUSINESSES}
+                    element={<ForBusinessesPage />}
+                  />
+                  <Route path={PATHS.PRIVACY} element={<PrivacyPage />} />
+                  <Route path={PATHS.TERMS} element={<TermsPage />} />
+                  <Route path={PATHS.PAYMENT_SUCCESS} element={<PaymentSuccessPage />} />
+                  <Route path={PATHS.PAYMENT_CANCEL} element={<PaymentCancelPage />} />
+                </Route>
+
                 <Route
-                  path={PATHS.PROFILE}
+                  path={PATHS.MERCHANT_DASHBOARD}
                   element={
                     <ProtectedRoute>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <ProfilePage />
-                      </Suspense>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantDashboardPage />
+                        </Suspense>
+                      </MerchantLayout>
                     </ProtectedRoute>
                   }
                 />
-                <Route path={PATHS.ABOUT} element={<AboutPage />} />
                 <Route
-                  path={PATHS.STREAK_LEADERBOARD}
-                  element={
-                    <Suspense fallback={<LoadingOverlay />}>
-                      <StreakLeaderboardPage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path={PATHS.LEADERBOARD}
-                  element={
-                    <Suspense fallback={<LoadingOverlay />}>
-                      <LeaderboardPage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path={PATHS.LEADERBOARD_COMPREHENSIVE}
-                  element={
-                    <Suspense fallback={<LoadingOverlay />}>
-                      <ComprehensiveLeaderboardPage />
-                    </Suspense>
-                  }
-                />
-                <Route path={PATHS.ALL_DEALS} element={<AllDealsPage />} />
-                <Route
-                  path={PATHS.LOYALTY_HISTORY}
+                  path={PATHS.MERCHANT_DEALS}
                   element={
                     <ProtectedRoute>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <LoyaltyHistoryPage />
-                      </Suspense>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantMyDealsPage />
+                        </Suspense>
+                      </MerchantLayout>
                     </ProtectedRoute>
                   }
                 />
                 <Route
-                  path={PATHS.REFERRALS}
+                  path="/merchant/deals/create/*"
                   element={
                     <ProtectedRoute>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <ReferralPage />
-                      </Suspense>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <CreateDealPage />
+                        </Suspense>
+                      </MerchantLayout>
                     </ProtectedRoute>
                   }
                 />
                 <Route
-                  path={PATHS.GAMIFICATION}
+                  path="/merchant/deals/:dealId/edit"
                   element={
                     <ProtectedRoute>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <GamificationPage />
-                      </Suspense>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <DealEditPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                {/* Merchant Events */}
+                <Route
+                  path={PATHS.MERCHANT_EVENTS}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantMyEventsPage />
+                        </Suspense>
+                      </MerchantLayout>
                     </ProtectedRoute>
                   }
                 />
                 <Route
-                  path={PATHS.HEIST_HISTORY}
+                  path={PATHS.MERCHANT_EVENTS_CREATE}
                   element={
                     <ProtectedRoute>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <HeistHistoryPage />
-                      </Suspense>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <CreateEventPage />
+                        </Suspense>
+                      </MerchantLayout>
                     </ProtectedRoute>
                   }
                 />
                 <Route
-                  path={PATHS.HEIST_NOTIFICATIONS}
+                  path={PATHS.MERCHANT_EVENTS_MANAGE}
                   element={
                     <ProtectedRoute>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <HeistNotificationsPage />
-                      </Suspense>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <EventManagePage />
+                        </Suspense>
+                      </MerchantLayout>
                     </ProtectedRoute>
                   }
                 />
                 <Route
-                  path={PATHS.HEIST_ITEM_SHOP}
+                  path={PATHS.MERCHANT_EVENTS_CHECKIN}
                   element={
                     <ProtectedRoute>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <HeistItemShopPage />
-                      </Suspense>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <EventCheckInPage />
+                        </Suspense>
+                      </MerchantLayout>
                     </ProtectedRoute>
                   }
                 />
                 <Route
-                  path={PATHS.DEAL_DETAIL}
-                  element={
-                    <Suspense fallback={<LoadingOverlay />}>
-                      <DealDetailPage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path={PATHS.EVENT_DETAIL}
-                  element={
-                    <Suspense fallback={<LoadingOverlay />}>
-                      <EventDetailPage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path={PATHS.DISCOVER_EVENTS}
-                  element={
-                    <Suspense fallback={<LoadingOverlay />}>
-                      <DiscoverEventsPage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path={PATHS.MY_TICKETS}
+                  path="/merchant/onboarding/*"
                   element={
                     <ProtectedRoute>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <MyTicketsPage />
-                      </Suspense>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantOnboardingPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path={PATHS.MERCHANT_KICKBACKS}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <KickbackEarningsPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path={PATHS.MERCHANT_STORES}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <StoreManagementPage />
+                        </Suspense>
+                      </MerchantLayout>
                     </ProtectedRoute>
                   }
                 />
                 <Route
-                  path="/deals/:dealId/menu/:itemId"
+                  path={PATHS.MERCHANT_STORES_CREATE}
                   element={
-                    <Suspense fallback={<LoadingOverlay />}>
-                      <MenuDetailPage />
-                    </Suspense>
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <StoreFormPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
                   }
                 />
                 <Route
-                  path="/deals/hidden/:code"
+                  path="/merchant/stores/:storeId/edit"
                   element={
-                    <Suspense fallback={<LoadingOverlay />}>
-                      <HiddenDealPage />
-                    </Suspense>
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <StoreFormPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
                   }
                 />
                 <Route
-                  path={PATHS.FOR_BUSINESSES}
-                  element={<ForBusinessesPage />}
+                  path="/merchant/stores/:storeId"
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <StoreDetailPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
                 />
-                <Route path={PATHS.PRIVACY} element={<PrivacyPage />} />
-                <Route path={PATHS.TERMS} element={<TermsPage />} />
-                <Route path={PATHS.PAYMENT_SUCCESS} element={<PaymentSuccessPage />} />
-                <Route path={PATHS.PAYMENT_CANCEL} element={<PaymentCancelPage />} />
-              </Route>
 
-              <Route
-                path={PATHS.MERCHANT_DASHBOARD}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <MerchantDashboardPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={PATHS.MERCHANT_DEALS}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <MerchantMyDealsPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/merchant/deals/create/*"
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <CreateDealPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/merchant/deals/:dealId/edit"
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <DealEditPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              {/* Merchant Events */}
-              <Route
-                path={PATHS.MERCHANT_EVENTS}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <MerchantMyEventsPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={PATHS.MERCHANT_EVENTS_CREATE}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <CreateEventPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={PATHS.MERCHANT_EVENTS_MANAGE}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <EventManagePage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={PATHS.MERCHANT_EVENTS_CHECKIN}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <EventCheckInPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/merchant/onboarding/*"
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <MerchantOnboardingPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path={PATHS.MERCHANT_MENU}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MenuManagementPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_MENU_CREATE}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MenuItemFormPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/merchant/menu/:itemId/edit"
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MenuItemFormPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/merchant/menu/:itemId"
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MenuItemDetailPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_MENU_COLLECTIONS}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MenuCollectionsPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
 
-              <Route
-                path={PATHS.MERCHANT_KICKBACKS}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <KickbackEarningsPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path={PATHS.MERCHANT_ANALYTICS}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantAnalyticsPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
 
-              <Route
-                path={PATHS.MERCHANT_STORES}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <StoreManagementPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={PATHS.MERCHANT_STORES_CREATE}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <StoreFormPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/merchant/stores/:storeId/edit"
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <StoreFormPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/merchant/stores/:storeId"
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <StoreDetailPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
+                {/* Merchant Loyalty */}
+                <Route
+                  path={PATHS.MERCHANT_LOYALTY_SETUP}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantLoyaltySetupPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_LOYALTY_PROGRAM}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantLoyaltyProgramPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_LOYALTY_ANALYTICS}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantLoyaltyAnalyticsPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_LOYALTY_CUSTOMERS}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantLoyaltyCustomersPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_LOYALTY_TRANSACTIONS}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantLoyaltyTransactionsPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
 
-              <Route
-                path={PATHS.MERCHANT_MENU}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <MenuManagementPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={PATHS.MERCHANT_MENU_CREATE}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <MenuItemFormPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/merchant/menu/:itemId/edit"
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <MenuItemFormPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/merchant/menu/:itemId"
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <MenuItemDetailPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={PATHS.MERCHANT_MENU_COLLECTIONS}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <MenuCollectionsPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path={PATHS.ADMIN_LOGIN}
+                  element={
+                    <Suspense fallback={<LoadingOverlay />}>
+                      <AdminLoginPage />
+                    </Suspense>
+                  }
+                />
 
-              <Route
-                path={PATHS.MERCHANT_ANALYTICS}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
+                <Route
+                  path={PATHS.ADMIN_DASHBOARD}
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminLayout />
+                    </AdminProtectedRoute>
+                  }
+                >
+                  <Route
+                    index
+                    element={
                       <Suspense fallback={<LoadingOverlay />}>
-                        <MerchantAnalyticsPage />
+                        <CityManagementDashboard />
                       </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
+                    }
+                  />
+                  <Route
+                    path={PATHS.ADMIN_MERCHANTS}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MerchantApprovalDashboard />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={PATHS.ADMIN_CITIES}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <CityManagementDashboard />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/admin/city-analytics"
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <CityAnalyticsDashboard />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={PATHS.ADMIN_CUSTOMERS}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <CustomerManagementPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/admin/customers/:customerId"
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <CustomerDetailPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/admin/analytics"
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <AdminDashboardPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/admin/master-data"
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <AdminDashboardPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={PATHS.ADMIN_NUDGES}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <AdminNudgesPage />
+                      </Suspense>
+                    }
+                  />
+                </Route>
 
-              {/* Merchant Loyalty */}
-              <Route
-                path={PATHS.MERCHANT_LOYALTY_SETUP}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <MerchantLoyaltySetupPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={PATHS.MERCHANT_LOYALTY_PROGRAM}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <MerchantLoyaltyProgramPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={PATHS.MERCHANT_LOYALTY_ANALYTICS}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <MerchantLoyaltyAnalyticsPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={PATHS.MERCHANT_LOYALTY_CUSTOMERS}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <MerchantLoyaltyCustomersPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={PATHS.MERCHANT_LOYALTY_TRANSACTIONS}
-                element={
-                  <ProtectedRoute>
-                    <MerchantLayout>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <MerchantLoyaltyTransactionsPage />
-                      </Suspense>
-                    </MerchantLayout>
-                  </ProtectedRoute>
-                }
-              />
+                {/* Consumer Nudge History */}
+                <Route element={<DefaultLayout />}>
+                  <Route
+                    path={PATHS.NUDGE_HISTORY}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <NudgeHistoryPage />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                </Route>
 
-              <Route
-                path={PATHS.ADMIN_LOGIN}
-                element={
-                  <Suspense fallback={<LoadingOverlay />}>
-                    <AdminLoginPage />
-                  </Suspense>
-                }
-              />
-
-              <Route
-                path={PATHS.ADMIN_DASHBOARD}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminLayout />
-                  </AdminProtectedRoute>
-                }
-              >
-                <Route
-                  index
-                  element={
-                    <Suspense fallback={<LoadingOverlay />}>
-                      <CityManagementDashboard />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path={PATHS.ADMIN_MERCHANTS}
-                  element={
-                    <Suspense fallback={<LoadingOverlay />}>
-                      <MerchantApprovalDashboard />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path={PATHS.ADMIN_CITIES}
-                  element={
-                    <Suspense fallback={<LoadingOverlay />}>
-                      <CityManagementDashboard />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="/admin/city-analytics"
-                  element={
-                    <Suspense fallback={<LoadingOverlay />}>
-                      <CityAnalyticsDashboard />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path={PATHS.ADMIN_CUSTOMERS}
-                  element={
-                    <Suspense fallback={<LoadingOverlay />}>
-                      <CustomerManagementPage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="/admin/customers/:customerId"
-                  element={
-                    <Suspense fallback={<LoadingOverlay />}>
-                      <CustomerDetailPage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="/admin/analytics"
-                  element={
-                    <Suspense fallback={<LoadingOverlay />}>
-                      <AdminDashboardPage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="/admin/master-data"
-                  element={
-                    <Suspense fallback={<LoadingOverlay />}>
-                      <AdminDashboardPage />
-                    </Suspense>
-                  }
-                />
-              </Route>
-              <Route path={PATHS.NOT_FOUND} element={<NotFoundPage />} />
-            </Routes>
-            <Toaster />
-          </ModalProvider>
+                <Route path={PATHS.NOT_FOUND} element={<NotFoundPage />} />
+              </Routes>
+              <NudgeToast />
+              <Toaster />
+            </ModalProvider>
           </CityProvider>
         </AuthProvider>
       </RedirectProvider>

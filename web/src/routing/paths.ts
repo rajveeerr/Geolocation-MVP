@@ -67,6 +67,10 @@ export const PATHS = {
   ADMIN_MERCHANTS: '/admin/merchants',
   ADMIN_CITIES: '/admin/cities', // New route for the city management table
   ADMIN_CUSTOMERS: '/admin/customers', // New route for the customer list
+  ADMIN_NUDGES: '/admin/nudges',
+
+  // Nudges (consumer)
+  NUDGE_HISTORY: '/nudges/history',
 
   // Merchant Events
   MERCHANT_EVENTS: '/merchant/events',
