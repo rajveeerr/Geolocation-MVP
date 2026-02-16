@@ -261,7 +261,7 @@ export function useTicketmasterSearch(params: {
       }
       return res.data;
     },
-    enabled: enabled && !!searchParams.keyword,
+    enabled: enabled && !!(searchParams.keyword || searchParams.city),
     staleTime: 5 * 60 * 1000,
     retry: 1,
   });
@@ -322,7 +322,7 @@ export function useTicketmasterVenues(params: {
       }
       return res.data;
     },
-    enabled: enabled && !!searchParams.keyword,
+    enabled: enabled && !!(searchParams.keyword || searchParams.city),
     staleTime: 10 * 60 * 1000,
     retry: 1,
   });

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -18,7 +18,10 @@ import {
   Star,
   Loader2,
   Zap,
+  Navigation,
 } from 'lucide-react';
+import { useGeolocation } from '@/hooks/useGeolocation';
+import { CityPickerModal } from '@/components/events/CityPickerModal';
 import {
   useDiscoverEvents,
   useBrowseEvents,
@@ -32,7 +35,8 @@ import {
   type TicketmasterAttraction,
 } from '@/hooks/useTickets';
 import { EventCard } from '@/components/events/EventCard';
-import { PATHS } from '@/routing/paths';
+import type { HybridEvent } from '@/components/events/EventCard';
+
 import { cn } from '@/lib/utils';
 
 /* ─── helpers ──────────────────────────────────────────────────── */
@@ -94,89 +98,23 @@ const SORT_OPTIONS = [
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   Ticketmaster Event Card
+   TMEventCard → replaced by shared EventCard
+   Adapter converts TicketmasterEvent → HybridEvent shape
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-function TMEventCard({ event }: { event: TicketmasterEvent }) {
-  const venue = event._embedded?.venues?.[0];
-  const image =
-    event.images?.find((i) => i.width > 500)?.url ?? event.images?.[0]?.url;
-  const dateStr =
-    event.dates.start.dateTime || event.dates.start.localDate;
-
-  return (
-    <a
-      href={event.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group block bg-white rounded-2xl border border-neutral-200 overflow-hidden hover:border-blue-300 hover:shadow-lg hover:shadow-blue-900/5 transition-all duration-200"
-    >
-      <div className="relative aspect-[16/10] overflow-hidden bg-neutral-100">
-        {image ? (
-          <img
-            src={image}
-            alt={event.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
-            <Globe className="w-10 h-10 text-neutral-300" />
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-
-        <span className="absolute top-3 left-3 bg-blue-600 text-white text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full flex items-center gap-1">
-          <ExternalLink className="h-3 w-3" />
-          Ticketmaster
-        </span>
-
-        {event.priceRanges?.[0] && (
-          <span className="absolute top-3 right-3 bg-white text-[#1a1a2e] text-xs font-black px-2.5 py-1 rounded-full shadow-sm">
-            ${event.priceRanges[0].min}+
-          </span>
-        )}
-
-        <div className="absolute bottom-3 left-3">
-          <span className="bg-white/90 backdrop-blur-sm text-[#1a1a2e] text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5">
-            <Calendar className="h-3 w-3 text-blue-600" />
-            {formatDate(dateStr)}
-          </span>
-        </div>
-      </div>
-
-      <div className="p-4">
-        <h3 className="font-heading text-base font-bold text-[#1a1a2e] group-hover:text-blue-600 transition-colors line-clamp-1">
-          {event.name}
-        </h3>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
-          {event.dates.start.localTime && (
-            <span className="flex items-center gap-1 text-xs text-neutral-500">
-              <Clock className="w-3.5 h-3.5 text-blue-500" />
-              {event.dates.start.localTime.slice(0, 5)}
-            </span>
-          )}
-          {venue && (
-            <span className="flex items-center gap-1 text-xs text-neutral-500">
-              <MapPin className="w-3.5 h-3.5 text-blue-500" />
-              <span className="line-clamp-1">{venue.name}</span>
-            </span>
-          )}
-        </div>
-        {event.priceRanges?.[0] && (
-          <p className="text-xs text-emerald-600 font-semibold mt-2">
-            ${event.priceRanges[0].min} – ${event.priceRanges[0].max}{' '}
-            {event.priceRanges[0].currency}
-          </p>
-        )}
-        <div className="flex items-center justify-end mt-3 pt-3 border-t border-neutral-100">
-          <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider flex items-center gap-1">
-            Buy on Ticketmaster
-            <ExternalLink className="h-3 w-3" />
-          </span>
-        </div>
-      </div>
-    </a>
-  );
+function tmToHybrid(event: TicketmasterEvent): HybridEvent {
+  return {
+    id: event.id,
+    name: event.name,
+    coverImageUrl: null,
+    images: event.images?.map((i) => ({ url: i.url, width: i.width })),
+    dates: event.dates ? { start: event.dates.start } : undefined,
+    venueName: event._embedded?.venues?.[0]?.name ?? null,
+    _embedded: event._embedded as HybridEvent['_embedded'],
+    source: 'ticketmaster' as const,
+    url: event.url,
+    priceRanges: event.priceRanges?.map((p) => ({ min: p.min, max: p.max, currency: p.currency })),
+  };
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -387,20 +325,34 @@ export function DiscoverEventsPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabKey>('all');
   const [searchInput, setSearchInput] = useState('');
-  const [cityInput, setCityInput] = useState('');
   const [keyword, setKeyword] = useState('');
   const [city, setCity] = useState('');
   const [page, setPage] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
+  const [showCityPicker, setShowCityPicker] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [eventType, setEventType] = useState('');
   const [sortBy, setSortBy] = useState('startDate');
   const [freeOnly, setFreeOnly] = useState(false);
 
+  /* ─── Auto-detect location ───────────────────────── */
+  const geo = useGeolocation(true);
+
+  // Auto-fill city once detected (only if user hasn't manually set one)
+  useEffect(() => {
+    if (geo.location?.city && !city) {
+      setCity(geo.location.city);
+    }
+  }, [geo.location?.city]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleSearch = () => {
     setKeyword(searchInput);
-    setCity(cityInput);
+    setPage(0);
+  };
+
+  const handleCitySelect = (selectedCity: string) => {
+    setCity(selectedCity);
     setPage(0);
   };
 
@@ -412,7 +364,7 @@ export function DiscoverEventsPage() {
   /* ─── All Events (local backend browse) ──────────────── */
   const browseQuery = useBrowseEvents({
     eventType: eventType || undefined,
-    search: keyword || undefined,
+    search: keyword || city || undefined,
     isFreeEvent: freeOnly ? true : undefined,
     page: page + 1, // backend is 1-indexed
     limit: 12,
@@ -426,9 +378,9 @@ export function DiscoverEventsPage() {
     city: activeTab === 'discover' ? city : undefined,
     startDate: activeTab === 'discover' ? startDate : undefined,
     endDate: activeTab === 'discover' ? endDate : undefined,
-    page,
-    size: 20,
-    includeTicketmaster: true,
+    page: activeTab === 'discover' ? page : undefined,
+    size: activeTab === 'discover' ? 20 : undefined,
+    includeTicketmaster: activeTab === 'discover' ? true : undefined,
   });
 
   /* ─── Ticketmaster Events ───────────────────────────── */
@@ -439,14 +391,14 @@ export function DiscoverEventsPage() {
     endDate: activeTab === 'ticketmaster' ? endDate : undefined,
     page,
     size: 20,
-    enabled: activeTab === 'ticketmaster' && !!keyword,
+    enabled: activeTab === 'ticketmaster' && !!(keyword || city),
   });
 
   /* ─── Ticketmaster Venues ───────────────────────────── */
   const venuesQuery = useTicketmasterVenues({
     keyword: activeTab === 'venues' ? keyword : undefined,
     city: activeTab === 'venues' ? city : undefined,
-    enabled: activeTab === 'venues' && !!keyword,
+    enabled: activeTab === 'venues' && !!(keyword || city),
   });
 
   /* ─── Ticketmaster Attractions ──────────────────────── */
@@ -491,17 +443,40 @@ export function DiscoverEventsPage() {
               className="w-full pl-10 pr-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm text-[#1a1a2e] placeholder-neutral-400 focus:outline-none focus:border-[#B91C1C] focus:ring-1 focus:ring-[#B91C1C]/20 transition-colors"
             />
           </div>
-          <div className="relative">
-            <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
-            <input
-              type="text"
-              placeholder="City"
-              value={cityInput}
-              onChange={(e) => setCityInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="w-full sm:w-44 pl-10 pr-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm text-[#1a1a2e] placeholder-neutral-400 focus:outline-none focus:border-[#B91C1C] focus:ring-1 focus:ring-[#B91C1C]/20 transition-colors"
-            />
-          </div>
+
+          {/* City picker button */}
+          <button
+            onClick={() => setShowCityPicker(true)}
+            className={cn(
+              'flex items-center gap-2 sm:w-52 px-3.5 py-2.5 rounded-xl text-sm border transition-all active:scale-[0.98]',
+              city
+                ? 'bg-red-50 border-[#B91C1C]/20 text-[#B91C1C]'
+                : 'bg-neutral-50 border-neutral-200 text-neutral-400 hover:border-neutral-300 hover:text-[#1a1a2e]',
+            )}
+          >
+            {geo.isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
+            ) : city ? (
+              <MapPin className="w-4 h-4 flex-shrink-0" />
+            ) : (
+              <Navigation className="w-4 h-4 flex-shrink-0" />
+            )}
+            <span className="truncate font-medium">
+              {geo.isLoading
+                ? 'Detecting…'
+                : city || 'Select City'}
+            </span>
+            {city && (
+              <X
+                className="w-3.5 h-3.5 ml-auto flex-shrink-0 hover:text-[#9B2020] transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCity('');
+                }}
+              />
+            )}
+          </button>
+
           <button
             onClick={handleSearch}
             className="px-6 py-2.5 bg-[#B91C1C] hover:bg-[#9B2020] rounded-xl text-sm font-bold text-white transition-colors active:scale-[0.98] shadow-sm"
@@ -520,6 +495,23 @@ export function DiscoverEventsPage() {
             <Filter className="w-4 h-4" />
           </button>
         </div>
+
+        {/* ─── City Picker Modal ────────────────────────────── */}
+        <CityPickerModal
+          isOpen={showCityPicker}
+          onClose={() => setShowCityPicker(false)}
+          onSelect={handleCitySelect}
+          currentCity={city}
+          detectedCity={geo.location?.city || null}
+          isDetecting={geo.isLoading}
+          onDetectLocation={() => {
+            geo.detect();
+            if (geo.location?.city) {
+              handleCitySelect(geo.location.city);
+              setShowCityPicker(false);
+            }
+          }}
+        />
 
         {/* ─── Filters ─────────────────────────────────────── */}
         <AnimatePresence>
@@ -764,9 +756,9 @@ export function DiscoverEventsPage() {
 
                 {tmEventsQuery.data.events.length > 0 ? (
                   <>
-                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                       {tmEventsQuery.data.events.map((event) => (
-                        <TMEventCard key={event.id} event={event} />
+                        <EventCard key={event.id} event={tmToHybrid(event)} />
                       ))}
                     </div>
                     {tmEventsQuery.data.pagination.totalPages && (

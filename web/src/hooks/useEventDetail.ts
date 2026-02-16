@@ -586,6 +586,7 @@ export function useDiscoverEvents(params: {
       }
       return res.data;
     },
+    enabled: !!(params.keyword || params.city),
     staleTime: 3 * 60 * 1000,
     retry: 1,
   });
