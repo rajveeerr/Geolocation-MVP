@@ -271,7 +271,6 @@ function NudgeForm({ initial, onClose }: NudgeFormProps) {
                     </label>
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
                         {NUDGE_TYPES.map(({ value, label }) => {
-                            const meta = NUDGE_TYPE_LABELS[value];
                             return (
                                 <button
                                     key={value}
@@ -286,7 +285,7 @@ function NudgeForm({ initial, onClose }: NudgeFormProps) {
                                             : 'border-neutral-200 text-neutral-600 hover:border-neutral-300',
                                     )}
                                 >
-                                    {meta.emoji} {label}
+                                    {label}
                                 </button>
                             );
                         })}
@@ -589,7 +588,7 @@ function NudgeCard({
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                         <span className={cn('inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium', meta.color)}>
-                            {meta.emoji} {meta.label}
+                            {meta.label}
                         </span>
                         <span className={cn(
                             'rounded-full px-2 py-0.5 text-xs font-medium',
@@ -754,7 +753,7 @@ function AdminNudgesContent() {
                                     : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200',
                             )}
                         >
-                            {NUDGE_TYPE_LABELS[value].emoji} {label} ({count})
+                            {label} ({count})
                         </button>
                     );
                 })}

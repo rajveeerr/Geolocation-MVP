@@ -2,6 +2,18 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiPost, apiPut, apiDelete } from '@/services/api';
 import type { Nudge, NudgeType, NudgeFrequency, UserNudge } from './useNudges';
 
+/**
+ * Backend returns { success, data: payload } and ApiClient wraps it as
+ * { success, data: { success, data: payload } }. This helper extracts
+ * the actual payload reliably.
+ */
+function extractPayload<T>(raw: unknown): T {
+    if (raw && typeof raw === 'object' && 'data' in raw) {
+        return (raw as Record<string, unknown>).data as T;
+    }
+    return raw as T;
+}
+
 // ─── Types ──────────────────────────────────────────────────────────
 
 export interface NudgeAnalytics {
@@ -49,7 +61,8 @@ export function useAdminNudges() {
             if (!res.success || !res.data) {
                 throw new Error(res.error || 'Failed to fetch nudges');
             }
-            return res.data;
+            const arr = extractPayload<Nudge[]>(res.data);
+            return Array.isArray(arr) ? arr : [];
         },
         staleTime: 60 * 1000,
     });
@@ -67,7 +80,7 @@ export function useAdminNudge(id: number | undefined) {
             if (!res.success || !res.data) {
                 throw new Error(res.error || 'Failed to fetch nudge');
             }
-            return res.data;
+            return extractPayload<NudgeWithDeliveries>(res.data);
         },
         enabled: !!id,
         staleTime: 30 * 1000,
@@ -87,7 +100,7 @@ export function useCreateNudge() {
             if (!res.success || !res.data) {
                 throw new Error(res.error || 'Failed to create nudge');
             }
-            return res.data;
+            return extractPayload<Nudge>(res.data);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['adminNudges'] });
@@ -108,7 +121,7 @@ export function useUpdateNudge(id: number) {
             if (!res.success || !res.data) {
                 throw new Error(res.error || 'Failed to update nudge');
             }
-            return res.data;
+            return extractPayload<Nudge>(res.data);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['adminNudges'] });
@@ -130,7 +143,7 @@ export function useDeleteNudge() {
             if (!res.success || !res.data) {
                 throw new Error(res.error || 'Failed to delete nudge');
             }
-            return res.data;
+            return extractPayload<{ message: string }>(res.data);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['adminNudges'] });
@@ -152,7 +165,7 @@ export function useTestNudge() {
             if (!res.success || !res.data) {
                 throw new Error(res.error || 'Failed to send test nudge');
             }
-            return res.data;
+            return extractPayload<{ message: string }>(res.data);
         },
     });
 }
@@ -169,7 +182,7 @@ export function useNudgeAnalyticsOverview() {
             if (!res.success || !res.data) {
                 throw new Error(res.error || 'Failed to fetch analytics');
             }
-            return res.data;
+            return extractPayload<NudgeAnalytics>(res.data);
         },
         staleTime: 2 * 60 * 1000,
     });
@@ -187,7 +200,7 @@ export function useNudgeAnalytics(id: number | undefined) {
             if (!res.success || !res.data) {
                 throw new Error(res.error || 'Failed to fetch nudge analytics');
             }
-            return res.data;
+            return extractPayload<NudgeAnalytics>(res.data);
         },
         enabled: !!id,
         staleTime: 2 * 60 * 1000,

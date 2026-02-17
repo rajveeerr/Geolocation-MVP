@@ -71,6 +71,7 @@ export const PATHS = {
 
   // Nudges (consumer)
   NUDGE_HISTORY: '/nudges/history',
+  NOTIFICATIONS: '/notifications',
 
   // Merchant Events
   MERCHANT_EVENTS: '/merchant/events',

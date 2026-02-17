@@ -1,58 +1,134 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, X, ExternalLink } from 'lucide-react';
-import { useNudgeHistory, useEngageNudge, NUDGE_TYPE_LABELS, type UserNudge } from '@/hooks/useNudges';
+import { useEngageNudge, NUDGE_TYPE_LABELS, type UserNudge, type NudgeType } from '@/hooks/useNudges';
+import { useAuth } from '@/context/useAuth';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { apiGet } from '@/services/api';
 import { cn } from '@/lib/utils';
+import { useSocket, type SocketNudge } from '@/hooks/useSocket';
 
 /**
  * NudgeToast — mounts globally in the app layout.
  *
- * Polls /api/nudges/history every 60 s and shows new, unopened nudges
- * as animated toast notifications. When the WebSocket client is set up
- * in the future, this component can subscribe to real-time `nudge` events
- * instead of polling.
+ * Uses WebSocket for instant delivery, with a one-time HTTP fetch
+ * on mount to pick up any nudges missed while offline.
  */
 
-const POLL_INTERVAL = 60_000; // 60 seconds
 const AUTO_DISMISS_MS = 8_000; // 8 seconds
 
+const FALLBACK_META = { label: 'Notification', emoji: '', color: 'text-neutral-600 bg-neutral-50 border-neutral-200' };
+
+function getMeta(type: NudgeType) {
+    return NUDGE_TYPE_LABELS[type] ?? FALLBACK_META;
+}
+
 export function NudgeToast() {
-    const { data: nudges, refetch } = useNudgeHistory(10);
+    const { user } = useAuth();
+    const isAuthenticated = !!user;
+    const queryClient = useQueryClient();
+
+    // ── WebSocket connection ────────────────────────────────
+    const { onNudge } = useSocket();
+
+    // ── One-time fetch for missed nudges while offline ──────
+    const { data: nudges } = useQuery<UserNudge[]>({
+        queryKey: ['nudgeHistory', 10],
+        queryFn: async () => {
+            const res = await apiGet<UserNudge[]>('/nudges/history?limit=10');
+            if (!res.success || !res.data) return [];
+            const inner = res.data as any;
+            const arr = Array.isArray(inner) ? inner : Array.isArray(inner?.data) ? inner.data : [];
+            return arr;
+        },
+        enabled: isAuthenticated,
+        staleTime: 60 * 1000,
+        retry: false,
+        throwOnError: false,
+    });
+
     const engageMutation = useEngageNudge();
     const [visibleNudges, setVisibleNudges] = useState<UserNudge[]>([]);
     const seenIdsRef = useRef<Set<number>>(new Set());
 
-    // Poll for new nudges
+    // ── Listen for real-time nudges via WebSocket ───────────
     useEffect(() => {
-        const interval = setInterval(() => {
-            refetch();
-        }, POLL_INTERVAL);
-        return () => clearInterval(interval);
-    }, [refetch]);
+        if (!isAuthenticated) return;
 
-    // Detect new, unopened nudges and show them
+        const unsub = onNudge((socketNudge: SocketNudge) => {
+            // Avoid duplicates
+            if (seenIdsRef.current.has(socketNudge.id)) return;
+            seenIdsRef.current.add(socketNudge.id);
+
+            // Convert socket payload to UserNudge shape for display
+            const fakeUserNudge: UserNudge = {
+                id: socketNudge.id,
+                nudgeId: 0,
+                userId: 0,
+                sentAt: socketNudge.timestamp,
+                deliveredVia: 'websocket',
+                delivered: true,
+                opened: false,
+                openedAt: null,
+                clicked: false,
+                clickedAt: null,
+                dismissed: false,
+                contextData: null,
+                nudge: {
+                    id: 0,
+                    type: socketNudge.type as NudgeType,
+                    title: socketNudge.title,
+                    message: socketNudge.message,
+                    active: true,
+                    frequency: 'ONCE',
+                    triggerCondition: {},
+                    cooldownHours: 0,
+                    activeStartTime: null,
+                    activeEndTime: null,
+                    timeWindowStart: null,
+                    timeWindowEnd: null,
+                    priority: 0,
+                    createdAt: socketNudge.timestamp,
+                    updatedAt: socketNudge.timestamp,
+                    createdBy: null,
+                },
+            };
+
+            setVisibleNudges((prev) => [...prev, fakeUserNudge].slice(-3));
+
+            // Refresh the nudge history cache so the Notifications page is up-to-date
+            queryClient.invalidateQueries({ queryKey: ['nudgeHistory'] });
+        });
+
+        return unsub;
+    }, [isAuthenticated, onNudge, queryClient]);
+
+    // ── Show missed nudges from the initial HTTP fetch ──────
     useEffect(() => {
         if (!nudges) return;
 
         const newNudges = nudges.filter(
-            (n) => !n.opened && !n.dismissed && !seenIdsRef.current.has(n.id),
+            (n) => n.nudge && !n.opened && !n.dismissed && !seenIdsRef.current.has(n.id),
         );
 
         if (newNudges.length > 0) {
             newNudges.forEach((n) => seenIdsRef.current.add(n.id));
-            setVisibleNudges((prev) => [...prev, ...newNudges].slice(-3)); // max 3 toasts
+            setVisibleNudges((prev) => [...prev, ...newNudges].slice(-3));
         }
     }, [nudges]);
 
+    // ── Dismiss / engage ────────────────────────────────────
     const dismiss = useCallback(
         (userNudge: UserNudge, action: 'opened' | 'clicked' | 'dismissed') => {
             setVisibleNudges((prev) => prev.filter((n) => n.id !== userNudge.id));
+
+            // Track engagement via REST (reliable, validates ownership on backend)
             engageMutation.mutate({ userNudgeId: userNudge.id, action });
         },
         [engageMutation],
     );
 
-    // Auto-dismiss after 8s
+    // ── Auto-dismiss after 8s ───────────────────────────────
     useEffect(() => {
         if (visibleNudges.length === 0) return;
 
@@ -66,11 +142,14 @@ export function NudgeToast() {
         return () => clearTimeout(timer);
     }, [visibleNudges, dismiss]);
 
+    if (!isAuthenticated) return null;
+
     return (
         <div className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 max-w-sm">
             <AnimatePresence>
                 {visibleNudges.map((userNudge) => {
-                    const meta = NUDGE_TYPE_LABELS[userNudge.nudge.type];
+                    if (!userNudge.nudge) return null;
+                    const meta = getMeta(userNudge.nudge.type);
                     return (
                         <motion.div
                             key={userNudge.id}
@@ -87,7 +166,7 @@ export function NudgeToast() {
                                 <div className="flex items-start justify-between gap-2">
                                     <div className="flex items-start gap-3 min-w-0">
                                         <div className={cn('mt-0.5 flex h-9 w-9 items-center justify-center rounded-full text-lg', meta.color)}>
-                                            {meta.emoji}
+                                            <Bell className="h-4 w-4" />
                                         </div>
                                         <div className="min-w-0">
                                             <p className="text-sm font-bold text-neutral-900 truncate">
@@ -102,7 +181,7 @@ export function NudgeToast() {
                                         onClick={() => dismiss(userNudge, 'dismissed')}
                                         className="flex-shrink-0 rounded-lg p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
                                     >
-                                        <X className="h-4 w-4" />
+                                        <X className="h-4 w-3" />
                                     </button>
                                 </div>
 

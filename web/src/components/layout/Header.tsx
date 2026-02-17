@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Menu, X, BookOpen, Compass, Coins, Briefcase, Shield, User, Settings, LogOut, Gift, Trophy, Flame, Users, CalendarDays, Ticket } from 'lucide-react';
+import { Menu, X, BookOpen, Compass, Coins, Briefcase, Shield, User, Settings, LogOut, Gift, Trophy, Flame, Users, CalendarDays, Ticket, Bell } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { PATHS } from '@/routing/paths';
 import { Logo } from '../common/Logo';
@@ -11,6 +11,7 @@ import { CitySelector } from './CitySelector';
 import { useGamificationProfile } from '@/hooks/useGamification';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
+import { useNudgeHistory } from '@/hooks/useNudges';
 
 // Navigation items for the hamburger/mobile menu
 const menuNavItems = [
@@ -34,6 +35,10 @@ export const Header = () => {
 
   const hasMerchantProfile = !!merchantData?.data?.merchant;
   const points = gamificationProfile?.coins ?? 0;
+
+  // Unread nudge count for bell badge
+  const { data: nudgeData } = useNudgeHistory(20);
+  const unreadCount = (nudgeData ?? []).filter((n) => !n.opened && !n.clicked && !n.dismissed).length;
 
   // Close hamburger menu on outside click
   useEffect(() => {
@@ -110,6 +115,20 @@ export const Header = () => {
                 <span className="text-sm font-semibold text-amber-700">
                   {points.toLocaleString()} pts
                 </span>
+              </Link>
+            )}
+
+            {/* Notifications bell */}
+            {user && !isLoadingUser && (
+              <Link
+                to={PATHS.NOTIFICATIONS}
+                className="relative flex h-9 w-9 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-neutral-900"
+                aria-label="Notifications"
+              >
+                <Bell className="h-[18px] w-[18px]" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#B91C1C] ring-2 ring-white" />
+                )}
               </Link>
             )}
 
@@ -216,6 +235,19 @@ export const Header = () => {
                           >
                             <Ticket className="h-4 w-4 text-neutral-400" />
                             My Tickets
+                          </Link>
+                          <Link
+                            to={PATHS.NOTIFICATIONS}
+                            onClick={() => setIsHamburgerMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 transition-colors hover:bg-neutral-50"
+                          >
+                            <Bell className="h-4 w-4 text-neutral-400" />
+                            Notifications
+                            {unreadCount > 0 && (
+                              <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#B91C1C] px-1.5 text-[10px] font-bold text-white">
+                                {unreadCount}
+                              </span>
+                            )}
                           </Link>
                           <Link
                             to={PATHS.SETTINGS}
@@ -390,6 +422,19 @@ export const Header = () => {
                   >
                     <Settings className="h-5 w-5 text-neutral-400" />
                     Settings
+                  </Link>
+                  <Link
+                    to={PATHS.NOTIFICATIONS}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                  >
+                    <Bell className="h-5 w-5 text-neutral-400" />
+                    Notifications
+                    {unreadCount > 0 && (
+                      <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#B91C1C] px-1.5 text-[10px] font-bold text-white">
+                        {unreadCount}
+                      </span>
+                    )}
                   </Link>
                 </div>
               )}

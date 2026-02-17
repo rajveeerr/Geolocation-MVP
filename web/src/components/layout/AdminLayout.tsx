@@ -1,7 +1,7 @@
 // web/src/components/layout/AdminLayout.tsx
 import { Outlet, NavLink } from 'react-router-dom';
 import { Logo } from '../common/Logo';
-import { Users, Menu, X, Building, BarChart3, TrendingUp, Award, Database } from 'lucide-react';
+import { Users, Menu, X, Building, BarChart3, TrendingUp, Award, Database, Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routing/paths';
 import { useState } from 'react';
@@ -36,6 +36,7 @@ export const AdminLayout = () => {
                     <AdminSidebarLink to={PATHS.ADMIN_MERCHANTS} icon={<Building className="h-5 w-5" />} label="Merchant Management" />
                     <AdminSidebarLink to="/admin/city-analytics" icon={<Award className="h-5 w-5" />} label="City Analytics" />
                     <AdminSidebarLink to={PATHS.ADMIN_CUSTOMERS} icon={<Users className="h-5 w-5" />} label="Customer Management" />
+                    <AdminSidebarLink to={PATHS.ADMIN_NUDGES} icon={<Bell className="h-5 w-5" />} label="Nudges" />
                     <AdminSidebarLink to="/admin/master-data" icon={<Database className="h-5 w-5" />} label="Master Data" />
                 </nav>
             </aside>
@@ -68,13 +69,14 @@ export const AdminLayout = () => {
                             <AdminSidebarLink to={PATHS.ADMIN_MERCHANTS} icon={<Building className="h-5 w-5" />} label="Merchant Management" />
                             <AdminSidebarLink to="/admin/city-analytics" icon={<Award className="h-5 w-5" />} label="City Analytics" />
                             <AdminSidebarLink to={PATHS.ADMIN_CUSTOMERS} icon={<Users className="h-5 w-5" />} label="Customer Management" />
+                            <AdminSidebarLink to={PATHS.ADMIN_NUDGES} icon={<Bell className="h-5 w-5" />} label="Nudges" />
                             <AdminSidebarLink to="/admin/master-data" icon={<Database className="h-5 w-5" />} label="Master Data" />
                         </nav>
                     </aside>
                 </div>
             )}
 
-            <main className="flex-1 p-8 sm:ml-0">
+            <main className="flex-1 p-8 pt-16 sm:pt-8 sm:ml-0">
                 <Outlet />
             </main>
         </div>

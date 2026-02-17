@@ -1,6 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiPut, apiPost } from '@/services/api';
 
+/**
+ * Backend returns { success, data: payload } and ApiClient wraps it as
+ * { success, data: { success, data: payload } }. This helper extracts
+ * the actual payload reliably.
+ */
+function extractPayload<T>(raw: unknown): T {
+    if (raw && typeof raw === 'object' && 'data' in raw) {
+        return (raw as Record<string, unknown>).data as T;
+    }
+    return raw as T;
+}
+
 // ─── Types ──────────────────────────────────────────────────────────
 
 export type NudgeType =
@@ -97,7 +109,8 @@ export function useNudgeHistory(limit = 50) {
             if (!res.success || !res.data) {
                 throw new Error(res.error || 'Failed to fetch nudge history');
             }
-            return res.data;
+            const arr = extractPayload<UserNudge[]>(res.data);
+            return Array.isArray(arr) ? arr : [];
         },
         staleTime: 60 * 1000, // 1 min
     });
@@ -115,7 +128,7 @@ export function useNudgePreferences() {
             if (!res.success || !res.data) {
                 throw new Error(res.error || 'Failed to fetch nudge preferences');
             }
-            return res.data;
+            return extractPayload<NudgePreferences>(res.data);
         },
         staleTime: 5 * 60 * 1000,
     });
@@ -137,7 +150,7 @@ export function useUpdateNudgePreferences() {
             if (!res.success || !res.data) {
                 throw new Error(res.error || 'Failed to update nudge preferences');
             }
-            return res.data;
+            return extractPayload<NudgePreferences>(res.data);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['nudgePreferences'] });

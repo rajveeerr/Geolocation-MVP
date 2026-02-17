@@ -154,6 +154,9 @@ const EventCheckInPage = React.lazy(() =>
 const MyTicketsPage = React.lazy(() =>
   import('./pages/MyTicketsPage').then((m) => ({ default: m.MyTicketsPage })),
 );
+const NotificationsPage = React.lazy(() =>
+  import('./pages/NotificationsPage').then((m) => ({ default: m.NotificationsPage })),
+);
 const DiscoverEventsPage = React.lazy(() =>
   import('./pages/DiscoverEventsPage').then((m) => ({ default: m.DiscoverEventsPage })),
 );
@@ -339,6 +342,16 @@ function App() {
                       <ProtectedRoute>
                         <Suspense fallback={<LoadingOverlay />}>
                           <MyTicketsPage />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path={PATHS.NOTIFICATIONS}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <NotificationsPage />
                         </Suspense>
                       </ProtectedRoute>
                     }
