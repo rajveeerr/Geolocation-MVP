@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -14,6 +14,9 @@ import {
   Plus,
   Trash2,
   Sparkles,
+  Upload,
+  Loader2,
+  Link as LinkIcon,
 } from 'lucide-react';
 import { MerchantProtectedRoute } from '@/components/auth/MerchantProtectedRoute';
 import { Button } from '@/components/common/Button';
@@ -30,6 +33,7 @@ import {
   TICKET_TIERS,
   type CreateEventPayload,
 } from '@/hooks/useMerchantEvents';
+import { useMediaUpload } from '@/hooks/useMediaUpload';
 
 // ─── Step Definition ────────────────────────────────────────────────
 
@@ -455,40 +459,172 @@ function SettingsStep() {
 
 function MediaStep() {
   const { state, dispatch } = useEventCreation();
+  const [coverUploading, setCoverUploading] = useState(false);
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  const [coverDragging, setCoverDragging] = useState(false);
+  const [galleryDragging, setGalleryDragging] = useState(false);
+  const [showCoverUrlInput, setShowCoverUrlInput] = useState(false);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+
+  const uploadMutation = useMediaUpload();
 
   const setField = (field: string, value: unknown) =>
     dispatch({ type: 'SET_FIELD', field: field as keyof typeof state, value });
 
+  // ── Cover Image Upload ──
+  const handleCoverUpload = useCallback(async (file: File) => {
+    if (!file.type.startsWith('image/')) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File must be under 5 MB');
+      return;
+    }
+    setCoverUploading(true);
+    try {
+      const result = await uploadMutation.mutateAsync({ file, context: 'event_cover' });
+      setField('coverImageUrl', result.url);
+    } catch {
+      alert('Failed to upload cover image. Please try again.');
+    } finally {
+      setCoverUploading(false);
+    }
+  }, [uploadMutation, dispatch]);
+
+  const handleCoverDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setCoverDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleCoverUpload(file);
+  }, [handleCoverUpload]);
+
+  // ── Gallery Upload ──
+  const handleGalleryUpload = useCallback(async (files: FileList | File[]) => {
+    const fileArray = Array.from(files).filter(f => f.type.startsWith('image/') && f.size <= 5 * 1024 * 1024);
+    if (fileArray.length === 0) return;
+    setGalleryUploading(true);
+    try {
+      for (const file of fileArray) {
+        const result = await uploadMutation.mutateAsync({ file, context: 'event_gallery' });
+        dispatch({ type: 'ADD_GALLERY_IMAGE', url: result.url });
+      }
+    } catch {
+      alert('Some images failed to upload. Please try again.');
+    } finally {
+      setGalleryUploading(false);
+    }
+  }, [uploadMutation, dispatch]);
+
+  const handleGalleryDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setGalleryDragging(false);
+    if (e.dataTransfer.files?.length) handleGalleryUpload(e.dataTransfer.files);
+  }, [handleGalleryUpload]);
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* ── Cover Image ── */}
       <div>
-        <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
-          Cover Image URL <span className="text-red-500">*</span>
+        <label className="mb-2 block text-sm font-semibold text-neutral-700">
+          Cover Image <span className="text-red-500">*</span>
         </label>
-        <input
-          type="url"
-          value={state.coverImageUrl}
-          onChange={(e) => setField('coverImageUrl', e.target.value)}
-          placeholder="https://example.com/cover.jpg"
-          className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
-        />
-        <p className="mt-1 text-xs text-neutral-400">
-          Required to publish. Use a high-quality landscape image.
-        </p>
-        {state.coverImageUrl && (
-          <div className="mt-3 overflow-hidden rounded-lg border border-neutral-200">
+
+        {state.coverImageUrl ? (
+          /* Preview */
+          <div className="group relative overflow-hidden rounded-xl border border-neutral-200">
             <img
               src={state.coverImageUrl}
               alt="Cover preview"
-              className="h-40 w-full object-cover"
+              className="h-48 w-full object-cover sm:h-56"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
             />
+            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+              <button
+                onClick={() => coverInputRef.current?.click()}
+                className="rounded-lg bg-white px-3 py-2 text-sm font-medium text-neutral-700 shadow hover:bg-neutral-50"
+              >
+                Replace
+              </button>
+              <button
+                onClick={() => setField('coverImageUrl', '')}
+                className="rounded-lg bg-red-500 px-3 py-2 text-sm font-medium text-white shadow hover:bg-red-600"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* Drop zone */
+          <div
+            onDragOver={(e) => { e.preventDefault(); setCoverDragging(true); }}
+            onDragLeave={() => setCoverDragging(false)}
+            onDrop={handleCoverDrop}
+            onClick={() => !coverUploading && coverInputRef.current?.click()}
+            className={cn(
+              'flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed py-12 transition-colors',
+              coverDragging
+                ? 'border-brand-primary-500 bg-brand-primary-500/5'
+                : 'border-neutral-300 bg-neutral-50 hover:border-brand-primary-400 hover:bg-neutral-100',
+              coverUploading && 'pointer-events-none opacity-60',
+            )}
+          >
+            {coverUploading ? (
+              <>
+                <Loader2 className="mb-2 h-8 w-8 animate-spin text-brand-primary-500" />
+                <p className="text-sm font-medium text-neutral-600">Uploading…</p>
+              </>
+            ) : (
+              <>
+                <Upload className="mb-2 h-8 w-8 text-neutral-400" />
+                <p className="text-sm font-medium text-neutral-600">
+                  Drag & drop or <span className="text-brand-primary-600">browse</span>
+                </p>
+                <p className="mt-1 text-xs text-neutral-400">JPG, PNG, WebP · Max 5 MB</p>
+              </>
+            )}
           </div>
         )}
+
+        <input
+          ref={coverInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleCoverUpload(file);
+            e.target.value = '';
+          }}
+        />
+
+        {/* URL fallback toggle */}
+        <div className="mt-2">
+          <button
+            type="button"
+            onClick={() => setShowCoverUrlInput((v) => !v)}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-neutral-700"
+          >
+            <LinkIcon className="h-3 w-3" />
+            {showCoverUrlInput ? 'Hide URL input' : 'Or paste an image URL'}
+          </button>
+          {showCoverUrlInput && (
+            <input
+              type="url"
+              value={state.coverImageUrl}
+              onChange={(e) => setField('coverImageUrl', e.target.value)}
+              placeholder="https://example.com/cover.jpg"
+              className="mt-1.5 w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
+            />
+          )}
+        </div>
+
+        <p className="mt-1 text-xs text-neutral-400">
+          Required to publish. Use a high-quality landscape image.
+        </p>
       </div>
 
+      {/* ── Video URL ── */}
       <div>
         <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
           Video URL
@@ -500,59 +636,80 @@ function MediaStep() {
           placeholder="https://youtube.com/watch?v=..."
           className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
         />
+        <p className="mt-1 text-xs text-neutral-400">
+          YouTube or Vimeo link for your event promo video.
+        </p>
       </div>
 
+      {/* ── Image Gallery ── */}
       <div>
-        <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
+        <label className="mb-2 block text-sm font-semibold text-neutral-700">
           Image Gallery
         </label>
-        <div className="space-y-2">
-          {state.imageGallery.map((url, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <input
-                type="url"
-                value={url}
-                readOnly
-                className="flex-1 rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-2 text-sm text-neutral-600"
-              />
-              <button
-                onClick={() => dispatch({ type: 'REMOVE_GALLERY_IMAGE', index: i })}
-                className="rounded-lg p-2 text-red-500 hover:bg-red-50"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-          ))}
+
+        {/* Existing gallery thumbnails */}
+        {state.imageGallery.length > 0 && (
+          <div className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+            {state.imageGallery.map((url, i) => (
+              <div key={i} className="group relative overflow-hidden rounded-lg border border-neutral-200">
+                <img
+                  src={url}
+                  alt={`Gallery ${i + 1}`}
+                  className="h-28 w-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+                <button
+                  onClick={() => dispatch({ type: 'REMOVE_GALLERY_IMAGE', index: i })}
+                  className="absolute right-1 top-1 rounded-full bg-black/50 p-1 text-white opacity-0 transition-opacity hover:bg-red-600 group-hover:opacity-100"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Gallery drop zone */}
+        <div
+          onDragOver={(e) => { e.preventDefault(); setGalleryDragging(true); }}
+          onDragLeave={() => setGalleryDragging(false)}
+          onDrop={handleGalleryDrop}
+          onClick={() => !galleryUploading && galleryInputRef.current?.click()}
+          className={cn(
+            'flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed py-8 transition-colors',
+            galleryDragging
+              ? 'border-brand-primary-500 bg-brand-primary-500/5'
+              : 'border-neutral-300 bg-neutral-50 hover:border-brand-primary-400 hover:bg-neutral-100',
+            galleryUploading && 'pointer-events-none opacity-60',
+          )}
+        >
+          {galleryUploading ? (
+            <>
+              <Loader2 className="mb-2 h-6 w-6 animate-spin text-brand-primary-500" />
+              <p className="text-sm font-medium text-neutral-600">Uploading…</p>
+            </>
+          ) : (
+            <>
+              <Plus className="mb-1 h-6 w-6 text-neutral-400" />
+              <p className="text-sm font-medium text-neutral-600">Add gallery images</p>
+              <p className="mt-0.5 text-xs text-neutral-400">Drag files or click to browse</p>
+            </>
+          )}
         </div>
-        <div className="mt-2 flex gap-2">
-          <input
-            type="url"
-            placeholder="Add image URL..."
-            id="gallery-input"
-            className="flex-1 rounded-lg border border-neutral-300 px-4 py-2 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                const input = e.target as HTMLInputElement;
-                if (input.value.trim()) {
-                  dispatch({ type: 'ADD_GALLERY_IMAGE', url: input.value.trim() });
-                  input.value = '';
-                }
-              }
-            }}
-          />
-          <button
-            onClick={() => {
-              const input = document.getElementById('gallery-input') as HTMLInputElement;
-              if (input?.value.trim()) {
-                dispatch({ type: 'ADD_GALLERY_IMAGE', url: input.value.trim() });
-                input.value = '';
-              }
-            }}
-            className="rounded-lg bg-neutral-100 px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-200"
-          >
-            Add
-          </button>
-        </div>
+
+        <input
+          ref={galleryInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+          className="hidden"
+          onChange={(e) => {
+            if (e.target.files?.length) handleGalleryUpload(e.target.files);
+            e.target.value = '';
+          }}
+        />
       </div>
     </div>
   );
