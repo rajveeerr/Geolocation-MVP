@@ -50,6 +50,15 @@ const fmtCount = (n: number) => {
   return n.toLocaleString();
 };
 
+/** Prettify raw category strings: FOOD_AND_BEVERAGE → Food & Beverage */
+const prettyCat = (raw: string) =>
+  raw
+    .replace(/_/g, ' ')
+    .replace(/\bAND\b/gi, '&')
+    .split(' ')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+
 /* ------------------------------------------------------------------ */
 /*  Hero Gallery – dark bg, VERIFIED VENUE, play btn, square aspect   */
 /* ------------------------------------------------------------------ */
@@ -434,6 +443,134 @@ const ComingSoonOverlay = ({ feature }: { feature: string }) => (
   </div>
 );
 
+/* ------------------------------------------------------------------ */
+/*  Menu Card – Figma style (dark immersive cards)                     */
+/* ------------------------------------------------------------------ */
+const MenuCardFigma = ({
+  item,
+  onClick,
+}: {
+  item: any;
+  deal?: any;
+  onClick?: () => void;
+}) => {
+  const discountAmount = item.originalPrice - item.discountedPrice;
+  const discountPercent = item.originalPrice > 0
+    ? Math.round((discountAmount / item.originalPrice) * 100)
+    : 0;
+
+  // Badge logic: show discount %, or fallback to a category-based badge
+  const getBadgeLabel = () => {
+    const cat = (item.category || '').toLowerCase();
+    if (cat.includes('cocktail') || cat.includes('mixology') || cat.includes('drink'))
+      return 'MIXOLOGY';
+    if (cat.includes('small plate') || cat.includes('appetizer') || cat.includes('starter'))
+      return 'SMALL PLATE';
+    if (cat.includes('shared') || cat.includes('platter'))
+      return 'SHARED PLATE';
+    if (cat.includes('wine') || cat.includes('bubbles') || cat.includes('champagne'))
+      return 'WINE & BUBBLES';
+    if (cat.includes('signature') || cat.includes('chef'))
+      return "CHEF'S SIGNATURE";
+    if (cat.includes('dessert') || cat.includes('sweet'))
+      return 'DESSERT';
+    return item.category?.toUpperCase() || 'MENU ITEM';
+  };
+
+  return (
+    <div
+      className="relative rounded-2xl overflow-hidden shadow-lg cursor-pointer group flex-shrink-0 w-[180px] sm:w-[220px] aspect-[3/4]"
+      onClick={onClick}
+    >
+      {/* Full-bleed image */}
+      {item.imageUrl ? (
+        <img
+          src={item.imageUrl}
+          alt={item.name}
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-neutral-800">
+          <ShoppingCart className="h-8 w-8 text-neutral-600" />
+        </div>
+      )}
+
+      {/* Category badge – top left */}
+      <div className="absolute top-3 left-3 z-10">
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md">
+          <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+          <span className="text-[9px] font-bold text-white uppercase tracking-wider leading-none">
+            {getBadgeLabel()}
+          </span>
+        </div>
+      </div>
+
+      {/* Price badge – top right */}
+      <div className="absolute top-3 right-3 z-10">
+        <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white font-bold text-xs">
+          ${(item.discountedPrice ?? item.originalPrice ?? 0).toFixed(2)}
+        </span>
+      </div>
+
+      {/* Discount ribbon */}
+      {discountPercent > 0 && (
+        <div className="absolute top-12 left-3 z-10">
+          <span className="px-2 py-0.5 rounded bg-red-600 text-white text-[9px] font-bold">
+            {discountPercent}% OFF
+          </span>
+        </div>
+      )}
+
+      {/* Bottom gradient */}
+      <div className="absolute inset-x-0 bottom-0 h-3/5 pointer-events-none bg-gradient-to-t from-black via-black/70 to-transparent" />
+
+      {/* Bottom content */}
+      <div className="absolute inset-x-0 bottom-0 z-10 p-4 flex flex-col">
+        {/* Best deal tag if first item */}
+        {discountPercent > 15 && (
+          <div className="mb-2">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-pink-600 text-white text-[9px] font-bold uppercase">
+              <MapPin className="w-2.5 h-2.5" /> Best Deal Within 5 Miles
+            </span>
+          </div>
+        )}
+
+        <h4 className="text-sm font-black text-white uppercase tracking-wide leading-tight line-clamp-2">
+          {item.name}
+        </h4>
+        {item.description && (
+          <p className="text-[10px] text-white/50 mt-0.5 line-clamp-2 leading-relaxed">
+            {item.description}
+          </p>
+        )}
+
+        {/* Action row */}
+        <div className="flex items-center gap-2 mt-3">
+          <button
+            disabled
+            onClick={(e) => e.stopPropagation()}
+            className="flex-1 flex items-center justify-between pl-3 pr-1 py-1 rounded-full bg-white cursor-not-allowed"
+            title="Online ordering coming soon"
+          >
+            <span className="text-[11px] font-semibold text-[#1a1a2e] whitespace-nowrap">Add to Basket</span>
+            <span className="w-8 h-8 rounded-full bg-[#1a1a2e] flex items-center justify-center flex-shrink-0">
+              <ShoppingCart className="h-3.5 w-3.5 text-white" />
+            </span>
+          </button>
+          <button
+            disabled
+            onClick={(e) => e.stopPropagation()}
+            className="w-9 h-9 rounded-full bg-white flex items-center justify-center cursor-not-allowed flex-shrink-0"
+            title="Save item coming soon"
+          >
+            <Heart className="h-3.5 w-3.5 text-[#1a1a2e]" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 /* ================================================================== */
 /*  MAIN PAGE                                                          */
 /* ================================================================== */
@@ -490,7 +627,26 @@ export const DealDetailPage = () => {
     return cats.sort();
   }, [deal]);
 
-  // Filter + paginate menu items
+  // Group menu items by category for section-based display
+  const menuSections = useMemo(() => {
+    if (!deal?.menuItems?.length) return [];
+    const groups: Record<string, any[]> = {};
+    deal.menuItems.forEach((item: any) => {
+      const cat = item.category || 'Other';
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(item);
+    });
+    // Sort categories alphabetically but put 'Other' last
+    return Object.entries(groups)
+      .sort(([a], [b]) => {
+        if (a === 'Other') return 1;
+        if (b === 'Other') return -1;
+        return a.localeCompare(b);
+      })
+      .map(([category, items]) => ({ category, items }));
+  }, [deal]);
+
+  // Filter menu items for the selected category pill (for "All Items" flat view)
   const filteredMenuItems = useMemo(() => {
     if (!deal?.menuItems?.length) return [];
     let items = deal.menuItems;
@@ -1006,168 +1162,154 @@ export const DealDetailPage = () => {
 
             {/* ---------- MENU ---------- */}
             {rightTab === 'menu' && (
-              <div>
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-2xl font-black text-neutral-900 uppercase tracking-tight">
-                      Curated Menu
-                    </h3>
-                    <p className="text-xs text-neutral-400 mt-0.5">
-                      Auto-playing cinematic previews
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      disabled
-                      className="w-10 h-10 rounded-xl bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-not-allowed opacity-50"
-                      title="Filter coming soon"
-                    >
-                      <SlidersHorizontal className="h-[18px] w-[18px] text-neutral-600" />
-                    </button>
-                    <button
-                      disabled
-                      className="w-10 h-10 rounded-xl bg-[#1a1a2e] flex items-center justify-center cursor-not-allowed opacity-70"
-                      title="Search coming soon"
-                    >
-                      <Search className="h-[18px] w-[18px] text-white" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Category filter pills */}
-                {menuCategories.length > 1 && (
-                  <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-3">
-                    <button
-                      onClick={() => { setMenuCategory('all'); setShowAllMenu(false); }}
-                      className={cn(
-                        'px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider whitespace-nowrap transition-all flex-shrink-0',
-                        menuCategory === 'all'
-                          ? 'bg-[#1a1a2e] text-white'
-                          : 'text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100 border border-neutral-200',
-                      )}
-                    >
-                      ALL
-                    </button>
-                    {menuCategories.map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => { setMenuCategory(cat); setShowAllMenu(false); }}
-                        className={cn(
-                          'px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider whitespace-nowrap transition-all flex-shrink-0 uppercase',
-                          menuCategory === cat
-                            ? 'bg-[#1a1a2e] text-white'
-                            : 'text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100 border border-neutral-200',
-                        )}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {/* Menu grid – cards per Figma */}
+              <div className="space-y-8">
                 {deal.hasMenuItems && deal.menuItems.length > 0 ? (
                   <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {filteredMenuItems.map((item: any) => (
-                        <div
-                          key={item.id}
-                          className="relative rounded-3xl overflow-hidden shadow-lg cursor-pointer group aspect-[3/5]"
-                          onClick={() => navigate(`/deals/${dealId}/menu/${item.id}`)}
+                    {/* Category text tabs – Figma style */}
+                    <div className="flex gap-6 overflow-x-auto scrollbar-hide border-b border-neutral-200 pb-0">
+                      <button
+                        onClick={() => { setMenuCategory('all'); setShowAllMenu(false); }}
+                        className={cn(
+                          'pb-2.5 text-sm font-semibold whitespace-nowrap transition-all flex-shrink-0 border-b-2',
+                          menuCategory === 'all'
+                            ? 'text-neutral-900 border-neutral-900'
+                            : 'text-neutral-400 border-transparent hover:text-neutral-600',
+                        )}
+                      >
+                        All Items
+                      </button>
+                      {menuCategories.map((cat) => (
+                        <button
+                          key={cat}
+                          onClick={() => { setMenuCategory(cat); setShowAllMenu(false); }}
+                          className={cn(
+                            'pb-2.5 text-sm font-semibold whitespace-nowrap transition-all flex-shrink-0 border-b-2',
+                            menuCategory === cat
+                              ? 'text-neutral-900 border-neutral-900'
+                              : 'text-neutral-400 border-transparent hover:text-neutral-600',
+                          )}
                         >
-                          {/* Full-bleed image / slideshow */}
-                          {(item.images && item.images.length > 0) || item.imageUrl ? (
-                            <div className="absolute inset-0">
-                              <ImageSlideshow
-                                images={item.images && item.images.length > 0 ? item.images : (item.imageUrl ? [item.imageUrl] : [])}
-                                alt={item.name}
-                                className="w-full h-full"
-                                autoPlay={5000}
-                                maxImages={3}
-                                hoverScale
-                              />
-                            </div>
-                          ) : (
-                            <div className="absolute inset-0 flex items-center justify-center bg-neutral-800">
-                              <ShoppingCart className="h-8 w-8 text-neutral-600" />
-                            </div>
-                          )}
-
-                          {/* Category badge – top left */}
-                          {item.category && (
-                            <div className="absolute top-3.5 left-3.5 z-10">
-                              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md">
-                                <div className="w-2 h-2 rounded-full bg-[#B91C1C]" />
-                                <span className="text-[10px] font-bold text-white uppercase tracking-wider">
-                                  {item.category}
-                                </span>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Price badge – top right */}
-                          <div className="absolute top-3.5 right-3.5 z-10">
-                            <span className="px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-white font-bold text-sm">
-                              ${(item.discountedPrice || item.originalPrice || 0).toFixed(2)}
-                            </span>
-                          </div>
-
-                          {/* Bottom gradient – smooth progressive fade */}
-                          <div className="absolute inset-x-0 bottom-0 h-3/5 pointer-events-none bg-gradient-to-t from-black via-black/70 to-transparent" />
-                          <div className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none bg-gradient-to-t from-black/50 to-transparent" />
-
-                          {/* Bottom content – all on top of image */}
-                          <div className="absolute inset-x-0 bottom-0 z-10 p-5 flex flex-col">
-                            {/* Name + description */}
-                            <h4 className="text-xl font-black text-white uppercase tracking-wide leading-tight">
-                              {item.name}
-                            </h4>
-                            {item.description && (
-                              <p className="text-[13px] text-white/50 mt-1 line-clamp-2 leading-relaxed">
-                                {item.description}
-                              </p>
-                            )}
-
-                            {/* Action row – overlaid on image */}
-                            <div className="flex items-center gap-2.5 mt-4">
-                              {/* Add to Basket + cart icon – single combined button, takes remaining space */}
-                              <button
-                                disabled
-                                onClick={(e) => e.stopPropagation()}
-                                className="flex-1 flex items-center justify-between pl-5 pr-1.5 py-1.5 rounded-full bg-white cursor-not-allowed"
-                                title="Online ordering coming soon"
-                              >
-                                <span className="text-sm font-semibold text-[#1a1a2e] whitespace-nowrap">Add to Basket</span>
-                                <span className="w-10 h-10 rounded-full bg-[#1a1a2e] flex items-center justify-center flex-shrink-0">
-                                  <ShoppingCart className="h-[17px] w-[17px] text-white" />
-                                </span>
-                              </button>
-                              {/* Heart – separate white circle */}
-                              <button
-                                disabled
-                                onClick={(e) => e.stopPropagation()}
-                                className="w-11 h-11 rounded-full bg-white flex items-center justify-center cursor-not-allowed flex-shrink-0"
-                                title="Save item coming soon"
-                              >
-                                <Heart className="h-[18px] w-[18px] text-[#1a1a2e]" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
+                          {prettyCat(cat)}
+                        </button>
                       ))}
                     </div>
 
-                    {/* Show More / Show Less */}
-                    {totalFilteredCount > MENU_INITIAL_COUNT && (
-                      <button
-                        onClick={() => setShowAllMenu(!showAllMenu)}
-                        className="mt-4 w-full py-3 rounded-xl border border-neutral-200 text-sm font-bold text-neutral-700 hover:bg-neutral-50 transition-colors"
-                      >
-                        {showAllMenu
-                          ? 'Show Less'
-                          : `Show All ${totalFilteredCount} Items`}
-                      </button>
+                    {/* Section-based display when "All" is selected */}
+                    {menuCategory === 'all' ? (
+                      menuSections.map((section) => {
+                        // Generate section display name
+                        const sectionName = prettyCat(section.category).toUpperCase();
+                        const sectionSubtitle = 'Auto-playing cinematic previews';
+                        return (
+                          <div key={section.category} className="space-y-3">
+                            {/* Section header */}
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h3 className="text-2xl font-black text-neutral-900 uppercase tracking-tight">
+                                  {sectionName}
+                                </h3>
+                                <p className="text-xs text-neutral-400 mt-0.5">
+                                  {sectionSubtitle}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  disabled
+                                  className="w-10 h-10 rounded-xl bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-not-allowed opacity-50"
+                                  title="Filter coming soon"
+                                >
+                                  <SlidersHorizontal className="h-[18px] w-[18px] text-neutral-600" />
+                                </button>
+                                <button
+                                  disabled
+                                  className="w-10 h-10 rounded-xl bg-[#1a1a2e] flex items-center justify-center cursor-not-allowed opacity-70"
+                                  title="Search coming soon"
+                                >
+                                  <Search className="h-[18px] w-[18px] text-white" />
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Horizontal scrollable carousel */}
+                            <div className="relative group/carousel">
+                              <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 snap-x snap-mandatory">
+                                {section.items.map((item: any) => (
+                                  <MenuCardFigma
+                                    key={item.id}
+                                    item={item}
+                                    deal={deal}
+                                    onClick={() => navigate(`/deals/${dealId}/menu/${item.id}`)}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* See all items link */}
+                            {section.items.length > 3 && (
+                              <div className="flex justify-end">
+                                <button
+                                  onClick={() => { setMenuCategory(section.category); setShowAllMenu(true); }}
+                                  className="text-sm font-bold text-red-700 hover:text-red-800 flex items-center gap-1 transition-colors"
+                                >
+                                  See all Items <ChevronRight className="h-4 w-4" />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      /* Filtered grid view for a specific category */
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h3 className="text-2xl font-black text-neutral-900 uppercase tracking-tight">
+                              {prettyCat(menuCategory).toUpperCase()}
+                            </h3>
+                            <p className="text-xs text-neutral-400 mt-0.5">
+                              Auto-playing cinematic previews
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              disabled
+                              className="w-10 h-10 rounded-xl bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-not-allowed opacity-50"
+                              title="Filter coming soon"
+                            >
+                              <SlidersHorizontal className="h-[18px] w-[18px] text-neutral-600" />
+                            </button>
+                            <button
+                              disabled
+                              className="w-10 h-10 rounded-xl bg-[#1a1a2e] flex items-center justify-center cursor-not-allowed opacity-70"
+                              title="Search coming soon"
+                            >
+                              <Search className="h-[18px] w-[18px] text-white" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                          {filteredMenuItems.map((item: any) => (
+                            <MenuCardFigma
+                              key={item.id}
+                              item={item}
+                              deal={deal}
+                              onClick={() => navigate(`/deals/${dealId}/menu/${item.id}`)}
+                            />
+                          ))}
+                        </div>
+
+                        {/* Show More / Show Less */}
+                        {totalFilteredCount > MENU_INITIAL_COUNT && (
+                          <button
+                            onClick={() => setShowAllMenu(!showAllMenu)}
+                            className="mt-4 w-full py-3 rounded-xl border border-neutral-200 text-sm font-bold text-neutral-700 hover:bg-neutral-50 transition-colors"
+                          >
+                            {showAllMenu
+                              ? 'Show Less'
+                              : `Show All ${totalFilteredCount} Items`}
+                          </button>
+                        )}
+                      </div>
                     )}
                   </>
                 ) : (

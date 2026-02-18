@@ -161,7 +161,8 @@ export function useEventForManage(eventId: number | undefined) {
       if (!res.success || !res.data) {
         throw new Error(res.error || 'Failed to fetch event');
       }
-      return res.data.event;
+      // Handle both nested { event: ... } and flat response shapes
+      return (res.data as any).event ?? res.data;
     },
     enabled: !!eventId,
     staleTime: 60 * 1000,

@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL||"https://api.yohop.com/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://api.yohop.com/api";
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -44,7 +44,7 @@ class ApiClient {
         if (contentType?.includes('application/json')) {
           errorData = await response.json();
         }
-        
+
         // Handle 401 Unauthorized - clear auth token and notify
         if (response.status === 401) {
           localStorage.removeItem('authToken');
@@ -53,7 +53,7 @@ class ApiClient {
             this.onAuthError();
           }
         }
-        
+
         return {
           success: false,
           data: null,
@@ -109,7 +109,7 @@ class ApiClient {
         if (contentType?.includes('application/json')) {
           errorData = await response.json();
         }
-        
+
         // Handle 401 Unauthorized - clear auth token and notify
         if (response.status === 401) {
           localStorage.removeItem('authToken');
@@ -118,7 +118,7 @@ class ApiClient {
             this.onAuthError();
           }
         }
-        
+
         return {
           success: false,
           data: null,
