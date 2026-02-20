@@ -127,11 +127,15 @@ interface EventCardProps {
     event: EventDetail | HybridEvent;
     /** Optional: override the aspect ratio. Default = 3/5 (tall card) */
     aspectRatio?: string;
+    /** Optional: fixed width in pixels (e.g., 204.75) */
+    width?: number;
+    /** Optional: fixed height in pixels (e.g., 364) */
+    height?: number;
 }
 
 /* ─── The Card ─────────────────────────────────────────────────── */
 
-export function EventCard({ event, aspectRatio = 'aspect-[3/5]' }: EventCardProps) {
+export function EventCard({ event, aspectRatio = 'aspect-[3/5]', width, height }: EventCardProps) {
     const navigate = useNavigate();
 
     // ── Normalize fields across both event shapes ──
@@ -179,12 +183,20 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]' }: EventCardProp
         handleClick();
     };
 
+    // Use fixed dimensions if provided, otherwise use aspect ratio
+    const cardStyle = width && height 
+        ? { width: `${width}px`, height: `${height}px` }
+        : undefined;
+    
+    const isFixedSize = width && height;
+
     return (
         <div
             className={cn(
-                'relative rounded-3xl overflow-hidden shadow-lg cursor-pointer group',
-                aspectRatio,
+                'relative rounded-2xl overflow-hidden shadow-lg cursor-pointer group flex-shrink-0',
+                !width && !height && aspectRatio,
             )}
+            style={cardStyle}
             onClick={handleClick}
         >
             {/* Full-bleed cover image */}
@@ -207,26 +219,26 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]' }: EventCardProp
             )}
 
             {/* Category badge – top left */}
-            <div className="absolute top-3.5 left-3.5 z-10 flex items-center gap-1.5">
+            <div className={cn("absolute z-10 flex items-center gap-1.5", isFixedSize ? "top-3 left-3" : "top-3.5 left-3.5")}>
                 {isHybridTM ? (
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600/80 backdrop-blur-md">
-                        <Globe className="h-3 w-3 text-white" />
-                        <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+                    <div className={cn("flex items-center gap-1.5 rounded-full bg-blue-600/80 backdrop-blur-md", isFixedSize ? "px-2 py-0.5" : "px-3 py-1.5")}>
+                        <Globe className={cn("text-white", isFixedSize ? "h-2.5 w-2.5" : "h-3 w-3")} />
+                        <span className={cn("font-bold text-white uppercase tracking-wider", isFixedSize ? "text-[9px]" : "text-[10px]")}>
                             Ticketmaster
                         </span>
                     </div>
                 ) : typeLabel ? (
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md">
-                        <div className={cn('w-2 h-2 rounded-full', dotColor)} />
-                        <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+                    <div className={cn("flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md", isFixedSize ? "px-2 py-0.5" : "px-3 py-1.5")}>
+                        <div className={cn("rounded-full", isFixedSize ? "w-1.5 h-1.5" : "w-2 h-2", dotColor)} />
+                        <span className={cn("font-bold text-white uppercase tracking-wider", isFixedSize ? "text-[9px]" : "text-[10px]")}>
                             {typeLabel}
                         </span>
                     </div>
                 ) : null}
                 {!isHybridTM && (event as HybridEvent).source === 'local' && (
-                    <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#B91C1C]/80 backdrop-blur-md">
-                        <Sparkles className="h-3 w-3 text-white" />
-                        <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+                    <div className={cn("flex items-center gap-1 rounded-full bg-[#B91C1C]/80 backdrop-blur-md", isFixedSize ? "px-2 py-0.5" : "px-2.5 py-1.5")}>
+                        <Sparkles className={cn("text-white", isFixedSize ? "h-2.5 w-2.5" : "h-3 w-3")} />
+                        <span className={cn("font-bold text-white uppercase tracking-wider", isFixedSize ? "text-[9px]" : "text-[10px]")}>
                             Local
                         </span>
                     </div>
@@ -234,18 +246,21 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]' }: EventCardProp
             </div>
 
             {/* Price badge – top right */}
-            <div className="absolute top-3.5 right-3.5 z-10">
-                <span className="px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-white font-bold text-sm">
+            <div className={cn("absolute z-10", isFixedSize ? "top-3 right-3" : "top-3.5 right-3.5")}>
+                <span className={cn(
+                    "rounded-full bg-black/60 backdrop-blur-md text-white font-bold",
+                    isFixedSize ? "px-2.5 py-0.5 text-xs" : "px-3.5 py-1.5 text-sm"
+                )}>
                     {price}
                 </span>
             </div>
 
             {/* Trending badge */}
             {isTrending && (
-                <div className="absolute top-14 right-3.5 z-10">
-                    <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/80 backdrop-blur-md">
-                        <TrendingUp className="h-3 w-3 text-white" />
-                        <span className="text-[9px] font-bold text-white uppercase tracking-wider">
+                <div className={cn("absolute z-10", isFixedSize ? "top-12 right-3" : "top-14 right-3.5")}>
+                    <div className={cn("flex items-center gap-1 rounded-full bg-amber-500/80 backdrop-blur-md", isFixedSize ? "px-2 py-0.5" : "px-2.5 py-1")}>
+                        <TrendingUp className={cn("text-white", isFixedSize ? "h-2.5 w-2.5" : "h-3 w-3")} />
+                        <span className={cn("font-bold text-white uppercase tracking-wider", isFixedSize ? "text-[8px]" : "text-[9px]")}>
                             Trending
                         </span>
                     </div>
@@ -254,8 +269,11 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]' }: EventCardProp
 
             {/* Sold out overlay */}
             {available === 0 && !isFree && (
-                <div className="absolute top-14 left-3.5 z-10">
-                    <span className="px-2.5 py-1 rounded-full bg-red-600/80 backdrop-blur-md text-white text-[9px] font-bold uppercase tracking-wider">
+                <div className={cn("absolute z-10", isFixedSize ? "top-12 left-3" : "top-14 left-3.5")}>
+                    <span className={cn(
+                        "rounded-full bg-red-600/80 backdrop-blur-md text-white font-bold uppercase tracking-wider",
+                        isFixedSize ? "px-2 py-0.5 text-[8px]" : "px-2.5 py-1 text-[9px]"
+                    )}>
                         Sold Out
                     </span>
                 </div>
@@ -266,22 +284,34 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]' }: EventCardProp
             <div className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none bg-gradient-to-t from-black/50 to-transparent" />
 
             {/* Bottom content – all on top of image */}
-            <div className="absolute inset-x-0 bottom-0 z-10 p-5 flex flex-col">
+            <div className={cn(
+                "absolute inset-x-0 bottom-0 z-10 flex flex-col",
+                isFixedSize ? "p-3" : "p-5"
+            )}>
                 {/* Title */}
-                <h4 className="text-xl font-black text-white uppercase tracking-wide leading-tight line-clamp-2">
+                <h4 className={cn(
+                    "font-black text-white uppercase tracking-wide leading-tight line-clamp-2",
+                    isFixedSize ? "text-base" : "text-xl"
+                )}>
                     {title}
                 </h4>
 
                 {/* Date + Time + Venue */}
                 {startDateStr && (
-                    <div className="mt-1.5 space-y-0.5">
-                        <p className="text-[13px] text-white/60 flex items-center gap-1.5">
-                            <Calendar className="h-3 w-3 flex-shrink-0" />
-                            {formatEventDate(startDateStr)} · {formatEventTime(startDateStr)}
+                    <div className={cn("space-y-0.5", isFixedSize ? "mt-1" : "mt-1.5")}>
+                        <p className={cn(
+                            "text-white/60 flex items-center gap-1.5",
+                            isFixedSize ? "text-[11px]" : "text-[13px]"
+                        )}>
+                            <Calendar className={cn("flex-shrink-0", isFixedSize ? "h-2.5 w-2.5" : "h-3 w-3")} />
+                            <span className="truncate">{formatEventDate(startDateStr)} · {formatEventTime(startDateStr)}</span>
                         </p>
                         {venue && (
-                            <p className="text-[13px] text-white/50 flex items-center gap-1.5">
-                                <MapPin className="h-3 w-3 flex-shrink-0" />
+                            <p className={cn(
+                                "text-white/50 flex items-center gap-1.5",
+                                isFixedSize ? "text-[11px]" : "text-[13px]"
+                            )}>
+                                <MapPin className={cn("flex-shrink-0", isFixedSize ? "h-2.5 w-2.5" : "h-3 w-3")} />
                                 <span className="truncate">{venue}</span>
                             </p>
                         )}
@@ -290,22 +320,31 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]' }: EventCardProp
 
                 {/* Short desc */}
                 {shortDesc && (
-                    <p className="text-[13px] text-white/40 mt-1.5 line-clamp-2 leading-relaxed">
+                    <p className={cn(
+                        "text-white/40 line-clamp-2 leading-relaxed",
+                        isFixedSize ? "text-[11px] mt-1" : "text-[13px] mt-1.5"
+                    )}>
                         {shortDesc}
                     </p>
                 )}
 
                 {/* Spots + attendees info */}
                 {(currentAttendees > 0 || (available > 0 && available <= 30)) && (
-                    <div className="flex items-center gap-3 mt-2">
+                    <div className={cn("flex items-center gap-2", isFixedSize ? "mt-1.5" : "mt-2")}>
                         {currentAttendees > 0 && (
-                            <span className="text-[11px] text-white/50 flex items-center gap-1">
-                                <Users className="h-3 w-3" />
-                                {currentAttendees} going
+                            <span className={cn(
+                                "text-white/50 flex items-center gap-1",
+                                isFixedSize ? "text-[10px]" : "text-[11px]"
+                            )}>
+                                <Users className={cn(isFixedSize ? "h-2.5 w-2.5" : "h-3 w-3")} />
+                                <span className="truncate">{currentAttendees} going</span>
                             </span>
                         )}
                         {available > 0 && available <= 30 && (
-                            <span className="text-[11px] text-amber-400 font-semibold">
+                            <span className={cn(
+                                "text-amber-400 font-semibold",
+                                isFixedSize ? "text-[10px]" : "text-[11px]"
+                            )}>
                                 {available} spots left
                             </span>
                         )}
@@ -313,29 +352,41 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]' }: EventCardProp
                 )}
 
                 {/* Action row – matches menu card "Add to Basket" design */}
-                <div className="flex items-center gap-2.5 mt-4">
+                <div className={cn("flex items-center", isFixedSize ? "gap-2 mt-2.5" : "gap-2.5 mt-4")}>
                     {/* View Event – main CTA */}
                     <button
                         onClick={handleCTAClick}
-                        className="flex-1 flex items-center justify-between pl-5 pr-1.5 py-1.5 rounded-full bg-white group/cta"
+                        className={cn(
+                            "flex-1 flex items-center justify-between rounded-full bg-white group/cta",
+                            isFixedSize ? "pl-3 pr-1 py-1" : "pl-5 pr-1.5 py-1.5"
+                        )}
                     >
-                        <span className="text-sm font-semibold text-[#1a1a2e] whitespace-nowrap">
+                        <span className={cn(
+                            "font-semibold text-[#1a1a2e] whitespace-nowrap",
+                            isFixedSize ? "text-xs" : "text-sm"
+                        )}>
                             {isHybridTM ? 'Buy Tickets' : 'View Event'}
                         </span>
-                        <span className="w-10 h-10 rounded-full bg-[#1a1a2e] flex items-center justify-center flex-shrink-0 group-hover/cta:scale-110 transition-transform">
+                        <span className={cn(
+                            "rounded-full bg-[#1a1a2e] flex items-center justify-center flex-shrink-0 group-hover/cta:scale-110 transition-transform",
+                            isFixedSize ? "w-8 h-8" : "w-10 h-10"
+                        )}>
                             {isHybridTM ? (
-                                <ExternalLink className="h-[17px] w-[17px] text-white" />
+                                <ExternalLink className={cn("text-white", isFixedSize ? "h-3.5 w-3.5" : "h-[17px] w-[17px]")} />
                             ) : (
-                                <ArrowUpRight className="h-[17px] w-[17px] text-white" />
+                                <ArrowUpRight className={cn("text-white", isFixedSize ? "h-3.5 w-3.5" : "h-[17px] w-[17px]")} />
                             )}
                         </span>
                     </button>
                     {/* Heart – separate white circle */}
                     <button
                         onClick={(e) => e.stopPropagation()}
-                        className="w-11 h-11 rounded-full bg-white flex items-center justify-center flex-shrink-0 hover:bg-neutral-100 transition-colors"
+                        className={cn(
+                            "rounded-full bg-white flex items-center justify-center flex-shrink-0 hover:bg-neutral-100 transition-colors",
+                            isFixedSize ? "w-9 h-9" : "w-11 h-11"
+                        )}
                     >
-                        <Heart className="h-[18px] w-[18px] text-[#1a1a2e]" />
+                        <Heart className={cn("text-[#1a1a2e]", isFixedSize ? "h-4 w-4" : "h-[18px] w-[18px]")} />
                     </button>
                 </div>
             </div>

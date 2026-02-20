@@ -80,11 +80,11 @@ export const EventsTab = ({ deal }: EventsTabProps) => {
         </div>
       )}
 
-      {/* Events Grid – tall cards like menu items */}
+      {/* Events Grid – 3 cards per row with fixed dimensions */}
       {!isLoading && events.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {events.map((event) => (
-            <EventCard key={event.id} event={event} />
+            <EventCard key={event.id} event={event} width={204.75} height={364} />
           ))}
         </div>
       )}

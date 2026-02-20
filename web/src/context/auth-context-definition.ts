@@ -12,6 +12,8 @@ interface User {
   avatarUrl?: string | null;
   points?: number;
   role?: string;
+  merchantId?: number | null;
+  merchantStatus?: string | null;
 }
 
 export interface AuthContextType {

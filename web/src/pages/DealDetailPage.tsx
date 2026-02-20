@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import {
   Heart, ChevronLeft, ChevronRight, Share2, Phone, MapPin, Star,
   ShoppingCart, ExternalLink, Play, Lock, AlertCircle, Pencil,
-  ThumbsUp, Check, Search, SlidersHorizontal,
+  ThumbsUp, Check, Search, SlidersHorizontal, Zap, ChevronDown,
 } from 'lucide-react';
 import { useCheckIn } from '@/hooks/useCheckIn';
 import { CheckInModal } from '@/components/deals/CheckInModal';
@@ -479,7 +479,8 @@ const MenuCardFigma = ({
 
   return (
     <div
-      className="relative rounded-2xl overflow-hidden shadow-lg cursor-pointer group flex-shrink-0 w-[180px] sm:w-[220px] aspect-[3/4]"
+      className="relative rounded-2xl overflow-hidden shadow-lg cursor-pointer group flex-shrink-0"
+      style={{ width: '204.75px', height: '364px' }}
       onClick={onClick}
     >
       {/* Full-bleed image */}
@@ -498,7 +499,12 @@ const MenuCardFigma = ({
       {/* Category badge – top left */}
       <div className="absolute top-3 left-3 z-10">
         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md">
-          <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+          <div className={cn(
+            "w-1.5 h-1.5 rounded-full",
+            getBadgeLabel().includes("CHEF'S SIGNATURE") ? "bg-red-500" :
+            getBadgeLabel().includes("BESTSELLER") ? "bg-yellow-500" :
+            "bg-green-400"
+          )} />
           <span className="text-[9px] font-bold text-white uppercase tracking-wider leading-none">
             {getBadgeLabel()}
           </span>
@@ -507,9 +513,16 @@ const MenuCardFigma = ({
 
       {/* Price badge – top right */}
       <div className="absolute top-3 right-3 z-10">
-        <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white font-bold text-xs">
-          ${(item.discountedPrice ?? item.originalPrice ?? 0).toFixed(2)}
-        </span>
+        {discountPercent > 0 && item.originalPrice ? (
+          <div className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white">
+            <div className="text-[9px] line-through opacity-70">${item.originalPrice.toFixed(2)}</div>
+            <div className="text-sm font-bold text-red-500 leading-tight">${(item.discountedPrice ?? 0).toFixed(2)}</div>
+          </div>
+        ) : (
+          <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white font-bold text-xs">
+            ${(item.discountedPrice ?? item.originalPrice ?? 0).toFixed(2)}
+          </span>
+        )}
       </div>
 
       {/* Discount ribbon */}
@@ -526,11 +539,11 @@ const MenuCardFigma = ({
 
       {/* Bottom content */}
       <div className="absolute inset-x-0 bottom-0 z-10 p-4 flex flex-col">
-        {/* Best deal tag if first item */}
+        {/* Best deal tag */}
         {discountPercent > 15 && (
           <div className="mb-2">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-pink-600 text-white text-[9px] font-bold uppercase">
-              <MapPin className="w-2.5 h-2.5" /> Best Deal Within 5 Miles
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-600 text-white text-[9px] font-bold uppercase">
+              <Zap className="w-2.5 h-2.5" /> Best Deal Within 5 Miles
             </span>
           </div>
         )}
@@ -586,6 +599,7 @@ export const DealDetailPage = () => {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [menuCategory, setMenuCategory] = useState<string>('all');
   const [showAllMenu, setShowAllMenu] = useState(false);
+  const [showHoursDropdown, setShowHoursDropdown] = useState(false);
   const MENU_INITIAL_COUNT = 4;
 
   const { isCheckingIn, checkIn } = useCheckIn({
@@ -849,35 +863,64 @@ export const DealDetailPage = () => {
                   <h3 className="text-[11px] font-bold text-[#8B1A1A] tracking-[0.2em] uppercase mb-2.5">
                     Hours
                   </h3>
-                  <div className="space-y-0">
-                    {placeholderHours.map((h) => {
-                      const isToday = h.day === todayDayName;
-                      return (
-                        <div
-                          key={h.day}
-                          className="flex items-center gap-3 py-2.5"
-                        >
-                          <span
-                            className={cn(
-                              'text-sm flex-shrink-0 w-24',
-                              isToday ? 'font-bold text-[#8B1A1A]' : 'font-medium text-neutral-700',
+                  {/* Current day display */}
+                  {(() => {
+                    const todayHours = placeholderHours.find((h) => h.day === todayDayName);
+                    const otherDays = placeholderHours.filter((h) => h.day !== todayDayName);
+                    
+                    return (
+                      <>
+                        {todayHours && (
+                          <div className="flex items-center gap-3 py-2.5">
+                            <span className="text-sm flex-shrink-0 w-24 font-bold text-[#8B1A1A]">
+                              {todayHours.day}
+                            </span>
+                            <div className="flex-1 border-b border-dashed border-neutral-300" />
+                            <span className="text-sm tabular-nums flex-shrink-0 font-bold text-[#8B1A1A]">
+                              {todayHours.isClosed ? 'Closed' : `${todayHours.open} - ${todayHours.close}`}
+                            </span>
+                          </div>
+                        )}
+                        
+                        {/* Dropdown for other days */}
+                        {otherDays.length > 0 && (
+                          <div className="relative">
+                            <button
+                              onClick={() => setShowHoursDropdown(!showHoursDropdown)}
+                              className="w-full flex items-center justify-between py-2.5 text-sm text-neutral-600 hover:text-neutral-900 transition-colors"
+                            >
+                              <span className="font-medium">View all hours</span>
+                              <ChevronDown
+                                className={cn(
+                                  'h-4 w-4 transition-transform',
+                                  showHoursDropdown && 'rotate-180',
+                                )}
+                              />
+                            </button>
+                            
+                            {showHoursDropdown && (
+                              <div className="mt-1 space-y-0 border-t border-neutral-200 pt-1">
+                                {otherDays.map((h) => (
+                                  <div
+                                    key={h.day}
+                                    className="flex items-center gap-3 py-2"
+                                  >
+                                    <span className="text-sm flex-shrink-0 w-24 font-medium text-neutral-700">
+                                      {h.day}
+                                    </span>
+                                    <div className="flex-1 border-b border-dashed border-neutral-300" />
+                                    <span className="text-sm tabular-nums flex-shrink-0 text-neutral-600">
+                                      {h.isClosed ? 'Closed' : `${h.open} - ${h.close}`}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
                             )}
-                          >
-                            {h.day}
-                          </span>
-                          <div className="flex-1 border-b border-dashed border-neutral-300" />
-                          <span
-                            className={cn(
-                              'text-sm tabular-nums flex-shrink-0',
-                              isToday ? 'font-bold text-[#8B1A1A]' : 'text-neutral-600',
-                            )}
-                          >
-                            {h.isClosed ? 'Closed' : `${h.open} - ${h.close}`}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
 
                 {/* ABOUT */}
@@ -1287,7 +1330,7 @@ export const DealDetailPage = () => {
                             </button>
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                           {filteredMenuItems.map((item: any) => (
                             <MenuCardFigma
                               key={item.id}

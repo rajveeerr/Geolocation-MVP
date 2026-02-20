@@ -96,8 +96,8 @@ export const MerchantProtectedRoute = ({
         // User is not authenticated
         setModalMessage('Please log in to access this page.');
         setShowModal(true);
-      } else if (user.role !== 'MERCHANT') {
-        // User is authenticated but not a merchant
+      } else if (user.role !== 'MERCHANT' && !user.merchantId) {
+        // User is authenticated but not a merchant (no MERCHANT role and no merchant profile)
         setModalMessage(fallbackMessage);
         setShowModal(true);
       }
