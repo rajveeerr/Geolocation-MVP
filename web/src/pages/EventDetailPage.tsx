@@ -44,6 +44,8 @@ import { PATHS } from '@/routing/paths';
 import { useDealsByCategory } from '@/hooks/useDealsByCategory';
 import type { Deal } from '@/data/deals';
 import { NewDealCard } from '@/components/landing/NewDealCard';
+import { useBrowseEvents } from '@/hooks/useEventDetail';
+import { EventCard } from '@/components/events/EventCard';
 
 /* ─── Extended types ──────────────────────────────────────────── */
 
@@ -976,66 +978,185 @@ function MerchandiseSection() {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   SECTION 9 — Deals Near This Event  (real data from API)
+   SECTION 9 — Tab Navigation
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-function DealsNearEvent({ event }: { event: FullEventDetail }) {
-  const { data: nearbyDeals, isLoading } = useDealsByCategory({
+function TabNavigation({
+  activeTab,
+  setActiveTab,
+}: {
+  activeTab: 'details' | 'merchandise' | 'similar' | 'merchants';
+  setActiveTab: (tab: 'details' | 'merchandise' | 'similar' | 'merchants') => void;
+}) {
+  const tabs = [
+    { id: 'details' as const, label: 'EVENT DETAILS' },
+    { id: 'merchandise' as const, label: 'MERCHANDISE' },
+    { id: 'similar' as const, label: 'SIMILAR EVENTS' },
+    { id: 'merchants' as const, label: 'MERCHANTS' },
+  ];
+
+  return (
+    <div className="rounded-full bg-neutral-100 p-1 flex overflow-x-auto scrollbar-hide border border-neutral-200">
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          onClick={() => setActiveTab(tab.id)}
+          className={cn(
+            'flex-1 px-4 py-2.5 rounded-full text-xs font-bold tracking-wider whitespace-nowrap transition-all',
+            activeTab === tab.id
+              ? 'bg-[#1a1a2e] text-white shadow-md'
+              : 'text-neutral-500 hover:text-neutral-700',
+          )}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SECTION 10 — Merchants Tab (Upcoming Shows + Deals)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+function MerchantsTab({ event }: { event: FullEventDetail }) {
+  const { data: upcomingEvents, isLoading: eventsLoading } = useBrowseEvents({
+    sortBy: 'startDate',
+    sortOrder: 'asc',
+    limit: 6,
+  });
+
+  const { data: nearbyDeals, isLoading: dealsLoading } = useDealsByCategory({
     latitude: event.latitude || undefined,
     longitude: event.longitude || undefined,
     radius: 5,
-    limit: 10,
+    limit: 8,
   });
 
-  // Always render the section — shows placeholder if no results
   return (
-    <div>
-      <div className="flex items-center justify-between mb-5">
-        <h2 className="font-heading text-xl sm:text-2xl font-black text-[#1a1a2e] uppercase tracking-wide">
-          Deals Near This Event
+    <div className="space-y-8">
+      {/* Upcoming Shows Section */}
+      <div>
+        <h2 className="font-heading text-xl sm:text-2xl font-black text-[#1a1a2e] uppercase tracking-wide mb-5">
+          Upcoming Shows
         </h2>
-        <Link
-          to={PATHS.ALL_DEALS}
-          className="text-xs font-bold text-[#B91C1C] hover:text-[#8B1A1A] flex items-center gap-1 tracking-wider"
-        >
-          Browse All Near Venue
-          <ArrowRight className="h-3 w-3" />
-        </Link>
+        {eventsLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-[364px] rounded-2xl bg-neutral-100 animate-pulse"
+              />
+            ))}
+          </div>
+        ) : upcomingEvents && upcomingEvents.events && upcomingEvents.events.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {upcomingEvents.events.map((evt) => (
+              <EventCard key={evt.id} event={evt} width={204.75} height={364} />
+            ))}
+          </div>
+        ) : (
+          <div className="bg-neutral-50 rounded-2xl p-6 text-center border border-neutral-200">
+            <Calendar className="h-8 w-8 text-neutral-300 mx-auto mb-2" />
+            <p className="text-sm text-neutral-500">No upcoming shows at this time.</p>
+          </div>
+        )}
       </div>
 
+      {/* Deals Near This Event Section */}
+      <div>
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="font-heading text-xl sm:text-2xl font-black text-[#1a1a2e] uppercase tracking-wide">
+            Deals Near This Event
+          </h2>
+          <Link
+            to={PATHS.ALL_DEALS}
+            className="text-xs font-bold text-[#B91C1C] hover:text-[#8B1A1A] flex items-center gap-1 tracking-wider"
+          >
+            Browse All Near Venue
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
+
+        {dealsLoading ? (
+          <div className="flex gap-6 overflow-hidden">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="w-[280px] sm:w-[300px] h-[420px] rounded-2xl bg-neutral-100 animate-pulse flex-shrink-0"
+              />
+            ))}
+          </div>
+        ) : nearbyDeals && nearbyDeals.length > 0 ? (
+          <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 -mx-1 px-1">
+            {nearbyDeals.slice(0, 8).map((deal) => (
+              <div key={deal.id} className="w-[280px] flex-shrink-0 sm:w-[300px]">
+                <NewDealCard deal={deal} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-neutral-50 rounded-2xl p-6 text-center border border-neutral-200">
+            <MapPin className="h-8 w-8 text-neutral-300 mx-auto mb-2" />
+            <p className="text-sm text-neutral-500">
+              Discover deals near{' '}
+              <span className="font-bold text-[#1a1a2e]">
+                {event.venueName || 'the venue'}
+              </span>
+            </p>
+            <Link
+              to={PATHS.ALL_DEALS}
+              className="inline-flex items-center gap-2 mt-3 px-5 py-2.5 bg-[#1a1a2e] hover:bg-[#252548] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+            >
+              Browse Nearby Deals
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SECTION 11 — Similar Events Tab
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+function SimilarEventsTab({ event }: { event: FullEventDetail }) {
+  const { data: similarEvents, isLoading } = useBrowseEvents({
+    sortBy: 'startDate',
+    sortOrder: 'asc',
+    eventType: event.eventType || undefined,
+    limit: 6,
+  });
+
+  return (
+    <div>
+      <h2 className="font-heading text-xl sm:text-2xl font-black text-[#1a1a2e] uppercase tracking-wide mb-5">
+        Similar Events
+      </h2>
       {isLoading ? (
-        <div className="flex gap-6 overflow-hidden">
-          {[1, 2, 3, 4, 5].map((i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="w-[280px] sm:w-[300px] h-[420px] rounded-2xl bg-neutral-100 animate-pulse flex-shrink-0"
+              className="h-[364px] rounded-2xl bg-neutral-100 animate-pulse"
             />
           ))}
         </div>
-      ) : nearbyDeals && nearbyDeals.length > 0 ? (
-        <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 -mx-1 px-1">
-          {nearbyDeals.slice(0, 8).map((deal) => (
-            <div key={deal.id} className="w-[280px] flex-shrink-0 sm:w-[300px]">
-              <NewDealCard deal={deal} />
-            </div>
-          ))}
+      ) : similarEvents && similarEvents.events && similarEvents.events.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {similarEvents.events
+            .filter((evt) => evt.id !== event.id)
+            .slice(0, 6)
+            .map((evt) => (
+              <EventCard key={evt.id} event={evt} width={204.75} height={364} />
+            ))}
         </div>
       ) : (
         <div className="bg-neutral-50 rounded-2xl p-6 text-center border border-neutral-200">
-          <MapPin className="h-8 w-8 text-neutral-300 mx-auto mb-2" />
-          <p className="text-sm text-neutral-500">
-            Discover deals near{' '}
-            <span className="font-bold text-[#1a1a2e]">
-              {event.venueName || 'the venue'}
-            </span>
-          </p>
-          <Link
-            to={PATHS.ALL_DEALS}
-            className="inline-flex items-center gap-2 mt-3 px-5 py-2.5 bg-[#1a1a2e] hover:bg-[#252548] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
-          >
-            Browse Nearby Deals
-            <ArrowRight className="h-3 w-3" />
-          </Link>
+          <Calendar className="h-8 w-8 text-neutral-300 mx-auto mb-2" />
+          <p className="text-sm text-neutral-500">No similar events found.</p>
         </div>
       )}
     </div>
@@ -1043,7 +1164,7 @@ function DealsNearEvent({ event }: { event: FullEventDetail }) {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   SECTION 10 — About the Event / Venue
+   SECTION 13 — About the Event / Venue
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 function AboutVenue({ event }: { event: FullEventDetail }) {
@@ -1143,7 +1264,7 @@ function AboutVenue({ event }: { event: FullEventDetail }) {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   SECTION 11 — Explore Section
+   SECTION 14 — Explore Section
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 function ExploreSection() {
@@ -1172,7 +1293,7 @@ function ExploreSection() {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   SECTION 12 — Purchase Success Modal
+   SECTION 15 — Purchase Success Modal
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 function PurchaseSuccessModal({
@@ -1264,6 +1385,7 @@ export function EventDetailPage() {
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [showSuccess, setShowSuccess] = useState(false);
   const [purchasedTickets, setPurchasedTickets] = useState<{ ticketNumber: string }[]>([]);
+  const [activeTab, setActiveTab] = useState<'details' | 'merchandise' | 'similar' | 'merchants'>('details');
 
   const selectedTier =
     event?.ticketTiers.find((t) => t.id === selectedTierId) ?? null;
@@ -1376,32 +1498,47 @@ export function EventDetailPage() {
               <EssentialRules event={fullEvent} />
             </div>
 
-            {/* ── RIGHT: Earn + Lineup + Tickets + Checkout + Merchandise ── */}
+            {/* ── RIGHT: Earn + Tabs + Content ── */}
             <div className="space-y-5">
               <EarnBanner event={fullEvent} />
-              <LineupSection event={fullEvent} />
-              <SelectTickets
-                event={fullEvent}
-                selectedTierId={selectedTierId}
-                setSelectedTierId={setSelectedTierId}
-                quantities={quantities}
-                setQuantities={setQuantities}
-                onWaitlist={handleWaitlist}
-              />
-              <SecureCheckout
-                event={fullEvent}
-                selectedTier={selectedTier}
-                quantity={selectedQty}
-                onPurchase={handlePurchase}
-                isPurchasing={purchaseMutation.isPending}
-              />
-              <MerchandiseSection />
+              
+              {/* Tab Navigation */}
+              <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+              
+              {/* Tab Content */}
+              <div>
+                {activeTab === 'details' && (
+                  <div className="space-y-5">
+                    <LineupSection event={fullEvent} />
+                    <SelectTickets
+                      event={fullEvent}
+                      selectedTierId={selectedTierId}
+                      setSelectedTierId={setSelectedTierId}
+                      quantities={quantities}
+                      setQuantities={setQuantities}
+                      onWaitlist={handleWaitlist}
+                    />
+                    <SecureCheckout
+                      event={fullEvent}
+                      selectedTier={selectedTier}
+                      quantity={selectedQty}
+                      onPurchase={handlePurchase}
+                      isPurchasing={purchaseMutation.isPending}
+                    />
+                  </div>
+                )}
+                
+                {activeTab === 'merchandise' && <MerchandiseSection />}
+                
+                {activeTab === 'similar' && <SimilarEventsTab event={fullEvent} />}
+                
+                {activeTab === 'merchants' && <MerchantsTab event={fullEvent} />}
+              </div>
             </div>
           </div>
 
           {/* ════ Full-width sections below the grid ════ */}
           <div className="mt-10 space-y-10">
-            <DealsNearEvent event={fullEvent} />
             <AboutVenue event={fullEvent} />
             <ExploreSection />
           </div>

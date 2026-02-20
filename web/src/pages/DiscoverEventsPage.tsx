@@ -335,6 +335,30 @@ export function DiscoverEventsPage() {
   const [eventType, setEventType] = useState('');
   const [sortBy, setSortBy] = useState('startDate');
   const [freeOnly, setFreeOnly] = useState(false);
+  const [showRecommendations, setShowRecommendations] = useState(false);
+
+  /* ─── Search Recommendations ─────────────────────── */
+  const SEARCH_RECOMMENDATIONS = [
+    'DJ',
+    'Jazz',
+    'Hip-Hop',
+    'Rock',
+    'Electronic',
+    'Comedy',
+    'Festival',
+    'Concert',
+    'Nightlife',
+    'R&B',
+    'Country',
+    'Pop',
+    'Indie',
+    'Metal',
+    'Reggae',
+  ];
+
+  const filteredRecommendations = SEARCH_RECOMMENDATIONS.filter((rec) =>
+    rec.toLowerCase().includes(searchInput.toLowerCase()),
+  );
 
   /* ─── Auto-detect location ───────────────────────── */
   const geo = useGeolocation(true);
@@ -433,15 +457,56 @@ export function DiscoverEventsPage() {
         {/* ─── Search Bar ──────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row gap-2 mb-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 z-10" />
             <input
               type="text"
               placeholder="Search events, artists, venues…"
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+                setShowRecommendations(true);
+              }}
+              onFocus={() => setShowRecommendations(true)}
+              onBlur={() => {
+                // Delay hiding to allow clicks on recommendations
+                setTimeout(() => setShowRecommendations(false), 200);
+              }}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               className="w-full pl-10 pr-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm text-[#1a1a2e] placeholder-neutral-400 focus:outline-none focus:border-[#B91C1C] focus:ring-1 focus:ring-[#B91C1C]/20 transition-colors"
             />
+            
+            {/* Search Recommendations Dropdown */}
+            {showRecommendations && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-neutral-200 rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto">
+                {filteredRecommendations.length > 0 ? (
+                  <div className="p-2">
+                    <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-2 px-2">
+                      Popular Searches
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {filteredRecommendations.map((rec) => (
+                        <button
+                          key={rec}
+                          onClick={() => {
+                            setSearchInput(rec);
+                            setShowRecommendations(false);
+                            setKeyword(rec);
+                            setPage(0);
+                          }}
+                          className="px-3 py-1.5 rounded-lg bg-neutral-50 hover:bg-[#B91C1C] hover:text-white text-xs font-semibold text-neutral-700 transition-colors border border-neutral-200 hover:border-[#B91C1C]"
+                        >
+                          {rec}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : searchInput && (
+                  <div className="p-3 text-sm text-neutral-500 text-center">
+                    No recommendations found
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* City picker button */}

@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { Button } from '@/components/common/Button';
 import { useNavigationHistory } from '@/hooks/useNavigationHistory';
@@ -597,7 +597,7 @@ export const DealDetailPage = () => {
   const [showCheckInModal, setShowCheckInModal] = useState(false);
   const [checkInResult, setCheckInResult] = useState<{ pointsEarned: number } | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const [menuCategory, setMenuCategory] = useState<string>('all');
+  const [menuCategory, setMenuCategory] = useState<string>('');
   const [showAllMenu, setShowAllMenu] = useState(false);
   const [showHoursDropdown, setShowHoursDropdown] = useState(false);
   const MENU_INITIAL_COUNT = 4;
@@ -641,32 +641,17 @@ export const DealDetailPage = () => {
     return cats.sort();
   }, [deal]);
 
-  // Group menu items by category for section-based display
-  const menuSections = useMemo(() => {
-    if (!deal?.menuItems?.length) return [];
-    const groups: Record<string, any[]> = {};
-    deal.menuItems.forEach((item: any) => {
-      const cat = item.category || 'Other';
-      if (!groups[cat]) groups[cat] = [];
-      groups[cat].push(item);
-    });
-    // Sort categories alphabetically but put 'Other' last
-    return Object.entries(groups)
-      .sort(([a], [b]) => {
-        if (a === 'Other') return 1;
-        if (b === 'Other') return -1;
-        return a.localeCompare(b);
-      })
-      .map(([category, items]) => ({ category, items }));
-  }, [deal]);
-
-  // Filter menu items for the selected category pill (for "All Items" flat view)
-  const filteredMenuItems = useMemo(() => {
-    if (!deal?.menuItems?.length) return [];
-    let items = deal.menuItems;
-    if (menuCategory !== 'all') {
-      items = items.filter((item: any) => item.category === menuCategory);
+  // Set default category to first available category
+  useEffect(() => {
+    if (menuCategories.length > 0 && !menuCategory) {
+      setMenuCategory(menuCategories[0]);
     }
+  }, [menuCategories, menuCategory]);
+
+  // Filter menu items for the selected category
+  const filteredMenuItems = useMemo(() => {
+    if (!deal?.menuItems?.length || !menuCategory) return [];
+    const items = deal.menuItems.filter((item: any) => item.category === menuCategory);
     if (!showAllMenu) {
       return items.slice(0, MENU_INITIAL_COUNT);
     }
@@ -674,8 +659,7 @@ export const DealDetailPage = () => {
   }, [deal, menuCategory, showAllMenu, MENU_INITIAL_COUNT]);
 
   const totalFilteredCount = useMemo(() => {
-    if (!deal?.menuItems?.length) return 0;
-    if (menuCategory === 'all') return deal.menuItems.length;
+    if (!deal?.menuItems?.length || !menuCategory) return 0;
     return deal.menuItems.filter((item: any) => item.category === menuCategory).length;
   }, [deal, menuCategory]);
 
@@ -1209,100 +1193,27 @@ export const DealDetailPage = () => {
                 {deal.hasMenuItems && deal.menuItems.length > 0 ? (
                   <>
                     {/* Category text tabs – Figma style */}
-                    <div className="flex gap-6 overflow-x-auto scrollbar-hide border-b border-neutral-200 pb-0">
-                      <button
-                        onClick={() => { setMenuCategory('all'); setShowAllMenu(false); }}
-                        className={cn(
-                          'pb-2.5 text-sm font-semibold whitespace-nowrap transition-all flex-shrink-0 border-b-2',
-                          menuCategory === 'all'
-                            ? 'text-neutral-900 border-neutral-900'
-                            : 'text-neutral-400 border-transparent hover:text-neutral-600',
-                        )}
-                      >
-                        All Items
-                      </button>
-                      {menuCategories.map((cat) => (
-                        <button
-                          key={cat}
-                          onClick={() => { setMenuCategory(cat); setShowAllMenu(false); }}
-                          className={cn(
-                            'pb-2.5 text-sm font-semibold whitespace-nowrap transition-all flex-shrink-0 border-b-2',
-                            menuCategory === cat
-                              ? 'text-neutral-900 border-neutral-900'
-                              : 'text-neutral-400 border-transparent hover:text-neutral-600',
-                          )}
-                        >
-                          {prettyCat(cat)}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Section-based display when "All" is selected */}
-                    {menuCategory === 'all' ? (
-                      menuSections.map((section) => {
-                        // Generate section display name
-                        const sectionName = prettyCat(section.category).toUpperCase();
-                        const sectionSubtitle = 'Auto-playing cinematic previews';
-                        return (
-                          <div key={section.category} className="space-y-3">
-                            {/* Section header */}
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <h3 className="text-2xl font-black text-neutral-900 uppercase tracking-tight">
-                                  {sectionName}
-                                </h3>
-                                <p className="text-xs text-neutral-400 mt-0.5">
-                                  {sectionSubtitle}
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <button
-                                  disabled
-                                  className="w-10 h-10 rounded-xl bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-not-allowed opacity-50"
-                                  title="Filter coming soon"
-                                >
-                                  <SlidersHorizontal className="h-[18px] w-[18px] text-neutral-600" />
-                                </button>
-                                <button
-                                  disabled
-                                  className="w-10 h-10 rounded-xl bg-[#1a1a2e] flex items-center justify-center cursor-not-allowed opacity-70"
-                                  title="Search coming soon"
-                                >
-                                  <Search className="h-[18px] w-[18px] text-white" />
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Horizontal scrollable carousel */}
-                            <div className="relative group/carousel">
-                              <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 snap-x snap-mandatory">
-                                {section.items.map((item: any) => (
-                                  <MenuCardFigma
-                                    key={item.id}
-                                    item={item}
-                                    deal={deal}
-                                    onClick={() => navigate(`/deals/${dealId}/menu/${item.id}`)}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* See all items link */}
-                            {section.items.length > 3 && (
-                              <div className="flex justify-end">
-                                <button
-                                  onClick={() => { setMenuCategory(section.category); setShowAllMenu(true); }}
-                                  className="text-sm font-bold text-red-700 hover:text-red-800 flex items-center gap-1 transition-colors"
-                                >
-                                  See all Items <ChevronRight className="h-4 w-4" />
-                                </button>
-                              </div>
+                    {menuCategories.length > 0 && (
+                      <div className="flex gap-6 overflow-x-auto scrollbar-hide border-b border-neutral-200 pb-0">
+                        {menuCategories.map((cat) => (
+                          <button
+                            key={cat}
+                            onClick={() => { setMenuCategory(cat); setShowAllMenu(false); }}
+                            className={cn(
+                              'pb-2.5 text-sm font-semibold whitespace-nowrap transition-all flex-shrink-0 border-b-2',
+                              menuCategory === cat
+                                ? 'text-neutral-900 border-neutral-900'
+                                : 'text-neutral-400 border-transparent hover:text-neutral-600',
                             )}
-                          </div>
-                        );
-                      })
-                    ) : (
-                      /* Filtered grid view for a specific category */
+                          >
+                            {prettyCat(cat)}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Filtered grid view for selected category */}
+                    {menuCategory && (
                       <div>
                         <div className="flex items-center justify-between mb-4">
                           <div>
