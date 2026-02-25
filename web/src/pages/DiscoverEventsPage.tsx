@@ -153,7 +153,7 @@ function VenueCard({ venue }: { venue: TicketmasterVenue }) {
         </h3>
         {location && (
           <p className="text-xs text-neutral-500 mt-0.5 flex items-center gap-1">
-            <MapPin className="w-3 h-3 text-brand-primary-700" />
+            <MapPin className="w-3 h-3 text-brand-primary-600" />
             {location}
           </p>
         )}
@@ -208,7 +208,7 @@ function AttractionCard({
         </h3>
         {genre && (
           <p className="text-xs text-neutral-500 mt-0.5 flex items-center gap-1">
-            <Music className="w-3 h-3 text-brand-primary-700" />
+            <Music className="w-3 h-3 text-brand-primary-600" />
             {genre}
           </p>
         )}
@@ -468,7 +468,7 @@ export function DiscoverEventsPage() {
             </span>
             {city && (
               <X
-                className="w-3.5 h-3.5 ml-auto flex-shrink-0 hover:text-brand-primary-700 transition-colors"
+                className="w-3.5 h-3.5 ml-auto flex-shrink-0 hover:text-brand-primary-600 transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   setCity('');
@@ -648,7 +648,7 @@ export function DiscoverEventsPage() {
 
         {/* Loading */}
         {isLoading && (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <CardSkeleton key={i} />
             ))}
@@ -668,7 +668,7 @@ export function DiscoverEventsPage() {
                     events found
                   </p>
                 </div>
-                <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                   {browseQuery.data.events.map((event) => (
                     <EventCard key={event.id} event={event} />
                   ))}
@@ -717,7 +717,7 @@ export function DiscoverEventsPage() {
                 </div>
 
                 {discoverQuery.data.events.length > 0 ? (
-                  <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                     {discoverQuery.data.events.map((event: any) => (
                       <EventCard key={event.id} event={event} />
                     ))}
@@ -756,7 +756,7 @@ export function DiscoverEventsPage() {
 
                 {tmEventsQuery.data.events.length > 0 ? (
                   <>
-                    <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                       {tmEventsQuery.data.events.map((event) => (
                         <EventCard key={event.id} event={tmToHybrid(event)} />
                       ))}

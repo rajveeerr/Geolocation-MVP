@@ -87,9 +87,9 @@ export const EnhancedCalendar = ({
                 className={`
                   h-10 w-10 p-0 text-sm font-medium rounded-md flex items-center justify-center
                   ${!isCurrentMonth ? 'text-neutral-300' : ''}
-                  ${isTodayDate ? 'bg-red-100 text-red-800 font-bold' : ''}
-                  ${isSelected ? 'bg-red-800 text-white font-bold hover:bg-red-900' : ''}
-                  ${isDisabled ? 'text-neutral-300 cursor-not-allowed' : 'hover:bg-red-50'}
+                  ${isTodayDate ? 'bg-brand-primary-100 text-brand-primary-800 font-bold' : ''}
+                  ${isSelected ? 'bg-brand-primary-600 text-white font-bold hover:bg-brand-primary-700' : ''}
+                  ${isDisabled ? 'text-neutral-300 cursor-not-allowed' : 'hover:bg-brand-primary-50'}
                   ${!isDisabled && isCurrentMonth && !isSelected && !isTodayDate ? 'text-neutral-800' : ''}
                 `}
                 disabled={isDisabled}

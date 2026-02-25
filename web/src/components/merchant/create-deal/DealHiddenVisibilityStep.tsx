@@ -263,7 +263,7 @@ export const DealHiddenVisibilityStep = () => {
                             }}
                             className={`rounded-lg border-2 p-2 text-sm transition-all ${
                               isSelected
-                                ? 'border-brand-primary-500 bg-brand-primary-50 text-brand-primary-700'
+                                ? 'border-brand-primary-500 bg-brand-primary-50 text-brand-primary-600'
                                 : 'border-neutral-200 bg-white text-neutral-600 hover:border-brand-primary-300'
                             }`}
                             whileHover={{ scale: 1.05 }}

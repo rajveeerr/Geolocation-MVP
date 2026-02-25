@@ -248,7 +248,7 @@
 
   /* Section container (consistent max-w + padding) */
   .section-container {
-    @apply mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-screen-2xl px-4 sm:px-6 lg:px-8;
   }
 
   /* Dark card surface (deal cards, bounty cards) */

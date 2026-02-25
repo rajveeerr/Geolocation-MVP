@@ -17,15 +17,15 @@ import {
   Repeat,
   Zap,
   Tag,
-  ChevronRight,
-  TrendingUp,
-  Scissors,
+  ChevronDown,
   Send,
   ArrowUpRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Deal } from '@/data/deals';
-import { useMenuItems } from '@/hooks/useMenuSystem';
+import { getLandingMenuItems } from '@/data/landing-menu';
+// API menu fetch disabled — using hardcoded menu for now:
+// import { useMenuItems } from '@/hooks/useMenuSystem';
 import { useTodayAvailability } from '@/hooks/useTableBooking';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -104,7 +104,7 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
   // Hooks
   const { savedDealIds, saveDeal, unsaveDeal } = useSavedDeals();
   const isSaved = savedDealIds.has(deal.id);
-  const { data: menuItems } = useMenuItems({ merchantId: deal.merchantId });
+  const { biteItems: hardcodedBites, drinkItems: hardcodedDrinks } = getLandingMenuItems(deal.id);
   const { data: availability } = useTodayAvailability(deal.merchantId || undefined);
 
   // Countdown
@@ -149,7 +149,6 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
   // Discount values for the top capsule
   const discountPct = deal.discountPercentage ?? 0;
   const discountAmt = deal.discountAmount ?? 0;
-  const hasDiscount = discountPct > 0 || discountAmt > 0;
   const originalPrice = deal.originalValue ?? 0;
   const salePrice =
     discountPct > 0 && originalPrice > 0
@@ -163,6 +162,26 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
     typeof deal.category === 'string'
       ? deal.category.toUpperCase()
       : (deal.category as any)?.name?.toUpperCase() || '';
+
+  // Price pill variant: 0 = red bg, 1 = glassmorphism + red border
+  const pricePillVariant =
+    (String(deal.id)
+      .split('')
+      .reduce((a, c) => a + c.charCodeAt(0), 0) %
+      2) as 0 | 1;
+
+  const PILL_BASE =
+    'rounded-full h-8 min-h-[32px] min-w-[84px] flex items-center shrink-0';
+
+  // First pill: always dark reddish-brown (maroon-type)
+  const categoryPillStyle = 'bg-[#453030] border border-white/5';
+
+  const pricePillStyles = [
+    // 0: solid red bg
+    'bg-[#E80203]/90 border border-white/20',
+    // 1: glassmorphism + red border
+    'bg-black/40 backdrop-blur-md border-2 border-[#E80203]',
+  ];
 
   // Navigation
   const goToDeal = () => {
@@ -187,23 +206,9 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
     setTimeout(() => setLinkCopied(false), 2000);
   };
 
-  // Menu filtering
-  const biteItems =
-    menuItems?.filter(
-      (item) =>
-        item.category?.toLowerCase().includes('food') ||
-        item.category?.toLowerCase().includes('bite') ||
-        item.category?.toLowerCase().includes('appetizer') ||
-        item.category?.toLowerCase().includes('entree'),
-    ) || [];
-
-  const drinkItems =
-    menuItems?.filter(
-      (item) =>
-        item.category?.toLowerCase().includes('drink') ||
-        item.category?.toLowerCase().includes('beverage') ||
-        item.category?.toLowerCase().includes('cocktail'),
-    ) || [];
+  // Hardcoded menu (API disabled for now)
+  const biteItems = hardcodedBites;
+  const drinkItems = hardcodedDrinks;
 
   // ─── Render ────────────────────────────────────────────────────
 
@@ -260,58 +265,44 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
             timeDisplay={timeDisplay}
             linkCopied={linkCopied}
             onCopyLink={handleCopyLink}
-            userId={user?.id}
+            userId={user?.id?.toString()}
           />
 
-          {/* ─────────────── TOP CAPSULE (Pricing Pill) ─────────────── */}
-          {(hasDiscount || categoryLabel || dtype !== 'standard') && (
-            <div className="absolute top-10 left-3 right-3 z-20">
-              <div className="inline-flex items-center gap-2 bg-[#1a1a2e]/80 backdrop-blur-sm rounded-full px-3 py-1.5 max-w-full">
-                {/* Deal type badge for non-standard types */}
-                {dtype !== 'standard' && (
-                  <span className="text-white font-bold text-[10px] leading-tight uppercase tracking-wider flex-shrink-0">
-                    {meta.badge}
-                  </span>
+          {/* ─────────────── TOP CAPSULE (Pills) ─────────────── */}
+          {/* Category pill (left) + Price pill (right) — similar height, glassmorphism variants */}
+          <div className="absolute top-10 left-3 right-3 z-20 flex items-center justify-between gap-2">
+            {/* Category tag — always dark maroon */}
+            <div
+              className={cn(PILL_BASE, 'px-3 justify-center', categoryPillStyle)}
+            >
+              <span className="text-white font-bold text-[10px] leading-tight uppercase tracking-wider">
+                {dtype !== 'standard' ? meta.badge : (categoryLabel || 'DEAL')}
+              </span>
+            </div>
+            {/* Price tag — red bg OR glassmorphism + red border */}
+            {(salePrice > 0 || originalPrice > 0) && (
+              <div
+                className={cn(
+                  PILL_BASE,
+                  'pl-3 pr-2 gap-1.5',
+                  pricePillStyles[pricePillVariant]
                 )}
-                {/* Category label (only for standard to avoid clutter) */}
-                {dtype === 'standard' && categoryLabel && (
-                  <span className="text-white font-bold text-[10px] leading-tight uppercase tracking-wider truncate">
-                    {categoryLabel}
-                  </span>
-                )}
-                {/* Sale price (only when we have the original value to compute it) */}
+              >
                 {salePrice > 0 && (
-                  <span className="text-red-500 font-bold text-base flex-shrink-0">
-                    ${salePrice.toFixed(2)}
-                  </span>
+                  <span className="text-white font-bold text-sm">${salePrice.toFixed(2)}</span>
                 )}
-                {/* Original price struck-through */}
                 {originalPrice > 0 && salePrice > 0 && (
-                  <span className="text-white/50 text-xs line-through flex-shrink-0">
+                  <span className="text-white/70 text-xs line-through">
                     ${originalPrice.toFixed(2)}
                   </span>
                 )}
-                {/* Discount percentage — always show if available */}
-                {discountPct > 0 && (
-                  <span className="text-white font-bold text-sm flex-shrink-0">
-                    {discountPct}%
-                  </span>
+                {originalPrice > 0 && salePrice === 0 && (
+                  <span className="text-white font-bold text-sm">${originalPrice.toFixed(2)}</span>
                 )}
-                {/* Discount amount fallback when no percentage */}
-                {discountPct === 0 && discountAmt > 0 && (
-                  <span className="text-white font-bold text-sm flex-shrink-0">
-                    ${discountAmt} off
-                  </span>
-                )}
-                {/* Trend icon */}
-                {hasDiscount && (
-                  <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center flex-shrink-0">
-                    <TrendingUp className="w-3 h-3 text-white" />
-                  </div>
-                )}
+                <ChevronDown className="w-4 h-4 text-white flex-shrink-0" />
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* ─────────────── Social Proof ─────────────── */}
           <div className="absolute bottom-[140px] left-3 z-10">
@@ -321,14 +312,14 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
                   {tappedInUsers.slice(0, 3).map((u, i) => (
                     <Avatar key={i} className="w-8 h-8 border-2 border-white/80 shadow-md">
                       <AvatarImage src={u.avatarUrl || undefined} />
-                      <AvatarFallback className="bg-gradient-to-br from-rose-400 to-amber-400 text-white text-[10px] font-semibold">
+                      <AvatarFallback className="bg-gradient-to-br from-brand-primary-400 to-amber-400 text-white text-[10px] font-semibold">
                         {String.fromCharCode(65 + i)}
                       </AvatarFallback>
                     </Avatar>
                   ))}
                 </div>
-                <span className="text-white/90 text-xs font-medium drop-shadow-lg">
-                  +{tappedInCount} tapped in
+                <span className="text-white text-xs font-medium drop-shadow-lg">
+                  +{tappedInCount} checked in
                 </span>
               </div>
             )}
@@ -357,45 +348,79 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
               )}
             </div>
 
-            {/* ── Bottom action row: status pill(s) + icon buttons ── */}
+            {/* ── Figma: Status pill + action icons ── */}
             <div className="flex items-center gap-1.5 pt-1">
-              {/* Left side: ONE status pill (priority order — show only the most relevant) */}
-              {(isActive || isUpcoming) && timeDisplay ? (
-                <div className="flex items-center gap-1 bg-brand-primary-700/80 backdrop-blur-sm rounded-full px-2.5 py-1.5 flex-shrink-0">
-                  <Clock className="w-3 h-3 text-white/80" />
-                  <span className="text-white text-[10px] font-semibold leading-tight whitespace-nowrap">
-                    {isUpcoming ? 'Starts' : 'Ends'} {timeDisplay}
-                  </span>
-                </div>
-              ) : dtype === 'recurring' && deal.recurringDays && deal.recurringDays.length > 0 ? (
-                <div className="flex items-center gap-1 bg-blue-600/60 backdrop-blur-sm rounded-full px-2.5 py-1.5 flex-shrink-0">
-                  <Repeat className="w-3 h-3 text-white/80" />
+              {/* Status pill — Figma styles: Starts (dark+red border), Ends (green), Opens/Date (dark) */}
+              {deal.statusText ? (
+                deal.statusText.startsWith('Opens') ? (
+                  <div
+                    className="flex items-center gap-1 rounded-full px-2.5 py-1.5 flex-shrink-0"
+                    style={{ background: '#2D2D2D' }}
+                  >
+                    <span className="text-white text-[10px] font-semibold">
+                      {deal.statusText}
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    className="flex items-center gap-1 rounded-full px-2.5 py-1.5 flex-shrink-0 border"
+                    style={{ background: '#2D2D2D', borderColor: '#E80203' }}
+                  >
+                    <Clock className="w-3 h-3 text-white" />
+                    <span className="text-white text-[10px] font-semibold">
+                      {deal.statusText}
+                    </span>
+                  </div>
+                )
+              ) : (isActive || isUpcoming) && timeDisplay ? (
+                isActive ? (
+                  <div
+                    className="flex items-center gap-1 rounded-full px-2.5 py-1.5 flex-shrink-0"
+                    style={{ background: '#34C759' }}
+                  >
+                    <Clock className="w-3 h-3 text-white" />
+                    <span className="text-white text-[10px] font-semibold whitespace-nowrap">
+                      Ends {timeDisplay}
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    className="flex items-center gap-1 rounded-full px-2.5 py-1.5 flex-shrink-0 border"
+                    style={{ background: '#2E3134', borderColor: '#E80203' }}
+                  >
+                    <Clock className="w-3 h-3 text-white" />
+                    <span className="text-white text-[10px] font-semibold whitespace-nowrap">
+                      Starts {timeDisplay}
+                    </span>
+                  </div>
+                )
+              ) : dtype === 'recurring' && deal.recurringDays?.length ? (
+                <div
+                  className="flex items-center gap-1 rounded-full px-2.5 py-1.5 flex-shrink-0"
+                  style={{ background: '#2D2D2D' }}
+                >
+                  <Repeat className="w-3 h-3 text-white" />
                   <span className="text-white text-[10px] font-semibold">
                     {deal.recurringDays.map((d) => d.slice(0, 3)).join('/')}
                   </span>
                 </div>
               ) : hasBounty && maxCash > 0 ? (
-                <div className="flex items-center gap-1 bg-emerald-600/60 backdrop-blur-sm rounded-full px-2.5 py-1.5 flex-shrink-0">
-                  <Banknote className="w-3 h-3 text-white/80" />
+                <div
+                  className="flex items-center gap-1 rounded-full px-2.5 py-1.5 flex-shrink-0"
+                  style={{ background: '#2D2D2D' }}
+                >
+                  <Banknote className="w-3 h-3 text-white" />
                   <span className="text-white text-[10px] font-semibold">Up to ${maxCash}</span>
                 </div>
               ) : null}
 
-              {/* Secondary pill: deal type badge (Secret, Flash, etc.) — only if different from time pill */}
-              {dtype === 'hidden' && (
-                <div className="flex items-center gap-1 bg-purple-600/60 backdrop-blur-sm rounded-full px-2.5 py-1.5 flex-shrink-0">
-                  <Sparkles className="w-3 h-3 text-white/80" />
-                  <span className="text-white text-[10px] font-semibold">Secret</span>
-                </div>
-              )}
-
-              {/* Spacer pushes icons right */}
               <div className="flex-1 min-w-0" />
 
-              {/* Icon buttons — always show, flex-shrink-0 */}
+              {/* Action icons — dark gray circles, send = purple gradient */}
               <div className="flex items-center gap-1.5 flex-shrink-0">
                 <button
-                  className="w-8 h-8 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center hover:bg-white/25 transition-all"
+                  className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity"
+                  style={{ background: '#4C4C4C' }}
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowShareSheet(true);
@@ -404,29 +429,31 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
                   <Share2 className="w-3.5 h-3.5 text-white" />
                 </button>
                 <button
-                  className="w-8 h-8 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center hover:bg-white/25 transition-all"
+                  className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity"
+                  style={{ background: '#4C4C4C' }}
                   onClick={handleFavorite}
                 >
                   <Heart
                     className={cn(
                       'w-3.5 h-3.5',
-                      isSaved ? 'fill-red-500 text-red-500' : 'text-white',
+                      isSaved ? 'fill-brand-primary-600 text-brand-primary-600' : 'text-white',
                     )}
                   />
                 </button>
-                {deal.merchantId && (
+                {(deal.merchantId || biteItems.length > 0 || drinkItems.length > 0) && (
                   <button
-                    className="w-8 h-8 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center hover:bg-white/25 transition-all"
+                    className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity"
+                    style={{ background: '#4C4C4C' }}
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowMenuPeek(true);
                     }}
                   >
-                    <Scissors className="w-3.5 h-3.5 text-white" />
+                    <UtensilsCrossed className="w-3.5 h-3.5 text-white" />
                   </button>
                 )}
                 <button
-                  className="w-8 h-8 rounded-full flex items-center justify-center transition-all"
+                  className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity"
                   style={{
                     background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
                   }}
@@ -443,12 +470,12 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
         </div>
       </motion.div>
 
-      {/* ── CTA Row ───────────────────────────────────── */}
+      {/* ── Figma: CTA bar — dark blue pill + "up to $80" ── */}
       <div className="flex items-center gap-2.5 mt-3">
-        {/* Main CTA — dark pill with arrow */}
         <button
           onClick={goToDeal}
-          className="flex-1 h-[52px] rounded-full shadow-md hover:shadow-lg transition-all flex items-center justify-between pl-5 pr-1.5 bg-gray-900 group/cta"
+          className="flex-1 h-[52px] rounded-full shadow-md hover:shadow-lg transition-all flex items-center justify-between pl-5 pr-1.5 group/cta"
+          style={{ background: '#1a1a2e' }}
         >
           <span className="text-white font-semibold text-sm tracking-wide">
             {meta.cta}
@@ -458,7 +485,6 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
           </div>
         </button>
 
-        {/* Reward badge — right pill */}
         <RewardBadge
           dtype={dtype}
           deal={deal}
@@ -487,6 +513,7 @@ function RewardBadge({
   onPress: () => void;
 }) {
   const hasContent =
+    maxCash > 0 ||
     hasBounty ||
     dtype === 'hidden' ||
     dtype === 'redeem' ||
@@ -503,11 +530,11 @@ function RewardBadge({
       }}
       className="h-[52px] rounded-full bg-white border border-gray-200 flex items-center justify-center px-4 shadow-md flex-shrink-0 hover:border-gray-400 transition-colors"
     >
-      {hasBounty && maxCash > 0 ? (
+      {(hasBounty || maxCash > 0) && maxCash > 0 ? (
         <div className="flex items-center gap-1.5">
-          <Banknote className="w-4 h-4 text-gray-600" />
-          <span className="text-[10px] text-gray-400">up to</span>
-          <span className="text-lg font-bold text-gray-900">${maxCash}</span>
+          <Banknote className="w-4 h-4 text-neutral-600" />
+          <span className="text-[10px] text-neutral-500">up to</span>
+          <span className="text-lg font-bold text-neutral-900">${maxCash}</span>
         </div>
       ) : dtype === 'hidden' ? (
         <div className="flex items-center gap-1.5">
@@ -637,7 +664,7 @@ function MenuItemRow({ item, deal }: { item: any; deal: Deal }) {
         <div className="flex items-center gap-1.5">
           <span className="text-emerald-600 font-semibold text-xs">${item.price}</span>
           {deal.discountPercentage != null && deal.discountPercentage > 0 && (
-            <Badge className="bg-red-700 text-white text-[9px] px-1.5 py-0">{deal.discountPercentage}% OFF</Badge>
+            <Badge className="bg-brand-primary-600 text-white text-[9px] px-1.5 py-0">{deal.discountPercentage}% OFF</Badge>
           )}
         </div>
       </div>
@@ -738,9 +765,9 @@ function IncentiveOverlay({
                 )}
               </div>
               {isActive && timeDisplay && (
-                <div className="flex items-center gap-2 bg-red-500/20 border border-red-500/30 rounded-xl p-2.5">
-                  <Clock className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
-                  <p className="text-red-200 text-[11px]">Deal ends in {timeDisplay}</p>
+                <div className="flex items-center gap-2 bg-brand-primary-600/20 border border-brand-primary-600/40 rounded-xl p-2.5">
+                  <Clock className="w-3.5 h-3.5 text-brand-primary-500 flex-shrink-0" />
+                  <p className="text-brand-primary-400 text-[11px]">Deal ends in {timeDisplay}</p>
                 </div>
               )}
             </div>

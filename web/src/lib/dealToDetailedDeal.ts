@@ -4,8 +4,30 @@
  */
 import type { Deal } from '@/data/deals';
 import type { DetailedDeal } from '@/hooks/useDealDetail';
+import { getLandingMenuItems } from '@/data/landing-menu';
 
 const now = new Date().toISOString();
+
+function toDetailMenuItems(
+  biteItems: { id: number; name: string; price: number; category: string; imageUrl?: string }[],
+  drinkItems: { id: number; name: string; price: number; category: string; imageUrl?: string }[],
+  discountPct: number,
+): DetailedDeal['menuItems'] {
+  const all = [...biteItems, ...drinkItems];
+  return all.map((item) => {
+    const orig = item.price;
+    const disc = discountPct > 0 ? +(orig * (1 - discountPct / 100)).toFixed(2) : orig;
+    return {
+      id: item.id,
+      name: item.name,
+      description: '',
+      originalPrice: orig,
+      discountedPrice: disc,
+      imageUrl: item.imageUrl || null,
+      category: item.category,
+    };
+  });
+}
 
 export function dealToDetailedDeal(d: Deal): DetailedDeal {
   const images = (d.images?.length ? d.images : [d.image]).filter(Boolean);
@@ -58,8 +80,14 @@ export function dealToDetailedDeal(d: Deal): DetailedDeal {
     },
     redemptionInstructions: 'Check in at the venue and show this deal to your server.',
     kickbackEnabled: (d.bountyRewardAmount ?? 0) > 0,
-    menuItems: [],
-    hasMenuItems: false,
+    menuItems: (() => {
+      const { biteItems: bites, drinkItems: drinks } = getLandingMenuItems(d.id);
+      return toDetailMenuItems(bites, drinks, d.discountPercentage ?? 0);
+    })(),
+    hasMenuItems: (() => {
+      const { biteItems, drinkItems } = getLandingMenuItems(d.id);
+      return biteItems.length > 0 || drinkItems.length > 0;
+    })(),
     merchant: {
       id: d.merchantId ?? 0,
       businessName: d.merchantName || 'Venue',

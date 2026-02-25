@@ -177,9 +177,7 @@ export const ImageSlideshow = ({
               }}
               className={cn(
                 'h-[2px] flex-1 rounded-full transition-all duration-300 min-w-0',
-                i === activeIndex
-                  ? 'bg-white'
-                  : 'bg-white/30',
+                i === activeIndex ? 'bg-white' : 'bg-white/20',
               )}
               aria-label={`Go to image ${i + 1}`}
             />

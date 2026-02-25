@@ -44,7 +44,7 @@ export const HowItWorksSection = () => {
     <section className="bg-white py-20 md:py-28 px-6 lg:px-8">
       <div className="max-w-5xl mx-auto text-center">
         {/* Section Label */}
-        <p className="text-[12px] font-bold uppercase tracking-[0.15em] text-brand-primary-700 mb-3">
+        <p className="text-[12px] font-bold uppercase tracking-[0.15em] text-brand-primary-600 mb-3">
           The Game
         </p>
 
@@ -73,12 +73,12 @@ export const HowItWorksSection = () => {
                 {/* Icon circle with step badge */}
                 <div className="relative mb-6 z-10">
                   {/* Outer ring */}
-                  <div className="w-[72px] h-[72px] rounded-full border-2 border-brand-primary-700/30 flex items-center justify-center bg-white">
+                  <div className="w-[72px] h-[72px] rounded-full border-2 border-brand-primary-600/40 flex items-center justify-center bg-white">
                     {/* Inner icon */}
-                    <s.icon className="h-7 w-7 text-brand-primary-700" strokeWidth={1.8} />
+                    <s.icon className="h-7 w-7 text-brand-primary-600" strokeWidth={1.8} />
                   </div>
                   {/* Step number badge */}
-                  <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-brand-primary-700 text-white text-[10px] font-bold rounded-full px-2 py-0.5 min-w-[46px] h-[20px] flex items-center justify-center shadow-sm whitespace-nowrap">
+                  <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-brand-primary-600 text-white text-[10px] font-bold rounded-full px-2 py-0.5 min-w-[46px] h-[20px] flex items-center justify-center shadow-sm whitespace-nowrap">
                     Step {s.step}
                   </span>
                 </div>

@@ -6,11 +6,15 @@ import {
   Loader2,
   PartyPopper,
   Beer,
+  Compass,
+  ArrowRight,
 } from 'lucide-react';
 import type { DetailedDeal } from '@/hooks/useDealDetail';
 import { useBrowseEvents } from '@/hooks/useEventDetail';
 import { EventCard } from '@/components/events/EventCard';
 import { cn } from '@/lib/utils';
+import { Link } from 'react-router-dom';
+import { PATHS } from '@/routing/paths';
 
 interface EventsTabProps {
   deal: DetailedDeal;
@@ -86,6 +90,30 @@ export const EventsTab = ({ deal }: EventsTabProps) => {
           {events.map((event) => (
             <EventCard key={event.id} event={event} width={204.75} height={364} compact />
           ))}
+          {/* Discover Events CTA Card */}
+          <Link
+            to={PATHS.DISCOVER_EVENTS}
+            className="group flex flex-col items-center justify-center rounded-2xl bg-[#1a1a2e] transition-all hover:bg-[#252548] active:scale-[0.98]"
+            style={{ minHeight: 364 }}
+          >
+            <div className="flex flex-col items-center gap-5 px-6 text-center">
+              <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center">
+                <Compass className="h-5 w-5 text-white/80" />
+              </div>
+              <div>
+                <h3 className="font-heading text-sm font-black text-white uppercase tracking-widest mb-1.5">
+                  Discover More
+                </h3>
+                <p className="text-[11px] text-white/40 leading-relaxed">
+                  Browse all events near you
+                </p>
+              </div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-[10px] font-bold text-white uppercase tracking-wider group-hover:bg-white/20 transition-colors">
+                View All
+                <ArrowRight className="h-3 w-3" />
+              </span>
+            </div>
+          </Link>
         </div>
       )}
 

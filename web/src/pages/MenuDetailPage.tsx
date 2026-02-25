@@ -179,8 +179,8 @@ export const MenuDetailPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
           {/* ============ LEFT – Image Gallery ============ */}
           <div className="space-y-3">
-            {/* Main image */}
-            <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-neutral-100">
+            {/* Main image – Instagram Reel ratio */}
+            <div className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden bg-neutral-100">
               {images.length > 0 ? (
                 <img
                   src={images[imgIdx]}
@@ -226,7 +226,7 @@ export const MenuDetailPage = () => {
                     onClick={() => setImgIdx(i)}
                     className={cn(
                       'flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all',
-                      imgIdx === i ? 'ring-2 ring-brand-primary-700' : 'opacity-70 hover:opacity-100',
+                      imgIdx === i ? 'ring-2 ring-brand-primary-600' : 'opacity-70 hover:opacity-100',
                     )}
                   >
                     <img src={src} alt="" className="w-full h-full object-cover" />

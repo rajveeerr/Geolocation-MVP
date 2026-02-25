@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import {
     Calendar,
     MapPin,
-    Users,
     TrendingUp,
     ArrowUpRight,
     Heart,
@@ -131,7 +130,7 @@ interface EventCardProps {
     width?: number;
     /** Optional: fixed height in pixels (e.g., 364) */
     height?: number;
-    /** Hide description & visitor count for compact contexts (e.g. deal detail) */
+    /** Reserved for future compact layout (e.g. smaller padding) */
     compact?: boolean;
 }
 
@@ -160,8 +159,6 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]', width, height, 
     const trendingScore = ('trendingScore' in event ? event.trendingScore : 0) ?? 0;
     const socialProofCount = ('socialProofCount' in event ? event.socialProofCount : 0) ?? 0;
     const isTrending = trendingScore > 50 || socialProofCount > 20;
-    const currentAttendees = ('currentAttendees' in event ? event.currentAttendees : 0) ?? 0;
-    const shortDesc = event.shortDescription || (event as HybridEvent).description || null;
     const isFree = ('isFreeEvent' in event && event.isFreeEvent) || false;
     const isHybridTM = (event as HybridEvent).source === 'ticketmaster';
 
@@ -273,7 +270,7 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]', width, height, 
             {available === 0 && !isFree && (
                 <div className={cn("absolute z-10", isFixedSize ? "top-12 left-3" : "top-14 left-3.5")}>
                     <span className={cn(
-                        "rounded-full bg-red-600/80 backdrop-blur-md text-white font-bold uppercase tracking-wider",
+                        "rounded-full bg-brand-primary-600/90 backdrop-blur-md text-white font-bold uppercase tracking-wider",
                         isFixedSize ? "px-2 py-0.5 text-[8px]" : "px-2.5 py-1 text-[9px]"
                     )}>
                         Sold Out
@@ -316,39 +313,6 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]', width, height, 
                                 <MapPin className={cn("flex-shrink-0", isFixedSize ? "h-2.5 w-2.5" : "h-3 w-3")} />
                                 <span className="truncate">{venue}</span>
                             </p>
-                        )}
-                    </div>
-                )}
-
-                {/* Short desc */}
-                {!compact && shortDesc && (
-                    <p className={cn(
-                        "text-white/40 line-clamp-2 leading-relaxed",
-                        isFixedSize ? "text-[11px] mt-1" : "text-[13px] mt-1.5"
-                    )}>
-                        {shortDesc}
-                    </p>
-                )}
-
-                {/* Spots + attendees info */}
-                {!compact && (currentAttendees > 0 || (available > 0 && available <= 30)) && (
-                    <div className={cn("flex items-center gap-2", isFixedSize ? "mt-1.5" : "mt-2")}>
-                        {currentAttendees > 0 && (
-                            <span className={cn(
-                                "text-white/50 flex items-center gap-1",
-                                isFixedSize ? "text-[10px]" : "text-[11px]"
-                            )}>
-                                <Users className={cn(isFixedSize ? "h-2.5 w-2.5" : "h-3 w-3")} />
-                                <span className="truncate">{currentAttendees} going</span>
-                            </span>
-                        )}
-                        {available > 0 && available <= 30 && (
-                            <span className={cn(
-                                "text-amber-400 font-semibold",
-                                isFixedSize ? "text-[10px]" : "text-[11px]"
-                            )}>
-                                {available} spots left
-                            </span>
                         )}
                     </div>
                 )}

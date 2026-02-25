@@ -143,11 +143,11 @@ export const NewHeroSection = ({ onCategoryChange, onFilterClick }: NewHeroSecti
           </span>
         </div>
 
-        {/* ── Main Headline — all on same line, Figma mixed-typography with CA$H ── */}
-        <div className="mb-5 max-w-5xl overflow-hidden">
+        {/* ── Main Headline — full width, single line ── */}
+        <div className="mb-5 w-full min-w-0">
           <h1
-            className="leading-[1.05] tracking-tight flex flex-nowrap items-baseline gap-x-2"
-            style={{ fontSize: 'clamp(1.5rem, 4.5vw, 3.25rem)' }}
+            className="leading-[1.05] tracking-tight flex flex-nowrap items-baseline gap-x-2 whitespace-nowrap"
+            style={{ fontSize: 'clamp(1.25rem, 3.5vw, 3.25rem)' }}
           >
             <span className="font-black text-[#1A1A1A] uppercase whitespace-nowrap">
               FIND A DEAL.
@@ -287,7 +287,7 @@ export const NewHeroSection = ({ onCategoryChange, onFilterClick }: NewHeroSecti
             title="More filters"
           >
             <div className="w-[72px] h-[72px] md:w-20 md:h-20 rounded-full border-[2.5px] border-neutral-200 bg-white flex items-center justify-center transition-all duration-200 group-hover:border-neutral-400 group-hover:shadow-sm">
-              <SlidersHorizontal className="h-6 w-6 text-brand-primary-600 group-hover:text-brand-primary-700 transition-colors" />
+              <SlidersHorizontal className="h-6 w-6 text-brand-primary-600 group-hover:text-brand-primary-600 transition-colors" />
             </div>
             <span className="text-xs text-gray-500 group-hover:text-gray-900 transition-colors whitespace-nowrap invisible">
               Filters

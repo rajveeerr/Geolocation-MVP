@@ -29,6 +29,7 @@ import {
   Lock,
   X,
   Heart,
+  Compass,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -309,7 +310,7 @@ function EarnBanner({ event }: { event: FullEventDetail }) {
 
             <Link
               to={PATHS.REFERRALS}
-              className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-brand-primary-600 hover:bg-brand-primary-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors active:scale-[0.98] shadow-lg shadow-red-900/30"
+              className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-brand-primary-600 hover:bg-brand-primary-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors active:scale-[0.98] shadow-lg shadow-black/20"
             >
               Check In Now
             </Link>
@@ -663,7 +664,7 @@ function SelectTickets({
                     e.stopPropagation();
                     onWaitlist();
                   }}
-                  className="mt-2 text-xs font-bold text-brand-primary-600 hover:text-brand-primary-700 uppercase tracking-wide"
+                  className="mt-2 text-xs font-bold text-brand-primary-600 hover:text-brand-primary-600 uppercase tracking-wide"
                 >
                   Join Waitlist &rarr;
                 </button>
@@ -710,7 +711,7 @@ function SecureCheckout({
   return (
     <div className="bg-white rounded-2xl border border-neutral-200 p-5">
       <h3 className="font-heading text-base font-black text-[#1a1a2e] uppercase tracking-wide mb-4 flex items-center gap-2">
-        <Lock className="h-4 w-4 text-brand-primary-700" />
+        <Lock className="h-4 w-4 text-brand-primary-600" />
         Secure Checkout
       </h3>
 
@@ -759,7 +760,7 @@ function SecureCheckout({
       <button
         onClick={onPurchase}
         disabled={isPurchasing}
-        className="w-full mt-4 h-12 rounded-full bg-brand-primary-600 hover:bg-brand-primary-700 text-white font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60 shadow-lg shadow-red-900/20"
+        className="w-full mt-4 h-12 rounded-full bg-brand-primary-600 hover:bg-brand-primary-700 text-white font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60 shadow-lg shadow-black/20"
       >
         {isPurchasing ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -819,7 +820,7 @@ function EventPerks({ event }: { event: FullEventDetail }) {
 
   return (
     <div className="bg-white rounded-2xl border border-neutral-200 p-5">
-      <h2 className="font-heading text-sm font-black text-brand-primary-700 uppercase tracking-[0.15em] mb-4 flex items-center gap-2">
+      <h2 className="font-heading text-sm font-black text-brand-primary-600 uppercase tracking-[0.15em] mb-4 flex items-center gap-2">
         <Sparkles className="h-4 w-4" />
         Event Perks
       </h2>
@@ -866,7 +867,7 @@ function EssentialRules({ event }: { event: FullEventDetail }) {
 
   return (
     <div className="bg-white rounded-2xl border border-neutral-200 p-5">
-      <h2 className="font-heading text-sm font-black text-brand-primary-700 uppercase tracking-[0.15em] mb-4 flex items-center gap-2">
+      <h2 className="font-heading text-sm font-black text-brand-primary-600 uppercase tracking-[0.15em] mb-4 flex items-center gap-2">
         <ShieldAlert className="h-4 w-4" />
         Essential Rules
       </h2>
@@ -1016,17 +1017,11 @@ function TabNavigation({
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   SECTION 10 — Merchants Tab (Upcoming Shows + Deals)
+   SECTION 10 — Deals Near This Event (always visible, outside tabs)
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-function MerchantsTab({ event }: { event: FullEventDetail }) {
-  const { data: upcomingEvents, isLoading: eventsLoading } = useBrowseEvents({
-    sortBy: 'startDate',
-    sortOrder: 'asc',
-    limit: 6,
-  });
-
-  const { data: nearbyDeals, isLoading: dealsLoading } = useDealsByCategory({
+function DealsNearThisEventSection({ event }: { event: FullEventDetail }) {
+  const { data: nearbyDeals, isLoading } = useDealsByCategory({
     latitude: event.latitude || undefined,
     longitude: event.longitude || undefined,
     radius: 5,
@@ -1034,86 +1029,97 @@ function MerchantsTab({ event }: { event: FullEventDetail }) {
   });
 
   return (
-    <div className="space-y-8">
-      {/* Upcoming Shows Section */}
-      <div>
-        <h2 className="font-heading text-xl sm:text-2xl font-black text-[#1a1a2e] uppercase tracking-wide mb-5">
-          Upcoming Shows
+    <div>
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="font-heading text-xl sm:text-2xl font-black text-[#1a1a2e] uppercase tracking-wide">
+          Deals Near This Event
         </h2>
-        {eventsLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="h-[364px] rounded-2xl bg-neutral-100 animate-pulse"
-              />
-            ))}
-          </div>
-        ) : upcomingEvents && upcomingEvents.events && upcomingEvents.events.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {upcomingEvents.events.map((evt) => (
-              <EventCard key={evt.id} event={evt} width={204.75} height={364} compact />
-            ))}
-          </div>
-        ) : (
-          <div className="bg-neutral-50 rounded-2xl p-6 text-center border border-neutral-200">
-            <Calendar className="h-8 w-8 text-neutral-300 mx-auto mb-2" />
-            <p className="text-sm text-neutral-500">No upcoming shows at this time.</p>
-          </div>
-        )}
+        <Link
+          to={PATHS.ALL_DEALS}
+          className="text-xs font-bold text-brand-primary-600 hover:text-brand-primary-600 flex items-center gap-1 tracking-wider"
+        >
+          Browse All Near Venue
+          <ArrowRight className="h-3 w-3" />
+        </Link>
       </div>
 
-      {/* Deals Near This Event Section */}
-      <div>
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="font-heading text-xl sm:text-2xl font-black text-[#1a1a2e] uppercase tracking-wide">
-            Deals Near This Event
-          </h2>
+      {isLoading ? (
+        <div className="flex gap-6 overflow-hidden">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div
+              key={i}
+              className="w-[280px] sm:w-[300px] h-[420px] rounded-2xl bg-neutral-100 animate-pulse flex-shrink-0"
+            />
+          ))}
+        </div>
+      ) : nearbyDeals && nearbyDeals.length > 0 ? (
+        <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 -mx-1 px-1">
+          {nearbyDeals.slice(0, 8).map((deal) => (
+            <div key={deal.id} className="w-[280px] flex-shrink-0 sm:w-[300px]">
+              <NewDealCard deal={deal} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-neutral-50 rounded-2xl p-6 text-center border border-neutral-200">
+          <MapPin className="h-8 w-8 text-neutral-300 mx-auto mb-2" />
+          <p className="text-sm text-neutral-500">
+            Discover deals near{' '}
+            <span className="font-bold text-[#1a1a2e]">
+              {event.venueName || 'the venue'}
+            </span>
+          </p>
           <Link
             to={PATHS.ALL_DEALS}
-            className="text-xs font-bold text-brand-primary-600 hover:text-brand-primary-700 flex items-center gap-1 tracking-wider"
+            className="inline-flex items-center gap-2 mt-3 px-5 py-2.5 bg-[#1a1a2e] hover:bg-[#252548] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
           >
-            Browse All Near Venue
+            Browse Nearby Deals
             <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
+      )}
+    </div>
+  );
+}
 
-        {dealsLoading ? (
-          <div className="flex gap-6 overflow-hidden">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div
-                key={i}
-                className="w-[280px] sm:w-[300px] h-[420px] rounded-2xl bg-neutral-100 animate-pulse flex-shrink-0"
-              />
-            ))}
-          </div>
-        ) : nearbyDeals && nearbyDeals.length > 0 ? (
-          <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 -mx-1 px-1">
-            {nearbyDeals.slice(0, 8).map((deal) => (
-              <div key={deal.id} className="w-[280px] flex-shrink-0 sm:w-[300px]">
-                <NewDealCard deal={deal} />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="bg-neutral-50 rounded-2xl p-6 text-center border border-neutral-200">
-            <MapPin className="h-8 w-8 text-neutral-300 mx-auto mb-2" />
-            <p className="text-sm text-neutral-500">
-              Discover deals near{' '}
-              <span className="font-bold text-[#1a1a2e]">
-                {event.venueName || 'the venue'}
-              </span>
-            </p>
-            <Link
-              to={PATHS.ALL_DEALS}
-              className="inline-flex items-center gap-2 mt-3 px-5 py-2.5 bg-[#1a1a2e] hover:bg-[#252548] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
-            >
-              Browse Nearby Deals
-              <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-        )}
-      </div>
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SECTION 10b — Merchants Tab (Upcoming Shows only)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+function MerchantsTab({ event }: { event: FullEventDetail }) {
+  const { data: upcomingEvents, isLoading } = useBrowseEvents({
+    sortBy: 'startDate',
+    sortOrder: 'asc',
+    limit: 6,
+  });
+
+  return (
+    <div>
+      <h2 className="font-heading text-xl sm:text-2xl font-black text-[#1a1a2e] uppercase tracking-wide mb-5">
+        Upcoming Shows
+      </h2>
+      {isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-[364px] rounded-2xl bg-neutral-100 animate-pulse"
+            />
+          ))}
+        </div>
+      ) : upcomingEvents && upcomingEvents.events && upcomingEvents.events.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {upcomingEvents.events.map((evt) => (
+            <EventCard key={evt.id} event={evt} width={204.75} height={364} />
+          ))}
+          <DiscoverEventsCard />
+        </div>
+      ) : (
+        <div className="bg-neutral-50 rounded-2xl p-6 text-center border border-neutral-200">
+          <Calendar className="h-8 w-8 text-neutral-300 mx-auto mb-2" />
+          <p className="text-sm text-neutral-500">No upcoming shows at this time.</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -1150,8 +1156,9 @@ function SimilarEventsTab({ event }: { event: FullEventDetail }) {
             .filter((evt) => evt.id !== event.id)
             .slice(0, 6)
             .map((evt) => (
-              <EventCard key={evt.id} event={evt} width={204.75} height={364} compact />
+              <EventCard key={evt.id} event={evt} width={204.75} height={364} />
             ))}
+          <DiscoverEventsCard />
         </div>
       ) : (
         <div className="bg-neutral-50 rounded-2xl p-6 text-center border border-neutral-200">
@@ -1180,18 +1187,18 @@ function AboutVenue({ event }: { event: FullEventDetail }) {
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-3">
           <div className="flex items-center gap-2.5 text-sm text-neutral-700">
-            <Calendar className="h-4 w-4 text-brand-primary-700" />
+            <Calendar className="h-4 w-4 text-brand-primary-600" />
             <span>{formatDate(event.startDate)}</span>
           </div>
           <div className="flex items-center gap-2.5 text-sm text-neutral-700">
-            <Clock className="h-4 w-4 text-brand-primary-700" />
+            <Clock className="h-4 w-4 text-brand-primary-600" />
             <span>
               {formatTime(event.startDate)} &ndash; {formatTime(event.endDate)}
             </span>
           </div>
           {event.venueName && (
             <div className="flex items-center gap-2.5 text-sm text-neutral-700">
-              <MapPin className="h-4 w-4 text-brand-primary-700" />
+              <MapPin className="h-4 w-4 text-brand-primary-600" />
               <span>{event.venueName}</span>
             </div>
           )}
@@ -1205,7 +1212,7 @@ function AboutVenue({ event }: { event: FullEventDetail }) {
           )}
           {event.maxAttendees && (
             <div className="flex items-center gap-2.5 text-sm text-neutral-700">
-              <Users className="h-4 w-4 text-brand-primary-700" />
+              <Users className="h-4 w-4 text-brand-primary-600" />
               <span>
                 {event.currentAttendees} / {event.maxAttendees} attendees
               </span>
@@ -1216,7 +1223,7 @@ function AboutVenue({ event }: { event: FullEventDetail }) {
               href={event.virtualEventUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2.5 text-sm text-brand-primary-600 hover:text-brand-primary-700 font-semibold"
+              className="flex items-center gap-2.5 text-sm text-brand-primary-600 hover:text-brand-primary-600 font-semibold"
             >
               <ExternalLink className="h-4 w-4" />
               Join Virtual Event
@@ -1264,31 +1271,34 @@ function AboutVenue({ event }: { event: FullEventDetail }) {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   SECTION 14 — Explore Section
+   SECTION 14 — Discover Events CTA Card (shown in event grids)
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-function ExploreSection() {
+function DiscoverEventsCard() {
   return (
-    <div className="text-center py-8 border-t border-neutral-100">
-      <h2 className="font-heading text-2xl font-black text-[#1a1a2e] mb-3">Explore</h2>
-      <p className="text-sm text-neutral-500 mb-5 max-w-md mx-auto">
-        Discover more events, deals, and experiences near you.
-      </p>
-      <div className="flex items-center justify-center gap-3">
-        <Link
-          to={PATHS.DISCOVER_EVENTS}
-          className="px-5 py-2.5 bg-brand-primary-600 hover:bg-brand-primary-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors active:scale-[0.98]"
-        >
-          More Events
-        </Link>
-        <Link
-          to={PATHS.ALL_DEALS}
-          className="px-5 py-2.5 bg-[#1a1a2e] hover:bg-[#252548] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
-        >
-          Browse Deals
-        </Link>
+    <Link
+      to={PATHS.DISCOVER_EVENTS}
+      className="group flex flex-col items-center justify-center rounded-2xl bg-[#1a1a2e] transition-all hover:bg-[#252548] active:scale-[0.98]"
+      style={{ minHeight: 364 }}
+    >
+      <div className="flex flex-col items-center gap-5 px-6 text-center">
+        <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center">
+          <Compass className="h-5 w-5 text-white/80" />
+        </div>
+        <div>
+          <h3 className="font-heading text-sm font-black text-white uppercase tracking-widest mb-1.5">
+            Discover More
+          </h3>
+          <p className="text-[11px] text-white/40 leading-relaxed">
+            Browse all events near you
+          </p>
+        </div>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-[10px] font-bold text-white uppercase tracking-wider group-hover:bg-white/20 transition-colors">
+          View All
+          <ArrowRight className="h-3 w-3" />
+        </span>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -1537,10 +1547,10 @@ export function EventDetailPage() {
             </div>
           </div>
 
-          {/* ════ Full-width sections below the grid ════ */}
+          {/* ════ Full-width sections below the grid (always visible) ════ */}
           <div className="mt-10 space-y-10">
             <AboutVenue event={fullEvent} />
-            <ExploreSection />
+            <DealsNearThisEventSection event={fullEvent} />
           </div>
         </div>
       </div>

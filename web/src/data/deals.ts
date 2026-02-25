@@ -58,6 +58,9 @@ export interface Deal {
   // --- BOUNTY/REFERRAL FIELDS ---
   bountyRewardAmount?: number | null;
   minReferralsRequired?: number | null;
+
+  /** Override for status pill text (e.g. "Opens at 9:00AM", "22 Jan 2026") */
+  statusText?: string;
 }
 
 // Function to get a future date for mock data

@@ -1,15 +1,15 @@
 import { ContentCarousel } from '@/components/common/ContentCarousel';
-import { CarouselSkeleton } from '@/components/common/DealCardSkeleton';
 import { NewHeroSection } from '@/components/landing/NewHeroSection';
 import { LeaderboardSection } from '@/components/landing/LeaderboardSection';
 import { HowItWorksSection } from '@/components/landing/HowItWorksSection';
 import { premiumDeals } from '@/data/deals';
 import { streetTacosDeals, weekendEnergyDeals, selfCareDeals } from '@/data/landing-deals';
-import { useFeaturedDeals } from '@/hooks/useFeaturedDeals';
-import { useTodaysDeals } from '@/hooks/useTodaysDeals';
-import { usePopularDeals } from '@/hooks/usePopularDeals';
-import { useHappyHourDeals } from '@/hooks/useDealsByCategory';
-import { useExperienceDeals } from '@/hooks/useDealsByCategory';
+// Backend API calls disabled for now — showing hardcoded data only. Uncomment when ready to fetch:
+// import { useFeaturedDeals } from '@/hooks/useFeaturedDeals';
+// import { useTodaysDeals } from '@/hooks/useTodaysDeals';
+// import { usePopularDeals } from '@/hooks/usePopularDeals';
+// import { useHappyHourDeals } from '@/hooks/useDealsByCategory';
+// import { useExperienceDeals } from '@/hooks/useDealsByCategory';
 
 /* ─── Section icons from Figma (#E80203) ─── */
 const iconClass = 'h-6 w-6 sm:h-7 sm:w-7 shrink-0';
@@ -55,19 +55,18 @@ const SectionIcons = {
 };
 
 export const HomePage = () => {
-  // Fetch real data from backend APIs
-  const { data: featuredDeals, isLoading: isLoadingFeatured } = useFeaturedDeals();
-  const { data: todaysDeals, isLoading: isLoadingTodays } = useTodaysDeals();
-  const { data: popularDeals, isLoading: isLoadingPopular } = usePopularDeals();
-  const { data: happyHourDealsData, isLoading: isLoadingHappyHour } = useHappyHourDeals();
-  const { data: experienceDealsData, isLoading: isLoadingExperiences } = useExperienceDeals();
+  // Hardcoded data only — backend API not called. Uncomment hooks above when ready to fetch real data.
+  // const { data: featuredDeals, isLoading: isLoadingFeatured } = useFeaturedDeals();
+  // const { data: todaysDeals, isLoading: isLoadingTodays } = useTodaysDeals();
+  // const { data: popularDeals, isLoading: isLoadingPopular } = usePopularDeals();
+  // const { data: happyHourDealsData, isLoading: isLoadingHappyHour } = useHappyHourDeals();
+  // const { data: experienceDealsData, isLoading: isLoadingExperiences } = useExperienceDeals();
 
-  // Use hardcoded landing deals for exact Figma match; API data as fallback when available
-  const displayTodaysDeals = todaysDeals?.length ? todaysDeals : streetTacosDeals;
-  const displayFeaturedDeals = featuredDeals?.length ? featuredDeals : premiumDeals;
-  const displayHappyHourDeals = happyHourDealsData?.length ? happyHourDealsData : selfCareDeals;
-  const displayExperienceDeals = experienceDealsData?.length ? experienceDealsData : weekendEnergyDeals;
-  const displayPopularDeals = popularDeals?.length ? popularDeals : premiumDeals;
+  const displayTodaysDeals = streetTacosDeals;
+  const displayFeaturedDeals = premiumDeals;
+  const displayHappyHourDeals = selfCareDeals;
+  const displayExperienceDeals = weekendEnergyDeals;
+  const displayPopularDeals = premiumDeals;
 
   return (
     <>
@@ -82,13 +81,6 @@ export const HomePage = () => {
         <NewHeroSection />
 
         {/* ── Fast Food Friday ── */}
-        {isLoadingTodays || isLoadingFeatured ? (
-          <CarouselSkeleton
-            title="Fast Food Friday"
-            icon={SectionIcons.fastFood}
-            subtitle="Kickstart your weekend with these tasty quick bites."
-          />
-        ) : (
           <ContentCarousel
             title="Fast Food Friday"
             icon={SectionIcons.fastFood}
@@ -96,16 +88,8 @@ export const HomePage = () => {
             deals={displayTodaysDeals}
             allLink="/deals?category=FOOD_AND_BEVERAGE"
           />
-        )}
 
         {/* ── Weekend Energy ── */}
-        {isLoadingExperiences ? (
-          <CarouselSkeleton
-            title="Weekend Energy"
-            icon={SectionIcons.weekend}
-            subtitle="Plans for the Weekend? We've Got You."
-          />
-        ) : (
           <ContentCarousel
             title="Weekend Energy"
             icon={SectionIcons.weekend}
@@ -113,16 +97,8 @@ export const HomePage = () => {
             deals={displayExperienceDeals}
             allLink="/deals?category=ENTERTAINMENT"
           />
-        )}
 
         {/* ── Self-Care Mode ── */}
-        {isLoadingHappyHour || isLoadingPopular ? (
-          <CarouselSkeleton
-            title="Self-Care Mode"
-            icon={SectionIcons.selfCare}
-            subtitle="Everything you need to unwind, glow, and step out confident. You can bring your friends too!"
-          />
-        ) : (
           <ContentCarousel
             title="Self-Care Mode"
             icon={SectionIcons.selfCare}
@@ -130,10 +106,9 @@ export const HomePage = () => {
             deals={displayHappyHourDeals}
             allLink="/deals?category=HEALTH_AND_BEAUTY"
           />
-        )}
 
-        {/* ── Popular Near You (extra section if we have data) ── */}
-        {displayPopularDeals.length > 0 && !isLoadingPopular && (
+        {/* ── Popular Near You ── */}
+        {displayPopularDeals.length > 0 && (
           <ContentCarousel
             title="Popular Near You"
             icon={<PopularNearIcon />}
@@ -144,7 +119,7 @@ export const HomePage = () => {
         )}
 
         {/* ── Featured Picks ── */}
-        {displayFeaturedDeals.length > 0 && !isLoadingFeatured && (
+        {displayFeaturedDeals.length > 0 && (
           <ContentCarousel
             title="Featured Picks"
             icon={<FeaturedPicksIcon />}

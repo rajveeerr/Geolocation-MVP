@@ -26,7 +26,7 @@ import { cn } from '@/lib/utils';
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof CheckCircle2 }> = {
   PURCHASED: { label: 'Active', color: 'text-emerald-600 bg-emerald-50', icon: CheckCircle2 },
   CHECKED_IN: { label: 'Checked In', color: 'text-blue-600 bg-blue-50', icon: CheckCircle2 },
-  CANCELLED: { label: 'Cancelled', color: 'text-red-600 bg-red-50', icon: XCircle },
+  CANCELLED: { label: 'Cancelled', color: 'text-brand-primary-600 bg-brand-primary-50', icon: XCircle },
   REFUNDED: { label: 'Refunded', color: 'text-amber-600 bg-amber-50', icon: RotateCcw },
   EXPIRED: { label: 'Expired', color: 'text-neutral-400 bg-neutral-100', icon: AlertCircle },
 };
@@ -236,7 +236,7 @@ function TicketCard({ ticket }: { ticket: MyTicket }) {
                     <button
                       onClick={handleRefund}
                       disabled={refundMutation.isPending}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 transition-colors"
+                      className="px-4 py-2 bg-brand-primary-600 text-white rounded-lg text-sm font-medium hover:bg-brand-primary-700 disabled:opacity-50 transition-colors"
                     >
                       {refundMutation.isPending ? 'Processing…' : 'Confirm Refund'}
                     </button>
@@ -379,8 +379,8 @@ export function MyTicketsPage() {
           </div>
         ) : error ? (
           <div className="text-center py-20">
-            <div className="h-16 w-16 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-4">
-              <AlertCircle className="w-8 h-8 text-red-400" />
+            <div className="h-16 w-16 rounded-2xl bg-brand-primary-50 flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="w-8 h-8 text-brand-primary-600" />
             </div>
             <p className="font-heading text-lg font-bold text-[#1a1a2e]">Failed to load your tickets</p>
             <p className="text-sm text-neutral-400 mt-1">{(error as Error).message}</p>

@@ -65,7 +65,7 @@ export const Header = () => {
     <>
       <header className="fixed top-0 z-40 w-full border-b border-neutral-200/80 bg-white">
         {/* ===== DESKTOP NAVBAR ===== */}
-        <div className="mx-auto hidden h-16 w-full max-w-screen-xl items-center justify-between gap-4 px-4 md:flex lg:px-6">
+        <div className="mx-auto hidden h-16 w-full max-w-screen-2xl items-center justify-between gap-4 px-4 md:flex lg:px-6">
           {/* Left: Logo */}
           <div className="shrink-0">
             <Logo />
@@ -187,7 +187,7 @@ export const Header = () => {
                         <Link
                           to={PATHS.ADMIN_DASHBOARD}
                           onClick={() => setIsHamburgerMenuOpen(false)}
-                          className="mx-2 mb-2 flex items-center gap-3 rounded-lg bg-red-50 px-3 py-2.5 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100"
+                          className="mx-2 mb-2 flex items-center gap-3 rounded-lg bg-brand-primary-50 px-3 py-2.5 text-sm font-semibold text-brand-primary-600 transition-colors hover:bg-brand-primary-100"
                         >
                           <Shield className="h-4 w-4" />
                           Admin Dashboard
@@ -263,7 +263,7 @@ export const Header = () => {
                               setIsHamburgerMenuOpen(false);
                               logout();
                             }}
-                            className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 transition-colors hover:bg-red-50"
+                            className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-brand-primary-600 transition-colors hover:bg-brand-primary-50"
                           >
                             <LogOut className="h-4 w-4" />
                             Log out
@@ -360,7 +360,7 @@ export const Header = () => {
                   <Link
                     to={hasMerchantProfile ? PATHS.MERCHANT_DASHBOARD : PATHS.MERCHANT_ONBOARDING}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 rounded-xl bg-brand-primary-50 px-4 py-3 text-sm font-semibold text-brand-primary-700"
+                    className="flex items-center gap-3 rounded-xl bg-brand-primary-50 px-4 py-3 text-sm font-semibold text-brand-primary-600"
                   >
                     <Briefcase className="h-5 w-5" />
                     {hasMerchantProfile ? 'Business Dashboard' : 'Yohop for Business'}
@@ -373,7 +373,7 @@ export const Header = () => {
                   <Link
                     to={PATHS.ADMIN_DASHBOARD}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
+                    className="flex items-center gap-3 rounded-xl bg-brand-primary-50 px-4 py-3 text-sm font-semibold text-brand-primary-600"
                   >
                     <Shield className="h-5 w-5" />
                     Admin Dashboard
@@ -456,7 +456,7 @@ export const Header = () => {
                       setIsMobileMenuOpen(false);
                       logout();
                     }}
-                    className="flex w-full items-center justify-center gap-2 rounded-full border border-red-200 py-3 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+                    className="flex w-full items-center justify-center gap-2 rounded-full border border-brand-primary-200 py-3 text-sm font-medium text-brand-primary-600 transition-colors hover:bg-brand-primary-50"
                   >
                     <LogOut className="h-4 w-4" />
                     Log out

@@ -58,7 +58,7 @@ export const Footer = () => {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-brand-primary-700 transition-colors hover:text-brand-primary-800"
+                className="text-brand-primary-600 transition-colors hover:text-brand-primary-700"
                 aria-label="Instagram"
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -71,7 +71,7 @@ export const Footer = () => {
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-brand-primary-700 transition-colors hover:text-brand-primary-800"
+                className="text-brand-primary-600 transition-colors hover:text-brand-primary-700"
                 aria-label="Facebook"
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -84,7 +84,7 @@ export const Footer = () => {
                 href="https://x.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-brand-primary-700 transition-colors hover:text-brand-primary-800"
+                className="text-brand-primary-600 transition-colors hover:text-brand-primary-700"
                 aria-label="X"
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
@@ -96,7 +96,7 @@ export const Footer = () => {
 
           {/* ── Right Column — Explore ── */}
           <div className="md:text-right">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-brand-primary-700 mb-5">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-brand-primary-600 mb-5">
               Explore
             </h3>
             <ul className="space-y-3">
