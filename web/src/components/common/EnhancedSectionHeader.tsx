@@ -36,7 +36,7 @@ export const EnhancedSectionHeader = ({
         {showAllLink && (
           <Link
             to={allLink}
-            className="hidden sm:flex items-center gap-1 text-sm font-semibold text-[#B91C1C] hover:text-[#8B1A1A] transition-colors whitespace-nowrap"
+            className="hidden sm:flex items-center gap-1 text-sm font-semibold text-brand-primary-600 hover:text-brand-primary-700 transition-colors whitespace-nowrap"
           >
             See all offers
             <ArrowRight className="h-4 w-4" />
@@ -55,7 +55,7 @@ export const EnhancedSectionHeader = ({
       {showAllLink && (
         <Link
           to={allLink}
-          className="flex sm:hidden items-center gap-1 text-sm font-semibold text-[#B91C1C] mt-2"
+          className="flex sm:hidden items-center gap-1 text-sm font-semibold text-brand-primary-600 mt-2"
         >
           See all offers
           <ArrowRight className="h-4 w-4" />

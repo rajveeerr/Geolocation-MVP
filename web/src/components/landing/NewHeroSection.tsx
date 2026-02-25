@@ -132,44 +132,34 @@ export const NewHeroSection = ({ onCategoryChange, onFilterClick }: NewHeroSecti
     }
   };
 
-  const currentDropdownLabel =
-    dropdownOptions.find(o => o.value === dropdownFilter)?.label || 'All Deals';
-
   return (
-    <section className="bg-[#FAF9F7] pt-36 md:pt-20 pb-8 px-6 lg:px-8">
+    <section className="bg-white pt-36 md:pt-20 pb-8 px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* ── NEW DEALS DROPPED TODAY badge ── */}
         <div className="mb-6">
-          <span className="inline-flex items-center gap-2 rounded-full bg-red-50 border border-red-100 px-4 py-1.5 text-[11px] font-bold tracking-[0.08em] uppercase text-red-600">
-            <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-            New Deals Dropped Today
+          <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.08em] uppercase text-[#4A4A4A]">
+            <span className="h-2 w-2 rounded-full bg-brand-primary-600 animate-pulse shrink-0" />
+            NEW DEALS DROPPED TODAY
           </span>
         </div>
 
-        {/* ── Main Headline — exact Figma mixed-typography ── */}
-        <div className="mb-5 max-w-5xl">
-          <h1 className="leading-[1.05] tracking-tight">
+        {/* ── Main Headline — all on same line, Figma mixed-typography with CA$H ── */}
+        <div className="mb-5 max-w-5xl overflow-hidden">
+          <h1
+            className="leading-[1.05] tracking-tight flex flex-nowrap items-baseline gap-x-2"
+            style={{ fontSize: 'clamp(1.5rem, 4.5vw, 3.25rem)' }}
+          >
+            <span className="font-black text-[#1A1A1A] uppercase whitespace-nowrap">
+              FIND A DEAL.
+            </span>
             <span
-              className="font-black text-[#1A1A1A] uppercase"
-              style={{ fontSize: 'clamp(2.25rem, 5.5vw, 4.5rem)' }}
-            >
-              Find a Deal.
-            </span>{' '}
-            <span
-              className="italic text-[#8B1A1A]"
-              style={{
-                fontFamily: "'Lora', 'Georgia', serif",
-                fontSize: 'clamp(2.25rem, 5.5vw, 4.5rem)',
-                fontWeight: 400,
-              }}
+              className="italic text-brand-primary-600 whitespace-nowrap"
+              style={{ fontFamily: "'Lora', 'Georgia', serif", fontWeight: 400 }}
             >
               bring friends.
-            </span>{' '}
-            <span
-              className="font-black text-[#1A1A1A] uppercase"
-              style={{ fontSize: 'clamp(2.25rem, 5.5vw, 4.5rem)' }}
-            >
-              Get Paid Cash.
+            </span>
+            <span className="font-black text-[#1A1A1A] uppercase whitespace-nowrap">
+              GET PAID CA<span className="line-through">$</span>H.
             </span>
           </h1>
         </div>
@@ -183,17 +173,17 @@ export const NewHeroSection = ({ onCategoryChange, onFilterClick }: NewHeroSecti
           experience.
         </p>
 
-        {/* ── Category Filter Row ── */}
-        <div className="flex gap-5 md:gap-7 overflow-x-auto pb-2 scrollbar-hide -mx-6 px-6">
-          {/* ALL DEALS dropdown pill — vertically centered with the circle images */}
+        {/* ── Category Filter Row — All Deals pill (left), centered story circles, Filter (right) ── */}
+        <div className="flex items-center gap-4 md:gap-6 overflow-x-auto pb-2 scrollbar-hide -mx-6 px-6">
+          {/* ALL DEALS dropdown pill — Figma: white bg, dark border, red cutlery icon */}
           <div className="relative shrink-0 flex items-center" style={{ height: '110px' }} ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className={cn(
-                'flex items-center gap-2.5 rounded-full border-2 px-5 py-2.5 transition-all duration-200 text-sm font-semibold select-none',
+                'flex items-center gap-2.5 rounded-full border-2 border-neutral-300 bg-white px-5 py-2.5 transition-all duration-200 text-sm font-semibold select-none',
                 dropdownFilter === 'all'
-                  ? 'border-gray-900 bg-white text-gray-900'
-                  : 'border-gray-900 bg-gray-900 text-white',
+                  ? 'border-neutral-300 text-[#1A1A1A] hover:border-neutral-400'
+                  : 'border-neutral-900 bg-neutral-900 text-white',
               )}
             >
               <svg
@@ -206,13 +196,13 @@ export const NewHeroSection = ({ onCategoryChange, onFilterClick }: NewHeroSecti
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="shrink-0"
+                className={cn('shrink-0', dropdownFilter === 'all' ? 'text-brand-primary-600' : 'text-white')}
               >
                 <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
                 <path d="M7 2v20" />
                 <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" />
               </svg>
-              <span className="uppercase tracking-wider text-[13px]">{currentDropdownLabel}</span>
+              <span className="uppercase tracking-wider text-[13px]">{dropdownFilter === 'all' ? 'ALL' : (dropdownOptions.find(o => o.value === dropdownFilter)?.label || 'ALL')}</span>
               <ChevronDown
                 className={cn(
                   'h-4 w-4 transition-transform duration-200',
@@ -238,7 +228,7 @@ export const NewHeroSection = ({ onCategoryChange, onFilterClick }: NewHeroSecti
                     <span className="text-lg w-6 text-center">{option.icon}</span>
                     <span className="flex-1">{option.label}</span>
                     {dropdownFilter === option.value && (
-                      <span className="text-red-600 text-xs">✓</span>
+                      <span className="text-brand-primary-600 text-xs">✓</span>
                     )}
                   </button>
                 ))}
@@ -246,7 +236,8 @@ export const NewHeroSection = ({ onCategoryChange, onFilterClick }: NewHeroSecti
             )}
           </div>
 
-          {/* Category circle buttons */}
+          {/* Category circle buttons — center-aligned story thingy */}
+          <div className="flex-1 flex items-center justify-center gap-4 md:gap-6 overflow-x-auto scrollbar-hide min-w-0">
           {displayCategories.map(category => {
             const isActive = selectedCategory === category.value;
             return (
@@ -287,15 +278,16 @@ export const NewHeroSection = ({ onCategoryChange, onFilterClick }: NewHeroSecti
               </button>
             );
           })}
+          </div>
 
-          {/* Filter / settings icon at end */}
+          {/* Filter / settings icon — Figma: white bg, red filter icon */}
           <button
             onClick={handleFilterClick}
             className="flex flex-col items-center gap-2 shrink-0 group"
             title="More filters"
           >
-            <div className="w-[72px] h-[72px] md:w-20 md:h-20 rounded-full border-[2.5px] border-gray-200 bg-white flex items-center justify-center transition-all duration-200 group-hover:border-gray-400 group-hover:shadow-sm">
-              <SlidersHorizontal className="h-6 w-6 text-gray-500 group-hover:text-gray-900 transition-colors" />
+            <div className="w-[72px] h-[72px] md:w-20 md:h-20 rounded-full border-[2.5px] border-neutral-200 bg-white flex items-center justify-center transition-all duration-200 group-hover:border-neutral-400 group-hover:shadow-sm">
+              <SlidersHorizontal className="h-6 w-6 text-brand-primary-600 group-hover:text-brand-primary-700 transition-colors" />
             </div>
             <span className="text-xs text-gray-500 group-hover:text-gray-900 transition-colors whitespace-nowrap invisible">
               Filters

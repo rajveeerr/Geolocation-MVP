@@ -176,7 +176,7 @@ export const LeaderboardSection = () => {
 
   // Skeleton loader for each column
   const ColumnSkeleton = ({ title, showDropdown = false }: { title: string; showDropdown?: boolean }) => (
-    <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+    <div className="bg-white rounded-2xl p-6 border border-neutral-100 shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="w-4 h-4 bg-gray-200 rounded animate-pulse"></div>
@@ -198,14 +198,14 @@ export const LeaderboardSection = () => {
   );
 
   return (
-    <section className="bg-white py-12 border-t border-gray-100">
+    <section className="bg-white py-12 border-t border-neutral-100">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           {/* Column 1: Top People Checking In */}
           {isLoadingLeaderboard ? (
             <ColumnSkeleton title="Top people checking in" showDropdown={true} />
           ) : (
-          <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+          <div className="bg-white rounded-2xl p-6 border border-neutral-100 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <Trophy className="w-4 h-4 text-gray-900" />
@@ -311,7 +311,7 @@ export const LeaderboardSection = () => {
                               </div>
                               <div className="space-y-1">
                                 {breakdown.slice(0, 5).map((item, idx) => (
-                                  <div key={idx} className="flex items-center justify-between text-xs bg-gray-50 px-2 py-1 rounded">
+                                  <div key={idx} className="flex items-center justify-between text-xs bg-neutral-50 px-2 py-1 rounded">
                                     <span className="text-gray-700">{item.eventTypeName || item.eventType}</span>
                                     <span className="text-gray-900 font-medium">{item.count}x (+{item.points} pts)</span>
                                   </div>
@@ -333,7 +333,7 @@ export const LeaderboardSection = () => {
           {isLoadingFeatured ? (
             <ColumnSkeleton title="New restaurants" />
           ) : (
-          <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+          <div className="bg-white rounded-2xl p-6 border border-neutral-100 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <Sparkles className="w-4 h-4 text-gray-900" />
@@ -484,7 +484,7 @@ export const LeaderboardSection = () => {
           {isLoadingPopular ? (
             <ColumnSkeleton title="Trending on site" />
           ) : (
-          <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+          <div className="bg-white rounded-2xl p-6 border border-neutral-100 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <TrendingUp className="w-4 h-4 text-gray-900" />

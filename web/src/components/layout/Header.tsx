@@ -65,14 +65,14 @@ export const Header = () => {
     <>
       <header className="fixed top-0 z-40 w-full border-b border-neutral-200/80 bg-white">
         {/* ===== DESKTOP NAVBAR ===== */}
-        <div className="container mx-auto hidden h-16 max-w-screen-xl items-center gap-4 px-4 md:flex lg:px-6">
+        <div className="mx-auto hidden h-16 w-full max-w-screen-xl items-center justify-between gap-4 px-4 md:flex lg:px-6">
           {/* Left: Logo */}
           <div className="shrink-0">
             <Logo />
           </div>
 
-          {/* Search bar */}
-          <div className="mx-4 flex-1 max-w-md">
+          {/* Search bar — centered with flex-1 and max-width */}
+          <div className="mx-4 min-w-0 flex-1 max-w-lg">
             <HeaderSearchBar />
           </div>
 
@@ -127,7 +127,7 @@ export const Header = () => {
               >
                 <Bell className="h-[18px] w-[18px]" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#B91C1C] ring-2 ring-white" />
+                  <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-brand-primary-600 ring-2 ring-white" />
                 )}
               </Link>
             )}
@@ -244,7 +244,7 @@ export const Header = () => {
                             <Bell className="h-4 w-4 text-neutral-400" />
                             Notifications
                             {unreadCount > 0 && (
-                              <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#B91C1C] px-1.5 text-[10px] font-bold text-white">
+                              <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-primary-600 px-1.5 text-[10px] font-bold text-white">
                                 {unreadCount}
                               </span>
                             )}
@@ -431,7 +431,7 @@ export const Header = () => {
                     <Bell className="h-5 w-5 text-neutral-400" />
                     Notifications
                     {unreadCount > 0 && (
-                      <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#B91C1C] px-1.5 text-[10px] font-bold text-white">
+                      <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-primary-600 px-1.5 text-[10px] font-bold text-white">
                         {unreadCount}
                       </span>
                     )}

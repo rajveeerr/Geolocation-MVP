@@ -1,12 +1,11 @@
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo } from 'react';
 import { useDealDetail } from '@/hooks/useDealDetail';
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { cn } from '@/lib/utils';
-import { PATHS } from '@/routing/paths';
 import {
   X, Share2, ChevronLeft, ChevronRight, Star, ThumbsUp,
-  Minus, Plus, ShoppingCart, Camera, Play,
+  Minus, Plus, ShoppingCart,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -152,31 +151,14 @@ export const MenuDetailPage = () => {
   return (
     <div className="pt-16 pb-28 bg-white min-h-screen">
       <div className="container mx-auto max-w-screen-lg px-4">
-        {/* Top bar with breadcrumbs */}
+        {/* Top bar */}
         <div className="flex items-center justify-between py-3">
-          <div className="flex items-center gap-4 flex-1 min-w-0">
-            <button
-              onClick={() => navigate(-1)}
-              className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors flex-shrink-0"
-            >
-              <X className="h-5 w-5 text-neutral-600" />
-            </button>
-            
-            {/* Breadcrumbs */}
-            <nav className="flex items-center gap-2 text-sm min-w-0">
-              <Link
-                to={PATHS.DEAL_DETAIL.replace(':dealId', dealId || '')}
-                className="text-neutral-500 hover:text-[#B91C1C] transition-colors truncate"
-              >
-                {deal?.merchant?.businessName || deal?.title || 'Deal'}
-              </Link>
-              <ChevronRight className="h-4 w-4 text-neutral-400 flex-shrink-0" />
-              <span className="text-neutral-500">Menu</span>
-              <ChevronRight className="h-4 w-4 text-neutral-400 flex-shrink-0" />
-              <span className="text-neutral-900 font-medium truncate">{menuItem.name}</span>
-            </nav>
-          </div>
-          
+          <button
+            onClick={() => navigate(-1)}
+            className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors"
+          >
+            <X className="h-5 w-5 text-neutral-600" />
+          </button>
           <button
             onClick={async () => {
               try {
@@ -187,7 +169,7 @@ export const MenuDetailPage = () => {
                 }
               } catch { /* cancelled */ }
             }}
-            className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors flex-shrink-0"
+            className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center transition-colors"
           >
             <Share2 className="h-5 w-5 text-neutral-600" />
           </button>
@@ -244,7 +226,7 @@ export const MenuDetailPage = () => {
                     onClick={() => setImgIdx(i)}
                     className={cn(
                       'flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all',
-                      imgIdx === i ? 'ring-2 ring-[#8B1A1A]' : 'opacity-70 hover:opacity-100',
+                      imgIdx === i ? 'ring-2 ring-brand-primary-700' : 'opacity-70 hover:opacity-100',
                     )}
                   >
                     <img src={src} alt="" className="w-full h-full object-cover" />
@@ -252,38 +234,6 @@ export const MenuDetailPage = () => {
                 ))}
               </div>
             )}
-
-            {/* Customer Clips Section */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
-                  <Play className="h-4 w-4 text-[#B91C1C]" />
-                  Customer Clips ({placeholderCustomerClips.length})
-                </h3>
-                <button
-                  disabled
-                  className="px-3 py-1.5 rounded-full bg-[#1a1a2e] text-white text-[10px] font-bold flex items-center gap-1.5 cursor-not-allowed opacity-70"
-                >
-                  <Camera className="h-3 w-3" />
-                  Upload Your Reel
-                </button>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {placeholderCustomerClips.map((clip, i) => (
-                  <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-neutral-100 group cursor-pointer">
-                    <img src={clip} alt={`Customer clip ${i + 1}`} className="w-full h-full object-cover" />
-                    {/* Black translucent overlay */}
-                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors" />
-                    {/* Play button overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-8 h-8 rounded-full bg-black/80 border-2 border-white flex items-center justify-center shadow-lg group-hover:bg-black group-hover:scale-110 transition-all">
-                        <Play className="h-4 w-4 text-white ml-0.5 fill-white" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
 
           {/* ============ RIGHT – Details ============ */}
@@ -304,7 +254,7 @@ export const MenuDetailPage = () => {
               {/* Calories placeholder */}
               <p className="text-sm text-neutral-500 mt-0.5">485 Cal</p>
               {/* Most liked badge */}
-              <span className="inline-block mt-2 px-2.5 py-1 rounded-full bg-red-50 text-[#B91C1C] text-xs font-bold">
+              <span className="inline-block mt-2 px-2.5 py-1 rounded-full bg-brand-primary-50 text-brand-primary-600 text-xs font-bold">
                 #2 most liked
               </span>
             </div>
@@ -389,6 +339,33 @@ export const MenuDetailPage = () => {
                       >
                         <Plus className="h-3 w-3" />
                       </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Customer Clips */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
+                  <span className="text-brand-primary-600">▸</span>
+                  Customer Clips ({placeholderCustomerClips.length})
+                </h3>
+                <button
+                  disabled
+                  className="px-3 py-1.5 rounded-full bg-[#1a1a2e] text-white text-[10px] font-bold flex items-center gap-1.5 cursor-not-allowed opacity-70"
+                >
+                  📷 Upload Your Reel
+                </button>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {placeholderCustomerClips.map((clip, i) => (
+                  <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-neutral-100">
+                    <img src={clip} alt="" className="w-full h-full object-cover" />
+                    {/* User avatar */}
+                    <div className="absolute bottom-2 left-2 w-6 h-6 rounded-full border-2 border-white overflow-hidden bg-neutral-300">
+                      <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500" />
                     </div>
                   </div>
                 ))}

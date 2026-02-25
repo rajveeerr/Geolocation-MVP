@@ -126,7 +126,7 @@ function TicketCard({ ticket }: { ticket: MyTicket }) {
 
           <Link
             to={PATHS.EVENT_DETAIL.replace(':eventId', String(ticket.eventId))}
-            className="font-heading font-bold text-[#1a1a2e] hover:text-[#B91C1C] transition-colors line-clamp-1"
+            className="font-heading font-bold text-[#1a1a2e] hover:text-brand-primary-600 transition-colors line-clamp-1"
             onClick={(e) => e.stopPropagation()}
           >
             {ticket.event.title}
@@ -176,7 +176,7 @@ function TicketCard({ ticket }: { ticket: MyTicket }) {
                 {canShowQR && (
                   <button
                     onClick={() => setShowQR(!showQR)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#B91C1C] text-white rounded-lg text-sm font-medium hover:bg-[#9B2020] transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-primary-600 text-white rounded-lg text-sm font-medium hover:bg-brand-primary-700 transition-colors"
                   >
                     <QrCode className="w-4 h-4" />
                     {showQR ? 'Hide QR' : 'Show QR Code'}
@@ -229,7 +229,7 @@ function TicketCard({ ticket }: { ticket: MyTicket }) {
                     placeholder="Reason for refund (optional)"
                     value={refundReason}
                     onChange={(e) => setRefundReason(e.target.value)}
-                    className="w-full p-2.5 bg-white border border-neutral-200 rounded-lg text-sm text-[#1a1a2e] placeholder-neutral-400 resize-none focus:outline-none focus:border-[#B91C1C]"
+                    className="w-full p-2.5 bg-white border border-neutral-200 rounded-lg text-sm text-[#1a1a2e] placeholder-neutral-400 resize-none focus:outline-none focus:border-brand-primary-500"
                     rows={2}
                   />
                   <div className="flex gap-2">
@@ -325,7 +325,7 @@ export function MyTicketsPage() {
           </Link>
           <div>
             <h1 className="font-heading text-2xl sm:text-3xl font-black text-[#1a1a2e] tracking-tight">
-              My <span className="text-[#B91C1C]">Tickets</span>
+              My <span className="text-brand-primary-600">Tickets</span>
             </h1>
             <p className="text-sm text-neutral-500">View and manage your event tickets</p>
           </div>
@@ -340,7 +340,7 @@ export function MyTicketsPage() {
               placeholder="Search by event name or ticket #"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm text-[#1a1a2e] placeholder-neutral-400 focus:outline-none focus:border-[#B91C1C] focus:ring-1 focus:ring-[#B91C1C]/20 transition-colors"
+              className="w-full pl-10 pr-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm text-[#1a1a2e] placeholder-neutral-400 focus:outline-none focus:border-brand-primary-500 focus:ring-1 focus:ring-brand-primary-500/20 transition-colors"
             />
           </div>
           <div className="flex gap-2 overflow-x-auto">
@@ -351,7 +351,7 @@ export function MyTicketsPage() {
                 className={cn(
                   'px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-colors',
                   activeFilter === tab.key
-                    ? 'bg-[#B91C1C] text-white'
+                    ? 'bg-brand-primary-600 text-white'
                     : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200 hover:text-[#1a1a2e]',
                 )}
               >
@@ -398,7 +398,7 @@ export function MyTicketsPage() {
             </p>
             <Link
               to={PATHS.HOME}
-              className="inline-flex items-center gap-2 mt-4 px-5 py-2 bg-[#B91C1C] hover:bg-[#9B2020] rounded-xl text-sm font-bold text-white transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 mt-4 px-5 py-2 bg-brand-primary-600 hover:bg-brand-primary-700 rounded-xl text-sm font-bold text-white transition-colors shadow-sm"
             >
               Browse Events
             </Link>

@@ -85,7 +85,7 @@ export const EVENT_TYPE_DOT_COLORS: Record<string, string> = {
     BAR_CRAWL: 'bg-amber-500',
     FESTIVAL: 'bg-purple-500',
     RSVP_EVENT: 'bg-blue-500',
-    CONCERT: 'bg-[#B91C1C]',
+    CONCERT: 'bg-brand-primary-600',
     COMEDY: 'bg-yellow-500',
     NIGHTLIFE: 'bg-indigo-500',
     SPORTS: 'bg-emerald-500',
@@ -131,11 +131,13 @@ interface EventCardProps {
     width?: number;
     /** Optional: fixed height in pixels (e.g., 364) */
     height?: number;
+    /** Hide description & visitor count for compact contexts (e.g. deal detail) */
+    compact?: boolean;
 }
 
 /* ─── The Card ─────────────────────────────────────────────────── */
 
-export function EventCard({ event, aspectRatio = 'aspect-[3/5]', width, height }: EventCardProps) {
+export function EventCard({ event, aspectRatio = 'aspect-[3/5]', width, height, compact }: EventCardProps) {
     const navigate = useNavigate();
 
     // ── Normalize fields across both event shapes ──
@@ -167,7 +169,7 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]', width, height }
     const available = getTotalAvailable(event as any);
 
     const typeLabel = EVENT_TYPE_LABELS[eventType] ?? (eventType?.replace(/_/g, ' ') || '');
-    const dotColor = EVENT_TYPE_DOT_COLORS[eventType] ?? 'bg-[#B91C1C]';
+    const dotColor = EVENT_TYPE_DOT_COLORS[eventType] ?? 'bg-brand-primary-600';
 
     const handleClick = () => {
         if (isHybridTM) {
@@ -184,10 +186,10 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]', width, height }
     };
 
     // Use fixed dimensions if provided, otherwise use aspect ratio
-    const cardStyle = width && height 
+    const cardStyle = width && height
         ? { width: `${width}px`, height: `${height}px` }
         : undefined;
-    
+
     const isFixedSize = width && height;
 
     return (
@@ -236,7 +238,7 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]', width, height }
                     </div>
                 ) : null}
                 {!isHybridTM && (event as HybridEvent).source === 'local' && (
-                    <div className={cn("flex items-center gap-1 rounded-full bg-[#B91C1C]/80 backdrop-blur-md", isFixedSize ? "px-2 py-0.5" : "px-2.5 py-1.5")}>
+                    <div className={cn("flex items-center gap-1 rounded-full bg-brand-primary-600/80 backdrop-blur-md", isFixedSize ? "px-2 py-0.5" : "px-2.5 py-1.5")}>
                         <Sparkles className={cn("text-white", isFixedSize ? "h-2.5 w-2.5" : "h-3 w-3")} />
                         <span className={cn("font-bold text-white uppercase tracking-wider", isFixedSize ? "text-[9px]" : "text-[10px]")}>
                             Local
@@ -319,7 +321,7 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]', width, height }
                 )}
 
                 {/* Short desc */}
-                {shortDesc && (
+                {!compact && shortDesc && (
                     <p className={cn(
                         "text-white/40 line-clamp-2 leading-relaxed",
                         isFixedSize ? "text-[11px] mt-1" : "text-[13px] mt-1.5"
@@ -329,7 +331,7 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]', width, height }
                 )}
 
                 {/* Spots + attendees info */}
-                {(currentAttendees > 0 || (available > 0 && available <= 30)) && (
+                {!compact && (currentAttendees > 0 || (available > 0 && available <= 30)) && (
                     <div className={cn("flex items-center gap-2", isFixedSize ? "mt-1.5" : "mt-2")}>
                         {currentAttendees > 0 && (
                             <span className={cn(

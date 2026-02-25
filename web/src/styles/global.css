@@ -21,26 +21,26 @@
   :root {
     /* ============================================================
        BRAND PALETTE
-       The single source of truth for Deal Hunt red (#B91C1C).
+       The single source of truth for Deal Hunt red (#E80203).
        ============================================================ */
-    --brand-primary: 0 74% 42%;          /* #B91C1C  — THE brand red */
-    --brand-primary-hover: 0 74% 36%;    /* #9B1B1B  — hover state */
-    --brand-primary-active: 0 74% 30%;   /* darker pressed state */
-    --brand-primary-subtle: 0 86% 97%;   /* #FEF2F2 — tinted backgrounds */
-    --brand-primary-muted: 0 80% 92%;    /* #FECACA — muted red fills */
+    --brand-primary: 0 98% 46%;          /* #E80203  — THE brand red */
+    --brand-primary-hover: 0 98% 40%;    /* darker hover state */
+    --brand-primary-active: 0 98% 34%;   /* darker pressed state */
+    --brand-primary-subtle: 0 100% 98%;  /* tinted backgrounds */
+    --brand-primary-muted: 0 95% 93%;    /* muted red fills */
 
     /* Full brand scale (50 → 950) */
-    --brand-50:  0 86% 97%;
-    --brand-100: 0 80% 92%;
-    --brand-200: 0 76% 84%;
-    --brand-300: 0 74% 71%;
-    --brand-400: 0 74% 57%;
-    --brand-500: 0 74% 47%;
-    --brand-600: 0 74% 42%;              /* = main brand */
-    --brand-700: 0 74% 36%;
-    --brand-800: 0 74% 29%;
-    --brand-900: 0 74% 22%;
-    --brand-950: 0 74% 12%;
+    --brand-50:  0 100% 98%;
+    --brand-100: 0 95% 93%;
+    --brand-200: 0 92% 88%;
+    --brand-300: 0 95% 78%;
+    --brand-400: 0 97% 62%;
+    --brand-500: 0 98% 54%;
+    --brand-600: 0 98% 46%;              /* = main brand #E80203 */
+    --brand-700: 0 98% 38%;
+    --brand-800: 0 98% 30%;
+    --brand-900: 0 98% 22%;
+    --brand-950: 0 98% 12%;
 
     /* Legacy aliases (keep for backward-compat, migrate away) */
     --brand-primary-main:  var(--brand-600);

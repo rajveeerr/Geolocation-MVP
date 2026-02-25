@@ -176,7 +176,7 @@ export function CityPickerModal({
                     placeholder="Search city..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    className="w-full pl-9 pr-9 py-2.5 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-[#1a1a2e] placeholder-neutral-400 focus:outline-none focus:border-[#B91C1C] focus:ring-1 focus:ring-[#B91C1C]/10 transition-all"
+                    className="w-full pl-9 pr-9 py-2.5 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-[#1a1a2e] placeholder-neutral-400 focus:outline-none focus:border-brand-primary-500 focus:ring-1 focus:ring-brand-primary-500/10 transition-all"
                   />
                   {query && (
                     <button
@@ -208,23 +208,23 @@ export function CityPickerModal({
                   className={cn(
                     'w-full flex items-center gap-3 px-3.5 py-3 rounded-xl border transition-all active:scale-[0.98]',
                     detectedCity
-                      ? 'border-[#B91C1C]/20 bg-[#B91C1C]/5'
-                      : 'border-neutral-200 hover:border-[#B91C1C]/20 hover:bg-[#B91C1C]/[0.02]',
+                      ? 'border-brand-primary-500/20 bg-brand-primary-500/5'
+                      : 'border-neutral-200 hover:border-brand-primary-500/20 hover:bg-brand-primary-500/5',
                   )}
                 >
                   <div
                     className={cn(
                       'h-9 w-9 rounded-lg flex items-center justify-center flex-shrink-0',
-                      detectedCity ? 'bg-[#B91C1C]/10' : 'bg-neutral-100',
+                      detectedCity ? 'bg-brand-primary-500/10' : 'bg-neutral-100',
                     )}
                   >
                     {isDetecting ? (
-                      <Loader2 className="w-4 h-4 text-[#B91C1C] animate-spin" />
+                      <Loader2 className="w-4 h-4 text-brand-primary-600 animate-spin" />
                     ) : (
                       <Navigation
                         className={cn(
                           'w-4 h-4',
-                          detectedCity ? 'text-[#B91C1C]' : 'text-neutral-400',
+                          detectedCity ? 'text-brand-primary-600' : 'text-neutral-400',
                         )}
                       />
                     )}
@@ -233,7 +233,7 @@ export function CityPickerModal({
                     <p
                       className={cn(
                         'text-sm font-semibold',
-                        detectedCity ? 'text-[#B91C1C]' : 'text-[#1a1a2e]',
+                        detectedCity ? 'text-brand-primary-600' : 'text-[#1a1a2e]',
                       )}
                     >
                       {isDetecting
@@ -251,7 +251,7 @@ export function CityPickerModal({
                     )}
                   </div>
                   {detectedCity && (
-                    <Check className="w-4 h-4 text-[#B91C1C] flex-shrink-0" />
+                    <Check className="w-4 h-4 text-brand-primary-600 flex-shrink-0" />
                   )}
                 </button>
 
@@ -290,7 +290,7 @@ export function CityPickerModal({
                               className={cn(
                                 'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left active:scale-[0.98]',
                                 isActive
-                                  ? 'bg-[#B91C1C]/5'
+                                  ? 'bg-brand-primary-600/5'
                                   : 'hover:bg-neutral-50',
                               )}
                             >
@@ -298,7 +298,7 @@ export function CityPickerModal({
                                 className={cn(
                                   'w-3.5 h-3.5 flex-shrink-0',
                                   isActive
-                                    ? 'text-[#B91C1C]'
+                                    ? 'text-brand-primary-600'
                                     : 'text-neutral-300',
                                 )}
                               />
@@ -307,7 +307,7 @@ export function CityPickerModal({
                                   className={cn(
                                     'text-sm font-medium truncate',
                                     isActive
-                                      ? 'text-[#B91C1C]'
+                                      ? 'text-brand-primary-600'
                                       : 'text-[#1a1a2e]',
                                   )}
                                 >
@@ -320,7 +320,7 @@ export function CityPickerModal({
                                 )}
                               </div>
                               {isActive && (
-                                <Check className="w-3.5 h-3.5 text-[#B91C1C] flex-shrink-0" />
+                                <Check className="w-3.5 h-3.5 text-brand-primary-600 flex-shrink-0" />
                               )}
                             </button>
                           );
@@ -351,7 +351,7 @@ export function CityPickerModal({
                             className={cn(
                               'flex items-center gap-2.5 px-3 py-2.5 rounded-lg transition-all text-left active:scale-[0.98]',
                               isActive
-                                ? 'bg-[#B91C1C]/5'
+                                ? 'bg-brand-primary-600/5'
                                 : 'hover:bg-neutral-50',
                             )}
                           >
@@ -359,7 +359,7 @@ export function CityPickerModal({
                               className={cn(
                                 'w-3.5 h-3.5 flex-shrink-0',
                                 isActive
-                                  ? 'text-[#B91C1C]'
+                                  ? 'text-brand-primary-600'
                                   : 'text-neutral-300',
                               )}
                             />
@@ -368,7 +368,7 @@ export function CityPickerModal({
                                 className={cn(
                                   'text-sm font-medium truncate',
                                   isActive
-                                    ? 'text-[#B91C1C]'
+                                    ? 'text-brand-primary-600'
                                     : 'text-[#1a1a2e]',
                                 )}
                               >
@@ -379,7 +379,7 @@ export function CityPickerModal({
                               </p>
                             </div>
                             {isActive && (
-                              <Check className="w-3.5 h-3.5 text-[#B91C1C] flex-shrink-0" />
+                              <Check className="w-3.5 h-3.5 text-brand-primary-600 flex-shrink-0" />
                             )}
                           </button>
                         );
@@ -392,7 +392,7 @@ export function CityPickerModal({
                 {currentCity && (
                   <button
                     onClick={() => handleSelect('')}
-                    className="w-full text-center text-[11px] text-neutral-400 hover:text-[#B91C1C] font-medium py-1.5 transition-colors"
+                    className="w-full text-center text-[11px] text-neutral-400 hover:text-brand-primary-600 font-medium py-1.5 transition-colors"
                   >
                     Clear location filter
                   </button>

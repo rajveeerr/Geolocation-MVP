@@ -8,10 +8,12 @@ interface ImageSlideshowProps {
   className?: string;
   /** Auto-advance interval in ms. 0 = disabled. Default 5000 */
   autoPlay?: number;
-  /** Max images to show indicator bars for (capped). Default 3 */
+  /** Max images to show indicator bars for (capped). Default 5 */
   maxImages?: number;
   /** Scale images on hover (parent must have `group` class). Default false */
   hoverScale?: boolean;
+  /** Show story bar at very top (Instagram-style). Default true */
+  showStoryBar?: boolean;
 }
 
 export const ImageSlideshow = ({
@@ -19,8 +21,9 @@ export const ImageSlideshow = ({
   alt,
   className,
   autoPlay = 5000,
-  maxImages = 3,
+  maxImages = 5,
   hoverScale = false,
+  showStoryBar = true,
 }: ImageSlideshowProps) => {
   // Filter out any falsy/empty image URLs, then cap to maxImages
   const validImages = images.filter((src) => !!src && src.trim() !== '');
@@ -108,10 +111,15 @@ export const ImageSlideshow = ({
     );
   }
 
-  // Single image — no slideshow, no indicator bars
+  // Single image — no slideshow, but show story bar if requested
   if (!hasMultiple) {
     return (
       <div className={cn('relative w-full h-full overflow-hidden', className)}>
+        {showStoryBar && (
+          <div className="absolute top-0 left-0 right-0 z-20 flex gap-0.5 px-1 pt-1">
+            <div className="h-[2px] flex-1 rounded-full bg-white" />
+          </div>
+        )}
         <img
           src={displayImages[0]}
           alt={alt}
@@ -157,25 +165,27 @@ export const ImageSlideshow = ({
         </AnimatePresence>
       </div>
 
-      {/* Indicator bars — OUTSIDE the scaling wrapper so they stay fixed */}
-      <div className="absolute top-3 left-4 right-4 z-20 flex gap-1.5 pointer-events-auto">
-        {displayImages.map((_, i) => (
-          <button
-            key={i}
-            onClick={(e) => {
-              e.stopPropagation();
-              goTo(i, i > activeIndex ? 1 : -1);
-            }}
-            className={cn(
-              'h-[3px] flex-1 rounded-full transition-all duration-300',
-              i === activeIndex
-                ? 'bg-white'
-                : 'bg-white/40',
-            )}
-            aria-label={`Go to image ${i + 1}`}
-          />
-        ))}
-      </div>
+      {/* Story bar — at very top, Instagram-style segmented progress */}
+      {showStoryBar && (
+        <div className="absolute top-0 left-0 right-0 z-20 flex gap-0.5 px-1 pt-1 pointer-events-auto">
+          {displayImages.map((_, i) => (
+            <button
+              key={i}
+              onClick={(e) => {
+                e.stopPropagation();
+                goTo(i, i > activeIndex ? 1 : -1);
+              }}
+              className={cn(
+                'h-[2px] flex-1 rounded-full transition-all duration-300 min-w-0',
+                i === activeIndex
+                  ? 'bg-white'
+                  : 'bg-white/30',
+              )}
+              aria-label={`Go to image ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

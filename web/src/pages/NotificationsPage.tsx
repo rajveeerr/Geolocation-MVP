@@ -82,7 +82,7 @@ function NotificationCard({ userNudge }: { userNudge: UserNudge }) {
             animate={{ opacity: 1, y: 0 }}
             className={cn(
                 'rounded-2xl border bg-white p-4 sm:p-5 transition-shadow hover:shadow-md cursor-pointer',
-                isRead ? 'border-neutral-200' : 'border-[#B91C1C]/30 bg-red-50/30',
+                isRead ? 'border-neutral-200' : 'border-brand-primary-500/30 bg-brand-primary-50/80',
             )}
             onClick={handleMarkRead}
         >
@@ -120,7 +120,7 @@ function NotificationCard({ userNudge }: { userNudge: UserNudge }) {
                                 e.stopPropagation();
                                 handleMarkRead();
                             }}
-                            className="mt-2 flex items-center gap-1 text-xs font-medium text-[#B91C1C] hover:text-[#9B2020] transition-colors"
+                            className="mt-2 flex items-center gap-1 text-xs font-medium text-brand-primary-600 hover:text-brand-primary-700 transition-colors"
                         >
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             Mark as read
@@ -161,7 +161,7 @@ export function NotificationsPage() {
                     </Link>
                     <div className="flex-1">
                         <h1 className="font-heading text-2xl sm:text-3xl font-black text-[#1a1a2e] tracking-tight">
-                            Notifi<span className="text-[#B91C1C]">cations</span>
+                            Notifi<span className="text-brand-primary-600">cations</span>
                         </h1>
                         <p className="text-sm text-neutral-500">
                             {unreadCount > 0 ? `${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}` : 'All caught up!'}
@@ -179,7 +179,7 @@ export function NotificationsPage() {
                             className={cn(
                                 'px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-colors',
                                 activeFilter === tab.key
-                                    ? 'bg-[#B91C1C] text-white'
+                                    ? 'bg-brand-primary-600 text-white'
                                     : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200 hover:text-[#1a1a2e]',
                             )}
                         >

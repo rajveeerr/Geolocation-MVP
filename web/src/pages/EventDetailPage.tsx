@@ -51,8 +51,8 @@ import { EventCard } from '@/components/events/EventCard';
 
 interface FullEventDetail extends EventDetail {
   userTickets?:
-    | { id: number; ticketNumber: string; status: string; purchasePrice: number }[]
-    | null;
+  | { id: number; ticketNumber: string; status: string; purchasePrice: number }[]
+  | null;
 }
 
 /* ─── Helpers ─────────────────────────────────────────────────── */
@@ -180,7 +180,7 @@ function HeroSlideshow({ event }: { event: FullEventDetail }) {
 
         {/* Verified Venue badge */}
         {event.merchant && (
-          <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-[#B91C1C] text-white px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg">
+          <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-brand-primary-600 text-white px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg">
             <ShieldCheck className="h-3.5 w-3.5" />
             Verified Venue
           </div>
@@ -223,7 +223,7 @@ function HeroSlideshow({ event }: { event: FullEventDetail }) {
               className={cn(
                 'relative h-16 flex-1 rounded-xl overflow-hidden transition-all',
                 current === i
-                  ? 'ring-2 ring-[#B91C1C] ring-offset-1'
+                  ? 'ring-2 ring-brand-primary-500 ring-offset-1'
                   : 'opacity-70 hover:opacity-100',
               )}
             >
@@ -287,7 +287,7 @@ function EarnBanner({ event }: { event: FullEventDetail }) {
       <div className="relative">
         {/* Top badges */}
         <div className="flex items-center gap-2 mb-3">
-          <span className="bg-[#B91C1C] text-white text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded border border-[#B91C1C]/40">
+          <span className="bg-brand-primary-600 text-white text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded border border-brand-primary-500/40">
             Ends at {formatTime(event.startDate)}
           </span>
           <span className="bg-emerald-500 text-white text-[9px] font-bold uppercase px-2.5 py-1 rounded flex items-center gap-1">
@@ -299,7 +299,7 @@ function EarnBanner({ event }: { event: FullEventDetail }) {
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <div className="flex-1 min-w-0">
             <h3 className="text-white text-2xl sm:text-3xl font-black tracking-tight leading-tight">
-              EARN <span className="text-[#B91C1C]">$18</span>{' '}
+              EARN <span className="text-brand-primary-600">$18</span>{' '}
               <span className="text-white/80">/ FRIEND</span>
             </h3>
             <p className="text-white/50 text-sm mt-1.5 leading-relaxed">
@@ -309,7 +309,7 @@ function EarnBanner({ event }: { event: FullEventDetail }) {
 
             <Link
               to={PATHS.REFERRALS}
-              className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-[#B91C1C] hover:bg-[#9B2020] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors active:scale-[0.98] shadow-lg shadow-red-900/30"
+              className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-brand-primary-600 hover:bg-brand-primary-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors active:scale-[0.98] shadow-lg shadow-red-900/30"
             >
               Check In Now
             </Link>
@@ -355,17 +355,17 @@ function EarnBanner({ event }: { event: FullEventDetail }) {
             </div>
 
             {isUpcoming && (
-              <div className="text-center px-4 py-3 bg-[#B91C1C]/15 border border-[#B91C1C]/30 rounded-2xl min-w-[90px]">
+              <div className="text-center px-4 py-3 bg-brand-primary-600/15 border border-brand-primary-500/30 rounded-2xl min-w-[90px]">
                 <p className="text-[8px] font-bold text-white/40 uppercase tracking-[0.15em]">
                   Ends In
                 </p>
-                <p className="text-2xl font-black text-[#B91C1C] font-mono mt-0.5">
+                <p className="text-2xl font-black text-brand-primary-600 font-mono mt-0.5">
                   {String(timeLeft.hours).padStart(2, '0')}:
                   {String(timeLeft.minutes).padStart(2, '0')}
                 </p>
                 <div className="h-1 bg-white/10 rounded-full mt-2 overflow-hidden">
                   <div
-                    className="h-full bg-[#B91C1C] rounded-full transition-all"
+                    className="h-full bg-brand-primary-600 rounded-full transition-all"
                     style={{
                       width: `${Math.max(10, 100 - (timeLeft.hours * 60 + timeLeft.minutes))}%`,
                     }}
@@ -428,7 +428,7 @@ function LineupSection({ event }: { event: FullEventDetail }) {
                 className={cn(
                   'h-[80px] w-[80px] rounded-full overflow-hidden border-[3px] bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center shadow-lg',
                   p.isHeadliner
-                    ? 'border-[#B91C1C]'
+                    ? 'border-brand-primary-500'
                     : 'border-neutral-300',
                 )}
               >
@@ -441,7 +441,7 @@ function LineupSection({ event }: { event: FullEventDetail }) {
                 )}
               </div>
               {p.isHeadliner && (
-                <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[8px] font-bold uppercase bg-[#B91C1C] text-white px-2.5 py-0.5 rounded-full whitespace-nowrap tracking-wider shadow-md">
+                <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[8px] font-bold uppercase bg-brand-primary-600 text-white px-2.5 py-0.5 rounded-full whitespace-nowrap tracking-wider shadow-md">
                   Headliner
                 </span>
               )}
@@ -564,7 +564,7 @@ function SelectTickets({
               className={cn(
                 'relative rounded-xl border-2 p-4 cursor-pointer transition-all duration-200',
                 isSelected && !isSoldOut
-                  ? 'border-[#B91C1C] bg-red-50/30'
+                  ? 'border-brand-primary-500 bg-brand-primary-50/50'
                   : isSoldOut
                     ? 'border-neutral-200 bg-neutral-50 opacity-60 cursor-default'
                     : 'border-neutral-200 hover:border-neutral-300 bg-white',
@@ -573,7 +573,7 @@ function SelectTickets({
               {/* Sold Out overlay */}
               {isSoldOut && (
                 <div className="absolute top-3 right-3 z-10">
-                  <span className="bg-[#B91C1C] text-white text-[10px] font-black uppercase px-3 py-1 rounded shadow-lg tracking-wider">
+                  <span className="bg-brand-primary-600 text-white text-[10px] font-black uppercase px-3 py-1 rounded shadow-lg tracking-wider">
                     Sold Out
                   </span>
                 </div>
@@ -623,7 +623,7 @@ function SelectTickets({
                     <button
                       onClick={(e) => handleDecrement(tier, e)}
                       disabled={qty <= 0}
-                      className="h-8 w-8 rounded-full bg-[#B91C1C] flex items-center justify-center text-white hover:bg-[#9B2020] disabled:opacity-30 transition-colors"
+                      className="h-8 w-8 rounded-full bg-brand-primary-600 flex items-center justify-center text-white hover:bg-brand-primary-700 disabled:opacity-30 transition-colors"
                     >
                       <Minus className="h-3.5 w-3.5" />
                     </button>
@@ -633,7 +633,7 @@ function SelectTickets({
                     <button
                       onClick={(e) => handleIncrement(tier, e)}
                       disabled={qty >= tier.maxPerOrder || qty >= avail}
-                      className="h-8 w-8 rounded-full bg-[#B91C1C] flex items-center justify-center text-white hover:bg-[#9B2020] disabled:opacity-30 transition-colors"
+                      className="h-8 w-8 rounded-full bg-brand-primary-600 flex items-center justify-center text-white hover:bg-brand-primary-700 disabled:opacity-30 transition-colors"
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>
@@ -646,11 +646,11 @@ function SelectTickets({
                 <div className="mt-3">
                   <div className="h-1 bg-neutral-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-[#B91C1C] rounded-full transition-all"
+                      className="h-full bg-brand-primary-600 rounded-full transition-all"
                       style={{ width: `${soldPct}%` }}
                     />
                   </div>
-                  <p className="text-[10px] text-[#B91C1C] font-bold mt-1">
+                  <p className="text-[10px] text-brand-primary-600 font-bold mt-1">
                     {soldPct}% SOLD OUT
                   </p>
                 </div>
@@ -663,7 +663,7 @@ function SelectTickets({
                     e.stopPropagation();
                     onWaitlist();
                   }}
-                  className="mt-2 text-xs font-bold text-[#B91C1C] hover:text-[#8B1A1A] uppercase tracking-wide"
+                  className="mt-2 text-xs font-bold text-brand-primary-600 hover:text-brand-primary-700 uppercase tracking-wide"
                 >
                   Join Waitlist &rarr;
                 </button>
@@ -710,7 +710,7 @@ function SecureCheckout({
   return (
     <div className="bg-white rounded-2xl border border-neutral-200 p-5">
       <h3 className="font-heading text-base font-black text-[#1a1a2e] uppercase tracking-wide mb-4 flex items-center gap-2">
-        <Lock className="h-4 w-4 text-[#8B1A1A]" />
+        <Lock className="h-4 w-4 text-brand-primary-700" />
         Secure Checkout
       </h3>
 
@@ -734,7 +734,7 @@ function SecureCheckout({
         {/* Cashback card */}
         {!event.isFreeEvent && total > 0 && (
           <div className="flex-shrink-0 rounded-xl border border-green-200 bg-green-50 px-3 py-2.5 max-w-[140px]">
-            <p className="text-[8px] font-bold text-[#B91C1C] uppercase tracking-[0.12em]">
+            <p className="text-[8px] font-bold text-brand-primary-600 uppercase tracking-[0.12em]">
               Cashback Rewards
             </p>
             <p className="text-sm font-black text-[#1a1a2e] mt-0.5">
@@ -759,7 +759,7 @@ function SecureCheckout({
       <button
         onClick={onPurchase}
         disabled={isPurchasing}
-        className="w-full mt-4 h-12 rounded-full bg-[#B91C1C] hover:bg-[#9B2020] text-white font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60 shadow-lg shadow-red-900/20"
+        className="w-full mt-4 h-12 rounded-full bg-brand-primary-600 hover:bg-brand-primary-700 text-white font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60 shadow-lg shadow-red-900/20"
       >
         {isPurchasing ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -819,7 +819,7 @@ function EventPerks({ event }: { event: FullEventDetail }) {
 
   return (
     <div className="bg-white rounded-2xl border border-neutral-200 p-5">
-      <h2 className="font-heading text-sm font-black text-[#8B1A1A] uppercase tracking-[0.15em] mb-4 flex items-center gap-2">
+      <h2 className="font-heading text-sm font-black text-brand-primary-700 uppercase tracking-[0.15em] mb-4 flex items-center gap-2">
         <Sparkles className="h-4 w-4" />
         Event Perks
       </h2>
@@ -829,10 +829,10 @@ function EventPerks({ event }: { event: FullEventDetail }) {
           return (
             <div
               key={i}
-              className="flex flex-col items-center gap-2.5 p-4 bg-neutral-50 rounded-xl border border-neutral-100 hover:border-[#B91C1C]/30 hover:bg-red-50/30 transition-colors"
+              className="flex flex-col items-center gap-2.5 p-4 bg-neutral-50 rounded-xl border border-neutral-100 hover:border-brand-primary-500/30 hover:bg-brand-primary-50/50 transition-colors"
             >
-              <div className="h-11 w-11 rounded-full bg-red-50 flex items-center justify-center">
-                <Icon className="h-5 w-5 text-[#B91C1C]" />
+              <div className="h-11 w-11 rounded-full bg-brand-primary-50 flex items-center justify-center">
+                <Icon className="h-5 w-5 text-brand-primary-600" />
               </div>
               <span className="text-[10px] font-bold text-neutral-700 text-center uppercase tracking-wider">
                 {perk.name}
@@ -866,7 +866,7 @@ function EssentialRules({ event }: { event: FullEventDetail }) {
 
   return (
     <div className="bg-white rounded-2xl border border-neutral-200 p-5">
-      <h2 className="font-heading text-sm font-black text-[#8B1A1A] uppercase tracking-[0.15em] mb-4 flex items-center gap-2">
+      <h2 className="font-heading text-sm font-black text-brand-primary-700 uppercase tracking-[0.15em] mb-4 flex items-center gap-2">
         <ShieldAlert className="h-4 w-4" />
         Essential Rules
       </h2>
@@ -957,7 +957,7 @@ function MerchandiseSection() {
               {/* Price + CTA */}
               <div className="p-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="font-black text-[#B91C1C] text-sm">
+                  <span className="font-black text-brand-primary-600 text-sm">
                     ${item.price.toFixed(2)}
                   </span>
                   <span className="text-neutral-400 text-xs line-through">
@@ -1071,7 +1071,7 @@ function MerchantsTab({ event }: { event: FullEventDetail }) {
           </h2>
           <Link
             to={PATHS.ALL_DEALS}
-            className="text-xs font-bold text-[#B91C1C] hover:text-[#8B1A1A] flex items-center gap-1 tracking-wider"
+            className="text-xs font-bold text-brand-primary-600 hover:text-brand-primary-700 flex items-center gap-1 tracking-wider"
           >
             Browse All Near Venue
             <ArrowRight className="h-3 w-3" />
@@ -1180,18 +1180,18 @@ function AboutVenue({ event }: { event: FullEventDetail }) {
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-3">
           <div className="flex items-center gap-2.5 text-sm text-neutral-700">
-            <Calendar className="h-4 w-4 text-[#8B1A1A]" />
+            <Calendar className="h-4 w-4 text-brand-primary-700" />
             <span>{formatDate(event.startDate)}</span>
           </div>
           <div className="flex items-center gap-2.5 text-sm text-neutral-700">
-            <Clock className="h-4 w-4 text-[#8B1A1A]" />
+            <Clock className="h-4 w-4 text-brand-primary-700" />
             <span>
               {formatTime(event.startDate)} &ndash; {formatTime(event.endDate)}
             </span>
           </div>
           {event.venueName && (
             <div className="flex items-center gap-2.5 text-sm text-neutral-700">
-              <MapPin className="h-4 w-4 text-[#8B1A1A]" />
+              <MapPin className="h-4 w-4 text-brand-primary-700" />
               <span>{event.venueName}</span>
             </div>
           )}
@@ -1205,7 +1205,7 @@ function AboutVenue({ event }: { event: FullEventDetail }) {
           )}
           {event.maxAttendees && (
             <div className="flex items-center gap-2.5 text-sm text-neutral-700">
-              <Users className="h-4 w-4 text-[#8B1A1A]" />
+              <Users className="h-4 w-4 text-brand-primary-700" />
               <span>
                 {event.currentAttendees} / {event.maxAttendees} attendees
               </span>
@@ -1216,7 +1216,7 @@ function AboutVenue({ event }: { event: FullEventDetail }) {
               href={event.virtualEventUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2.5 text-sm text-[#B91C1C] hover:text-[#8B1A1A] font-semibold"
+              className="flex items-center gap-2.5 text-sm text-brand-primary-600 hover:text-brand-primary-700 font-semibold"
             >
               <ExternalLink className="h-4 w-4" />
               Join Virtual Event
@@ -1277,7 +1277,7 @@ function ExploreSection() {
       <div className="flex items-center justify-center gap-3">
         <Link
           to={PATHS.DISCOVER_EVENTS}
-          className="px-5 py-2.5 bg-[#B91C1C] hover:bg-[#9B2020] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors active:scale-[0.98]"
+          className="px-5 py-2.5 bg-brand-primary-600 hover:bg-brand-primary-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors active:scale-[0.98]"
         >
           More Events
         </Link>
@@ -1341,7 +1341,7 @@ function PurchaseSuccessModal({
                     key={t.ticketNumber}
                     className="flex items-center gap-2 rounded-lg bg-neutral-50 px-4 py-2 text-sm"
                   >
-                    <Ticket className="h-4 w-4 text-[#B91C1C]" />
+                    <Ticket className="h-4 w-4 text-brand-primary-600" />
                     <span className="font-mono text-neutral-700">{t.ticketNumber}</span>
                   </div>
                 ))}
@@ -1351,7 +1351,7 @@ function PurchaseSuccessModal({
                   onClose();
                   navigate(PATHS.MY_TICKETS);
                 }}
-                className="w-full h-11 rounded-xl bg-[#B91C1C] text-white font-bold hover:bg-[#9B2020] transition-colors"
+                className="w-full h-11 rounded-xl bg-brand-primary-600 text-white font-bold hover:bg-brand-primary-700 transition-colors"
               >
                 View My Tickets
               </button>
@@ -1455,7 +1455,7 @@ export function EventDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <Loader2 className="h-8 w-8 animate-spin text-[#B91C1C]" />
+        <Loader2 className="h-8 w-8 animate-spin text-brand-primary-600" />
       </div>
     );
   }
@@ -1473,7 +1473,7 @@ export function EventDetailPage() {
         </p>
         <button
           onClick={() => navigate(-1)}
-          className="mt-2 h-10 px-6 rounded-full bg-[#B91C1C] text-white text-sm font-bold hover:bg-[#9B2020] transition-colors"
+          className="mt-2 h-10 px-6 rounded-full bg-brand-primary-600 text-white text-sm font-bold hover:bg-brand-primary-700 transition-colors"
         >
           Go Back
         </button>
@@ -1501,10 +1501,10 @@ export function EventDetailPage() {
             {/* ── RIGHT: Earn + Tabs + Content ── */}
             <div className="space-y-5">
               <EarnBanner event={fullEvent} />
-              
+
               {/* Tab Navigation */}
               <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
-              
+
               {/* Tab Content */}
               <div>
                 {activeTab === 'details' && (
@@ -1527,11 +1527,11 @@ export function EventDetailPage() {
                     />
                   </div>
                 )}
-                
+
                 {activeTab === 'merchandise' && <MerchandiseSection />}
-                
+
                 {activeTab === 'similar' && <SimilarEventsTab event={fullEvent} />}
-                
+
                 {activeTab === 'merchants' && <MerchantsTab event={fullEvent} />}
               </div>
             </div>

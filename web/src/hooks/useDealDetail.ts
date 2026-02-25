@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
+import { getLandingDealById } from '@/data/landing-deals';
+import { dealToDetailedDeal } from '@/lib/dealToDetailedDeal';
 
-// Types
+// Types (id can be string for landing/hardcoded deals)
 export interface DetailedDeal {
-  id: number;
+  id: number | string;
   title: string;
   description: string;
   category: {
@@ -123,9 +125,14 @@ export const useDealDetail = (dealId: string) => {
     queryKey: ['deal-detail', dealId],
     queryFn: async () => {
       const response = await apiGet<{ success: boolean; deal: DetailedDeal }>(`/deals/${dealId}`);
-      
+
       if (response.success && response.data?.deal) {
         return response.data.deal;
+      }
+      // Fallback to hardcoded landing deals when API returns 404 or error
+      const landingDeal = getLandingDealById(dealId);
+      if (landingDeal) {
+        return dealToDetailedDeal(landingDeal);
       }
       throw new Error(response.error || 'Deal not found');
     },

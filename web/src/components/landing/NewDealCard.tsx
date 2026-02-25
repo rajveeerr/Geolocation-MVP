@@ -131,8 +131,8 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
   const tappedInCount = deal.claimedBy?.totalCount || 0;
   const tappedInUsers = deal.claimedBy?.visibleUsers || [];
 
-  // Images (cap to 3)
-  const images = (deal.images?.length ? deal.images : [deal.image]).slice(0, 3);
+  // Images for story bar / slideshow (cap to 5)
+  const images = (deal.images?.length ? deal.images : [deal.image]).filter(Boolean).slice(0, 5);
 
   // Distance
   const distanceDisplay = distance
@@ -217,7 +217,7 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
       >
         {/* Image area — tall aspect ratio like Figma */}
         <div className="relative aspect-[3/4.5] overflow-hidden">
-          <ImageSlideshow images={images} alt={deal.name} />
+          <ImageSlideshow images={images} alt={deal.name} maxImages={5} autoPlay={4000} showStoryBar />
 
           {/* Gradient overlay — stronger at bottom */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 via-50% to-black/80 pointer-events-none" />
@@ -361,7 +361,7 @@ export const NewDealCard = ({ deal, onClick, distance }: NewDealCardProps) => {
             <div className="flex items-center gap-1.5 pt-1">
               {/* Left side: ONE status pill (priority order — show only the most relevant) */}
               {(isActive || isUpcoming) && timeDisplay ? (
-                <div className="flex items-center gap-1 bg-[#8B1A1A]/80 backdrop-blur-sm rounded-full px-2.5 py-1.5 flex-shrink-0">
+                <div className="flex items-center gap-1 bg-brand-primary-700/80 backdrop-blur-sm rounded-full px-2.5 py-1.5 flex-shrink-0">
                   <Clock className="w-3 h-3 text-white/80" />
                   <span className="text-white text-[10px] font-semibold leading-tight whitespace-nowrap">
                     {isUpcoming ? 'Starts' : 'Ends'} {timeDisplay}

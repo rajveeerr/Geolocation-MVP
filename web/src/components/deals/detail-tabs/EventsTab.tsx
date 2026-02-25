@@ -76,7 +76,7 @@ export const EventsTab = ({ deal }: EventsTabProps) => {
       {/* Loading state */}
       {isLoading && (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="h-6 w-6 animate-spin text-[#B91C1C]" />
+          <Loader2 className="h-6 w-6 animate-spin text-brand-primary-600" />
         </div>
       )}
 
@@ -84,7 +84,7 @@ export const EventsTab = ({ deal }: EventsTabProps) => {
       {!isLoading && events.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {events.map((event) => (
-            <EventCard key={event.id} event={event} width={204.75} height={364} />
+            <EventCard key={event.id} event={event} width={204.75} height={364} compact />
           ))}
         </div>
       )}
@@ -119,7 +119,7 @@ export const EventsTab = ({ deal }: EventsTabProps) => {
             'AV equipment and entertainment options',
           ].map((item) => (
             <li key={item} className="flex items-start gap-2">
-              <span className="text-[#B91C1C] mt-0.5">•</span>
+              <span className="text-brand-primary-600 mt-0.5">•</span>
               <span>{item}</span>
             </li>
           ))}

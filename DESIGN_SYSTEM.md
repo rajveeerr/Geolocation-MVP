@@ -28,7 +28,7 @@
 | Property | Value |
 |----------|-------|
 | **App name** | Deal Hunt (previously "yohop") |
-| **Primary colour** | `#B91C1C` — a bold, warm red |
+| **Primary colour** | `#E80203` — a bold, vibrant red |
 | **Personality** | Energetic, local, deal-focused, premium-casual |
 | **Target audience** | Young adults discovering local food deals |
 | **Tone** | Confident, playful, action-oriented |
@@ -43,15 +43,15 @@ All colours are defined as CSS custom properties in `web/src/styles/global.css` 
 
 | Token | HSL | Hex (approx) | Tailwind class | Use |
 |-------|-----|--------|----------------|-----|
-| `--brand-primary` | `0 74% 42%` | `#B91C1C` | `bg-brand` / `text-brand` | Primary buttons, CTAs, focus rings |
-| `--brand-primary-hover` | `0 74% 36%` | `#9B1B1B` | `bg-brand-hover` | Hover states |
-| `--brand-primary-active` | `0 74% 30%` | darker | `bg-brand-active` | Pressed states |
+| `--brand-primary` | `0 98% 46%` | `#E80203` | `bg-brand` / `text-brand` | Primary buttons, CTAs, focus rings |
+| `--brand-primary-hover` | `0 98% 40%` | darker | `bg-brand-hover` | Hover states |
+| `--brand-primary-active` | `0 98% 34%` | darker | `bg-brand-active` | Pressed states |
 | `--brand-primary-subtle` | `0 86% 97%` | `#FEF2F2` | `bg-brand-subtle` | Tinted section backgrounds |
 | `--brand-primary-muted` | `0 80% 92%` | `#FECACA` | `bg-brand-muted` | Soft accent fills |
 
 Full scale: `brand-50` → `brand-950` (50-step increments).
 
-> ❌ **`#8B1A1A` is deprecated.** It was used inconsistently as a darker red. Migrate all instances to `brand-700` or `brand-800`.
+> Use `brand-700` or `brand-800` for darker red accents. Avoid hard-coding hex values.
 
 ### Dark Surfaces
 
@@ -499,7 +499,7 @@ import { MapPin, Clock, Star, ChevronRight } from 'lucide-react';
 
 ### ❌ DON'T
 
-- Hard-code hex values like `#B91C1C`, `#8B1A1A`, `#1a1a2e` — use tokens
+- Hard-code hex values like `#E80203`, `#1a1a2e` — use tokens
 - Use `accent-orange` (removed legacy token)
 - Use `text-[22px]` or other arbitrary font sizes — use the Tailwind scale
 - Mix `rounded-lg` and `rounded-xl` on cards in the same view
@@ -508,7 +508,7 @@ import { MapPin, Clock, Star, ChevronRight } from 'lucide-react';
 - Exceed `z-50` — use the z-index scale
 - Use `ring-brand-primary-main` — use `ring-ring` or `ring-brand`
 - Apply shadow values directly — always use shadow tokens
-- Use `#8B1A1A` — it's the old deprecated dark red. Use `brand-700` or `brand-800`
+- Hard-code brand red variants — use `brand-700` or `brand-800` for darker accents
 
 ---
 
