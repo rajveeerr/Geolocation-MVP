@@ -1052,7 +1052,7 @@ function MerchantsTab({ event }: { event: FullEventDetail }) {
         ) : upcomingEvents && upcomingEvents.events && upcomingEvents.events.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {upcomingEvents.events.map((evt) => (
-              <EventCard key={evt.id} event={evt} width={204.75} height={364} />
+              <EventCard key={evt.id} event={evt} width={204.75} height={364} compact />
             ))}
           </div>
         ) : (
@@ -1150,7 +1150,7 @@ function SimilarEventsTab({ event }: { event: FullEventDetail }) {
             .filter((evt) => evt.id !== event.id)
             .slice(0, 6)
             .map((evt) => (
-              <EventCard key={evt.id} event={evt} width={204.75} height={364} />
+              <EventCard key={evt.id} event={evt} width={204.75} height={364} compact />
             ))}
         </div>
       ) : (

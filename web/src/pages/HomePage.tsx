@@ -3,7 +3,8 @@ import { CarouselSkeleton } from '@/components/common/DealCardSkeleton';
 import { NewHeroSection } from '@/components/landing/NewHeroSection';
 import { LeaderboardSection } from '@/components/landing/LeaderboardSection';
 import { HowItWorksSection } from '@/components/landing/HowItWorksSection';
-import { premiumDeals, experiencesData, selfCareDeals } from '@/data/deals';
+import { premiumDeals } from '@/data/deals';
+import { streetTacosDeals, weekendEnergyDeals, selfCareDeals } from '@/data/landing-deals';
 import { useFeaturedDeals } from '@/hooks/useFeaturedDeals';
 import { useTodaysDeals } from '@/hooks/useTodaysDeals';
 import { usePopularDeals } from '@/hooks/usePopularDeals';
@@ -61,11 +62,11 @@ export const HomePage = () => {
   const { data: happyHourDealsData, isLoading: isLoadingHappyHour } = useHappyHourDeals();
   const { data: experienceDealsData, isLoading: isLoadingExperiences } = useExperienceDeals();
 
-  // Fallback to mock data if real data is not available
-  const displayTodaysDeals = todaysDeals?.length ? todaysDeals : premiumDeals;
+  // Use hardcoded landing deals for exact Figma match; API data as fallback when available
+  const displayTodaysDeals = todaysDeals?.length ? todaysDeals : streetTacosDeals;
   const displayFeaturedDeals = featuredDeals?.length ? featuredDeals : premiumDeals;
   const displayHappyHourDeals = happyHourDealsData?.length ? happyHourDealsData : selfCareDeals;
-  const displayExperienceDeals = experienceDealsData?.length ? experienceDealsData : experiencesData;
+  const displayExperienceDeals = experienceDealsData?.length ? experienceDealsData : weekendEnergyDeals;
   const displayPopularDeals = popularDeals?.length ? popularDeals : premiumDeals;
 
   return (
