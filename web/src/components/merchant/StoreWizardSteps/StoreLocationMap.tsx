@@ -57,8 +57,8 @@ export const StoreLocationMap = ({ center, onLocationChange, className = "", dra
   }
 
   return (
-    <div className={`w-full ${className}`}>
-      <div className="relative h-96 w-full overflow-hidden rounded-lg border border-neutral-200 shadow-lg">
+    <div className={`relative z-0 w-full overflow-hidden ${className}`}>
+      <div className="relative h-64 w-full overflow-hidden rounded-lg border-0 shadow-none">
         <MapContainer
           center={[center.lat, center.lng]}
           zoom={15}

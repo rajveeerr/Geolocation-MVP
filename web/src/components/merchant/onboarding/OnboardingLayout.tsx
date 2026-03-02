@@ -81,8 +81,8 @@ export const OnboardingLayout = ({
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="flex-1">{children}</main>
+      {/* Main content - scrolls when tall (e.g. map) so footer stays visible */}
+      <main className="flex-1 min-h-0 overflow-y-auto">{children}</main>
 
       {/* Footer with progress bar */}
       {showFooter && (

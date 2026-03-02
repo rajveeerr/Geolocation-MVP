@@ -190,8 +190,8 @@ export const StoreLocationSearchStep = ({ data, onUpdate, cities }: StoreLocatio
         </p>
       </div>
 
-      {/* Search bar - Airbnb style */}
-      <div className="relative">
+      {/* Search bar - Airbnb style (z-30 so suggestions appear above Leaflet map) */}
+      <div className="relative z-30">
         <div
           className={cn(
             'flex items-center gap-3 rounded-xl border bg-white shadow-sm transition-all',
@@ -222,7 +222,7 @@ export const StoreLocationSearchStep = ({ data, onUpdate, cities }: StoreLocatio
 
         {/* Suggestions dropdown */}
         {showSuggestions && (suggestions.length > 0 || debouncedQuery.length >= 3) && (
-          <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-64 overflow-y-auto rounded-xl border border-neutral-200 bg-white shadow-lg">
+          <div className="absolute left-0 right-0 top-full z-[1100] mt-1 max-h-64 overflow-y-auto rounded-xl border border-neutral-200 bg-white shadow-lg">
             {isSearching ? (
               <div className="flex items-center justify-center gap-2 py-8">
                 <Loader2 className="h-5 w-5 animate-spin text-brand-primary-600" />
@@ -276,8 +276,8 @@ export const StoreLocationSearchStep = ({ data, onUpdate, cities }: StoreLocatio
         Use my current location
       </button>
 
-      {/* Map preview */}
-      <div className="overflow-hidden rounded-xl border border-neutral-200">
+      {/* Map preview - constrained height, below search in stacking order */}
+      <div className="relative z-0 overflow-hidden rounded-xl border border-neutral-200">
         <StoreLocationMap
           center={mapCenter}
           onLocationChange={(coords) => onUpdate({ latitude: coords.lat, longitude: coords.lng })}
