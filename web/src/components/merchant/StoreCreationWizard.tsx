@@ -45,6 +45,8 @@ interface StoreWizardData {
   description?: string;
   features: string[];
   storeImages: File[];
+  galleryUrls: string[]; // URLs from uploaded store media
+  isFoodTruck: boolean;
   
   // Settings
   active: boolean;
@@ -127,6 +129,8 @@ export const StoreCreationWizard = ({
     description: '',
     features: [],
     storeImages: [],
+    galleryUrls: [],
+    isFoodTruck: false,
     active: true,
     ...existingStoreData,
   });
@@ -162,23 +166,29 @@ export const StoreCreationWizard = ({
     setCurrentStep(stepId);
   };
 
+  // Map monday-sunday to 0-6 (Sun=0, Mon=1, ..., Sat=6) for backend operatingHours
+  const businessHoursToOperatingHours = (hours: BusinessHours): Record<string, { open: string; close: string; closed: boolean }> => {
+    const dayOrder = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const result: Record<string, { open: string; close: string; closed: boolean }> = {};
+    dayOrder.forEach((day, i) => {
+      const h = hours[day];
+      if (h) result[String(i)] = { open: h.open, close: h.close, closed: h.closed };
+    });
+    return result;
+  };
+
   const handleSubmit = async () => {
     try {
-      // Convert wizard data to API format
       const storeData: CreateStoreData | UpdateStoreData = {
         address: wizardData.address,
         cityId: wizardData.cityId,
-        latitude: wizardData.latitude,
-        longitude: wizardData.longitude,
+        latitude: wizardData.latitude ?? null,
+        longitude: wizardData.longitude ?? null,
         active: wizardData.active,
-        // Add additional fields as needed
-        businessName: wizardData.businessName,
-        phoneNumber: wizardData.phoneNumber,
-        email: wizardData.email,
-        storeType: wizardData.storeType,
-        businessHours: wizardData.businessHours,
-        description: wizardData.description,
-        features: wizardData.features,
+        description: wizardData.description || null,
+        operatingHours: businessHoursToOperatingHours(wizardData.businessHours),
+        galleryUrls: wizardData.galleryUrls.length > 0 ? wizardData.galleryUrls : undefined,
+        isFoodTruck: wizardData.isFoodTruck,
       };
 
       if (isEditing && storeId) {

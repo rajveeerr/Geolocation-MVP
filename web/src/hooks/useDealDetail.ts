@@ -63,6 +63,7 @@ export interface DetailedDeal {
     longitude: number | null;
     logoUrl: string | null;
     phoneNumber?: string | null;
+    status?: string;
     totalDeals: number;
     totalStores: number;
     stores: Array<{
@@ -71,6 +72,10 @@ export interface DetailedDeal {
       latitude: number | null;
       longitude: number | null;
       active: boolean;
+      description?: string | null;
+      operatingHours?: Record<string, { open: string; close: string; closed: boolean }> | null;
+      galleryUrls?: string[];
+      isFoodTruck?: boolean;
       city: {
         id: number;
         name: string;

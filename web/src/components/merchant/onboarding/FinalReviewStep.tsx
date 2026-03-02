@@ -1,271 +1,317 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOnboarding } from '@/context/MerchantOnboardingContext';
-import { OnboardingStepLayout } from './OnboardingStepLayout';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useWhitelistedCities } from '@/hooks/useWhitelistedCities';
-import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { OnboardingLayout } from './OnboardingLayout';
 import { apiPost } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
+import { Loader2, Store, Image, Phone, AlertCircle } from 'lucide-react';
 import { PATHS } from '@/routing/paths';
+import { getChapterProgress } from '@/context/MerchantOnboardingContext';
 
-type AddressDetails = {
-  street?: string;
-  city?: string;
-  state?: string;
-  zip?: string;
-  country?: string;
+const PRICE_LABELS: Record<string, string> = {
+  $: 'Budget-friendly',
+  $$: 'Moderate',
+  $$$: 'Upscale',
+  $$$$: 'Fine dining',
 };
 
-async function reverseGeocode(coords: { lat: number; lng: number }): Promise<Partial<AddressDetails> | null> {
-    try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.lat}&lon=${coords.lng}`);
-        const data = await res.json();
-    if (data && data.address) {
-      return {
-        street: `${data.address.house_number || ''} ${data.address.road || ''}`.trim(),
-        city: data.address.city || data.address.town || data.address.village || '',
-        state: data.address.state || '',
-        zip: data.address.postcode || '',
-        country: data.address.country || '',
-      } as Partial<AddressDetails>;
-        }
-        return null;
-    } catch (error) {
-        console.error("Reverse geocoding error:", error);
-        return null;
-    }
-}
+const VIBE_LABELS: Record<string, string> = {
+  HAPPY_HOUR: 'Happy hour vibe',
+  DATE_NIGHT: 'Date night',
+  QUICK_BITE: 'Quick bite',
+  FINE_DINING: 'Fine dining',
+  TRENDY: 'Trendy',
+  COZY: 'Cozy',
+  FAMILY_FRIENDLY: 'Family-friendly',
+  UPSCALE: 'Upscale',
+  CASUAL: 'Casual',
+  LIVE_MUSIC: 'Live music',
+  CENTRAL: 'Central location',
+  SPACIOUS: 'Spacious',
+};
+
+const AMENITY_LABELS: Record<string, string> = {
+  WIFI: 'Free WiFi',
+  PARKING: 'Parking',
+  DINE_IN: 'Dine-in',
+  CARD_PAYMENT: 'Card payments',
+  GROUP_FRIENDLY: 'Group friendly',
+  LIVE_MUSIC: 'Live music / DJ',
+  OUTDOOR_SEATING: 'Outdoor seating',
+  PET_FRIENDLY: 'Pet friendly',
+  FULL_BAR: 'Full bar',
+  TABLE_BOOKING: 'Table reservations',
+  LOYALTY_PROGRAM: 'Loyalty program',
+  HAPPY_HOUR: 'Happy hour',
+};
+
+const formatLabel = (id: string, labels: Record<string, string>) =>
+  labels[id] ?? id.replace(/_/g, ' ');
 
 export const FinalReviewStep = () => {
   const { state, dispatch } = useOnboarding();
-  const { data: citiesData } = useWhitelistedCities();
-  
-  // Debug logging to see what we're getting
-  console.log('FinalReviewStep - citiesData:', citiesData);
-  
-  // Ensure we have an array
-  const cities = Array.isArray(citiesData?.cities) ? citiesData.cities : [];
-  const whitelistedSet = cities.reduce<Set<string>>((acc, c) => {
-    acc.add((c.name || '').toLowerCase().trim());
-    return acc;
-  }, new Set<string>());
-
-  const [isCityWhitelisted, setIsCityWhitelisted] = useState<boolean | null>(null);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const step = 12;
 
-  useEffect(() => {
-    // If we have a cityId, validate it directly
-    if (state.cityId !== null && cities) {
-      const found = cities.some(c => c.id === state.cityId && c.active);
-      setIsCityWhitelisted(found);
-      return;
-    }
-
-    // If we have an address city, try to match it with whitelisted cities
-    if (state.address.city) {
-      const raw = state.address.city.toLowerCase().trim();
-      // Accept variants like "new york" and "new york city"
-      const base = raw.replace(/\s*city$/,'').trim();
-      const variants = new Set([raw, base, `${base} city`]);
-      const accepted = Array.from(variants).some(v => whitelistedSet.has(v));
-      
-      // If city is whitelisted but we don't have a cityId, try to find and set it
-      if (accepted && cities && state.cityId === null) {
-        const matchingCity = cities.find(c => {
-          const cityName = c.name.toLowerCase().trim();
-          return variants.has(cityName) || variants.has(cityName.replace(/\s*city$/,'').trim());
-        });
-        if (matchingCity) {
-          dispatch({ type: 'SET_CITY_ID', payload: matchingCity.id });
-        }
-      }
-      
-      setIsCityWhitelisted(accepted);
-      return;
-    }
-
-    // Fallback: if no address.city we can still try reverse geocoding from coordinates
-    if (state.coordinates.lat !== null && state.coordinates.lng !== null) {
-      reverseGeocode({ lat: state.coordinates.lat, lng: state.coordinates.lng }).then(addressDetails => {
-        if (addressDetails) {
-          dispatch({ type: 'SET_FULL_ADDRESS', payload: addressDetails });
-          const raw = (addressDetails.city || '').toLowerCase().trim();
-          if (raw) {
-            const base = raw.replace(/\s*city$/,'').trim();
-            const variants = new Set([raw, base, `${base} city`]);
-            const accepted = Array.from(variants).some(v => whitelistedSet.has(v));
-            
-            // If city is whitelisted but we don't have a cityId, try to find and set it
-            if (accepted && cities && state.cityId === null) {
-              const matchingCity = cities.find(c => {
-                const cityName = c.name.toLowerCase().trim();
-                return variants.has(cityName) || variants.has(cityName.replace(/\s*city$/,'').trim());
-              });
-              if (matchingCity) {
-                dispatch({ type: 'SET_CITY_ID', payload: matchingCity.id });
-              }
-            }
-            
-            setIsCityWhitelisted(accepted);
-          }
-        }
-      });
-    }
-  }, [state.address.city, state.cityId, state.coordinates, dispatch, whitelistedSet, cities]);
-  
-  const handleFinalSubmit = async () => {
+  const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      console.log('Final submit - Current state:', {
-        cityId: state.cityId,
-        addressCity: state.address.city,
-        isCityWhitelisted,
-        cities: cities?.length
-      });
-
-      // Last attempt to find cityId if it's missing
-      let finalCityId = state.cityId;
-      if (!finalCityId && state.address.city && cities) {
-        const raw = state.address.city.toLowerCase().trim();
-        const base = raw.replace(/\s*city$/,'').trim();
-        const variants = new Set([raw, base, `${base} city`]);
-        
-        const matchingCity = cities.find(c => {
-          const cityName = c.name.toLowerCase().trim();
-          return variants.has(cityName) || variants.has(cityName.replace(/\s*city$/,'').trim());
-        });
-        
-        if (matchingCity) {
-          finalCityId = matchingCity.id;
-          dispatch({ type: 'SET_CITY_ID', payload: matchingCity.id });
-          console.log('Found matching city:', matchingCity);
-        }
-      }
-
-      const fullAddress = `${state.address.street}, ${state.address.city}, ${state.address.state} ${state.address.zip}`;
       const payload = {
         businessName: state.businessName,
-        address: fullAddress,
-        cityId: finalCityId,
-        latitude: state.coordinates.lat,
-        longitude: state.coordinates.lng,
         description: state.description || undefined,
         logoUrl: state.logoUrl || undefined,
-        businessType: state.businessType || 'LOCAL', // Default to LOCAL if not set
+        phoneNumber: state.phoneNumber || undefined,
+        businessType: state.businessType || 'LOCAL',
+        businessCategory: state.businessCategory || undefined,
+        categoryId: state.categoryId || undefined,
+        websiteUrl: state.websiteUrl || undefined,
+        instagramUrl: state.instagramUrl || undefined,
+        facebookUrl: state.facebookUrl || undefined,
+        twitterUrl: state.twitterUrl || undefined,
+        priceRange: state.priceRange || undefined,
+        galleryUrls: state.galleryUrls.length > 0 ? state.galleryUrls : undefined,
+        vibeTags: state.vibeTags.length > 0 ? state.vibeTags : undefined,
+        amenities: state.amenities.length > 0 ? state.amenities : undefined,
+        thingsToNote: state.thingsToNote || undefined,
       };
-
-      console.log('Final payload:', payload);
-
-      // Validation: ensure cityId is present or city is whitelisted
-      if (!payload.cityId && isCityWhitelisted !== true) {
-        toast({ 
-          title: 'Submission Failed', 
-          description: 'A city must be selected and must be in our service area. Please go back and select a valid city.', 
-          variant: 'destructive' 
-        });
-        setIsSubmitting(false);
-        return;
-      }
 
       const response = await apiPost('/merchants/register', payload);
       if (response.success) {
-        toast({ title: 'Application Submitted!', description: 'Your profile is now pending approval.' });
+        toast({
+          title: 'Application submitted!',
+          description: 'Your profile is pending approval. Add locations and create deals from the dashboard next.',
+        });
         localStorage.removeItem('merchantOnboardingState');
         navigate(PATHS.MERCHANT_DASHBOARD);
       } else {
         throw new Error(response.error || 'Something went wrong.');
       }
     } catch (err) {
-      toast({ title: 'Submission Failed', description: (err as Error).message, variant: 'destructive' });
+      toast({
+        title: 'Submission failed',
+        description: (err as Error).message,
+        variant: 'destructive',
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const cityFilled = !!state.address.city && state.address.city.trim().length > 0;
-
   return (
-    <OnboardingStepLayout
-      title="Confirm your address"
-      onNext={handleFinalSubmit}
-      onBack={() => dispatch({ type: 'SET_STEP', payload: state.step - 1 })}
-      isNextDisabled={isSubmitting || !cityFilled || isCityWhitelisted === false || isCityWhitelisted === null}
-      isLoading={isSubmitting}
-      progress={100}
-      nextButtonText={isSubmitting ? 'Submitting...' : 'Finish & Submit'}
+    <OnboardingLayout
+      chapterProgress={getChapterProgress(step)}
+      onBack={() => dispatch({ type: 'SET_STEP', payload: step - 1 })}
+      onNext={handleSubmit}
+      nextLabel={isSubmitting ? 'Submitting...' : 'Finish & Submit'}
+      nextDisabled={isSubmitting}
+      nextDisabledReason="Please wait while we submit your application."
+      showFooter={true}
     >
-      {/* Business Information Summary */}
-      <div className="mb-6 rounded-lg border border-neutral-200 bg-white p-6">
-        <h3 className="text-lg font-semibold text-neutral-800 mb-4">Business Information</h3>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-neutral-600">Business Name:</span>
-            <span className="font-medium text-neutral-800">{state.businessName}</span>
+      <div className="mx-auto max-w-2xl px-6 py-12">
+        <h1 className="font-heading text-2xl font-bold text-neutral-900 md:text-3xl">
+          Review everything before you submit
+        </h1>
+        <p className="mt-2 text-neutral-600">
+          Double-check everything before we submit your profile. Use Back to make changes.
+        </p>
+
+        {/* Recheck banner */}
+        <div className="mt-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/80 p-4">
+          <AlertCircle className="h-5 w-5 shrink-0 text-amber-600 mt-0.5" />
+          <div>
+            <p className="font-medium text-amber-900">Take a moment to recheck</p>
+            <p className="mt-0.5 text-sm text-amber-800">
+              Ensure your business name, type, description, logo, photos, vibes, amenities, and contact info are correct.
+            </p>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-neutral-600">Business Type:</span>
+        </div>
+
+        <div className="mt-8 space-y-6">
+          {/* Business information */}
+          <div className="rounded-2xl border border-neutral-200 bg-neutral-50/50 p-6">
             <div className="flex items-center gap-2">
-              <span className={`text-sm px-2 py-1 rounded-full ${
-                state.businessType === 'NATIONAL' 
-                  ? 'bg-blue-100 text-blue-800' 
-                  : 'bg-green-100 text-green-800'
-              }`}>
-                {state.businessType === 'NATIONAL' ? '🏢 National Chain' : '🏪 Local Business'}
-              </span>
+              <Store className="h-5 w-5 text-neutral-500" />
+              <h3 className="font-heading text-lg font-bold text-neutral-900">
+                Business information
+              </h3>
+            </div>
+            <dl className="mt-5 space-y-4">
+              <div>
+                <dt className="text-sm font-medium text-neutral-500">Business name</dt>
+                <dd className="mt-1 font-medium text-neutral-900">{state.businessName || '—'}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-neutral-500">Category</dt>
+                <dd className="mt-1 font-medium text-neutral-900">
+                  {state.businessCategory || '—'}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-neutral-500">Type of business</dt>
+                <dd className="mt-1 font-medium text-neutral-900">
+                  {state.businessType === 'NATIONAL' ? 'National Chain' : state.businessType === 'LOCAL' ? 'Local Business' : '—'}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-neutral-500">Price range</dt>
+                <dd className="mt-1 font-medium text-neutral-900">
+                  {state.priceRange
+                    ? `${state.priceRange} — ${PRICE_LABELS[state.priceRange] || state.priceRange}`
+                    : '—'}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-neutral-500">About / Description</dt>
+                <dd className="mt-1 font-medium text-neutral-900 whitespace-pre-wrap">
+                  {state.description || '—'}
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          {/* Media */}
+          <div className="rounded-2xl border border-neutral-200 bg-neutral-50/50 p-6">
+            <div className="flex items-center gap-2">
+              <Image className="h-5 w-5 text-neutral-500" />
+              <h3 className="font-heading text-lg font-bold text-neutral-900">
+                Logo & photos
+              </h3>
+            </div>
+            <div className="mt-5 space-y-4">
+              <div>
+                <dt className="text-sm font-medium text-neutral-500">Business logo</dt>
+                <dd className="mt-1">
+                  {state.logoUrl ? (
+                    <img
+                      src={state.logoUrl}
+                      alt="Logo"
+                      className="h-24 w-24 rounded-xl border border-neutral-200 object-contain bg-white p-2"
+                    />
+                  ) : (
+                    <span className="text-neutral-500">—</span>
+                  )}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-neutral-500">
+                  Gallery ({state.galleryUrls.length} photo{state.galleryUrls.length !== 1 ? 's' : ''})
+                </dt>
+                <dd className="mt-2 flex flex-wrap gap-2">
+                  {state.galleryUrls.length > 0 ? (
+                    <>
+                      {state.galleryUrls.slice(0, 6).map((url, i) => (
+                        <img
+                          key={i}
+                          src={url}
+                          alt={`Gallery ${i + 1}`}
+                          className="h-16 w-16 rounded-xl border border-neutral-200 object-cover"
+                        />
+                      ))}
+                      {state.galleryUrls.length > 6 && (
+                        <span className="flex h-16 w-16 items-center justify-center rounded-xl border border-neutral-200 bg-neutral-100 text-xs font-medium text-neutral-600">
+                          +{state.galleryUrls.length - 6}
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <span className="text-neutral-500">—</span>
+                  )}
+                </dd>
+              </div>
             </div>
           </div>
-          {state.description && (
-            <div className="flex items-start justify-between">
-              <span className="text-sm text-neutral-600">Description:</span>
-              <span className="font-medium text-neutral-800 text-right max-w-xs">{state.description}</span>
+
+          {/* Vibe tags & amenities */}
+          {(state.vibeTags.length > 0 || state.amenities.length > 0 || state.thingsToNote) && (
+            <div className="rounded-2xl border border-neutral-200 bg-neutral-50/50 p-6">
+              <h3 className="font-heading text-lg font-bold text-neutral-900">
+                Highlights & amenities
+              </h3>
+              <div className="mt-4 space-y-3">
+                {state.vibeTags.length > 0 && (
+                  <div>
+                    <dt className="text-sm font-medium text-neutral-500">Vibe</dt>
+                    <dd className="mt-1 flex flex-wrap gap-2">
+                      {state.vibeTags.map((t) => (
+                        <span
+                          key={t}
+                          className="rounded-lg bg-neutral-200 px-2.5 py-1 text-sm font-medium text-neutral-800"
+                        >
+                          {formatLabel(t, VIBE_LABELS)}
+                        </span>
+                      ))}
+                    </dd>
+                  </div>
+                )}
+                {state.amenities.length > 0 && (
+                  <div>
+                    <dt className="text-sm font-medium text-neutral-500">Amenities</dt>
+                    <dd className="mt-1 flex flex-wrap gap-2">
+                      {state.amenities.map((a) => (
+                        <span
+                          key={a}
+                          className="rounded-lg bg-neutral-200 px-2.5 py-1 text-sm font-medium text-neutral-800"
+                        >
+                          {formatLabel(a, AMENITY_LABELS)}
+                        </span>
+                      ))}
+                    </dd>
+                  </div>
+                )}
+                {state.thingsToNote && (
+                  <div>
+                    <dt className="text-sm font-medium text-neutral-500">Things to note</dt>
+                    <dd className="mt-1 font-medium text-neutral-900 whitespace-pre-wrap">
+                      {state.thingsToNote}
+                    </dd>
+                  </div>
+                )}
+              </div>
             </div>
           )}
-        </div>
-      </div>
 
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="street">Street address</Label>
-          <Input id="street" value={state.address.street} onChange={(e) => dispatch({ type: 'SET_ADDRESS_FIELD', payload: { field: 'street', value: e.target.value } })} />
-        </div>
-        <div>
-          <Label htmlFor="city">City/town</Label>
-          <Input id="city" value={state.address.city} onChange={(e) => dispatch({ type: 'SET_ADDRESS_FIELD', payload: { field: 'city', value: e.target.value } })} />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="state">State</Label>
-            <Input id="state" value={state.address.state} onChange={(e) => dispatch({ type: 'SET_ADDRESS_FIELD', payload: { field: 'state', value: e.target.value } })} />
+          {/* Contact & social */}
+          <div className="rounded-2xl border border-neutral-200 bg-neutral-50/50 p-6">
+            <div className="flex items-center gap-2">
+              <Phone className="h-5 w-5 text-neutral-500" />
+              <h3 className="font-heading text-lg font-bold text-neutral-900">
+                Contact & social
+              </h3>
+            </div>
+            <dl className="mt-5 space-y-4">
+              <div>
+                <dt className="text-sm font-medium text-neutral-500">Phone</dt>
+                <dd className="mt-1 font-medium text-neutral-900">{state.phoneNumber || '—'}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-neutral-500">Website</dt>
+                <dd className="mt-1 font-medium text-neutral-900 break-all">{state.websiteUrl || '—'}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-neutral-500">Instagram</dt>
+                <dd className="mt-1 font-medium text-neutral-900 break-all">{state.instagramUrl || '—'}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-neutral-500">Facebook</dt>
+                <dd className="mt-1 font-medium text-neutral-900 break-all">{state.facebookUrl || '—'}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-neutral-500">X (Twitter)</dt>
+                <dd className="mt-1 font-medium text-neutral-900 break-all">{state.twitterUrl || '—'}</dd>
+              </div>
+            </dl>
           </div>
-          <div>
-            <Label htmlFor="zip">PIN code</Label>
-            <Input id="zip" value={state.address.zip} onChange={(e) => dispatch({ type: 'SET_ADDRESS_FIELD', payload: { field: 'zip', value: e.target.value } })} />
+        </div>
+
+        {isSubmitting && (
+          <div className="mt-6 flex items-center gap-2 text-neutral-600">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span className="text-sm">Submitting your merchant profile...</span>
           </div>
-        </div>
+        )}
       </div>
-      {cityFilled && isCityWhitelisted === true && (
-      <div className="mt-4 flex items-center gap-3 rounded-lg bg-green-50 p-4 text-green-800 border border-green-200">
-        <CheckCircle className="h-6 w-6" />
-        <p className="font-semibold">Great! Your city is supported.</p>
-      </div>
-    )}
-      {cityFilled && isCityWhitelisted === null && (
-        <div className="mt-4 flex items-center gap-3 rounded-lg bg-blue-50 p-4 text-blue-800 border border-blue-200">
-          <Loader2 className="h-5 w-5 animate-spin" />
-          <p className="font-medium">Checking city availability...</p>
-        </div>
-      )}
-    {cityFilled && isCityWhitelisted === false && (
-      <div className="mt-4 flex items-center gap-3 rounded-lg bg-amber-50 p-4 text-amber-800 border border-amber-200">
-        <XCircle className="h-6 w-6" />
-        <p className="font-semibold">We're not in your city yet, but we're expanding soon!</p>
-      </div>
-    )}
-    </OnboardingStepLayout>
+    </OnboardingLayout>
   );
 };

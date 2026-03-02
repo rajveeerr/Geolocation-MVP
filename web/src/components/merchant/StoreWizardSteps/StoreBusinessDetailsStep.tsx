@@ -3,7 +3,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/common/Button';
 import { Switch } from '@/components/ui/switch';
-import { Clock, Wifi, Car, Utensils, CreditCard, Users, CheckCircle } from 'lucide-react';
+import { Clock, Wifi, Car, Utensils, CreditCard, Users, CheckCircle, Truck, Plus, X } from 'lucide-react';
+import { ImageUploadModal } from '@/components/common/ImageUploadModal';
 import { cn } from '@/lib/utils';
 // Local types to avoid import issues
 interface BusinessHours {
@@ -28,6 +29,8 @@ interface StoreWizardData {
   description?: string;
   features: string[];
   storeImages: File[];
+  galleryUrls: string[];
+  isFoodTruck: boolean;
   active: boolean;
 }
 
@@ -65,6 +68,11 @@ const TIME_OPTIONS = [
 
 export const StoreBusinessDetailsStep = ({ data, onUpdate }: StoreBusinessDetailsStepProps) => {
   const [showAdvancedHours, setShowAdvancedHours] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+
+  const handleGalleryUploadComplete = (urls: string[]) => {
+    onUpdate({ galleryUrls: [...(data.galleryUrls || []), ...urls] });
+  };
 
   const handleInputChange = (field: keyof StoreWizardData, value: any) => {
     onUpdate({ [field]: value });
@@ -275,6 +283,25 @@ export const StoreBusinessDetailsStep = ({ data, onUpdate }: StoreBusinessDetail
         </div>
       </div>
 
+      {/* Food Truck */}
+      <div className="rounded-lg border border-neutral-200 bg-white p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
+              <Truck className="h-5 w-5 text-amber-600" />
+            </div>
+            <div>
+              <Label className="text-sm font-semibold text-neutral-700">Food truck or mobile venue</Label>
+              <p className="text-sm text-neutral-600">Does this location move? (e.g. food truck, pop-up)</p>
+            </div>
+          </div>
+          <Switch
+            checked={data.isFoodTruck ?? false}
+            onCheckedChange={(checked) => onUpdate({ isFoodTruck: checked })}
+          />
+        </div>
+      </div>
+
       {/* Store Description */}
       <div className="space-y-2">
         <Label htmlFor="description" className="text-sm font-semibold text-neutral-700">
@@ -291,6 +318,45 @@ export const StoreBusinessDetailsStep = ({ data, onUpdate }: StoreBusinessDetail
         <p className="text-xs text-neutral-500">
           Optional - Help customers understand what your store offers
         </p>
+      </div>
+
+      {/* Store Media Gallery */}
+      <div className="space-y-4">
+        <Label className="text-sm font-semibold text-neutral-700">Store photos</Label>
+        <p className="text-sm text-neutral-600">Add photos of this location. Optional.</p>
+        {(data.galleryUrls || []).length > 0 && (
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+            {(data.galleryUrls || []).map((url, i) => (
+              <div key={`${url}-${i}`} className="group relative aspect-square overflow-hidden rounded-lg border">
+                <img src={url} alt="" className="h-full w-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => onUpdate({ galleryUrls: (data.galleryUrls || []).filter((_, idx) => idx !== i) })}
+                  className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                  aria-label="Remove"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={() => setUploadModalOpen(true)}
+          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-neutral-300 py-6 text-sm text-neutral-600 transition-colors hover:border-neutral-400 hover:bg-neutral-50"
+        >
+          <Plus className="h-5 w-5" />
+          Add photo
+        </button>
+        <ImageUploadModal
+          open={uploadModalOpen}
+          onOpenChange={setUploadModalOpen}
+          onUploadComplete={handleGalleryUploadComplete}
+          context="venue_gallery"
+          maxFiles={20}
+          title="Upload store photos"
+        />
       </div>
 
       {/* Store Status */}

@@ -121,6 +121,11 @@
     --input:              var(--neutral-200);
     --ring:               var(--brand-primary);
 
+    /* Folder illustration (3d-folder, onboarding) */
+    --folder-back:  0 95% 88%;
+    --folder-front: 0 100% 98%;
+    --folder-tab:   0 95% 82%;
+
     /* ============================================================
        RADII  — use via Tailwind: rounded-dh-sm, rounded-dh-lg, etc.
        Also sets the shadcn --radius mapping.
@@ -199,6 +204,9 @@
     --input:              var(--neutral-700);
     --ring:               var(--brand-primary);
     --radius:             12px;
+    --folder-back:  0 95% 22%;
+    --folder-front: 0 95% 18%;
+    --folder-tab:   0 95% 26%;
   }
 }
 

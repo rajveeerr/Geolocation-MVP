@@ -483,11 +483,9 @@ function App() {
                   path="/merchant/onboarding/*"
                   element={
                     <ProtectedRoute>
-                      <MerchantLayout>
-                        <Suspense fallback={<LoadingOverlay />}>
-                          <MerchantOnboardingPage />
-                        </Suspense>
-                      </MerchantLayout>
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MerchantOnboardingPage />
+                      </Suspense>
                     </ProtectedRoute>
                   }
                 />

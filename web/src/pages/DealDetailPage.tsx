@@ -62,7 +62,7 @@ const prettyCat = (raw: string) =>
 /* ------------------------------------------------------------------ */
 /*  Hero Gallery – dark bg, VERIFIED VENUE, play btn, square aspect   */
 /* ------------------------------------------------------------------ */
-const HeroGallery = ({ images, title }: { images: string[]; title: string }) => {
+const HeroGallery = ({ images, title, showVerifiedBadge = false }: { images: string[]; title: string; showVerifiedBadge?: boolean }) => {
   const [idx, setIdx] = useState(0);
 
   if (!images.length) {
@@ -86,10 +86,11 @@ const HeroGallery = ({ images, title }: { images: string[]; title: string }) => 
           className="w-full h-full object-cover"
         />
 
-        {/* VERIFIED VENUE badge */}
-        <div className="absolute top-4 left-4 bg-brand-primary-600 text-white rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider shadow-lg">
-          Verified Venue
-        </div>
+        {showVerifiedBadge && (
+          <div className="absolute top-4 left-4 bg-brand-primary-600 text-white rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider shadow-lg">
+            Verified Venue
+          </div>
+        )}
 
         {/* Counter */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm font-bold drop-shadow-md">
@@ -600,6 +601,7 @@ export const DealDetailPage = () => {
   const [menuCategory, setMenuCategory] = useState<string>('');
   const [showAllMenu, setShowAllMenu] = useState(false);
   const [showHoursDropdown, setShowHoursDropdown] = useState(false);
+  const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
   const MENU_INITIAL_COUNT = 4;
 
   const { isCheckingIn, checkIn } = useCheckIn({
@@ -613,10 +615,52 @@ export const DealDetailPage = () => {
 
   const { data: deal, isLoading, error } = useDealDetail(dealId || '');
 
+  const stores = deal?.merchant?.stores ?? [];
+  const selectedStore = useMemo(
+    () => (selectedStoreId ? stores.find((s: any) => s.id === selectedStoreId) : stores[0]),
+    [stores, selectedStoreId],
+  );
+  useEffect(() => {
+    if (stores.length > 0 && selectedStoreId === null) setSelectedStoreId(stores[0].id);
+  }, [stores, selectedStoreId]);
+
   const allImages = useMemo(() => {
     if (!deal) return [];
-    return deal.images?.length ? deal.images : deal.imageUrl ? [deal.imageUrl] : [];
-  }, [deal]);
+    const dealImgs = deal.images?.length ? deal.images : deal.imageUrl ? [deal.imageUrl] : [];
+    const storeGallery = selectedStore?.galleryUrls ?? [];
+    return [...dealImgs, ...storeGallery].filter(Boolean);
+  }, [deal, selectedStore]);
+
+  const displayAddress = selectedStore?.address ?? deal?.merchant?.address ?? '';
+  const displayLat = selectedStore?.latitude ?? deal?.merchant?.latitude ?? null;
+  const displayLng = selectedStore?.longitude ?? deal?.merchant?.longitude ?? null;
+  const displayAbout = selectedStore?.description ?? deal?.merchant?.description ?? deal?.description ?? '';
+
+  const displayHours = useMemo(() => {
+    const hours = selectedStore?.operatingHours;
+    if (!hours || typeof hours !== 'object') return placeholderHours;
+    const dayOrder = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return dayOrder.map((day, i) => {
+      const h = hours[String(i)];
+      const fmt = (t: string) => {
+        const [hr, min] = t.split(':');
+        const hh = parseInt(hr || '0', 10);
+        const mm = parseInt(min || '0', 10);
+        const period = hh >= 12 ? 'PM' : 'AM';
+        const h12 = hh % 12 || 12;
+        return `${h12}:${mm.toString().padStart(2, '0')} ${period}`;
+      };
+      return {
+        day,
+        shortDay: day.slice(0, 3),
+        open: h ? fmt(h.open) : '—',
+        close: h ? fmt(h.close) : '—',
+        isClosed: h?.closed ?? true,
+      };
+    });
+  }, [selectedStore?.operatingHours]);
+
+  const isVerifiedVenue = deal?.merchant?.status === 'APPROVED';
 
   const todayDayName = useMemo(
     () => new Date().toLocaleDateString('en-US', { weekday: 'long' }),
@@ -730,7 +774,7 @@ export const DealDetailPage = () => {
           {/*  LEFT COLUMN  (5 / 12)                                     */}
           {/* ========================================================= */}
           <div className="lg:col-span-5 space-y-4">
-            <HeroGallery images={allImages} title={deal.merchant.businessName} />
+            <HeroGallery images={allImages} title={deal.merchant.businessName} showVerifiedBadge={isVerifiedVenue} />
 
             <TabBar tabs={LEFT_TABS} active={leftTab} onChange={setLeftTab} />
 
@@ -794,9 +838,9 @@ export const DealDetailPage = () => {
                       </span>
                     </div>
                   )}
-                  {deal.merchant.latitude && deal.merchant.longitude ? (
+                  {displayLat != null && displayLng != null ? (
                     <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${deal.merchant.latitude},${deal.merchant.longitude}`}
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${displayLat},${displayLng}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-1 flex flex-col items-center gap-2 py-4 rounded-xl border border-neutral-200 hover:border-brand-primary-600/30 hover:bg-brand-primary-600/5 transition-all"
@@ -842,15 +886,34 @@ export const DealDetailPage = () => {
                   </div>
                 </div>
 
-                {/* HOURS (placeholder – no backend field) */}
+                {/* Location dropdown when multiple stores */}
+                {stores.length > 1 && (
+                  <div>
+                    <h3 className="text-[11px] font-bold text-neutral-500 tracking-[0.2em] uppercase mb-2.5">
+                      Location
+                    </h3>
+                    <select
+                      value={selectedStoreId ?? ''}
+                      onChange={(e) => setSelectedStoreId(Number(e.target.value) || null)}
+                      className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-900 focus:border-brand-primary-500 focus:ring-1 focus:ring-brand-primary-500"
+                    >
+                      {stores.map((s: any) => (
+                        <option key={s.id} value={s.id}>
+                          {s.address} {s.city?.name ? `(${s.city.name})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* HOURS (store-specific when available) */}
                 <div>
                   <h3 className="text-[11px] font-bold text-brand-primary-600 tracking-[0.2em] uppercase mb-2.5">
                     Hours
                   </h3>
-                  {/* Current day display */}
                   {(() => {
-                    const todayHours = placeholderHours.find((h) => h.day === todayDayName);
-                    const otherDays = placeholderHours.filter((h) => h.day !== todayDayName);
+                    const todayHours = displayHours.find((h: { day: string }) => h.day === todayDayName);
+                    const otherDays = displayHours.filter((h: { day: string }) => h.day !== todayDayName);
                     
                     return (
                       <>
@@ -913,14 +976,14 @@ export const DealDetailPage = () => {
                     About
                   </h3>
                   <p className="text-sm text-neutral-700 leading-relaxed">
-                    {deal.merchant.description ||
-                      deal.description ||
-                      'No description available.'}
+                    {displayAbout || 'No description available.'}
                   </p>
-                  <p className="mt-2 text-xs text-neutral-500">
-                    <MapPin className="inline h-3 w-3 mr-1" />
-                    {deal.merchant.address}
-                  </p>
+                  {displayAddress && (
+                    <p className="mt-2 text-xs text-neutral-500">
+                      <MapPin className="inline h-3 w-3 mr-1" />
+                      {displayAddress}
+                    </p>
+                  )}
                   {deal.merchant.totalStores > 1 && (
                     <p className="mt-1 text-xs text-neutral-400">
                       {deal.merchant.totalStores} locations

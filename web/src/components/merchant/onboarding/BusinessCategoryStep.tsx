@@ -1,45 +1,58 @@
 import { useOnboarding } from '@/context/MerchantOnboardingContext';
-import { OnboardingStepLayout } from './OnboardingStepLayout';
-import { Home, Coffee, ShoppingBag, Beer } from 'lucide-react';
+import { OnboardingLayout } from './OnboardingLayout';
+import { Home, Coffee, ShoppingBag, Utensils } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getChapterProgress } from '@/context/MerchantOnboardingContext';
 
 const categories = [
-  { name: 'Restaurant', icon: <Beer /> },
-  { name: 'Cafe', icon: <Coffee /> },
-  { name: 'Retail', icon: <ShoppingBag /> },
-  { name: 'Other', icon: <Home /> },
+  { name: 'Restaurant', icon: Utensils },
+  { name: 'Cafe', icon: Coffee },
+  { name: 'Retail', icon: ShoppingBag },
+  { name: 'Other', icon: Home },
 ];
-
-const CategoryCard = ({ icon, name, isSelected, onClick }: any) => (
-    <button onClick={onClick} className={cn("p-4 border-2 rounded-lg flex flex-col items-center justify-center gap-2 transition-all", isSelected ? "border-brand-primary-600 bg-brand-primary-50" : "border-neutral-200 hover:border-neutral-400")}>
-        {icon}
-        <span className="font-semibold">{name}</span>
-    </button>
-);
 
 export const BusinessCategoryStep = () => {
   const { state, dispatch } = useOnboarding();
-  const handleNext = () => dispatch({ type: 'SET_STEP', payload: state.step + 1 });
-  
+  const step = 3;
+
   return (
-    <OnboardingStepLayout
-      title="Which of these best describes your place?"
-      onNext={handleNext}
-      onBack={() => dispatch({ type: 'SET_STEP', payload: state.step - 1 })}
-  isNextDisabled={!state.businessCategory}
-  progress={40}
+    <OnboardingLayout
+      chapterProgress={getChapterProgress(step)}
+      onBack={() => dispatch({ type: 'SET_STEP', payload: step - 1 })}
+      onNext={() => dispatch({ type: 'SET_STEP', payload: step + 1 })}
+      nextLabel="Next"
+      nextDisabled={!state.businessCategory}
+      nextDisabledReason="Please select a category to continue."
     >
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        {categories.map(cat => (
-          <CategoryCard 
-            key={cat.name}
-            icon={cat.icon}
-            name={cat.name}
-            isSelected={state.businessCategory === cat.name}
-            onClick={() => dispatch({ type: 'SET_BUSINESS_CATEGORY', payload: cat.name })}
-          />
-        ))}
+      <div className="mx-auto max-w-2xl px-6 py-12">
+        <h1 className="font-heading text-2xl font-bold text-neutral-900 md:text-3xl">
+          Which best describes your place?
+        </h1>
+        <p className="mt-2 text-neutral-600">
+          We&apos;ll use this to help customers find deals at places like yours.
+        </p>
+
+        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {categories.map((cat) => (
+            <button
+              key={cat.name}
+              type="button"
+              onClick={() =>
+                dispatch({ type: 'SET_BUSINESS_CATEGORY', payload: cat.name })
+              }
+              className={cn(
+                'flex flex-col items-center gap-2 rounded-2xl border-2 p-6 transition-all',
+                state.businessCategory === cat.name
+                  ? 'border-brand-primary-500 bg-brand-primary-50 shadow-card'
+                  : 'border-neutral-200 hover:border-neutral-300'
+              )}
+            >
+              <cat.icon className="h-8 w-8 text-neutral-600" />
+              <span className="font-semibold text-neutral-900">{cat.name}</span>
+            </button>
+          ))}
+        </div>
       </div>
-    </OnboardingStepLayout>
+    </OnboardingLayout>
   );
 };
