@@ -13,6 +13,8 @@ import { cn } from '@/lib/utils';
 
 const DEFAULT_MAX_SIZE_MB = 5;
 const DEFAULT_ACCEPTED = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+const VIDEO_FORMATS = ['video/mp4', 'video/webm', 'video/quicktime'];
+const DEFAULT_VIDEO_MAX_MB = 50;
 
 export interface ImageUploadModalProps {
   open: boolean;
@@ -24,6 +26,8 @@ export interface ImageUploadModalProps {
   acceptedFormats?: string[];
   uploadEndpoint?: string;
   title?: string;
+  /** When true, accept video files (mp4, webm, mov) with higher size limit */
+  acceptVideos?: boolean;
 }
 
 type PendingFile = { file: File; id: string; preview: string };
@@ -38,7 +42,10 @@ export const ImageUploadModal = ({
   acceptedFormats = DEFAULT_ACCEPTED,
   uploadEndpoint = '/media/upload',
   title = 'Upload photos',
+  acceptVideos = false,
 }: ImageUploadModalProps) => {
+  const effectiveFormats = acceptVideos ? [...DEFAULT_ACCEPTED, ...VIDEO_FORMATS] : acceptedFormats;
+  const effectiveMaxMB = acceptVideos ? Math.max(maxSizeMB, DEFAULT_VIDEO_MAX_MB) : maxSizeMB;
   const [pending, setPending] = useState<PendingFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -48,15 +55,17 @@ export const ImageUploadModal = ({
 
   const validateFile = useCallback(
     (file: File): string | null => {
-      if (!acceptedFormats.includes(file.type)) {
-        return `Invalid format. Use JPEG, PNG, GIF, or WebP.`;
+      if (!effectiveFormats.includes(file.type)) {
+        return acceptVideos
+          ? 'Invalid format. Use images (JPEG, PNG, GIF, WebP) or videos (MP4, WebM, MOV).'
+          : 'Invalid format. Use JPEG, PNG, GIF, or WebP.';
       }
-      if (file.size > maxSizeMB * 1024 * 1024) {
-        return `File too large. Max ${maxSizeMB}MB per image.`;
+      if (file.size > effectiveMaxMB * 1024 * 1024) {
+        return `File too large. Max ${effectiveMaxMB}MB.`;
       }
       return null;
     },
-    [acceptedFormats, maxSizeMB]
+    [effectiveFormats, effectiveMaxMB, acceptVideos]
   );
 
   const addFiles = useCallback(
@@ -171,9 +180,11 @@ export const ImageUploadModal = ({
     [isUploading, onOpenChange]
   );
 
-  const formatHint = maxFiles === 1
-    ? `JPEG, PNG, GIF or WebP. Max ${maxSizeMB}MB.`
-    : `JPEG, PNG, GIF or WebP. Max ${maxSizeMB}MB per image.`;
+  const formatHint = acceptVideos
+    ? `Images (JPEG, PNG, GIF, WebP) or videos (MP4, WebM, MOV). Max ${effectiveMaxMB}MB per file.`
+    : maxFiles === 1
+      ? `JPEG, PNG, GIF or WebP. Max ${effectiveMaxMB}MB.`
+      : `JPEG, PNG, GIF or WebP. Max ${effectiveMaxMB}MB per image.`;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -224,7 +235,7 @@ export const ImageUploadModal = ({
               <input
                 ref={fileInputRef}
                 type="file"
-                accept={acceptedFormats.join(',')}
+                accept={effectiveFormats.join(',')}
                 multiple={maxFiles > 1}
                 className="hidden"
                 onChange={handleInputChange}
@@ -259,14 +270,18 @@ export const ImageUploadModal = ({
               <input
                 ref={fileInputRef}
                 type="file"
-                accept={acceptedFormats.join(',')}
+                accept={effectiveFormats.join(',')}
                 multiple={maxFiles > 1}
                 className="hidden"
                 onChange={handleInputChange}
               />
               {pending.map((p) => (
                 <div key={p.id} className="group relative aspect-square overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50">
-                  <img src={p.preview} alt={p.file.name} className="h-full w-full object-cover" />
+                  {p.file.type.startsWith('video/') ? (
+                    <video src={p.preview} className="h-full w-full object-cover" muted playsInline />
+                  ) : (
+                    <img src={p.preview} alt={p.file.name} className="h-full w-full object-cover" />
+                  )}
                   {!isUploading && (
                     <button
                       type="button"

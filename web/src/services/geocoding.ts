@@ -14,7 +14,8 @@ export interface ReverseGeocodeResult {
 export const reverseGeocodeCoordinates = async (coords: { lat: number; lng: number }): Promise<ReverseGeocodeResult | null> => {
     try {
         const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${coords.lat}&lon=${coords.lng}`
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${coords.lat}&lon=${coords.lng}`,
+            { headers: { 'User-Agent': 'Yohop-Geolocation-MVP/1.0' } }
         );
         if (!response.ok) throw new Error("Failed to fetch address");
         
@@ -37,29 +38,74 @@ export const reverseGeocodeCoordinates = async (coords: { lat: number; lng: numb
     }
 };
 
-export interface AddressSuggestion {
-    place_id: number;
-    display_name: string; // The full, formatted address string
-    lat: string;
-    lon: string;
+export interface AddressComponents {
+    street?: string;
+    house_number?: string;
+    road?: string;
+    city?: string;
+    town?: string;
+    village?: string;
+    state?: string;
+    state_district?: string;
+    postcode?: string;
+    country?: string;
 }
 
-// --- NEW FUNCTION for Address Autocomplete ---
+export interface AddressSuggestion {
+    place_id: number;
+    display_name: string;
+    lat: string;
+    lon: string;
+    address?: AddressComponents;
+}
+
+/** Extract city name from Nominatim address object */
+export function getCityFromAddress(addr: AddressComponents | undefined): string {
+    if (!addr) return '';
+    return addr.city || addr.town || addr.village || '';
+}
+
+/** Extract state from Nominatim address object */
+export function getStateFromAddress(addr: AddressComponents | undefined): string {
+    if (!addr) return '';
+    return addr.state || addr.state_district || '';
+}
+
+/** Check if address city/state matches a whitelisted city (case-insensitive) */
+export function addressMatchesCity(
+    addr: AddressComponents | undefined,
+    cityName: string,
+    cityState: string
+): boolean {
+    const addrCity = getCityFromAddress(addr)?.toLowerCase().trim();
+    const addrState = getStateFromAddress(addr)?.toLowerCase().trim();
+    const cName = cityName?.toLowerCase().trim();
+    const cState = cityState?.toLowerCase().trim();
+    return (
+        (!!addrCity && addrCity === cName && (!cState || addrState === cState)) ||
+        (!!addrCity && addrCity.includes(cName) && (!cState || addrState.includes(cState)))
+    );
+}
+
 export const searchAddresses = async (query: string, city: string): Promise<AddressSuggestion[]> => {
-    if (query.trim().length < 3) {
-        return []; // Don't search for very short queries
-    }
+    if (query.trim().length < 3) return [];
 
     try {
-        // We add the city to the query to make the search results more relevant.
-        const fullQuery = `${query}, ${city}`;
-        const response = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullQuery)}&limit=5`
-        );
+        const fullQuery = city ? `${query}, ${city}` : query;
+        const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&q=${encodeURIComponent(fullQuery)}`;
+        const response = await fetch(url, {
+            headers: { Accept: 'application/json', 'User-Agent': 'Yohop-Geolocation-MVP/1.0' },
+        });
         if (!response.ok) throw new Error("Failed to fetch address suggestions");
 
-        const data: AddressSuggestion[] = await response.json();
-        return data;
+        const raw = await response.json();
+        return raw.map((p: any) => ({
+            place_id: p.place_id,
+            display_name: p.display_name || '',
+            lat: String(p.lat),
+            lon: String(p.lon),
+            address: p.address,
+        }));
     } catch (error) {
         console.error("Address search error:", error);
         return [];

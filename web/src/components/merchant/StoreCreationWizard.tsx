@@ -1,106 +1,51 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/common/Button';
 import { PATHS } from '@/routing/paths';
 import { useCreateStore, useUpdateStore, type CreateStoreData, type UpdateStoreData } from '@/hooks/useMerchantStores';
 import { useWhitelistedCities } from '@/hooks/useWhitelistedCities';
-import { 
-  ArrowLeft, 
+import {
+  ArrowLeft,
   ArrowRight,
   Check,
-  MapPin, 
-  Building2, 
+  MapPin,
+  Building2,
   Clock,
   Eye,
   Loader2,
-  AlertCircle
+  Utensils,
+  Phone,
+  Wifi,
+  Image,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  StoreRegistrationStepContent,
+  type StoreRegistrationCity,
+} from '@/components/merchant/store-registration/StoreRegistrationStepContent';
+import {
+  defaultBusinessHours,
+  businessHoursToOperatingHours,
+  type StoreWizardData,
+  STORE_REGISTRATION_STEP_IDS,
+} from '@/components/merchant/store-registration/storeRegistrationTypes';
 
-// Local types to avoid import issues
-interface BusinessHours {
-  [key: string]: {
-    open: string;
-    close: string;
-    closed: boolean;
-  };
-}
-
-interface StoreWizardData {
-  // Basic Info
-  businessName: string;
-  address: string;
-  phoneNumber: string;
-  email?: string;
-  storeType: string;
-  
-  // Location
-  cityId: number;
-  latitude?: number;
-  longitude?: number;
-  verifiedAddress?: string;
-  
-  // Business Details
-  businessHours: BusinessHours;
-  description?: string;
-  features: string[];
-  storeImages: File[];
-  galleryUrls: string[]; // URLs from uploaded store media
-  isFoodTruck: boolean;
-  
-  // Settings
-  active: boolean;
-}
-
-const defaultBusinessHours: BusinessHours = {
-  monday: { open: '09:00', close: '17:00', closed: false },
-  tuesday: { open: '09:00', close: '17:00', closed: false },
-  wednesday: { open: '09:00', close: '17:00', closed: false },
-  thursday: { open: '09:00', close: '17:00', closed: false },
-  friday: { open: '09:00', close: '17:00', closed: false },
-  saturday: { open: '10:00', close: '16:00', closed: false },
-  sunday: { open: '10:00', close: '16:00', closed: true },
-};
-
-// Step 1: Basic Information
-import { StoreBasicInfoStep } from './StoreWizardSteps/StoreBasicInfoStep';
-// Step 2: Location Selection
-import { StoreLocationStep } from './StoreWizardSteps/StoreLocationStep';
-// Step 3: Business Details
-import { StoreBusinessDetailsStep } from './StoreWizardSteps/StoreBusinessDetailsStep';
-// Step 4: Review & Preview
-import { StoreReviewStep } from './StoreWizardSteps/StoreReviewStep';
-
-// Wizard steps configuration
 const WIZARD_STEPS = [
-  {
-    id: 'basic-info',
-    title: 'Basic Information',
-    description: 'Store details and contact information',
-    icon: Building2,
-  },
-  {
-    id: 'location',
-    title: 'Location',
-    description: 'Address and map selection',
-    icon: MapPin,
-  },
-  {
-    id: 'business-details',
-    title: 'Business Details',
-    description: 'Hours, features, and additional info',
-    icon: Clock,
-  },
-  {
-    id: 'review',
-    title: 'Review & Preview',
-    description: 'Confirm and preview your store',
-    icon: Eye,
-  },
+  { id: 'location-search', title: 'Find Location', description: 'Search or use location', icon: MapPin },
+  { id: 'location-confirm', title: 'Confirm Address', description: 'Verify details', icon: MapPin },
+  { id: 'location-pin', title: 'Pin Location', description: 'Set exact spot', icon: MapPin },
+  { id: 'store-name', title: 'Name', description: 'Location name', icon: Building2 },
+  { id: 'store-type', title: 'Type', description: 'Store type', icon: Utensils },
+  { id: 'store-contact', title: 'Contact', description: 'Phone & email', icon: Phone },
+  { id: 'hours-weekday', title: 'Weekday Hours', description: 'Mon-Fri', icon: Clock },
+  { id: 'hours-weekend', title: 'Weekend Hours', description: 'Sat-Sun', icon: Clock },
+  { id: 'features', title: 'Features', description: 'Amenities', icon: Wifi },
+  { id: 'extras', title: 'Extras', description: 'Food truck, description', icon: Building2 },
+  { id: 'photos', title: 'Photos', description: 'Add photos', icon: Image },
+  { id: 'review', title: 'Review', description: 'Confirm & create', icon: Eye },
 ] as const;
 
-type WizardStep = typeof WIZARD_STEPS[number]['id'];
-
+type WizardStep = (typeof WIZARD_STEPS)[number]['id'];
 
 interface StoreCreationWizardProps {
   isEditing?: boolean;
@@ -108,13 +53,13 @@ interface StoreCreationWizardProps {
   existingStoreData?: Partial<StoreWizardData>;
 }
 
-export const StoreCreationWizard = ({ 
-  isEditing = false, 
-  storeId, 
-  existingStoreData 
+export const StoreCreationWizard = ({
+  isEditing = false,
+  storeId,
+  existingStoreData,
 }: StoreCreationWizardProps) => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState<WizardStep>('basic-info');
+  const [currentStep, setCurrentStep] = useState<WizardStep>('location-search');
   const [wizardData, setWizardData] = useState<StoreWizardData>({
     businessName: '',
     address: '',
@@ -139,7 +84,7 @@ export const StoreCreationWizard = ({
   const createStoreMutation = useCreateStore();
   const updateStoreMutation = useUpdateStore();
 
-  const cities = citiesData?.cities || [];
+  const cities: StoreRegistrationCity[] = citiesData?.cities || [];
   const currentStepIndex = WIZARD_STEPS.findIndex(step => step.id === currentStep);
   const isLastStep = currentStepIndex === WIZARD_STEPS.length - 1;
   const isFirstStep = currentStepIndex === 0;
@@ -164,17 +109,6 @@ export const StoreCreationWizard = ({
 
   const goToStep = (stepId: WizardStep) => {
     setCurrentStep(stepId);
-  };
-
-  // Map monday-sunday to 0-6 (Sun=0, Mon=1, ..., Sat=6) for backend operatingHours
-  const businessHoursToOperatingHours = (hours: BusinessHours): Record<string, { open: string; close: string; closed: boolean }> => {
-    const dayOrder = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    const result: Record<string, { open: string; close: string; closed: boolean }> = {};
-    dayOrder.forEach((day, i) => {
-      const h = hours[day];
-      if (h) result[String(i)] = { open: h.open, close: h.close, closed: h.closed };
-    });
-    return result;
   };
 
   const handleSubmit = async () => {
@@ -208,14 +142,24 @@ export const StoreCreationWizard = ({
 
   const isStepValid = (stepId: WizardStep): boolean => {
     switch (stepId) {
-      case 'basic-info':
-        return !!(wizardData.businessName && wizardData.address && wizardData.phoneNumber);
-      case 'location':
-        return !!(wizardData.cityId && wizardData.latitude && wizardData.longitude);
-      case 'business-details':
-        return true; // Business details are optional
+      case 'location-search':
+      case 'location-confirm':
+        return !!(wizardData.address && wizardData.cityId && wizardData.latitude && wizardData.longitude);
+      case 'location-pin':
+        return !!(wizardData.latitude && wizardData.longitude);
+      case 'store-name':
+        return !!wizardData.businessName;
+      case 'store-type':
+        return !!wizardData.storeType;
+      case 'store-contact':
+        return !!wizardData.phoneNumber;
+      case 'hours-weekday':
+      case 'hours-weekend':
+      case 'features':
+      case 'extras':
+      case 'photos':
       case 'review':
-        return true; // Review step is always valid
+        return true;
       default:
         return false;
     }
@@ -316,35 +260,12 @@ export const StoreCreationWizard = ({
       {/* Step Content */}
       <div className="rounded-xl border border-neutral-200 bg-white shadow-sm">
         <div className="p-8">
-          {currentStep === 'basic-info' && (
-            <StoreBasicInfoStep
-              data={wizardData}
-              onUpdate={updateWizardData}
-              cities={cities}
-            />
-          )}
-          
-          {currentStep === 'location' && (
-            <StoreLocationStep
-              data={wizardData}
-              onUpdate={updateWizardData}
-              cities={cities}
-            />
-          )}
-          
-          {currentStep === 'business-details' && (
-            <StoreBusinessDetailsStep
-              data={wizardData}
-              onUpdate={updateWizardData}
-            />
-          )}
-          
-          {currentStep === 'review' && (
-            <StoreReviewStep
-              data={wizardData}
-              cities={cities}
-            />
-          )}
+          <StoreRegistrationStepContent
+            stepIndex={STORE_REGISTRATION_STEP_IDS.indexOf(currentStep) as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11}
+            data={wizardData}
+            onUpdate={updateWizardData}
+            cities={cities}
+          />
         </div>
 
         {/* Navigation Footer */}

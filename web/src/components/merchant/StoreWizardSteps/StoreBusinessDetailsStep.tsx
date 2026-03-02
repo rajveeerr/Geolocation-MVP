@@ -322,13 +322,19 @@ export const StoreBusinessDetailsStep = ({ data, onUpdate }: StoreBusinessDetail
 
       {/* Store Media Gallery */}
       <div className="space-y-4">
-        <Label className="text-sm font-semibold text-neutral-700">Store photos</Label>
-        <p className="text-sm text-neutral-600">Add photos of this location. Optional.</p>
+        <Label className="text-sm font-semibold text-neutral-700">Store photos & videos</Label>
+        <p className="text-sm text-neutral-600">Add photos or short videos of this location. Optional.</p>
         {(data.galleryUrls || []).length > 0 && (
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-            {(data.galleryUrls || []).map((url, i) => (
+            {(data.galleryUrls || []).map((url, i) => {
+              const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(url) || /\/video\//i.test(url);
+              return (
               <div key={`${url}-${i}`} className="group relative aspect-square overflow-hidden rounded-lg border">
-                <img src={url} alt="" className="h-full w-full object-cover" />
+                {isVideo ? (
+                  <video src={url} className="h-full w-full object-cover" muted playsInline />
+                ) : (
+                  <img src={url} alt="" className="h-full w-full object-cover" />
+                )}
                 <button
                   type="button"
                   onClick={() => onUpdate({ galleryUrls: (data.galleryUrls || []).filter((_, idx) => idx !== i) })}
@@ -338,7 +344,8 @@ export const StoreBusinessDetailsStep = ({ data, onUpdate }: StoreBusinessDetail
                   <X className="h-3 w-3" />
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
         <button
@@ -347,7 +354,7 @@ export const StoreBusinessDetailsStep = ({ data, onUpdate }: StoreBusinessDetail
           className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-neutral-300 py-6 text-sm text-neutral-600 transition-colors hover:border-neutral-400 hover:bg-neutral-50"
         >
           <Plus className="h-5 w-5" />
-          Add photo
+          Add photo or video
         </button>
         <ImageUploadModal
           open={uploadModalOpen}
@@ -355,7 +362,8 @@ export const StoreBusinessDetailsStep = ({ data, onUpdate }: StoreBusinessDetail
           onUploadComplete={handleGalleryUploadComplete}
           context="venue_gallery"
           maxFiles={20}
-          title="Upload store photos"
+          title="Upload store photos & videos"
+          acceptVideos
         />
       </div>
 

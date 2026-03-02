@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Store, Image, CheckCircle } from 'lucide-react';
+import { Store, Image, CheckCircle, MapPin } from 'lucide-react';
 import { OnboardingLayout } from './OnboardingLayout';
 import { getChapterProgress } from '@/context/MerchantOnboardingContext';
 
@@ -16,8 +16,13 @@ const CHAPTERS = [
   },
   {
     title: 'Finish up and publish',
-    description: "Add contact info so customers can reach you. Review and submit — you'll add locations from the dashboard after approval.",
+    description: "Add contact info so customers can reach you. Then add your location and we'll review everything before submitting.",
     icon: CheckCircle,
+  },
+  {
+    title: 'Add your location',
+    description: 'Tell us about this venue — address, hours, and details. Need more locations? Create or manage them anytime from Settings → Stores.',
+    icon: MapPin,
   },
 ];
 

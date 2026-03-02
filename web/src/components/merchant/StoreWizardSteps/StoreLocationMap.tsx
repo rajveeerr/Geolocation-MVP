@@ -18,10 +18,12 @@ interface StoreLocationMapProps {
   center: { lat: number; lng: number };
   onLocationChange: (coords: { lat: number; lng: number }) => void;
   className?: string;
+  /** When false, marker is not draggable (e.g. search preview) */
+  draggable?: boolean;
 }
 
 // This component ensures the map pans when the center prop changes
-export const StoreLocationMap = ({ center, onLocationChange, className = "" }: StoreLocationMapProps) => {
+export const StoreLocationMap = ({ center, onLocationChange, className = "", draggable = true }: StoreLocationMapProps) => {
   const markerRef = useRef<L.Marker>(null);
   const mapRef = useRef<L.Map | null>(null);
 
@@ -69,8 +71,8 @@ export const StoreLocationMap = ({ center, onLocationChange, className = "" }: S
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <Marker
-            draggable={true}
-            eventHandlers={eventHandlers}
+            draggable={draggable}
+            eventHandlers={draggable ? eventHandlers : {}}
             position={[center.lat, center.lng]}
             ref={markerRef}
           />

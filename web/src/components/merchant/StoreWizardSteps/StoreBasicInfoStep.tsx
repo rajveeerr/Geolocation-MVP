@@ -1,36 +1,31 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Building2, Phone, Mail, MapPin } from 'lucide-react';
+import { Button } from '@/components/common/Button';
+import { Building2, Phone, Mail, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
-// Local types to avoid import issues
+// Local types - prefer storeRegistrationTypes for shared shape
 interface StoreWizardData {
   businessName: string;
-  address: string;
   phoneNumber: string;
   email?: string;
   storeType: string;
-  cityId: number;
-  latitude?: number;
-  longitude?: number;
-  verifiedAddress?: string;
-  businessHours: any;
-  description?: string;
-  features: string[];
-  storeImages: File[];
-  active: boolean;
+  [key: string]: unknown;
 }
 
 interface City {
   id: number;
   name: string;
   state: string;
-  active: boolean;
+  active?: boolean;
 }
 
 interface StoreBasicInfoStepProps {
   data: StoreWizardData;
   onUpdate: (data: Partial<StoreWizardData>) => void;
   cities: City[];
+  /** When provided, show "Use merchant contact info" button */
+  merchantPhone?: string;
+  merchantEmail?: string;
 }
 
 const STORE_TYPES = [
@@ -42,7 +37,7 @@ const STORE_TYPES = [
   { value: 'other', label: 'Other', description: 'Other business type' },
 ];
 
-export const StoreBasicInfoStep = ({ data, onUpdate, cities }: StoreBasicInfoStepProps) => {
+export const StoreBasicInfoStep = ({ data, onUpdate, cities, merchantPhone, merchantEmail }: StoreBasicInfoStepProps) => {
   const handleInputChange = (field: keyof StoreWizardData, value: any) => {
     onUpdate({ [field]: value });
   };
@@ -83,8 +78,11 @@ export const StoreBasicInfoStep = ({ data, onUpdate, cities }: StoreBasicInfoSte
       {/* Store Type */}
       <div className="space-y-3">
         <Label className="text-sm font-semibold text-neutral-700">
-          Business Type *
+          Store type *
         </Label>
+        <p className="text-xs text-neutral-500">
+          What type of place is this? (e.g. restaurant, retail)
+        </p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {STORE_TYPES.map((type) => (
             <button
@@ -116,32 +114,29 @@ export const StoreBasicInfoStep = ({ data, onUpdate, cities }: StoreBasicInfoSte
         </div>
       </div>
 
-      {/* Address */}
-      <div className="space-y-2">
-        <Label htmlFor="address" className="text-sm font-semibold text-neutral-700">
-          Store Address *
-        </Label>
-        <div className="relative">
-          <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
-          <Input
-            id="address"
-            placeholder="Enter the full address of your store"
-            value={data.address}
-            onChange={(e) => handleInputChange('address', e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        <p className="text-xs text-neutral-500">
-          We'll help you verify and locate this address on the next step
-        </p>
-      </div>
-
       {/* Contact Information */}
+      {(merchantPhone || merchantEmail) && (
+        <div>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              if (merchantPhone) onUpdate({ phoneNumber: merchantPhone });
+              if (merchantEmail) onUpdate({ email: merchantEmail });
+            }}
+            className="flex items-center gap-2"
+          >
+            <Copy className="h-4 w-4" />
+            Use merchant contact info
+          </Button>
+        </div>
+      )}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {/* Phone Number */}
         <div className="space-y-2">
           <Label htmlFor="phoneNumber" className="text-sm font-semibold text-neutral-700">
-            Phone Number *
+            Store phone number *
           </Label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
@@ -154,12 +149,15 @@ export const StoreBasicInfoStep = ({ data, onUpdate, cities }: StoreBasicInfoSte
               className="pl-10"
             />
           </div>
+          <p className="text-xs text-neutral-500">
+            Customers will use this to call this location
+          </p>
         </div>
 
         {/* Email */}
         <div className="space-y-2">
           <Label htmlFor="email" className="text-sm font-semibold text-neutral-700">
-            Email Address
+            Store email
           </Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
@@ -173,7 +171,7 @@ export const StoreBasicInfoStep = ({ data, onUpdate, cities }: StoreBasicInfoSte
             />
           </div>
           <p className="text-xs text-neutral-500">
-            Optional - for customer inquiries and notifications
+            Optional - for customer inquiries
           </p>
         </div>
       </div>
@@ -197,16 +195,7 @@ export const StoreBasicInfoStep = ({ data, onUpdate, cities }: StoreBasicInfoSte
               data.storeType ? 'bg-green-500' : 'bg-neutral-300'
             )} />
             <span className={data.storeType ? 'text-green-700' : 'text-neutral-500'}>
-              Business type
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className={cn(
-              'h-2 w-2 rounded-full',
-              data.address ? 'bg-green-500' : 'bg-neutral-300'
-            )} />
-            <span className={data.address ? 'text-green-700' : 'text-neutral-500'}>
-              Store address
+              Store type
             </span>
           </div>
           <div className="flex items-center gap-2">

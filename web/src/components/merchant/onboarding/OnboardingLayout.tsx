@@ -19,8 +19,8 @@ interface OnboardingLayoutProps {
   showFooter?: boolean;
   /** Single progress 0–100 (legacy) */
   progress?: number;
-  /** Per-chapter progress [c1, c2, c3] 0–100 each. Takes precedence over progress. */
-  chapterProgress?: [number, number, number];
+  /** Per-chapter progress [c1, c2, c3, c4] 0–100 each. Takes precedence over progress. */
+  chapterProgress?: [number, number, number] | [number, number, number, number];
 }
 
 export const OnboardingLayout = ({

@@ -1,5 +1,7 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import type { StoreWizardData } from '@/components/merchant/store-registration/storeRegistrationTypes';
+import { getDefaultFirstStore } from '@/components/merchant/store-registration/storeRegistrationTypes';
 
 export interface OnboardingState {
   step: number;
@@ -19,6 +21,8 @@ export interface OnboardingState {
   vibeTags: string[];
   amenities: string[];
   thingsToNote: string;
+  /** First store (location) - used when store flow is part of onboarding */
+  firstStore: StoreWizardData | null;
 }
 
 export type OnboardingAction =
@@ -43,9 +47,10 @@ export type OnboardingAction =
   | { type: 'SET_THINGS_TO_NOTE'; payload: string }
   | { type: 'TOGGLE_VIBE_TAG'; payload: string }
   | { type: 'TOGGLE_AMENITY'; payload: string }
-  | { type: 'HYDRATE_STATE'; payload: Partial<OnboardingState> };
+  | { type: 'HYDRATE_STATE'; payload: Partial<OnboardingState> }
+  | { type: 'SET_FIRST_STORE'; payload: Partial<StoreWizardData> | null };
 
-export const TOTAL_STEPS = 13; // Welcome + chapter intros + data steps
+export const TOTAL_STEPS = 26; // Welcome + chapter intros + data steps + store flow (12 steps) + final review
 
 const initialState: OnboardingState = {
   step: 0,
@@ -65,6 +70,7 @@ const initialState: OnboardingState = {
   vibeTags: [],
   amenities: [],
   thingsToNote: '',
+  firstStore: null,
 };
 
 const ONBOARDING_STATE_KEY = 'merchantOnboardingState';
@@ -123,6 +129,14 @@ function reducer(state: OnboardingState, action: OnboardingAction): OnboardingSt
           ? state.amenities.filter((a) => a !== action.payload)
           : [...state.amenities, action.payload],
       };
+    case 'SET_FIRST_STORE':
+      return {
+        ...state,
+        firstStore:
+          action.payload === null
+            ? null
+            : { ...getDefaultFirstStore(), ...(state.firstStore ?? {}), ...action.payload },
+      };
     case 'HYDRATE_STATE':
       return { ...state, ...action.payload };
     default:
@@ -170,14 +184,25 @@ export const useOnboarding = () => useContext(OnboardingContext);
 export const getProgressPercent = (step: number) =>
   step <= 0 ? 0 : Math.round((step / (TOTAL_STEPS - 1)) * 100);
 
-/** Chapter-based step number (1-3). Welcome=0 has no step; chapters 1-3 map to Step 1, 2, 3. */
+/** Chapter-based step number (1-4). Welcome=0 has no step; chapters 1-4 = business, standout, finish, first location. */
 export const getChapterStepNumber = (stepIndex: number): number | null =>
-  stepIndex <= 0 ? null : stepIndex <= 4 ? 1 : stepIndex <= 9 ? 2 : 3;
+  stepIndex <= 0
+    ? null
+    : stepIndex <= 4
+      ? 1
+      : stepIndex <= 9
+        ? 2
+        : stepIndex <= 11
+          ? 3
+          : stepIndex <= 17
+            ? 4
+            : null;
 
-/** Progress within each chapter (0–100). [chapter1, chapter2, chapter3]. */
-export const getChapterProgress = (stepIndex: number): [number, number, number] => {
+/** Progress within each chapter (0–100). [ch1, ch2, ch3, ch4]. */
+export const getChapterProgress = (stepIndex: number): [number, number, number, number] => {
   const c1 = stepIndex < 1 ? 0 : stepIndex >= 5 ? 100 : Math.round(((stepIndex - 1) / 3) * 100);
   const c2 = stepIndex < 5 ? 0 : stepIndex >= 10 ? 100 : Math.round(((stepIndex - 5) / 4) * 100);
-  const c3 = stepIndex < 10 ? 0 : stepIndex >= 13 ? 100 : Math.round(((stepIndex - 10) / 2) * 100);
-  return [c1, c2, c3];
+  const c3 = stepIndex < 10 ? 0 : stepIndex >= 12 ? 100 : Math.round(((stepIndex - 10) / 1) * 100);
+  const c4 = stepIndex < 12 ? 0 : stepIndex >= 25 ? 100 : Math.round(((stepIndex - 12) / 12) * 100);
+  return [c1, c2, c3, c4];
 };

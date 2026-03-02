@@ -7,6 +7,8 @@ interface ChapterIntroScreenProps {
   title: string;
   description: string;
   illustration?: ReactNode;
+  /** Optional hint/link shown below description */
+  hint?: ReactNode;
   step: number;
   onNext: () => void;
   onBack: () => void;
@@ -16,6 +18,7 @@ export const ChapterIntroScreen = ({
   title,
   description,
   illustration,
+  hint,
   step,
   onNext,
   onBack,
@@ -43,6 +46,12 @@ export const ChapterIntroScreen = ({
           {title}
         </h1>
         <p className="mt-4 text-lg text-neutral-600">{description}</p>
+
+        {hint && (
+          <div className="mt-4 rounded-xl border border-neutral-200 bg-neutral-50/80 px-4 py-3 text-sm text-neutral-600">
+            {hint}
+          </div>
+        )}
 
         {illustration && (
           <div className="mt-12 flex w-full justify-center px-2">{illustration}</div>

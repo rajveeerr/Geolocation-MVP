@@ -38,9 +38,9 @@ Currently, amenities, business types (LOCAL/NATIONAL), and vibe tags are hardcod
 - **Planned:** Email notification on approval/rejection; optional "Update application" before approval.
 
 ### 3. Store Registration
-- **Status:** Store creation wizard exists (`StoreCreationWizard`); `POST /api/merchants/stores`; merchant must add stores after approval.
-- **Flow:** Dashboard → Stores → Add Store (multi-step: address, hours, tables/booking).
-- **Planned:** Ensure operating hours, table setup, and city linkage are consistent with deal creation.
+- **Status:** ✅ Reusable `StoreRegistrationFlow` — used in merchant onboarding (first location) and dashboard "Add Store" (`StoreCreationWizard`). Same steps: Basic info, Location, Business details, Review.
+- **Flow:** Onboarding collects first store; dashboard "Add Store" reuses same flow. Admin sees merchant + store(s) in review.
+- **Backend:** Extend `POST /api/merchants/register` to accept optional `stores: CreateStoreData[]` and create stores with the merchant. If not supported yet, merchants add stores from dashboard after approval.
 
 ### 4. Deal Creation
 - **Status:** Multi-step flow for STANDARD, HAPPY_HOUR, RECURRING, REDEEM_NOW, BOUNTY, HIDDEN.

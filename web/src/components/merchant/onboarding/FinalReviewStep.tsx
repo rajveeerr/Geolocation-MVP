@@ -4,9 +4,12 @@ import { useOnboarding } from '@/context/MerchantOnboardingContext';
 import { OnboardingLayout } from './OnboardingLayout';
 import { apiPost } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Store, Image, Phone, AlertCircle } from 'lucide-react';
+import { Loader2, Store, Image, Phone, AlertCircle, MapPin } from 'lucide-react';
 import { PATHS } from '@/routing/paths';
 import { getChapterProgress } from '@/context/MerchantOnboardingContext';
+import {
+  businessHoursToOperatingHours,
+} from '@/components/merchant/store-registration/storeRegistrationTypes';
 
 const PRICE_LABELS: Record<string, string> = {
   $: 'Budget-friendly',
@@ -53,11 +56,34 @@ export const FinalReviewStep = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const step = 12;
+  const step = 25;
+
+  const firstStore = state.firstStore;
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
+      const stores =
+        firstStore &&
+        firstStore.address &&
+        firstStore.cityId &&
+        firstStore.latitude != null &&
+        firstStore.longitude != null
+          ? [
+              {
+                address: firstStore.address,
+                cityId: firstStore.cityId,
+                latitude: firstStore.latitude,
+                longitude: firstStore.longitude,
+                active: firstStore.active ?? true,
+                description: firstStore.description || null,
+                operatingHours: businessHoursToOperatingHours(firstStore.businessHours),
+                galleryUrls: firstStore.galleryUrls?.length ? firstStore.galleryUrls : undefined,
+                isFoodTruck: firstStore.isFoodTruck ?? false,
+              },
+            ]
+          : undefined;
+
       const payload = {
         businessName: state.businessName,
         description: state.description || undefined,
@@ -75,13 +101,15 @@ export const FinalReviewStep = () => {
         vibeTags: state.vibeTags.length > 0 ? state.vibeTags : undefined,
         amenities: state.amenities.length > 0 ? state.amenities : undefined,
         thingsToNote: state.thingsToNote || undefined,
+        stores,
       };
 
       const response = await apiPost('/merchants/register', payload);
       if (response.success) {
         toast({
           title: 'Application submitted!',
-          description: 'Your profile is pending approval. Add locations and create deals from the dashboard next.',
+          description:
+            'Your profile and location are pending approval. Add more locations, create deals, and manage your menu from the dashboard next.',
         });
         localStorage.removeItem('merchantOnboardingState');
         navigate(PATHS.MERCHANT_DASHBOARD);
@@ -123,7 +151,8 @@ export const FinalReviewStep = () => {
           <div>
             <p className="font-medium text-amber-900">Take a moment to recheck</p>
             <p className="mt-0.5 text-sm text-amber-800">
-              Ensure your business name, type, description, logo, photos, vibes, amenities, and contact info are correct.
+              Ensure your business name, type, description, logo, photos, location, vibes, amenities, and contact
+              info are correct.
             </p>
           </div>
         </div>
@@ -269,6 +298,30 @@ export const FinalReviewStep = () => {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Location */}
+          {firstStore && firstStore.address && firstStore.cityId && (
+            <div className="rounded-2xl border border-neutral-200 bg-neutral-50/50 p-6">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-neutral-500" />
+                <h3 className="font-heading text-lg font-bold text-neutral-900">
+                  Location
+                </h3>
+              </div>
+              <dl className="mt-5 space-y-4">
+                <div>
+                  <dt className="text-sm font-medium text-neutral-500">Address</dt>
+                  <dd className="mt-1 font-medium text-neutral-900">{firstStore.address}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-neutral-500">Type</dt>
+                  <dd className="mt-1 font-medium text-neutral-900">
+                    {firstStore.isFoodTruck ? 'Food truck' : 'Physical store'}
+                  </dd>
+                </div>
+              </dl>
             </div>
           )}
 
