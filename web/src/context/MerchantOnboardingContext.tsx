@@ -14,6 +14,7 @@ export interface OnboardingState {
   galleryUrls: string[];
   priceRange: string | null;
   phoneNumber: string;
+  contactEmail: string;
   websiteUrl: string;
   instagramUrl: string;
   facebookUrl: string;
@@ -21,6 +22,7 @@ export interface OnboardingState {
   vibeTags: string[];
   amenities: string[];
   thingsToNote: string;
+  isFoodTruck: boolean;
   /** First store (location) - used when store flow is part of onboarding */
   firstStore: StoreWizardData | null;
 }
@@ -47,10 +49,12 @@ export type OnboardingAction =
   | { type: 'SET_THINGS_TO_NOTE'; payload: string }
   | { type: 'TOGGLE_VIBE_TAG'; payload: string }
   | { type: 'TOGGLE_AMENITY'; payload: string }
+  | { type: 'SET_CONTACT_EMAIL'; payload: string }
+  | { type: 'SET_IS_FOOD_TRUCK'; payload: boolean }
   | { type: 'HYDRATE_STATE'; payload: Partial<OnboardingState> }
   | { type: 'SET_FIRST_STORE'; payload: Partial<StoreWizardData> | null };
 
-export const TOTAL_STEPS = 26; // Welcome + chapter intros + data steps + store flow (12 steps) + final review
+export const TOTAL_STEPS = 3; // Screen 0: Business Profile, Screen 1: Store Details, Screen 2: Review & Publish
 
 const initialState: OnboardingState = {
   step: 0,
@@ -63,6 +67,7 @@ const initialState: OnboardingState = {
   galleryUrls: [],
   priceRange: null,
   phoneNumber: '',
+  contactEmail: '',
   websiteUrl: '',
   instagramUrl: '',
   facebookUrl: '',
@@ -70,6 +75,7 @@ const initialState: OnboardingState = {
   vibeTags: [],
   amenities: [],
   thingsToNote: '',
+  isFoodTruck: false,
   firstStore: null,
 };
 
@@ -129,6 +135,10 @@ function reducer(state: OnboardingState, action: OnboardingAction): OnboardingSt
           ? state.amenities.filter((a) => a !== action.payload)
           : [...state.amenities, action.payload],
       };
+    case 'SET_CONTACT_EMAIL':
+      return { ...state, contactEmail: action.payload };
+    case 'SET_IS_FOOD_TRUCK':
+      return { ...state, isFoodTruck: action.payload };
     case 'SET_FIRST_STORE':
       return {
         ...state,
@@ -137,8 +147,14 @@ function reducer(state: OnboardingState, action: OnboardingAction): OnboardingSt
             ? null
             : { ...getDefaultFirstStore(), ...(state.firstStore ?? {}), ...action.payload },
       };
-    case 'HYDRATE_STATE':
-      return { ...state, ...action.payload };
+    case 'HYDRATE_STATE': {
+      const hydrated = { ...action.payload };
+      // Clamp step for localStorage migration from old 26-step flow
+      if (hydrated.step !== undefined && hydrated.step > TOTAL_STEPS - 1) {
+        hydrated.step = TOTAL_STEPS - 1;
+      }
+      return { ...state, ...hydrated };
+    }
     default:
       return state;
   }
@@ -182,27 +198,13 @@ export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
 export const useOnboarding = () => useContext(OnboardingContext);
 
 export const getProgressPercent = (step: number) =>
-  step <= 0 ? 0 : Math.round((step / (TOTAL_STEPS - 1)) * 100);
+  Math.round(((step + 1) / TOTAL_STEPS) * 100);
 
-/** Chapter-based step number (1-4). Welcome=0 has no step; chapters 1-4 = business, standout, finish, first location. */
-export const getChapterStepNumber = (stepIndex: number): number | null =>
-  stepIndex <= 0
-    ? null
-    : stepIndex <= 4
-      ? 1
-      : stepIndex <= 9
-        ? 2
-        : stepIndex <= 11
-          ? 3
-          : stepIndex <= 17
-            ? 4
-            : null;
-
-/** Progress within each chapter (0–100). [ch1, ch2, ch3, ch4]. */
-export const getChapterProgress = (stepIndex: number): [number, number, number, number] => {
-  const c1 = stepIndex < 1 ? 0 : stepIndex >= 5 ? 100 : Math.round(((stepIndex - 1) / 3) * 100);
-  const c2 = stepIndex < 5 ? 0 : stepIndex >= 10 ? 100 : Math.round(((stepIndex - 5) / 4) * 100);
-  const c3 = stepIndex < 10 ? 0 : stepIndex >= 12 ? 100 : Math.round(((stepIndex - 10) / 1) * 100);
-  const c4 = stepIndex < 12 ? 0 : stepIndex >= 25 ? 100 : Math.round(((stepIndex - 12) / 12) * 100);
-  return [c1, c2, c3, c4];
+export const getStepLabel = (step: number): string => {
+  switch (step) {
+    case 0: return 'Business Profile';
+    case 1: return 'Store Details';
+    case 2: return 'Review & Publish';
+    default: return '';
+  }
 };

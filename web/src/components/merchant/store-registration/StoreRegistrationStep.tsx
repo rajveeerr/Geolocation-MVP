@@ -1,12 +1,11 @@
 /**
  * Single step of store registration wrapped in OnboardingLayout.
- * Used in merchant onboarding flow.
+ * Legacy wrapper — kept for backwards compatibility.
  */
 import { OnboardingLayout } from '../onboarding/OnboardingLayout';
 import { StoreRegistrationStepContent } from './StoreRegistrationStepContent';
 import { useOnboarding } from '@/context/MerchantOnboardingContext';
 import { useWhitelistedCities } from '@/hooks/useWhitelistedCities';
-import { getChapterProgress } from '@/context/MerchantOnboardingContext';
 import { getDefaultFirstStore } from './storeRegistrationTypes';
 
 interface StoreRegistrationStepProps {
@@ -34,7 +33,7 @@ export function StoreRegistrationStep({
 
   return (
     <OnboardingLayout
-      chapterProgress={getChapterProgress(13 + stepIndex)}
+      currentStep={1}
       onBack={onBack}
       onNext={onNext}
       nextLabel={stepIndex === 11 ? 'Continue to review' : 'Next'}
