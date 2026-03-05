@@ -36,6 +36,7 @@ import {
     type NudgeFrequency,
     type Nudge,
 } from '@/hooks/useNudges';
+import { useAiNudgePersonalize } from '@/hooks/useAi';
 
 // ─── Constants ──────────────────────────────────────────────────────
 
@@ -179,6 +180,7 @@ function NudgeForm({ initial, onClose }: NudgeFormProps) {
     const { toast } = useToast();
     const createNudge = useCreateNudge();
     const updateNudge = initial ? useUpdateNudge(initial.id) : null;
+    const aiNudge = useAiNudgePersonalize();
 
     const [form, setForm] = useState({
         type: (initial?.type ?? 'INACTIVITY') as NudgeType,
@@ -205,6 +207,41 @@ function NudgeForm({ initial, onClose }: NudgeFormProps) {
             ...f,
             triggerCondition: { ...f.triggerCondition, [key]: value },
         }));
+
+    const handleGenerateWithAi = async () => {
+        const userIdRaw = (form.triggerCondition['userId'] as number | string | undefined) ?? '';
+        const userId = typeof userIdRaw === 'string' ? Number(userIdRaw) : Number(userIdRaw);
+        if (!userId || Number.isNaN(userId)) {
+            toast({
+                title: 'Add a sample user id',
+                description: 'Set a numeric user id in trigger condition under "userId" to generate example copy.',
+                variant: 'warn',
+            });
+            return;
+        }
+
+        try {
+            const res = await aiNudge.mutateAsync({
+                userId,
+                nudgeType: form.type,
+            });
+            setForm((f) => ({
+                ...f,
+                title: res.nudge.title || f.title,
+                message: res.nudge.body || f.message,
+            }));
+            toast({
+                title: 'AI suggestion added',
+                description: 'We filled in a draft title and message. You can edit them before saving.',
+            });
+        } catch (err: unknown) {
+            toast({
+                title: 'AI could not generate this nudge',
+                description: err instanceof Error ? err.message : 'Please try again in a moment.',
+                variant: 'destructive',
+            });
+        }
+    };
 
     const handleSubmit = async () => {
         if (!form.title || !form.message) {
@@ -319,6 +356,24 @@ function NudgeForm({ initial, onClose }: NudgeFormProps) {
                             max={100}
                             className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
                         />
+                        <button
+                            type="button"
+                            onClick={handleGenerateWithAi}
+                            disabled={aiNudge.isPending}
+                            className="mt-2 inline-flex items-center gap-1 rounded-full bg-neutral-900 px-3 py-1 text-[11px] font-medium text-white hover:bg-neutral-800 disabled:opacity-60"
+                        >
+                            {aiNudge.isPending ? (
+                                <>
+                                    <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                    Draft with AI
+                                </>
+                            ) : (
+                                <>
+                                    <Sparkles className="h-3 w-3" />
+                                    Draft with AI
+                                </>
+                            )}
+                        </button>
                     </div>
                 </div>
 

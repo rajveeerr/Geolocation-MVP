@@ -16,6 +16,7 @@ import { ExploreDealsPreview } from '@/components/merchant/ExploreDealsPreview';
 import { MerchantTableBookingDashboard } from '@/components/table-booking/MerchantTableBookingDashboard';
 import { BusinessTypeCard } from '@/components/merchant/BusinessTypeCard';
 import { CheckInFeed } from '@/components/merchant/CheckInFeed';
+import { useAiMerchantInsights } from '@/hooks/useAi';
 
 interface Deal {
   id: string;
@@ -182,6 +183,7 @@ export const MerchantDashboardPage = () => {
 
   // Fetch real store data
   const { data: storesData, isLoading: storesLoading } = useMerchantStores();
+  const { data: aiInsights, isLoading: aiInsightsLoading } = useAiMerchantInsights();
 
   const {
     data: dealsData,
@@ -428,6 +430,64 @@ export const MerchantDashboardPage = () => {
           {/* Loyalty Program Card */}
           <div className="mb-6">
             <LoyaltyProgramCard />
+          </div>
+
+          {/* AI Merchant Insights */}
+          <div className="mb-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-900 text-white">
+                  <BarChart3 className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-neutral-900">AI business insights</h3>
+                  <p className="text-xs text-neutral-500">
+                    Quick, plain‑English summary of how your deals are performing.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {aiInsightsLoading && (
+              <div className="space-y-2">
+                <div className="h-4 w-40 animate-pulse rounded bg-neutral-200" />
+                <div className="h-3 w-full animate-pulse rounded bg-neutral-200" />
+                <div className="h-3 w-5/6 animate-pulse rounded bg-neutral-200" />
+              </div>
+            )}
+
+            {!aiInsightsLoading && aiInsights && (
+              <div className="space-y-4">
+                <p className="text-sm text-neutral-800">{aiInsights.insights.summary}</p>
+                {aiInsights.insights.topInsights.length > 0 && (
+                  <div>
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                      What we&apos;re seeing
+                    </p>
+                    <ul className="space-y-1 text-sm text-neutral-700">
+                      {aiInsights.insights.topInsights.slice(0, 3).map((point, idx) => (
+                        <li key={idx}>• {point}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {aiInsights.insights.recommendations.length > 0 && (
+                  <div>
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                      Recommended next moves
+                    </p>
+                    <ul className="space-y-2 text-sm text-neutral-700">
+                      {aiInsights.insights.recommendations.slice(0, 2).map((rec, idx) => (
+                        <li key={idx} className="rounded-lg bg-neutral-50 p-2">
+                          <div className="font-medium text-neutral-900">{rec.title}</div>
+                          <div className="text-xs text-neutral-600">{rec.description}</div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Dynamic Region badges - using real merchant store data */}

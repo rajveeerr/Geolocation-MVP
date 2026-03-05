@@ -13,6 +13,7 @@ import {
   Download
 } from 'lucide-react';
 import { useBulkUploadMenuItems } from '@/hooks/useMerchantMenuManagement';
+import { useAiMenuParse } from '@/hooks/useAi';
 import { toast } from 'sonner';
 
 interface BulkMenuUploadProps {
@@ -25,8 +26,13 @@ export const BulkMenuUpload: React.FC<BulkMenuUploadProps> = ({ isOpen, onClose 
   const [errors, setErrors] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [rawText, setRawText] = useState('');
+  const [parsedItems, setParsedItems] = useState<
+    { name: string; price: number; category?: string; description?: string }[]
+  >([]);
 
   const bulkUploadMutation = useBulkUploadMenuItems();
+  const aiMenuParse = useAiMenuParse();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -75,6 +81,36 @@ export const BulkMenuUpload: React.FC<BulkMenuUploadProps> = ({ isOpen, onClose 
     }
   };
 
+  const handleAiParse = async () => {
+    const text = rawText.trim();
+    if (!text) {
+      setErrors(['Paste your menu text first.']);
+      return;
+    }
+
+    setErrors([]);
+    setParsedItems([]);
+
+    try {
+      const res = await aiMenuParse.mutateAsync({ text: text.slice(0, 4000) });
+      const items = (res.items || []).map((item) => ({
+        name: item.name,
+        price: item.price,
+        category: item.category,
+        description: item.description,
+      }));
+      setParsedItems(items);
+      if (!items.length) {
+        setErrors(['AI could not find any menu items in your text. Try simplifying it.']);
+      }
+    } catch (error: any) {
+      setErrors([
+        error?.message ||
+          'Failed to parse menu text. Please try again or use the CSV/Excel upload instead.',
+      ]);
+    }
+  };
+
   const downloadTemplate = () => {
     const csvContent = [
       'name,price,category,description,isAvailable,imageUrl,preparationTime,calories,allergens,dietaryInfo,ingredients',
@@ -118,13 +154,17 @@ export const BulkMenuUpload: React.FC<BulkMenuUploadProps> = ({ isOpen, onClose 
                   ref={fileInputRef}
                   className="mt-1"
                 />
-                <p className="text-sm text-neutral-500 mt-1">
+                <p className="mt-1 text-sm text-neutral-500">
                   Supported formats: CSV, Excel (.xlsx, .xls)
                 </p>
               </div>
-                
+
               <div className="flex items-center gap-2">
-                <Button variant="outline" onClick={downloadTemplate} className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  onClick={downloadTemplate}
+                  className="flex items-center gap-2"
+                >
                   <Download className="h-4 w-4" />
                   Download Template
                 </Button>
@@ -135,7 +175,7 @@ export const BulkMenuUpload: React.FC<BulkMenuUploadProps> = ({ isOpen, onClose 
 
               {/* Selected File Display */}
               {file && (
-                <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-3">
                   <CheckCircle className="h-5 w-5 text-green-500" />
                   <div className="flex-1">
                     <p className="text-sm font-medium text-green-800">{file.name}</p>
@@ -155,6 +195,95 @@ export const BulkMenuUpload: React.FC<BulkMenuUploadProps> = ({ isOpen, onClose 
                   >
                     <XCircle className="h-4 w-4" />
                   </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* AI Menu Parser */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Paste Menu Text (AI)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="menu-text">Paste or type your menu</Label>
+                <textarea
+                  id="menu-text"
+                  value={rawText}
+                  onChange={(e) => setRawText(e.target.value)}
+                  placeholder={'Margherita Pizza $12.99\nCaesar Salad $8.50\nGarlic Bread $5'}
+                  className="mt-1 h-32 w-full rounded-md border border-neutral-300 p-2 text-sm"
+                />
+                <p className="mt-1 text-sm text-neutral-500">
+                  Paste plain text, a screenshot OCR result, or a copied PDF menu. AI will turn it into
+                  structured items you can review.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between gap-2">
+                <Button
+                  variant="outline"
+                  onClick={handleAiParse}
+                  disabled={aiMenuParse.isPending || !rawText.trim()}
+                  className="flex items-center gap-2"
+                >
+                  {aiMenuParse.isPending ? (
+                    <>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-neutral-900 border-t-transparent" />
+                      Parsing with AI...
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="h-4 w-4" />
+                      Parse with AI
+                    </>
+                  )}
+                </Button>
+                <span className="text-xs text-neutral-500">
+                  We never save drafts until you confirm upload.
+                </span>
+              </div>
+
+              {parsedItems.length > 0 && (
+                <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+                  <div className="mb-2 flex items-center justify-between">
+                    <p className="text-sm font-medium text-neutral-800">
+                      Preview ({parsedItems.length} item{parsedItems.length === 1 ? '' : 's'})
+                    </p>
+                  </div>
+                  <div className="max-h-48 space-y-2 overflow-y-auto text-sm">
+                    {parsedItems.map((item, idx) => (
+                      <div
+                        key={`${item.name}-${idx}`}
+                        className="flex items-start justify-between gap-2 rounded-md bg-white p-2"
+                      >
+                        <div>
+                          <p className="font-semibold text-neutral-900">{item.name}</p>
+                          {item.description && (
+                            <p className="text-xs text-neutral-600 line-clamp-2">
+                              {item.description}
+                            </p>
+                          )}
+                          {item.category && (
+                            <p className="mt-0.5 text-[11px] text-neutral-500">
+                              Category: {item.category}
+                            </p>
+                          )}
+                        </div>
+                        <p className="whitespace-nowrap text-sm font-semibold text-green-700">
+                          ${item.price.toFixed(2)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-[11px] text-neutral-500">
+                    To save these items permanently, download our CSV template above, paste this data
+                    in, and upload — or quickly recreate key dishes using the form view.
+                  </p>
                 </div>
               )}
             </CardContent>

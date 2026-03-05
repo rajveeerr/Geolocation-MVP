@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUploadModal } from '@/components/common/ImageUploadModal';
 import { useToast } from '@/hooks/use-toast';
+import { useAiMerchantSuggestion, useAiStatus } from '@/hooks/useAi';
 import { cn } from '@/lib/utils';
 import {
   Building2,
@@ -115,6 +116,11 @@ export const BusinessProfileScreen = () => {
   const { toast } = useToast();
   const [logoModalOpen, setLogoModalOpen] = useState(false);
   const [galleryModalOpen, setGalleryModalOpen] = useState(false);
+  const [aiDescriptionInput, setAiDescriptionInput] = useState('');
+
+  const { data: aiStatus } = useAiStatus();
+  const aiEnabled = aiStatus?.aiEnabled ?? false;
+  const merchantSuggestMutation = useAiMerchantSuggestion();
 
   const hasContactData = !!(state.phoneNumber || state.contactEmail || state.websiteUrl || state.instagramUrl || state.facebookUrl || state.twitterUrl);
 
@@ -131,6 +137,43 @@ export const BusinessProfileScreen = () => {
       dispatch({ type: 'SET_VIBE_TAGS', payload: state.vibeTags.filter((t) => t !== id) });
     } else if (state.vibeTags.length < MAX_VIBES) {
       dispatch({ type: 'TOGGLE_VIBE_TAG', payload: id });
+    }
+  };
+
+  const applyAiSuggestion = async () => {
+    const prompt = aiDescriptionInput.trim() || state.description.trim();
+    if (!prompt) {
+      toast({ title: 'Add a short description first', description: 'Tell AI what kind of place you run.', variant: 'warn' });
+      return;
+    }
+
+    try {
+      const result = await merchantSuggestMutation.mutateAsync({ description: prompt.slice(0, 500) });
+      const suggestion = result.suggestion;
+
+      if (suggestion.businessType === 'LOCAL' || suggestion.businessType === 'NATIONAL') {
+        dispatch({ type: 'SET_BUSINESS_TYPE', payload: suggestion.businessType });
+      }
+
+      if (suggestion.description) {
+        dispatch({ type: 'SET_DESCRIPTION', payload: suggestion.description });
+      }
+
+      if (suggestion.priceRange) {
+        dispatch({ type: 'SET_PRICE_RANGE', payload: suggestion.priceRange });
+      }
+
+      toast({
+        title: 'Profile draft created',
+        description: 'We pre-filled your description and basics. You can tweak anything before publishing.',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Something went wrong while talking to AI.';
+      toast({
+        title: 'Could not generate suggestion',
+        description: message,
+        variant: 'destructive',
+      });
     }
   };
 
@@ -301,9 +344,54 @@ export const BusinessProfileScreen = () => {
                   className="mt-2 min-h-[100px] rounded-xl border-neutral-300 text-sm"
                   rows={4}
                 />
-                <p className="mt-1 text-xs text-neutral-400">
-                  Tip: Describe your business in 2-3 words and we&apos;ll help generate a full description (coming soon)
-                </p>
+                {aiEnabled && (
+                  <div className="mt-3 rounded-xl border border-dashed border-neutral-200 bg-neutral-50 p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-brand-primary-600" />
+                        <p className="text-xs font-medium text-neutral-800">
+                          Let AI draft this for you
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-2 space-y-2">
+                      <Input
+                        value={aiDescriptionInput}
+                        onChange={(e) => setAiDescriptionInput(e.target.value)}
+                        placeholder="e.g. Rooftop bar, cocktails & tapas in downtown..."
+                        className="h-9 rounded-lg border-neutral-300 text-xs"
+                      />
+                      <div className="flex items-center justify-between">
+                        <button
+                          type="button"
+                          onClick={applyAiSuggestion}
+                          disabled={merchantSuggestMutation.isPending}
+                          className="inline-flex items-center gap-1 rounded-full bg-neutral-900 px-3 py-1 text-xs font-medium text-white hover:bg-neutral-800 disabled:opacity-60"
+                        >
+                          {merchantSuggestMutation.isPending ? (
+                            <>
+                              <span className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                              Thinking...
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="h-3 w-3" />
+                              Draft with AI
+                            </>
+                          )}
+                        </button>
+                        <p className="text-[11px] text-neutral-500">
+                          You can edit everything after it&apos;s filled in.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {!aiEnabled && (
+                  <p className="mt-1 text-xs text-neutral-400">
+                    Tip: Describe your business in 2-3 words and we&apos;ll help generate a full description once AI is enabled.
+                  </p>
+                )}
               </div>
 
               {/* Vibe tags */}

@@ -6,6 +6,7 @@ import { OnboardingStepLayout } from '../onboarding/OnboardingStepLayout';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/common/Button';
 import { CategorySelector } from '@/components/common/CategorySelector';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -19,10 +20,16 @@ import {
   Users,
   Star
 } from 'lucide-react';
+import { useAiDealGenerator, type DealGeneratorSuggestion } from '@/hooks/useAi';
+import { useToast } from '@/hooks/use-toast';
+
 export const DealBasicsStep = () => {
   const { state, dispatch } = useDealCreation();
   const navigate = useNavigate();
   const [showTips, setShowTips] = useState(false);
+  const [aiIntent, setAiIntent] = useState('');
+  const aiDealMutation = useAiDealGenerator();
+  const { toast } = useToast();
 
   // Real-time validation
   const titleValidation = {
@@ -57,6 +64,51 @@ export const DealBasicsStep = () => {
       'OTHER': ['Special Offer', 'Limited Time Deal', 'Exclusive Package', 'Custom Service']
     };
     return suggestions[state.category as keyof typeof suggestions] || [];
+  };
+
+  const applyAiDealSuggestion = (suggestion: DealGeneratorSuggestion) => {
+    dispatch({ type: 'UPDATE_FIELD', field: 'title', value: suggestion.title });
+    dispatch({ type: 'UPDATE_FIELD', field: 'description', value: suggestion.description });
+
+    if (suggestion.discountPercentage != null) {
+      dispatch({ type: 'UPDATE_FIELD', field: 'discountPercentage', value: suggestion.discountPercentage });
+      dispatch({ type: 'UPDATE_FIELD', field: 'standardOfferKind', value: 'percentage' });
+    } else if (suggestion.discountAmount != null) {
+      dispatch({ type: 'UPDATE_FIELD', field: 'discountAmount', value: suggestion.discountAmount });
+      dispatch({ type: 'UPDATE_FIELD', field: 'standardOfferKind', value: 'amount' });
+    }
+
+    if (suggestion.redemptionInstructions) {
+      dispatch({ type: 'UPDATE_FIELD', field: 'redemptionInstructions', value: suggestion.redemptionInstructions });
+    }
+  };
+
+  const handleGenerateWithAi = async () => {
+    const intent = aiIntent.trim();
+    if (!intent) {
+      toast({
+        title: 'Add what you want to offer',
+        description: 'For example: “Happy hour, half price cocktails, 5–8pm on weekdays”.',
+        variant: 'warn',
+      });
+      return;
+    }
+
+    try {
+      const result = await aiDealMutation.mutateAsync({ intent: intent.slice(0, 500) });
+      applyAiDealSuggestion(result.suggestion);
+      toast({
+        title: 'Draft deal created',
+        description: 'We pre-filled your basics. Review and tweak before publishing.',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Something went wrong while talking to AI.';
+      toast({
+        title: 'Could not generate deal',
+        description: message,
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -230,7 +282,36 @@ export const DealBasicsStep = () => {
           <p className="text-sm text-neutral-600">
             Provide details about what's included. Be specific to attract the right customers.
           </p>
-          
+
+          <div className="rounded-xl border border-dashed border-neutral-200 bg-neutral-50 p-3 space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-brand-primary-600" />
+                <span className="text-xs font-semibold text-neutral-800">Describe your idea and let AI draft it</span>
+              </div>
+            </div>
+            <Textarea
+              value={aiIntent}
+              onChange={(e) => setAiIntent(e.target.value)}
+              placeholder="e.g. Happy hour, half price cocktails, 5pm to 8pm on weekdays"
+              className="min-h-[64px] rounded-lg border-neutral-300 text-xs"
+            />
+            <div className="flex items-center justify-between">
+              <Button
+                size="sm"
+                variant="secondary"
+                className="rounded-full px-4 py-1 text-xs"
+                onClick={handleGenerateWithAi}
+                disabled={aiDealMutation.isPending}
+              >
+                {aiDealMutation.isPending ? 'Thinking…' : 'Draft with AI'}
+              </Button>
+              <span className="text-[11px] text-neutral-500">
+                We&apos;ll fill in title, description, discount and redemption notes.
+              </span>
+            </div>
+          </div>
+
           <div className="relative">
           <Textarea
             id="description"

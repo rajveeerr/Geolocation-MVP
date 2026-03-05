@@ -165,6 +165,7 @@ import { ScrollToTop } from '@/components/common/ScrollToTop';
 import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
 import { PaymentCancelPage } from './pages/PaymentCancelPage';
 import { NudgeToast } from '@/components/nudges/NudgeToast';
+import { AiChatWidget } from '@/components/ai/AiChatWidget';
 const LoyaltyHistoryPage = React.lazy(() =>
   import('./pages/LoyaltyHistoryPage').then((m) => ({ default: m.LoyaltyHistoryPage }))
 );
@@ -796,6 +797,7 @@ function App() {
                 <Route path={PATHS.NOT_FOUND} element={<NotFoundPage />} />
               </Routes>
               <NudgeToast />
+              <AiChatWidget />
               <Toaster />
             </ModalProvider>
           </CityProvider>
