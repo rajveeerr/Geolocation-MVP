@@ -26,7 +26,7 @@ const categoryDisplayLabel: Record<string, string> = {
   'RETAIL': 'Retail',
   'ENTERTAINMENT': 'Bars',
   'HEALTH_AND_FITNESS': 'Fitness',
-  'BEAUTY_AND_SPA': 'Beauty',
+  'BEAUTY_AND_SPA': 'Beauty & Spa',
   'AUTOMOTIVE': 'Auto',
   'TRAVEL': 'Happy Hour',
   'EDUCATION': 'Education',
@@ -61,6 +61,9 @@ export const NewHeroSection = ({ onCategoryChange, onFilterClick }: NewHeroSecti
   const [dropdownFilter, setDropdownFilter] = useState('all');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const isSpaCategory = (value: string) =>
+    ['BEAUTY_AND_SPA', 'BEAUTY_WELLNESS', 'SPA'].includes(value);
+
   // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -72,9 +75,17 @@ export const NewHeroSection = ({ onCategoryChange, onFilterClick }: NewHeroSecti
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Build category circles from API (first 6)
+  // Special Events entry for the category circles
+  const eventsCategory = {
+    value: 'EVENTS',
+    label: 'Events',
+    image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=200&h=200&fit=crop',
+    icon: '🎉',
+  };
+
+  // Build category circles from API (first 6), replacing Nightlife with Events
   const apiCategories = categoriesData?.categories || [];
-  const displayCategories = apiCategories.length > 0
+  const rawDisplayCategories = apiCategories.length > 0
     ? apiCategories.slice(0, 6).map(cat => ({
         value: cat.value,
         label: categoryDisplayLabel[cat.value] || cat.label,
@@ -84,11 +95,18 @@ export const NewHeroSection = ({ onCategoryChange, onFilterClick }: NewHeroSecti
     : [
         { value: 'FOOD_AND_BEVERAGE', label: 'Restaurants', image: categoryImageMap['FOOD_AND_BEVERAGE'], icon: '🍽️' },
         { value: 'ENTERTAINMENT', label: 'Bars', image: categoryImageMap['ENTERTAINMENT'], icon: '🍸' },
-        { value: 'OTHER', label: 'Coffee', image: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=200&h=200&fit=crop', icon: '☕' },
+        { value: 'EVENTS', label: 'Events', image: eventsCategory.image, icon: '🎉' },
         { value: 'HEALTH_AND_FITNESS', label: 'Brunch', image: 'https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=200&h=200&fit=crop', icon: '🥐' },
         { value: 'BEAUTY_AND_SPA', label: 'Desserts', image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=200&h=200&fit=crop', icon: '🍰' },
         { value: 'TRAVEL', label: 'Happy Hour', image: categoryImageMap['TRAVEL'], icon: '🍹' },
       ];
+
+  // Replace any Nightlife / NIGHTLIFE entry with Events
+  const displayCategories = rawDisplayCategories.map(cat =>
+    cat.label === 'Nightlife' || cat.value === 'NIGHTLIFE'
+      ? eventsCategory
+      : cat
+  );
 
   // Build dropdown from ALL API categories
   const dropdownOptions = apiCategories.length > 0
@@ -96,7 +114,7 @@ export const NewHeroSection = ({ onCategoryChange, onFilterClick }: NewHeroSecti
         { value: 'all', label: 'All Deals', icon: '🔥' },
         ...apiCategories.map(cat => ({
           value: cat.value,
-          label: cat.label,
+          label: categoryDisplayLabel[cat.value] || cat.label,
           icon: cat.icon,
         })),
       ]
@@ -105,6 +123,14 @@ export const NewHeroSection = ({ onCategoryChange, onFilterClick }: NewHeroSecti
   const handleCategoryClick = (categoryValue: string) => {
     setSelectedCategory(categoryValue);
     onCategoryChange?.(categoryValue);
+    if (categoryValue === 'EVENTS') {
+      navigate(PATHS.DISCOVER_EVENTS);
+      return;
+    }
+    if (isSpaCategory(categoryValue)) {
+      navigate(PATHS.DISCOVER_EVENTS);
+      return;
+    }
     if (categoryValue === 'all') {
       navigate(PATHS.ALL_DEALS);
     } else {
@@ -117,6 +143,10 @@ export const NewHeroSection = ({ onCategoryChange, onFilterClick }: NewHeroSecti
     setIsDropdownOpen(false);
     setSelectedCategory(value);
     onCategoryChange?.(value);
+    if (isSpaCategory(value)) {
+      navigate(PATHS.DISCOVER_EVENTS);
+      return;
+    }
     if (value === 'all') {
       navigate(PATHS.ALL_DEALS);
     } else {
