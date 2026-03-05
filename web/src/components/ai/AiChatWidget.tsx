@@ -86,19 +86,20 @@ export const AiChatWidget = ({ className }: AiChatWidgetProps) => {
   return (
     <div
       className={cn(
-        'pointer-events-none fixed bottom-4 right-4 z-40 flex justify-end sm:bottom-6 sm:right-6',
+        'pointer-events-none fixed bottom-4 right-4 z-40 sm:bottom-6 sm:right-6',
         className,
       )}
     >
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.96 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="pointer-events-auto mb-2 w-full max-w-md overflow-hidden rounded-3xl border border-neutral-200 bg-white/95 shadow-2xl shadow-neutral-900/10 backdrop-blur-sm sm:max-w-sm"
-          >
+      <div className="pointer-events-auto flex flex-col items-end gap-2">
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 12, scale: 0.96 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              className="w-full max-w-md overflow-hidden rounded-3xl border border-neutral-200 bg-white/95 shadow-2xl shadow-neutral-900/10 backdrop-blur-sm sm:max-w-sm"
+            >
             <div className="flex items-center justify-between gap-2 border-b border-neutral-100 px-4 py-3">
               <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-neutral-900 text-white">
@@ -227,11 +228,10 @@ export const AiChatWidget = ({ className }: AiChatWidgetProps) => {
                 </button>
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      <div className="pointer-events-auto flex flex-col items-end gap-2">
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
