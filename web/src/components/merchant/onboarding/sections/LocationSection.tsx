@@ -35,6 +35,8 @@ interface LocationSectionProps {
   data: LocationData;
   onUpdate: (data: Partial<LocationData>) => void;
   cities: City[];
+  /** When true and no address is set, highlight the search bar in red */
+  attempted?: boolean;
 }
 
 const DEFAULT_CENTER = { lat: 20.5937, lng: 78.9629 };
@@ -51,7 +53,7 @@ function findMatchingCity(addr: AddressComponents | undefined, cities: City[]): 
   return null;
 }
 
-export const LocationSection = ({ data, onUpdate, cities }: LocationSectionProps) => {
+export const LocationSection = ({ data, onUpdate, cities, attempted }: LocationSectionProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
@@ -148,7 +150,9 @@ export const LocationSection = ({ data, onUpdate, cities }: LocationSectionProps
       <div className="relative z-30">
         <div className={cn(
           'flex items-center gap-3 rounded-xl border bg-white shadow-sm transition-all',
-          inputFocused || showSuggestions ? 'border-brand-primary-400 ring-2 ring-brand-primary-100' : 'border-neutral-200'
+          attempted && !data.address
+            ? 'border-red-400 ring-2 ring-red-200'
+            : inputFocused || showSuggestions ? 'border-brand-primary-400 ring-2 ring-brand-primary-100' : 'border-neutral-200'
         )}>
           <MapPin className="ml-4 h-5 w-5 shrink-0 text-neutral-400" />
           <Input

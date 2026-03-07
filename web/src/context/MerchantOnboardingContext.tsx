@@ -19,6 +19,12 @@ export interface OnboardingState {
   instagramUrl: string;
   facebookUrl: string;
   twitterUrl: string;
+  tiktokUrl: string;
+  youtubeUrl: string;
+  /** Owner (private) contact info */
+  ownerName: string;
+  ownerEmail: string;
+  ownerPhone: string;
   vibeTags: string[];
   amenities: string[];
   thingsToNote: string;
@@ -51,6 +57,11 @@ export type OnboardingAction =
   | { type: 'TOGGLE_AMENITY'; payload: string }
   | { type: 'SET_CONTACT_EMAIL'; payload: string }
   | { type: 'SET_IS_FOOD_TRUCK'; payload: boolean }
+  | { type: 'SET_TIKTOK_URL'; payload: string }
+  | { type: 'SET_YOUTUBE_URL'; payload: string }
+  | { type: 'SET_OWNER_NAME'; payload: string }
+  | { type: 'SET_OWNER_EMAIL'; payload: string }
+  | { type: 'SET_OWNER_PHONE'; payload: string }
   | { type: 'HYDRATE_STATE'; payload: Partial<OnboardingState> }
   | { type: 'SET_FIRST_STORE'; payload: Partial<StoreWizardData> | null };
 
@@ -72,6 +83,11 @@ const initialState: OnboardingState = {
   instagramUrl: '',
   facebookUrl: '',
   twitterUrl: '',
+  tiktokUrl: '',
+  youtubeUrl: '',
+  ownerName: '',
+  ownerEmail: '',
+  ownerPhone: '',
   vibeTags: [],
   amenities: [],
   thingsToNote: '',
@@ -139,6 +155,16 @@ function reducer(state: OnboardingState, action: OnboardingAction): OnboardingSt
       return { ...state, contactEmail: action.payload };
     case 'SET_IS_FOOD_TRUCK':
       return { ...state, isFoodTruck: action.payload };
+    case 'SET_TIKTOK_URL':
+      return { ...state, tiktokUrl: action.payload };
+    case 'SET_YOUTUBE_URL':
+      return { ...state, youtubeUrl: action.payload };
+    case 'SET_OWNER_NAME':
+      return { ...state, ownerName: action.payload };
+    case 'SET_OWNER_EMAIL':
+      return { ...state, ownerEmail: action.payload };
+    case 'SET_OWNER_PHONE':
+      return { ...state, ownerPhone: action.payload };
     case 'SET_FIRST_STORE':
       return {
         ...state,

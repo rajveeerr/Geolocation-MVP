@@ -43,7 +43,26 @@ import {
   Wine,
   Calendar,
   Gift,
+  CheckCircle2,
+  Youtube,
 } from 'lucide-react';
+
+const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+  </svg>
+);
 
 // ---- Data constants (extracted from old step components) ----
 
@@ -103,13 +122,31 @@ const CONTACT_FIELDS = [
   { id: 'website', label: 'Website', stateKey: 'websiteUrl', action: 'SET_WEBSITE_URL' as const, placeholder: 'https://yoursite.com', type: 'url' as const, icon: Globe, iconColor: 'text-neutral-500' },
 ] as const;
 
+const OWNER_CONTACT_FIELDS = [
+  { id: 'ownerName', label: 'Owner name', stateKey: 'ownerName', action: 'SET_OWNER_NAME' as const, placeholder: 'Jane Doe', type: 'text' as const, icon: Users, iconColor: 'text-neutral-500' },
+  { id: 'ownerEmail', label: 'Owner email', stateKey: 'ownerEmail', action: 'SET_OWNER_EMAIL' as const, placeholder: 'jane@example.com', type: 'email' as const, icon: Mail, iconColor: 'text-neutral-500' },
+  { id: 'ownerPhone', label: 'Owner phone', stateKey: 'ownerPhone', action: 'SET_OWNER_PHONE' as const, placeholder: '+1 234 567 8900', type: 'tel' as const, icon: Phone, iconColor: 'text-neutral-500' },
+] as const;
+
 const SOCIAL_FIELDS = [
   { id: 'instagram', label: 'Instagram', stateKey: 'instagramUrl', action: 'SET_INSTAGRAM_URL' as const, placeholder: 'https://instagram.com/yourhandle', type: 'url' as const, icon: Instagram, iconColor: 'text-pink-500' },
   { id: 'facebook', label: 'Facebook', stateKey: 'facebookUrl', action: 'SET_FACEBOOK_URL' as const, placeholder: 'https://facebook.com/yourpage', type: 'url' as const, icon: Facebook, iconColor: 'text-blue-600' },
   { id: 'twitter', label: 'X (Twitter)', stateKey: 'twitterUrl', action: 'SET_TWITTER_URL' as const, placeholder: 'https://x.com/yourhandle', type: 'url' as const, icon: Twitter, iconColor: 'text-neutral-700' },
+  { id: 'tiktok', label: 'TikTok', stateKey: 'tiktokUrl', action: 'SET_TIKTOK_URL' as const, placeholder: 'https://tiktok.com/@yourhandle', type: 'url' as const, icon: TikTokIcon, iconColor: 'text-neutral-900' },
+  { id: 'youtube', label: 'YouTube', stateKey: 'youtubeUrl', action: 'SET_YOUTUBE_URL' as const, placeholder: 'https://youtube.com/@yourchannel', type: 'url' as const, icon: Youtube, iconColor: 'text-red-600' },
 ] as const;
 
 // ---- Component ----
+
+// Format phone number as (XXX) XXX-XXXX
+const formatPhoneDisplay = (value: string) => {
+  const digits = value.replace(/\D/g, '').slice(0, 10);
+  if (digits.length === 0) return '';
+  if (digits.length <= 3) return `(${digits}`;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+};
+const stripPhoneToDigits = (value: string) => value.replace(/\D/g, '').slice(0, 10);
 
 export const BusinessProfileScreen = () => {
   const { state, dispatch } = useOnboarding();
@@ -117,16 +154,21 @@ export const BusinessProfileScreen = () => {
   const [logoModalOpen, setLogoModalOpen] = useState(false);
   const [galleryModalOpen, setGalleryModalOpen] = useState(false);
   const [aiDescriptionInput, setAiDescriptionInput] = useState('');
+  const [showAiBar, setShowAiBar] = useState(false);
+  const [attempted, setAttempted] = useState(false);
 
   const { data: aiStatus } = useAiStatus();
   const aiEnabled = aiStatus?.aiEnabled ?? false;
   const merchantSuggestMutation = useAiMerchantSuggestion();
 
-  const hasContactData = !!(state.phoneNumber || state.contactEmail || state.websiteUrl || state.instagramUrl || state.facebookUrl || state.twitterUrl);
+  const hasContactData = !!(state.phoneNumber || state.contactEmail || state.websiteUrl || state.instagramUrl || state.facebookUrl || state.twitterUrl || state.tiktokUrl || state.youtubeUrl);
+  const hasOwnerData = !!(state.ownerName || state.ownerEmail || state.ownerPhone);
+  const hasFeaturesData = state.vibeTags.length > 0 || state.amenities.length > 0;
 
   const handleContinue = () => {
     if (!state.businessName.trim()) {
-      toast({ title: 'Business name required', description: 'Please enter your business name to continue.', variant: 'warn' });
+      setAttempted(true);
+      toast({ title: 'Business name required', description: 'Please enter your business name to continue.', variant: 'destructive' });
       return;
     }
     dispatch({ type: 'SET_STEP', payload: 1 });
@@ -143,7 +185,7 @@ export const BusinessProfileScreen = () => {
   const applyAiSuggestion = async () => {
     const prompt = aiDescriptionInput.trim() || state.description.trim();
     if (!prompt) {
-      toast({ title: 'Add a short description first', description: 'Tell AI what kind of place you run.', variant: 'warn' });
+      toast({ title: 'Add a short description first', description: 'Tell AI what kind of place you run.', variant: 'destructive' });
       return;
     }
 
@@ -180,7 +222,7 @@ export const BusinessProfileScreen = () => {
   return (
     <OnboardingLayout
       currentStep={0}
-      onBack={() => {}} // No back on first screen
+      onBack={() => { }} // No back on first screen
       onNext={handleContinue}
       nextLabel="Save & Continue"
       nextDisabled={!state.businessName.trim()}
@@ -223,6 +265,7 @@ export const BusinessProfileScreen = () => {
             <section>
               <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">
                 Business Info
+                {state.businessName.trim().length > 0 && <CheckCircle2 className="h-4 w-4 text-brand-primary-500" />}
               </h2>
 
               {/* Business name */}
@@ -233,9 +276,14 @@ export const BusinessProfileScreen = () => {
                 <Input
                   id="businessName"
                   value={state.businessName}
-                  onChange={(e) => dispatch({ type: 'SET_BUSINESS_NAME', payload: e.target.value.slice(0, 80) })}
+                  onChange={(e) => { setAttempted(false); dispatch({ type: 'SET_BUSINESS_NAME', payload: e.target.value.slice(0, 80) }); }}
                   placeholder="e.g. Joe's Coffee, Maria's Taco Truck"
-                  className="mt-1 h-12 rounded-xl border-neutral-300 text-base"
+                  className={cn(
+                    'mt-1 h-12 rounded-xl text-base transition-colors',
+                    attempted && !state.businessName.trim()
+                      ? 'border-red-400 ring-1 ring-red-200 focus:border-red-500 focus:ring-red-300'
+                      : 'border-neutral-300'
+                  )}
                   maxLength={80}
                   autoFocus
                 />
@@ -244,7 +292,10 @@ export const BusinessProfileScreen = () => {
 
               {/* Category */}
               <div className="mt-6">
-                <Label className="text-sm font-medium text-neutral-700">Category</Label>
+                <Label className="flex items-center gap-2 text-sm font-medium text-neutral-700">
+                  Category
+                  {!!state.businessCategory && <CheckCircle2 className="h-4 w-4 text-brand-primary-500" />}
+                </Label>
                 <p className="mt-0.5 text-xs text-neutral-500">Helps customers find deals at places like yours</p>
                 <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {CATEGORIES.map((cat) => (
@@ -326,6 +377,7 @@ export const BusinessProfileScreen = () => {
             <section>
               <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">
                 Make it stand out
+                {(state.description.trim().length > 0 || hasFeaturesData) && <CheckCircle2 className="h-4 w-4 text-brand-primary-500" />}
               </h2>
 
               {/* Description */}
@@ -336,57 +388,68 @@ export const BusinessProfileScreen = () => {
                 <p className="mt-0.5 text-xs text-neutral-500">
                   Appears on your profile and deal pages when customers discover you.
                 </p>
-                <Textarea
-                  id="description"
-                  value={state.description}
-                  onChange={(e) => dispatch({ type: 'SET_DESCRIPTION', payload: e.target.value })}
-                  placeholder="What makes your place special? Cuisine, atmosphere, happy hours, events..."
-                  className="mt-2 min-h-[100px] rounded-xl border-neutral-300 text-sm"
-                  rows={4}
-                />
-                {aiEnabled && (
-                  <div className="mt-3 rounded-xl border border-dashed border-neutral-200 bg-neutral-50 p-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 text-brand-primary-600" />
-                        <p className="text-xs font-medium text-neutral-800">
-                          Let AI draft this for you
-                        </p>
-                      </div>
-                    </div>
-                    <div className="mt-2 space-y-2">
-                      <Input
-                        value={aiDescriptionInput}
-                        onChange={(e) => setAiDescriptionInput(e.target.value)}
-                        placeholder="e.g. Rooftop bar, cocktails & tapas in downtown..."
-                        className="h-9 rounded-lg border-neutral-300 text-xs"
-                      />
-                      <div className="flex items-center justify-between">
+                {/* Description + inline AI bar */}
+                <div className={cn(
+                  'mt-2 overflow-hidden rounded-xl border transition-colors',
+                  'border-neutral-300 focus-within:border-brand-primary-400 focus-within:ring-1 focus-within:ring-brand-primary-200'
+                )}>
+                  <Textarea
+                    id="description"
+                    value={state.description}
+                    onChange={(e) => dispatch({ type: 'SET_DESCRIPTION', payload: e.target.value })}
+                    placeholder="What makes your place special? Cuisine, atmosphere, happy hours, events..."
+                    className="min-h-[100px] rounded-none border-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+                    rows={4}
+                  />
+                  {aiEnabled && (
+                    <div className="border-t border-neutral-200 bg-neutral-50">
+                      {!showAiBar ? (
                         <button
                           type="button"
-                          onClick={applyAiSuggestion}
-                          disabled={merchantSuggestMutation.isPending}
-                          className="inline-flex items-center gap-1 rounded-full bg-neutral-900 px-3 py-1 text-xs font-medium text-white hover:bg-neutral-800 disabled:opacity-60"
+                          onClick={() => setShowAiBar(true)}
+                          className="flex w-full items-center gap-2 px-3 py-2 text-xs text-neutral-500 hover:bg-neutral-100 transition-colors"
                         >
-                          {merchantSuggestMutation.isPending ? (
-                            <>
-                              <span className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                              Thinking...
-                            </>
-                          ) : (
-                            <>
-                              <Sparkles className="h-3 w-3" />
-                              Draft with AI
-                            </>
-                          )}
+                          <Sparkles className="h-3.5 w-3.5 text-brand-primary-500" />
+                          <span>Let AI draft this for you...</span>
                         </button>
-                        <p className="text-[11px] text-neutral-500">
-                          You can edit everything after it&apos;s filled in.
-                        </p>
-                      </div>
+                      ) : (
+                        <div className="flex items-center gap-2 px-3 py-2">
+                          <Sparkles className="h-4 w-4 shrink-0 text-brand-primary-500" />
+                          <input
+                            value={aiDescriptionInput}
+                            onChange={(e) => setAiDescriptionInput(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); applyAiSuggestion(); } }}
+                            placeholder="e.g. Rooftop bar, cocktails & tapas in downtown..."
+                            className="min-w-0 flex-1 bg-transparent text-sm text-neutral-800 placeholder:text-neutral-400 outline-none"
+                            autoFocus
+                          />
+                          <button
+                            type="button"
+                            onClick={() => { setShowAiBar(false); setAiDescriptionInput(''); }}
+                            className="shrink-0 text-sm font-medium text-neutral-500 hover:text-neutral-700"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            onClick={applyAiSuggestion}
+                            disabled={merchantSuggestMutation.isPending}
+                            className="shrink-0 rounded-full bg-neutral-200 px-3 py-1 text-sm font-medium text-neutral-700 hover:bg-neutral-300 disabled:opacity-60 transition-colors"
+                          >
+                            {merchantSuggestMutation.isPending ? (
+                              <span className="flex items-center gap-1">
+                                <span className="h-3 w-3 animate-spin rounded-full border-2 border-neutral-500 border-t-transparent" />
+                                Thinking...
+                              </span>
+                            ) : (
+                              'Create'
+                            )}
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
                 {!aiEnabled && (
                   <p className="mt-1 text-xs text-neutral-400">
                     Tip: Describe your business in 2-3 words and we&apos;ll help generate a full description once AI is enabled.
@@ -467,12 +530,15 @@ export const BusinessProfileScreen = () => {
             </section>
 
             {/* ====== CONTACT & SOCIAL (accordion) ====== */}
-            <AccordionSection title="Contact & Social" defaultOpen={hasContactData}>
+            <AccordionSection title="Contact & Social" defaultOpen={hasContactData || hasOwnerData} completed={hasContactData || hasOwnerData}>
               <div className="space-y-4">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Contact</h3>
-                {CONTACT_FIELDS.map((field) => {
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Owner Contact (Private)</h3>
+                <p className="text-xs text-neutral-500 -mt-2">Used by Yohop admins to contact you. Not shown to customers.</p>
+                {OWNER_CONTACT_FIELDS.map((field) => {
                   const Icon = field.icon;
-                  const value = (state as Record<string, unknown>)[field.stateKey] as string;
+                  const rawValue = (state as unknown as Record<string, unknown>)[field.stateKey] as string;
+                  const isPhone = field.type === 'tel';
+                  const displayValue = isPhone ? formatPhoneDisplay(rawValue || '') : (rawValue || '');
                   return (
                     <div key={field.id}>
                       <label htmlFor={`bp-${field.id}`} className="mb-1 flex items-center gap-2 text-sm font-medium text-neutral-700">
@@ -481,10 +547,45 @@ export const BusinessProfileScreen = () => {
                       </label>
                       <Input
                         id={`bp-${field.id}`}
-                        type={field.type}
-                        value={value || ''}
-                        onChange={(e) => dispatch({ type: field.action, payload: e.target.value })}
+                        type={isPhone ? 'text' : field.type}
+                        inputMode={isPhone ? 'numeric' : undefined}
+                        value={displayValue}
+                        onChange={(e) => {
+                          const val = isPhone ? stripPhoneToDigits(e.target.value) : e.target.value;
+                          dispatch({ type: field.action, payload: val });
+                        }}
                         placeholder={field.placeholder}
+                        className="h-11 rounded-xl border-neutral-300"
+                      />
+                    </div>
+                  );
+                })}
+
+                <div className="border-t border-neutral-200 pt-4">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Business Contact (Public)</h3>
+                  <p className="text-xs text-neutral-500 mt-1">Shown to customers on your page.</p>
+                </div>
+                {CONTACT_FIELDS.map((field) => {
+                  const Icon = field.icon;
+                  const rawValue = (state as unknown as Record<string, unknown>)[field.stateKey] as string;
+                  const isPhone = field.type === 'tel';
+                  const displayValue = isPhone ? formatPhoneDisplay(rawValue || '') : (rawValue || '');
+                  return (
+                    <div key={field.id}>
+                      <label htmlFor={`bp-${field.id}`} className="mb-1 flex items-center gap-2 text-sm font-medium text-neutral-700">
+                        <Icon className={cn('h-4 w-4', field.iconColor)} />
+                        {field.label}
+                      </label>
+                      <Input
+                        id={`bp-${field.id}`}
+                        type={isPhone ? 'text' : field.type}
+                        inputMode={isPhone ? 'numeric' : undefined}
+                        value={displayValue}
+                        onChange={(e) => {
+                          const val = isPhone ? stripPhoneToDigits(e.target.value) : e.target.value;
+                          dispatch({ type: field.action, payload: val });
+                        }}
+                        placeholder={isPhone ? '(555) 123-4567' : field.placeholder}
                         className="h-11 rounded-xl border-neutral-300"
                       />
                     </div>
@@ -496,7 +597,7 @@ export const BusinessProfileScreen = () => {
                 </div>
                 {SOCIAL_FIELDS.map((field) => {
                   const Icon = field.icon;
-                  const value = (state as Record<string, unknown>)[field.stateKey] as string;
+                  const value = (state as unknown as Record<string, unknown>)[field.stateKey] as string;
                   return (
                     <div key={field.id}>
                       <label htmlFor={`bp-${field.id}`} className="mb-1 flex items-center gap-2 text-sm font-medium text-neutral-700">

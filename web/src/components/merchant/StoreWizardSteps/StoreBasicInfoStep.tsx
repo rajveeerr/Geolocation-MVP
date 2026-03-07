@@ -3,6 +3,16 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/common/Button';
 import { Building2, Phone, Mail, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+// Phone formatting utilities
+const formatPhoneDisplay = (value: string) => {
+  const digits = value.replace(/\D/g, '').slice(0, 10);
+  if (digits.length === 0) return '';
+  if (digits.length <= 3) return `(${digits}`;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+};
+const stripPhoneToDigits = (value: string) => value.replace(/\D/g, '').slice(0, 10);
 // Local types - prefer storeRegistrationTypes for shared shape
 interface StoreWizardData {
   businessName: string;
@@ -142,10 +152,11 @@ export const StoreBasicInfoStep = ({ data, onUpdate, cities, merchantPhone, merc
             <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
             <Input
               id="phoneNumber"
-              type="tel"
+              type="text"
+              inputMode="numeric"
               placeholder="(555) 123-4567"
-              value={data.phoneNumber}
-              onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+              value={formatPhoneDisplay(data.phoneNumber || '')}
+              onChange={(e) => handleInputChange('phoneNumber', stripPhoneToDigits(e.target.value))}
               className="pl-10"
             />
           </div>

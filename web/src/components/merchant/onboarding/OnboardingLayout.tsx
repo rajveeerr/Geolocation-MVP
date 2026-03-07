@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/common/Button';
 import { Logo } from '@/components/common/Logo';
-import { useToast } from '@/hooks/use-toast';
 import { PATHS } from '@/routing/paths';
 import { TOTAL_STEPS, getStepLabel } from '@/context/MerchantOnboardingContext';
 
@@ -26,24 +25,17 @@ export const OnboardingLayout = ({
   onBack,
   onNext,
   nextLabel = 'Next',
-  nextDisabled = false,
-  nextDisabledReason,
+  nextDisabled: _nextDisabled = false,
+  nextDisabledReason: _nextDisabledReason,
   showFooter = true,
   currentStep,
 }: OnboardingLayoutProps) => {
-  const { toast } = useToast();
 
   const handleNextClick = useCallback(() => {
-    if (nextDisabled && nextDisabledReason) {
-      toast({
-        title: 'Complete this step',
-        description: nextDisabledReason,
-        variant: 'warn',
-      });
-      return;
-    }
+    // Always call onNext — individual screens handle their own validation
+    // (set attempted=true for red borders + show toast messages)
     onNext?.();
-  }, [nextDisabled, nextDisabledReason, onNext, toast]);
+  }, [onNext]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

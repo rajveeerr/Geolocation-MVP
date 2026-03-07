@@ -6,13 +6,13 @@ import { OnboardingStepLayout } from '../onboarding/OnboardingStepLayout';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { 
-  Tag, 
-  Calendar, 
-  CalendarDays, 
-  Flame, 
-  Trophy, 
-  ChevronDown, 
+import {
+  Tag,
+  Calendar,
+  CalendarDays,
+  Flame,
+  Trophy,
+  ChevronDown,
   ChevronUp,
   CheckCircle,
   AlertCircle,
@@ -52,7 +52,7 @@ export const DealDailyDealConfigStep = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [pendingCollectionItems, setPendingCollectionItems] = useState<any[] | null>(null);
   const { data: menuData, isLoading: isLoadingMenu } = useMerchantMenu();
-  
+
   // Ensure dealType is RECURRING and recurringDays is an array
   useEffect(() => {
     if (state.dealType !== 'RECURRING') {
@@ -62,24 +62,24 @@ export const DealDailyDealConfigStep = () => {
       dispatch({ type: 'UPDATE_FIELD', field: 'recurringDays', value: [] });
     }
   }, [state.dealType, state.recurringDays, dispatch]);
-  
+
   const menuItems = menuData?.menuItems || [];
   const selectedMenuItems = state.selectedMenuItems || [];
-  
+
   // Filter menu items based on search and category
   const filteredMenuItems = menuItems.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      item.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
-  
+
   // Get unique categories
   const categories = ['all', ...new Set(menuItems.map(item => item.category))];
-  
+
   const handleToggleMenuItem = (item: MenuItem) => {
     const isSelected = selectedMenuItems.some(selected => selected.id === item.id);
-    
+
     if (isSelected) {
       // Remove from selection
       const updated = selectedMenuItems.filter(selected => selected.id !== item.id);
@@ -94,10 +94,10 @@ export const DealDailyDealConfigStep = () => {
         ...item,
         isHidden: false,
       } as SelectedMenuItem;
-      dispatch({ 
-        type: 'SET_FIELD', 
-        field: 'selectedMenuItems', 
-        value: [...selectedMenuItems, newItem] 
+      dispatch({
+        type: 'SET_FIELD',
+        field: 'selectedMenuItems',
+        value: [...selectedMenuItems, newItem]
       });
       // Clear collection if using individual items
       if (!useCollection) {
@@ -105,20 +105,20 @@ export const DealDailyDealConfigStep = () => {
       }
     }
   };
-  
+
   const handleToggleVisibility = (item: MenuItem) => {
-    const updated = selectedMenuItems.map(selected => 
-      selected.id === item.id 
+    const updated = selectedMenuItems.map(selected =>
+      selected.id === item.id
         ? { ...selected, isHidden: !selected.isHidden }
         : selected
     );
     dispatch({ type: 'SET_FIELD', field: 'selectedMenuItems', value: updated });
   };
-  
+
   const isMenuItemSelected = (item: MenuItem) => {
     return selectedMenuItems.some(selected => selected.id === item.id);
   };
-  
+
   // Handle mode switch
   const handleModeSwitch = (useCollectionMode: boolean) => {
     setUseCollection(useCollectionMode);
@@ -138,7 +138,7 @@ export const DealDailyDealConfigStep = () => {
       const dayLabels = state.recurringDays
         .map((dayKey) => weekdays.find((d) => d.key === dayKey)?.label)
         .filter(Boolean);
-      
+
       if (dayLabels.length === 1) {
         dispatch({ type: 'UPDATE_FIELD', field: 'title', value: `${dayLabels[0]} Special` });
       } else if (dayLabels.length > 1) {
@@ -150,31 +150,31 @@ export const DealDailyDealConfigStep = () => {
   // Calculate number of occurrences based on frequency and date range
   const calculateOccurrences = () => {
     if (!state.activeStartDate || !state.activeEndDate || !state.recurringFrequency) return null;
-    
+
     const start = new Date(state.activeStartDate);
     const end = new Date(state.activeEndDate);
     const selectedDays = state.recurringDays;
-    
+
     if (!selectedDays || selectedDays.length === 0) return null;
-    
+
     // Ensure dates are valid
     if (isNaN(start.getTime()) || isNaN(end.getTime())) return null;
     if (end < start) return null;
-    
+
     let count = 0;
     const current = new Date(start);
     const dayNames = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
-    
+
     if (state.recurringFrequency === 'week') {
       // For weekly, check every day in the range
       while (current <= end) {
         const dayOfWeek = current.getDay(); // 0 = Sunday, 1 = Monday, etc.
         const dayName = dayNames[dayOfWeek];
-        
+
         if (selectedDays.includes(dayName)) {
           count++;
         }
-        
+
         // Move to next day
         current.setDate(current.getDate() + 1);
       }
@@ -182,7 +182,7 @@ export const DealDailyDealConfigStep = () => {
       // For monthly, check the same day of month each month
       const startDayOfWeek = start.getDay();
       const startDayName = dayNames[startDayOfWeek];
-      
+
       // Only count if the start day is in selected days
       if (selectedDays.includes(startDayName)) {
         let checkDate = new Date(start);
@@ -190,11 +190,11 @@ export const DealDailyDealConfigStep = () => {
           // Check if this date falls on one of the selected weekdays
           const checkDayOfWeek = checkDate.getDay();
           const checkDayName = dayNames[checkDayOfWeek];
-          
+
           if (selectedDays.includes(checkDayName)) {
             count++;
           }
-          
+
           // Move to same day next month
           checkDate.setMonth(checkDate.getMonth() + 1);
         }
@@ -203,7 +203,7 @@ export const DealDailyDealConfigStep = () => {
       // For yearly, check the same date each year
       const startDayOfWeek = start.getDay();
       const startDayName = dayNames[startDayOfWeek];
-      
+
       // Only count if the start day is in selected days
       if (selectedDays.includes(startDayName)) {
         let checkDate = new Date(start);
@@ -211,17 +211,17 @@ export const DealDailyDealConfigStep = () => {
           // Check if this date falls on one of the selected weekdays
           const checkDayOfWeek = checkDate.getDay();
           const checkDayName = dayNames[checkDayOfWeek];
-          
+
           if (selectedDays.includes(checkDayName)) {
             count++;
           }
-          
+
           // Move to same date next year
           checkDate.setFullYear(checkDate.getFullYear() + 1);
         }
       }
     }
-    
+
     return count;
   };
 
@@ -233,7 +233,7 @@ export const DealDailyDealConfigStep = () => {
   const hasMenuItems = (state.selectedMenuItems && Array.isArray(state.selectedMenuItems) && state.selectedMenuItems.length > 0) || (state.menuCollectionId !== null && state.menuCollectionId !== undefined);
   const isFrequencySet = state.recurringFrequency !== null && state.recurringFrequency !== undefined;
   const hasDateRange = !!(state.activeStartDate && state.activeEndDate);
-  
+
   // Validate date range (end must be after start)
   let isDateRangeValid = false;
   if (hasDateRange) {
@@ -247,23 +247,23 @@ export const DealDailyDealConfigStep = () => {
       isDateRangeValid = false;
     }
   }
-  
+
   const customOfferText = state.customOfferDisplay ? state.customOfferDisplay.trim() : '';
-  const hasOffer = (state.discountPercentage !== null && state.discountPercentage !== undefined && state.discountPercentage > 0) || 
-                   (state.discountAmount !== null && state.discountAmount !== undefined && state.discountAmount > 0) || 
-                   customOfferText.length > 0;
+  const hasOffer = (state.discountPercentage !== null && state.discountPercentage !== undefined && state.discountPercentage > 0) ||
+    (state.discountAmount !== null && state.discountAmount !== undefined && state.discountAmount > 0) ||
+    customOfferText.length > 0;
   const isStreakValid = !state.streakEnabled || (
     state.streakMinVisits !== null && state.streakMinVisits !== undefined && state.streakMinVisits >= 2 &&
     state.streakRewardType !== null && state.streakRewardType !== undefined &&
     state.streakRewardValue !== null && state.streakRewardValue !== undefined && state.streakRewardValue > 0
   );
   const isBountyValid = !state.bountyRewardAmount || (
-    state.bountyRewardAmount > 0 && 
+    state.bountyRewardAmount > 0 &&
     state.minReferralsRequired !== null && state.minReferralsRequired !== undefined && state.minReferralsRequired >= 1
   );
 
   const canProceed = hasRecurringDays && isTitleValid && hasMenuItems && isFrequencySet && hasDateRange && isDateRangeValid && hasOffer && isStreakValid && isBountyValid;
-  
+
   // Debug validation (only in development)
   useEffect(() => {
     if (!canProceed && process.env.NODE_ENV === 'development') {
@@ -294,7 +294,7 @@ export const DealDailyDealConfigStep = () => {
       });
     }
   }, [canProceed, hasRecurringDays, isTitleValid, hasMenuItems, isFrequencySet, hasDateRange, isDateRangeValid, hasOffer, isStreakValid, isBountyValid, state]);
-  
+
   // Get validation errors for hints
   const validationErrors: string[] = [];
   if (!hasRecurringDays) {
@@ -347,22 +347,22 @@ export const DealDailyDealConfigStep = () => {
       validationErrors.push('Bounty: Set minimum friends required (at least 1)');
     }
   }
-  
+
   // Sync useCollection state with actual state
   useEffect(() => {
     if (state.menuCollectionId !== null && !useCollection) {
       setUseCollection(true);
     }
   }, [state.menuCollectionId, useCollection]);
-  
+
   // Sync items after collection is set (reducer clears them, so we restore them)
   useEffect(() => {
     if (state.menuCollectionId !== null && pendingCollectionItems && pendingCollectionItems.length > 0) {
       // Collection is set, now restore the items
-      dispatch({ 
-        type: 'SET_FIELD', 
-        field: 'selectedMenuItems', 
-        value: pendingCollectionItems 
+      dispatch({
+        type: 'SET_FIELD',
+        field: 'selectedMenuItems',
+        value: pendingCollectionItems
       });
       setPendingCollectionItems(null);
     }
@@ -401,13 +401,12 @@ export const DealDailyDealConfigStep = () => {
               })
             }
             placeholder="e.g., Monday Special, Weekend Deal"
-            className={`h-12 text-base ${
-              state.title && !isTitleValid
+            className={`h-12 text-base ${state.title && !isTitleValid
                 ? 'border-red-300 focus:border-red-500'
                 : state.title && isTitleValid
-                ? 'border-green-300 focus:border-green-500'
-                : ''
-            }`}
+                  ? 'border-green-300 focus:border-green-500'
+                  : ''
+              }`}
           />
           {state.title && (
             <p className={cn('text-sm', isTitleValid ? 'text-green-600' : 'text-red-600')}>
@@ -458,7 +457,7 @@ export const DealDailyDealConfigStep = () => {
           <p className="text-sm text-neutral-600">
             Select items individually or use a collection for this deal
           </p>
-          
+
           {/* Mode Toggle */}
           <div className="flex items-center gap-2 rounded-lg bg-neutral-100 p-1">
             <button
@@ -484,7 +483,7 @@ export const DealDailyDealConfigStep = () => {
               Collection
             </button>
           </div>
-          
+
           {/* Collection Selection Mode */}
           {useCollection && (
             <div className="space-y-4">
@@ -497,15 +496,15 @@ export const DealDailyDealConfigStep = () => {
                   } else {
                     setPendingCollectionItems(null);
                     dispatch({ type: 'SET_MENU_COLLECTION', collectionId: null });
-                    dispatch({ 
-                      type: 'SET_FIELD', 
-                      field: 'selectedMenuItems', 
-                      value: [] 
+                    dispatch({
+                      type: 'SET_FIELD',
+                      field: 'selectedMenuItems',
+                      value: []
                     });
                   }
                 }}
               />
-              
+
               {!state.menuCollectionId && state.selectedMenuItems.length === 0 && (
                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
                   <p className="text-sm text-amber-800">
@@ -515,7 +514,7 @@ export const DealDailyDealConfigStep = () => {
               )}
             </div>
           )}
-          
+
           {/* Individual Item Selection Mode */}
           {!useCollection && (
             <div className="space-y-4">
@@ -530,7 +529,7 @@ export const DealDailyDealConfigStep = () => {
                     className="pl-10"
                   />
                 </div>
-                
+
                 <div className="flex items-center gap-2 overflow-x-auto">
                   <Filter className="h-4 w-4 text-neutral-500 flex-shrink-0" />
                   {categories.map((category) => (
@@ -549,7 +548,7 @@ export const DealDailyDealConfigStep = () => {
                   ))}
                 </div>
               </div>
-              
+
               {/* Selection Summary */}
               {selectedMenuItems.length > 0 && (
                 <motion.div
@@ -567,7 +566,7 @@ export const DealDailyDealConfigStep = () => {
                       </p>
                     </div>
                   </div>
-                  
+
                   {/* Selected Items List */}
                   <div className="mt-3 space-y-2 max-h-48 overflow-y-auto">
                     {selectedMenuItems.map((selectedItem) => (
@@ -616,7 +615,7 @@ export const DealDailyDealConfigStep = () => {
                   </div>
                 </motion.div>
               )}
-              
+
               {/* Menu Items Grid */}
               {isLoadingMenu ? (
                 <div className="rounded-lg border border-neutral-200 bg-white p-6 text-center">
@@ -636,7 +635,7 @@ export const DealDailyDealConfigStep = () => {
                 <div className="grid gap-3">
                   {filteredMenuItems.map((item) => {
                     const isSelected = isMenuItemSelected(item);
-                    
+
                     return (
                       <motion.div
                         key={item.id}
@@ -644,8 +643,8 @@ export const DealDailyDealConfigStep = () => {
                         animate={{ opacity: 1, y: 0 }}
                         className={cn(
                           'relative rounded-lg border-2 p-4 transition-all cursor-pointer',
-                          isSelected 
-                            ? 'border-brand-primary-500 bg-brand-primary-50' 
+                          isSelected
+                            ? 'border-brand-primary-500 bg-brand-primary-50'
                             : 'border-neutral-200 bg-white hover:border-neutral-300'
                         )}
                         onClick={() => handleToggleMenuItem(item)}
@@ -655,7 +654,7 @@ export const DealDailyDealConfigStep = () => {
                             <CheckCircle className="h-4 w-4" />
                           </div>
                         )}
-                        
+
                         <div className="flex items-start gap-3">
                           <div className="flex-shrink-0">
                             {item.imageUrl || (item.images && item.images.length > 0) ? (
@@ -670,7 +669,7 @@ export const DealDailyDealConfigStep = () => {
                               </div>
                             )}
                           </div>
-                          
+
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold text-neutral-900 truncate">{item.name}</h3>
                             {item.description && (
@@ -692,7 +691,7 @@ export const DealDailyDealConfigStep = () => {
                   })}
                 </div>
               )}
-              
+
               {menuItems.length === 0 && (
                 <div className="rounded-lg border-2 border-dashed border-neutral-200 bg-white py-12 text-center">
                   <Utensils className="mx-auto mb-4 h-12 w-12 text-neutral-400" />
@@ -718,8 +717,8 @@ export const DealDailyDealConfigStep = () => {
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-600" />
                 <span className="text-sm text-green-800">
-                  {state.menuCollectionId 
-                    ? 'Collection selected' 
+                  {state.menuCollectionId
+                    ? 'Collection selected'
                     : `${state.selectedMenuItems.length} item${state.selectedMenuItems.length !== 1 ? 's' : ''} selected`}
                 </span>
               </div>
@@ -760,7 +759,7 @@ export const DealDailyDealConfigStep = () => {
               </div>
             )}
           </div>
-          
+
           {!hasRecurringDays && (
             <div className="rounded-lg border border-red-200 bg-red-50 p-3">
               <div className="flex items-center gap-2">
@@ -793,55 +792,59 @@ export const DealDailyDealConfigStep = () => {
             </div>
           </div>
 
+
           {/* Date Range */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="activeStartDate" className="text-sm font-medium text-neutral-700">
                 Start Date <span className="text-red-500">*</span>
               </Label>
-              <Input
-                id="activeStartDate"
-                type="date"
-                value={state.activeStartDate || ''}
-                onChange={(e) => {
-                  const dateValue = e.target.value;
-                  if (dateValue) {
-                    dispatch({
-                      type: 'UPDATE_FIELD',
-                      field: 'activeStartDate',
-                      value: dateValue,
-                    });
-                    // Also set startTime for compatibility
-                    const date = new Date(dateValue);
-                    if (!isNaN(date.getTime())) {
-                      date.setHours(0, 0, 0, 0);
+              <div className="relative">
+                <Calendar className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+                <Input
+                  id="activeStartDate"
+                  type="date"
+                  value={state.activeStartDate || ''}
+                  onChange={(e) => {
+                    const dateValue = e.target.value;
+                    if (dateValue) {
                       dispatch({
                         type: 'UPDATE_FIELD',
-                        field: 'startTime',
-                        value: date.toISOString(),
+                        field: 'activeStartDate',
+                        value: dateValue,
+                      });
+                      // Also set startTime for compatibility
+                      const date = new Date(dateValue);
+                      if (!isNaN(date.getTime())) {
+                        date.setHours(0, 0, 0, 0);
+                        dispatch({
+                          type: 'UPDATE_FIELD',
+                          field: 'startTime',
+                          value: date.toISOString(),
+                        });
+                      }
+                    } else {
+                      dispatch({
+                        type: 'UPDATE_FIELD',
+                        field: 'activeStartDate',
+                        value: '',
                       });
                     }
-                  } else {
-                    dispatch({
-                      type: 'UPDATE_FIELD',
-                      field: 'activeStartDate',
-                      value: '',
-                    });
-                  }
-                }}
-                min={new Date().toISOString().split('T')[0]}
-                className={cn(
-                  "h-12",
-                  state.activeStartDate && !isDateRangeValid && state.activeEndDate
-                    ? "border-red-300 focus:border-red-500"
-                    : state.activeStartDate
-                    ? "border-green-300 focus:border-green-500"
-                    : ""
-                )}
-                required
-              />
+                  }}
+                  min={new Date().toISOString().split('T')[0]}
+                  className={cn(
+                    "h-12 pl-10 text-base cursor-pointer",
+                    state.activeStartDate && !isDateRangeValid && state.activeEndDate
+                      ? "border-red-300 focus:border-red-500"
+                      : state.activeStartDate
+                        ? "border-green-300 focus:border-green-500"
+                        : ""
+                  )}
+                  required
+                />
+              </div>
               {state.activeStartDate && (
-                <p className="text-xs text-neutral-500">
+                <p className="rounded-md bg-neutral-50 px-2 py-1 text-xs font-medium text-neutral-700">
                   {new Date(state.activeStartDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                 </p>
               )}
@@ -850,55 +853,58 @@ export const DealDailyDealConfigStep = () => {
               <Label htmlFor="activeEndDate" className="text-sm font-medium text-neutral-700">
                 End Date <span className="text-red-500">*</span>
               </Label>
-              <Input
-                id="activeEndDate"
-                type="date"
-                value={state.activeEndDate || ''}
-                onChange={(e) => {
-                  const dateValue = e.target.value;
-                  if (dateValue) {
-                    dispatch({
-                      type: 'UPDATE_FIELD',
-                      field: 'activeEndDate',
-                      value: dateValue,
-                    });
-                    // Also set endTime for compatibility
-                    const date = new Date(dateValue);
-                    if (!isNaN(date.getTime())) {
-                      date.setHours(23, 59, 59, 999);
+              <div className="relative">
+                <Calendar className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+                <Input
+                  id="activeEndDate"
+                  type="date"
+                  value={state.activeEndDate || ''}
+                  onChange={(e) => {
+                    const dateValue = e.target.value;
+                    if (dateValue) {
                       dispatch({
                         type: 'UPDATE_FIELD',
-                        field: 'endTime',
-                        value: date.toISOString(),
+                        field: 'activeEndDate',
+                        value: dateValue,
+                      });
+                      // Also set endTime for compatibility
+                      const date = new Date(dateValue);
+                      if (!isNaN(date.getTime())) {
+                        date.setHours(23, 59, 59, 999);
+                        dispatch({
+                          type: 'UPDATE_FIELD',
+                          field: 'endTime',
+                          value: date.toISOString(),
+                        });
+                      }
+                    } else {
+                      dispatch({
+                        type: 'UPDATE_FIELD',
+                        field: 'activeEndDate',
+                        value: '',
                       });
                     }
-                  } else {
-                    dispatch({
-                      type: 'UPDATE_FIELD',
-                      field: 'activeEndDate',
-                      value: '',
-                    });
-                  }
-                }}
-                min={state.activeStartDate || new Date().toISOString().split('T')[0]}
-                className={cn(
-                  "h-12",
-                  state.activeEndDate && !isDateRangeValid && state.activeStartDate
-                    ? "border-red-300 focus:border-red-500"
-                    : state.activeEndDate
-                    ? "border-green-300 focus:border-green-500"
-                    : ""
-                )}
-                required
-              />
+                  }}
+                  min={state.activeStartDate || new Date().toISOString().split('T')[0]}
+                  className={cn(
+                    "h-12 pl-10 text-base cursor-pointer",
+                    state.activeEndDate && !isDateRangeValid && state.activeStartDate
+                      ? "border-red-300 focus:border-red-500"
+                      : state.activeEndDate
+                        ? "border-green-300 focus:border-green-500"
+                        : ""
+                  )}
+                  required
+                />
+              </div>
               {state.activeEndDate && (
-                <p className="text-xs text-neutral-500">
+                <p className="rounded-md bg-neutral-50 px-2 py-1 text-xs font-medium text-neutral-700">
                   {new Date(state.activeEndDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                 </p>
               )}
             </div>
           </div>
-          
+
           {/* Date Range Validation Message */}
           {hasDateRange && !isDateRangeValid && (
             <div className="rounded-lg border border-red-200 bg-red-50 p-3">
@@ -938,7 +944,7 @@ export const DealDailyDealConfigStep = () => {
               </div>
             </div>
           )}
-          
+
           {/* Show when dates/frequency are set but no weekdays selected */}
           {state.activeStartDate && state.activeEndDate && state.recurringFrequency && (!state.recurringDays || state.recurringDays.length === 0) && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
@@ -1237,7 +1243,7 @@ export const DealDailyDealConfigStep = () => {
                     <div className="rounded-lg border border-brand-primary-200 bg-brand-primary-50 p-3">
                       <p className="text-sm text-brand-primary-800">
                         Reward customers who visit <strong>{state.streakMinVisits} {state.recurringDays.length === 1 ? weekdays.find(d => d.key === state.recurringDays[0])?.label.toLowerCase() : 'times'} in a row</strong> with{' '}
-                        {state.streakRewardType === 'percentage' 
+                        {state.streakRewardType === 'percentage'
                           ? `${state.streakRewardValue}% off`
                           : `$${state.streakRewardValue} off`}
                       </p>

@@ -20,6 +20,16 @@ import {
   Wifi, Car, CreditCard, Users, ExternalLink,
 } from 'lucide-react';
 
+// Phone formatting utilities
+const formatPhoneDisplay = (value: string) => {
+  const digits = value.replace(/\D/g, '').slice(0, 10);
+  if (digits.length === 0) return '';
+  if (digits.length <= 3) return `(${digits}`;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+};
+const stripPhoneToDigits = (value: string) => value.replace(/\D/g, '').slice(0, 10);
+
 // ---- Store type options ----
 const STORE_TYPES = [
   { value: 'restaurant', label: 'Restaurant', icon: Utensils },
@@ -44,6 +54,7 @@ export const StoreDetailsScreen = () => {
   const { data: citiesData } = useWhitelistedCities();
   const cities = citiesData?.cities ?? [];
   const [photosModalOpen, setPhotosModalOpen] = useState(false);
+  const [attempted, setAttempted] = useState(false);
 
   const store = state.firstStore;
 
@@ -69,15 +80,18 @@ export const StoreDetailsScreen = () => {
   const handleContinue = () => {
     if (!store) return;
     if (!store.address || !store.cityId || store.latitude == null || store.longitude == null) {
-      toast({ title: 'Address required', description: 'Please search and select your store address.', variant: 'warn' });
+      setAttempted(true);
+      toast({ title: 'Address required', description: 'Please search and select your store address.', variant: 'destructive' });
       return;
     }
     if (!store.businessName?.trim()) {
-      toast({ title: 'Store name required', description: 'Please enter a name for this location.', variant: 'warn' });
+      setAttempted(true);
+      toast({ title: 'Store name required', description: 'Please enter a name for this location.', variant: 'destructive' });
       return;
     }
     if (!store.phoneNumber?.trim()) {
-      toast({ title: 'Phone required', description: 'Please enter a phone number for this location.', variant: 'warn' });
+      setAttempted(true);
+      toast({ title: 'Phone required', description: 'Please enter a phone number for this location.', variant: 'destructive' });
       return;
     }
     dispatch({ type: 'SET_STEP', payload: 2 });
@@ -126,12 +140,16 @@ export const StoreDetailsScreen = () => {
               }}
               onUpdate={(d) => updateStore(d)}
               cities={cities}
+              attempted={attempted}
             />
           </section>
 
           {/* ====== STORE INFO ====== */}
           <section>
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Store Info</h2>
+            <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+              Store Info
+              {hasStoreInfoData && <CheckCircle2 className="h-4 w-4 text-brand-primary-500" />}
+            </h2>
 
             <div className="mt-4">
               <Label htmlFor="storeName" className="text-sm font-medium text-neutral-700">
@@ -140,9 +158,14 @@ export const StoreDetailsScreen = () => {
               <Input
                 id="storeName"
                 value={store.businessName}
-                onChange={(e) => updateStore({ businessName: e.target.value })}
+                onChange={(e) => { setAttempted(false); updateStore({ businessName: e.target.value }); }}
                 placeholder="e.g. Joe's Coffee — Downtown"
-                className="mt-1 h-11 rounded-xl border-neutral-300 text-sm"
+                className={cn(
+                  'mt-1 h-11 rounded-xl text-sm transition-colors',
+                  attempted && !store.businessName?.trim()
+                    ? 'border-red-400 ring-1 ring-red-200 focus:border-red-500 focus:ring-red-300'
+                    : 'border-neutral-300'
+                )}
               />
             </div>
 
@@ -173,7 +196,10 @@ export const StoreDetailsScreen = () => {
 
           {/* ====== CONTACT ====== */}
           <section>
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Contact</h2>
+            <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+              Contact
+              {hasContactDataLocal && <CheckCircle2 className="h-4 w-4 text-brand-primary-500" />}
+            </h2>
 
             {canUseMerchantContact && (
               <button
@@ -209,11 +235,17 @@ export const StoreDetailsScreen = () => {
                   <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
                   <Input
                     id="storePhone"
-                    type="tel"
-                    value={store.phoneNumber}
-                    onChange={(e) => updateStore({ phoneNumber: e.target.value })}
+                    type="text"
+                    inputMode="numeric"
+                    value={formatPhoneDisplay(store.phoneNumber || '')}
+                    onChange={(e) => { setAttempted(false); updateStore({ phoneNumber: stripPhoneToDigits(e.target.value) }); }}
                     placeholder="(555) 123-4567"
-                    className="h-11 pl-10"
+                    className={cn(
+                      'h-11 pl-10 transition-colors',
+                      attempted && !store.phoneNumber?.trim()
+                        ? 'border-red-400 ring-1 ring-red-200 focus:border-red-500 focus:ring-red-300'
+                        : ''
+                    )}
                   />
                 </div>
               </div>
@@ -236,16 +268,21 @@ export const StoreDetailsScreen = () => {
 
           {/* ====== HOURS ====== */}
           <section>
-            <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-neutral-400">Hours</h2>
+            <h2 className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+              Hours
+              {hasHoursData && <CheckCircle2 className="h-4 w-4 text-brand-primary-500" />}
+            </h2>
             <HoursSection
               hours={store.businessHours}
               onChange={(h: BusinessHours) => updateStore({ businessHours: h })}
               isFoodTruck={store.isFoodTruck}
+              holidayHours={store.holidayHours || []}
+              onHolidayHoursChange={(entries) => updateStore({ holidayHours: entries })}
             />
           </section>
 
           {/* ====== FEATURES & PHOTOS (accordion) ====== */}
-          <AccordionSection title="Features & Photos" defaultOpen={hasFeatures || hasPhotos}>
+          <AccordionSection title="Features & Photos" defaultOpen={hasFeatures || hasPhotos} completed={hasFeatures || hasPhotos}>
             <div className="space-y-6">
               {/* Features */}
               <div>

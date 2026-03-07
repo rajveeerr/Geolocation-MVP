@@ -6,6 +6,16 @@ import { Label } from '@/components/ui/label';
 import { Phone, Mail, Copy, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// Phone formatting utilities
+const formatPhoneDisplay = (value: string) => {
+  const digits = value.replace(/\D/g, '').slice(0, 10);
+  if (digits.length === 0) return '';
+  if (digits.length <= 3) return `(${digits}`;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+};
+const stripPhoneToDigits = (value: string) => value.replace(/\D/g, '').slice(0, 10);
+
 interface StoreContactStepProps {
   data: { phoneNumber: string; email?: string };
   onUpdate: (data: Partial<{ phoneNumber: string; email?: string }>) => void;
@@ -81,10 +91,11 @@ export const StoreContactStep = ({
             <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
             <Input
               id="phoneNumber"
-              type="tel"
+              type="text"
+              inputMode="numeric"
               placeholder="(555) 123-4567"
-              value={data.phoneNumber}
-              onChange={(e) => onUpdate({ phoneNumber: e.target.value })}
+              value={formatPhoneDisplay(data.phoneNumber || '')}
+              onChange={(e) => onUpdate({ phoneNumber: stripPhoneToDigits(e.target.value) })}
               className="pl-10 h-12"
             />
           </div>

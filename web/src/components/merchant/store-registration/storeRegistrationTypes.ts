@@ -7,6 +7,14 @@ export interface BusinessHours {
   [key: string]: { open: string; close: string; closed: boolean };
 }
 
+export interface HolidayHoursEntry {
+  date: string; // YYYY-MM-DD
+  open: string;
+  close: string;
+  closed: boolean;
+  label?: string; // e.g. "Christmas", "July 4th"
+}
+
 export interface StoreWizardData {
   businessName: string;
   address: string;
@@ -32,6 +40,7 @@ export interface StoreWizardData {
   galleryUrls: string[];
   isFoodTruck: boolean;
   active: boolean;
+  holidayHours?: HolidayHoursEntry[];
 }
 
 export const defaultBusinessHours: BusinessHours = {
@@ -62,6 +71,7 @@ export function getDefaultFirstStore(): StoreWizardData {
     galleryUrls: [],
     isFoodTruck: false,
     active: true,
+    holidayHours: [],
   };
 }
 
