@@ -41,7 +41,7 @@ const WIZARD_STEPS = [
   { id: 'hours-weekend', title: 'Weekend Hours', description: 'Sat-Sun', icon: Clock },
   { id: 'features', title: 'Features', description: 'Amenities', icon: Wifi },
   { id: 'extras', title: 'Extras', description: 'Food truck, description', icon: Building2 },
-  { id: 'photos', title: 'Photos', description: 'Add photos', icon: Image },
+  { id: 'photos', title: 'Photos', description: 'Add photos/videos', icon: Image },
   { id: 'review', title: 'Review', description: 'Confirm & create', icon: Eye },
 ] as const;
 

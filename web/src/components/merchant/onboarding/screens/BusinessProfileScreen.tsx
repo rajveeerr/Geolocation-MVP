@@ -660,7 +660,7 @@ export const BusinessProfileScreen = () => {
 
               {/* Gallery */}
               <div>
-                <h3 className="text-sm font-medium text-neutral-700">Gallery photos</h3>
+                <h3 className="text-sm font-medium text-neutral-700">Featured photos</h3>
                 <p className="text-xs text-neutral-500">Showcase your venue</p>
                 <div className="mt-2">
                   {state.galleryUrls.length > 0 ? (

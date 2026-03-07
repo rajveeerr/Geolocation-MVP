@@ -320,7 +320,7 @@ export const StoreDetailsScreen = () => {
 
               {/* Store photos */}
               <div>
-                <Label className="text-sm font-medium text-neutral-700">Store photos</Label>
+                <Label className="text-sm font-medium text-neutral-700">Store photos/videos</Label>
                 <p className="text-xs text-neutral-500">Photos help customers find you. You can add more later.</p>
                 <div className="mt-2">
                   {(store.galleryUrls?.length ?? 0) > 0 ? (
@@ -347,7 +347,7 @@ export const StoreDetailsScreen = () => {
                   ) : (
                     <button type="button" onClick={() => setPhotosModalOpen(true)} className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-neutral-300 py-6 text-sm text-neutral-500 hover:bg-neutral-50">
                       <Plus className="h-5 w-5" />
-                      Add store photos
+                      Add store photos/videos
                     </button>
                   )}
                 </div>
