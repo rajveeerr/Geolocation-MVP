@@ -62,10 +62,13 @@ export const OnboardingLayout = ({
       {/* Minimal navbar */}
       <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-neutral-200 bg-white px-4 md:px-6">
         <Logo />
+
+        {/* Centered Step Indicator */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-base sm:text-lg text-neutral-900 tracking-tight whitespace-nowrap">
+          Step {currentStep + 1} of {TOTAL_STEPS} <span className="text-neutral-400 mx-1 font-normal">—</span> {getStepLabel(currentStep)}
+        </div>
+
         <div className="flex items-center gap-3">
-          <span className="hidden text-sm text-neutral-500 sm:block">
-            Step {currentStep + 1} of {TOTAL_STEPS} — {getStepLabel(currentStep)}
-          </span>
           <Link
             to={PATHS.MERCHANT_DASHBOARD}
             className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"

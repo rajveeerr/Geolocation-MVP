@@ -18,7 +18,7 @@ import {
   Utensils, ShoppingBag, Briefcase, Music2, Heart, MoreHorizontal,
   Phone, Mail, Copy, Check, Plus, X,
   Wifi, Car, CreditCard, Users, ExternalLink,
-  CheckCircle2,
+  CheckCircle2, Sparkles,
 } from 'lucide-react';
 
 // Phone formatting utilities
@@ -321,7 +321,13 @@ export const StoreDetailsScreen = () => {
               {/* Store photos */}
               <div>
                 <Label className="text-sm font-medium text-neutral-700">Store photos/videos</Label>
-                <p className="text-xs text-neutral-500">Photos help customers find you. You can add more later.</p>
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs text-neutral-500">Photos help customers find you. You can add more later.</p>
+                  <div className="flex items-center gap-1.5 rounded-md bg-amber-50 px-2 py-1 text-[10px] font-medium text-amber-800 ring-1 ring-inset ring-amber-600/20 w-fit">
+                    <Sparkles className="h-3 w-3" />
+                    Premium merchants can also add short videos
+                  </div>
+                </div>
                 <div className="mt-2">
                   {(store.galleryUrls?.length ?? 0) > 0 ? (
                     <div className="grid grid-cols-4 gap-2">
