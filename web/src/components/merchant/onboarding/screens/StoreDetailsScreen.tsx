@@ -18,6 +18,7 @@ import {
   Utensils, ShoppingBag, Briefcase, Music2, Heart, MoreHorizontal,
   Phone, Mail, Copy, Check, Plus, X,
   Wifi, Car, CreditCard, Users, ExternalLink,
+  CheckCircle2,
 } from 'lucide-react';
 
 // Phone formatting utilities
@@ -104,6 +105,10 @@ export const StoreDetailsScreen = () => {
 
   const hasFeatures = (store.features?.length ?? 0) > 0;
   const hasPhotos = (store.galleryUrls?.length ?? 0) > 0;
+  const hasHoursData = Object.values(store.businessHours || {}).some(h => !h.closed);
+  const hasLocationData = !!(store.address && store.cityId);
+  const hasStoreInfoData = (store.businessName || '').trim().length > 0;
+  const hasContactDataLocal = (store.phoneNumber || '').trim().length > 0;
 
   return (
     <OnboardingLayout
