@@ -20,8 +20,8 @@ export const LineChart: React.FC<LineChartProps> = ({
 }) => {
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white p-6 rounded-lg border shadow-sm">
-        <h3 className="text-lg font-semibold text-neutral-900 mb-4">{title}</h3>
+      <div className="bg-white p-6 rounded-2xl border border-neutral-200/60 shadow-sm">
+        <h3 className="text-base font-bold font-heading text-neutral-900 mb-4">{title}</h3>
         <div className="flex items-center justify-center h-48 text-neutral-500">
           No data available
         </div>
@@ -55,8 +55,8 @@ export const LineChart: React.FC<LineChartProps> = ({
   const areaPathData = `${pathData} L ${points[points.length - 1].x} ${padding + chartHeight} L ${points[0].x} ${padding + chartHeight} Z`;
 
   return (
-    <div className="bg-white p-6 rounded-lg border shadow-sm">
-      <h3 className="text-lg font-semibold text-neutral-900 mb-4">{title}</h3>
+    <div className="bg-white p-6 rounded-2xl border border-neutral-200/60 shadow-sm">
+      <h3 className="text-base font-bold font-heading text-neutral-900 mb-4">{title}</h3>
       <div className="relative">
         <svg width={chartWidth} height={height} className="w-full">
           {/* Grid lines */}

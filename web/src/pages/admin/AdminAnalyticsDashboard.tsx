@@ -125,7 +125,7 @@ export const AdminAnalyticsDashboard = () => {
       case 'down':
         return <TrendingDown className="h-4 w-4 text-red-500" />;
       default:
-        return <span className="text-gray-400">—</span>;
+        return <span className="text-neutral-400">—</span>;
     }
   };
 
@@ -136,23 +136,23 @@ export const AdminAnalyticsDashboard = () => {
       case 'down':
         return 'text-red-600';
       default:
-        return 'text-gray-600';
+        return 'text-neutral-500';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="space-y-6">
+      <div>
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Admin Analytics Dashboard</h1>
-          <p className="text-gray-600">Comprehensive insights into platform performance</p>
+          <h1 className="text-2xl font-bold font-heading text-neutral-900 mb-1">Analytics Dashboard</h1>
+          <p className="text-sm text-neutral-500">Comprehensive insights into platform performance</p>
         </div>
 
         {/* Controls */}
         <div className="mb-6 flex gap-4">
           <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-48 rounded-xl border-neutral-200">
               <SelectValue placeholder="Select period" />
             </SelectTrigger>
             <SelectContent>
@@ -193,9 +193,9 @@ export const AdminAnalyticsDashboard = () => {
                       </CardHeader>
                       <CardContent>
                         <div className="text-center">
-                          <h3 className="text-xl font-bold">{performanceOverview.overview.topPerformingCity.name}</h3>
-                          <p className="text-gray-600">{formatNumber(performanceOverview.overview.topPerformingCity.revenue)} revenue</p>
-                          <p className="text-sm text-gray-500">{formatCount(performanceOverview.overview.topPerformingCity.transactions)} transactions</p>
+                          <h3 className="text-xl font-bold font-heading">{performanceOverview.overview.topPerformingCity.name}</h3>
+                          <p className="text-neutral-500">{formatNumber(performanceOverview.overview.topPerformingCity.revenue)} revenue</p>
+                          <p className="text-sm text-neutral-500">{formatCount(performanceOverview.overview.topPerformingCity.transactions)} transactions</p>
                         </div>
                       </CardContent>
                     </Card>
@@ -209,9 +209,9 @@ export const AdminAnalyticsDashboard = () => {
                       </CardHeader>
                       <CardContent>
                         <div className="text-center">
-                          <h3 className="text-xl font-bold">{performanceOverview.overview.topPerformingMerchant.name}</h3>
-                          <p className="text-gray-600">{formatNumber(performanceOverview.overview.topPerformingMerchant.revenue)} revenue</p>
-                          <p className="text-sm text-gray-500">{formatCount(performanceOverview.overview.topPerformingMerchant.transactions)} transactions</p>
+                          <h3 className="text-xl font-bold font-heading">{performanceOverview.overview.topPerformingMerchant.name}</h3>
+                          <p className="text-neutral-500">{formatNumber(performanceOverview.overview.topPerformingMerchant.revenue)} revenue</p>
+                          <p className="text-sm text-neutral-500">{formatCount(performanceOverview.overview.topPerformingMerchant.transactions)} transactions</p>
                         </div>
                       </CardContent>
                     </Card>
@@ -225,9 +225,9 @@ export const AdminAnalyticsDashboard = () => {
                       </CardHeader>
                       <CardContent>
                         <div className="text-center">
-                          <h3 className="text-xl font-bold">{performanceOverview.overview.topPerformingCategory.name}</h3>
-                          <p className="text-gray-600">{formatNumber(performanceOverview.overview.topPerformingCategory.revenue)} revenue</p>
-                          <p className="text-sm text-gray-500">{formatCount(performanceOverview.overview.topPerformingCategory.transactions)} transactions</p>
+                          <h3 className="text-xl font-bold font-heading">{performanceOverview.overview.topPerformingCategory.name}</h3>
+                          <p className="text-neutral-500">{formatNumber(performanceOverview.overview.topPerformingCategory.revenue)} revenue</p>
+                          <p className="text-sm text-neutral-500">{formatCount(performanceOverview.overview.topPerformingCategory.transactions)} transactions</p>
                         </div>
                       </CardContent>
                     </Card>
@@ -252,22 +252,22 @@ export const AdminAnalyticsDashboard = () => {
                         <div className="space-y-4">
                           <div className="grid grid-cols-2 gap-4">
                             <div className="text-center">
-                              <p className="text-2xl font-bold text-yellow-600">{formatCount(tapInsOverview.overview.totalTapIns)}</p>
-                              <p className="text-sm text-gray-600">Total Tap-ins</p>
+                              <p className="text-2xl font-bold font-heading text-yellow-600">{formatCount(tapInsOverview.overview.totalTapIns)}</p>
+                              <p className="text-sm text-neutral-500">Total Tap-ins</p>
                             </div>
                             <div className="text-center">
-                              <p className="text-2xl font-bold text-blue-600">{formatCount(tapInsOverview.overview.uniqueUsers)}</p>
-                              <p className="text-sm text-gray-600">Unique Users</p>
+                              <p className="text-2xl font-bold font-heading text-blue-600">{formatCount(tapInsOverview.overview.uniqueUsers)}</p>
+                              <p className="text-sm text-neutral-500">Unique Users</p>
                             </div>
                           </div>
                           <div className="pt-2 border-t">
-                            <p className="text-sm text-gray-500 text-center">
+                            <p className="text-sm text-neutral-500 text-center">
                               {formatCount(tapInsOverview.overview.totalMerchants)} merchants across {formatCount(tapInsOverview.overview.totalCities)} cities
                             </p>
                           </div>
                         </div>
                       ) : (
-                        <div className="text-center py-4 text-gray-500">No tap-ins data available</div>
+                        <div className="text-center py-4 text-neutral-500">No tap-ins data available</div>
                       )}
                     </CardContent>
                   </Card>
@@ -288,22 +288,22 @@ export const AdminAnalyticsDashboard = () => {
                         <div className="space-y-4">
                           <div className="grid grid-cols-2 gap-4">
                             <div className="text-center">
-                              <p className="text-2xl font-bold text-red-600">{formatCount(bountiesOverview.overview.totalBounties)}</p>
-                              <p className="text-sm text-gray-600">Total Bounties</p>
+                              <p className="text-2xl font-bold font-heading text-red-600">{formatCount(bountiesOverview.overview.totalBounties)}</p>
+                              <p className="text-sm text-neutral-500">Total Bounties</p>
                             </div>
                             <div className="text-center">
-                              <p className="text-2xl font-bold text-green-600">{formatNumber(bountiesOverview.overview.totalBountyValue)}</p>
-                              <p className="text-sm text-gray-600">Total Value</p>
+                              <p className="text-2xl font-bold font-heading text-green-600">{formatNumber(bountiesOverview.overview.totalBountyValue)}</p>
+                              <p className="text-sm text-neutral-500">Total Value</p>
                             </div>
                           </div>
                           <div className="pt-2 border-t">
-                            <p className="text-sm text-gray-500 text-center">
+                            <p className="text-sm text-neutral-500 text-center">
                               {formatCount(bountiesOverview.overview.totalBountyClaims)} claims by {formatCount(bountiesOverview.overview.totalBountyWinners)} winners
                             </p>
                           </div>
                         </div>
                       ) : (
-                        <div className="text-center py-4 text-gray-500">No bounties data available</div>
+                        <div className="text-center py-4 text-neutral-500">No bounties data available</div>
                       )}
                     </CardContent>
                   </Card>
@@ -318,23 +318,23 @@ export const AdminAnalyticsDashboard = () => {
           {/* Performance Tab */}
           <TabsContent value="performance" className="space-y-6">
             {/* Quick Navigation to Detailed Analytics */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-5 mb-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-blue-900">Detailed Analytics Available</h3>
-                  <p className="text-sm text-blue-700">Click on the tabs above to view comprehensive Tap-ins and Bounties analytics</p>
+                  <h3 className="text-base font-bold font-heading text-blue-900">Detailed Analytics Available</h3>
+                  <p className="text-sm text-blue-600">Click on the tabs above to view comprehensive Tap-ins and Bounties analytics</p>
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setActiveTab('tapins')}
-                    className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors flex items-center gap-2"
+                    className="px-4 py-2 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition-colors flex items-center gap-2 text-sm font-medium"
                   >
                     <Zap className="h-4 w-4" />
                     View Tap-ins
                   </button>
                   <button
                     onClick={() => setActiveTab('bounties')}
-                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center gap-2"
+                    className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors flex items-center gap-2 text-sm font-medium"
                   >
                     <Trophy className="h-4 w-4" />
                     View Bounties
@@ -361,22 +361,22 @@ export const AdminAnalyticsDashboard = () => {
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="text-center">
-                          <p className="text-2xl font-bold text-yellow-600">{formatCount(tapInsOverview.overview.totalTapIns)}</p>
-                          <p className="text-sm text-gray-600">Total Tap-ins</p>
+                          <p className="text-2xl font-bold font-heading text-yellow-600">{formatCount(tapInsOverview.overview.totalTapIns)}</p>
+                          <p className="text-sm text-neutral-500">Total Tap-ins</p>
                         </div>
                         <div className="text-center">
-                          <p className="text-2xl font-bold text-blue-600">{formatCount(tapInsOverview.overview.uniqueUsers)}</p>
-                          <p className="text-sm text-gray-600">Unique Users</p>
+                          <p className="text-2xl font-bold font-heading text-blue-600">{formatCount(tapInsOverview.overview.uniqueUsers)}</p>
+                          <p className="text-sm text-neutral-500">Unique Users</p>
                         </div>
                       </div>
                       <div className="pt-2 border-t">
-                        <p className="text-sm text-gray-500 text-center">
+                        <p className="text-sm text-neutral-500 text-center">
                           {formatCount(tapInsOverview.overview.totalMerchants)} merchants across {formatCount(tapInsOverview.overview.totalCities)} cities
                         </p>
                       </div>
                     </div>
                   ) : (
-                    <div className="text-center py-4 text-gray-500">No tap-ins data available</div>
+                    <div className="text-center py-4 text-neutral-500">No tap-ins data available</div>
                   )}
                 </CardContent>
               </Card>
@@ -397,22 +397,22 @@ export const AdminAnalyticsDashboard = () => {
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="text-center">
-                          <p className="text-2xl font-bold text-red-600">{formatCount(bountiesOverview.overview.totalBounties)}</p>
-                          <p className="text-sm text-gray-600">Total Bounties</p>
+                          <p className="text-2xl font-bold font-heading text-red-600">{formatCount(bountiesOverview.overview.totalBounties)}</p>
+                          <p className="text-sm text-neutral-500">Total Bounties</p>
                         </div>
                         <div className="text-center">
-                          <p className="text-2xl font-bold text-green-600">{formatNumber(bountiesOverview.overview.totalBountyValue)}</p>
-                          <p className="text-sm text-gray-600">Total Value</p>
+                          <p className="text-2xl font-bold font-heading text-green-600">{formatNumber(bountiesOverview.overview.totalBountyValue)}</p>
+                          <p className="text-sm text-neutral-500">Total Value</p>
                         </div>
                       </div>
                       <div className="pt-2 border-t">
-                        <p className="text-sm text-gray-500 text-center">
+                        <p className="text-sm text-neutral-500 text-center">
                           {formatCount(bountiesOverview.overview.totalBountyClaims)} claims by {formatCount(bountiesOverview.overview.totalBountyWinners)} winners
                         </p>
                       </div>
                     </div>
                   ) : (
-                    <div className="text-center py-4 text-gray-500">No bounties data available</div>
+                    <div className="text-center py-4 text-neutral-500">No bounties data available</div>
                   )}
                 </CardContent>
               </Card>
@@ -433,17 +433,17 @@ export const AdminAnalyticsDashboard = () => {
                   ) : (
                     <div className="space-y-3">
                       {topCities?.cities?.slice(0, 10).map((city, index) => (
-                        <div key={city.city.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                        <div key={city.city.id} className="flex items-center justify-between p-3 rounded-xl bg-neutral-50/50">
                           <div className="flex items-center gap-3">
-                            <span className="text-sm font-bold text-gray-600">#{index + 1}</span>
+                            <span className="text-sm font-bold text-neutral-500">#{index + 1}</span>
                             <div>
                               <h4 className="font-semibold">{city.city.name}</h4>
-                              <p className="text-sm text-gray-600">{city.city.state}, {city.city.country}</p>
+                              <p className="text-sm text-neutral-500">{city.city.state}, {city.city.country}</p>
                             </div>
                           </div>
                           <div className="text-right">
                             <p className="font-semibold">{formatNumber(city.totalRevenue)}</p>
-                            <p className="text-sm text-gray-600">{formatCount(city.totalTransactions)} txns</p>
+                            <p className="text-sm text-neutral-500">{formatCount(city.totalTransactions)} txns</p>
                           </div>
                         </div>
                       ))}
@@ -466,17 +466,17 @@ export const AdminAnalyticsDashboard = () => {
                   ) : (
                     <div className="space-y-3">
                       {topMerchants?.merchants?.slice(0, 10).map((merchant, index) => (
-                        <div key={merchant.merchant.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                        <div key={merchant.merchant.id} className="flex items-center justify-between p-3 rounded-xl bg-neutral-50/50">
                           <div className="flex items-center gap-3">
-                            <span className="text-sm font-bold text-gray-600">#{index + 1}</span>
+                            <span className="text-sm font-bold text-neutral-500">#{index + 1}</span>
                             <div>
                               <h4 className="font-semibold">{merchant.merchant.name}</h4>
-                              <p className="text-sm text-gray-600">{merchant.merchant.city.name}</p>
+                              <p className="text-sm text-neutral-500">{merchant.merchant.city.name}</p>
                             </div>
                           </div>
                           <div className="text-right">
                             <p className="font-semibold">{formatNumber(merchant.totalRevenue)}</p>
-                            <p className="text-sm text-gray-600">{formatCount(merchant.totalTransactions)} txns</p>
+                            <p className="text-sm text-neutral-500">{formatCount(merchant.totalTransactions)} txns</p>
                           </div>
                         </div>
                       ))}
@@ -500,25 +500,25 @@ export const AdminAnalyticsDashboard = () => {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {topCategories?.categories?.map((category) => (
-                      <div key={category.category.id} className="p-4 rounded-lg border bg-white">
+                      <div key={category.category.id} className="p-4 rounded-xl border border-neutral-200/60 bg-white">
                         <div className="flex items-center gap-3 mb-3">
                           <span className="text-2xl">{category.category.icon}</span>
                           <div>
                             <h4 className="font-semibold">{category.category.name}</h4>
-                            <p className="text-sm text-gray-600">{formatCount(category.totalActiveMerchants)} merchants</p>
+                            <p className="text-sm text-neutral-500">{formatCount(category.totalActiveMerchants)} merchants</p>
                           </div>
                         </div>
                         <div className="space-y-2">
                           <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">Revenue:</span>
+                            <span className="text-sm text-neutral-500">Revenue:</span>
                             <span className="font-semibold">{formatNumber(category.totalRevenue)}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">Transactions:</span>
+                            <span className="text-sm text-neutral-500">Transactions:</span>
                             <span className="font-semibold">{formatCount(category.totalTransactions)}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">Customers:</span>
+                            <span className="text-sm text-neutral-500">Customers:</span>
                             <span className="font-semibold">{formatCount(category.totalCustomers)}</span>
                           </div>
                         </div>
@@ -544,8 +544,8 @@ export const AdminAnalyticsDashboard = () => {
                         <div className="flex items-center gap-2">
                           <Users className="h-5 w-5 text-blue-500" />
                           <div>
-                            <p className="text-sm text-gray-600">Total Customers</p>
-                            <p className="text-2xl font-bold">{formatCount(customerOverview.overview.totalCustomers)}</p>
+                            <p className="text-sm text-neutral-500">Total Customers</p>
+                            <p className="text-2xl font-bold font-heading">{formatCount(customerOverview.overview.totalCustomers)}</p>
                           </div>
                         </div>
                       </CardContent>
@@ -556,8 +556,8 @@ export const AdminAnalyticsDashboard = () => {
                         <div className="flex items-center gap-2">
                           <UserCheck className="h-5 w-5 text-green-500" />
                           <div>
-                            <p className="text-sm text-gray-600">Active Customers</p>
-                            <p className="text-2xl font-bold">{formatCount(customerOverview.overview.activeCustomers)}</p>
+                            <p className="text-sm text-neutral-500">Active Customers</p>
+                            <p className="text-2xl font-bold font-heading">{formatCount(customerOverview.overview.activeCustomers)}</p>
                           </div>
                         </div>
                       </CardContent>
@@ -568,8 +568,8 @@ export const AdminAnalyticsDashboard = () => {
                         <div className="flex items-center gap-2">
                           <DollarSign className="h-5 w-5 text-purple-500" />
                           <div>
-                            <p className="text-sm text-gray-600">Avg Customer Value</p>
-                            <p className="text-2xl font-bold">{formatNumber(customerOverview.overview.averageCustomerValue)}</p>
+                            <p className="text-sm text-neutral-500">Avg Customer Value</p>
+                            <p className="text-2xl font-bold font-heading">{formatNumber(customerOverview.overview.averageCustomerValue)}</p>
                           </div>
                         </div>
                       </CardContent>
@@ -580,8 +580,8 @@ export const AdminAnalyticsDashboard = () => {
                         <div className="flex items-center gap-2">
                           <Activity className="h-5 w-5 text-orange-500" />
                           <div>
-                            <p className="text-sm text-gray-600">Retention Rate</p>
-                            <p className="text-2xl font-bold">{(customerOverview.overview.customerRetentionRate * 100).toFixed(1)}%</p>
+                            <p className="text-sm text-neutral-500">Retention Rate</p>
+                            <p className="text-2xl font-bold font-heading">{(customerOverview.overview.customerRetentionRate * 100).toFixed(1)}%</p>
                           </div>
                         </div>
                       </CardContent>
@@ -594,8 +594,8 @@ export const AdminAnalyticsDashboard = () => {
                           <div className="flex items-center gap-2">
                             <Zap className="h-5 w-5 text-yellow-500" />
                             <div>
-                              <p className="text-sm text-gray-600">Total Tap-ins</p>
-                              <p className="text-2xl font-bold">{formatCount(tapInsOverview.overview.totalTapIns)}</p>
+                              <p className="text-sm text-neutral-500">Total Tap-ins</p>
+                              <p className="text-2xl font-bold font-heading">{formatCount(tapInsOverview.overview.totalTapIns)}</p>
                             </div>
                           </div>
                         </CardContent>
@@ -609,8 +609,8 @@ export const AdminAnalyticsDashboard = () => {
                           <div className="flex items-center gap-2">
                             <Trophy className="h-5 w-5 text-yellow-600" />
                             <div>
-                              <p className="text-sm text-gray-600">Total Bounties</p>
-                              <p className="text-2xl font-bold">{formatCount(bountiesOverview.overview.totalBounties)}</p>
+                              <p className="text-sm text-neutral-500">Total Bounties</p>
+                              <p className="text-2xl font-bold font-heading">{formatCount(bountiesOverview.overview.totalBounties)}</p>
                             </div>
                           </div>
                         </CardContent>
@@ -630,17 +630,17 @@ export const AdminAnalyticsDashboard = () => {
                     ) : (
                       <div className="space-y-3">
                         {customers?.customers?.slice(0, 20).map((customer) => (
-                          <div key={customer.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                          <div key={customer.id} className="flex items-center justify-between p-3 rounded-xl bg-neutral-50/50">
                             <div>
                               <h4 className="font-semibold">{customer.name}</h4>
-                              <p className="text-sm text-gray-600">{customer.email}</p>
+                              <p className="text-sm text-neutral-500">{customer.email}</p>
                               {customer.city && (
-                                <p className="text-sm text-gray-500">{customer.city.name}</p>
+                                <p className="text-sm text-neutral-500">{customer.city.name}</p>
                               )}
                             </div>
                             <div className="text-right">
                               <p className="font-semibold">{formatNumber(customer.totalSpent)}</p>
-                              <p className="text-sm text-gray-600">{formatCount(customer.kickbackEvents)} kickbacks</p>
+                              <p className="text-sm text-neutral-500">{formatCount(customer.kickbackEvents)} kickbacks</p>
                             </div>
                           </div>
                         ))}
@@ -663,8 +663,8 @@ export const AdminAnalyticsDashboard = () => {
                     <div className="flex items-center gap-2">
                       <Building2 className="h-5 w-5 text-blue-500" />
                       <div>
-                        <p className="text-sm text-gray-600">Total Merchants</p>
-                        <p className="text-2xl font-bold">{formatCount(performanceOverview.overview.totalActiveMerchants)}</p>
+                        <p className="text-sm text-neutral-500">Total Merchants</p>
+                        <p className="text-2xl font-bold font-heading">{formatCount(performanceOverview.overview.totalActiveMerchants)}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -678,8 +678,8 @@ export const AdminAnalyticsDashboard = () => {
                     <div className="flex items-center gap-2">
                       <DollarSign className="h-5 w-5 text-green-500" />
                       <div>
-                        <p className="text-sm text-gray-600">Total Revenue</p>
-                        <p className="text-2xl font-bold">{formatNumber(performanceOverview.overview.totalRevenue)}</p>
+                        <p className="text-sm text-neutral-500">Total Revenue</p>
+                        <p className="text-2xl font-bold font-heading">{formatNumber(performanceOverview.overview.totalRevenue)}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -693,8 +693,8 @@ export const AdminAnalyticsDashboard = () => {
                     <div className="flex items-center gap-2">
                       <Zap className="h-5 w-5 text-yellow-500" />
                       <div>
-                        <p className="text-sm text-gray-600">Total Tap-ins</p>
-                        <p className="text-2xl font-bold">{formatCount(tapInsOverview.overview.totalTapIns)}</p>
+                        <p className="text-sm text-neutral-500">Total Tap-ins</p>
+                        <p className="text-2xl font-bold font-heading">{formatCount(tapInsOverview.overview.totalTapIns)}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -708,8 +708,8 @@ export const AdminAnalyticsDashboard = () => {
                     <div className="flex items-center gap-2">
                       <Trophy className="h-5 w-5 text-yellow-600" />
                       <div>
-                        <p className="text-sm text-gray-600">Total Bounties</p>
-                        <p className="text-2xl font-bold">{formatCount(bountiesOverview.overview.totalBounties)}</p>
+                        <p className="text-sm text-neutral-500">Total Bounties</p>
+                        <p className="text-2xl font-bold font-heading">{formatCount(bountiesOverview.overview.totalBounties)}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -730,19 +730,19 @@ export const AdminAnalyticsDashboard = () => {
                 ) : (
                   <div className="space-y-3">
                     {salesByStore?.stores?.slice(0, 20).map((store, index) => (
-                      <div key={store.merchant.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                      <div key={store.merchant.id} className="flex items-center justify-between p-3 rounded-xl bg-neutral-50/50">
                         <div className="flex items-center gap-3">
-                          <span className="text-sm font-bold text-gray-600">#{index + 1}</span>
+                          <span className="text-sm font-bold text-neutral-500">#{index + 1}</span>
                           <div>
                             <h4 className="font-semibold">{store.merchant.name}</h4>
-                            <p className="text-sm text-gray-600">{store.merchant.city.name}</p>
-                            <p className="text-sm text-gray-500">{store.merchant.category.name}</p>
+                            <p className="text-sm text-neutral-500">{store.merchant.city.name}</p>
+                            <p className="text-sm text-neutral-500">{store.merchant.category.name}</p>
                           </div>
                         </div>
                         <div className="text-right">
                           <p className="font-semibold">{formatNumber(store.totalRevenue)}</p>
-                          <p className="text-sm text-gray-600">{formatCount(store.totalTransactions)} txns</p>
-                          <p className="text-sm text-gray-500">{formatCount(store.totalCustomers)} customers</p>
+                          <p className="text-sm text-neutral-500">{formatCount(store.totalTransactions)} txns</p>
+                          <p className="text-sm text-neutral-500">{formatCount(store.totalCustomers)} customers</p>
                         </div>
                       </div>
                     ))}
@@ -766,8 +766,8 @@ export const AdminAnalyticsDashboard = () => {
                         <div className="flex items-center gap-2">
                           <Zap className="h-5 w-5 text-yellow-500" />
                           <div>
-                            <p className="text-sm text-gray-600">Total Tap-ins</p>
-                            <p className="text-2xl font-bold">{formatCount(tapInsOverview.overview.totalTapIns)}</p>
+                            <p className="text-sm text-neutral-500">Total Tap-ins</p>
+                            <p className="text-2xl font-bold font-heading">{formatCount(tapInsOverview.overview.totalTapIns)}</p>
                           </div>
                         </div>
                       </CardContent>
@@ -778,8 +778,8 @@ export const AdminAnalyticsDashboard = () => {
                         <div className="flex items-center gap-2">
                           <Users className="h-5 w-5 text-blue-500" />
                           <div>
-                            <p className="text-sm text-gray-600">Unique Users</p>
-                            <p className="text-2xl font-bold">{formatCount(tapInsOverview.overview.uniqueUsers)}</p>
+                            <p className="text-sm text-neutral-500">Unique Users</p>
+                            <p className="text-2xl font-bold font-heading">{formatCount(tapInsOverview.overview.uniqueUsers)}</p>
                           </div>
                         </div>
                       </CardContent>
@@ -790,8 +790,8 @@ export const AdminAnalyticsDashboard = () => {
                         <div className="flex items-center gap-2">
                           <Building2 className="h-5 w-5 text-green-500" />
                           <div>
-                            <p className="text-sm text-gray-600">Total Merchants</p>
-                            <p className="text-2xl font-bold">{formatCount(tapInsOverview.overview.totalMerchants)}</p>
+                            <p className="text-sm text-neutral-500">Total Merchants</p>
+                            <p className="text-2xl font-bold font-heading">{formatCount(tapInsOverview.overview.totalMerchants)}</p>
                           </div>
                         </div>
                       </CardContent>
@@ -802,8 +802,8 @@ export const AdminAnalyticsDashboard = () => {
                         <div className="flex items-center gap-2">
                           <MapPin className="h-5 w-5 text-purple-500" />
                           <div>
-                            <p className="text-sm text-gray-600">Total Cities</p>
-                            <p className="text-2xl font-bold">{formatCount(tapInsOverview.overview.totalCities)}</p>
+                            <p className="text-sm text-neutral-500">Total Cities</p>
+                            <p className="text-2xl font-bold font-heading">{formatCount(tapInsOverview.overview.totalCities)}</p>
                           </div>
                         </div>
                       </CardContent>
@@ -825,18 +825,18 @@ export const AdminAnalyticsDashboard = () => {
                     ) : (
                       <div className="space-y-3">
                         {tapInsGeographic?.geographic?.slice(0, 20).map((geo, index) => (
-                          <div key={geo.city.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                          <div key={geo.city.id} className="flex items-center justify-between p-3 rounded-xl bg-neutral-50/50">
                             <div className="flex items-center gap-3">
-                              <span className="text-sm font-bold text-gray-600">#{index + 1}</span>
+                              <span className="text-sm font-bold text-neutral-500">#{index + 1}</span>
                               <div>
                                 <h4 className="font-semibold">{geo.city.name}</h4>
-                                <p className="text-sm text-gray-600">{geo.city.state}, {geo.city.country}</p>
+                                <p className="text-sm text-neutral-500">{geo.city.state}, {geo.city.country}</p>
                               </div>
                             </div>
                             <div className="text-right">
                               <p className="font-semibold">{formatCount(geo.tapIns)}</p>
-                              <p className="text-sm text-gray-600">{formatCount(geo.uniqueUsers)} users</p>
-                              <p className="text-sm text-gray-500">{formatCount(geo.merchants)} merchants</p>
+                              <p className="text-sm text-neutral-500">{formatCount(geo.uniqueUsers)} users</p>
+                              <p className="text-sm text-neutral-500">{formatCount(geo.merchants)} merchants</p>
                             </div>
                           </div>
                         ))}
@@ -862,8 +862,8 @@ export const AdminAnalyticsDashboard = () => {
                         <div className="flex items-center gap-2">
                           <Target className="h-5 w-5 text-red-500" />
                           <div>
-                            <p className="text-sm text-gray-600">Total Bounties</p>
-                            <p className="text-2xl font-bold">{formatCount(bountiesOverview.overview.totalBounties)}</p>
+                            <p className="text-sm text-neutral-500">Total Bounties</p>
+                            <p className="text-2xl font-bold font-heading">{formatCount(bountiesOverview.overview.totalBounties)}</p>
                           </div>
                         </div>
                       </CardContent>
@@ -874,8 +874,8 @@ export const AdminAnalyticsDashboard = () => {
                         <div className="flex items-center gap-2">
                           <DollarSign className="h-5 w-5 text-green-500" />
                           <div>
-                            <p className="text-sm text-gray-600">Total Value</p>
-                            <p className="text-2xl font-bold">{formatNumber(bountiesOverview.overview.totalBountyValue)}</p>
+                            <p className="text-sm text-neutral-500">Total Value</p>
+                            <p className="text-2xl font-bold font-heading">{formatNumber(bountiesOverview.overview.totalBountyValue)}</p>
                           </div>
                         </div>
                       </CardContent>
@@ -886,8 +886,8 @@ export const AdminAnalyticsDashboard = () => {
                         <div className="flex items-center gap-2">
                           <Activity className="h-5 w-5 text-blue-500" />
                           <div>
-                            <p className="text-sm text-gray-600">Total Claims</p>
-                            <p className="text-2xl font-bold">{formatCount(bountiesOverview.overview.totalBountyClaims)}</p>
+                            <p className="text-sm text-neutral-500">Total Claims</p>
+                            <p className="text-2xl font-bold font-heading">{formatCount(bountiesOverview.overview.totalBountyClaims)}</p>
                           </div>
                         </div>
                       </CardContent>
@@ -898,8 +898,8 @@ export const AdminAnalyticsDashboard = () => {
                         <div className="flex items-center gap-2">
                           <Users className="h-5 w-5 text-purple-500" />
                           <div>
-                            <p className="text-sm text-gray-600">Total Winners</p>
-                            <p className="text-2xl font-bold">{formatCount(bountiesOverview.overview.totalBountyWinners)}</p>
+                            <p className="text-sm text-neutral-500">Total Winners</p>
+                            <p className="text-2xl font-bold font-heading">{formatCount(bountiesOverview.overview.totalBountyWinners)}</p>
                           </div>
                         </div>
                       </CardContent>
@@ -925,29 +925,29 @@ export const AdminAnalyticsDashboard = () => {
                             ? bountiesLeaderboard?.leaderboard 
                             : bountiesLeaderboard?.leaderboard?.slice(0, 5)
                           )?.map((user, index) => (
-                            <div key={user.user.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                            <div key={user.user.id} className="flex items-center justify-between p-3 rounded-xl bg-neutral-50/50">
                               <div className="flex items-center gap-3">
-                                <span className="text-sm font-bold text-gray-600">#{index + 1}</span>
+                                <span className="text-sm font-bold text-neutral-500">#{index + 1}</span>
                                 <div>
                                   <h4 className="font-semibold">{user.user.name}</h4>
-                                  <p className="text-sm text-gray-600">{formatCount(user.totalBounties)} bounties</p>
+                                  <p className="text-sm text-neutral-500">{formatCount(user.totalBounties)} bounties</p>
                                 </div>
                               </div>
                               <div className="text-right">
                                 <p className="font-semibold">{formatNumber(user.totalBountyValue)}</p>
-                                <p className="text-sm text-gray-600">{formatCount(user.totalBountyClaims)} claims</p>
-                                <p className="text-sm text-gray-500">{formatCount(user.totalBountyWinners)} wins</p>
+                                <p className="text-sm text-neutral-500">{formatCount(user.totalBountyClaims)} claims</p>
+                                <p className="text-sm text-neutral-500">{formatCount(user.totalBountyWinners)} wins</p>
                               </div>
                             </div>
                           ))}
                         </div>
                         
                         {bountiesLeaderboard?.leaderboard && bountiesLeaderboard.leaderboard.length > 5 && (
-                          <div className="mt-4 pt-4 border-t border-gray-200">
+                          <div className="mt-4 pt-4 border-t border-neutral-100">
                             <Button
                               variant="ghost"
                               onClick={() => setIsBountiesExpanded(!isBountiesExpanded)}
-                              className="w-full flex items-center justify-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                              className="w-full flex items-center justify-center gap-2 text-sm text-neutral-500 hover:text-neutral-900"
                             >
                               {isBountiesExpanded ? (
                                 <>

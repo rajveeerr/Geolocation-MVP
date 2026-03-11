@@ -51,7 +51,7 @@ export const HealthMonitor = () => {
       case 'degraded':
         return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
       default:
-        return <Activity className="h-5 w-5 text-gray-500" />;
+        return <Activity className="h-5 w-5 text-neutral-400" />;
     }
   };
 
@@ -64,7 +64,7 @@ export const HealthMonitor = () => {
       case 'degraded':
         return 'bg-yellow-500';
       default:
-        return 'bg-gray-500';
+        return 'bg-neutral-500';
     }
   };
 
@@ -99,7 +99,7 @@ export const HealthMonitor = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">System Health Monitor</h1>
+          <h1 className="text-3xl font-bold font-heading">System Health Monitor</h1>
           <p className="text-muted-foreground">
             Monitor system performance and service status
           </p>
@@ -155,7 +155,7 @@ export const HealthMonitor = () => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Database */}
-              <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div className="flex items-center justify-between p-4 border border-neutral-200/60 rounded-xl">
                 <div className="flex items-center gap-3">
                   <Database className="h-5 w-5 text-blue-500" />
                   <div>
@@ -177,7 +177,7 @@ export const HealthMonitor = () => {
 
               {/* Redis */}
               {healthData.services.redis && (
-                <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center justify-between p-4 border border-neutral-200/60 rounded-xl">
                   <div className="flex items-center gap-3">
                     <Server className="h-5 w-5 text-red-500" />
                     <div>
@@ -200,7 +200,7 @@ export const HealthMonitor = () => {
 
               {/* Storage */}
               {healthData.services.storage && (
-                <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center justify-between p-4 border border-neutral-200/60 rounded-xl">
                   <div className="flex items-center gap-3">
                     <HardDrive className="h-5 w-5 text-green-500" />
                     <div>

@@ -346,7 +346,7 @@ export const AdminMasterDataManager: React.FC = () => {
         {items.map((item) => (
           <div
             key={item.id}
-            className="flex items-center justify-between p-4 bg-white border border-neutral-200 rounded-lg"
+            className="flex items-center justify-between p-4 bg-white border border-neutral-200/60 rounded-xl hover:shadow-sm transition-all"
           >
             <div className="flex items-center gap-4">
               {activeTab === 'categories' && (
@@ -410,8 +410,8 @@ export const AdminMasterDataManager: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-neutral-900">Master Data Management</h2>
-          <p className="text-neutral-600 mt-1">Manage categories, deal types, and point event types.</p>
+          <h2 className="text-2xl font-bold font-heading text-neutral-900">Master Data Management</h2>
+          <p className="text-neutral-500 mt-1 text-sm">Manage categories, deal types, and point event types.</p>
         </div>
         <Button
           onClick={() => {
@@ -426,37 +426,35 @@ export const AdminMasterDataManager: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="border-b">
-        <div className="flex space-x-8">
-          {[
-            { key: 'categories', label: 'Categories', icon: Tag },
-            { key: 'deal-types', label: 'Deal Types', icon: Package },
-            { key: 'point-events', label: 'Point Events', icon: Award },
-          ].map(({ key, label, icon: Icon }) => (
-            <button
-              key={key}
-              onClick={() => {
-                setActiveTab(key as TabType);
-                resetForms();
-              }}
-              className={`flex items-center gap-2 px-1 py-4 border-b-2 font-medium text-sm ${
-                activeTab === key
-                  ? 'border-brand-primary-500 text-brand-primary-600'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
-              }`}
-            >
-              <Icon className="h-4 w-4" />
-              {label}
-            </button>
-          ))}
-        </div>
+      <div className="inline-flex rounded-xl bg-neutral-100 p-1">
+        {[
+          { key: 'categories', label: 'Categories', icon: Tag },
+          { key: 'deal-types', label: 'Deal Types', icon: Package },
+          { key: 'point-events', label: 'Point Events', icon: Award },
+        ].map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            onClick={() => {
+              setActiveTab(key as TabType);
+              resetForms();
+            }}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeTab === key
+                ? 'bg-white text-neutral-900 shadow-sm'
+                : 'text-neutral-500 hover:text-neutral-700'
+            }`}
+          >
+            <Icon className="h-4 w-4" />
+            {label}
+          </button>
+        ))}
       </div>
 
       {/* Form */}
       {editMode && (
-        <div className="bg-white border border-neutral-200 rounded-lg p-6">
+        <div className="bg-white border border-neutral-200/60 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-neutral-900">
+            <h3 className="text-base font-bold font-heading text-neutral-900">
               {editMode === 'create' ? 'Create New' : 'Edit'} {activeTab.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
             </h3>
             <Button variant="outline" size="sm" onClick={resetForms}>
@@ -484,8 +482,8 @@ export const AdminMasterDataManager: React.FC = () => {
       )}
 
       {/* List */}
-      <div className="bg-white border border-neutral-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-neutral-900 mb-4">
+      <div className="bg-white border border-neutral-200/60 rounded-2xl p-6 shadow-sm">
+        <h3 className="text-base font-bold font-heading text-neutral-900 mb-4">
           {activeTab.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())} List
         </h3>
         {renderList()}
