@@ -9,7 +9,7 @@ import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useMerchantDashboardStats } from '@/hooks/useMerchantDashboardStats';
 import { useMerchantStores } from '@/hooks/useMerchantStores';
 import { useMerchantLoyaltyProgram } from '@/hooks/useMerchantLoyalty';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { ExploreDealsPreview } from '@/components/merchant/ExploreDealsPreview';
 // Removed shadcn tabs import - using custom styling like kickback page
@@ -17,6 +17,8 @@ import { MerchantTableBookingDashboard } from '@/components/table-booking/Mercha
 import { BusinessTypeCard } from '@/components/merchant/BusinessTypeCard';
 import { CheckInFeed } from '@/components/merchant/CheckInFeed';
 import { useAiMerchantInsights } from '@/hooks/useAi';
+import { MenuTabContent } from '@/components/merchant/menu-tab/MenuTabContent';
+import { StoreSelector } from '@/components/merchant/menu-tab/StoreSelector';
 
 interface Deal {
   id: string;
@@ -172,6 +174,7 @@ export const MerchantDashboardPage = () => {
   type DealStatusFilter = 'all' | 'active' | 'scheduled' | 'expired';
   const [activeFilter, setActiveFilter] = useState<DealStatusFilter>('all');
   const [activeTab, setActiveTab] = useState('overview');
+  const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
 
   const { data: merchantData, isLoading: merchantLoading } = useMerchantStatus();
   const merchantStatus = merchantData?.data?.merchant?.status;
@@ -184,6 +187,13 @@ export const MerchantDashboardPage = () => {
   // Fetch real store data
   const { data: storesData, isLoading: storesLoading } = useMerchantStores();
   const { data: aiInsights, isLoading: aiInsightsLoading } = useAiMerchantInsights();
+
+  // Auto-select first store for menu tab
+  useEffect(() => {
+    if (!selectedStoreId && storesData?.stores?.length) {
+      setSelectedStoreId(storesData.stores[0].id);
+    }
+  }, [storesData, selectedStoreId]);
 
   const {
     data: dealsData,
@@ -307,13 +317,16 @@ export const MerchantDashboardPage = () => {
 
       {merchantStatus === 'APPROVED' && (
         <>
+          {/* Store Selector */}
+          <StoreSelector selectedStoreId={selectedStoreId} onStoreChange={setSelectedStoreId} />
+
           {/* Custom Tabs Navigation - matching kickback page style */}
           <div className="mb-6">
-            <div className="flex items-center gap-2 rounded-full bg-neutral-100 p-1">
+            <div className="flex items-center gap-2 overflow-x-auto rounded-full bg-neutral-100 p-1">
               <button
                 onClick={() => setActiveTab('overview')}
                 className={cn(
-                  'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                  'whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
                   activeTab === 'overview'
                     ? 'bg-black text-white shadow-sm'
                     : 'text-neutral-600 hover:bg-neutral-200/50',
@@ -324,7 +337,7 @@ export const MerchantDashboardPage = () => {
               <button
                 onClick={() => setActiveTab('deals')}
                 className={cn(
-                  'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                  'whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
                   activeTab === 'deals'
                     ? 'bg-black text-white shadow-sm'
                     : 'text-neutral-600 hover:bg-neutral-200/50',
@@ -333,9 +346,20 @@ export const MerchantDashboardPage = () => {
                 Deals
               </button>
               <button
+                onClick={() => setActiveTab('menu')}
+                className={cn(
+                  'whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                  activeTab === 'menu'
+                    ? 'bg-black text-white shadow-sm'
+                    : 'text-neutral-600 hover:bg-neutral-200/50',
+                )}
+              >
+                Menu
+              </button>
+              <button
                 onClick={() => setActiveTab('analytics')}
                 className={cn(
-                  'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                  'whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
                   activeTab === 'analytics'
                     ? 'bg-black text-white shadow-sm'
                     : 'text-neutral-600 hover:bg-neutral-200/50',
@@ -346,7 +370,7 @@ export const MerchantDashboardPage = () => {
               <button
                 onClick={() => setActiveTab('booking')}
                 className={cn(
-                  'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                  'whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
                   activeTab === 'booking'
                     ? 'bg-black text-white shadow-sm'
                     : 'text-neutral-600 hover:bg-neutral-200/50',
@@ -666,6 +690,12 @@ export const MerchantDashboardPage = () => {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {activeTab === 'menu' && (
+            <div className="space-y-6">
+              <MenuTabContent storeId={selectedStoreId} />
             </div>
           )}
 
