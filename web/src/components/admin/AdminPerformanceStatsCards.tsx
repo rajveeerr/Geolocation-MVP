@@ -31,9 +31,9 @@ export const AdminPerformanceStatsCards: React.FC<AdminPerformanceStatsCardsProp
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[...Array(4)].map((_, index) => (
-          <div key={index} className="bg-white rounded-lg border border-red-200 p-6">
+          <div key={index} className="bg-white rounded-2xl border border-red-100 p-6 shadow-sm">
             <div className="flex items-center justify-center h-32">
-              <span className="text-red-500 text-sm">Failed to load data</span>
+              <span className="text-red-400 text-sm">Failed to load data</span>
             </div>
           </div>
         ))}

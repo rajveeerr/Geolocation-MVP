@@ -15,10 +15,10 @@ interface SalesByStoreProps {
 export const SalesByStore: React.FC<SalesByStoreProps> = ({ data }) => {
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white p-6 rounded-lg border shadow-sm">
+      <div className="bg-white p-6 rounded-2xl border border-neutral-200/60 shadow-sm">
         <div className="flex items-center gap-2 mb-4">
           <BarChart3 className="h-5 w-5 text-neutral-600" />
-          <h3 className="text-lg font-semibold text-neutral-900">Sales by Store</h3>
+          <h3 className="text-base font-bold font-heading text-neutral-900">Sales by Store</h3>
         </div>
         <div className="text-neutral-500">No data available</div>
       </div>
@@ -26,10 +26,10 @@ export const SalesByStore: React.FC<SalesByStoreProps> = ({ data }) => {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg border shadow-sm">
+    <div className="bg-white p-6 rounded-2xl border border-neutral-200/60 shadow-sm">
       <div className="flex items-center gap-2 mb-6">
         <BarChart3 className="h-5 w-5 text-neutral-600" />
-        <h3 className="text-lg font-semibold text-neutral-900">Sales by Store</h3>
+        <h3 className="text-base font-bold font-heading text-neutral-900">Sales by Store</h3>
       </div>
       <div className="space-y-4">
         {data.map((store, index) => (

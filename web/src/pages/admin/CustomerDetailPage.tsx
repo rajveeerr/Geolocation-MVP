@@ -204,7 +204,7 @@ export const CustomerDetailPage = () => {
     switch (status) {
       case 'completed': return 'bg-green-100 text-green-800';
       case 'pending': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-neutral-100 text-neutral-800';
     }
   };
 
@@ -219,7 +219,7 @@ export const CustomerDetailPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-neutral-50/50 py-8">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -231,14 +231,14 @@ export const CustomerDetailPage = () => {
               </Button>
             </Link>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Customer Details</h1>
-              <p className="text-gray-600">Comprehensive view of customer activity and engagement</p>
+              <h1 className="text-3xl font-bold font-heading text-neutral-900">Customer Details</h1>
+              <p className="text-neutral-500">Comprehensive view of customer activity and engagement</p>
             </div>
           </div>
         </div>
 
         {/* Customer Profile Card */}
-        <Card className="mb-8">
+        <Card className="mb-8 rounded-2xl shadow-sm border border-neutral-200/60">
           <CardContent className="p-6">
             <div className="flex flex-col lg:flex-row gap-6">
               <div className="flex items-center gap-4">
@@ -249,12 +249,12 @@ export const CustomerDetailPage = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">{customer.name}</h2>
-                  <p className="text-gray-600 flex items-center gap-2">
+                  <h2 className="text-2xl font-bold font-heading text-neutral-900">{customer.name}</h2>
+                  <p className="text-neutral-500 flex items-center gap-2">
                     <Mail className="h-4 w-4" />
                     {customer.email}
                   </p>
-                  <p className="text-gray-600 flex items-center gap-2">
+                  <p className="text-neutral-500 flex items-center gap-2">
                     <Phone className="h-4 w-4" />
                     {customer.phone}
                   </p>

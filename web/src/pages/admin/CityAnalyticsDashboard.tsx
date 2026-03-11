@@ -26,10 +26,10 @@ const getCategoryColor = (index: number) => {
 
 // Simple category card using consistent design
 const CategoryCard = ({ category, color }: { category: any; color: string }) => (
-  <div className="bg-white p-4 rounded-lg border shadow-sm">
+  <div className="bg-white p-4 rounded-2xl border border-neutral-200/60 shadow-sm">
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
+        <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${
           color === 'primary' ? 'bg-brand-primary-100 text-brand-primary-600' :
           color === 'amber' ? 'bg-amber-100 text-amber-600' :
           color === 'green' ? 'bg-green-100 text-green-600' :
@@ -39,11 +39,11 @@ const CategoryCard = ({ category, color }: { category: any; color: string }) => 
         </div>
         <div>
           <h3 className="font-medium text-neutral-900">{category.name}</h3>
-          <p className="text-sm text-neutral-600">{category.deals} deals</p>
+          <p className="text-sm text-neutral-500">{category.deals} deals</p>
         </div>
       </div>
       <div className="text-right">
-        <div className="text-lg font-bold text-neutral-900">{category.deals}</div>
+        <div className="text-lg font-bold font-heading text-neutral-900">{category.deals}</div>
       </div>
     </div>
   </div>
@@ -51,13 +51,13 @@ const CategoryCard = ({ category, color }: { category: any; color: string }) => 
 
 // Simple customer card using consistent design
 const CustomerCard = ({ customer }: { customer: any }) => (
-  <div className="flex items-center gap-3 p-3 bg-white rounded-lg border shadow-sm">
+  <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-neutral-200/60 shadow-sm">
     <div className="w-10 h-10 rounded-full bg-brand-primary-100 flex items-center justify-center text-brand-primary-600 font-semibold text-sm">
       {customer.avatar}
     </div>
     <div className="flex-1">
       <h4 className="font-medium text-neutral-900">{customer.name}</h4>
-      <p className="text-sm text-neutral-600">{customer.checkIns} check-ins</p>
+      <p className="text-sm text-neutral-500">{customer.checkIns} check-ins</p>
     </div>
     <div className="text-right">
       <div className="text-lg font-bold text-brand-primary-600">{customer.checkIns}</div>

@@ -71,9 +71,9 @@ export const AdminCustomerList: React.FC<AdminCustomerListProps> = ({
 
   if (error || !data) {
     return (
-      <div className="bg-white rounded-lg border border-red-200 p-6">
+      <div className="bg-white rounded-2xl border border-red-100 p-6 shadow-sm">
         <div className="flex items-center justify-center h-64">
-          <span className="text-red-500 text-sm">Failed to load customer data</span>
+          <span className="text-red-400 text-sm">Failed to load customer data</span>
         </div>
       </div>
     );
@@ -83,20 +83,20 @@ export const AdminCustomerList: React.FC<AdminCustomerListProps> = ({
 
   const getMemberTypeBadge = (type: 'paid' | 'free') => {
     return type === 'paid' ? (
-      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-emerald-50 text-emerald-700">
         Paid
       </span>
     ) : (
-      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-neutral-100 text-neutral-800">
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-neutral-100 text-neutral-600">
         Free
       </span>
     );
   };
 
   return (
-    <div className="bg-white rounded-lg border border-neutral-200 p-6">
+    <div className="bg-white rounded-2xl border border-neutral-200/60 p-6 shadow-sm">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-neutral-900">Customer Management</h3>
+        <h3 className="text-base font-bold font-heading text-neutral-900">Customer Management</h3>
         <div className="flex items-center gap-2">
           <span className="text-sm text-neutral-500">
             {pagination.totalCount.toLocaleString()} total customers
@@ -119,7 +119,7 @@ export const AdminCustomerList: React.FC<AdminCustomerListProps> = ({
           <select
             value={memberType}
             onChange={(e) => setMemberType(e.target.value as 'all' | 'paid' | 'free')}
-            className="px-3 py-2 border border-neutral-300 rounded-md text-sm"
+            className="px-3 py-2 border border-neutral-200 rounded-xl text-sm bg-white focus:border-neutral-400 focus:ring-1 focus:ring-neutral-300 transition-all"
           >
             <option value="all">All Members</option>
             <option value="paid">Paid Members</option>
@@ -128,7 +128,7 @@ export const AdminCustomerList: React.FC<AdminCustomerListProps> = ({
           <select
             value={limit}
             onChange={(e) => setLimit(Number(e.target.value))}
-            className="px-3 py-2 border border-neutral-300 rounded-md text-sm"
+            className="px-3 py-2 border border-neutral-200 rounded-xl text-sm bg-white focus:border-neutral-400 focus:ring-1 focus:ring-neutral-300 transition-all"
           >
             <option value={25}>25 per page</option>
             <option value={50}>50 per page</option>
@@ -141,11 +141,11 @@ export const AdminCustomerList: React.FC<AdminCustomerListProps> = ({
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-neutral-200">
-              <th className="text-left py-3 px-4 font-medium text-neutral-700">Customer</th>
-              <th className="text-left py-3 px-4 font-medium text-neutral-700">Location</th>
-              <th 
-                className="text-left py-3 px-4 font-medium text-neutral-700 cursor-pointer hover:text-brand-primary-600"
+            <tr className="border-b border-neutral-100">
+              <th className="text-left py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-neutral-500">Customer</th>
+              <th className="text-left py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-neutral-500">Location</th>
+              <th
+                className="text-left py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-neutral-500 cursor-pointer hover:text-brand-primary-600"
                 onClick={() => handleSort('totalSpend')}
               >
                 <div className="flex items-center gap-1">
@@ -155,8 +155,8 @@ export const AdminCustomerList: React.FC<AdminCustomerListProps> = ({
                   )}
                 </div>
               </th>
-              <th 
-                className="text-left py-3 px-4 font-medium text-neutral-700 cursor-pointer hover:text-brand-primary-600"
+              <th
+                className="text-left py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-neutral-500 cursor-pointer hover:text-brand-primary-600"
                 onClick={() => handleSort('points')}
               >
                 <div className="flex items-center gap-1">
@@ -166,9 +166,9 @@ export const AdminCustomerList: React.FC<AdminCustomerListProps> = ({
                   )}
                 </div>
               </th>
-              <th className="text-left py-3 px-4 font-medium text-neutral-700">Type</th>
-              <th 
-                className="text-left py-3 px-4 font-medium text-neutral-700 cursor-pointer hover:text-brand-primary-600"
+              <th className="text-left py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-neutral-500">Type</th>
+              <th
+                className="text-left py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-neutral-500 cursor-pointer hover:text-brand-primary-600"
                 onClick={() => handleSort('lastActive')}
               >
                 <div className="flex items-center gap-1">
@@ -182,7 +182,7 @@ export const AdminCustomerList: React.FC<AdminCustomerListProps> = ({
           </thead>
           <tbody>
             {customers.map((customer) => (
-              <tr key={customer.id} className="border-b border-neutral-100 hover:bg-neutral-50">
+              <tr key={customer.id} className="border-b border-neutral-100/80 hover:bg-neutral-50/50 transition-colors">
                 <td className="py-4 px-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-brand-primary-100 flex items-center justify-center">

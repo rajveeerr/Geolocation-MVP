@@ -18,8 +18,8 @@ export const DashboardLeaderboard = ({
   ctaLink: string;
 }) => {
   return (
-    <div className="bg-white p-6 rounded-lg border shadow-sm">
-      <h3 className="font-semibold text-neutral-800">{title}</h3>
+    <div className="bg-white p-6 rounded-2xl border border-neutral-200/60 shadow-sm">
+      <h3 className="font-heading font-semibold text-neutral-800">{title}</h3>
       <div className="mt-4 space-y-3">
         {isLoading && Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="flex justify-between items-center">

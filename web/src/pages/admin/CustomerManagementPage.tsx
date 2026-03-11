@@ -50,8 +50,8 @@ export const CustomerManagementPage = () => {
     return (
         <div className="space-y-6">
         <div>
-            <h1 className="text-3xl font-bold text-neutral-900">Customer Management</h1>
-                <p className="text-neutral-600 mt-1">Manage and analyze customer data across the platform.</p>
+            <h1 className="text-3xl font-bold font-heading text-neutral-900">Customer Management</h1>
+                <p className="text-neutral-500 mt-1">Manage and analyze customer data across the platform.</p>
             </div>
 
             {/* Stats Cards */}
@@ -99,7 +99,7 @@ export const CustomerManagementPage = () => {
             </div>
 
             {/* Filters and Search */}
-            <div className="bg-white p-4 rounded-lg border shadow-sm">
+            <div className="bg-white p-4 rounded-2xl border border-neutral-200/60 shadow-sm">
                 <div className="flex flex-col sm:flex-row gap-4 mb-4">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
@@ -123,7 +123,7 @@ export const CustomerManagementPage = () => {
                         onChange={(e) => handleFilterChange('state', e.target.value)}
                     />
                     <select 
-                        className="px-3 py-2 border border-neutral-300 rounded-md text-sm"
+                        className="px-3 py-2 border border-neutral-200/60 rounded-xl text-sm"
                         value={filters.isPaidMember === undefined ? '' : filters.isPaidMember.toString()}
                         onChange={(e) => handleFilterChange('isPaidMember', e.target.value === '' ? undefined : e.target.value === 'true')}
                     >
@@ -142,29 +142,29 @@ export const CustomerManagementPage = () => {
                     <>
                         <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                                <thead className="bg-neutral-50">
-                        <tr className="border-b">
-                                        <th className="text-left p-3 font-medium">Name</th>
-                                        <th className="text-left p-3 font-medium">Email</th>
-                                        <th className="text-left p-3 font-medium">Location</th>
-                                        <th className="text-left p-3 font-medium">Total Spend</th>
-                                        <th className="text-left p-3 font-medium">Points</th>
-                                        <th className="text-left p-3 font-medium">Member Type</th>
-                                        <th className="text-left p-3 font-medium">Last Active</th>
-                                        <th className="text-left p-3 font-medium">Actions</th>
+                                <thead className="bg-neutral-50/50">
+                        <tr className="border-b border-neutral-200/60">
+                                        <th className="text-left p-3 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">Name</th>
+                                        <th className="text-left p-3 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">Email</th>
+                                        <th className="text-left p-3 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">Location</th>
+                                        <th className="text-left p-3 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">Total Spend</th>
+                                        <th className="text-left p-3 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">Points</th>
+                                        <th className="text-left p-3 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">Member Type</th>
+                                        <th className="text-left p-3 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">Last Active</th>
+                                        <th className="text-left p-3 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                                     {customers.map(customer => (
-                                        <tr key={customer.id} className="border-b hover:bg-neutral-50">
+                                        <tr key={customer.id} className="border-b border-neutral-200/60 hover:bg-neutral-50/50">
                                             <td className="p-3 font-medium">{customer.name}</td>
-                                            <td className="p-3 text-neutral-600">{customer.email}</td>
-                                            <td className="p-3 text-neutral-600 flex items-center gap-1">
+                                            <td className="p-3 text-neutral-500">{customer.email}</td>
+                                            <td className="p-3 text-neutral-500 flex items-center gap-1">
                                                 <MapPin className="h-3 w-3" />
                                                 {customer.city}, {customer.state}
                                             </td>
                                             <td className="p-3 font-medium">${customer.totalSpend.toFixed(2)}</td>
-                                            <td className="p-3 text-neutral-600">{customer.points.toLocaleString()}</td>
+                                            <td className="p-3 text-neutral-500">{customer.points.toLocaleString()}</td>
                                             <td className="p-3">
                                                 {customer.isPaidMember ? (
                                                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">

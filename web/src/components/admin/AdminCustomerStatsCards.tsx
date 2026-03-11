@@ -43,11 +43,11 @@ export const AdminCustomerStatsCards: React.FC<AdminCustomerStatsCardsProps> = (
 
   if (error || !data) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {[...Array(6)].map((_, index) => (
-          <div key={index} className="bg-white rounded-lg border border-red-200 p-6">
+          <div key={index} className="rounded-2xl border border-red-100 bg-white p-6">
             <div className="flex items-center justify-center h-32">
-              <span className="text-red-500 text-sm">Failed to load data</span>
+              <span className="text-sm text-red-400">Failed to load data</span>
             </div>
           </div>
         ))}
@@ -80,7 +80,7 @@ export const AdminCustomerStatsCards: React.FC<AdminCustomerStatsCardsProps> = (
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
       <StatCard
         title="Total Customers"
         value={metrics.totalCustomers.value.toLocaleString()}
@@ -92,7 +92,7 @@ export const AdminCustomerStatsCards: React.FC<AdminCustomerStatsCardsProps> = (
           icon: getTrendIcon(metrics.totalCustomers.trend)
         }}
       />
-      
+
       <StatCard
         title="Paid Members"
         value={metrics.paidMembers.value.toLocaleString()}
@@ -104,7 +104,7 @@ export const AdminCustomerStatsCards: React.FC<AdminCustomerStatsCardsProps> = (
           icon: getTrendIcon(metrics.paidMembers.trend)
         }}
       />
-      
+
       <StatCard
         title="Total Spend"
         value={`$${metrics.totalSpend.value.toLocaleString()}`}
@@ -116,7 +116,7 @@ export const AdminCustomerStatsCards: React.FC<AdminCustomerStatsCardsProps> = (
           icon: getTrendIcon(metrics.totalSpend.trend)
         }}
       />
-      
+
       <StatCard
         title="Average Spend"
         value={`$${metrics.averageSpend.value.toFixed(2)}`}
@@ -128,21 +128,19 @@ export const AdminCustomerStatsCards: React.FC<AdminCustomerStatsCardsProps> = (
           icon: getTrendIcon(metrics.averageSpend.trend)
         }}
       />
-      
-      {/* Tap-ins Stats */}
+
       <StatCard
         title="Total Tap-ins"
         value={isLoadingTapIns ? '...' : (tapInsOverview?.overview?.totalTapIns || 0).toLocaleString()}
         icon={<Zap />}
-        color="yellow"
+        color="amber"
       />
-      
-      {/* Bounties Stats */}
+
       <StatCard
         title="Total Bounties"
         value={isLoadingBounties ? '...' : (bountiesOverview?.overview?.totalBounties || 0).toLocaleString()}
         icon={<Trophy />}
-        color="purple"
+        color="primary"
       />
     </div>
   );
