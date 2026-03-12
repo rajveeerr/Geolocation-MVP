@@ -96,15 +96,15 @@ function AnalyticsOverviewCards() {
             {cards.map(({ label, value, icon: Icon, color }) => (
                 <div
                     key={label}
-                    className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm"
+                    className="rounded-2xl border border-neutral-200/60 bg-white p-4 shadow-sm"
                 >
                     <div className="flex items-center justify-between">
-                        <p className="text-xs font-medium text-neutral-500">{label}</p>
-                        <div className={cn('rounded-lg p-1.5', color)}>
+                        <p className="text-[13px] font-medium text-neutral-500">{label}</p>
+                        <div className={cn('rounded-xl p-2', color)}>
                             <Icon className="h-3.5 w-3.5" />
                         </div>
                     </div>
-                    <p className="mt-2 text-2xl font-bold text-neutral-900">{value}</p>
+                    <p className="mt-2 text-2xl font-bold font-heading text-neutral-900 tracking-tight">{value}</p>
                 </div>
             ))}
         </div>
@@ -745,8 +745,10 @@ function AdminNudgesContent() {
             {/* Header */}
             <div className="flex items-start justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-neutral-900 flex items-center gap-2">
-                        <Bell className="h-6 w-6 text-brand-primary-500" />
+                    <h1 className="text-2xl font-bold font-heading text-neutral-900 tracking-tight flex items-center gap-2.5">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-primary-50">
+                          <Bell className="h-4 w-4 text-brand-primary-600" />
+                        </span>
                         Nudge Management
                     </h1>
                     <p className="mt-1 text-sm text-neutral-500">
@@ -759,7 +761,7 @@ function AdminNudgesContent() {
                             setEditingNudge(null);
                             setShowForm(true);
                         }}
-                        className="flex items-center gap-1.5 rounded-lg bg-brand-primary-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-primary-600"
+                        className="flex items-center gap-1.5 rounded-xl bg-brand-primary-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-brand-primary-600 transition-colors"
                     >
                         <Plus className="h-4 w-4" />
                         Create Nudge

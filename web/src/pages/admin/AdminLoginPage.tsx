@@ -63,7 +63,7 @@ export const AdminLoginPage = () => {
             <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
               <Shield className="h-8 w-8 text-red-600" />
             </div>
-            <h1 className="text-2xl font-black text-neutral-900 mb-2">Access Denied</h1>
+            <h1 className="text-2xl font-black font-heading text-neutral-900 mb-2">Access Denied</h1>
             <p className="text-neutral-500 mb-6 text-sm">
               You don't have admin privileges. Please contact your administrator.
             </p>
@@ -164,7 +164,7 @@ export const AdminLoginPage = () => {
                 Back to main site
               </Link>
 
-              <h1 className="text-3xl sm:text-[2rem] font-black text-neutral-900 tracking-tight">
+              <h1 className="text-3xl sm:text-[2rem] font-black font-heading text-neutral-900 tracking-tight">
                 Welcome Back
               </h1>
               <p className="mt-2 text-neutral-500 text-[15px]">

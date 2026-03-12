@@ -24,9 +24,9 @@ export const AdminCustomerAnalytics: React.FC<AdminCustomerAnalyticsProps> = ({
 
   if (error || !data) {
     return (
-      <div className="bg-white rounded-lg border border-red-200 p-6">
+      <div className="rounded-2xl border border-red-100 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-center h-32">
-          <span className="text-red-500 text-sm">Failed to load customer analytics</span>
+          <span className="text-sm text-red-400">Failed to load customer analytics</span>
         </div>
       </div>
     );
@@ -37,10 +37,12 @@ export const AdminCustomerAnalytics: React.FC<AdminCustomerAnalyticsProps> = ({
   return (
     <div className="space-y-6">
       {/* Demographics */}
-      <div className="bg-white rounded-lg border border-neutral-200 p-6">
-        <div className="flex items-center gap-2 mb-6">
-          <Users className="h-5 w-5 text-brand-primary-600" />
-          <h3 className="text-lg font-semibold text-neutral-900">Customer Demographics</h3>
+      <div className="bg-white rounded-2xl border border-neutral-200/60 p-6 shadow-sm">
+        <div className="flex items-center gap-2.5 mb-6">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-primary-50">
+            <Users className="h-4 w-4 text-brand-primary-600" />
+          </span>
+          <h3 className="text-base font-bold font-heading text-neutral-900">Customer Demographics</h3>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -86,16 +88,18 @@ export const AdminCustomerAnalytics: React.FC<AdminCustomerAnalyticsProps> = ({
       </div>
 
       {/* Activity Levels */}
-      <div className="bg-white rounded-lg border border-neutral-200 p-6">
-        <div className="flex items-center gap-2 mb-6">
-          <Activity className="h-5 w-5 text-brand-primary-600" />
-          <h3 className="text-lg font-semibold text-neutral-900">Activity Levels</h3>
+      <div className="bg-white rounded-2xl border border-neutral-200/60 p-6 shadow-sm">
+        <div className="flex items-center gap-2.5 mb-6">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50">
+            <Activity className="h-4 w-4 text-amber-600" />
+          </span>
+          <h3 className="text-base font-bold font-heading text-neutral-900">Activity Levels</h3>
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Object.entries(activityLevels).map(([level, count]) => (
-            <div key={level} className="text-center p-4 rounded-lg border border-neutral-200">
-              <div className="text-2xl font-bold text-brand-primary-600">{count.toLocaleString()}</div>
+            <div key={level} className="text-center p-4 rounded-xl border border-neutral-200/60 bg-neutral-50/50">
+              <div className="text-2xl font-bold font-heading text-brand-primary-600">{count.toLocaleString()}</div>
               <div className="text-sm text-neutral-600 capitalize">{level.replace(/([A-Z])/g, ' $1').trim()}</div>
             </div>
           ))}
@@ -103,43 +107,47 @@ export const AdminCustomerAnalytics: React.FC<AdminCustomerAnalyticsProps> = ({
       </div>
 
       {/* Retention Metrics */}
-      <div className="bg-white rounded-lg border border-neutral-200 p-6">
-        <div className="flex items-center gap-2 mb-6">
-          <TrendingUp className="h-5 w-5 text-brand-primary-600" />
-          <h3 className="text-lg font-semibold text-neutral-900">Retention Metrics</h3>
+      <div className="bg-white rounded-2xl border border-neutral-200/60 p-6 shadow-sm">
+        <div className="flex items-center gap-2.5 mb-6">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
+            <TrendingUp className="h-4 w-4 text-emerald-600" />
+          </span>
+          <h3 className="text-base font-bold font-heading text-neutral-900">Retention Metrics</h3>
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center p-4 rounded-lg border border-neutral-200">
-            <div className="text-2xl font-bold text-green-600">{retentionMetrics.newCustomers.toLocaleString()}</div>
+          <div className="text-center p-4 rounded-xl border border-neutral-200/60 bg-neutral-50/50">
+            <div className="text-2xl font-bold font-heading text-green-600">{retentionMetrics.newCustomers.toLocaleString()}</div>
             <div className="text-sm text-neutral-600">New Customers</div>
           </div>
-          <div className="text-center p-4 rounded-lg border border-neutral-200">
-            <div className="text-2xl font-bold text-blue-600">{retentionMetrics.returningCustomers.toLocaleString()}</div>
+          <div className="text-center p-4 rounded-xl border border-neutral-200/60 bg-neutral-50/50">
+            <div className="text-2xl font-bold font-heading text-blue-600">{retentionMetrics.returningCustomers.toLocaleString()}</div>
             <div className="text-sm text-neutral-600">Returning Customers</div>
           </div>
-          <div className="text-center p-4 rounded-lg border border-neutral-200">
-            <div className="text-2xl font-bold text-red-600">{retentionMetrics.churnRate.toFixed(1)}%</div>
+          <div className="text-center p-4 rounded-xl border border-neutral-200/60 bg-neutral-50/50">
+            <div className="text-2xl font-bold font-heading text-red-600">{retentionMetrics.churnRate.toFixed(1)}%</div>
             <div className="text-sm text-neutral-600">Churn Rate</div>
           </div>
-          <div className="text-center p-4 rounded-lg border border-neutral-200">
-            <div className="text-2xl font-bold text-green-600">{retentionMetrics.retentionRate.toFixed(1)}%</div>
+          <div className="text-center p-4 rounded-xl border border-neutral-200/60 bg-neutral-50/50">
+            <div className="text-2xl font-bold font-heading text-green-600">{retentionMetrics.retentionRate.toFixed(1)}%</div>
             <div className="text-sm text-neutral-600">Retention Rate</div>
           </div>
         </div>
       </div>
 
       {/* Spending Patterns */}
-      <div className="bg-white rounded-lg border border-neutral-200 p-6">
-        <div className="flex items-center gap-2 mb-6">
-          <BarChart3 className="h-5 w-5 text-brand-primary-600" />
-          <h3 className="text-lg font-semibold text-neutral-900">Spending Patterns</h3>
+      <div className="bg-white rounded-2xl border border-neutral-200/60 p-6 shadow-sm">
+        <div className="flex items-center gap-2.5 mb-6">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
+            <BarChart3 className="h-4 w-4 text-blue-600" />
+          </span>
+          <h3 className="text-base font-bold font-heading text-neutral-900">Spending Patterns</h3>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h4 className="font-medium text-neutral-700 mb-3">Average Spend</h4>
-            <div className="text-3xl font-bold text-brand-primary-600">
+            <div className="text-3xl font-bold font-heading text-brand-primary-600">
               ${spendingPatterns.averageSpendPerCustomer.toFixed(2)}
             </div>
             <div className="text-sm text-neutral-600">per customer</div>
@@ -147,7 +155,7 @@ export const AdminCustomerAnalytics: React.FC<AdminCustomerAnalyticsProps> = ({
           
           <div>
             <h4 className="font-medium text-neutral-700 mb-3">Top Spenders</h4>
-            <div className="text-3xl font-bold text-green-600">
+            <div className="text-3xl font-bold font-heading text-green-600">
               {spendingPatterns.topSpendingCustomers.toLocaleString()}
             </div>
             <div className="text-sm text-neutral-600">customers spending $200+</div>
@@ -158,8 +166,8 @@ export const AdminCustomerAnalytics: React.FC<AdminCustomerAnalyticsProps> = ({
           <h4 className="font-medium text-neutral-700 mb-3">Spending Distribution</h4>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {Object.entries(spendingPatterns.spendingDistribution).map(([range, count]) => (
-              <div key={range} className="text-center p-3 rounded-lg border border-neutral-200">
-                <div className="text-lg font-bold text-neutral-900">{count.toLocaleString()}</div>
+              <div key={range} className="text-center p-3 rounded-xl border border-neutral-200/60 bg-neutral-50/50">
+                <div className="text-lg font-bold font-heading text-neutral-900">{count.toLocaleString()}</div>
                 <div className="text-xs text-neutral-600">${range}</div>
               </div>
             ))}
