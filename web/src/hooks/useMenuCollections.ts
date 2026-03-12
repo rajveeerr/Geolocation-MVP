@@ -14,12 +14,21 @@ export interface MenuCollectionItem {
   menuItem: MenuItem;
 }
 
+export type MenuCollectionType = 'STANDARD' | 'HAPPY_HOUR' | 'SPECIAL';
+
 export interface MenuCollection {
   id: number;
   merchantId: number;
   name: string;
   description: string | null;
   isActive: boolean;
+  menuType: MenuCollectionType;
+  subType: string | null;
+  startTime: string | null;
+  endTime: string | null;
+  themeName: string | null;
+  icon: string | null;
+  color: string | null;
   createdAt: string;
   updatedAt: string;
   items: MenuCollectionItem[];
@@ -31,6 +40,13 @@ export interface MenuCollection {
 export interface CreateCollectionData {
   name: string;
   description?: string;
+  menuType?: MenuCollectionType;
+  subType?: string;
+  startTime?: string;
+  endTime?: string;
+  themeName?: string;
+  icon?: string;
+  color?: string;
   menuItems?: Array<{
     id: number;
     sortOrder?: number;
@@ -38,12 +54,33 @@ export interface CreateCollectionData {
     customDiscount?: number | null;
     notes?: string | null;
   }>;
+  storeId?: number; // Optional store ID to link the menu to a specific store
 }
 
 export interface UpdateCollectionData {
   name?: string;
   description?: string;
   isActive?: boolean;
+  menuType?: MenuCollectionType;
+  subType?: string;
+  startTime?: string;
+  endTime?: string;
+  themeName?: string;
+  icon?: string;
+  color?: string;
+}
+
+export interface BulkItemData {
+  id?: number;
+  name: string;
+  price: number;
+  description?: string;
+  category?: string;
+  imageUrl?: string;
+  imageUrls?: string[];
+  isHappyHour?: boolean;
+  happyHourPrice?: number;
+  discountPercent?: number;
 }
 
 export interface CreateFromDealTypeData {
@@ -62,11 +99,17 @@ export interface MenuCollectionResponse {
 }
 
 // Hook to fetch all menu collections for the authenticated merchant
-export const useMenuCollections = () => {
+// Optionally filter by menuType and storeId
+export const useMenuCollections = (menuType?: MenuCollectionType, storeId?: number | null) => {
   return useQuery<MenuCollectionsResponse, Error>({
-    queryKey: ['menu-collections'],
+    queryKey: ['menu-collections', menuType ?? 'all', storeId ?? 'all-stores'],
     queryFn: async () => {
-      const response = await apiGet<MenuCollectionsResponse>('/merchants/me/menu-collections');
+      const queryParams = new URLSearchParams();
+      if (menuType) queryParams.append('menuType', menuType);
+      if (storeId) queryParams.append('storeId', storeId.toString());
+      
+      const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      const response = await apiGet<MenuCollectionsResponse>(`/merchants/me/menu-collections${queryString}`);
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to fetch menu collections');
       }
@@ -302,6 +345,40 @@ export const useRemoveItemFromCollection = () => {
     onError: (error: Error) => {
       toast({
         title: 'Error Removing Item',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+// Hook to bulk create/update items in a collection (for inline editor save)
+export const useBulkUpdateCollectionItems = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ collectionId, items }: { collectionId: number; items: BulkItemData[] }) => {
+      const response = await apiPut<MenuCollectionResponse & { itemsProcessed: number }, { items: BulkItemData[] }>(
+        `/merchants/me/menu-collections/${collectionId}/items/bulk`,
+        { items }
+      );
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to bulk update collection items');
+      }
+      return response.data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['menu-collections'] });
+      queryClient.invalidateQueries({ queryKey: ['menu-collection', variables.collectionId] });
+      toast({
+        title: 'Menu Saved!',
+        description: `${data.itemsProcessed} items saved successfully.`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Error Saving Menu',
         description: error.message,
         variant: 'destructive',
       });

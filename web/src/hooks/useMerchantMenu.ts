@@ -2,12 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiPost, apiPut, apiDelete } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 
-export interface MenuItemImage {
-  id: string;
-  url: string;
-  publicId: string;
-  name: string;
-}
+// Removed MenuItemImage interface as we are now using simple string arrays (imageUrls) for images 
 
 export type MenuDealType = 
   | 'STANDARD'
@@ -27,7 +22,7 @@ export interface MenuItem {
   category: string;
   description: string | null;
   imageUrl: string | null; // Keep for backward compatibility
-  images: MenuItemImage[]; // New field for multiple images
+  imageUrls: string[]; 
   merchantId: number;
   dealType?: MenuDealType;
   isHappyHour?: boolean;
@@ -47,7 +42,7 @@ export interface CreateMenuItemData {
   category: string;
   description?: string;
   imageUrl?: string; // Keep for backward compatibility
-  images?: MenuItemImage[]; // New field for multiple images
+  imageUrls?: string[];
   dealType?: MenuDealType;
   isHappyHour?: boolean;
   happyHourPrice?: number | null;
@@ -64,7 +59,7 @@ export interface UpdateMenuItemData {
   category?: string;
   description?: string;
   imageUrl?: string; // Keep for backward compatibility
-  images?: MenuItemImage[]; // New field for multiple images
+  imageUrls?: string[];
   dealType?: MenuDealType;
   isHappyHour?: boolean;
   happyHourPrice?: number | null;

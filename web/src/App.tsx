@@ -122,7 +122,7 @@ const StoreFormPage = React.lazy(() =>
   import('./pages/merchant/StoreFormPage').then((m) => ({ default: m.StoreFormPage })),
 );
 const MenuManagementPage = React.lazy(() =>
-  import('./pages/merchant/MenuManagementPage').then((m) => ({ default: m.MenuManagementPage })),
+  import('./pages/merchant/MenuManagementPageV2'),
 );
 const MenuItemFormPage = React.lazy(() =>
   import('./pages/merchant/MenuItemFormPage').then((m) => ({ default: m.MenuItemFormPage })),
@@ -165,7 +165,6 @@ import { ScrollToTop } from '@/components/common/ScrollToTop';
 import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
 import { PaymentCancelPage } from './pages/PaymentCancelPage';
 import { NudgeToast } from '@/components/nudges/NudgeToast';
-import { AiChatWidget } from '@/components/ai/AiChatWidget';
 const LoyaltyHistoryPage = React.lazy(() =>
   import('./pages/LoyaltyHistoryPage').then((m) => ({ default: m.LoyaltyHistoryPage }))
 );
@@ -484,9 +483,11 @@ function App() {
                   path="/merchant/onboarding/*"
                   element={
                     <ProtectedRoute>
-                      <Suspense fallback={<LoadingOverlay />}>
-                        <MerchantOnboardingPage />
-                      </Suspense>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantOnboardingPage />
+                        </Suspense>
+                      </MerchantLayout>
                     </ProtectedRoute>
                   }
                 />
@@ -797,7 +798,6 @@ function App() {
                 <Route path={PATHS.NOT_FOUND} element={<NotFoundPage />} />
               </Routes>
               <NudgeToast />
-              <AiChatWidget />
               <Toaster />
             </ModalProvider>
           </CityProvider>

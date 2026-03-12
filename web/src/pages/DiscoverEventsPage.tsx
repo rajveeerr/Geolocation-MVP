@@ -132,7 +132,7 @@ function VenueCard({ venue }: { venue: TicketmasterVenue }) {
       href={venue.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex items-center gap-4 p-4 bg-white border border-neutral-200 rounded-2xl hover:border-brand-primary-500/30 hover:shadow-md transition-all duration-200"
+      className="group flex items-center gap-4 p-4 bg-white border border-neutral-200 rounded-2xl hover:border-[#B91C1C]/30 hover:shadow-md transition-all duration-200"
     >
       <div className="w-16 h-16 rounded-xl overflow-hidden bg-neutral-100 flex-shrink-0">
         {image ? (
@@ -148,12 +148,12 @@ function VenueCard({ venue }: { venue: TicketmasterVenue }) {
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <h3 className="font-heading text-sm font-bold text-[#1a1a2e] group-hover:text-brand-primary-600 transition-colors line-clamp-1">
+        <h3 className="font-heading text-sm font-bold text-[#1a1a2e] group-hover:text-[#B91C1C] transition-colors line-clamp-1">
           {venue.name}
         </h3>
         {location && (
           <p className="text-xs text-neutral-500 mt-0.5 flex items-center gap-1">
-            <MapPin className="w-3 h-3 text-brand-primary-600" />
+            <MapPin className="w-3 h-3 text-[#8B1A1A]" />
             {location}
           </p>
         )}
@@ -163,7 +163,7 @@ function VenueCard({ venue }: { venue: TicketmasterVenue }) {
           </p>
         )}
       </div>
-      <ExternalLink className="w-4 h-4 text-neutral-300 group-hover:text-brand-primary-600 flex-shrink-0 transition-colors" />
+      <ExternalLink className="w-4 h-4 text-neutral-300 group-hover:text-[#B91C1C] flex-shrink-0 transition-colors" />
     </a>
   );
 }
@@ -187,7 +187,7 @@ function AttractionCard({
       href={attraction.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex items-center gap-4 p-4 bg-white border border-neutral-200 rounded-2xl hover:border-brand-primary-500/30 hover:shadow-md transition-all duration-200"
+      className="group flex items-center gap-4 p-4 bg-white border border-neutral-200 rounded-2xl hover:border-[#B91C1C]/30 hover:shadow-md transition-all duration-200"
     >
       <div className="w-16 h-16 rounded-full overflow-hidden bg-neutral-100 flex-shrink-0">
         {image ? (
@@ -203,17 +203,17 @@ function AttractionCard({
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <h3 className="font-heading text-sm font-bold text-[#1a1a2e] group-hover:text-brand-primary-600 transition-colors line-clamp-1">
+        <h3 className="font-heading text-sm font-bold text-[#1a1a2e] group-hover:text-[#B91C1C] transition-colors line-clamp-1">
           {attraction.name}
         </h3>
         {genre && (
           <p className="text-xs text-neutral-500 mt-0.5 flex items-center gap-1">
-            <Music className="w-3 h-3 text-brand-primary-600" />
+            <Music className="w-3 h-3 text-[#8B1A1A]" />
             {genre}
           </p>
         )}
       </div>
-      <ExternalLink className="w-4 h-4 text-neutral-300 group-hover:text-brand-primary-600 flex-shrink-0 transition-colors" />
+      <ExternalLink className="w-4 h-4 text-neutral-300 group-hover:text-[#B91C1C] flex-shrink-0 transition-colors" />
     </a>
   );
 }
@@ -423,7 +423,7 @@ export function DiscoverEventsPage() {
         <div className="mb-8">
           <h1 className="font-heading text-3xl sm:text-4xl font-black text-[#1a1a2e] tracking-tight">
             Discover{' '}
-            <span className="text-brand-primary-600">Events</span>
+            <span className="text-[#B91C1C]">Events</span>
           </h1>
           <p className="text-neutral-500 mt-2 text-sm">
             Find local events and browse Ticketmaster listings near you
@@ -440,7 +440,7 @@ export function DiscoverEventsPage() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="w-full pl-10 pr-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm text-[#1a1a2e] placeholder-neutral-400 focus:outline-none focus:border-brand-primary-500 focus:ring-1 focus:ring-brand-primary-500/20 transition-colors"
+              className="w-full pl-10 pr-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm text-[#1a1a2e] placeholder-neutral-400 focus:outline-none focus:border-[#B91C1C] focus:ring-1 focus:ring-[#B91C1C]/20 transition-colors"
             />
           </div>
 
@@ -450,7 +450,7 @@ export function DiscoverEventsPage() {
             className={cn(
               'flex items-center gap-2 sm:w-52 px-3.5 py-2.5 rounded-xl text-sm border transition-all active:scale-[0.98]',
               city
-                ? 'bg-brand-primary-50 border-brand-primary-500/20 text-brand-primary-600'
+                ? 'bg-red-50 border-[#B91C1C]/20 text-[#B91C1C]'
                 : 'bg-neutral-50 border-neutral-200 text-neutral-400 hover:border-neutral-300 hover:text-[#1a1a2e]',
             )}
           >
@@ -468,7 +468,7 @@ export function DiscoverEventsPage() {
             </span>
             {city && (
               <X
-                className="w-3.5 h-3.5 ml-auto flex-shrink-0 hover:text-brand-primary-600 transition-colors"
+                className="w-3.5 h-3.5 ml-auto flex-shrink-0 hover:text-[#9B2020] transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   setCity('');
@@ -479,7 +479,7 @@ export function DiscoverEventsPage() {
 
           <button
             onClick={handleSearch}
-            className="px-6 py-2.5 bg-brand-primary-600 hover:bg-brand-primary-700 rounded-xl text-sm font-bold text-white transition-colors active:scale-[0.98] shadow-sm"
+            className="px-6 py-2.5 bg-[#B91C1C] hover:bg-[#9B2020] rounded-xl text-sm font-bold text-white transition-colors active:scale-[0.98] shadow-sm"
           >
             Search
           </button>
@@ -488,7 +488,7 @@ export function DiscoverEventsPage() {
             className={cn(
               'px-3 py-2.5 rounded-xl text-sm font-medium border transition-colors',
               showFilters
-                ? 'bg-brand-primary-50 border-brand-primary-500/30 text-brand-primary-600'
+                ? 'bg-red-50 border-[#B91C1C]/30 text-[#B91C1C]'
                 : 'bg-neutral-50 border-neutral-200 text-neutral-400 hover:text-[#1a1a2e] hover:border-neutral-300',
             )}
           >
@@ -533,7 +533,7 @@ export function DiscoverEventsPage() {
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className="px-3 py-2 bg-white border border-neutral-200 rounded-lg text-sm text-[#1a1a2e] focus:outline-none focus:border-brand-primary-500"
+                      className="px-3 py-2 bg-white border border-neutral-200 rounded-lg text-sm text-[#1a1a2e] focus:outline-none focus:border-[#B91C1C]"
                     />
                   </div>
                   <div>
@@ -544,7 +544,7 @@ export function DiscoverEventsPage() {
                       type="date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
-                      className="px-3 py-2 bg-white border border-neutral-200 rounded-lg text-sm text-[#1a1a2e] focus:outline-none focus:border-brand-primary-500"
+                      className="px-3 py-2 bg-white border border-neutral-200 rounded-lg text-sm text-[#1a1a2e] focus:outline-none focus:border-[#B91C1C]"
                     />
                   </div>
                   <div>
@@ -554,7 +554,7 @@ export function DiscoverEventsPage() {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="px-3 py-2 bg-white border border-neutral-200 rounded-lg text-sm text-[#1a1a2e] focus:outline-none focus:border-brand-primary-500"
+                      className="px-3 py-2 bg-white border border-neutral-200 rounded-lg text-sm text-[#1a1a2e] focus:outline-none focus:border-[#B91C1C]"
                     >
                       {SORT_OPTIONS.map((opt) => (
                         <option key={opt.value} value={opt.value}>
@@ -569,7 +569,7 @@ export function DiscoverEventsPage() {
                         type="checkbox"
                         checked={freeOnly}
                         onChange={(e) => setFreeOnly(e.target.checked)}
-                        className="h-3.5 w-3.5 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                        className="h-3.5 w-3.5 rounded border-neutral-300 text-[#B91C1C] focus:ring-[#B91C1C]"
                       />
                       <span className="text-sm text-[#1a1a2e] font-medium">
                         Free only
@@ -582,7 +582,7 @@ export function DiscoverEventsPage() {
                         setStartDate('');
                         setEndDate('');
                       }}
-                      className="self-end px-3 py-2 text-xs text-neutral-400 hover:text-brand-primary-600 font-medium"
+                      className="self-end px-3 py-2 text-xs text-neutral-400 hover:text-[#B91C1C] font-medium"
                     >
                       <X className="w-3 h-3 inline mr-1" />
                       Clear dates
@@ -607,8 +607,8 @@ export function DiscoverEventsPage() {
                           className={cn(
                             'px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors',
                             eventType === type.value
-                              ? 'bg-brand-primary-600 text-white'
-                              : 'bg-white border border-neutral-200 text-neutral-500 hover:border-brand-primary-500/30 hover:text-brand-primary-600',
+                              ? 'bg-[#B91C1C] text-white'
+                              : 'bg-white border border-neutral-200 text-neutral-500 hover:border-[#B91C1C]/30 hover:text-[#B91C1C]',
                           )}
                         >
                           {type.label}
@@ -633,7 +633,7 @@ export function DiscoverEventsPage() {
                 className={cn(
                   'flex items-center gap-1.5 px-4 py-2.5 text-sm font-bold whitespace-nowrap border-b-2 transition-colors -mb-px',
                   activeTab === tab.key
-                    ? 'border-brand-primary-500 text-brand-primary-600'
+                    ? 'border-[#B91C1C] text-[#B91C1C]'
                     : 'border-transparent text-neutral-400 hover:text-neutral-600',
                 )}
               >
@@ -648,7 +648,7 @@ export function DiscoverEventsPage() {
 
         {/* Loading */}
         {isLoading && (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <CardSkeleton key={i} />
             ))}
@@ -668,7 +668,7 @@ export function DiscoverEventsPage() {
                     events found
                   </p>
                 </div>
-                <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                   {browseQuery.data.events.map((event) => (
                     <EventCard key={event.id} event={event} />
                   ))}
@@ -717,7 +717,7 @@ export function DiscoverEventsPage() {
                 </div>
 
                 {discoverQuery.data.events.length > 0 ? (
-                  <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                     {discoverQuery.data.events.map((event: any) => (
                       <EventCard key={event.id} event={event} />
                     ))}
@@ -756,7 +756,7 @@ export function DiscoverEventsPage() {
 
                 {tmEventsQuery.data.events.length > 0 ? (
                   <>
-                    <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                       {tmEventsQuery.data.events.map((event) => (
                         <EventCard key={event.id} event={tmToHybrid(event)} />
                       ))}

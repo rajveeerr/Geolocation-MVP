@@ -50,23 +50,23 @@ export const ReviewPublishScreen = () => {
     try {
       const stores =
         firstStore &&
-        firstStore.address &&
-        firstStore.cityId &&
-        firstStore.latitude != null &&
-        firstStore.longitude != null
+          firstStore.address &&
+          firstStore.cityId &&
+          firstStore.latitude != null &&
+          firstStore.longitude != null
           ? [
-              {
-                address: firstStore.address,
-                cityId: firstStore.cityId,
-                latitude: firstStore.latitude,
-                longitude: firstStore.longitude,
-                active: firstStore.active ?? true,
-                description: firstStore.description || null,
-                operatingHours: businessHoursToOperatingHours(firstStore.businessHours),
-                galleryUrls: firstStore.galleryUrls?.length ? firstStore.galleryUrls : undefined,
-                isFoodTruck: firstStore.isFoodTruck ?? false,
-              },
-            ]
+            {
+              address: firstStore.address,
+              cityId: firstStore.cityId,
+              latitude: firstStore.latitude,
+              longitude: firstStore.longitude,
+              active: firstStore.active ?? true,
+              description: firstStore.description || null,
+              operatingHours: businessHoursToOperatingHours(firstStore.businessHours),
+              galleryUrls: firstStore.galleryUrls?.length ? firstStore.galleryUrls : undefined,
+              isFoodTruck: firstStore.isFoodTruck ?? false,
+            },
+          ]
           : undefined;
 
       const payload = {
@@ -86,6 +86,11 @@ export const ReviewPublishScreen = () => {
         vibeTags: state.vibeTags.length > 0 ? state.vibeTags : undefined,
         amenities: state.amenities.length > 0 ? state.amenities : undefined,
         thingsToNote: state.thingsToNote || undefined,
+        tiktokUrl: state.tiktokUrl || undefined,
+        youtubeUrl: state.youtubeUrl || undefined,
+        ownerName: state.ownerName || undefined,
+        ownerEmail: state.ownerEmail || undefined,
+        ownerPhone: state.ownerPhone || undefined,
         stores,
       };
 
