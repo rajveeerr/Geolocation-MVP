@@ -28,9 +28,9 @@ export const AdminCityPerformanceCards: React.FC<AdminCityPerformanceCardsProps>
 
   const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
-      case 'up': return <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />;
-      case 'down': return <TrendingDown className="h-3.5 w-3.5 text-red-400" />;
-      default: return <Minus className="h-3.5 w-3.5 text-neutral-400" />;
+      case 'up': return <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />;
+      case 'down': return <TrendingDown className="h-3.5 w-3.5 text-red-500" />;
+      default: return <Minus className="h-3.5 w-3.5 text-neutral-500" />;
     }
   };
 
@@ -58,29 +58,29 @@ export const AdminCityPerformanceCards: React.FC<AdminCityPerformanceCardsProps>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {citiesWithStores.map((city, index) => (
           <div key={city.id}
-            className="rounded-2xl bg-gradient-to-br from-neutral-900 to-neutral-800 p-5 shadow-sm hover:shadow-lg transition-all duration-300 group">
+            className="rounded-2xl border border-neutral-200/60 bg-neutral-50/50 p-5 shadow-sm hover:shadow-md hover:bg-white hover:border-brand-primary-100 transition-all duration-300 group">
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-xl group-hover:scale-105 transition-transform">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white border border-neutral-200/60 shadow-sm text-xl group-hover:scale-105 transition-transform">
                 {getCityIcon(index)}
               </div>
               <div>
-                <h4 className="text-base font-bold text-white">{city.name}</h4>
-                <p className="text-[13px] text-neutral-400">{city.state}</p>
+                <h4 className="text-base font-bold text-neutral-900">{city.name}</h4>
+                <p className="text-[13px] text-neutral-500">{city.state}</p>
               </div>
             </div>
 
             <div className="space-y-2">
-              <div className="text-3xl font-bold font-heading text-white tracking-tight">
+              <div className="text-3xl font-bold font-heading text-neutral-900 tracking-tight">
                 {city.value.toLocaleString()}
               </div>
               <div className={`flex items-center gap-1.5 text-sm font-medium ${
-                city.trend === 'up' ? 'text-emerald-400' :
-                city.trend === 'down' ? 'text-red-400' :
-                'text-neutral-400'
+                city.trend === 'up' ? 'text-emerald-600' :
+                city.trend === 'down' ? 'text-red-600' :
+                'text-neutral-500'
               }`}>
                 {getTrendIcon(city.trend)}
                 <span>{city.change > 0 ? '+' : ''}{city.change.toFixed(1)}%</span>
-                <span className="text-neutral-500 text-[12px]">vs last period</span>
+                <span className="text-neutral-400 text-[12px]">vs last period</span>
               </div>
             </div>
           </div>

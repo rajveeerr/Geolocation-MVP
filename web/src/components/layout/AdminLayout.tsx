@@ -46,36 +46,65 @@ function isGroup(entry: SidebarEntry): entry is NavGroup {
 
 const SIDEBAR_NAV: SidebarEntry[] = [
   {
-    to: '/admin/analytics',
+    to: '/admin',
     icon: <LayoutDashboard className="h-[18px] w-[18px]" />,
     label: 'Overview',
+    end: true
   },
   {
-    label: 'Management',
+    to: '/admin/real-time',
+    icon: <TrendingUp className="h-[18px] w-[18px]" />,
+    label: 'Real-Time Analytics',
+  },
+  {
+    label: 'User Management',
     icon: <Users className="h-[18px] w-[18px]" />,
     items: [
-      { to: PATHS.ADMIN_MERCHANTS, icon: <Building className="h-[18px] w-[18px]" />, label: 'Merchants' },
-      { to: PATHS.ADMIN_CUSTOMERS, icon: <Users className="h-[18px] w-[18px]" />, label: 'Customers' },
-      { to: PATHS.ADMIN_CITIES, icon: <BarChart3 className="h-[18px] w-[18px]" />, label: 'Cities' },
+      { to: PATHS.ADMIN_CUSTOMERS, icon: <Users className="h-[15px] w-[15px]" />, label: 'All Users' },
+      { to: PATHS.ADMIN_MERCHANTS, icon: <Building className="h-[15px] w-[15px]" />, label: 'Businesses' },
+      { to: '/admin/crm', icon: <Database className="h-[15px] w-[15px]" />, label: 'Customer CRM' },
     ],
   },
   {
-    label: 'Analytics',
-    icon: <TrendingUp className="h-[18px] w-[18px]" />,
+    label: 'Analytics & Reporting',
+    icon: <BarChart3 className="h-[18px] w-[18px]" />,
     items: [
-      { to: '/admin/analytics', icon: <TrendingUp className="h-[18px] w-[18px]" />, label: 'Performance' },
-      { to: '/admin/city-analytics', icon: <Award className="h-[18px] w-[18px]" />, label: 'City Analytics' },
+      { to: '/admin/analytics', icon: <TrendingUp className="h-[15px] w-[15px]" />, label: 'Performance' },
+      { to: '/admin/city-analytics', icon: <Award className="h-[15px] w-[15px]" />, label: 'City Analytics' },
     ],
   },
   {
-    to: PATHS.ADMIN_NUDGES,
-    icon: <Bell className="h-[18px] w-[18px]" />,
-    label: 'Nudges',
+    label: 'Marketplace',
+    icon: <Award className="h-[18px] w-[18px]" />,
+    items: [
+      { to: '/admin/master-data', icon: <Database className="h-[15px] w-[15px]" />, label: 'Master Data' },
+      { to: PATHS.ADMIN_NUDGES, icon: <Bell className="h-[15px] w-[15px]" />, label: 'Nudges' },
+    ],
   },
   {
-    to: '/admin/master-data',
-    icon: <Database className="h-[18px] w-[18px]" />,
-    label: 'Master Data',
+    label: 'Revenue & Finance',
+    icon: <span className="font-bold flex items-center justify-center w-[18px] h-[18px]">$</span>,
+    items: [],
+  },
+  {
+    label: 'Marketing & Growth',
+    icon: <span className="font-bold flex items-center justify-center w-[18px] h-[18px] text-[15px]">{'>'}</span>,
+    items: [],
+  },
+  {
+    label: 'Community',
+    icon: <svg viewBox="0 0 24 24" fill="none" className="h-[18px] w-[18px]" stroke="currentColor" strokeWidth="2"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+    items: [],
+  },
+  {
+    label: 'Settings & Admin',
+    icon: <Settings className="h-[18px] w-[18px]" />,
+    items: [],
+  },
+  {
+    to: '/admin/chat',
+    icon: <MessageSquare className="h-[18px] w-[18px]" />,
+    label: 'Chat',
   },
 ];
 

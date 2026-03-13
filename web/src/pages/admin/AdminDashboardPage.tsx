@@ -12,7 +12,7 @@ export const AdminDashboardPage = () => {
       return <AdminMasterDataManager />;
     }
     
-    if (location.pathname === '/admin/analytics') {
+    if (location.pathname === '/admin/analytics' || location.pathname === '/admin') {
       return <AdminOverviewPage />;
     }
     

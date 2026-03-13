@@ -8,6 +8,8 @@ import { AdminWeeklyChart } from '@/components/admin/AdminWeeklyChart';
 import { AdminTopMerchants } from '@/components/admin/AdminTopMerchants';
 import { AdminTopCities } from '@/components/admin/AdminTopCities';
 import { AdminTopCategories } from '@/components/admin/AdminTopCategories';
+import { UserActivityChart } from '@/components/admin/UserActivityChart';
+import { RevenueTrendChart } from '@/components/admin/RevenueTrendChart';
 import { useAdminCities } from '@/hooks/useAdminCities';
 import { useAdminTapInsOverview, useAdminBountiesOverview, useAdminTapInsGeographic, useAdminBountiesLeaderboard } from '@/hooks/useAdminAdvancedAnalytics';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -317,7 +319,13 @@ export const AdminOverviewPage = () => {
       {/* City Performance */}
       <AdminCityPerformanceCards period={selectedTimeRange === '90d' ? '30d' : selectedTimeRange} />
 
-      {/* Charts Row */}
+      {/* Activity & Revenue Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <UserActivityChart />
+        <RevenueTrendChart />
+      </div>
+
+      {/* Weekly Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <AdminWeeklyChart cityId={cityId} metric={selectedMetric}
           title={selectedCity ? `${selectedCity} - Weekly ${selectedMetric}` : `Weekly ${selectedMetric}`} />
