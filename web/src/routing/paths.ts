@@ -85,6 +85,15 @@ export const PATHS = {
   MERCHANT_SERVICES_MANAGE: '/merchant/services/:serviceId',
   MERCHANT_SERVICES_CHECKIN: '/merchant/services/:serviceId/checkin',
 
+  // Merchant Surprises
+  MERCHANT_SURPRISES: '/merchant/surprises',
+  MERCHANT_SURPRISES_CREATE: '/merchant/surprises/create',
+  MERCHANT_SURPRISES_ANALYTICS: '/merchant/surprises/:dealId/analytics',
+
+  // Consumer Surprises
+  SURPRISES: '/surprises',
+  MY_REVEAL_HISTORY: '/surprises/history',
+
   // Events
   EVENT_DETAIL: '/events/:eventId',
   DISCOVER_EVENTS: '/discover/events',

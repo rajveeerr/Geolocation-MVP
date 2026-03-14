@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { to: PATHS.MERCHANT_DEALS, label: 'My Deals' },
   { to: PATHS.MERCHANT_EVENTS, label: 'My Events' },
   { to: PATHS.MERCHANT_SERVICES, label: 'My Services' },
+  { to: PATHS.MERCHANT_SURPRISES, label: 'My Surprises' },
   { to: PATHS.MERCHANT_STORES, label: 'My Stores' },
   { to: PATHS.MERCHANT_ANALYTICS, label: 'Analytics' },
   { to: PATHS.MERCHANT_LOYALTY_ANALYTICS, label: 'Loyalty' },
