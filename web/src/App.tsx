@@ -69,6 +69,12 @@ const AdminLoginPage = React.lazy(() =>
 const AdminDashboardPage = React.lazy(() =>
   import('./pages/admin/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })),
 );
+const AdminRealTimeAnalyticsPage = React.lazy(() =>
+  import('./pages/admin/AdminRealTimeAnalyticsPage').then((m) => ({ default: m.AdminRealTimeAnalyticsPage })),
+);
+const CustomerCRMPage = React.lazy(() =>
+  import('./pages/admin/CustomerCRMPage').then((m) => ({ default: m.CustomerCRMPage })),
+);
 const MerchantApprovalDashboard = React.lazy(() =>
   import('./pages/admin/MerchantApprovalDashboard').then((m) => ({ default: m.MerchantApprovalDashboard })),
 );
@@ -822,7 +828,23 @@ function App() {
                     index
                     element={
                       <Suspense fallback={<LoadingOverlay />}>
-                        <CityManagementDashboard />
+                        <AdminDashboardPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/admin/real-time"
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <AdminRealTimeAnalyticsPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/admin/crm"
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <CustomerCRMPage />
                       </Suspense>
                     }
                   />
