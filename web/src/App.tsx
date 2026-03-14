@@ -181,6 +181,21 @@ const ServiceManagePage = React.lazy(() =>
 const ServiceCheckInPage = React.lazy(() =>
   import('./pages/merchant/ServiceCheckInPage').then((m) => ({ default: m.ServiceCheckInPage })),
 );
+const MerchantMySurprisesPage = React.lazy(() =>
+  import('./pages/merchant/MerchantMySurprisesPage').then((m) => ({ default: m.MerchantMySurprisesPage })),
+);
+const SurpriseCreatePage = React.lazy(() =>
+  import('./pages/merchant/SurpriseCreatePage').then((m) => ({ default: m.SurpriseCreatePage })),
+);
+const SurpriseAnalyticsPage = React.lazy(() =>
+  import('./pages/merchant/SurpriseAnalyticsPage').then((m) => ({ default: m.SurpriseAnalyticsPage })),
+);
+const SurprisesPage = React.lazy(() =>
+  import('./pages/SurprisesPage').then((m) => ({ default: m.SurprisesPage })),
+);
+const MyRevealHistoryPage = React.lazy(() =>
+  import('./pages/MyRevealHistoryPage').then((m) => ({ default: m.MyRevealHistoryPage })),
+);
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
 import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
@@ -876,6 +891,68 @@ function App() {
                     }
                   />
                 </Route>
+
+                {/* Consumer Surprises */}
+                <Route element={<DefaultLayout />}>
+                  <Route
+                    path={PATHS.SURPRISES}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <SurprisesPage />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path={PATHS.MY_REVEAL_HISTORY}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MyRevealHistoryPage />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                </Route>
+
+                {/* Merchant Surprises */}
+                <Route
+                  path={PATHS.MERCHANT_SURPRISES}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantMySurprisesPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_SURPRISES_CREATE}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <SurpriseCreatePage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_SURPRISES_ANALYTICS}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <SurpriseAnalyticsPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* Consumer Nudge History */}
                 <Route element={<DefaultLayout />}>
