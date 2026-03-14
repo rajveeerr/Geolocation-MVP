@@ -79,9 +79,20 @@ export const PATHS = {
   MERCHANT_EVENTS_MANAGE: '/merchant/events/:eventId',
   MERCHANT_EVENTS_CHECKIN: '/merchant/events/:eventId/checkin',
 
+  // Merchant Services
+  MERCHANT_SERVICES: '/merchant/services',
+  MERCHANT_SERVICES_CREATE: '/merchant/services/create',
+  MERCHANT_SERVICES_MANAGE: '/merchant/services/:serviceId',
+  MERCHANT_SERVICES_CHECKIN: '/merchant/services/:serviceId/checkin',
+
   // Events
   EVENT_DETAIL: '/events/:eventId',
   DISCOVER_EVENTS: '/discover/events',
+
+  // Services
+  DISCOVER_SERVICES: '/discover/services',
+  SERVICE_DETAIL: '/services/:serviceId',
+  MY_SERVICE_BOOKINGS: '/my-services/bookings',
 
   // My Tickets (consumer)
   MY_TICKETS: '/my-tickets',

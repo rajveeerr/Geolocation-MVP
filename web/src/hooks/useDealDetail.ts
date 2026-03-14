@@ -125,6 +125,47 @@ export interface DetailedDeal {
   };
 }
 
+export interface PublicMenuCollectionItem {
+  collectionId: number;
+  menuItemId: number;
+  sortOrder: number;
+  isActive: boolean;
+  customPrice: number | null;
+  customDiscount: number | null;
+  notes: string | null;
+  menuItem: {
+    id: number;
+    name: string;
+    price: number;
+    category: string;
+    imageUrl: string | null;
+    imageUrls?: string[];
+    description: string;
+    dealType?: string | null;
+    isHappyHour?: boolean;
+    happyHourPrice?: number | null;
+  };
+}
+
+export interface PublicMenuCollection {
+  id: number;
+  merchantId: number;
+  name: string;
+  description: string | null;
+  isActive: boolean;
+  menuType?: string | null;
+  subType?: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
+  themeName?: string | null;
+  icon?: string | null;
+  color?: string | null;
+  items: PublicMenuCollectionItem[];
+  _count?: {
+    items: number;
+  };
+}
+
 export const useDealDetail = (dealId: string) => {
   return useQuery<DetailedDeal, Error>({
     queryKey: ['deal-detail', dealId],
@@ -151,5 +192,24 @@ export const useDealDetail = (dealId: string) => {
       // Retry up to 2 times for other errors
       return failureCount < 2;
     },
+  });
+};
+
+export const usePublicMenuCollections = (merchantId: number | null | undefined) => {
+  return useQuery<{ collections: PublicMenuCollection[] }, Error>({
+    queryKey: ['public-menu-collections', merchantId],
+    queryFn: async () => {
+      const response = await apiGet<{ collections: PublicMenuCollection[] }>(
+        `/menu-collections/${merchantId}`,
+      );
+
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to fetch menu collections');
+      }
+
+      return response.data;
+    },
+    enabled: !!merchantId,
+    staleTime: 5 * 60 * 1000,
   });
 };

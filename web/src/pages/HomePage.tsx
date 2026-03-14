@@ -2,14 +2,11 @@ import { ContentCarousel } from '@/components/common/ContentCarousel';
 import { NewHeroSection } from '@/components/landing/NewHeroSection';
 import { LeaderboardSection } from '@/components/landing/LeaderboardSection';
 import { HowItWorksSection } from '@/components/landing/HowItWorksSection';
-import { premiumDeals } from '@/data/deals';
-import { streetTacosDeals, weekendEnergyDeals, selfCareDeals } from '@/data/landing-deals';
-// Backend API calls disabled for now — showing hardcoded data only. Uncomment when ready to fetch:
-// import { useFeaturedDeals } from '@/hooks/useFeaturedDeals';
-// import { useTodaysDeals } from '@/hooks/useTodaysDeals';
-// import { usePopularDeals } from '@/hooks/usePopularDeals';
-// import { useHappyHourDeals } from '@/hooks/useDealsByCategory';
-// import { useExperienceDeals } from '@/hooks/useDealsByCategory';
+import { CarouselSkeleton } from '@/components/common/DealCardSkeleton';
+import { useFeaturedDeals } from '@/hooks/useFeaturedDeals';
+import { useTodaysDeals } from '@/hooks/useTodaysDeals';
+import { usePopularDeals } from '@/hooks/usePopularDeals';
+import { useDealsByCategory } from '@/hooks/useDealsByCategory';
 
 /* ─── Section icons from Figma (#E80203) ─── */
 const iconClass = 'h-6 w-6 sm:h-7 sm:w-7 shrink-0';
@@ -55,18 +52,27 @@ const SectionIcons = {
 };
 
 export const HomePage = () => {
-  // Hardcoded data only — backend API not called. Uncomment hooks above when ready to fetch real data.
-  // const { data: featuredDeals, isLoading: isLoadingFeatured } = useFeaturedDeals();
-  // const { data: todaysDeals, isLoading: isLoadingTodays } = useTodaysDeals();
-  // const { data: popularDeals, isLoading: isLoadingPopular } = usePopularDeals();
-  // const { data: happyHourDealsData, isLoading: isLoadingHappyHour } = useHappyHourDeals();
-  // const { data: experienceDealsData, isLoading: isLoadingExperiences } = useExperienceDeals();
+  const { data: featuredDeals, isLoading: isLoadingFeatured } = useFeaturedDeals();
+  const { data: todaysDeals, isLoading: isLoadingTodays } = useTodaysDeals();
+  const { data: popularDeals, isLoading: isLoadingPopular } = usePopularDeals();
+  const { data: foodAndBeverageDeals, isLoading: isLoadingFood } = useDealsByCategory({ category: 'FOOD_AND_BEVERAGE' });
+  const { data: entertainmentDeals, isLoading: isLoadingEntertainment } = useDealsByCategory({ category: 'ENTERTAINMENT' });
+  const { data: healthAndFitnessDeals, isLoading: isLoadingHealth } = useDealsByCategory({ category: 'HEALTH_AND_FITNESS' });
 
-  const displayTodaysDeals = streetTacosDeals;
-  const displayFeaturedDeals = premiumDeals;
-  const displayHappyHourDeals = selfCareDeals;
-  const displayExperienceDeals = weekendEnergyDeals;
-  const displayPopularDeals = premiumDeals;
+  const isHomeDealsLoading =
+    isLoadingFeatured ||
+    isLoadingTodays ||
+    isLoadingPopular ||
+    isLoadingFood ||
+    isLoadingEntertainment ||
+    isLoadingHealth;
+
+  const displayTodaysDeals = todaysDeals ?? [];
+  const displayFeaturedDeals = featuredDeals ?? [];
+  const displayHappyHourDeals = healthAndFitnessDeals ?? [];
+  const displayExperienceDeals = entertainmentDeals ?? [];
+  const displayPopularDeals = popularDeals ?? [];
+  const displayFoodDeals = foodAndBeverageDeals ?? [];
 
   return (
     <>
@@ -80,53 +86,76 @@ export const HomePage = () => {
         {/* Hero Section */}
         <NewHeroSection />
 
-        {/* ── Fast Food Friday ── */}
-          <ContentCarousel
-            title="Fast Food Friday"
-            icon={SectionIcons.fastFood}
-            subtitle="Kickstart your weekend with these tasty quick bites."
-            deals={displayTodaysDeals}
-            allLink="/deals?category=FOOD_AND_BEVERAGE"
-          />
+        {isHomeDealsLoading ? (
+          <>
+            <CarouselSkeleton
+              title="Fast Food Friday"
+              icon={SectionIcons.fastFood}
+              subtitle="Kickstart your weekend with these tasty quick bites."
+            />
+            <CarouselSkeleton
+              title="Weekend Energy"
+              icon={SectionIcons.weekend}
+              subtitle="Plans for the Weekend? We've Got You."
+            />
+            <CarouselSkeleton
+              title="Self-Care Mode"
+              icon={SectionIcons.selfCare}
+              subtitle="Everything you need to unwind, glow, and step out confident. You can bring your friends too!"
+            />
+          </>
+        ) : (
+          <>
 
-        {/* ── Weekend Energy ── */}
-          <ContentCarousel
-            title="Weekend Energy"
-            icon={SectionIcons.weekend}
-            subtitle="Plans for the Weekend? We've Got You."
-            deals={displayExperienceDeals}
-            allLink="/deals?category=ENTERTAINMENT"
-          />
+            {/* ── Fast Food Friday ── */}
+              <ContentCarousel
+                title="Fast Food Friday"
+                icon={SectionIcons.fastFood}
+                subtitle="Kickstart your weekend with these tasty quick bites."
+                deals={displayFoodDeals.length > 0 ? displayFoodDeals : displayTodaysDeals}
+                allLink="/deals?category=FOOD_AND_BEVERAGE"
+              />
 
-        {/* ── Self-Care Mode ── */}
-          <ContentCarousel
-            title="Self-Care Mode"
-            icon={SectionIcons.selfCare}
-            subtitle="Everything you need to unwind, glow, and step out confident. You can bring your friends too!"
-            deals={displayHappyHourDeals}
-            allLink="/deals?category=HEALTH_AND_BEAUTY"
-          />
+            {/* ── Weekend Energy ── */}
+              <ContentCarousel
+                title="Weekend Energy"
+                icon={SectionIcons.weekend}
+                subtitle="Plans for the Weekend? We've Got You."
+                deals={displayExperienceDeals}
+                allLink="/deals?category=ENTERTAINMENT"
+              />
 
-        {/* ── Popular Near You ── */}
-        {displayPopularDeals.length > 0 && (
-          <ContentCarousel
-            title="Popular Near You"
-            icon={<PopularNearIcon />}
-            subtitle="Trending deals in your area right now."
-            deals={displayPopularDeals}
-            allLink="/deals"
-          />
-        )}
+            {/* ── Self-Care Mode ── */}
+              <ContentCarousel
+                title="Self-Care Mode"
+                icon={SectionIcons.selfCare}
+                subtitle="Everything you need to unwind, glow, and step out confident. You can bring your friends too!"
+                deals={displayHappyHourDeals}
+                allLink="/deals?category=HEALTH_AND_BEAUTY"
+              />
 
-        {/* ── Featured Picks ── */}
-        {displayFeaturedDeals.length > 0 && (
-          <ContentCarousel
-            title="Featured Picks"
-            icon={<FeaturedPicksIcon />}
-            subtitle="Handpicked by our team just for you."
-            deals={displayFeaturedDeals}
-            allLink="/deals"
-          />
+            {/* ── Popular Near You ── */}
+            {displayPopularDeals.length > 0 && (
+              <ContentCarousel
+                title="Popular Near You"
+                icon={<PopularNearIcon />}
+                subtitle="Trending deals in your area right now."
+                deals={displayPopularDeals}
+                allLink="/deals"
+              />
+            )}
+
+            {/* ── Featured Picks ── */}
+            {displayFeaturedDeals.length > 0 && (
+              <ContentCarousel
+                title="Featured Picks"
+                icon={<FeaturedPicksIcon />}
+                subtitle="Handpicked by our team just for you."
+                deals={displayFeaturedDeals}
+                allLink="/deals"
+              />
+            )}
+          </>
         )}
 
         {/* Leaderboard Section */}

@@ -23,6 +23,11 @@ const StoreDetailCard = ({ store, onEdit, onDelete }: {
   onEdit: (store: Store) => void;
   onDelete: (store: Store) => void;
 }) => {
+  const cityName = store.city?.name || 'Unknown City';
+  const cityState = store.city?.state || 'Unknown State';
+  const cityId = store.city?.id;
+  const cityActive = !!store.city?.active;
+
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return 'Recently';
     
@@ -52,7 +57,7 @@ const StoreDetailCard = ({ store, onEdit, onDelete }: {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-neutral-900 mb-2">
-                {store.city.name}, {store.city.state}
+                {cityName}, {cityState}
               </h1>
               <div className="flex items-center gap-4 text-sm text-neutral-600">
                 <span className="flex items-center gap-1">
@@ -119,7 +124,7 @@ const StoreDetailCard = ({ store, onEdit, onDelete }: {
             <div className="space-y-3">
               <div>
                 <h4 className="font-medium text-neutral-900 mb-1">City</h4>
-                <p className="text-sm text-neutral-600">{store.city.name}, {store.city.state}</p>
+                <p className="text-sm text-neutral-600">{cityName}, {cityState}</p>
               </div>
               <div>
                 <h4 className="font-medium text-neutral-900 mb-1">Store ID</h4>
@@ -155,16 +160,16 @@ const StoreDetailCard = ({ store, onEdit, onDelete }: {
               <div>
                 <h4 className="font-medium text-neutral-900 mb-1">Latitude</h4>
                 <p className="text-sm text-neutral-600 font-mono">
-                  {store.latitude ? store.latitude.toFixed(6) : 'Not set'}
+                  {store.latitude !== null && store.latitude !== undefined ? store.latitude.toFixed(6) : 'Not set'}
                 </p>
               </div>
               <div>
                 <h4 className="font-medium text-neutral-900 mb-1">Longitude</h4>
                 <p className="text-sm text-neutral-600 font-mono">
-                  {store.longitude ? store.longitude.toFixed(6) : 'Not set'}
+                  {store.longitude !== null && store.longitude !== undefined ? store.longitude.toFixed(6) : 'Not set'}
                 </p>
               </div>
-              {store.latitude && store.longitude && (
+              {store.latitude !== null && store.latitude !== undefined && store.longitude !== null && store.longitude !== undefined && (
                 <div>
                   <h4 className="font-medium text-neutral-900 mb-1">Map Link</h4>
                   <a
@@ -203,25 +208,25 @@ const StoreDetailCard = ({ store, onEdit, onDelete }: {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <h4 className="font-medium text-neutral-900 mb-1">City Name</h4>
-                <p className="text-sm text-neutral-600">{store.city.name}</p>
+                <p className="text-sm text-neutral-600">{cityName}</p>
               </div>
               <div>
                 <h4 className="font-medium text-neutral-900 mb-1">State</h4>
-                <p className="text-sm text-neutral-600">{store.city.state}</p>
+                <p className="text-sm text-neutral-600">{cityState}</p>
               </div>
               <div>
                 <h4 className="font-medium text-neutral-900 mb-1">City ID</h4>
-                <p className="text-sm text-neutral-600">#{store.city.id}</p>
+                <p className="text-sm text-neutral-600">{cityId ? `#${cityId}` : 'Not available'}</p>
               </div>
               <div>
                 <h4 className="font-medium text-neutral-900 mb-1">City Status</h4>
                 <span className={cn(
                   'inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium',
-                  store.city.active
+                  cityActive
                     ? 'bg-green-100 text-green-800'
                     : 'bg-red-100 text-red-800'
                 )}>
-                  {store.city.active ? (
+                  {cityActive ? (
                     <>
                       <CheckCircle className="h-3 w-3" />
                       Active

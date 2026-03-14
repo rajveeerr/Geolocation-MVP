@@ -1,6 +1,6 @@
 // src/components/layout/ProfileDropDown.tsx
 import { Link } from 'react-router-dom';
-import { LogOut, User, Settings, LayoutDashboard, Shield, Briefcase, Gift } from 'lucide-react'; // <-- Import Shield icon
+import { LogOut, User, Settings, LayoutDashboard, Shield, Briefcase, Gift, Wrench } from 'lucide-react'; // <-- Import Shield icon
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -110,6 +110,14 @@ export const ProfileDropDown = ({ isMerchant }: { isMerchant: boolean }) => {
               <span>Settings</span>
             </Link>
           </DropdownMenuItem>
+          {!isMerchant && (
+            <DropdownMenuItem asChild>
+              <Link to={PATHS.MY_SERVICE_BOOKINGS}>
+                <Wrench className="mr-2 h-4 w-4" />
+                <span>My Service Bookings</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={logout}

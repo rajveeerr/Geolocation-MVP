@@ -13,6 +13,7 @@ import {
   type MenuCollection,
   type MenuCollectionType,
 } from '@/hooks/useMenuCollections';
+import { useMerchantStores } from '@/hooks/useMerchantStores';
 import {
   STANDARD_TEMPLATES,
   HAPPY_HOUR_TEMPLATES,
@@ -60,10 +61,21 @@ const MenuManagementPageV2: React.FC = () => {
   const { toast: _toast } = useToast();
 
   // --- Data ---
-  const { data: collectionsData, isLoading } = useMenuCollections(activeTab as MenuCollectionType);
+  const { data: storesData } = useMerchantStores();
+  const { data: collectionsData, isLoading } = useMenuCollections(
+    activeTab as MenuCollectionType,
+    selectedStoreId
+  );
   const deleteCollection = useDeleteMenuCollection();
 
   const collections = collectionsData?.collections ?? [];
+  const stores = storesData?.stores ?? [];
+  const selectedStore = stores.find((store) => store.id === selectedStoreId);
+  const selectedStoreLabel = selectedStore
+    ? selectedStore.isFoodTruck
+      ? `Food Truck — ${selectedStore.city?.name ?? selectedStore.address}`
+      : selectedStore.address
+    : `All Stores (${storesData?.total ?? stores.length})`;
 
   // --- Handlers ---
   const handleTemplateClick = useCallback((template: MenuTemplate) => {
@@ -167,6 +179,8 @@ const MenuManagementPageV2: React.FC = () => {
             <SpecialMenuSection
               collections={collections}
               onDeleteCollection={handleDeleteCollection}
+              selectedStoreId={selectedStoreId}
+              selectedStoreLabel={selectedStoreLabel}
             />
           ) : (
             <>
@@ -243,6 +257,8 @@ const MenuManagementPageV2: React.FC = () => {
         existingCollection={editingStdCollection}
         defaultName={stdTemplateName}
         defaultSubType={stdSubType}
+        selectedStoreId={selectedStoreId}
+        selectedStoreLabel={selectedStoreLabel}
       />
 
       <HappyHourMenuEditor
@@ -256,6 +272,8 @@ const MenuManagementPageV2: React.FC = () => {
         defaultSubType={hhSubType}
         defaultStartTime={hhStartTime}
         defaultEndTime={hhEndTime}
+        selectedStoreId={selectedStoreId}
+        selectedStoreLabel={selectedStoreLabel}
       />
     </div>
   );

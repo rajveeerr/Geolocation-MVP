@@ -56,6 +56,8 @@ interface StandardMenuEditorProps {
   themeName?: string;
   icon?: string;
   color?: string;
+  selectedStoreId?: number | null;
+  selectedStoreLabel?: string;
 }
 
 let tempIdCounter = 0;
@@ -82,6 +84,8 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
   themeName,
   icon,
   color,
+  selectedStoreId = null,
+  selectedStoreLabel = 'All Stores',
 }) => {
   // --- State ---
   const [collectionName, setCollectionName] = useState(defaultName);
@@ -101,6 +105,10 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
 
   const isSaving =
     createCollection.isPending || updateCollection.isPending || bulkUpdate.isPending;
+
+  const storeContextMessage = existingCollection
+    ? `This menu is currently being edited in the context of ${selectedStoreLabel}.`
+    : `This menu will be created for ${selectedStoreLabel}.`;
 
   // Populate from existing collection if editing
   useEffect(() => {
@@ -210,6 +218,7 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
           themeName,
           icon,
           color,
+          storeId: selectedStoreId ?? undefined,
         });
 
         // Bulk add items
@@ -251,6 +260,17 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
 
           {/* Body — scrollable */}
           <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
+            <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">
+                Store Context
+              </p>
+              <p className="mt-1 text-sm text-neutral-700">
+                {storeContextMessage.split(selectedStoreLabel)[0]}
+                <span className="font-semibold text-neutral-900">{selectedStoreLabel}</span>
+                {storeContextMessage.split(selectedStoreLabel)[1]}
+              </p>
+            </div>
+
             {/* Collection name & description */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
@@ -351,7 +371,7 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
 
             {/* Card-Style Items Editor */}
             <div className="space-y-3">
-              {items.map((item, idx) => (
+              {items.map((item) => (
                 <div
                   key={item.tempId}
                   className={cn(

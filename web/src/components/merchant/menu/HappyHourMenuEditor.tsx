@@ -27,6 +27,8 @@ interface HappyHourMenuEditorProps {
   defaultSubType?: string;
   defaultStartTime?: string;
   defaultEndTime?: string;
+  selectedStoreId?: number | null;
+  selectedStoreLabel?: string;
 }
 
 interface HappyHourItemRow {
@@ -76,6 +78,8 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
   defaultSubType,
   defaultStartTime = '16:00',
   defaultEndTime = '19:00',
+  selectedStoreId = null,
+  selectedStoreLabel = 'All Stores',
 }) => {
   const [collectionName, setCollectionName] = useState(defaultName);
   const [startTime, setStartTime] = useState(defaultStartTime);
@@ -91,6 +95,10 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
 
   const isSaving =
     createCollection.isPending || updateCollection.isPending || bulkUpdate.isPending;
+
+  const storeContextMessage = existingCollection
+    ? `This happy hour menu is currently being edited in the context of ${selectedStoreLabel}.`
+    : `This happy hour menu will be created for ${selectedStoreLabel}.`;
 
   // ── Derived values ────────────────────────────────────────────────────
 
@@ -181,6 +189,7 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
           subType: defaultSubType,
           startTime,
           endTime,
+          storeId: selectedStoreId ?? undefined,
         });
         collectionId = result.collection.id;
       }
@@ -223,43 +232,85 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
 
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">
+              Store Context
+            </p>
+            <p className="mt-1 text-sm text-neutral-700">
+              {storeContextMessage.split(selectedStoreLabel)[0]}
+              <span className="font-semibold text-neutral-900">{selectedStoreLabel}</span>
+              {storeContextMessage.split(selectedStoreLabel)[1]}
+            </p>
+          </div>
+
           {/* ── Happy Hour Schedule card ── */}
-          <div className="rounded-xl border border-brand/20 bg-brand-subtle p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Clock className="h-4 w-4 text-brand" />
-              <span className="text-sm font-semibold text-brand">Happy Hour Schedule</span>
+          <div className="rounded-2xl border border-brand/20 bg-brand-subtle/50 p-6 shadow-sm">
+            <div className="flex items-center gap-2.5 mb-6">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand/10">
+                <Clock className="h-4 w-4 text-brand" />
+              </div>
+              <span className="text-sm font-bold text-neutral-900">Happy Hour Schedule</span>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Start Time */}
-              <div>
-                <label className="text-xs font-medium text-neutral-500 mb-1.5 block">Start Time</label>
-                <input
-                  type="time"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className="w-full rounded-lg bg-neutral-50 border border-neutral-200 text-neutral-800 text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30"
-                />
-                <p className="text-xs text-neutral-400 mt-1">{to12h(startTime)}</p>
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-wider text-neutral-500 block">
+                  Start Time
+                </label>
+                <div className="relative group">
+                  <input
+                    type="time"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                    className={cn(
+                      "w-full rounded-xl bg-white border border-neutral-200 text-neutral-900 text-base font-medium px-4 py-3.5",
+                      "focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all",
+                      "group-hover:border-neutral-300"
+                    )}
+                  />
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <Clock className="h-4 w-4 text-neutral-400" />
+                  </div>
+                </div>
+                <p className="text-sm font-medium text-neutral-400 pl-1">{to12h(startTime)}</p>
               </div>
 
               {/* End Time */}
-              <div>
-                <label className="text-xs font-medium text-neutral-500 mb-1.5 block">End Time</label>
-                <input
-                  type="time"
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  className="w-full rounded-lg bg-neutral-50 border border-neutral-200 text-neutral-800 text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30"
-                />
-                <p className="text-xs text-neutral-400 mt-1">{to12h(endTime)}</p>
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-wider text-neutral-500 block">
+                  End Time
+                </label>
+                <div className="relative group">
+                  <input
+                    type="time"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                    className={cn(
+                      "w-full rounded-xl bg-white border border-neutral-200 text-neutral-900 text-base font-medium px-4 py-3.5",
+                      "focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all",
+                      "group-hover:border-neutral-300"
+                    )}
+                  />
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <Clock className="h-4 w-4 text-neutral-400" />
+                  </div>
+                </div>
+                <p className="text-sm font-medium text-neutral-400 pl-1">{to12h(endTime)}</p>
               </div>
 
               {/* Duration badge */}
-              <div className="flex flex-col">
-                <label className="text-xs font-medium text-neutral-500 mb-1.5 block">Duration</label>
-                <div className="flex-1 flex items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 px-3">
-                  <p className="text-lg font-bold text-neutral-900">{duration.label}</p>
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-wider text-neutral-500 block">
+                  Total Duration
+                </label>
+                <div className="flex h-[60px] items-center justify-center rounded-xl border border-dashed border-brand/30 bg-white/50 px-4">
+                  <p className="text-2xl font-black text-neutral-900 tracking-tight">
+                    {duration.label.split(' ')[0]}
+                    <span className="text-sm font-bold text-neutral-400 ml-1">
+                      {duration.label.split(' ').slice(1).join(' ')}
+                    </span>
+                  </p>
                 </div>
               </div>
             </div>

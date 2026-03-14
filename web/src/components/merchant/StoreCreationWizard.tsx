@@ -9,6 +9,8 @@ import {
   ArrowRight,
   Check,
   MapPin,
+  Map,
+  Navigation,
   Building2,
   Clock,
   Eye,
@@ -31,9 +33,9 @@ import {
 } from '@/components/merchant/store-registration/storeRegistrationTypes';
 
 const WIZARD_STEPS = [
-  { id: 'location-search', title: 'Find Location', description: 'Search or use location', icon: MapPin },
-  { id: 'location-confirm', title: 'Confirm Address', description: 'Verify details', icon: MapPin },
-  { id: 'location-pin', title: 'Pin Location', description: 'Set exact spot', icon: MapPin },
+  { id: 'location-search', title: 'Location', description: 'Search area', icon: MapPin },
+  { id: 'location-confirm', title: 'Address', description: 'Confirm details', icon: Map },
+  { id: 'location-pin', title: 'Pin', description: 'Exact spot', icon: Navigation },
   { id: 'store-name', title: 'Name', description: 'Location name', icon: Building2 },
   { id: 'store-type', title: 'Type', description: 'Store type', icon: Utensils },
   { id: 'store-contact', title: 'Contact', description: 'Phone & email', icon: Phone },
@@ -203,7 +205,16 @@ export const StoreCreationWizard = ({
 
       {/* Progress Steps */}
       <div className="mb-8">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2 mb-2 md:hidden">
+          <span className="text-sm font-medium text-neutral-500">
+            Step {currentStepIndex + 1} of {WIZARD_STEPS.length}
+          </span>
+          <span className="text-sm font-bold text-brand-primary-600">
+            {WIZARD_STEPS[currentStepIndex].title}
+          </span>
+        </div>
+        
+        <div className="flex items-center gap-1 overflow-x-auto pb-4 scrollbar-hide">
           {WIZARD_STEPS.map((step, index) => {
             const isActive = step.id === currentStep;
             const isCompleted = currentStepIndex > index;
@@ -211,13 +222,13 @@ export const StoreCreationWizard = ({
             const Icon = step.icon;
 
             return (
-              <div key={step.id} className="flex items-center">
-                <div className="flex flex-col items-center">
+              <div key={step.id} className="flex items-center shrink-0">
+                <div className="flex flex-col items-center min-w-[80px]">
                   <button
                     onClick={() => goToStep(step.id)}
                     disabled={!isValid && !isCompleted}
                     className={cn(
-                      'flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all duration-200',
+                      'flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-200',
                       isActive
                         ? 'border-brand-primary-500 bg-brand-primary-500 text-white'
                         : isCompleted
@@ -228,26 +239,23 @@ export const StoreCreationWizard = ({
                     )}
                   >
                     {isCompleted ? (
-                      <Check className="h-5 w-5" />
+                      <Check className="h-4 w-4" />
                     ) : (
-                      <Icon className="h-5 w-5" />
+                      <Icon className="h-4 w-4" />
                     )}
                   </button>
-                  <div className="mt-2 text-center">
+                  <div className="mt-2 text-center md:block hidden">
                     <p className={cn(
-                      'text-sm font-medium',
+                      'text-xs font-medium whitespace-nowrap',
                       isActive ? 'text-brand-primary-600' : 'text-neutral-600'
                     )}>
                       {step.title}
-                    </p>
-                    <p className="text-xs text-neutral-500">
-                      {step.description}
                     </p>
                   </div>
                 </div>
                 {index < WIZARD_STEPS.length - 1 && (
                   <div className={cn(
-                    'mx-4 h-0.5 w-16',
+                    'mx-2 h-0.5 w-8 shrink-0',
                     currentStepIndex > index ? 'bg-green-500' : 'bg-neutral-300'
                   )} />
                 )}

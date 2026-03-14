@@ -34,6 +34,13 @@ interface Deal {
   };
 }
 
+interface MerchantCheckInSummaryResponse {
+  success: boolean;
+  pagination?: {
+    totalCount: number;
+  };
+}
+
 const DealCard = ({ deal }: { deal: Deal }) => {
   const isActive =
     new Date() >= new Date(deal.startTime) &&
@@ -184,6 +191,19 @@ export const MerchantDashboardPage = () => {
   // Fetch real store data
   const { data: storesData, isLoading: storesLoading } = useMerchantStores();
   const { data: aiInsights, isLoading: aiInsightsLoading } = useAiMerchantInsights();
+  const merchantStores = storesData?.stores ?? [];
+
+  const { data: checkInSummary, isLoading: checkInSummaryLoading } = useQuery({
+    queryKey: ['merchant-checkins-summary'],
+    queryFn: () =>
+      apiGet<MerchantCheckInSummaryResponse>(
+        '/merchants/check-ins?page=1&limit=1&sortBy=createdAt&sortOrder=desc',
+      ),
+    enabled: !!merchantStatus && merchantStatus === 'APPROVED',
+    staleTime: 60 * 1000,
+  });
+
+  const totalCheckIns = checkInSummary?.data?.pagination?.totalCount ?? 0;
 
   const {
     data: dealsData,
@@ -393,7 +413,7 @@ export const MerchantDashboardPage = () => {
                     <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-neutral-100 text-neutral-700">
                       <Users className="h-3 w-3" />
                     </span>
-                    {statsLoading ? '...' : dashboardStats?.kpis.orderVolume || 0}
+                    {checkInSummaryLoading ? '...' : totalCheckIns}
                   </p>
                 </div>
               </div>
@@ -500,9 +520,9 @@ export const MerchantDashboardPage = () => {
                   <div className="h-3 w-16 bg-neutral-300 rounded"></div>
                 </div>
               ))
-            ) : storesData && storesData.length > 0 ? (
+            ) : merchantStores.length > 0 ? (
               // Show only cities where merchant has stores
-              storesData
+              merchantStores
                 .filter((store) => store.city) // Filter out stores without city data
                 .map((store) => (
                   <div key={store.id} className="rounded-md bg-neutral-900 px-4 py-2 text-white text-sm">
@@ -558,9 +578,9 @@ export const MerchantDashboardPage = () => {
                     </div>
                   ))}
                 </div>
-              ) : storesData && storesData.length > 0 ? (
+              ) : merchantStores.length > 0 ? (
                 <ul className="space-y-3">
-                  {storesData.map((store) => (
+                  {merchantStores.map((store) => (
                     <li key={store.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <span className={`h-3 w-3 rounded-full inline-block ${
@@ -571,7 +591,7 @@ export const MerchantDashboardPage = () => {
                             {store.address}
                           </span>
                           <span className="text-xs text-neutral-500">
-                            {store.city.name}, {store.city.state}
+                            {store.city?.name || 'Unknown City'}{store.city?.state ? `, ${store.city.state}` : ''}
                           </span>
                         </div>
                       </div>

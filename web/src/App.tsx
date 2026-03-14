@@ -160,6 +160,27 @@ const NotificationsPage = React.lazy(() =>
 const DiscoverEventsPage = React.lazy(() =>
   import('./pages/DiscoverEventsPage').then((m) => ({ default: m.DiscoverEventsPage })),
 );
+const DiscoverServicesPage = React.lazy(() =>
+  import('./pages/DiscoverServicesPage').then((m) => ({ default: m.DiscoverServicesPage })),
+);
+const ServiceDetailPage = React.lazy(() =>
+  import('./pages/ServiceDetailPage').then((m) => ({ default: m.ServiceDetailPage })),
+);
+const MyServiceBookingsPage = React.lazy(() =>
+  import('./pages/MyServiceBookingsPage').then((m) => ({ default: m.MyServiceBookingsPage })),
+);
+const MerchantMyServicesPage = React.lazy(() =>
+  import('./pages/merchant/MerchantMyServicesPage').then((m) => ({ default: m.MerchantMyServicesPage })),
+);
+const ServiceCreatePage = React.lazy(() =>
+  import('./pages/merchant/ServiceCreatePage').then((m) => ({ default: m.ServiceCreatePage })),
+);
+const ServiceManagePage = React.lazy(() =>
+  import('./pages/merchant/ServiceManagePage').then((m) => ({ default: m.ServiceManagePage })),
+);
+const ServiceCheckInPage = React.lazy(() =>
+  import('./pages/merchant/ServiceCheckInPage').then((m) => ({ default: m.ServiceCheckInPage })),
+);
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
 import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
@@ -337,11 +358,37 @@ function App() {
                     }
                   />
                   <Route
+                    path={PATHS.DISCOVER_SERVICES}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <DiscoverServicesPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={PATHS.SERVICE_DETAIL}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <ServiceDetailPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
                     path={PATHS.MY_TICKETS}
                     element={
                       <ProtectedRoute>
                         <Suspense fallback={<LoadingOverlay />}>
                           <MyTicketsPage />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path={PATHS.MY_SERVICE_BOOKINGS}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MyServiceBookingsPage />
                         </Suspense>
                       </ProtectedRoute>
                     }
@@ -474,6 +521,55 @@ function App() {
                       <MerchantLayout>
                         <Suspense fallback={<LoadingOverlay />}>
                           <EventCheckInPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                {/* Merchant Services */}
+                <Route
+                  path={PATHS.MERCHANT_SERVICES}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantMyServicesPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_SERVICES_CREATE}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <ServiceCreatePage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_SERVICES_MANAGE}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <ServiceManagePage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_SERVICES_CHECKIN}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <ServiceCheckInPage />
                         </Suspense>
                       </MerchantLayout>
                     </ProtectedRoute>

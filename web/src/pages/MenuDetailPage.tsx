@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo } from 'react';
-import { useDealDetail } from '@/hooks/useDealDetail';
+import { useDealDetail, usePublicMenuCollections } from '@/hooks/useDealDetail';
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { cn } from '@/lib/utils';
 import {
@@ -81,6 +81,9 @@ export const MenuDetailPage = () => {
   const { dealId, itemId } = useParams<{ dealId: string; itemId: string }>();
   const navigate = useNavigate();
   const { data: deal, isLoading } = useDealDetail(dealId || '');
+  const { data: collectionsData } = usePublicMenuCollections(
+    typeof deal?.merchant?.id === 'number' ? deal.merchant.id : null,
+  );
 
   const [imgIdx, setImgIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -88,14 +91,49 @@ export const MenuDetailPage = () => {
 
   /* Find the specific menu item */
   const menuItem = useMemo(() => {
-    if (!deal?.menuItems?.length || !itemId) return null;
-    return deal.menuItems.find((m: any) => String(m.id) === itemId) || null;
-  }, [deal, itemId]);
+    if (!itemId) return null;
+
+    const fromDeal = deal?.menuItems?.find((menuEntry: any) => String(menuEntry.id) === itemId);
+    if (fromDeal) return fromDeal;
+
+    const collections = collectionsData?.collections ?? [];
+    for (const collection of collections) {
+      for (const entry of collection.items || []) {
+        const source = entry.menuItem;
+        if (String(source.id) === itemId) {
+          return {
+            id: source.id,
+            name: source.name,
+            description: source.description,
+            originalPrice: source.price,
+            discountedPrice:
+              entry.customPrice !== null && entry.customPrice !== undefined
+                ? Number(entry.customPrice)
+                : entry.customDiscount !== null && entry.customDiscount !== undefined
+                ? Math.max(0, Number(source.price) - Number(entry.customDiscount))
+                : source.isHappyHour && source.happyHourPrice != null
+                ? Number(source.happyHourPrice)
+                : Number(source.price),
+            imageUrl: source.imageUrl,
+            images: source.imageUrls || [],
+            category: source.category,
+          };
+        }
+      }
+    }
+
+    return null;
+  }, [deal, collectionsData, itemId]);
 
   /* Images for gallery — use item image + deal images as fallback */
   const images = useMemo(() => {
     const imgs: string[] = [];
     if (menuItem?.imageUrl) imgs.push(menuItem.imageUrl);
+    if (menuItem?.images?.length) {
+      menuItem.images.forEach((img: string) => {
+        if (!imgs.includes(img)) imgs.push(img);
+      });
+    }
     if (deal?.images?.length) {
       deal.images.forEach((img: string) => {
         if (!imgs.includes(img)) imgs.push(img);

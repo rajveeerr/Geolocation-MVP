@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Menu, X, BookOpen, Compass, Coins, Briefcase, Shield, User, Settings, LogOut, Gift, Trophy, Flame, Users, CalendarDays, Ticket, Bell } from 'lucide-react';
+import { Menu, X, BookOpen, Compass, Coins, Briefcase, Shield, User, Settings, LogOut, Gift, Trophy, Flame, Users, CalendarDays, Ticket, Bell, Wrench } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { PATHS } from '@/routing/paths';
 import { Logo } from '../common/Logo';
@@ -17,6 +17,7 @@ import { useNudgeHistory } from '@/hooks/useNudges';
 const menuNavItems = [
   { id: 'deals', label: 'Hot Deals', path: PATHS.ALL_DEALS, icon: Flame },
   { id: 'events', label: 'Discover Events', path: PATHS.DISCOVER_EVENTS, icon: CalendarDays },
+  { id: 'services', label: 'Discover Services', path: PATHS.DISCOVER_SERVICES, icon: Wrench },
   { id: 'leaderboard', label: 'Leaderboard', path: PATHS.LEADERBOARD, icon: Trophy },
   { id: 'referral', label: 'Referrals', path: PATHS.REFERRALS, icon: Users },
   { id: 'gamification', label: 'Coins & Rewards', path: PATHS.GAMIFICATION, icon: Coins },
@@ -237,6 +238,14 @@ export const Header = () => {
                             My Tickets
                           </Link>
                           <Link
+                            to={PATHS.MY_SERVICE_BOOKINGS}
+                            onClick={() => setIsHamburgerMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 transition-colors hover:bg-neutral-50"
+                          >
+                            <Wrench className="h-4 w-4 text-neutral-400" />
+                            My Service Bookings
+                          </Link>
+                          <Link
                             to={PATHS.NOTIFICATIONS}
                             onClick={() => setIsHamburgerMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 transition-colors hover:bg-neutral-50"
@@ -422,6 +431,14 @@ export const Header = () => {
                   >
                     <Settings className="h-5 w-5 text-neutral-400" />
                     Settings
+                  </Link>
+                  <Link
+                    to={PATHS.MY_SERVICE_BOOKINGS}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                  >
+                    <Wrench className="h-5 w-5 text-neutral-400" />
+                    My Service Bookings
                   </Link>
                   <Link
                     to={PATHS.NOTIFICATIONS}

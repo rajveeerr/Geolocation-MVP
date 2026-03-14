@@ -19,7 +19,13 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
   const stores = storesData?.stores ?? [];
+  const storeCount = storesData?.total ?? stores.length;
   const selectedStore = stores.find((s: Store) => s.id === selectedStoreId);
+
+  const formatStoreLabel = (store: Store) =>
+    store.isFoodTruck
+      ? `🚚 ${store.city?.name ?? store.address}`
+      : `📍 ${store.address}`;
 
   // Close dropdown on outside click
   React.useEffect(() => {
@@ -47,24 +53,22 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
           type="button"
           disabled
           className={cn(
-            'flex items-center gap-2 rounded-xl px-4 py-2.5 opacity-50 cursor-not-allowed',
-            'bg-white border border-neutral-200 shadow-xs',
-            'text-sm font-medium text-neutral-700 w-[200px]'
+            'flex items-center gap-2 rounded-xl px-4 py-2.5',
+            'bg-brand-subtle border border-brand/20 shadow-xs',
+            'text-sm font-semibold text-brand w-[220px] cursor-not-allowed'
           )}
         >
-          <MapPin className="h-4 w-4 text-neutral-400 shrink-0" />
-          <span className="truncate flex-1 text-left">Unavailable</span>
+          <div className="h-2 w-2 rounded-full bg-brand animate-pulse" />
+          <span className="truncate flex-1 text-left">Syncing Stores...</span>
         </button>
       </div>
     );
   }
 
   const displayLabel = selectedStore
-    ? selectedStore.isFoodTruck
-      ? `🚚 ${selectedStore.city?.name ?? selectedStore.address}`
-      : selectedStore.address
-    : stores.length > 0 
-      ? `All Stores (${stores.length})` 
+    ? formatStoreLabel(selectedStore)
+    : storeCount > 0
+      ? `All Stores (${storeCount})`
       : 'No stores available';
 
   return (
@@ -112,7 +116,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
             )}
           >
             <MapPin className="h-4 w-4 shrink-0" />
-            <span>All Stores</span>
+            <span>All Stores ({storeCount})</span>
           </button>
 
           {stores.map((store: Store) => (
@@ -130,12 +134,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
                   : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
               )}
             >
-              <span className="shrink-0">{store.isFoodTruck ? '🚚' : '📍'}</span>
-              <span className="truncate">
-                {store.isFoodTruck
-                  ? `Food Truck — ${store.city?.name ?? 'Unknown'}`
-                  : store.address}
-              </span>
+              <span className="truncate">{formatStoreLabel(store)}</span>
             </button>
           ))}
         </div>

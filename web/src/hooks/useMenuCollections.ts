@@ -19,6 +19,7 @@ export type MenuCollectionType = 'STANDARD' | 'HAPPY_HOUR' | 'SPECIAL';
 export interface MenuCollection {
   id: number;
   merchantId: number;
+  storeId?: number | null;
   name: string;
   description: string | null;
   isActive: boolean;

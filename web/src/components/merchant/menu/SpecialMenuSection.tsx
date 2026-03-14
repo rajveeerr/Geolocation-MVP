@@ -9,11 +9,15 @@ import { StandardMenuEditor } from './StandardMenuEditor';
 interface SpecialMenuSectionProps {
   collections: MenuCollection[];
   onDeleteCollection: (collection: MenuCollection) => void;
+  selectedStoreId?: number | null;
+  selectedStoreLabel?: string;
 }
 
 export const SpecialMenuSection: React.FC<SpecialMenuSectionProps> = ({
   collections: _collections,
   onDeleteCollection: _onDeleteCollection,
+  selectedStoreId = null,
+  selectedStoreLabel = 'All Stores',
 }) => {
   const [showEditor, setShowEditor] = useState(false);
   const [editingCollection, setEditingCollection] = useState<MenuCollection | null>(null);
@@ -163,6 +167,8 @@ export const SpecialMenuSection: React.FC<SpecialMenuSectionProps> = ({
         themeName={selectedTheme?.name ?? customTheme.trim() ?? undefined}
         icon={selectedTheme?.icon}
         color={selectedTheme?.color}
+        selectedStoreId={selectedStoreId}
+        selectedStoreLabel={selectedStoreLabel}
       />
     </div>
   );

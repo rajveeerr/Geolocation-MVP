@@ -64,9 +64,9 @@ export const MenuListCard: React.FC<MenuListCardProps> = ({
             <p className="text-sm font-bold text-neutral-900 truncate">{collection.name}</p>
             <span
               className={cn(
-                'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold shrink-0',
+                'inline-flex items-center rounded-full px-3 py-1 text-xs font-bold shrink-0 shadow-sm transition-all',
                 collection.isActive
-                  ? 'bg-success/10 text-success'
+                  ? 'bg-emerald-500 text-white'
                   : 'bg-neutral-100 text-neutral-500'
               )}
             >
@@ -112,20 +112,27 @@ export const MenuListCard: React.FC<MenuListCardProps> = ({
 
       {/* Row 3: Item count + chips */}
       {itemCount > 0 && (
-        <div className="mt-3 ml-[52px] pt-3 border-t border-neutral-100">
-          <p className="text-xs font-medium text-neutral-500 mb-2">Items: {itemCount}</p>
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {(collection.items ?? []).slice(0, 4).map((item, idx) => (
+        <div className="mt-4 ml-[52px] pt-4 border-t border-neutral-100">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+              Menu Items ({itemCount})
+            </p>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            {(collection.items ?? []).slice(0, 5).map((item, idx) => (
               <span
                 key={item.menuItemId || idx}
-                className="inline-flex items-center rounded-md bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-600"
+                className={cn(
+                  "inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-semibold",
+                  "bg-neutral-50 border border-neutral-100 text-neutral-600 shadow-xs"
+                )}
               >
                 {item.menuItem?.name || 'Unnamed'}
               </span>
             ))}
-            {itemCount > 4 && (
-              <span className="text-xs font-medium text-neutral-400">
-                +{itemCount - 4} more
+            {itemCount > 5 && (
+              <span className="text-xs font-bold text-brand ml-1">
+                +{itemCount - 5} more
               </span>
             )}
           </div>

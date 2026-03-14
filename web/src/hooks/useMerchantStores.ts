@@ -6,6 +6,11 @@ import { useToast } from '@/hooks/use-toast';
 export interface Store {
   id: number;
   address: string;
+  businessName?: string;
+  phoneNumber?: string;
+  email?: string;
+  storeType?: string;
+  cityId?: number;
   latitude: number | null;
   longitude: number | null;
   active: boolean;
@@ -13,12 +18,17 @@ export interface Store {
     id: number;
     name: string;
     state: string;
+    active?: boolean;
   };
+  verifiedAddress?: string;
+  businessHours?: Record<string, { open: string; close: string; closed: boolean }> | null;
+  features?: string[];
   description?: string | null;
   operatingHours?: Record<string, { open: string; close: string; closed: boolean }> | null;
   galleryUrls?: string[];
   isFoodTruck?: boolean;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CreateStoreData {

@@ -1,34 +1,52 @@
 import { useMerchantLoyaltyTransactions, useMerchantLoyaltyProgram } from '@/hooks/useMerchantLoyalty';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { MerchantLoyaltyLayout, MerchantLoyaltyProgramMissingState } from '@/components/merchant/loyalty/MerchantLoyaltyLayout';
 
 export const MerchantLoyaltyTransactionsPage = () => {
-  const { data: program } = useMerchantLoyaltyProgram();
-  const { data, isLoading, error } = useMerchantLoyaltyTransactions();
+  const { data: program, error: programError } = useMerchantLoyaltyProgram();
+  const [type, setType] = useState<string>('');
+  const [limit] = useState(20);
+  const [offset, setOffset] = useState(0);
+  const { data, isLoading, error } = useMerchantLoyaltyTransactions(limit, offset, type || undefined);
 
-  if (error || !program) {
+  if (programError || !program?.program) {
     return (
-      <div className="container mx-auto max-w-6xl px-4 py-8">
-        <h1 className="text-2xl font-bold text-neutral-900">Loyalty Transactions</h1>
-        <div className="mt-4 rounded-xl border border-neutral-200 bg-neutral-50 p-6">
-          <h3 className="font-semibold text-neutral-900">No loyalty program found</h3>
-          <p className="mt-2 text-neutral-600">Please initialize your loyalty program first.</p>
-          <Link to="/merchant/loyalty/setup" className="mt-4 inline-block rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white">
-            Set Up Program
-          </Link>
-        </div>
-      </div>
+      <MerchantLoyaltyLayout title="Loyalty Transactions" subtitle="Audit every points movement and its before/after balance impact.">
+        <MerchantLoyaltyProgramMissingState />
+      </MerchantLoyaltyLayout>
     );
   }
 
+  const hasMore = data?.hasMore || false;
+
   return (
-    <div className="container mx-auto max-w-6xl px-4 py-8">
-      <h1 className="text-2xl font-bold text-neutral-900">Loyalty Transactions</h1>
+    <MerchantLoyaltyLayout title="Loyalty Transactions" subtitle="Audit every points movement and its before/after balance impact.">
+      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-neutral-200 bg-white p-3">
+        <select
+          value={type}
+          onChange={(e) => {
+            setType(e.target.value);
+            setOffset(0);
+          }}
+          className="rounded-md border border-neutral-300 px-2 py-1 text-sm"
+        >
+          <option value="">All types</option>
+          <option value="EARNED">Earned</option>
+          <option value="REDEEMED">Redeemed</option>
+          <option value="BONUS">Bonus</option>
+          <option value="ADJUSTED">Adjusted</option>
+          <option value="REFUNDED">Refunded</option>
+          <option value="EXPIRED">Expired</option>
+        </select>
+        <span className="ml-auto text-sm text-neutral-600">Total records: {data?.total || 0}</span>
+      </div>
+
       {isLoading ? (
-        <div className="mt-4 h-24 animate-pulse rounded-xl bg-neutral-100" />
+        <div className="h-24 animate-pulse rounded-xl bg-neutral-100" />
       ) : !data || data.transactions.length === 0 ? (
-        <div className="mt-4 rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-neutral-600">No transactions found.</div>
+        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-neutral-600">No transactions found.</div>
       ) : (
-        <div className="mt-4 overflow-hidden rounded-xl border border-neutral-200">
+        <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
           <table className="min-w-full divide-y divide-neutral-200">
             <thead className="bg-neutral-50">
               <tr>
@@ -53,7 +71,28 @@ export const MerchantLoyaltyTransactionsPage = () => {
           </table>
         </div>
       )}
-    </div>
+
+      {!isLoading && !error && data && data.transactions.length > 0 && (
+        <div className="mt-4 flex items-center justify-end gap-2">
+          <button
+            type="button"
+            className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm disabled:opacity-50"
+            disabled={offset === 0}
+            onClick={() => setOffset((prev) => Math.max(0, prev - limit))}
+          >
+            Previous
+          </button>
+          <button
+            type="button"
+            className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm disabled:opacity-50"
+            disabled={!hasMore}
+            onClick={() => setOffset((prev) => prev + limit)}
+          >
+            Next
+          </button>
+        </div>
+      )}
+    </MerchantLoyaltyLayout>
   );
 };
 

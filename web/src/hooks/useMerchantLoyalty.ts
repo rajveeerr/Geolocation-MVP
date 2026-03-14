@@ -15,6 +15,8 @@ import type {
 export const MERCHANT_LOYALTY_KEYS = {
   program: ['merchant', 'loyalty', 'program'] as const,
   analytics: ['merchant', 'loyalty', 'analytics'] as const,
+  customersRoot: ['merchant', 'loyalty', 'customers'] as const,
+  transactionsRoot: ['merchant', 'loyalty', 'tx'] as const,
   customers: (limit: number, offset: number, sortBy: string, order: string) =>
     ['merchant', 'loyalty', 'customers', limit, offset, sortBy, order] as const,
   transactions: (limit: number, offset: number, type?: string) =>
@@ -83,8 +85,9 @@ export function useAdjustLoyaltyPoints() {
   return useMutation<AdjustPointsResponse, unknown, AdjustPointsPayload>({
     mutationFn: (payload) => loyaltyService.adjustPoints(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: MERCHANT_LOYALTY_KEYS.customers(50, 0, 'currentBalance', 'desc') });
+      queryClient.invalidateQueries({ queryKey: MERCHANT_LOYALTY_KEYS.customersRoot });
       queryClient.invalidateQueries({ queryKey: MERCHANT_LOYALTY_KEYS.analytics });
+      queryClient.invalidateQueries({ queryKey: MERCHANT_LOYALTY_KEYS.transactionsRoot });
     },
   });
 }
@@ -95,6 +98,8 @@ export function useCancelLoyaltyRedemption() {
     mutationFn: (payload) => loyaltyService.cancelRedemption(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MERCHANT_LOYALTY_KEYS.analytics });
+      queryClient.invalidateQueries({ queryKey: MERCHANT_LOYALTY_KEYS.transactionsRoot });
+      queryClient.invalidateQueries({ queryKey: MERCHANT_LOYALTY_KEYS.customersRoot });
     },
   });
 }

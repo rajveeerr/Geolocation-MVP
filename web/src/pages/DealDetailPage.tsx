@@ -4,7 +4,7 @@ import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { Button } from '@/components/common/Button';
 import { useNavigationHistory } from '@/hooks/useNavigationHistory';
 import { useSavedDeals } from '@/hooks/useSavedDeals';
-import { useDealDetail } from '@/hooks/useDealDetail';
+import { useDealDetail, usePublicMenuCollections } from '@/hooks/useDealDetail';
 import { useCountdown } from '@/hooks/useCountdown';
 import { cn } from '@/lib/utils';
 import {
@@ -598,11 +598,8 @@ export const DealDetailPage = () => {
   const [showCheckInModal, setShowCheckInModal] = useState(false);
   const [checkInResult, setCheckInResult] = useState<{ pointsEarned: number } | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const [menuCategory, setMenuCategory] = useState<string>('');
-  const [showAllMenu, setShowAllMenu] = useState(false);
   const [showHoursDropdown, setShowHoursDropdown] = useState(false);
   const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
-  const MENU_INITIAL_COUNT = 4;
 
   const { isCheckingIn, checkIn } = useCheckIn({
     onSuccess: (data) => {
@@ -614,6 +611,9 @@ export const DealDetailPage = () => {
   });
 
   const { data: deal, isLoading, error } = useDealDetail(dealId || '');
+  const { data: collectionsData } = usePublicMenuCollections(
+    typeof deal?.merchant?.id === 'number' ? deal.merchant.id : null,
+  );
 
   const stores = deal?.merchant?.stores ?? [];
   const selectedStore = useMemo(
@@ -678,34 +678,62 @@ export const DealDetailPage = () => {
     return `$${Math.round(avg)}+`;
   }, [deal]);
 
-  // Derive unique menu categories dynamically
-  const menuCategories = useMemo(() => {
+  const menuCollections = useMemo(() => {
+    const rawCollections = collectionsData?.collections ?? [];
+
+    if (rawCollections.length > 0) {
+      return rawCollections
+        .filter((collection: any) => (collection.items?.length ?? 0) > 0)
+        .map((collection: any) => ({
+          id: collection.id,
+          title: collection.name,
+          description: collection.description || null,
+          items: (collection.items || []).map((entry: any) => {
+            const menuItem = entry.menuItem;
+            const originalPrice = menuItem.price;
+            const discountedPrice =
+              entry.customPrice !== null && entry.customPrice !== undefined
+                ? Number(entry.customPrice)
+                : entry.customDiscount !== null && entry.customDiscount !== undefined
+                ? Math.max(0, Number(originalPrice) - Number(entry.customDiscount))
+                : deal?.discountPercentage
+                ? Number(originalPrice) * (1 - Number(deal.discountPercentage) / 100)
+                : deal?.discountAmount
+                ? Math.max(0, Number(originalPrice) - Number(deal.discountAmount))
+                : menuItem.isHappyHour && menuItem.happyHourPrice != null
+                ? Number(menuItem.happyHourPrice)
+                : Number(originalPrice);
+
+            return {
+              id: menuItem.id,
+              name: menuItem.name,
+              description: menuItem.description,
+              originalPrice,
+              discountedPrice,
+              imageUrl: menuItem.imageUrl,
+              images: menuItem.imageUrls || [],
+              category: menuItem.category,
+            };
+          }),
+        }));
+    }
+
     if (!deal?.menuItems?.length) return [];
-    const cats = Array.from(new Set(deal.menuItems.map((item: any) => item.category).filter(Boolean)));
-    return cats.sort();
-  }, [deal]);
 
-  // Set default category to first available category
-  useEffect(() => {
-    if (menuCategories.length > 0 && !menuCategory) {
-      setMenuCategory(menuCategories[0]);
-    }
-  }, [menuCategories, menuCategory]);
+    const grouped = deal.menuItems.reduce((acc: Record<string, any[]>, item: any) => {
+      const key = item.category || 'Other';
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(item);
+      return acc;
+    }, {});
 
-  // Filter menu items for the selected category
-  const filteredMenuItems = useMemo(() => {
-    if (!deal?.menuItems?.length || !menuCategory) return [];
-    const items = deal.menuItems.filter((item: any) => item.category === menuCategory);
-    if (!showAllMenu) {
-      return items.slice(0, MENU_INITIAL_COUNT);
-    }
-    return items;
-  }, [deal, menuCategory, showAllMenu, MENU_INITIAL_COUNT]);
-
-  const totalFilteredCount = useMemo(() => {
-    if (!deal?.menuItems?.length || !menuCategory) return 0;
-    return deal.menuItems.filter((item: any) => item.category === menuCategory).length;
-  }, [deal, menuCategory]);
+    return Object.entries(grouped).map(([category, items], index) => ({
+      id: `fallback-${index}`,
+      title: prettyCat(category),
+      description: null,
+      items,
+    }));
+  }, [collectionsData, deal]);
 
   /* ---------- Loading / Error ---------- */
   if (isLoading) return <LoadingOverlay message="Loading deal details\u2026" />;
@@ -1253,85 +1281,55 @@ export const DealDetailPage = () => {
             {/* ---------- MENU ---------- */}
             {rightTab === 'menu' && (
               <div className="space-y-8">
-                {deal.hasMenuItems && deal.menuItems.length > 0 ? (
+                {menuCollections.length > 0 ? (
                   <>
-                    {/* Category text tabs – Figma style */}
-                    {menuCategories.length > 0 && (
-                      <div className="flex gap-6 overflow-x-auto scrollbar-hide border-b border-neutral-200 pb-0">
-                        {menuCategories.map((cat) => (
-                          <button
-                            key={cat}
-                            onClick={() => { setMenuCategory(cat); setShowAllMenu(false); }}
-                            className={cn(
-                              'pb-2.5 text-sm font-semibold whitespace-nowrap transition-all flex-shrink-0 border-b-2',
-                              menuCategory === cat
-                                ? 'text-neutral-900 border-neutral-900'
-                                : 'text-neutral-400 border-transparent hover:text-neutral-600',
-                            )}
-                          >
-                            {prettyCat(cat)}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Filtered grid view for selected category */}
-                    {menuCategory && (
-                      <div>
-                        <div className="flex items-center justify-between mb-4">
-                          <div>
-                            <h3 className="text-2xl font-black text-neutral-900 uppercase tracking-tight">
-                              {prettyCat(menuCategory).toUpperCase()}
-                            </h3>
-                            <p className="text-xs text-neutral-400 mt-0.5">
-                              Auto-playing cinematic previews
-                            </p>
+                    <div className="space-y-8">
+                      {menuCollections.map((collection: any) => (
+                        <section key={collection.id} className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className="text-2xl font-black text-neutral-900 uppercase tracking-tight">
+                                {collection.title}
+                              </h3>
+                              <p className="text-xs text-neutral-400 mt-0.5">
+                                {collection.description || `${collection.items.length} items in this collection`}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                disabled
+                                className="w-10 h-10 rounded-xl bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-not-allowed opacity-50"
+                                title="Filter coming soon"
+                              >
+                                <SlidersHorizontal className="h-[18px] w-[18px] text-neutral-600" />
+                              </button>
+                              <button
+                                disabled
+                                className="w-10 h-10 rounded-xl bg-[#1a1a2e] flex items-center justify-center cursor-not-allowed opacity-70"
+                                title="Search coming soon"
+                              >
+                                <Search className="h-[18px] w-[18px] text-white" />
+                              </button>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <button
-                              disabled
-                              className="w-10 h-10 rounded-xl bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-not-allowed opacity-50"
-                              title="Filter coming soon"
-                            >
-                              <SlidersHorizontal className="h-[18px] w-[18px] text-neutral-600" />
-                            </button>
-                            <button
-                              disabled
-                              className="w-10 h-10 rounded-xl bg-[#1a1a2e] flex items-center justify-center cursor-not-allowed opacity-70"
-                              title="Search coming soon"
-                            >
-                              <Search className="h-[18px] w-[18px] text-white" />
-                            </button>
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {filteredMenuItems.map((item: any) => (
-                            <MenuCardFigma
-                              key={item.id}
-                              item={item}
-                              deal={deal}
-                              onClick={() => navigate(`/deals/${dealId}/menu/${item.id}`)}
-                            />
-                          ))}
-                        </div>
 
-                        {/* Show More / Show Less */}
-                        {totalFilteredCount > MENU_INITIAL_COUNT && (
-                          <button
-                            onClick={() => setShowAllMenu(!showAllMenu)}
-                            className="mt-4 w-full py-3 rounded-xl border border-neutral-200 text-sm font-bold text-neutral-700 hover:bg-neutral-50 transition-colors"
-                          >
-                            {showAllMenu
-                              ? 'Show Less'
-                              : `Show All ${totalFilteredCount} Items`}
-                          </button>
-                        )}
-                      </div>
-                    )}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {collection.items.map((item: any) => (
+                              <MenuCardFigma
+                                key={`${collection.id}-${item.id}`}
+                                item={item}
+                                deal={deal}
+                                onClick={() => navigate(`/deals/${dealId}/menu/${item.id}`)}
+                              />
+                            ))}
+                          </div>
+                        </section>
+                      ))}
+                    </div>
                   </>
                 ) : (
                   <div className="text-center py-16 text-neutral-400 text-sm">
-                    No menu items available for this deal.
+                    No menu collections available for this deal.
                   </div>
                 )}
               </div>
