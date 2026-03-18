@@ -104,6 +104,66 @@ export interface TicketmasterPagination {
   size: number;
   total: number;
   totalPages?: number;
+  totalElements?: number;
+}
+
+// ─── SeatGeek Types ───────────────────────────────────────────────
+
+export interface SeatGeekPerformer {
+  id: number;
+  name: string;
+  short_name?: string;
+  url?: string;
+  image?: string | null;
+  images?: {
+    huge?: string;
+    large?: string;
+    medium?: string;
+    small?: string;
+  } | null;
+  primary?: boolean;
+  type?: string;
+  slug?: string;
+}
+
+export interface SeatGeekVenue {
+  id: number;
+  name: string;
+  url?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  postal_code?: string;
+  address?: string | null;
+  extended_address?: string | null;
+  location?: {
+    lat?: number;
+    lon?: number;
+  };
+}
+
+export interface SeatGeekEvent {
+  id: number;
+  title: string;
+  short_title?: string;
+  type?: string;
+  url: string;
+  datetime_local?: string;
+  datetime_utc?: string;
+  announce_date?: string;
+  time_tbd?: boolean;
+  date_tbd?: boolean;
+  score?: number;
+  stats?: {
+    listing_count?: number | null;
+    average_price?: number | null;
+    lowest_price?: number | null;
+    highest_price?: number | null;
+  };
+  venue?: SeatGeekVenue;
+  performers?: SeatGeekPerformer[];
+  taxonomies?: Array<{ id: number; name: string; parent_id?: number | null }>;
+  [key: string]: unknown;
 }
 
 // ─── Consumer Hooks ─────────────────────────────────────────────────
@@ -359,5 +419,83 @@ export function useTicketmasterAttractions(params: {
     enabled: enabled && !!searchParams.keyword,
     staleTime: 10 * 60 * 1000,
     retry: 1,
+  });
+}
+
+/**
+ * Search SeatGeek events.
+ * GET /events/seatgeek/search
+ */
+export function useSeatGeekSearch(params: {
+  keyword?: string;
+  city?: string;
+  stateCode?: string;
+  postalCode?: string;
+  latitude?: number;
+  longitude?: number;
+  radius?: number;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  size?: number;
+  sort?: string;
+  enabled?: boolean;
+}) {
+  const { enabled = true, ...searchParams } = params;
+  const qs = new URLSearchParams();
+  if (searchParams.keyword) qs.set('keyword', searchParams.keyword);
+  if (searchParams.city) qs.set('city', searchParams.city);
+  if (searchParams.stateCode) qs.set('stateCode', searchParams.stateCode);
+  if (searchParams.postalCode) qs.set('postalCode', searchParams.postalCode);
+  if (searchParams.latitude) qs.set('latitude', String(searchParams.latitude));
+  if (searchParams.longitude) qs.set('longitude', String(searchParams.longitude));
+  if (searchParams.radius) qs.set('radius', String(searchParams.radius));
+  if (searchParams.startDate) qs.set('startDate', searchParams.startDate);
+  if (searchParams.endDate) qs.set('endDate', searchParams.endDate);
+  qs.set('page', String(searchParams.page ?? 0));
+  qs.set('size', String(searchParams.size ?? 20));
+  if (searchParams.sort) qs.set('sort', searchParams.sort);
+
+  return useQuery<{
+    events: SeatGeekEvent[];
+    pagination: TicketmasterPagination;
+    source: string;
+  }>({
+    queryKey: ['seatgeekSearch', searchParams],
+    queryFn: async () => {
+      const res = await apiGet<{
+        events: SeatGeekEvent[];
+        pagination: TicketmasterPagination;
+        source: string;
+      }>(`/events/seatgeek/search?${qs.toString()}`);
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Failed to search SeatGeek events');
+      }
+      return res.data;
+    },
+    enabled: enabled && !!(searchParams.keyword || searchParams.city),
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
+}
+
+/**
+ * Get a single SeatGeek event detail.
+ * GET /events/seatgeek/:eventId
+ */
+export function useSeatGeekEvent(eventId: string | number | null) {
+  return useQuery<{ event: SeatGeekEvent; source: string }>({
+    queryKey: ['seatgeekEvent', eventId],
+    queryFn: async () => {
+      const res = await apiGet<{ event: SeatGeekEvent; source: string }>(
+        `/events/seatgeek/${eventId}`,
+      );
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Failed to get SeatGeek event');
+      }
+      return res.data;
+    },
+    enabled: eventId !== null && eventId !== undefined,
+    staleTime: 10 * 60 * 1000,
   });
 }

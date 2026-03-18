@@ -42,9 +42,12 @@ function getLowestPrice(event: EventDetail | HybridEvent): string {
         const min = Math.min(...activeTiers.map((t) => t.price));
         return `$${min.toFixed(2)}`;
     }
-    // Ticketmaster price
+    // External provider price
     if ('priceRanges' in event && (event as any).priceRanges?.[0]) {
         return `$${(event as any).priceRanges[0].min}+`;
+    }
+    if ('stats' in (event as any) && (event as any).stats?.lowest_price != null) {
+        return `$${(event as any).stats.lowest_price}+`;
     }
     return 'FREE';
 }
@@ -114,9 +117,10 @@ export interface HybridEvent {
     socialProofCount?: number;
     tags?: string[];
     ticketTiers?: EventDetail['ticketTiers'];
-    source?: 'local' | 'ticketmaster';
+    source?: 'local' | 'ticketmaster' | 'seatgeek';
     url?: string;
     priceRanges?: { min: number; max: number; currency: string }[];
+    stats?: { lowest_price?: number | null; highest_price?: number | null };
 }
 
 /* ─── Card Props ───────────────────────────────────────────────── */
@@ -160,7 +164,9 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]', width, height, 
     const socialProofCount = ('socialProofCount' in event ? event.socialProofCount : 0) ?? 0;
     const isTrending = trendingScore > 50 || socialProofCount > 20;
     const isFree = ('isFreeEvent' in event && event.isFreeEvent) || false;
-    const isHybridTM = (event as HybridEvent).source === 'ticketmaster';
+    const externalSource = (event as HybridEvent).source;
+    const isExternalEvent = externalSource === 'ticketmaster' || externalSource === 'seatgeek';
+    const externalLabel = externalSource === 'seatgeek' ? 'SeatGeek' : 'Ticketmaster';
 
     const price = getLowestPrice(event as any);
     const available = getTotalAvailable(event as any);
@@ -169,7 +175,7 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]', width, height, 
     const dotColor = EVENT_TYPE_DOT_COLORS[eventType] ?? 'bg-brand-primary-600';
 
     const handleClick = () => {
-        if (isHybridTM) {
+        if (isExternalEvent) {
             const tmUrl = (event as HybridEvent).url;
             if (tmUrl) window.open(tmUrl, '_blank', 'noopener,noreferrer');
         } else {
@@ -219,11 +225,11 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]', width, height, 
 
             {/* Category badge – top left */}
             <div className={cn("absolute z-10 flex items-center gap-1.5", isFixedSize ? "top-3 left-3" : "top-3.5 left-3.5")}>
-                {isHybridTM ? (
+                {isExternalEvent ? (
                     <div className={cn("flex items-center gap-1.5 rounded-full bg-blue-600/80 backdrop-blur-md", isFixedSize ? "px-2 py-0.5" : "px-3 py-1.5")}>
                         <Globe className={cn("text-white", isFixedSize ? "h-2.5 w-2.5" : "h-3 w-3")} />
                         <span className={cn("font-bold text-white uppercase tracking-wider", isFixedSize ? "text-[9px]" : "text-[10px]")}>
-                            Ticketmaster
+                            {externalLabel}
                         </span>
                     </div>
                 ) : typeLabel ? (
@@ -234,7 +240,7 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]', width, height, 
                         </span>
                     </div>
                 ) : null}
-                {!isHybridTM && (event as HybridEvent).source === 'local' && (
+                {!isExternalEvent && (event as HybridEvent).source === 'local' && (
                     <div className={cn("flex items-center gap-1 rounded-full bg-brand-primary-600/80 backdrop-blur-md", isFixedSize ? "px-2 py-0.5" : "px-2.5 py-1.5")}>
                         <Sparkles className={cn("text-white", isFixedSize ? "h-2.5 w-2.5" : "h-3 w-3")} />
                         <span className={cn("font-bold text-white uppercase tracking-wider", isFixedSize ? "text-[9px]" : "text-[10px]")}>
@@ -331,13 +337,13 @@ export function EventCard({ event, aspectRatio = 'aspect-[3/5]', width, height, 
                             "font-semibold text-[#1a1a2e] whitespace-nowrap",
                             isFixedSize ? "text-xs" : "text-sm"
                         )}>
-                            {isHybridTM ? 'Buy Tickets' : 'View Event'}
+                            {isExternalEvent ? 'Buy Tickets' : 'View Event'}
                         </span>
                         <span className={cn(
                             "rounded-full bg-[#1a1a2e] flex items-center justify-center flex-shrink-0 group-hover/cta:scale-110 transition-transform",
                             isFixedSize ? "w-8 h-8" : "w-10 h-10"
                         )}>
-                            {isHybridTM ? (
+                            {isExternalEvent ? (
                                 <ExternalLink className={cn("text-white", isFixedSize ? "h-3.5 w-3.5" : "h-[17px] w-[17px]")} />
                             ) : (
                                 <ArrowUpRight className={cn("text-white", isFixedSize ? "h-3.5 w-3.5" : "h-[17px] w-[17px]")} />

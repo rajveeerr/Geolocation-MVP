@@ -27,9 +27,11 @@ import {
   useBrowseEvents,
 } from '@/hooks/useEventDetail';
 import {
+  useSeatGeekSearch,
   useTicketmasterSearch,
   useTicketmasterVenues,
   useTicketmasterAttractions,
+  type SeatGeekEvent,
   type TicketmasterEvent,
   type TicketmasterVenue,
   type TicketmasterAttraction,
@@ -65,6 +67,7 @@ const TABS = [
   { key: 'all', label: 'All Events', icon: Sparkles },
   { key: 'discover', label: 'Discover', icon: Zap },
   { key: 'ticketmaster', label: 'Ticketmaster', icon: Globe },
+  { key: 'seatgeek', label: 'SeatGeek', icon: Globe },
   { key: 'venues', label: 'Venues', icon: MapPin },
   { key: 'artists', label: 'Artists', icon: Music },
 ] as const;
@@ -114,6 +117,35 @@ function tmToHybrid(event: TicketmasterEvent): HybridEvent {
     source: 'ticketmaster' as const,
     url: event.url,
     priceRanges: event.priceRanges?.map((p) => ({ min: p.min, max: p.max, currency: p.currency })),
+  };
+}
+
+function seatGeekToHybrid(event: SeatGeekEvent): HybridEvent {
+  const performerImages = (event.performers || [])
+    .flatMap((performer) => [
+      performer.image,
+      performer.images?.huge,
+      performer.images?.large,
+      performer.images?.medium,
+      performer.images?.small,
+    ])
+    .filter((url): url is string => !!url)
+    .map((url, index) => ({ url, width: 1000 - index }));
+
+  return {
+    id: event.id,
+    title: event.title,
+    coverImageUrl: performerImages[0]?.url ?? null,
+    images: performerImages,
+    startDate: event.datetime_utc || event.datetime_local,
+    venueName: event.venue?.name ?? null,
+    source: 'seatgeek',
+    url: event.url,
+    stats: {
+      lowest_price: event.stats?.lowest_price ?? null,
+      highest_price: event.stats?.highest_price ?? null,
+    },
+    eventType: event.type?.toUpperCase().replace(/[^A-Z]+/g, '_') || 'OTHER',
   };
 }
 
@@ -381,6 +413,7 @@ export function DiscoverEventsPage() {
     page: activeTab === 'discover' ? page : undefined,
     size: activeTab === 'discover' ? 20 : undefined,
     includeTicketmaster: activeTab === 'discover' ? true : undefined,
+    includeSeatGeek: activeTab === 'discover' ? true : undefined,
   });
 
   /* ─── Ticketmaster Events ───────────────────────────── */
@@ -392,6 +425,17 @@ export function DiscoverEventsPage() {
     page,
     size: 20,
     enabled: activeTab === 'ticketmaster' && !!(keyword || city),
+  });
+
+  /* ─── SeatGeek Events ───────────────────────────────── */
+  const seatGeekEventsQuery = useSeatGeekSearch({
+    keyword: activeTab === 'seatgeek' ? keyword : undefined,
+    city: activeTab === 'seatgeek' ? city : undefined,
+    startDate: activeTab === 'seatgeek' ? startDate : undefined,
+    endDate: activeTab === 'seatgeek' ? endDate : undefined,
+    page,
+    size: 20,
+    enabled: activeTab === 'seatgeek' && !!(keyword || city),
   });
 
   /* ─── Ticketmaster Venues ───────────────────────────── */
@@ -413,6 +457,7 @@ export function DiscoverEventsPage() {
     (activeTab === 'all' && browseQuery.isLoading) ||
     (activeTab === 'discover' && discoverQuery.isLoading) ||
     (activeTab === 'ticketmaster' && tmEventsQuery.isLoading) ||
+    (activeTab === 'seatgeek' && seatGeekEventsQuery.isLoading) ||
     (activeTab === 'venues' && venuesQuery.isLoading) ||
     (activeTab === 'artists' && attractionsQuery.isLoading);
 
@@ -426,7 +471,7 @@ export function DiscoverEventsPage() {
             <span className="text-[#B91C1C]">Events</span>
           </h1>
           <p className="text-neutral-500 mt-2 text-sm">
-            Find local events and browse Ticketmaster listings near you
+            Find local events and browse Ticketmaster and SeatGeek listings near you
           </p>
         </div>
 
@@ -683,7 +728,7 @@ export function DiscoverEventsPage() {
               <EmptyState
                 icon={Ticket}
                 title="No events yet"
-                subtitle="Check back soon — new events are added regularly. Try the Discover tab to find Ticketmaster events too."
+                subtitle="Check back soon — new events are added regularly. Try the Discover tab to find Ticketmaster and SeatGeek events too."
               />
             )}
           </>
@@ -696,7 +741,7 @@ export function DiscoverEventsPage() {
               <EmptyState
                 icon={Sparkles}
                 title="Search to discover events"
-                subtitle="Find local events and Ticketmaster listings combined in one place."
+                subtitle="Find local events plus Ticketmaster and SeatGeek listings combined in one place."
               />
             ) : discoverQuery.data ? (
               <>
@@ -710,7 +755,8 @@ export function DiscoverEventsPage() {
                       <span className="text-neutral-400">
                         {' '}
                         · {discoverQuery.data.sources.local} local,{' '}
-                        {discoverQuery.data.sources.ticketmaster} Ticketmaster
+                        {discoverQuery.data.sources.ticketmaster} Ticketmaster,{' '}
+                        {discoverQuery.data.sources.seatgeek} SeatGeek
                       </span>
                     )}
                   </p>
@@ -773,6 +819,53 @@ export function DiscoverEventsPage() {
                   <EmptyState
                     icon={Search}
                     title={`No Ticketmaster events for "${keyword}"`}
+                    subtitle="Try a different search term or change the city filter."
+                  />
+                )}
+              </>
+            ) : null}
+          </>
+        )}
+
+        {/* ═══ Tab: SeatGeek ═══ */}
+        {!isLoading && activeTab === 'seatgeek' && (
+          <>
+            {!keyword ? (
+              <EmptyState
+                icon={Globe}
+                title="Search SeatGeek Events"
+                subtitle="Enter a keyword to search SeatGeek events and ticket listings."
+              />
+            ) : seatGeekEventsQuery.data ? (
+              <>
+                <div className="flex items-center justify-between mb-5">
+                  <p className="text-sm text-neutral-500">
+                    <span className="font-bold text-[#1a1a2e]">
+                      {seatGeekEventsQuery.data.pagination.total}
+                    </span>{' '}
+                    results from SeatGeek
+                  </p>
+                </div>
+
+                {seatGeekEventsQuery.data.events.length > 0 ? (
+                  <>
+                    <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                      {seatGeekEventsQuery.data.events.map((event) => (
+                        <EventCard key={event.id} event={seatGeekToHybrid(event)} />
+                      ))}
+                    </div>
+                    {seatGeekEventsQuery.data.pagination.totalPages && (
+                      <Pagination
+                        page={page}
+                        totalPages={seatGeekEventsQuery.data.pagination.totalPages}
+                        onPageChange={setPage}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <EmptyState
+                    icon={Search}
+                    title={`No SeatGeek events for "${keyword}"`}
                     subtitle="Try a different search term or change the city filter."
                   />
                 )}

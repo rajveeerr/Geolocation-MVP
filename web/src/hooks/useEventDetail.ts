@@ -560,6 +560,7 @@ export function useDiscoverEvents(params: {
   page?: number;
   size?: number;
   includeTicketmaster?: boolean;
+  includeSeatGeek?: boolean;
 }) {
   const qs = new URLSearchParams();
   if (params.keyword) qs.set('keyword', params.keyword);
@@ -572,6 +573,7 @@ export function useDiscoverEvents(params: {
   qs.set('page', String(params.page ?? 0));
   qs.set('size', String(params.size ?? 20));
   qs.set('includeTicketmaster', String(params.includeTicketmaster ?? true));
+  qs.set('includeSeatGeek', String(params.includeSeatGeek ?? true));
 
   return useQuery({
     queryKey: ['discoverEvents', params],
@@ -579,7 +581,7 @@ export function useDiscoverEvents(params: {
       const res = await apiGet<{
         events: any[];
         pagination: { page: number; size: number; total: number };
-        sources: { local: number; ticketmaster: number };
+        sources: { local: number; ticketmaster: number; seatgeek: number };
       }>(`/events/discover?${qs.toString()}`);
       if (!res.success || !res.data) {
         throw new Error(res.error || 'Failed to discover events');
