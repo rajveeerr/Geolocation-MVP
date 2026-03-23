@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { ArrowRight, ChevronDown, SlidersHorizontal, Sparkles } from 'lucide-react';
 import { useDealCategories } from '@/hooks/useDealCategories';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routing/paths';
@@ -202,6 +202,23 @@ export const NewHeroSection = ({ onCategoryChange, onFilterClick }: NewHeroSecti
           <br className="hidden sm:block" />
           experience.
         </p>
+
+        <div className="mb-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <button
+            onClick={() => navigate(PATHS.CITY_GUIDE)}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#111827] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1f2937]"
+          >
+            <Sparkles className="h-4 w-4" />
+            Try AI City Guide
+          </button>
+          <button
+            onClick={() => navigate(PATHS.ALL_DEALS)}
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-neutral-300 bg-white px-5 py-3 text-sm font-semibold text-neutral-700 transition hover:border-neutral-400 hover:text-neutral-900"
+          >
+            Browse live deals
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
 
         {/* ── Category Filter Row — All Deals pill (left), centered story circles, Filter (right) ── */}
         <div className="flex items-center gap-4 md:gap-6 overflow-x-auto pb-2 scrollbar-hide -mx-6 px-6">

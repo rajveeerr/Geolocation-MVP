@@ -169,6 +169,9 @@ const DiscoverEventsPage = React.lazy(() =>
 const DiscoverServicesPage = React.lazy(() =>
   import('./pages/DiscoverServicesPage').then((m) => ({ default: m.DiscoverServicesPage })),
 );
+const CityGuidePage = React.lazy(() =>
+  import('./pages/CityGuidePage').then((m) => ({ default: m.CityGuidePage })),
+);
 const ServiceDetailPage = React.lazy(() =>
   import('./pages/ServiceDetailPage').then((m) => ({ default: m.ServiceDetailPage })),
 );
@@ -384,6 +387,16 @@ function App() {
                       <Suspense fallback={<LoadingOverlay />}>
                         <DiscoverServicesPage />
                       </Suspense>
+                    }
+                  />
+                  <Route
+                    path={PATHS.CITY_GUIDE}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <CityGuidePage />
+                        </Suspense>
+                      </ProtectedRoute>
                     }
                   />
                   <Route
