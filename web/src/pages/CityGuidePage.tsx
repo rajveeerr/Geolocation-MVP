@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Car,
@@ -23,7 +23,13 @@ import {
   useAiCityGuideItinerary,
   useAiCityGuideRecommend,
 } from '@/hooks/useAi';
+import { StoreLocationMap } from '@/components/merchant/StoreWizardSteps/StoreLocationMap';
 import { useGeolocation } from '@/hooks/useGeolocation';
+import {
+  reverseGeocodeCoordinates,
+  searchAddresses,
+  type AddressSuggestion,
+} from '@/services/geocoding';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routing/paths';
@@ -48,6 +54,7 @@ const PREFERENCE_OPTIONS = [
 ];
 
 const TIME_OPTIONS = ['morning', 'afternoon', 'evening', 'night'];
+const DEFAULT_MAP_CENTER = { lat: 20.5937, lng: 78.9629 };
 
 function formatGeneratedAt(value?: string) {
   if (!value) return '';
@@ -323,18 +330,71 @@ export function CityGuidePage() {
   const [maxStops, setMaxStops] = useState(3);
   const [latInput, setLatInput] = useState('');
   const [lngInput, setLngInput] = useState('');
+  const [locationQuery, setLocationQuery] = useState('');
+  const [debouncedLocationQuery, setDebouncedLocationQuery] = useState('');
+  const [locationSuggestions, setLocationSuggestions] = useState<AddressSuggestion[]>([]);
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
+  const [isSearchingLocation, setIsSearchingLocation] = useState(false);
+  const [selectedLocationLabel, setSelectedLocationLabel] = useState('');
 
   useEffect(() => {
     if (geo.location) {
       setLatInput(geo.location.latitude.toFixed(6));
       setLngInput(geo.location.longitude.toFixed(6));
+      setSelectedLocationLabel(
+        [geo.location.city, geo.location.state, geo.location.country].filter(Boolean).join(', ') ||
+          'Current location',
+      );
     }
   }, [geo.location]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedLocationQuery(locationQuery.trim());
+    }, 300);
+
+    return () => window.clearTimeout(timer);
+  }, [locationQuery]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadSuggestions = async () => {
+      if (debouncedLocationQuery.length < 3) {
+        setLocationSuggestions([]);
+        return;
+      }
+
+      setIsSearchingLocation(true);
+      try {
+        const results = await searchAddresses(debouncedLocationQuery, '');
+        if (!cancelled) {
+          setLocationSuggestions(results);
+          setShowLocationSuggestions(true);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsSearchingLocation(false);
+        }
+      }
+    };
+
+    void loadSuggestions();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedLocationQuery]);
 
   const parsedLat = Number(latInput);
   const parsedLng = Number(lngInput);
   const hasValidLocation = Number.isFinite(parsedLat) && Number.isFinite(parsedLng);
   const activeRecommendations = recommend.data ?? followUp.data;
+  const mapCenter = hasValidLocation
+    ? { lat: parsedLat, lng: parsedLng }
+    : geo.location
+      ? { lat: geo.location.latitude, lng: geo.location.longitude }
+      : DEFAULT_MAP_CENTER;
 
   const selectedPreferences = useMemo(
     () => preferences.slice(0, 8),
@@ -366,11 +426,33 @@ export function CityGuidePage() {
     setCustomPreference('');
   };
 
+  const handleSelectLocation = (suggestion: AddressSuggestion) => {
+    setLatInput(Number(suggestion.lat).toFixed(6));
+    setLngInput(Number(suggestion.lon).toFixed(6));
+    setSelectedLocationLabel(suggestion.display_name);
+    setLocationQuery('');
+    setLocationSuggestions([]);
+    setShowLocationSuggestions(false);
+  };
+
+  const handleMapLocationChange = useCallback(async (coords: { lat: number; lng: number }) => {
+    setLatInput(coords.lat.toFixed(6));
+    setLngInput(coords.lng.toFixed(6));
+    setSelectedLocationLabel('Pinned location');
+
+    const address = await reverseGeocodeCoordinates(coords);
+    const label = [address?.street, address?.city, address?.state, address?.country]
+      .filter(Boolean)
+      .join(', ');
+
+    setSelectedLocationLabel(label || `${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)}`);
+  }, []);
+
   const ensureLocation = () => {
     if (!hasValidLocation) {
       toast({
         title: 'Location required',
-        description: 'Detect your location or enter latitude and longitude to use City Guide.',
+        description: 'Pick a place on the map, search for an area, or detect your current location first.',
         variant: 'destructive',
       });
       return false;
@@ -453,7 +535,7 @@ export function CityGuidePage() {
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.16),_transparent_32%),linear-gradient(180deg,_#fffaf5_0%,_#ffffff_38%,_#f8fafc_100%)]">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 pb-10 pt-14 sm:px-6 sm:pt-16 lg:px-8">
         <section className="relative overflow-hidden rounded-[36px] border border-[#fed7aa] bg-[#111827] px-6 py-8 text-white shadow-xl shadow-neutral-950/10 sm:px-8 lg:px-10">
           <div className="absolute inset-y-0 right-0 hidden w-1/2 bg-[radial-gradient(circle_at_center,_rgba(251,146,60,0.35),_transparent_60%)] lg:block" />
           <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.7fr)]">
@@ -485,7 +567,7 @@ export function CityGuidePage() {
                     <p className="text-xs text-slate-300">
                       {geo.isLoading
                         ? 'Checking your device location...'
-                        : geo.error || 'You can auto-detect your spot or enter coordinates manually.'}
+                        : geo.error || 'Use your current spot, search an area, or fine-tune it on the map.'}
                     </p>
                   </div>
                 </div>
@@ -523,25 +605,74 @@ export function CityGuidePage() {
                 </button>
               </div>
 
-              <div className="mt-5 grid gap-4 md:grid-cols-2">
+              <div className="mt-5">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#111827]">Latitude</span>
-                  <input
-                    value={latInput}
-                    onChange={(e) => setLatInput(e.target.value)}
-                    placeholder="12.971599"
-                    className="mt-2 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-[#111827] outline-none transition focus:border-[#b91c1c] focus:bg-white"
-                  />
+                  <span className="text-sm font-semibold text-[#111827]">Where do you want to explore?</span>
+                  <div className="relative mt-2">
+                    <MapPin className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+                    <input
+                      value={locationQuery}
+                      onChange={(e) => {
+                        setLocationQuery(e.target.value);
+                        setShowLocationSuggestions(true);
+                      }}
+                      onFocus={() => {
+                        if (locationSuggestions.length > 0) {
+                          setShowLocationSuggestions(true);
+                        }
+                      }}
+                      onBlur={() => {
+                        window.setTimeout(() => setShowLocationSuggestions(false), 150);
+                      }}
+                      placeholder="Search for a neighborhood, landmark, or address"
+                      className="w-full rounded-2xl border border-neutral-200 bg-neutral-50 py-3 pl-11 pr-4 text-sm text-[#111827] outline-none transition focus:border-[#b91c1c] focus:bg-white"
+                    />
+                    {isSearchingLocation && (
+                      <Loader2 className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-neutral-400" />
+                    )}
+                    {showLocationSuggestions && (locationSuggestions.length > 0 || debouncedLocationQuery.length >= 3) && (
+                      <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-20 max-h-64 overflow-y-auto rounded-3xl border border-neutral-200 bg-white p-2 shadow-xl shadow-neutral-950/10">
+                        {locationSuggestions.length > 0 ? (
+                          locationSuggestions.map((suggestion) => (
+                            <button
+                              key={suggestion.place_id}
+                              type="button"
+                              onMouseDown={(event) => event.preventDefault()}
+                              onClick={() => handleSelectLocation(suggestion)}
+                              className="flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left transition hover:bg-neutral-50"
+                            >
+                              <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#b91c1c]" />
+                              <span className="text-sm text-neutral-700">{suggestion.display_name}</span>
+                            </button>
+                          ))
+                        ) : (
+                          <div className="px-3 py-4 text-sm text-neutral-500">No matching places found yet.</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[#111827]">Longitude</span>
-                  <input
-                    value={lngInput}
-                    onChange={(e) => setLngInput(e.target.value)}
-                    placeholder="77.594566"
-                    className="mt-2 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-[#111827] outline-none transition focus:border-[#b91c1c] focus:bg-white"
+
+                <div className="mt-4 rounded-[28px] border border-neutral-200 bg-neutral-50 p-3">
+                  <StoreLocationMap
+                    center={mapCenter}
+                    onLocationChange={(coords) => {
+                      void handleMapLocationChange(coords);
+                    }}
+                    draggable={hasValidLocation}
+                    className="rounded-[20px]"
                   />
-                </label>
+                </div>
+
+                <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
+                  <span className="font-semibold text-[#111827]">Selected area:</span>
+                  <span className="rounded-full bg-[#fff7ed] px-3 py-1.5 text-[#9a3412]">
+                    {selectedLocationLabel || 'No place selected yet'}
+                  </span>
+                </div>
+                <p className="mt-2 text-xs text-neutral-500">
+                  Search for a place, use your current location, then drag the pin if you want to fine-tune the spot.
+                </p>
               </div>
 
               <label className="mt-5 block">
@@ -779,7 +910,7 @@ export function CityGuidePage() {
                 <div className="rounded-2xl bg-neutral-50 p-4">
                   <p className="text-sm font-semibold text-[#111827]">1. Start from a real place</p>
                   <p className="mt-1 text-sm text-neutral-500">
-                    Use GPS or paste coordinates for any part of the city you want to explore.
+                    Use GPS, search a neighborhood, or drop a pin on the map for the area you want to explore.
                   </p>
                 </div>
                 <div className="rounded-2xl bg-neutral-50 p-4">
