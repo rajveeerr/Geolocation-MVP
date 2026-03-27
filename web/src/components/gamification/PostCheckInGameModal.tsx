@@ -123,7 +123,9 @@ const SpinWheelGame = ({
   labels: string[];
 }) => {
   const [spinCount, setSpinCount] = useState(0);
-  const rotation = resultSlot != null ? 1440 + resultSlot * 60 + spinCount * 360 : spinCount * 360;
+  const slotCount = Math.max(labels.length, 1);
+  const segmentAngle = 360 / slotCount;
+  const rotation = resultSlot != null ? 2520 + resultSlot * segmentAngle + spinCount * 540 : spinCount * 540;
 
   const handleSpin = () => {
     setSpinCount((count) => count + 1);
@@ -132,37 +134,59 @@ const SpinWheelGame = ({
 
   return (
     <div className="space-y-5">
-      <div className="mx-auto flex h-72 w-72 items-center justify-center">
-        <div className="relative h-64 w-64">
-          <ChevronDown className="absolute left-1/2 top-0 z-10 h-5 w-5 -translate-x-1/2 text-yellow-400" />
+      <div className="mx-auto flex items-center justify-center py-2">
+        <div className="relative h-72 w-72">
+          <div className="absolute left-1/2 top-1 z-20 -translate-x-1/2 rounded-full bg-yellow-400/10 p-1.5 shadow-[0_0_20px_rgba(250,204,21,0.18)]">
+            <ChevronDown className="h-5 w-5 text-yellow-400" />
+          </div>
           <div
-            className="h-full w-full rounded-full border-8 border-neutral-950 bg-neutral-100 shadow-xl transition-transform duration-[2200ms] ease-out"
+            className="relative h-full w-full overflow-hidden rounded-full border-8 border-neutral-950 bg-neutral-100 shadow-xl transition-transform duration-[4200ms] [transition-timing-function:cubic-bezier(0.18,0.82,0.22,1)]"
             style={{ transform: `rotate(${rotation}deg)` }}
           >
+            <div
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: `conic-gradient(${labels
+                  .map((_, index) => {
+                    const start = index * segmentAngle;
+                    const end = start + segmentAngle;
+                    const color = index % 2 === 0 ? '#f3f4f6' : '#fee2e2';
+                    return `${color} ${start}deg ${end}deg`;
+                  })
+                  .join(', ')})`,
+              }}
+            />
             {labels.map((label, index) => {
-              const angle = (360 / labels.length) * index;
+              const angle = index * segmentAngle + segmentAngle / 2;
               return (
                 <div
                   key={`${label}-${index}`}
-                  className="absolute left-1/2 top-1/2 h-1/2 w-1/2 origin-bottom-left"
-                  style={{ transform: `rotate(${angle}deg)` }}
+                  className="absolute left-1/2 top-1/2 z-10 origin-center"
+                  style={{ transform: `translate(-50%, -50%) rotate(${angle}deg)` }}
                 >
-                  <div
-                    className={cn(
-                      'flex h-full w-full items-start justify-center rounded-tr-full pt-3 text-[10px] font-bold uppercase tracking-wide',
-                      index % 2 === 0 ? 'bg-brand-primary-100 text-brand-primary-700' : 'bg-neutral-100 text-neutral-700',
-                    )}
-                  >
-                    <span className="-rotate-45">{label}</span>
+                  <div className="flex w-[7.5rem] -translate-y-[6.6rem] justify-center">
+                    <span
+                      className={cn(
+                        'block max-w-[4.75rem] text-center text-[11px] font-bold uppercase leading-tight tracking-wide',
+                        index % 2 === 0 ? 'text-brand-primary-700' : 'text-red-600',
+                      )}
+                      style={{ transform: `rotate(${-angle}deg)` }}
+                    >
+                      {label}
+                    </span>
                   </div>
                 </div>
               );
             })}
+            <div className="pointer-events-none absolute inset-[18%] rounded-full border border-black/5" />
           </div>
           <button
             onClick={handleSpin}
             disabled={isPlaying || resultSlot !== null}
-            className="absolute left-1/2 top-1/2 z-20 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-neutral-950 text-sm font-bold text-white shadow-xl disabled:opacity-60"
+            className={cn(
+              'absolute left-1/2 top-1/2 z-20 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-neutral-950 text-sm font-bold text-white shadow-xl transition-all disabled:opacity-60',
+              !isPlaying && resultSlot === null && 'ring-8 ring-white/5 hover:scale-[1.03]',
+            )}
           >
             {isPlaying ? '...' : resultSlot !== null ? 'Won' : 'Spin'}
           </button>
