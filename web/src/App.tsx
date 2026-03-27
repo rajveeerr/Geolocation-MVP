@@ -41,6 +41,11 @@ const MerchantAnalyticsPage = React.lazy(() =>
     default: m.MerchantAnalyticsPage,
   })),
 );
+const MerchantCheckInGamesPage = React.lazy(() =>
+  import('./pages/merchant/MerchantCheckInGamesPage').then((m) => ({
+    default: m.MerchantCheckInGamesPage,
+  })),
+);
 const CreateDealPage = React.lazy(() =>
   import('./pages/merchant/DealCreatePage').then((m) => ({
     default: m.CreateDealPage,
@@ -230,6 +235,9 @@ const MerchantLoyaltyTransactionsPage = React.lazy(() =>
 );
 const AdminNudgesPage = React.lazy(() =>
   import('./pages/admin/AdminNudgesPage').then((m) => ({ default: m.AdminNudgesPage }))
+);
+const AdminGamesPage = React.lazy(() =>
+  import('./pages/admin/AdminGamesPage').then((m) => ({ default: m.AdminGamesPage }))
 );
 const NudgeHistoryPage = React.lazy(() =>
   import('./pages/NudgeHistoryPage').then((m) => ({ default: m.NudgeHistoryPage }))
@@ -757,6 +765,18 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path={PATHS.MERCHANT_CHECKIN_GAMES}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantCheckInGamesPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* Merchant Loyalty */}
                 <Route
@@ -922,6 +942,14 @@ function App() {
                     element={
                       <Suspense fallback={<LoadingOverlay />}>
                         <AdminNudgesPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={PATHS.ADMIN_GAMES}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <AdminGamesPage />
                       </Suspense>
                     }
                   />

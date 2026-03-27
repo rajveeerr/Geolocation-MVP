@@ -1,6 +1,7 @@
 import React from 'react';
 import { Trophy } from 'lucide-react';
 import GamificationDashboard from '../components/gamification/GamificationDashboard';
+import { CheckInLotteryCard } from '@/components/gamification/CheckInLotteryCard';
 
 export const GamificationPage: React.FC = () => {
   return (
@@ -21,6 +22,9 @@ export const GamificationPage: React.FC = () => {
         </div>
         
         <GamificationDashboard />
+        <div className="mt-6">
+          <CheckInLotteryCard />
+        </div>
       </div>
     </div>
   );

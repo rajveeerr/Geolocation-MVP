@@ -26,6 +26,7 @@ export const PATHS = {
   MERCHANT_MENU_DETAIL: '/merchant/menu/:itemId',
   MERCHANT_MENU_COLLECTIONS: '/merchant/menu/collections',
   MERCHANT_ANALYTICS: '/merchant/analytics',
+  MERCHANT_CHECKIN_GAMES: '/merchant/check-in-games',
 
   LOGIN: '/login',
   SIGNUP: '/signup',
@@ -68,6 +69,7 @@ export const PATHS = {
   ADMIN_CITIES: '/admin/cities', // New route for the city management table
   ADMIN_CUSTOMERS: '/admin/customers', // New route for the customer list
   ADMIN_NUDGES: '/admin/nudges',
+  ADMIN_GAMES: '/admin/games',
 
   // Nudges (consumer)
   NUDGE_HISTORY: '/nudges/history',

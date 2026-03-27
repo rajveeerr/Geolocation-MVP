@@ -13,7 +13,7 @@ import {
   ThumbsUp, Check, Search, SlidersHorizontal, Zap, ChevronDown,
 } from 'lucide-react';
 import { useCheckIn } from '@/hooks/useCheckIn';
-import { CheckInModal } from '@/components/deals/CheckInModal';
+import { PostCheckInGameModal } from '@/components/gamification/PostCheckInGameModal';
 import { TableBookingModal } from '@/components/table-booking/TableBookingModal';
 import { LeaderboardTab } from '@/components/deals/detail-tabs/LeaderboardTab';
 import { EventsTab } from '@/components/deals/detail-tabs/EventsTab';
@@ -614,6 +614,13 @@ export const DealDetailPage = () => {
       totalEntries: number;
       drawAt: string;
     } | null;
+    gameSession?: {
+      sessionToken: string;
+      gameType: 'SCRATCH_CARD' | 'SPIN_WHEEL' | 'PICK_A_CARD';
+      title: string;
+      subtitle?: string | null;
+      expiresAt: string;
+    } | null;
   } | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showHoursDropdown, setShowHoursDropdown] = useState(false);
@@ -626,6 +633,7 @@ export const DealDetailPage = () => {
           pointsEarned: data.pointsEarned,
           eligibleRewards: data.eligibleRewards,
           lotteryEntry: data.lotteryEntry,
+          gameSession: data.gameSession,
         });
         setShowCheckInModal(true);
       }
@@ -1374,7 +1382,7 @@ export const DealDetailPage = () => {
       {/*  MODALS                                                       */}
       {/* ============================================================ */}
       {showCheckInModal && deal && (
-        <CheckInModal
+        <PostCheckInGameModal
           isOpen={showCheckInModal}
           onClose={() => {
             setShowCheckInModal(false);
@@ -1384,6 +1392,7 @@ export const DealDetailPage = () => {
           pointsEarned={checkInResult?.pointsEarned || 50}
           eligibleRewards={checkInResult?.eligibleRewards || []}
           lotteryEntry={checkInResult?.lotteryEntry || null}
+          gameSession={checkInResult?.gameSession || null}
           onCheckOut={() => {
             setShowCheckInModal(false);
             setCheckInResult(null);

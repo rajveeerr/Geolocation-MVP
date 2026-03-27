@@ -7,6 +7,7 @@ import { useSavedDeals } from '@/hooks/useSavedDeals';
 import { useCheckIn } from '@/hooks/useCheckIn';
 import { useNavigationHistory } from '@/hooks/useNavigationHistory';
 import { useDealDetail, type DetailedDeal } from '@/hooks/useDealDetail';
+import { PostCheckInGameModal } from '@/components/gamification/PostCheckInGameModal';
 import { cn } from '@/lib/utils';
 import { MerchantLogo } from '@/components/common/MerchantLogo';
 import { useLoyaltyBalance, useLoyaltyProgram } from '@/hooks/useLoyalty';
@@ -303,9 +304,46 @@ const MerchantInfoSection = ({ merchant }: { merchant: DetailedDeal['merchant'] 
 export const EnhancedDealDetailPage = () => {
   const { dealId } = useParams<{ dealId: string }>();
   const { savedDealIds, saveDeal, unsaveDeal } = useSavedDeals();
-  const { isCheckingIn, checkIn } = useCheckIn();
   const { toast } = useToast();
   const { canGoBack, goBack } = useNavigationHistory();
+  const [showCheckInModal, setShowCheckInModal] = useState(false);
+  const [checkInResult, setCheckInResult] = useState<{
+    pointsEarned: number;
+    eligibleRewards?: Array<{
+      id: number;
+      title: string;
+      description?: string | null;
+      rewardType: string;
+      rewardAmount: number;
+      checkInCondition: 'ANY_CHECKIN' | 'FIRST_VISIT' | 'BIRTHDAY';
+      expiresAt: string;
+    }>;
+    lotteryEntry?: {
+      gameId: string;
+      entered: boolean;
+      newEntry: boolean;
+      totalEntries: number;
+      drawAt: string;
+    } | null;
+    gameSession?: {
+      sessionToken: string;
+      gameType: 'SCRATCH_CARD' | 'SPIN_WHEEL' | 'PICK_A_CARD';
+      title: string;
+      subtitle?: string | null;
+      expiresAt: string;
+    } | null;
+  } | null>(null);
+  const { isCheckingIn, checkIn } = useCheckIn({
+    onSuccess: ({ pointsEarned, eligibleRewards, lotteryEntry, gameSession }) => {
+      setCheckInResult({
+        pointsEarned,
+        eligibleRewards,
+        lotteryEntry,
+        gameSession,
+      });
+      setShowCheckInModal(true);
+    },
+  });
 
   const {
     data: deal,
@@ -793,6 +831,25 @@ export const EnhancedDealDetailPage = () => {
           )}
         </div>
       </div>
+
+      {showCheckInModal && deal && (
+        <PostCheckInGameModal
+          isOpen={showCheckInModal}
+          onClose={() => {
+            setShowCheckInModal(false);
+            setCheckInResult(null);
+          }}
+          deal={deal}
+          pointsEarned={checkInResult?.pointsEarned || 0}
+          eligibleRewards={checkInResult?.eligibleRewards || []}
+          lotteryEntry={checkInResult?.lotteryEntry || null}
+          gameSession={checkInResult?.gameSession || null}
+          onCheckOut={() => {
+            setShowCheckInModal(false);
+            setCheckInResult(null);
+          }}
+        />
+      )}
     </div>
   );
 };

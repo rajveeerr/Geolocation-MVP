@@ -32,6 +32,21 @@ interface CheckInResponse {
     totalEntries: number;
     drawAt: string;
   } | null;
+  gameSession?: {
+    sessionToken: string;
+    gameType: 'SCRATCH_CARD' | 'SPIN_WHEEL' | 'PICK_A_CARD';
+    title: string;
+    subtitle?: string | null;
+    expiresAt: string;
+  } | null;
+  streak?: {
+    currentStreak: number;
+    currentDiscountPercent: number;
+    message: string;
+    newWeek: boolean;
+    streakBroken: boolean;
+    maxDiscountReached: boolean;
+  };
 }
 
 interface UseCheckInOptions {
@@ -40,6 +55,7 @@ interface UseCheckInOptions {
     withinRange: boolean;
     eligibleRewards?: CheckInResponse['eligibleRewards'];
     lotteryEntry?: CheckInResponse['lotteryEntry'];
+    gameSession?: CheckInResponse['gameSession'];
   }) => void;
 }
 
@@ -94,6 +110,7 @@ export const useCheckIn = (options?: UseCheckInOptions) => {
         withinRange: response.data.withinRange,
         eligibleRewards: response.data.eligibleRewards,
         lotteryEntry: response.data.lotteryEntry,
+        gameSession: response.data.gameSession,
       });
       
       // Don't show toast if callback is provided (modal will handle it)
@@ -121,6 +138,8 @@ export const useCheckIn = (options?: UseCheckInOptions) => {
 
       // Invalidate user data to refetch their new point total
       queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ['gamification'] });
+      queryClient.invalidateQueries({ queryKey: ['user', 'checkinLotteryCurrent'] });
       queryClient.invalidateQueries({ queryKey: ['leaderboard'] }); // Also refresh leaderboard
     },
     onError: (error: any) => {
