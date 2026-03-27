@@ -5,16 +5,45 @@ import { useReferrals } from '@/hooks/useReferrals';
 import { useToast } from '@/hooks/use-toast';
 import { useHappyHourTimer } from '@/hooks/useHappyHourTimer';
 import type { DetailedDeal } from '@/hooks/useDealDetail';
+import { cn } from '@/lib/utils';
+
+type EligibleReward = {
+  id: number;
+  title: string;
+  description?: string | null;
+  rewardType: string;
+  rewardAmount: number;
+  checkInCondition: 'ANY_CHECKIN' | 'FIRST_VISIT' | 'BIRTHDAY';
+  expiresAt: string;
+};
+
+type LotteryEntry = {
+  gameId: string;
+  entered: boolean;
+  newEntry: boolean;
+  totalEntries: number;
+  drawAt: string;
+};
 
 interface CheckInModalProps {
   isOpen: boolean;
   onClose: () => void;
   deal: DetailedDeal;
   pointsEarned: number;
+  eligibleRewards?: EligibleReward[];
+  lotteryEntry?: LotteryEntry | null;
   onCheckOut?: () => void;
 }
 
-export const CheckInModal = ({ isOpen, onClose, deal, pointsEarned, onCheckOut }: CheckInModalProps) => {
+export const CheckInModal = ({
+  isOpen,
+  onClose,
+  deal,
+  pointsEarned,
+  eligibleRewards = [],
+  lotteryEntry = null,
+  onCheckOut,
+}: CheckInModalProps) => {
   const { toast } = useToast();
   const { data: referrals } = useReferrals();
   const [copied, setCopied] = useState(false);
@@ -80,6 +109,38 @@ export const CheckInModal = ({ isOpen, onClose, deal, pointsEarned, onCheckOut }
               {String(happyHourTimer.hours).padStart(2, '0')}h{' '}
               {String(happyHourTimer.minutes).padStart(2, '0')}m
             </div>
+          </div>
+        )}
+
+        {eligibleRewards.length > 0 && (
+          <div className="bg-emerald-900/40 border border-emerald-500/40 rounded-2xl p-4 mb-6">
+            <h3 className="text-lg font-bold text-emerald-300 mb-3">Rewards Unlocked</h3>
+            <div className="space-y-3">
+              {eligibleRewards.map((reward) => (
+                <div key={reward.id} className="rounded-xl border border-emerald-500/25 bg-emerald-950/40 p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-semibold text-white">{reward.title}</p>
+                    <span className="text-xs font-bold text-emerald-300 uppercase tracking-wide">{reward.rewardType.replaceAll('_', ' ')}</span>
+                  </div>
+                  {reward.description && <p className="text-xs text-emerald-100/80 mt-1">{reward.description}</p>}
+                  <p className="text-xs text-emerald-200 mt-2">
+                    Condition: {reward.checkInCondition.replaceAll('_', ' ').toLowerCase()}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {lotteryEntry?.entered && (
+          <div className="bg-blue-900/40 border border-blue-500/40 rounded-2xl p-4 mb-6">
+            <h3 className="text-lg font-bold text-blue-300 mb-1">Global Check-in Lottery</h3>
+            <p className="text-sm text-blue-100">
+              You are entered with {lotteryEntry.totalEntries} total participant{lotteryEntry.totalEntries === 1 ? '' : 's'}.
+            </p>
+            <p className="text-xs text-blue-200 mt-2">
+              Draw time: {new Date(lotteryEntry.drawAt).toLocaleString()}
+            </p>
           </div>
         )}
 

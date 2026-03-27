@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useKickbackEarnings } from '@/hooks/useKickbackEarnings';
+import { type KickbackEarningRow, useKickbackEarnings } from '@/hooks/useKickbackEarnings';
 import { Button } from '@/components/common/Button';
 import { ArrowLeft, ChevronDown, Plus, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -11,21 +11,27 @@ import { AnimatePresence, motion } from 'framer-motion';
 // --- Sub-components for a clean structure ---
 
 const PeriodFilter = ({ period, setPeriod }: { period: string; setPeriod: (p: string) => void }) => {
-  const periods = ['All time', 'Today', 'Yesterday', 'This week'];
+  const periods = [
+    { label: 'All time', value: 'all_time' },
+    { label: 'Last 7 days', value: 'last_7_days' },
+    { label: 'Last 30 days', value: 'last_30_days' },
+    { label: 'This month', value: 'this_month' },
+    { label: 'This year', value: 'this_year' },
+  ];
   return (
     <div className="flex items-center gap-2 rounded-full bg-neutral-100 p-1">
       {periods.map((p) => (
         <button
-          key={p}
-          onClick={() => setPeriod(p.toLowerCase().replace(' ', '_'))}
+          key={p.value}
+          onClick={() => setPeriod(p.value)}
           className={cn(
             'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
-            period === p.toLowerCase().replace(' ', '_')
+            period === p.value
               ? 'bg-black text-white shadow-sm'
               : 'text-neutral-600 hover:bg-neutral-200/50',
           )}
         >
-          {p}
+          {p.label}
         </button>
       ))}
     </div>
@@ -40,7 +46,7 @@ const SummaryCard = ({ title, value, subtext }: { title: string; value: number; 
   </div>
 );
 
-const EarningsRow = ({ detail }: { detail: any }) => {
+const EarningsRow = ({ detail }: { detail: KickbackEarningRow }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="border-b border-neutral-200 last:border-b-0 bg-white">
@@ -68,11 +74,18 @@ const EarningsRow = ({ detail }: { detail: any }) => {
           >
             <div className="px-4 pb-4 pl-16 space-y-2">
               <p className="text-xs font-semibold text-neutral-400 uppercase">Spending Details</p>
-              {detail.spendingDetail.map((item: any, index: number) => (
+              {detail.spendingDetail.map((item, index: number) => (
                 <div key={index} className="flex items-center gap-3">
-                  <img src={item.imageUrl} className="h-10 w-10 rounded-md object-cover" />
-                  <p className="flex-grow font-semibold text-neutral-700">{item.itemName}</p>
-                  <p className="text-neutral-500">${item.price.toFixed(2)}</p>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-md bg-neutral-100 text-xs font-bold text-neutral-500">
+                    #{item.dealId}
+                  </div>
+                  <div className="flex-grow">
+                    <p className="font-semibold text-neutral-700">{item.dealTitle}</p>
+                    <p className="text-xs text-neutral-500">
+                      Earned ${item.amountEarned.toFixed(2)} from ${item.amountSpent.toFixed(2)} spend
+                    </p>
+                  </div>
+                  <p className="text-neutral-500">{new Date(item.date).toLocaleDateString('en-US')}</p>
                 </div>
               ))}
             </div>
@@ -116,7 +129,7 @@ export const KickbackEarningsPage = () => {
               <SummaryCard title="Total kickback" value={data.summary.totalKickbackHandout} subtext="All time" />
             </div>
             <div className="rounded-2xl border border-neutral-200 overflow-hidden">
-              {data.details.map((detail: any, index: number) => (
+              {data.details.map((detail, index: number) => (
                 <EarningsRow key={index} detail={detail} />
               ))}
             </div>

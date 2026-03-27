@@ -16,10 +16,31 @@ interface CheckInResponse {
   pointsAwarded: number;
   firstCheckIn: boolean;
   withinRange: boolean;
+  eligibleRewards?: Array<{
+    id: number;
+    title: string;
+    description?: string | null;
+    rewardType: string;
+    rewardAmount: number;
+    checkInCondition: 'ANY_CHECKIN' | 'FIRST_VISIT' | 'BIRTHDAY';
+    expiresAt: string;
+  }>;
+  lotteryEntry?: {
+    gameId: string;
+    entered: boolean;
+    newEntry: boolean;
+    totalEntries: number;
+    drawAt: string;
+  } | null;
 }
 
 interface UseCheckInOptions {
-  onSuccess?: (data: { pointsEarned: number; withinRange: boolean }) => void;
+  onSuccess?: (data: {
+    pointsEarned: number;
+    withinRange: boolean;
+    eligibleRewards?: CheckInResponse['eligibleRewards'];
+    lotteryEntry?: CheckInResponse['lotteryEntry'];
+  }) => void;
 }
 
 export const useCheckIn = (options?: UseCheckInOptions) => {
@@ -71,6 +92,8 @@ export const useCheckIn = (options?: UseCheckInOptions) => {
       options?.onSuccess?.({
         pointsEarned,
         withinRange: response.data.withinRange,
+        eligibleRewards: response.data.eligibleRewards,
+        lotteryEntry: response.data.lotteryEntry,
       });
       
       // Don't show toast if callback is provided (modal will handle it)

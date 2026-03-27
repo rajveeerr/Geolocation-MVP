@@ -2,6 +2,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/common/Button';
 import { PATHS } from '@/routing/paths';
 import { useMerchantStores, type Store } from '@/hooks/useMerchantStores';
+import { useUpdateMerchantCoordinates } from '@/hooks/useMerchantCoordinates';
+import { useToast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
   Edit, 
@@ -23,6 +25,8 @@ const StoreDetailCard = ({ store, onEdit, onDelete }: {
   onEdit: (store: Store) => void;
   onDelete: (store: Store) => void;
 }) => {
+  const { toast } = useToast();
+  const updateMerchantCoordinates = useUpdateMerchantCoordinates();
   const cityName = store.city?.name || 'Unknown City';
   const cityState = store.city?.state || 'Unknown State';
   const cityId = store.city?.id;
@@ -180,6 +184,37 @@ const StoreDetailCard = ({ store, onEdit, onDelete }: {
                   >
                     View on Google Maps
                   </a>
+                </div>
+              )}
+              {store.latitude !== null && store.latitude !== undefined && store.longitude !== null && store.longitude !== undefined && (
+                <div className="pt-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => {
+                      updateMerchantCoordinates.mutate(
+                        { latitude: store.latitude!, longitude: store.longitude! },
+                        {
+                          onSuccess: () => {
+                            toast({
+                              title: 'Merchant coordinates updated',
+                              description: 'Your merchant-level coordinates now match this store.',
+                            });
+                          },
+                          onError: (error) => {
+                            toast({
+                              title: 'Could not update merchant coordinates',
+                              description: error.message,
+                              variant: 'destructive',
+                            });
+                          },
+                        },
+                      );
+                    }}
+                    disabled={updateMerchantCoordinates.isPending}
+                  >
+                    {updateMerchantCoordinates.isPending ? 'Saving…' : 'Use These For Merchant Location'}
+                  </Button>
                 </div>
               )}
             </div>

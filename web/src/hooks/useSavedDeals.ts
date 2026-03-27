@@ -116,3 +116,21 @@ export const useSavedDeals = () => {
     isUnsaving: unsaveDealMutation.isPending,
   };
 };
+
+export const useSavedDealStatus = (dealId: number | null) => {
+  const { user } = useAuth();
+
+  return useQuery<
+    ApiResponse<{ isSaved: boolean; savedAt: string | null }>,
+    Error,
+    { isSaved: boolean; savedAt: string | null }
+  >({
+    queryKey: ['savedDealStatus', user?.id, dealId],
+    queryFn: () => apiGet<{ isSaved: boolean; savedAt: string | null }>(`/users/saved-deals/${dealId}`),
+    enabled: !!user?.id && !!dealId,
+    select: (response) => ({
+      isSaved: response.data?.isSaved ?? false,
+      savedAt: response.data?.savedAt ?? null,
+    }),
+  });
+};

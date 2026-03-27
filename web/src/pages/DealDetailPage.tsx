@@ -596,7 +596,25 @@ export const DealDetailPage = () => {
   const [leftTab, setLeftTab] = useState<LeftTab>('info');
   const [rightTab, setRightTab] = useState<RightTab>('menu');
   const [showCheckInModal, setShowCheckInModal] = useState(false);
-  const [checkInResult, setCheckInResult] = useState<{ pointsEarned: number } | null>(null);
+  const [checkInResult, setCheckInResult] = useState<{
+    pointsEarned: number;
+    eligibleRewards?: Array<{
+      id: number;
+      title: string;
+      description?: string | null;
+      rewardType: string;
+      rewardAmount: number;
+      checkInCondition: 'ANY_CHECKIN' | 'FIRST_VISIT' | 'BIRTHDAY';
+      expiresAt: string;
+    }>;
+    lotteryEntry?: {
+      gameId: string;
+      entered: boolean;
+      newEntry: boolean;
+      totalEntries: number;
+      drawAt: string;
+    } | null;
+  } | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showHoursDropdown, setShowHoursDropdown] = useState(false);
   const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
@@ -604,7 +622,11 @@ export const DealDetailPage = () => {
   const { isCheckingIn, checkIn } = useCheckIn({
     onSuccess: (data) => {
       if (data.withinRange) {
-        setCheckInResult({ pointsEarned: data.pointsEarned });
+        setCheckInResult({
+          pointsEarned: data.pointsEarned,
+          eligibleRewards: data.eligibleRewards,
+          lotteryEntry: data.lotteryEntry,
+        });
         setShowCheckInModal(true);
       }
     },
@@ -1360,6 +1382,8 @@ export const DealDetailPage = () => {
           }}
           deal={deal}
           pointsEarned={checkInResult?.pointsEarned || 50}
+          eligibleRewards={checkInResult?.eligibleRewards || []}
+          lotteryEntry={checkInResult?.lotteryEntry || null}
           onCheckOut={() => {
             setShowCheckInModal(false);
             setCheckInResult(null);
