@@ -185,6 +185,12 @@ const rewardTypeLabels: Record<MerchantCheckInGameReward['rewardType'], string> 
   BONUS_POINTS: 'Bonus points',
 };
 
+const editorInputClass =
+  'w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100';
+
+const editorFieldLabelClass =
+  'mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-500';
+
 const StatCard = ({
   label,
   value,
@@ -467,12 +473,14 @@ export function MerchantCheckInGamesPage() {
               <p className="mt-1 text-sm text-neutral-600">Define which game appears and how the reward moment is presented.</p>
             </div>
 
-            <div className="mb-5 grid grid-cols-1 gap-2 rounded-2xl bg-neutral-100 p-1 sm:grid-cols-2">
+            <div className="mb-6 grid grid-cols-1 gap-2 rounded-2xl border border-neutral-200 bg-neutral-100/80 p-1.5 sm:grid-cols-2">
               <button
                 type="button"
                 className={cn(
-                  'rounded-xl px-4 py-2.5 text-sm font-semibold transition',
-                  builderMode === 'preset' ? 'bg-white text-neutral-900 shadow-sm' : 'text-neutral-600 hover:text-neutral-900',
+                  'rounded-xl px-4 py-3 text-sm font-semibold transition',
+                  builderMode === 'preset'
+                    ? 'bg-white text-neutral-900 shadow-sm ring-1 ring-neutral-200'
+                    : 'text-neutral-600 hover:bg-white/80 hover:text-neutral-900',
                 )}
                 onClick={() => setBuilderMode('preset')}
               >
@@ -481,8 +489,10 @@ export function MerchantCheckInGamesPage() {
               <button
                 type="button"
                 className={cn(
-                  'rounded-xl px-4 py-2.5 text-sm font-semibold transition',
-                  builderMode === 'manual' ? 'bg-white text-neutral-900 shadow-sm' : 'text-neutral-600 hover:text-neutral-900',
+                  'rounded-xl px-4 py-3 text-sm font-semibold transition',
+                  builderMode === 'manual'
+                    ? 'bg-white text-neutral-900 shadow-sm ring-1 ring-neutral-200'
+                    : 'text-neutral-600 hover:bg-white/80 hover:text-neutral-900',
                 )}
                 onClick={() => {
                   setBuilderMode('manual');
@@ -494,7 +504,7 @@ export function MerchantCheckInGamesPage() {
             </div>
 
             {builderMode === 'preset' && (
-              <div className="mb-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              <div className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {CHECK_IN_GAME_PRESETS.map((preset) => {
                   const isSelected = selectedPresetId === preset.id;
 
@@ -503,26 +513,26 @@ export function MerchantCheckInGamesPage() {
                       key={preset.id}
                       type="button"
                       className={cn(
-                        'rounded-2xl border p-4 text-left transition focus:outline-none focus:ring-2 focus:ring-brand-primary-100',
+                        'group flex h-full flex-col rounded-[1.4rem] border p-5 text-left transition focus:outline-none focus:ring-2 focus:ring-brand-primary-100',
                         isSelected
-                          ? 'border-brand-primary-300 bg-brand-primary-50/70 shadow-sm'
-                          : 'border-neutral-200 bg-neutral-50/70 hover:border-neutral-300 hover:bg-white',
+                          ? 'border-brand-primary-300 bg-brand-primary-50/80 shadow-sm shadow-brand-primary-100/50'
+                          : 'border-neutral-200 bg-neutral-50/70 hover:-translate-y-0.5 hover:border-neutral-300 hover:bg-white hover:shadow-sm',
                       )}
                       onClick={() => applyPreset(preset.id)}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <div className="text-base font-bold text-neutral-900">{preset.name}</div>
-                          <div className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
+                          <div className="text-xl font-black tracking-tight text-neutral-900">{preset.name}</div>
+                          <div className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
                             {gameTypeCopy[preset.config.gameType].title}
                           </div>
                         </div>
-                        <div className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-600">
+                        <div className="shrink-0 rounded-full border border-neutral-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-600">
                           {preset.badge}
                         </div>
                       </div>
-                      <p className="mt-2 text-sm leading-6 text-neutral-600">{preset.description}</p>
-                      <div className="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
+                      <p className="mt-4 flex-1 text-sm leading-6 text-neutral-600">{preset.description}</p>
+                      <div className="mt-5 flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
                         {gameTypeCopy[preset.config.gameType].title} • {preset.config.rewards.length} rewards
                       </div>
                     </button>
@@ -535,7 +545,7 @@ export function MerchantCheckInGamesPage() {
               <label className="space-y-2 text-sm text-neutral-700">
                 <span className="font-semibold">Enable post check-in game</span>
                 <select
-                  className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100"
+                  className={editorInputClass}
                   value={form.isEnabled ? 'enabled' : 'disabled'}
                   onChange={(event) => setForm({ ...form, isEnabled: event.target.value === 'enabled' })}
                 >
@@ -547,7 +557,7 @@ export function MerchantCheckInGamesPage() {
               <label className="space-y-2 text-sm text-neutral-700">
                 <span className="font-semibold">Game type</span>
                 <select
-                  className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100"
+                  className={editorInputClass}
                   value={form.gameType}
                   onChange={(event) => {
                     setSelectedPresetId('custom');
@@ -566,7 +576,7 @@ export function MerchantCheckInGamesPage() {
               <label className="space-y-2 text-sm text-neutral-700">
                 <span className="font-semibold">Headline</span>
                 <input
-                  className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100"
+                  className={editorInputClass}
                   value={form.title}
                   onChange={(event) => {
                     setSelectedPresetId('custom');
@@ -579,7 +589,7 @@ export function MerchantCheckInGamesPage() {
               <label className="space-y-2 text-sm text-neutral-700">
                 <span className="font-semibold">Subheadline</span>
                 <input
-                  className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100"
+                  className={editorInputClass}
                   value={form.subtitle || ''}
                   onChange={(event) => {
                     setSelectedPresetId('custom');
@@ -592,7 +602,7 @@ export function MerchantCheckInGamesPage() {
               <label className="space-y-2 text-sm text-neutral-700">
                 <span className="font-semibold">Cooldown minutes</span>
                 <input
-                  className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100"
+                  className={editorInputClass}
                   type="number"
                   min={0}
                   value={form.cooldownMinutes}
@@ -607,7 +617,7 @@ export function MerchantCheckInGamesPage() {
               <label className="space-y-2 text-sm text-neutral-700">
                 <span className="font-semibold">Reward expires in hours</span>
                 <input
-                  className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100"
+                  className={editorInputClass}
                   type="number"
                   min={1}
                   value={form.rewardExpiryHours}
@@ -641,8 +651,11 @@ export function MerchantCheckInGamesPage() {
 
             <div className="space-y-4">
               {form.rewards.map((reward, index) => (
-                <div key={`${reward.id ?? 'new'}-${index}`} className="rounded-2xl border border-neutral-200 bg-neutral-50/60 p-4">
-                  <div className="mb-4 flex items-center justify-between gap-3">
+                <div
+                  key={`${reward.id ?? 'new'}-${index}`}
+                  className="rounded-[1.6rem] border border-neutral-200 bg-gradient-to-br from-white to-neutral-50/70 p-4 shadow-sm sm:p-5"
+                >
+                  <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex min-w-0 items-center gap-3">
                       <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-white">
                         {reward.imageUrl ? (
@@ -652,11 +665,11 @@ export function MerchantCheckInGamesPage() {
                         )}
                       </div>
                       <div className="min-w-0">
-                        <div className="text-sm font-semibold text-neutral-900">
+                        <div className="text-base font-bold text-neutral-900">
                         Reward {index + 1}
                         {reward.label.trim() ? ` · ${reward.label}` : ''}
                         </div>
-                        <div className="mt-1 text-xs uppercase tracking-[0.18em] text-neutral-500">
+                        <div className="mt-1 text-xs uppercase tracking-[0.2em] text-neutral-500">
                           {rewardTypeLabels[reward.rewardType]}
                         </div>
                       </div>
@@ -671,8 +684,8 @@ export function MerchantCheckInGamesPage() {
                     </button>
                   </div>
 
-                  <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-                    <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-3 md:col-span-2 xl:col-span-1">
+                  <div className="grid gap-4 xl:grid-cols-[minmax(140px,0.9fr)_minmax(0,1.5fr)_minmax(160px,0.85fr)_minmax(130px,0.65fr)]">
+                    <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-3">
                       {reward.imageUrl ? (
                         <div className="space-y-3">
                           <div className="aspect-square overflow-hidden rounded-xl bg-neutral-100">
@@ -711,46 +724,69 @@ export function MerchantCheckInGamesPage() {
                         </button>
                       )}
                     </div>
-                    <input
-                      className="rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100 xl:col-span-2"
-                      placeholder="Reward title"
-                      value={reward.label}
-                      onChange={(event) => updateReward(index, { label: event.target.value })}
-                    />
-                    <select
-                      className="rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100"
-                      value={reward.rewardType}
-                      onChange={(event) => updateReward(index, { rewardType: event.target.value as MerchantCheckInGameReward['rewardType'] })}
-                    >
-                      {REWARD_TYPES.map((rewardType) => (
-                        <option key={rewardType} value={rewardType}>
-                          {rewardTypeLabels[rewardType]}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      className="rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100"
-                      type="number"
-                      min={0}
-                      step="0.01"
-                      placeholder="Reward value"
-                      value={reward.rewardValue}
-                      onChange={(event) => updateReward(index, { rewardValue: Number(event.target.value) || 0 })}
-                    />
-                    <input
-                      className="rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100"
-                      type="number"
-                      min={1}
-                      placeholder="Weight"
-                      value={reward.probabilityWeight}
-                      onChange={(event) => updateReward(index, { probabilityWeight: Number(event.target.value) || 1 })}
-                    />
-                    <input
-                      className="rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100 md:col-span-2 xl:col-span-5"
-                      placeholder="Customer-facing label"
-                      value={reward.rewardLabel || ''}
-                      onChange={(event) => updateReward(index, { rewardLabel: event.target.value })}
-                    />
+                    <div className="space-y-4 xl:col-span-2">
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <label>
+                          <span className={editorFieldLabelClass}>Reward title</span>
+                          <input
+                            className={editorInputClass}
+                            placeholder="Reward title"
+                            value={reward.label}
+                            onChange={(event) => updateReward(index, { label: event.target.value })}
+                          />
+                        </label>
+                        <label>
+                          <span className={editorFieldLabelClass}>Reward type</span>
+                          <select
+                            className={editorInputClass}
+                            value={reward.rewardType}
+                            onChange={(event) =>
+                              updateReward(index, { rewardType: event.target.value as MerchantCheckInGameReward['rewardType'] })
+                            }
+                          >
+                            {REWARD_TYPES.map((rewardType) => (
+                              <option key={rewardType} value={rewardType}>
+                                {rewardTypeLabels[rewardType]}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      </div>
+                      <label>
+                        <span className={editorFieldLabelClass}>Customer-facing label</span>
+                        <input
+                          className={editorInputClass}
+                          placeholder="What the customer sees after winning"
+                          value={reward.rewardLabel || ''}
+                          onChange={(event) => updateReward(index, { rewardLabel: event.target.value })}
+                        />
+                      </label>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+                      <label>
+                        <span className={editorFieldLabelClass}>Reward value</span>
+                        <input
+                          className={editorInputClass}
+                          type="number"
+                          min={0}
+                          step="0.01"
+                          placeholder="0"
+                          value={reward.rewardValue}
+                          onChange={(event) => updateReward(index, { rewardValue: Number(event.target.value) || 0 })}
+                        />
+                      </label>
+                      <label>
+                        <span className={editorFieldLabelClass}>Weight</span>
+                        <input
+                          className={editorInputClass}
+                          type="number"
+                          min={1}
+                          placeholder="1"
+                          value={reward.probabilityWeight}
+                          onChange={(event) => updateReward(index, { probabilityWeight: Number(event.target.value) || 1 })}
+                        />
+                      </label>
+                    </div>
                   </div>
                 </div>
               ))}
