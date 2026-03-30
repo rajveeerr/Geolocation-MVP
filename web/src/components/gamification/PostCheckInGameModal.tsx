@@ -52,22 +52,22 @@ const rewardValueLabel = (type: string, value: number, label?: string | null) =>
 
 const ScratchOrPickGame = ({
   gameType,
-  cardCount,
+  board,
   onPlay,
   isPlaying,
   resultSlot,
   rewardLabel,
 }: {
   gameType: 'SCRATCH_CARD' | 'PICK_A_CARD';
-  cardCount: number;
+  board: Array<{ imageUrl?: string | null }>;
   onPlay: () => void;
   isPlaying: boolean;
   resultSlot: number | null;
   rewardLabel: string | null;
 }) => (
   <div className="space-y-4">
-    <div className={cn('grid gap-3', cardCount === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-3')}>
-      {Array.from({ length: cardCount }, (_, index) => {
+    <div className={cn('grid gap-3', board.length === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-3')}>
+      {board.map((slot, index) => {
         const isWinner = resultSlot === index;
         const isRevealed = resultSlot !== null;
 
@@ -84,6 +84,11 @@ const ScratchOrPickGame = ({
               isPlaying && 'animate-pulse',
             )}
           >
+            {slot.imageUrl && !isRevealed && (
+              <div className="mx-auto mb-3 h-14 w-14 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+                <img src={slot.imageUrl} alt="" className="h-full w-full object-cover" />
+              </div>
+            )}
             {!isRevealed && (
               <>
                 <Sparkles className="mx-auto mb-3 h-6 w-6 text-yellow-400" />
@@ -215,6 +220,7 @@ export function PostCheckInGameModal({
       rewardType: string;
       rewardValue: number;
       rewardLabel?: string | null;
+      imageUrl?: string | null;
       claimCode: string;
       expiresAt?: string | null;
     };
@@ -285,7 +291,7 @@ export function PostCheckInGameModal({
               {session.gameType === 'SCRATCH_CARD' && (
                 <ScratchOrPickGame
                   gameType="SCRATCH_CARD"
-                  cardCount={session.board.length || 6}
+                  board={session.board.length > 0 ? session.board : Array.from({ length: 6 }, () => ({ imageUrl: null }))}
                   onPlay={handlePlay}
                   isPlaying={playSession.isPending}
                   resultSlot={resultSlot}
@@ -296,7 +302,7 @@ export function PostCheckInGameModal({
               {session.gameType === 'PICK_A_CARD' && (
                 <ScratchOrPickGame
                   gameType="PICK_A_CARD"
-                  cardCount={session.board.length || 3}
+                  board={session.board.length > 0 ? session.board : Array.from({ length: 3 }, () => ({ imageUrl: null }))}
                   onPlay={handlePlay}
                   isPlaying={playSession.isPending}
                   resultSlot={resultSlot}
@@ -318,6 +324,11 @@ export function PostCheckInGameModal({
           {reward && (
             <section className="rounded-3xl border border-emerald-500/30 bg-emerald-900/30 p-5">
               <div className="flex items-center gap-3">
+                {reward.imageUrl ? (
+                  <div className="h-14 w-14 overflow-hidden rounded-2xl border border-emerald-500/20 bg-emerald-950/40">
+                    <img src={reward.imageUrl} alt={rewardLabel || 'Reward'} className="h-full w-full object-cover" />
+                  </div>
+                ) : null}
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-300">
                   {reward.rewardType.includes('DISCOUNT') ? <Percent className="h-6 w-6" /> : reward.rewardType === 'COINS' ? <Coins className="h-6 w-6" /> : <Trophy className="h-6 w-6" />}
                 </div>

@@ -13,6 +13,7 @@ export interface MerchantCheckInGameReward {
   id?: number;
   label: string;
   description?: string | null;
+  imageUrl?: string | null;
   rewardType: CheckInGameRewardType;
   rewardValue: number;
   rewardLabel?: string | null;
@@ -43,6 +44,7 @@ export interface CheckInGameBoardSlot {
   rewardId: number;
   label: string;
   rewardType: CheckInGameRewardType;
+  imageUrl?: string | null;
 }
 
 export interface CheckInGameIssuedReward {
@@ -50,6 +52,7 @@ export interface CheckInGameIssuedReward {
   rewardType: CheckInGameRewardType;
   rewardValue: number;
   rewardLabel?: string | null;
+  imageUrl?: string | null;
   claimCode: string;
   status: 'AVAILABLE' | 'REDEEMED' | 'EXPIRED';
   expiresAt?: string | null;

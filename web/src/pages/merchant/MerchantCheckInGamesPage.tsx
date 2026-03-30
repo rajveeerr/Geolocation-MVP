@@ -1,18 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  BadgePercent,
   CheckCircle2,
   CircleDot,
   Coins,
   Eye,
   Gift,
-  Percent,
+  Image as ImageIcon,
   Plus,
   Sparkles,
   Ticket,
   Trash2,
+  X,
 } from 'lucide-react';
 import { Button } from '@/components/common/Button';
+import { ImageUploadModal } from '@/components/common/ImageUploadModal';
 import {
   useMerchantCheckInGameAnalytics,
   useMerchantCheckInGameConfig,
@@ -32,14 +33,128 @@ const REWARD_TYPES: MerchantCheckInGameReward['rewardType'][] = [
   'BONUS_POINTS',
 ];
 
+type CheckInGamePreset = {
+  id: string;
+  name: string;
+  description: string;
+  badge: string;
+  config: Pick<
+    MerchantCheckInGameConfig,
+    'gameType' | 'title' | 'subtitle' | 'cooldownMinutes' | 'rewardExpiryHours'
+  > & {
+    rewards: MerchantCheckInGameReward[];
+  };
+};
+
 const createEmptyReward = (): MerchantCheckInGameReward => ({
   label: '',
+  imageUrl: '',
   rewardType: 'DISCOUNT_PERCENTAGE',
   rewardValue: 5,
   rewardLabel: '',
   probabilityWeight: 1,
   isActive: true,
 });
+
+const CHECK_IN_GAME_PRESETS: CheckInGamePreset[] = [
+  {
+    id: 'daily-delight',
+    name: 'Daily delight',
+    badge: 'Balanced',
+    description: 'A dependable everyday setup with a mix of small wins and one standout reward.',
+    config: {
+      gameType: 'SPIN_WHEEL',
+      title: "Spin for today's surprise",
+      subtitle: 'Every check-in could unlock a fresh perk before you leave.',
+      cooldownMinutes: 0,
+      rewardExpiryHours: 24,
+      rewards: [
+        { label: '5% Off', rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 5, rewardLabel: '5% OFF', probabilityWeight: 5, isActive: true },
+        { label: '10 Coins', rewardType: 'COINS', rewardValue: 10, rewardLabel: '10 Bonus Coins', probabilityWeight: 4, isActive: true },
+        { label: '10% Off', rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 10, rewardLabel: '10% OFF', probabilityWeight: 2, isActive: true },
+        { label: 'Free Drink', rewardType: 'FREE_ITEM', rewardValue: 1, rewardLabel: 'Free Drink', probabilityWeight: 1, isActive: true },
+      ],
+    },
+  },
+  {
+    id: 'vip-burst',
+    name: 'VIP burst',
+    badge: 'Premium',
+    description: 'A higher-impact reveal meant for premium brands and special customer moments.',
+    config: {
+      gameType: 'PICK_A_CARD',
+      title: 'Pick your VIP reward',
+      subtitle: 'Choose a card and unlock an elevated check-in bonus.',
+      cooldownMinutes: 60,
+      rewardExpiryHours: 48,
+      rewards: [
+        { label: '$5 Off', rewardType: 'DISCOUNT_FIXED', rewardValue: 5, rewardLabel: '$5 OFF', probabilityWeight: 4, isActive: true },
+        { label: '15% Off', rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 15, rewardLabel: '15% OFF', probabilityWeight: 2, isActive: true },
+        { label: '25 Coins', rewardType: 'COINS', rewardValue: 25, rewardLabel: '25 Bonus Coins', probabilityWeight: 2, isActive: true },
+        { label: 'Free Dessert', rewardType: 'FREE_ITEM', rewardValue: 1, rewardLabel: 'Free Dessert', probabilityWeight: 1, isActive: true },
+      ],
+    },
+  },
+  {
+    id: 'quick-scratch',
+    name: 'Quick scratch',
+    badge: 'Fast',
+    description: 'A lightweight scratch-card flow for fast-moving queues and instant gratification.',
+    config: {
+      gameType: 'SCRATCH_CARD',
+      title: 'Scratch to reveal your reward',
+      subtitle: 'A quick post check-in surprise with fast wins.',
+      cooldownMinutes: 15,
+      rewardExpiryHours: 12,
+      rewards: [
+        { label: '5 Coins', rewardType: 'COINS', rewardValue: 5, rewardLabel: '5 Bonus Coins', probabilityWeight: 5, isActive: true },
+        { label: '5% Off', rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 5, rewardLabel: '5% OFF', probabilityWeight: 4, isActive: true },
+        { label: '$3 Off', rewardType: 'DISCOUNT_FIXED', rewardValue: 3, rewardLabel: '$3 OFF', probabilityWeight: 2, isActive: true },
+        { label: 'Free Add-on', rewardType: 'FREE_ITEM', rewardValue: 1, rewardLabel: 'Free Add-on', probabilityWeight: 1, isActive: true },
+      ],
+    },
+  },
+];
+
+const cloneReward = (reward: MerchantCheckInGameReward): MerchantCheckInGameReward => ({ ...reward });
+
+const normalizeReward = (reward: MerchantCheckInGameReward) => ({
+  label: reward.label.trim(),
+  rewardType: reward.rewardType,
+  rewardValue: Number(reward.rewardValue) || 0,
+  rewardLabel: reward.rewardLabel?.trim() || '',
+  probabilityWeight: Number(reward.probabilityWeight) || 0,
+  isActive: reward.isActive,
+  imageUrl: reward.imageUrl?.trim() || '',
+});
+
+const getMatchingPresetId = (config: MerchantCheckInGameConfig | null) => {
+  if (!config) return 'custom';
+
+  const normalizedRewards = config.rewards.map(normalizeReward);
+
+  const matchedPreset = CHECK_IN_GAME_PRESETS.find((preset) => {
+    if (
+      preset.config.gameType !== config.gameType ||
+      preset.config.title !== config.title ||
+      (preset.config.subtitle || '') !== (config.subtitle || '') ||
+      preset.config.cooldownMinutes !== config.cooldownMinutes ||
+      preset.config.rewardExpiryHours !== config.rewardExpiryHours ||
+      preset.config.rewards.length !== normalizedRewards.length
+    ) {
+      return false;
+    }
+
+    return preset.config.rewards.every((reward, index) => {
+      const currentReward = normalizedRewards[index];
+      const presetReward = normalizeReward(reward);
+
+      return JSON.stringify(currentReward) === JSON.stringify(presetReward);
+    });
+  });
+
+  return matchedPreset?.id || 'custom';
+};
 
 const gameTypeCopy: Record<
   MerchantCheckInGameConfig['gameType'],
@@ -119,31 +234,76 @@ export function MerchantCheckInGamesPage() {
   const { data: analytics } = useMerchantCheckInGameAnalytics();
   const saveMutation = useSaveMerchantCheckInGameConfig();
   const [form, setForm] = useState<MerchantCheckInGameConfig | null>(null);
+  const [builderMode, setBuilderMode] = useState<'preset' | 'manual'>('preset');
+  const [selectedPresetId, setSelectedPresetId] = useState<string>('custom');
+  const [uploadRewardIndex, setUploadRewardIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (data) {
       setForm(data);
+      const matchedPresetId = getMatchingPresetId(data);
+      setSelectedPresetId(matchedPresetId);
+      setBuilderMode(matchedPresetId === 'custom' ? 'manual' : 'preset');
     }
   }, [data]);
+
+  const applyPreset = (presetId: string) => {
+    const preset = CHECK_IN_GAME_PRESETS.find((item) => item.id === presetId);
+    if (!preset) return;
+
+    setSelectedPresetId(presetId);
+    setBuilderMode('preset');
+    setForm((current) =>
+      current
+        ? {
+            ...current,
+            gameType: preset.config.gameType,
+            title: preset.config.title,
+            subtitle: preset.config.subtitle,
+            cooldownMinutes: preset.config.cooldownMinutes,
+            rewardExpiryHours: preset.config.rewardExpiryHours,
+            rewards: preset.config.rewards.map(cloneReward),
+          }
+        : current,
+    );
+  };
 
   const updateReward = (index: number, patch: Partial<MerchantCheckInGameReward>) => {
     setForm((current) => {
       if (!current) return current;
       const rewards = [...current.rewards];
       rewards[index] = { ...rewards[index], ...patch };
+      setSelectedPresetId('custom');
+      setBuilderMode('manual');
       return { ...current, rewards };
     });
   };
 
   const addReward = () => {
+    setSelectedPresetId('custom');
+    setBuilderMode('manual');
     setForm((current) => (current ? { ...current, rewards: [...current.rewards, createEmptyReward()] } : current));
   };
 
   const removeReward = (index: number) => {
+    setSelectedPresetId('custom');
+    setBuilderMode('manual');
     setForm((current) => {
       if (!current) return current;
       return { ...current, rewards: current.rewards.filter((_, rewardIndex) => rewardIndex !== index) };
     });
+  };
+
+  const handleRewardImageUpload = (urls: string[]) => {
+    const imageUrl = urls[0];
+    if (uploadRewardIndex === null || !imageUrl) return;
+
+    updateReward(uploadRewardIndex, { imageUrl });
+    setUploadRewardIndex(null);
+  };
+
+  const clearRewardImage = (index: number) => {
+    updateReward(index, { imageUrl: '' });
   };
 
   const activeRewards = useMemo(
@@ -307,6 +467,70 @@ export function MerchantCheckInGamesPage() {
               <p className="mt-1 text-sm text-neutral-600">Define which game appears and how the reward moment is presented.</p>
             </div>
 
+            <div className="mb-5 grid grid-cols-1 gap-2 rounded-2xl bg-neutral-100 p-1 sm:grid-cols-2">
+              <button
+                type="button"
+                className={cn(
+                  'rounded-xl px-4 py-2.5 text-sm font-semibold transition',
+                  builderMode === 'preset' ? 'bg-white text-neutral-900 shadow-sm' : 'text-neutral-600 hover:text-neutral-900',
+                )}
+                onClick={() => setBuilderMode('preset')}
+              >
+                Choose preset
+              </button>
+              <button
+                type="button"
+                className={cn(
+                  'rounded-xl px-4 py-2.5 text-sm font-semibold transition',
+                  builderMode === 'manual' ? 'bg-white text-neutral-900 shadow-sm' : 'text-neutral-600 hover:text-neutral-900',
+                )}
+                onClick={() => {
+                  setBuilderMode('manual');
+                  setSelectedPresetId('custom');
+                }}
+              >
+                Manual creation
+              </button>
+            </div>
+
+            {builderMode === 'preset' && (
+              <div className="mb-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {CHECK_IN_GAME_PRESETS.map((preset) => {
+                  const isSelected = selectedPresetId === preset.id;
+
+                  return (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      className={cn(
+                        'rounded-2xl border p-4 text-left transition focus:outline-none focus:ring-2 focus:ring-brand-primary-100',
+                        isSelected
+                          ? 'border-brand-primary-300 bg-brand-primary-50/70 shadow-sm'
+                          : 'border-neutral-200 bg-neutral-50/70 hover:border-neutral-300 hover:bg-white',
+                      )}
+                      onClick={() => applyPreset(preset.id)}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="text-base font-bold text-neutral-900">{preset.name}</div>
+                          <div className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
+                            {gameTypeCopy[preset.config.gameType].title}
+                          </div>
+                        </div>
+                        <div className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-600">
+                          {preset.badge}
+                        </div>
+                      </div>
+                      <p className="mt-2 text-sm leading-6 text-neutral-600">{preset.description}</p>
+                      <div className="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
+                        {gameTypeCopy[preset.config.gameType].title} • {preset.config.rewards.length} rewards
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
             <div className="grid gap-4 md:grid-cols-2">
               <label className="space-y-2 text-sm text-neutral-700">
                 <span className="font-semibold">Enable post check-in game</span>
@@ -325,7 +549,11 @@ export function MerchantCheckInGamesPage() {
                 <select
                   className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100"
                   value={form.gameType}
-                  onChange={(event) => setForm({ ...form, gameType: event.target.value as MerchantCheckInGameConfig['gameType'] })}
+                  onChange={(event) => {
+                    setSelectedPresetId('custom');
+                    setBuilderMode('manual');
+                    setForm({ ...form, gameType: event.target.value as MerchantCheckInGameConfig['gameType'] });
+                  }}
                 >
                   {GAME_TYPES.map((gameType) => (
                     <option key={gameType} value={gameType}>
@@ -340,7 +568,11 @@ export function MerchantCheckInGamesPage() {
                 <input
                   className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100"
                   value={form.title}
-                  onChange={(event) => setForm({ ...form, title: event.target.value })}
+                  onChange={(event) => {
+                    setSelectedPresetId('custom');
+                    setBuilderMode('manual');
+                    setForm({ ...form, title: event.target.value });
+                  }}
                 />
               </label>
 
@@ -349,7 +581,11 @@ export function MerchantCheckInGamesPage() {
                 <input
                   className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100"
                   value={form.subtitle || ''}
-                  onChange={(event) => setForm({ ...form, subtitle: event.target.value })}
+                  onChange={(event) => {
+                    setSelectedPresetId('custom');
+                    setBuilderMode('manual');
+                    setForm({ ...form, subtitle: event.target.value });
+                  }}
                 />
               </label>
 
@@ -360,7 +596,11 @@ export function MerchantCheckInGamesPage() {
                   type="number"
                   min={0}
                   value={form.cooldownMinutes}
-                  onChange={(event) => setForm({ ...form, cooldownMinutes: Number(event.target.value) || 0 })}
+                  onChange={(event) => {
+                    setSelectedPresetId('custom');
+                    setBuilderMode('manual');
+                    setForm({ ...form, cooldownMinutes: Number(event.target.value) || 0 });
+                  }}
                 />
               </label>
 
@@ -371,10 +611,20 @@ export function MerchantCheckInGamesPage() {
                   type="number"
                   min={1}
                   value={form.rewardExpiryHours}
-                  onChange={(event) => setForm({ ...form, rewardExpiryHours: Number(event.target.value) || 24 })}
+                  onChange={(event) => {
+                    setSelectedPresetId('custom');
+                    setBuilderMode('manual');
+                    setForm({ ...form, rewardExpiryHours: Number(event.target.value) || 24 });
+                  }}
                 />
               </label>
             </div>
+
+            {builderMode === 'manual' && (
+              <div className="mt-4 rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 px-4 py-3 text-sm text-neutral-600">
+                Manual mode keeps everything editable. You can build from scratch here or tweak a preset and it will automatically become custom.
+              </div>
+            )}
           </section>
 
           <section className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-6">
@@ -393,13 +643,22 @@ export function MerchantCheckInGamesPage() {
               {form.rewards.map((reward, index) => (
                 <div key={`${reward.id ?? 'new'}-${index}`} className="rounded-2xl border border-neutral-200 bg-neutral-50/60 p-4">
                   <div className="mb-4 flex items-center justify-between gap-3">
-                    <div>
-                      <div className="text-sm font-semibold text-neutral-900">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+                        {reward.imageUrl ? (
+                          <img src={reward.imageUrl} alt={reward.label || `Reward ${index + 1}`} className="h-full w-full object-cover" />
+                        ) : (
+                          <ImageIcon className="h-5 w-5 text-neutral-300" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-neutral-900">
                         Reward {index + 1}
                         {reward.label.trim() ? ` · ${reward.label}` : ''}
-                      </div>
-                      <div className="mt-1 text-xs uppercase tracking-[0.18em] text-neutral-500">
-                        {rewardTypeLabels[reward.rewardType]}
+                        </div>
+                        <div className="mt-1 text-xs uppercase tracking-[0.18em] text-neutral-500">
+                          {rewardTypeLabels[reward.rewardType]}
+                        </div>
                       </div>
                     </div>
                     <button
@@ -413,6 +672,45 @@ export function MerchantCheckInGamesPage() {
                   </div>
 
                   <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+                    <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-3 md:col-span-2 xl:col-span-1">
+                      {reward.imageUrl ? (
+                        <div className="space-y-3">
+                          <div className="aspect-square overflow-hidden rounded-xl bg-neutral-100">
+                            <img src={reward.imageUrl} alt={reward.label || `Reward ${index + 1}`} className="h-full w-full object-cover" />
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="flex-1 rounded-xl"
+                              onClick={() => setUploadRewardIndex(index)}
+                            >
+                              Replace
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="rounded-xl text-red-600 hover:text-red-700"
+                              onClick={() => clearRewardImage(index)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className="flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 px-3 py-6 text-center text-sm text-neutral-500 transition hover:border-brand-primary-300 hover:bg-brand-primary-50/40 hover:text-brand-primary-700"
+                          onClick={() => setUploadRewardIndex(index)}
+                        >
+                          <ImageIcon className="h-5 w-5" />
+                          <span className="font-medium">Upload reward image</span>
+                          <span className="text-xs text-neutral-400">Optional artwork for this reward</span>
+                        </button>
+                      )}
+                    </div>
                     <input
                       className="rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100 xl:col-span-2"
                       placeholder="Reward title"
@@ -500,11 +798,18 @@ export function MerchantCheckInGamesPage() {
                   {topRewards.map((reward, index) => (
                     <div key={`${reward.id ?? 'preview'}-${index}`} className="rounded-2xl border border-white/10 bg-white/5 p-4">
                       <div className="flex items-center justify-between gap-3">
-                        <div>
+                        <div className="flex min-w-0 items-center gap-3">
+                          {reward.imageUrl ? (
+                            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/5">
+                              <img src={reward.imageUrl} alt={previewRewardLabel(reward)} className="h-full w-full object-cover" />
+                            </div>
+                          ) : null}
+                          <div className="min-w-0">
                           <div className="text-sm font-semibold text-white">{previewRewardLabel(reward)}</div>
                           <div className="mt-1 text-xs uppercase tracking-[0.18em] text-white/45">
                             {rewardTypeLabels[reward.rewardType]}
                           </div>
+                        </div>
                         </div>
                         <div className="text-xs uppercase tracking-[0.18em] text-white/60">
                           {totalWeight > 0 ? Math.round((Math.max(1, reward.probabilityWeight) / totalWeight) * 100) : 0}%
@@ -568,17 +873,28 @@ export function MerchantCheckInGamesPage() {
         </aside>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-stretch sm:justify-end">
         <Button
           variant="primary"
           size="md"
-          className="rounded-xl px-6"
+          className="w-full rounded-xl px-6 sm:w-auto"
           onClick={handleSave}
           disabled={saveMutation.isPending}
         >
           {saveMutation.isPending ? 'Saving...' : 'Save Check-in Game'}
         </Button>
       </div>
+
+      <ImageUploadModal
+        open={uploadRewardIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) setUploadRewardIndex(null);
+        }}
+        onUploadComplete={handleRewardImageUpload}
+        context="checkin_game_reward"
+        maxFiles={1}
+        title="Upload reward image"
+      />
     </div>
   );
 }
