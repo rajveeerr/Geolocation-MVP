@@ -1,4 +1,3 @@
-// src/pages/merchant/MerchantAnalyticsPage.tsx
 import { useState } from 'react';
 import { MerchantKPICards } from '@/components/merchant/MerchantKPICards';
 import { MerchantAnalyticsTabs } from '@/components/merchant/MerchantAnalyticsTabs';
@@ -6,20 +5,29 @@ import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { Button } from '@/components/common/Button';
 import { Link } from 'react-router-dom';
 import { PATHS } from '@/routing/paths';
-import { ArrowLeft, BarChart3 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import {
+  MerchantMetaCard,
+  MerchantPageIntro,
+  MerchantPageState,
+  MerchantSegmentedControl,
+} from '@/components/merchant/MerchantAppleUI';
 
 export const MerchantAnalyticsPage = () => {
-  const [selectedPeriod, setSelectedPeriod] = useState<'last_7_days' | 'last_30_days' | 'this_month' | 'this_year' | 'all_time'>('all_time');
+  const [selectedPeriod, setSelectedPeriod] = useState<
+    'last_7_days' | 'last_30_days' | 'this_month' | 'this_year' | 'all_time'
+  >('all_time');
   const [activeTab, setActiveTab] = useState<'overview' | 'analytics'>('overview');
 
   const { data: merchantData, isLoading: merchantLoading } = useMerchantStatus();
   const merchantStatus = merchantData?.data?.merchant?.status;
+  const merchantName = merchantData?.data?.merchant?.businessName || 'Your business';
 
   if (merchantLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-[40vh] items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary-600 mx-auto mb-4"></div>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-brand-primary-600" />
           <p className="text-neutral-600">Loading analytics...</p>
         </div>
       </div>
@@ -28,153 +36,121 @@ export const MerchantAnalyticsPage = () => {
 
   if (merchantStatus === 'PENDING') {
     return (
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="text-center py-12">
-          <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <BarChart3 className="h-8 w-8 text-amber-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-neutral-900 mb-2">
-            Analytics Unavailable
-          </h1>
-          <p className="text-neutral-600 mb-6">
-            Analytics are only available for approved merchants. Your application is currently under review.
-          </p>
-          <Button asChild variant="secondary">
+      <MerchantPageState
+        tone="amber"
+        title="Analytics unavailable"
+        description="Analytics are only available for approved merchants. Your application is currently under review."
+        action={
+          <Button asChild variant="secondary" className="rounded-xl">
             <Link to={PATHS.MERCHANT_DASHBOARD}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to dashboard
             </Link>
           </Button>
-        </div>
-      </div>
+        }
+      />
     );
   }
 
   if (merchantStatus === 'REJECTED' || merchantStatus === 'SUSPENDED') {
     return (
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="text-center py-12">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <BarChart3 className="h-8 w-8 text-red-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-neutral-900 mb-2">
-            Analytics Unavailable
-          </h1>
-          <p className="text-neutral-600 mb-6">
-            Analytics are only available for approved merchants. Please contact support for assistance.
-          </p>
-          <Button asChild variant="secondary">
+      <MerchantPageState
+        tone="red"
+        title="Analytics unavailable"
+        description="Analytics are only available for approved merchants. Please contact support for assistance."
+        action={
+          <Button asChild variant="secondary" className="rounded-xl">
             <Link to={PATHS.MERCHANT_DASHBOARD}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to dashboard
             </Link>
           </Button>
-        </div>
-      </div>
+        }
+      />
     );
   }
 
   if (!merchantStatus) {
     return (
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="text-center py-12">
-          <h1 className="text-4xl font-bold text-neutral-900 mb-4">Join as a Merchant</h1>
-          <p className="text-neutral-600 mb-8">
-            Start creating deals and access analytics
-          </p>
-          <Button asChild size="lg">
+      <MerchantPageState
+        title="Join as a merchant"
+        description="Start creating deals and access analytics once your merchant profile is active."
+        action={
+          <Button asChild size="lg" className="rounded-xl">
             <Link to={PATHS.MERCHANT_ONBOARDING}>Become a Merchant</Link>
           </Button>
-        </div>
-      </div>
+        }
+      />
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="secondary" asChild>
-            <Link to={PATHS.MERCHANT_DASHBOARD}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-neutral-900">Analytics Dashboard</h1>
-            <p className="text-neutral-600 mt-1">
-              Comprehensive insights into your business performance
-            </p>
+    <div className="space-y-5">
+      <MerchantPageIntro
+        eyebrow="Analytics"
+        title={`${merchantName} performance overview`}
+        description="Track sales, engagement, customer movement, and comparison trends in a cleaner Apple-style analytics workspace."
+        aside={
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+            <MerchantMetaCard label="Merchant status" value={merchantStatus} caption="Live access to analytics is enabled." />
+            <MerchantMetaCard label="Workspace" value="Analytics" caption="Responsive views for KPI, trends, and comparison." />
           </div>
-        </div>
-        <div className="flex gap-3">
-          <Button variant="secondary" asChild>
-            <Link to={PATHS.MERCHANT_DEALS_CREATE}>
-              Create Deal
+        }
+      />
+
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <MerchantSegmentedControl
+          value={activeTab}
+          onChange={setActiveTab}
+          options={[
+            { value: 'overview', label: 'Overview' },
+            { value: 'analytics', label: 'Detailed analytics' },
+          ]}
+        />
+        <div className="flex flex-wrap gap-2">
+          <Button
+            asChild
+            variant="secondary"
+            className="rounded-full border-neutral-200 bg-white px-4 text-sm text-neutral-700 hover:bg-neutral-50"
+          >
+            <Link to={PATHS.MERCHANT_DASHBOARD} className="inline-flex items-center whitespace-nowrap">
+              <ArrowLeft className="mr-2 h-4 w-4 shrink-0" />
+              Dashboard
             </Link>
+          </Button>
+          <Button
+            asChild
+            className="rounded-full bg-neutral-950 px-4 text-sm text-white hover:bg-neutral-800"
+          >
+            <Link to={PATHS.MERCHANT_DEALS_CREATE}>Create Deal</Link>
           </Button>
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex gap-2 border-b border-neutral-200">
-        <button
-          onClick={() => setActiveTab('overview')}
-          className={`px-4 py-2 font-medium text-sm transition-colors ${
-            activeTab === 'overview'
-              ? 'text-brand-primary-600 border-b-2 border-brand-primary-600'
-              : 'text-neutral-600 hover:text-neutral-800'
-          }`}
-        >
-          Overview
-        </button>
-        <button
-          onClick={() => setActiveTab('analytics')}
-          className={`px-4 py-2 font-medium text-sm transition-colors ${
-            activeTab === 'analytics'
-              ? 'text-brand-primary-600 border-b-2 border-brand-primary-600'
-              : 'text-neutral-600 hover:text-neutral-800'
-          }`}
-        >
-          Detailed Analytics
-        </button>
-      </div>
-
-      {/* Period Selector */}
-      <div className="flex items-center gap-4">
-        <p className="text-sm font-medium text-neutral-700">Time Period:</p>
-        <div className="flex gap-2">
-          {[
-            { value: 'last_7_days', label: 'Last 7 Days' },
-            { value: 'last_30_days', label: 'Last 30 Days' },
-            { value: 'this_month', label: 'This Month' },
-            { value: 'this_year', label: 'This Year' },
-            { value: 'all_time', label: 'All Time' },
-          ].map((option) => (
-            <button
-              key={option.value}
-              onClick={() => setSelectedPeriod(option.value as any)}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                selectedPeriod === option.value
-                  ? 'bg-brand-primary-100 text-brand-primary-700'
-                  : 'text-neutral-600 hover:bg-neutral-100'
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
+      <div className="space-y-2">
+        <div className="text-[13px] font-semibold text-neutral-900">Time period</div>
+        <div className="overflow-x-auto pb-1">
+          <MerchantSegmentedControl
+            value={selectedPeriod}
+            onChange={setSelectedPeriod}
+            options={[
+              { value: 'last_7_days', label: 'Last 7 Days' },
+              { value: 'last_30_days', label: 'Last 30 Days' },
+              { value: 'this_month', label: 'This Month' },
+              { value: 'this_year', label: 'This Year' },
+              { value: 'all_time', label: 'All Time' },
+            ]}
+            className="min-w-max"
+          />
         </div>
       </div>
 
-      {/* Tab Content */}
-      {activeTab === 'overview' && (
-        <div className="space-y-8">
-          {/* KPI Cards */}
+      {activeTab === 'overview' ? (
+        <div className="space-y-6">
           <MerchantKPICards period={selectedPeriod} />
         </div>
-      )}
-
-      {activeTab === 'analytics' && (
-        <div className="space-y-8">
-          {/* Analytics Tabs */}
+      ) : (
+        <div className="space-y-6">
           <MerchantAnalyticsTabs period={selectedPeriod} />
         </div>
       )}

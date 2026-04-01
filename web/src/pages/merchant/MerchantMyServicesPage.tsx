@@ -17,10 +17,13 @@ import {
 
 const statusStyles: Record<string, string> = {
   DRAFT: 'bg-amber-100 text-amber-700',
-  PUBLISHED: 'bg-green-100 text-green-700',
-  PAUSED: 'bg-blue-100 text-blue-700',
-  CANCELLED: 'bg-red-100 text-red-700',
+  PUBLISHED: 'bg-emerald-100 text-emerald-700',
+  PAUSED: 'bg-sky-100 text-sky-700',
+  CANCELLED: 'bg-rose-100 text-rose-700',
 };
+
+const panelClass =
+  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 function StatusBadge({ status }: { status: string }) {
   return (
@@ -42,14 +45,14 @@ function ServiceCard({ service, onDelete }: { service: Service; onDelete: (id: n
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm"
+      className="overflow-hidden rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]"
     >
-      <div className="relative h-36 bg-gradient-to-br from-brand-primary-500/20 to-brand-primary-700/30">
+      <div className="relative h-36 bg-gradient-to-br from-neutral-100 via-white to-[#eef1f5]">
         {service.coverImageUrl ? (
           <img src={service.coverImageUrl} alt={service.title} className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full items-center justify-center">
-            <Wrench className="h-10 w-10 text-brand-primary-400/70" />
+            <Wrench className="h-10 w-10 text-neutral-300" />
           </div>
         )}
         <div className="absolute left-3 top-3">
@@ -57,11 +60,11 @@ function ServiceCard({ service, onDelete }: { service: Service; onDelete: (id: n
         </div>
       </div>
 
-      <div className="p-4">
-        <h3 className="line-clamp-1 text-lg font-bold text-neutral-900">{service.title}</h3>
-        <p className="mt-1 line-clamp-2 text-sm text-neutral-500">{service.shortDescription || service.description}</p>
+      <div className="p-5">
+        <h3 className="line-clamp-1 text-[1.02rem] font-semibold tracking-tight text-neutral-900">{service.title}</h3>
+        <p className="mt-1 line-clamp-2 text-[13px] leading-6 text-neutral-500">{service.shortDescription || service.description}</p>
 
-        <div className="mt-3 space-y-1.5 text-xs text-neutral-500">
+        <div className="mt-4 space-y-2 text-[13px] text-neutral-500">
           <div className="flex items-center gap-2">
             <Clock className="h-3.5 w-3.5" />
             <span>{service.durationMinutes} min</span>
@@ -72,16 +75,16 @@ function ServiceCard({ service, onDelete }: { service: Service; onDelete: (id: n
           </div>
         </div>
 
-        <div className="mt-4 flex items-center gap-2">
+        <div className="mt-5 flex items-center gap-2 border-t border-neutral-100 pt-4">
           <Link to={PATHS.MERCHANT_SERVICES_MANAGE.replace(':serviceId', String(service.id))} className="flex-1">
-            <Button size="sm" className="w-full rounded-lg">
+            <Button size="sm" className="w-full rounded-full bg-neutral-950 text-white hover:bg-neutral-800">
               <Eye className="mr-1.5 h-3.5 w-3.5" />
               Manage
             </Button>
           </Link>
           <button
             onClick={() => onDelete(service.id)}
-            className="rounded-lg border border-red-200 p-2 text-red-500 transition-colors hover:bg-red-50"
+            className="rounded-full border border-neutral-200 p-2 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-800"
             title="Delete service"
           >
             <Trash2 className="h-4 w-4" />
@@ -132,20 +135,21 @@ function MerchantMyServicesContent() {
   if (error) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">{(error as Error).message}</div>
+        <div className="rounded-[1.2rem] border border-rose-200 bg-rose-50 p-4 text-red-700">{(error as Error).message}</div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto max-w-screen-xl px-6 py-8">
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mx-auto max-w-screen-xl px-4 py-3 sm:px-1 sm:py-4">
+      <div className="mb-6 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900">My Services</h1>
-          <p className="mt-1 text-neutral-500">Create and manage your services, tiers, add-ons, and bookings.</p>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Experiences</div>
+          <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-neutral-900">My Services</h1>
+          <p className="mt-2 text-[13px] text-neutral-500 sm:text-sm">Create and manage your services, tiers, add-ons, and bookings.</p>
         </div>
         <Link to={PATHS.MERCHANT_SERVICES_CREATE}>
-          <Button size="md" className="rounded-full">
+          <Button size="md" className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800">
             <PlusCircle className="mr-2 h-4 w-4" />
             Create Service
           </Button>
@@ -153,7 +157,7 @@ function MerchantMyServicesContent() {
       </div>
 
       {services.length > 0 && (
-        <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-2">
+        <div className={cn(panelClass, 'mb-6 flex items-center gap-2 overflow-x-auto p-3')}>
           <Filter className="mr-1 h-4 w-4 flex-shrink-0 text-neutral-400" />
           {(['ALL', ...SERVICE_STATUSES.map((s) => s.value)] as StatusFilter[]).map((status) => {
             const count = statusCounts[status] ?? 0;
@@ -163,9 +167,9 @@ function MerchantMyServicesContent() {
                 key={status}
                 onClick={() => setStatusFilter(status)}
                 className={cn(
-                  'flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
+                  'flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors',
                   statusFilter === status
-                    ? 'bg-brand-primary-500 text-white'
+                    ? 'bg-neutral-950 text-white'
                     : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200',
                 )}
               >
@@ -185,10 +189,10 @@ function MerchantMyServicesContent() {
       )}
 
       {filteredServices.length === 0 ? (
-        <div className="rounded-2xl border-2 border-dashed border-neutral-200 py-16 text-center">
+        <div className={cn(panelClass, 'border-dashed py-16 text-center')}>
           <Wrench className="mx-auto mb-3 h-10 w-10 text-neutral-300" />
-          <h3 className="text-xl font-bold text-neutral-700">No services yet</h3>
-          <p className="mt-1 text-neutral-500">Create your first service to start accepting bookings.</p>
+          <h3 className="text-[1.4rem] font-semibold tracking-tight text-neutral-900">No services yet</h3>
+          <p className="mt-1 text-[13px] text-neutral-500 sm:text-sm">Create your first service to start accepting bookings.</p>
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

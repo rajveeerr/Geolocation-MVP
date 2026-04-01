@@ -17,11 +17,14 @@ const TYPE_LABELS: Record<SurpriseType, string> = {
 };
 
 const TYPE_COLORS: Record<SurpriseType, string> = {
-  LOCATION_BASED: 'bg-blue-100 text-blue-700',
-  TIME_BASED: 'bg-purple-100 text-purple-700',
-  ENGAGEMENT_BASED: 'bg-orange-100 text-orange-700',
-  RANDOM_DROP: 'bg-pink-100 text-pink-700',
+  LOCATION_BASED: 'bg-sky-100 text-sky-700',
+  TIME_BASED: 'bg-violet-100 text-violet-700',
+  ENGAGEMENT_BASED: 'bg-amber-100 text-amber-700',
+  RANDOM_DROP: 'bg-rose-100 text-rose-700',
 };
+
+const panelClass =
+  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 function SurpriseDealCard({
   deal,
@@ -38,10 +41,9 @@ function SurpriseDealCard({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm"
+      className="overflow-hidden rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]"
     >
-      {/* Header */}
-      <div className="relative h-28 bg-gradient-to-br from-brand-primary-500/20 via-purple-500/10 to-pink-500/20 flex items-center justify-center">
+      <div className="relative flex h-28 items-center justify-center bg-gradient-to-br from-neutral-100 via-white to-[#eef1f5]">
         <span className="text-4xl">{deal.category?.icon ?? '🎁'}</span>
         <div className="absolute left-3 top-3 flex gap-1.5">
           <span
@@ -55,7 +57,7 @@ function SurpriseDealCard({
           <span
             className={cn(
               'rounded-full px-2 py-0.5 text-xs font-semibold',
-              isActive && !slotsFull ? 'bg-green-100 text-green-700' : 'bg-neutral-100 text-neutral-500',
+              isActive && !slotsFull ? 'bg-emerald-100 text-emerald-700' : 'bg-neutral-100 text-neutral-500',
             )}
           >
             {!isActive ? 'Inactive' : slotsFull ? 'Full' : 'Active'}
@@ -63,23 +65,22 @@ function SurpriseDealCard({
         </div>
       </div>
 
-      <div className="p-4">
-        <h3 className="line-clamp-1 font-bold text-neutral-900">{deal.title}</h3>
+      <div className="p-5">
+        <h3 className="line-clamp-1 text-[1.02rem] font-semibold tracking-tight text-neutral-900">{deal.title}</h3>
         {deal.surpriseHint && (
           <p className="mt-0.5 line-clamp-1 text-xs italic text-neutral-400">"{deal.surpriseHint}"</p>
         )}
 
-        {/* Stats */}
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <div className="flex items-center gap-2 rounded-lg bg-neutral-50 px-2.5 py-2">
-            <Users className="h-4 w-4 text-brand-primary-400" />
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <div className="flex items-center gap-2 rounded-[1rem] bg-neutral-50 px-2.5 py-2">
+            <Users className="h-4 w-4 text-neutral-500" />
             <div>
               <p className="text-xs text-neutral-400">Reveals</p>
               <p className="text-sm font-bold text-neutral-800">{deal.revealsCount}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-lg bg-neutral-50 px-2.5 py-2">
-            <Layers className="h-4 w-4 text-brand-primary-400" />
+          <div className="flex items-center gap-2 rounded-[1rem] bg-neutral-50 px-2.5 py-2">
+            <Layers className="h-4 w-4 text-neutral-500" />
             <div>
               <p className="text-xs text-neutral-400">Slots</p>
               <p className="text-sm font-bold text-neutral-800">
@@ -95,13 +96,12 @@ function SurpriseDealCard({
           {new Date(deal.startTime).toLocaleDateString()} — {new Date(deal.endTime).toLocaleDateString()}
         </p>
 
-        {/* Actions */}
-        <div className="mt-3 flex items-center gap-2">
+        <div className="mt-4 flex items-center gap-2 border-t border-neutral-100 pt-4">
           <Link
             to={PATHS.MERCHANT_SURPRISES_ANALYTICS.replace(':dealId', String(deal.id))}
             className="flex-1"
           >
-            <Button size="sm" className="w-full rounded-lg">
+            <Button size="sm" className="w-full rounded-full bg-neutral-950 text-white hover:bg-neutral-800">
               <BarChart2 className="mr-1.5 h-3.5 w-3.5" />
               Analytics
             </Button>
@@ -109,7 +109,7 @@ function SurpriseDealCard({
           {isActive && (
             <button
               onClick={() => onDeactivate(deal.id)}
-              className="rounded-lg border border-red-200 p-2 text-red-500 transition-colors hover:bg-red-50"
+              className="rounded-full border border-neutral-200 p-2 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-800"
               title="Deactivate"
             >
               <Trash2 className="h-4 w-4" />
@@ -147,7 +147,7 @@ function MerchantMySurprisesContent() {
   if (error) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+        <div className="rounded-[1.2rem] border border-rose-200 bg-rose-50 p-4 text-red-700">
           {(error as Error).message}
         </div>
       </div>
@@ -155,16 +155,17 @@ function MerchantMySurprisesContent() {
   }
 
   return (
-    <div className="container mx-auto max-w-screen-xl px-6 py-8">
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mx-auto max-w-screen-xl px-4 py-3 sm:px-1 sm:py-4">
+      <div className="mb-6 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900">My Surprise Deals</h1>
-          <p className="mt-1 text-neutral-500">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Experiences</div>
+          <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-neutral-900">My Surprise Deals</h1>
+          <p className="mt-2 text-[13px] text-neutral-500 sm:text-sm">
             Mystery deals that unlock based on location, time, check-ins, or random drops.
           </p>
         </div>
         <Link to={PATHS.MERCHANT_SURPRISES_CREATE}>
-          <Button size="md" className="rounded-full">
+          <Button size="md" className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800">
             <PlusCircle className="mr-2 h-4 w-4" />
             Create Surprise
           </Button>
@@ -172,12 +173,12 @@ function MerchantMySurprisesContent() {
       </div>
 
       {deals.length === 0 ? (
-        <div className="rounded-2xl border-2 border-dashed border-neutral-200 py-16 text-center">
+        <div className={cn(panelClass, 'border-dashed py-16 text-center')}>
           <Gift className="mx-auto mb-3 h-10 w-10 text-neutral-300" />
-          <h3 className="text-xl font-bold text-neutral-700">No surprise deals yet</h3>
-          <p className="mt-1 text-neutral-500">Create a mystery deal to engage nearby customers.</p>
+          <h3 className="text-[1.4rem] font-semibold tracking-tight text-neutral-900">No surprise deals yet</h3>
+          <p className="mt-1 text-[13px] text-neutral-500 sm:text-sm">Create a mystery deal to engage nearby customers.</p>
           <Link to={PATHS.MERCHANT_SURPRISES_CREATE} className="mt-4 inline-block">
-            <Button size="sm" className="rounded-full">Create Your First Surprise</Button>
+            <Button size="sm" className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800">Create Your First Surprise</Button>
           </Link>
         </div>
       ) : (

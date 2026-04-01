@@ -29,7 +29,7 @@
 
 ### **Current Running Servers:**
 - ✅ **Frontend**: `http://localhost:5173` (Vite Dev Server)
-- ✅ **Backend**: `http://localhost:3000` (Express API Server)
+- ✅ **Backend**: `https://api.yohop.com` (Express API Server)
 - ✅ **CORS**: Properly configured and working
 - ✅ **Database**: Connected and responding
 
@@ -40,10 +40,10 @@
 ### **1. BASIC CONNECTIVITY TEST**
 ```bash
 # Test backend API directly
-curl http://localhost:3000/api/deals/featured
+curl https://api.yohop.com/api/deals/featured
 
 # Test CORS headers
-curl -H "Origin: http://localhost:5173" -I http://localhost:3000/api/deals/featured
+curl -H "Origin: http://localhost:5173" -I https://api.yohop.com/api/deals/featured
 ```
 
 **Expected Result**: JSON response with deal data and proper CORS headers
@@ -218,10 +218,10 @@ curl -H "Origin: http://localhost:5173" -I http://localhost:3000/api/deals/featu
 #### **1. CORS Errors**
 ```bash
 # Check if backend is running
-curl http://localhost:3000/
+curl https://api.yohop.com/
 
 # Check CORS headers
-curl -H "Origin: http://localhost:5173" -I http://localhost:3000/api/deals/featured
+curl -H "Origin: http://localhost:5173" -I https://api.yohop.com/api/deals/featured
 ```
 
 #### **2. Frontend Not Loading**
@@ -239,7 +239,7 @@ cd web && npm run dev
 cd backend && npm run dev
 
 # Test specific endpoint
-curl http://localhost:3000/api/deals/featured
+curl https://api.yohop.com/api/deals/featured
 ```
 
 #### **4. Database Connection Issues**

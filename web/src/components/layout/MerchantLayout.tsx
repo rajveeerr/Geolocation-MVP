@@ -4,14 +4,15 @@ import {
   BarChart3,
   Building2,
   ChevronDown,
-  ChevronRight,
   CircleDollarSign,
   Gift,
   Grid2x2,
+  LogOut,
   Menu,
   Plus,
   ScanSearch,
   Search,
+  Settings,
   Sparkles,
   Store,
   Ticket,
@@ -20,8 +21,18 @@ import {
   WandSparkles,
   X,
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { PATHS } from '@/routing/paths';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/useAuth';
+import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 
 type MerchantNavItem = {
   label: string;
@@ -59,6 +70,12 @@ const navSections: MerchantNavSection[] = [
         icon: CircleDollarSign,
         match: (pathname) => pathname.startsWith(PATHS.MERCHANT_KICKBACKS),
       },
+      {
+        label: 'Profile',
+        to: PATHS.PROFILE,
+        icon: UserCircle2,
+        match: (pathname) => pathname.startsWith(PATHS.PROFILE),
+      },
     ],
   },
   {
@@ -72,16 +89,40 @@ const navSections: MerchantNavSection[] = [
         match: (pathname) => pathname.startsWith('/merchant/deals'),
       },
       {
+        label: 'Create Deal',
+        to: PATHS.MERCHANT_DEALS_CREATE,
+        icon: Ticket,
+        match: (pathname) => pathname === PATHS.MERCHANT_DEALS_CREATE,
+      },
+      {
         label: 'Menu',
         to: PATHS.MERCHANT_MENU,
         icon: UtensilsCrossed,
         match: (pathname) => pathname.startsWith('/merchant/menu'),
       },
       {
+        label: 'Add Menu Item',
+        to: PATHS.MERCHANT_MENU_CREATE,
+        icon: UtensilsCrossed,
+        match: (pathname) => pathname === PATHS.MERCHANT_MENU_CREATE,
+      },
+      {
+        label: 'Collections',
+        to: PATHS.MERCHANT_MENU_COLLECTIONS,
+        icon: UtensilsCrossed,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_MENU_COLLECTIONS),
+      },
+      {
         label: 'Stores',
         to: PATHS.MERCHANT_STORES,
         icon: Store,
         match: (pathname) => pathname.startsWith('/merchant/stores'),
+      },
+      {
+        label: 'Add Store',
+        to: PATHS.MERCHANT_STORES_CREATE,
+        icon: Store,
+        match: (pathname) => pathname === PATHS.MERCHANT_STORES_CREATE,
       },
     ],
   },
@@ -96,16 +137,34 @@ const navSections: MerchantNavSection[] = [
         match: (pathname) => pathname.startsWith('/merchant/events'),
       },
       {
+        label: 'Create Event',
+        to: PATHS.MERCHANT_EVENTS_CREATE,
+        icon: Building2,
+        match: (pathname) => pathname === PATHS.MERCHANT_EVENTS_CREATE,
+      },
+      {
         label: 'Services',
         to: PATHS.MERCHANT_SERVICES,
         icon: Sparkles,
         match: (pathname) => pathname.startsWith('/merchant/services'),
       },
       {
+        label: 'Create Service',
+        to: PATHS.MERCHANT_SERVICES_CREATE,
+        icon: Sparkles,
+        match: (pathname) => pathname === PATHS.MERCHANT_SERVICES_CREATE,
+      },
+      {
         label: 'Surprises',
         to: PATHS.MERCHANT_SURPRISES,
         icon: WandSparkles,
         match: (pathname) => pathname.startsWith('/merchant/surprises'),
+      },
+      {
+        label: 'Create Surprise',
+        to: PATHS.MERCHANT_SURPRISES_CREATE,
+        icon: WandSparkles,
+        match: (pathname) => pathname === PATHS.MERCHANT_SURPRISES_CREATE,
       },
       {
         label: 'Check-in Games',
@@ -119,17 +178,29 @@ const navSections: MerchantNavSection[] = [
         icon: Gift,
         match: (pathname) => pathname.startsWith('/merchant/loyalty'),
       },
-    ],
-  },
-  {
-    id: 'account',
-    label: 'Account',
-    items: [
       {
-        label: 'Profile',
-        to: PATHS.PROFILE,
-        icon: UserCircle2,
-        match: (pathname) => pathname.startsWith(PATHS.PROFILE),
+        label: 'Loyalty Program',
+        to: PATHS.MERCHANT_LOYALTY_PROGRAM,
+        icon: Gift,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_LOYALTY_PROGRAM),
+      },
+      {
+        label: 'Loyalty Customers',
+        to: PATHS.MERCHANT_LOYALTY_CUSTOMERS,
+        icon: Gift,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_LOYALTY_CUSTOMERS),
+      },
+      {
+        label: 'Loyalty Transactions',
+        to: PATHS.MERCHANT_LOYALTY_TRANSACTIONS,
+        icon: Gift,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_LOYALTY_TRANSACTIONS),
+      },
+      {
+        label: 'Loyalty Setup',
+        to: PATHS.MERCHANT_LOYALTY_SETUP,
+        icon: Gift,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_LOYALTY_SETUP),
       },
     ],
   },
@@ -193,88 +264,134 @@ const getActiveSection = (pathname: string) =>
     section.items.some((item) => (item.match ? item.match(pathname) : pathname.startsWith(item.to))),
   ) ?? navSections[0];
 
+const searchableNavItems = navSections.flatMap((section) =>
+  section.items.map((item) => ({
+    ...item,
+    sectionLabel: section.label,
+  })),
+);
+
+const getInitials = (name: string) =>
+  name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('') || 'Y';
+
 function MerchantSidebar({
   pathname,
   onNavigate,
+  merchantDisplayName,
+  merchantTagline,
+  merchantInitials,
 }: {
   pathname: string;
   onNavigate?: () => void;
+  merchantDisplayName: string;
+  merchantTagline: string;
+  merchantInitials: string;
 }) {
   const activeSection = getActiveSection(pathname);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(navSections.map((section) => [section.id, section.id === activeSection.id])),
+  );
+
+  useEffect(() => {
+    setExpandedSections((current) => ({
+      ...current,
+      [activeSection.id]: true,
+    }));
+  }, [activeSection.id]);
+
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections((current) => ({
+      ...current,
+      [sectionId]: !current[sectionId],
+    }));
+  };
 
   return (
     <div className="flex h-full flex-col">
       <div className="border-b border-neutral-200/80 px-5 py-5">
         <Link to={PATHS.MERCHANT_DASHBOARD} onClick={onNavigate} className="inline-flex items-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[#111111] text-sm font-semibold text-white shadow-[0_8px_18px_rgba(17,17,17,0.18)]">
-            Y
+            {merchantInitials}
           </span>
           <span className="min-w-0">
-            <span className="block text-[1.05rem] font-semibold tracking-tight text-neutral-950">Merchant Business</span>
-            <span className="block text-xs text-neutral-500">Refined control center</span>
+            <span className="block truncate text-[1.05rem] font-semibold tracking-tight text-neutral-950">{merchantDisplayName}</span>
+            <span className="block truncate text-xs text-neutral-500">{merchantTagline}</span>
           </span>
         </Link>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-5">
-        <div className="rounded-[1.75rem] border border-neutral-200/80 bg-white/80 p-3 shadow-[0_8px_24px_rgba(15,23,42,0.05)] backdrop-blur">
-          <div className="px-3 pb-3">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Workspace</div>
-            <div className="mt-2 flex items-center justify-between gap-2">
-              <div>
-                <div className="text-xl font-semibold tracking-tight text-neutral-950">{activeSection.label}</div>
-                <div className="text-sm text-neutral-500">Tools for this part of your merchant workspace.</div>
-              </div>
-              <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500">
-                {activeSection.items.length} items
-              </span>
-            </div>
-          </div>
+      <div className="flex-1 overflow-y-auto px-5 py-6">
+        <div className="pb-4">
+          <div className="text-[1.7rem] font-semibold tracking-tight text-neutral-950">Merchant</div>
+          <div className="mt-1 text-[13px] text-neutral-500">Business workspace</div>
+        </div>
 
-          <div className="space-y-1.5">
-            {activeSection.items.map((item) => {
-              const Icon = item.icon;
-              const isActive = item.match ? item.match(pathname) : pathname.startsWith(item.to);
+        <div className="space-y-1">
+          {navSections.map((section) => {
+            const isExpanded = expandedSections[section.id] ?? false;
+            const sectionHasActiveItem = section.items.some((item) =>
+              item.match ? item.match(pathname) : pathname.startsWith(item.to),
+            );
 
-              return (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  onClick={onNavigate}
+            return (
+              <div key={section.id}>
+                <button
+                  type="button"
+                  onClick={() => toggleSection(section.id)}
                   className={cn(
-                    'group flex items-center gap-3 rounded-[1.15rem] px-3 py-3 text-sm font-medium transition-all duration-200',
-                    isActive
-                      ? 'bg-[#f4f5f7] text-neutral-950 ring-1 ring-neutral-200/90'
-                      : 'text-neutral-600 hover:bg-[#f7f7f8] hover:text-neutral-950',
+                    'flex w-full items-center justify-between rounded-[0.9rem] px-3 py-2 text-left text-[14px] font-medium transition',
+                    sectionHasActiveItem
+                      ? 'text-neutral-950'
+                      : 'text-neutral-700 hover:bg-neutral-100/80 hover:text-neutral-950',
                   )}
                 >
-                  <span
+                  <span>{section.label}</span>
+                  <ChevronDown
                     className={cn(
-                      'flex h-10 w-10 items-center justify-center rounded-[0.95rem] transition-colors',
-                      isActive
-                        ? 'bg-neutral-950 text-white'
-                        : 'bg-neutral-100 text-neutral-500 group-hover:bg-neutral-950 group-hover:text-white',
-                    )}
-                  >
-                    <Icon className="h-4 w-4" />
-                  </span>
-                  <span className="flex-1 truncate">{item.label}</span>
-                  <ChevronRight
-                    className={cn(
-                      'h-4 w-4 transition-opacity',
-                      isActive ? 'opacity-100 text-neutral-400' : 'opacity-0 group-hover:opacity-60',
+                      'h-4 w-4 text-neutral-500 transition-transform',
+                      isExpanded ? 'rotate-180' : 'rotate-0',
                     )}
                   />
-                </NavLink>
-              );
-            })}
-          </div>
+                </button>
+
+                {isExpanded ? (
+                  <div className="mt-1 space-y-1 pb-2">
+                    {section.items.map((item) => {
+                      const isActive = item.match ? item.match(pathname) : pathname.startsWith(item.to);
+
+                      return (
+                        <NavLink
+                          key={item.to}
+                          to={item.to}
+                          onClick={onNavigate}
+                          className={cn(
+                            'block rounded-[0.7rem] px-4 py-2.5 text-[13px] transition',
+                            isActive
+                              ? 'bg-neutral-100 font-semibold text-neutral-950'
+                              : 'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950',
+                          )}
+                        >
+                          {item.label}
+                        </NavLink>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
         </div>
       </div>
 
       <div className="border-t border-neutral-200/80 px-4 py-4">
-        <div className="rounded-[1.5rem] border border-neutral-200/80 bg-white/90 p-4 shadow-[0_8px_24px_rgba(15,23,42,0.05)]">
-          <p className="text-sm font-semibold text-neutral-950">Quick actions</p>
+        <div className="rounded-[1.2rem] border border-neutral-200/80 bg-white/90 p-4 shadow-[0_8px_24px_rgba(15,23,42,0.05)]">
+          <p className="text-[13px] font-semibold text-neutral-950">Quick actions</p>
           <p className="mt-1 text-xs leading-5 text-neutral-500">
             Jump into publishing or switch back to the customer-facing app.
           </p>
@@ -300,9 +417,108 @@ function MerchantSidebar({
   );
 }
 
+function MerchantWorkspaceSearch({
+  onNavigateTo,
+}: {
+  onNavigateTo: (to: string) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState('');
+
+  const filteredItems = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) {
+      return searchableNavItems.slice(0, 8);
+    }
+
+    return searchableNavItems.filter((item) => {
+      const haystack = `${item.label} ${item.sectionLabel} ${item.to}`.toLowerCase();
+      return haystack.includes(normalizedQuery);
+    });
+  }, [query]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setIsOpen(true);
+      }
+
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleNavigate = (to: string) => {
+    onNavigateTo(to);
+    setIsOpen(false);
+    setQuery('');
+  };
+
+  return (
+    <div className="relative hidden md:block">
+      <button
+        type="button"
+        onClick={() => setIsOpen((current) => !current)}
+        className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2 text-[13px] text-neutral-500 shadow-sm transition hover:border-neutral-300 hover:text-neutral-700"
+      >
+        <Search className="h-4 w-4" />
+        <span>Search workspace</span>
+        <span className="rounded-md bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-400">Ctrl K</span>
+      </button>
+
+      {isOpen ? (
+        <div className="absolute right-0 top-[calc(100%+10px)] z-50 w-[340px] overflow-hidden rounded-[1.1rem] border border-neutral-200 bg-white shadow-[0_18px_40px_rgba(15,23,42,0.14)]">
+          <div className="border-b border-neutral-200 p-3">
+            <div className="flex items-center gap-2 rounded-[0.9rem] border border-neutral-200 bg-neutral-50 px-3 py-2">
+              <Search className="h-4 w-4 text-neutral-400" />
+              <input
+                autoFocus
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search pages, tools, and create flows"
+                className="w-full bg-transparent text-[13px] text-neutral-800 outline-none placeholder:text-neutral-400"
+              />
+            </div>
+          </div>
+
+          <div className="max-h-[320px] overflow-y-auto p-2">
+            {filteredItems.length > 0 ? (
+              filteredItems.map((item) => (
+                <button
+                  key={`${item.sectionLabel}-${item.to}`}
+                  type="button"
+                  onClick={() => handleNavigate(item.to)}
+                  className="flex w-full items-start justify-between rounded-[0.9rem] px-3 py-2.5 text-left transition hover:bg-neutral-50"
+                >
+                  <div>
+                    <div className="text-[13px] font-medium text-neutral-900">{item.label}</div>
+                    <div className="mt-0.5 text-xs text-neutral-500">{item.sectionLabel}</div>
+                  </div>
+                  <div className="ml-4 truncate text-xs text-neutral-400">{item.to}</div>
+                </button>
+              ))
+            ) : (
+              <div className="px-3 py-5 text-center text-[13px] text-neutral-500">
+                No workspace matches found.
+              </div>
+            )}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const { data: merchantData } = useMerchantStatus();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -319,19 +535,37 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
   );
 
   const activeSection = useMemo(() => getActiveSection(location.pathname), [location.pathname]);
+  const merchantName = merchantData?.data?.merchant?.businessName?.trim() || user?.name?.trim() || 'Merchant Business';
+  const merchantStatus = merchantData?.data?.merchant?.status;
+  const merchantCity = merchantData?.data?.merchant?.city?.trim();
+  const merchantInitials = getInitials(merchantName);
+  const profileName = user?.name?.trim() || 'Merchant';
+  const merchantTagline =
+    merchantCity && merchantStatus
+      ? `${merchantCity} · ${merchantStatus.toLowerCase()}`
+      : merchantCity
+        ? merchantCity
+        : merchantStatus
+          ? `${merchantStatus.toLowerCase()} merchant workspace`
+          : 'Refined control center';
 
   return (
     <div className="min-h-screen bg-[#f5f5f7] text-neutral-900">
       <div className="flex min-h-screen">
         <aside className="hidden w-[320px] shrink-0 border-r border-neutral-200/70 bg-[#fbfbfc] lg:block">
           <div className="sticky top-0 flex h-screen flex-col">
-            <MerchantSidebar pathname={location.pathname} />
+            <MerchantSidebar
+              pathname={location.pathname}
+              merchantDisplayName={merchantName}
+              merchantTagline={merchantTagline}
+              merchantInitials={merchantInitials}
+            />
           </div>
         </aside>
 
         <div className="flex min-h-screen min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-30 border-b border-neutral-200/80 bg-[#f5f5f7]/88 backdrop-blur-2xl">
-            <div className="border-b border-neutral-200/70 px-4 py-3 sm:px-6 lg:px-8">
+          <header className="sticky top-0 z-30 border-b border-neutral-200/80 bg-white/92 backdrop-blur-2xl">
+            <div className="border-b border-neutral-200/80 px-4 py-3 sm:px-6 lg:px-8">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex min-w-0 items-center gap-3">
                   <button
@@ -344,10 +578,13 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
                   </button>
 
                   <Link to={PATHS.MERCHANT_DASHBOARD} className="hidden items-center gap-3 lg:flex">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-[0.9rem] bg-neutral-950 text-sm font-semibold text-white">
-                      Y
+                    <span className="flex h-10 w-10 items-center justify-center rounded-[1rem] bg-neutral-950 text-sm font-semibold text-white">
+                      {merchantInitials}
                     </span>
-                    <span className="text-lg font-semibold tracking-tight text-neutral-950">Merchant Business</span>
+                    <div className="min-w-0">
+                      <div className="max-w-[280px] truncate text-[15px] font-semibold tracking-tight text-neutral-950">{merchantName}</div>
+                      <div className="max-w-[280px] truncate text-xs text-neutral-500">{merchantTagline}</div>
+                    </div>
                   </Link>
                 </div>
 
@@ -361,10 +598,10 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
                         type="button"
                         onClick={() => navigate(section.items[0].to)}
                         className={cn(
-                          'rounded-[0.95rem] px-4 py-2 text-sm font-medium transition',
+                          'rounded-full px-4 py-2 text-[13px] font-medium transition',
                           isActive
-                            ? 'bg-white text-neutral-950 shadow-sm ring-1 ring-neutral-200'
-                            : 'text-neutral-500 hover:bg-white/70 hover:text-neutral-950',
+                            ? 'bg-neutral-100 text-neutral-950 shadow-sm ring-1 ring-neutral-200/80'
+                            : 'text-neutral-500 hover:bg-neutral-100/80 hover:text-neutral-950',
                         )}
                       >
                         {section.label}
@@ -374,49 +611,95 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
                 </nav>
 
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="hidden items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-500 shadow-sm md:flex">
-                    <Search className="h-4 w-4" />
-                    <span>Search workspace</span>
-                  </div>
+                  <MerchantWorkspaceSearch onNavigateTo={(to) => navigate(to)} />
 
                   <Link
                     to={PATHS.MERCHANT_DEALS_CREATE}
-                    className="inline-flex h-10 items-center justify-center rounded-full bg-neutral-950 px-4 text-sm font-semibold text-white transition hover:bg-neutral-800"
+                    className="inline-flex h-11 items-center justify-center rounded-full bg-neutral-950 px-5 text-[13px] font-semibold text-white transition hover:bg-neutral-800"
                   >
                     <Plus className="mr-1.5 h-4 w-4" />
                     Create
                   </Link>
 
-                  <Link
-                    to={PATHS.PROFILE}
-                    className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-2.5 py-1.5 text-sm text-neutral-700 shadow-sm"
-                  >
-                    <span className="hidden font-medium sm:inline">Merchant</span>
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#d9f99d] text-neutral-900">
-                      <UserCircle2 className="h-4 w-4" />
-                    </span>
-                    <ChevronDown className="hidden h-4 w-4 text-neutral-400 sm:block" />
-                  </Link>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-2.5 py-1.5 text-[13px] text-neutral-700 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-50"
+                      >
+                        <span className="hidden max-w-[120px] truncate font-medium sm:inline">{profileName}</span>
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#d9f99d] text-neutral-900">
+                          <UserCircle2 className="h-4 w-4" />
+                        </span>
+                        <ChevronDown className="hidden h-4 w-4 text-neutral-400 sm:block" />
+                      </button>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent
+                      align="end"
+                      className="w-[240px] rounded-[1.15rem] border-neutral-200 p-2 shadow-[0_18px_40px_rgba(15,23,42,0.14)]"
+                    >
+                      <DropdownMenuLabel className="px-3 py-2">
+                        <div className="truncate text-[13px] font-semibold text-neutral-950">{profileName}</div>
+                        <div className="truncate text-xs font-normal text-neutral-500">{merchantTagline}</div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+
+                      <DropdownMenuItem asChild className="rounded-[0.85rem] px-3 py-2 text-[13px]">
+                        <Link to={PATHS.MERCHANT_DASHBOARD}>
+                          <Grid2x2 className="mr-2 h-4 w-4" />
+                          <span>Merchant dashboard</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="rounded-[0.85rem] px-3 py-2 text-[13px]">
+                        <Link to={PATHS.PROFILE}>
+                          <UserCircle2 className="mr-2 h-4 w-4" />
+                          <span>Profile</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="rounded-[0.85rem] px-3 py-2 text-[13px]">
+                        <Link to={PATHS.SETTINGS}>
+                          <Settings className="mr-2 h-4 w-4" />
+                          <span>Settings</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="rounded-[0.85rem] px-3 py-2 text-[13px]">
+                        <Link to={PATHS.HOME}>
+                          <Store className="mr-2 h-4 w-4" />
+                          <span>Browse app</span>
+                        </Link>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={logout}
+                        className="rounded-[0.85rem] px-3 py-2 text-[13px] text-red-600 focus:text-red-600"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Log out</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>
 
-            <div className="px-4 py-4 sm:px-6 lg:px-8">
+            <div className="bg-[#f5f5f7] px-4 py-4 sm:px-6 lg:px-8">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-400">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-neutral-400">
                     {activeSection.label}
                   </p>
-                  <h1 className="truncate text-[1.9rem] font-semibold tracking-tight text-neutral-950 sm:text-[2.1rem]">
+                  <h1 className="truncate text-[1.55rem] font-semibold tracking-tight text-neutral-950 sm:text-[1.75rem]">
                     {pageMeta.title}
                   </h1>
-                  <p className="mt-1 max-w-3xl text-sm text-neutral-500 sm:text-[15px]">{pageMeta.subtitle}</p>
+                  <p className="mt-1 max-w-3xl text-[13px] text-neutral-500 sm:text-sm">{pageMeta.subtitle}</p>
                 </div>
 
-                <div className="hidden min-w-[220px] rounded-[1.25rem] border border-neutral-200/80 bg-white/90 px-4 py-3 shadow-sm lg:block">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Active section</div>
-                  <div className="mt-1 text-sm font-semibold text-neutral-900">{activeSection.label}</div>
-                  <div className="mt-1 text-sm text-neutral-500">{activeSection.items.length} integrated destinations ready.</div>
+                <div className="hidden min-w-[220px] rounded-[1.15rem] border border-neutral-200/80 bg-white/90 px-4 py-3 shadow-sm lg:block">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Active section</div>
+                  <div className="mt-1 text-[13px] font-semibold text-neutral-900">{activeSection.label}</div>
+                  <div className="mt-1 text-[13px] text-neutral-500">{activeSection.items.length} integrated destinations ready.</div>
                 </div>
               </div>
             </div>
@@ -448,7 +731,13 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
               </button>
             </div>
             <div className="h-[calc(100%-64px)]">
-              <MerchantSidebar pathname={location.pathname} onNavigate={() => setMobileSidebarOpen(false)} />
+              <MerchantSidebar
+                pathname={location.pathname}
+                onNavigate={() => setMobileSidebarOpen(false)}
+                merchantDisplayName={merchantName}
+                merchantTagline={merchantTagline}
+                merchantInitials={merchantInitials}
+              />
             </div>
           </div>
         </div>

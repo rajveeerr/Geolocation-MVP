@@ -4,7 +4,7 @@
 
 The GeolocationMVPBackend is a Node.js/TypeScript backend for a geolocation-based deals platform using Express, Prisma, and PostgreSQL. It provides APIs for user management, merchant operations, deal discovery, gamification, and admin functions.
 
-**Base URL**: `http://localhost:3000/api`  
+**Base URL**: `https://api.yohop.com/api`  
 **Version**: 1.0.0  
 **Authentication**: JWT Bearer Token
 

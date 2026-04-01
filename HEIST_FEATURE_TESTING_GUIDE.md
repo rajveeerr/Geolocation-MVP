@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-1. **Backend Running**: Ensure backend is running on `http://localhost:3000`
+1. **Backend Running**: Ensure backend is running on `https://api.yohop.com`
 2. **Frontend Running**: Ensure frontend is running on `http://localhost:5173`
 3. **Database**: Ensure database has heist tables migrated
 4. **Test Users**: Create at least 2-3 test users for testing heist execution

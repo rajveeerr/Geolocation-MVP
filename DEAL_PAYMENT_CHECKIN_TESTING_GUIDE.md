@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-1. **Backend Running**: Ensure backend is running on `http://localhost:3000`
+1. **Backend Running**: Ensure backend is running on `https://api.yohop.com`
 2. **Frontend Running**: Ensure frontend is running (usually `http://localhost:5173` or similar)
 3. **PayPal Sandbox**: Configure PayPal sandbox credentials in `.env`:
    ```
