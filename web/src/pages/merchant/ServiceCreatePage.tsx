@@ -67,8 +67,8 @@ function ServiceCreateInner() {
 
   return (
     <div className="mx-auto max-w-3xl px-2 py-4">
-      <Link to={PATHS.MERCHANT_SERVICES} className="inline-flex items-center gap-1 text-sm font-medium text-brand-primary-600 hover:underline">
-        <ArrowLeft className="h-4 w-4" />
+      <Link to={PATHS.MERCHANT_SERVICES} className="inline-flex items-center gap-2 whitespace-nowrap text-sm font-medium text-brand-primary-600 hover:underline">
+        <ArrowLeft className="h-4 w-4 shrink-0" />
         Back to services
       </Link>
 

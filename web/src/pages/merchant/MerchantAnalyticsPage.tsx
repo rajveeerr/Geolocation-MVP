@@ -42,8 +42,8 @@ export const MerchantAnalyticsPage = () => {
         description="Analytics are only available for approved merchants. Your application is currently under review."
         action={
           <Button asChild variant="secondary" className="rounded-xl">
-            <Link to={PATHS.MERCHANT_DASHBOARD}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
+            <Link to={PATHS.MERCHANT_DASHBOARD} className="inline-flex items-center whitespace-nowrap">
+              <ArrowLeft className="mr-2 h-4 w-4 shrink-0" />
               Back to dashboard
             </Link>
           </Button>
@@ -60,8 +60,8 @@ export const MerchantAnalyticsPage = () => {
         description="Analytics are only available for approved merchants. Please contact support for assistance."
         action={
           <Button asChild variant="secondary" className="rounded-xl">
-            <Link to={PATHS.MERCHANT_DASHBOARD}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
+            <Link to={PATHS.MERCHANT_DASHBOARD} className="inline-flex items-center whitespace-nowrap">
+              <ArrowLeft className="mr-2 h-4 w-4 shrink-0" />
               Back to dashboard
             </Link>
           </Button>

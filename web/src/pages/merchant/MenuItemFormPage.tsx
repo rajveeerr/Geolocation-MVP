@@ -162,7 +162,7 @@ export const MenuItemFormPage = () => {
       }
       
       navigate(PATHS.MERCHANT_MENU);
-    } catch (error) {
+    } catch {
       // Error handling is done in the mutation hooks
     }
   };
@@ -197,7 +197,7 @@ export const MenuItemFormPage = () => {
           onClick={() => navigate(PATHS.MERCHANT_MENU)}
           className="mb-4"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="mr-2 h-4 w-4 shrink-0" />
           Back to Menu
         </Button>
         <h1 className="text-4xl font-bold text-neutral-900">

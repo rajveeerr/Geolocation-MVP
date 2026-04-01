@@ -11,9 +11,7 @@ import {
   Calendar,
   Image as ImageIcon,
   AlertCircle,
-  Loader2
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useModal } from '@/context/ModalContext';
 import { useDeleteMenuItem } from '@/hooks/useMerchantMenu';
 
@@ -43,7 +41,7 @@ const ImageGallery = ({ images }: { images: MenuItem['images'] }) => {
       {/* Thumbnail Gallery */}
       {images.length > 1 && (
         <div className="grid grid-cols-4 gap-2">
-          {images.slice(1).map((image, index) => (
+          {images.slice(1).map((image) => (
             <div key={image.id} className="aspect-square rounded-lg overflow-hidden bg-neutral-100">
               <img
                 src={image.url}
@@ -83,7 +81,7 @@ const MenuItemDetailCard = ({ item, onEdit, onDelete }: {
         month: 'long',
         day: 'numeric'
       });
-    } catch (error) {
+    } catch {
       return 'Recently';
     }
   };
@@ -285,7 +283,7 @@ export const MenuItemDetailPage = () => {
           onClick={() => navigate(PATHS.MERCHANT_MENU)}
           className="mb-4"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="mr-2 h-4 w-4 shrink-0" />
           Back to Menu
         </Button>
       </div>

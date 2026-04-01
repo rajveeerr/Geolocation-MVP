@@ -14,7 +14,6 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useModal } from '@/context/ModalContext';
@@ -45,7 +44,7 @@ const StoreDetailCard = ({ store, onEdit, onDelete }: {
         month: 'long',
         day: 'numeric'
       });
-    } catch (error) {
+    } catch {
       return 'Recently';
     }
   };
@@ -377,7 +376,7 @@ export const StoreDetailPage = () => {
           onClick={() => navigate(PATHS.MERCHANT_STORES)}
           className="mb-4"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="mr-2 h-4 w-4 shrink-0" />
           Back to Stores
         </Button>
       </div>

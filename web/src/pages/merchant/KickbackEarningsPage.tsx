@@ -117,8 +117,8 @@ export const KickbackEarningsPage = () => {
           <PeriodFilter period={period} setPeriod={setPeriod} />
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button onClick={() => navigate(PATHS.MERCHANT_DASHBOARD)} variant="secondary" size="sm" className="rounded-xl text-sm">
-            <ArrowLeft className="mr-2 h-4 w-4" />
+          <Button onClick={() => navigate(PATHS.MERCHANT_DASHBOARD)} variant="secondary" size="sm" className="inline-flex items-center whitespace-nowrap rounded-xl text-sm">
+            <ArrowLeft className="mr-2 h-4 w-4 shrink-0" />
             Dashboard
           </Button>
           <Button onClick={() => navigate(PATHS.MERCHANT_DEALS_CREATE)} size="sm" className="rounded-xl text-sm">
