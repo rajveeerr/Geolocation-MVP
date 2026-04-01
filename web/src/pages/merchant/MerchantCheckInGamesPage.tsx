@@ -50,7 +50,7 @@ const createEmptyReward = (): MerchantCheckInGameReward => ({
   label: '',
   imageUrl: '',
   rewardType: 'DISCOUNT_PERCENTAGE',
-  rewardValue: 5,
+  rewardValue: 50,
   rewardLabel: '',
   probabilityWeight: 1,
   isActive: true,
@@ -69,9 +69,9 @@ const CHECK_IN_GAME_PRESETS: CheckInGamePreset[] = [
       cooldownMinutes: 0,
       rewardExpiryHours: 24,
       rewards: [
-        { label: '5% Off', rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 5, rewardLabel: '5% OFF', probabilityWeight: 5, isActive: true },
+        { label: 'Up to $10 Off', rewardType: 'DISCOUNT_FIXED', rewardValue: 10, rewardLabel: 'UP TO $10 OFF', probabilityWeight: 5, isActive: true },
         { label: '10 Coins', rewardType: 'COINS', rewardValue: 10, rewardLabel: '10 Bonus Coins', probabilityWeight: 4, isActive: true },
-        { label: '10% Off', rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 10, rewardLabel: '10% OFF', probabilityWeight: 2, isActive: true },
+        { label: '50% Off', rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 50, rewardLabel: '50% OFF', probabilityWeight: 2, isActive: true },
         { label: 'Free Drink', rewardType: 'FREE_ITEM', rewardValue: 1, rewardLabel: 'Free Drink', probabilityWeight: 1, isActive: true },
       ],
     },
@@ -88,8 +88,8 @@ const CHECK_IN_GAME_PRESETS: CheckInGamePreset[] = [
       cooldownMinutes: 60,
       rewardExpiryHours: 48,
       rewards: [
-        { label: '$5 Off', rewardType: 'DISCOUNT_FIXED', rewardValue: 5, rewardLabel: '$5 OFF', probabilityWeight: 4, isActive: true },
-        { label: '15% Off', rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 15, rewardLabel: '15% OFF', probabilityWeight: 2, isActive: true },
+        { label: 'Up to $20 Off', rewardType: 'DISCOUNT_FIXED', rewardValue: 20, rewardLabel: 'UP TO $20 OFF', probabilityWeight: 4, isActive: true },
+        { label: '75% Off', rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 75, rewardLabel: '75% OFF', probabilityWeight: 2, isActive: true },
         { label: '25 Coins', rewardType: 'COINS', rewardValue: 25, rewardLabel: '25 Bonus Coins', probabilityWeight: 2, isActive: true },
         { label: 'Free Dessert', rewardType: 'FREE_ITEM', rewardValue: 1, rewardLabel: 'Free Dessert', probabilityWeight: 1, isActive: true },
       ],
@@ -108,8 +108,8 @@ const CHECK_IN_GAME_PRESETS: CheckInGamePreset[] = [
       rewardExpiryHours: 12,
       rewards: [
         { label: '5 Coins', rewardType: 'COINS', rewardValue: 5, rewardLabel: '5 Bonus Coins', probabilityWeight: 5, isActive: true },
-        { label: '5% Off', rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 5, rewardLabel: '5% OFF', probabilityWeight: 4, isActive: true },
-        { label: '$3 Off', rewardType: 'DISCOUNT_FIXED', rewardValue: 3, rewardLabel: '$3 OFF', probabilityWeight: 2, isActive: true },
+        { label: '50% Off', rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 50, rewardLabel: '50% OFF', probabilityWeight: 4, isActive: true },
+        { label: 'Up to $8 Off', rewardType: 'DISCOUNT_FIXED', rewardValue: 8, rewardLabel: 'UP TO $8 OFF', probabilityWeight: 2, isActive: true },
         { label: 'Free Add-on', rewardType: 'FREE_ITEM', rewardValue: 1, rewardLabel: 'Free Add-on', probabilityWeight: 1, isActive: true },
       ],
     },
@@ -641,7 +641,7 @@ export function MerchantCheckInGamesPage() {
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-lg font-bold text-neutral-900">Reward pool</h2>
-                <p className="mt-1 text-sm text-neutral-600">Balance win frequency and prize value to shape the experience.</p>
+                <p className="mt-1 text-sm text-neutral-600">Set how common each reward should be and balance it against prize value.</p>
               </div>
               <Button variant="secondary" size="sm" className="rounded-xl" onClick={addReward}>
                 <Plus className="mr-1 h-4 w-4" />
@@ -776,7 +776,7 @@ export function MerchantCheckInGamesPage() {
                         />
                       </label>
                       <label>
-                        <span className={editorFieldLabelClass}>Weight</span>
+                        <span className={editorFieldLabelClass}>Chance level</span>
                         <input
                           className={editorInputClass}
                           type="number"
