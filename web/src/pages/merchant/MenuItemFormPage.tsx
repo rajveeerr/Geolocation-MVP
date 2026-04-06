@@ -303,24 +303,17 @@ export const MenuItemFormPage = () => {
     }
 
     const prompt = [
-      'You are helping a merchant choose starting inventory settings for one menu item.',
-      'Return ONLY valid JSON with this exact shape:',
-      '{"isAvailable":true,"inventoryTrackingEnabled":true,"inventoryQuantity":24,"lowStockThreshold":5,"allowBackorder":false,"rationale":"...","tips":["...","..."]}',
-      'Rules:',
-      '- inventoryQuantity must be a non-negative integer',
-      '- lowStockThreshold must be a non-negative integer and less than or equal to inventoryQuantity',
-      '- prefer inventoryTrackingEnabled=true for food or limited items',
-      '- prefer allowBackorder=false unless there is a strong reason otherwise',
-      '- keep rationale under 160 characters',
-      '- max 3 short tips',
-      `Item name: ${itemName}`,
-      `Category: ${itemCategory}`,
-      `Price: ${watchedValues.price || 0}`,
-      `Description: ${watchedValues.description || 'N/A'}`,
-      `Deal type: ${selectedDealType || 'STANDARD'}`,
-      `Existing quantity: ${inventoryQuantity || 'none'}`,
-      `Existing threshold: ${lowStockThreshold || 'none'}`,
-    ].join('\n');
+      'Return JSON only:',
+      '{"isAvailable":true,"inventoryTrackingEnabled":true,"inventoryQuantity":24,"lowStockThreshold":5,"allowBackorder":false,"rationale":"...","tips":["..."]}',
+      `name:${itemName}`,
+      `category:${itemCategory}`,
+      `price:${watchedValues.price || 0}`,
+      `desc:${(watchedValues.description || 'N/A').slice(0, 80)}`,
+      `deal:${selectedDealType || 'STANDARD'}`,
+      `qty:${inventoryQuantity || 'none'}`,
+      `threshold:${lowStockThreshold || 'none'}`,
+      'Use integers. threshold<=quantity. Prefer tracking on. Keep rationale short.',
+    ].join('\n').slice(0, 500);
 
     try {
       const result = await aiChat.mutateAsync({ message: prompt });
