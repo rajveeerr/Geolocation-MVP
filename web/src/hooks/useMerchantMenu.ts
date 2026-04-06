@@ -1,8 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiGet, apiPost, apiPut, apiDelete } from '@/services/api';
+import { apiGet, apiPost, apiPut, apiPatch, apiDelete } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 
-// Removed MenuItemImage interface as we are now using simple string arrays (imageUrls) for images 
+export interface MenuItemImage {
+  id: string;
+  url: string;
+  publicId: string;
+  name: string;
+}
 
 export type MenuDealType = 
   | 'STANDARD'
@@ -22,7 +27,8 @@ export interface MenuItem {
   category: string;
   description: string | null;
   imageUrl: string | null; // Keep for backward compatibility
-  imageUrls: string[]; 
+  imageUrls: string[];
+  images: MenuItemImage[];
   merchantId: number;
   dealType?: MenuDealType;
   isHappyHour?: boolean;
@@ -32,6 +38,12 @@ export interface MenuItem {
   validStartTime?: string | null;
   validEndTime?: string | null;
   validDays?: string | null;
+  isAvailable: boolean;
+  inventoryTrackingEnabled: boolean;
+  inventoryQuantity?: number | null;
+  lowStockThreshold?: number | null;
+  allowBackorder: boolean;
+  inventoryStatus?: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'UNTRACKED';
   createdAt: string;
   updatedAt: string;
 }
@@ -43,6 +55,7 @@ export interface CreateMenuItemData {
   description?: string;
   imageUrl?: string; // Keep for backward compatibility
   imageUrls?: string[];
+  images?: MenuItemImage[];
   dealType?: MenuDealType;
   isHappyHour?: boolean;
   happyHourPrice?: number | null;
@@ -51,6 +64,11 @@ export interface CreateMenuItemData {
   validStartTime?: string | null;
   validEndTime?: string | null;
   validDays?: string | null;
+  isAvailable?: boolean;
+  inventoryTrackingEnabled?: boolean;
+  inventoryQuantity?: number | null;
+  lowStockThreshold?: number | null;
+  allowBackorder?: boolean;
 }
 
 export interface UpdateMenuItemData {
@@ -60,6 +78,7 @@ export interface UpdateMenuItemData {
   description?: string;
   imageUrl?: string; // Keep for backward compatibility
   imageUrls?: string[];
+  images?: MenuItemImage[];
   dealType?: MenuDealType;
   isHappyHour?: boolean;
   happyHourPrice?: number | null;
@@ -68,11 +87,43 @@ export interface UpdateMenuItemData {
   validStartTime?: string | null;
   validEndTime?: string | null;
   validDays?: string | null;
+  isAvailable?: boolean;
+  inventoryTrackingEnabled?: boolean;
+  inventoryQuantity?: number | null;
+  lowStockThreshold?: number | null;
+  allowBackorder?: boolean;
 }
 
 export interface MenuItemsResponse {
   menuItems: MenuItem[];
 }
+
+const toMenuItemImages = (imageUrls?: string[] | null): MenuItemImage[] =>
+  (imageUrls || []).map((url, index) => ({
+    id: `image-${index}`,
+    url,
+    publicId: `image-${index}`,
+    name: `Image ${index + 1}`,
+  }));
+
+const normalizeMenuItem = (item: Omit<MenuItem, 'images'> & { images?: MenuItemImage[] }): MenuItem => ({
+  ...item,
+  imageUrls: item.imageUrls || [],
+  images: item.images && item.images.length > 0 ? item.images : toMenuItemImages(item.imageUrls),
+});
+
+const serializeMenuItemPayload = (data: CreateMenuItemData | UpdateMenuItemData) => {
+  const imageUrls =
+    data.imageUrls && data.imageUrls.length > 0
+      ? data.imageUrls
+      : data.images?.map((image) => image.url).filter(Boolean) || [];
+
+  return {
+    ...data,
+    imageUrls,
+    imageUrl: imageUrls[0] || data.imageUrl || undefined,
+  };
+};
 
 // Hook to fetch all menu items for the authenticated merchant
 export const useMerchantMenu = () => {
@@ -83,7 +134,10 @@ export const useMerchantMenu = () => {
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to fetch menu items');
       }
-      return response.data;
+      return {
+        ...response.data,
+        menuItems: response.data.menuItems.map(normalizeMenuItem),
+      };
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -96,14 +150,18 @@ export const useCreateMenuItem = () => {
 
   return useMutation({
     mutationFn: async (data: CreateMenuItemData) => {
-      const response = await apiPost<{ menuItem: MenuItem }, CreateMenuItemData>('/merchants/me/menu/item', data);
+      const payload = serializeMenuItemPayload(data);
+      const response = await apiPost<{ menuItem: MenuItem }, typeof payload>('/merchants/me/menu/item', payload);
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to create menu item');
       }
-      return response.data;
+      return {
+        menuItem: normalizeMenuItem(response.data.menuItem),
+      };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['merchant-menu'] });
+      queryClient.invalidateQueries({ queryKey: ['merchantMenuItems'] });
       toast({
         title: 'Menu Item Created!',
         description: `${data.menuItem.name} has been added to your menu.`,
@@ -126,14 +184,18 @@ export const useUpdateMenuItem = () => {
 
   return useMutation({
     mutationFn: async ({ itemId, data }: { itemId: number; data: UpdateMenuItemData }) => {
-      const response = await apiPut<{ menuItem: MenuItem }, UpdateMenuItemData>(`/merchants/me/menu/item/${itemId}`, data);
+      const payload = serializeMenuItemPayload(data);
+      const response = await apiPut<{ menuItem: MenuItem }, typeof payload>(`/merchants/me/menu/item/${itemId}`, payload);
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to update menu item');
       }
-      return response.data;
+      return {
+        menuItem: normalizeMenuItem(response.data.menuItem),
+      };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['merchant-menu'] });
+      queryClient.invalidateQueries({ queryKey: ['merchantMenuItems'] });
       toast({
         title: 'Menu Item Updated!',
         description: `${data.menuItem.name} has been updated successfully.`,
@@ -164,6 +226,7 @@ export const useDeleteMenuItem = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['merchant-menu'] });
+      queryClient.invalidateQueries({ queryKey: ['merchantMenuItems'] });
       toast({
         title: 'Menu Item Deleted',
         description: data?.message || 'Menu item has been deleted successfully.',
@@ -178,6 +241,50 @@ export const useDeleteMenuItem = () => {
           variant: 'destructive',
         });
       }
+    },
+  });
+};
+
+export const useUpdateMenuItemInventory = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({
+      itemId,
+      data,
+    }: {
+      itemId: number;
+      data: Pick<
+        UpdateMenuItemData,
+        'isAvailable' | 'inventoryTrackingEnabled' | 'inventoryQuantity' | 'lowStockThreshold' | 'allowBackorder'
+      >;
+    }) => {
+      const response = await apiPatch<{ menuItem: MenuItem }, typeof data>(
+        `/merchants/me/menu/item/${itemId}/inventory`,
+        data,
+      );
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to update menu item inventory');
+      }
+      return {
+        menuItem: normalizeMenuItem(response.data.menuItem),
+      };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['merchant-menu'] });
+      queryClient.invalidateQueries({ queryKey: ['merchantMenuItems'] });
+      toast({
+        title: 'Inventory Updated',
+        description: `${data.menuItem.name} inventory has been updated.`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Error Updating Inventory',
+        description: error.message,
+        variant: 'destructive',
+      });
     },
   });
 };

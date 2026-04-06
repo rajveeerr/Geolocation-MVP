@@ -8,6 +8,8 @@ import { CategoryDropdown } from '@/components/common/CategoryDropdown';
 import { PATHS } from '@/routing/paths';
 import { useCreateMenuItem, useUpdateMenuItem, useMerchantMenu, type CreateMenuItemData, type UpdateMenuItemData, type MenuItemImage, type MenuDealType } from '@/hooks/useMerchantMenu';
 import { useDealTypes } from '@/hooks/useDealTypes';
+import { useAiChat, useAiStatus } from '@/hooks/useAi';
+import { useToast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
   Utensils, 
@@ -16,7 +18,9 @@ import {
   DollarSign,
   Clock,
   Sparkles,
-  Info
+  Info,
+  Wand2,
+  CheckCircle2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
@@ -36,10 +40,59 @@ const menuItemFormSchema = z.object({
   validStartTime: z.string().optional().nullable(),
   validEndTime: z.string().optional().nullable(),
   validDays: z.string().optional().nullable(),
+  isAvailable: z.boolean().optional(),
+  inventoryTrackingEnabled: z.boolean().optional(),
+  inventoryQuantity: z.number().int().min(0).optional().nullable(),
+  lowStockThreshold: z.number().int().min(0).optional().nullable(),
+  allowBackorder: z.boolean().optional(),
   // Remove imageUrl from schema since we're using the ImageUpload component
 });
 
 type MenuItemFormData = z.infer<typeof menuItemFormSchema>;
+
+type InventoryAiSuggestion = {
+  isAvailable: boolean;
+  inventoryTrackingEnabled: boolean;
+  inventoryQuantity: number;
+  lowStockThreshold: number;
+  allowBackorder: boolean;
+  rationale: string;
+  tips?: string[];
+};
+
+const parseInventoryAiSuggestion = (reply: string): InventoryAiSuggestion | null => {
+  const cleaned = reply.trim();
+  const fencedMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const jsonCandidate = fencedMatch?.[1] || cleaned;
+
+  try {
+    const parsed = JSON.parse(jsonCandidate);
+    if (
+      typeof parsed?.isAvailable === 'boolean' &&
+      typeof parsed?.inventoryTrackingEnabled === 'boolean' &&
+      Number.isInteger(parsed?.inventoryQuantity) &&
+      parsed.inventoryQuantity >= 0 &&
+      Number.isInteger(parsed?.lowStockThreshold) &&
+      parsed.lowStockThreshold >= 0 &&
+      typeof parsed?.allowBackorder === 'boolean' &&
+      typeof parsed?.rationale === 'string'
+    ) {
+      return {
+        isAvailable: parsed.isAvailable,
+        inventoryTrackingEnabled: parsed.inventoryTrackingEnabled,
+        inventoryQuantity: parsed.inventoryQuantity,
+        lowStockThreshold: parsed.lowStockThreshold,
+        allowBackorder: parsed.allowBackorder,
+        rationale: parsed.rationale,
+        tips: Array.isArray(parsed.tips) ? parsed.tips.filter((tip: unknown) => typeof tip === 'string').slice(0, 3) : [],
+      };
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+};
 
 export const MenuItemFormPage = () => {
   const navigate = useNavigate();
@@ -48,6 +101,9 @@ export const MenuItemFormPage = () => {
   
   const { data: menuData } = useMerchantMenu();
   const { data: dealTypesData } = useDealTypes();
+  const { data: aiStatus } = useAiStatus();
+  const aiChat = useAiChat();
+  const { toast } = useToast();
   const createMenuItemMutation = useCreateMenuItem();
   const updateMenuItemMutation = useUpdateMenuItem();
 
@@ -65,6 +121,20 @@ export const MenuItemFormPage = () => {
   const [validStartTime, setValidStartTime] = useState(existingItem?.validStartTime || '');
   const [validEndTime, setValidEndTime] = useState(existingItem?.validEndTime || '');
   const [validDays, setValidDays] = useState(existingItem?.validDays || '');
+  const [isAvailable, setIsAvailable] = useState(existingItem?.isAvailable ?? true);
+  const [inventoryTrackingEnabled, setInventoryTrackingEnabled] = useState(existingItem?.inventoryTrackingEnabled ?? false);
+  const [inventoryQuantity, setInventoryQuantity] = useState(
+    existingItem?.inventoryQuantity !== null && existingItem?.inventoryQuantity !== undefined
+      ? String(existingItem.inventoryQuantity)
+      : '',
+  );
+  const [lowStockThreshold, setLowStockThreshold] = useState(
+    existingItem?.lowStockThreshold !== null && existingItem?.lowStockThreshold !== undefined
+      ? String(existingItem.lowStockThreshold)
+      : '',
+  );
+  const [allowBackorder, setAllowBackorder] = useState(existingItem?.allowBackorder ?? false);
+  const [inventoryAiSuggestion, setInventoryAiSuggestion] = useState<InventoryAiSuggestion | null>(null);
 
   const {
     register,
@@ -87,10 +157,27 @@ export const MenuItemFormPage = () => {
       validStartTime: existingItem?.validStartTime || null,
       validEndTime: existingItem?.validEndTime || null,
       validDays: existingItem?.validDays || null,
+      isAvailable: existingItem?.isAvailable ?? true,
+      inventoryTrackingEnabled: existingItem?.inventoryTrackingEnabled ?? false,
+      inventoryQuantity: existingItem?.inventoryQuantity ?? null,
+      lowStockThreshold: existingItem?.lowStockThreshold ?? null,
+      allowBackorder: existingItem?.allowBackorder ?? false,
     }
   });
 
   const watchedValues = watch();
+  const parsedInventoryQuantity = inventoryQuantity !== '' ? Number(inventoryQuantity) : null;
+  const parsedLowStockThreshold = lowStockThreshold !== '' ? Number(lowStockThreshold) : null;
+  const inventoryQuantityInvalid =
+    inventoryTrackingEnabled &&
+    (parsedInventoryQuantity === null || !Number.isInteger(parsedInventoryQuantity) || parsedInventoryQuantity < 0);
+  const lowStockThresholdInvalid =
+    inventoryTrackingEnabled &&
+    parsedLowStockThreshold !== null &&
+    (!Number.isInteger(parsedLowStockThreshold) ||
+      parsedLowStockThreshold < 0 ||
+      (parsedInventoryQuantity !== null && parsedLowStockThreshold > parsedInventoryQuantity));
+  const aiEnabled = aiStatus?.aiEnabled ?? false;
 
   // Update form when existing item data loads
   useEffect(() => {
@@ -116,6 +203,19 @@ export const MenuItemFormPage = () => {
       setValidStartTime(existingItem.validStartTime || '');
       setValidEndTime(existingItem.validEndTime || '');
       setValidDays(existingItem.validDays || '');
+      setIsAvailable(existingItem.isAvailable ?? true);
+      setInventoryTrackingEnabled(existingItem.inventoryTrackingEnabled ?? false);
+      setInventoryQuantity(
+        existingItem.inventoryQuantity !== null && existingItem.inventoryQuantity !== undefined
+          ? String(existingItem.inventoryQuantity)
+          : '',
+      );
+      setLowStockThreshold(
+        existingItem.lowStockThreshold !== null && existingItem.lowStockThreshold !== undefined
+          ? String(existingItem.lowStockThreshold)
+          : '',
+      );
+      setAllowBackorder(existingItem.allowBackorder ?? false);
       
       // Set existing images if available
       if (existingItem.images && existingItem.images.length > 0) {
@@ -134,6 +234,10 @@ export const MenuItemFormPage = () => {
 
   const onSubmit = async (data: MenuItemFormData) => {
     try {
+      if (inventoryQuantityInvalid || lowStockThresholdInvalid) {
+        return;
+      }
+
       const itemData: CreateMenuItemData | UpdateMenuItemData = {
         name: data.name,
         price: data.price,
@@ -150,6 +254,11 @@ export const MenuItemFormPage = () => {
         validStartTime: validStartTime || null,
         validEndTime: validEndTime || null,
         validDays: validDays || null,
+        isAvailable,
+        inventoryTrackingEnabled,
+        inventoryQuantity: inventoryTrackingEnabled && inventoryQuantity !== '' ? parseInt(inventoryQuantity, 10) : null,
+        lowStockThreshold: inventoryTrackingEnabled && lowStockThreshold !== '' ? parseInt(lowStockThreshold, 10) : null,
+        allowBackorder: inventoryTrackingEnabled ? allowBackorder : false,
       };
 
       if (isEditing && itemId) {
@@ -164,6 +273,76 @@ export const MenuItemFormPage = () => {
       navigate(PATHS.MERCHANT_MENU);
     } catch {
       // Error handling is done in the mutation hooks
+    }
+  };
+
+  const applyInventoryAiSuggestion = (suggestion: InventoryAiSuggestion) => {
+    setIsAvailable(suggestion.isAvailable);
+    setInventoryTrackingEnabled(suggestion.inventoryTrackingEnabled);
+    setInventoryQuantity(String(suggestion.inventoryQuantity));
+    setLowStockThreshold(String(suggestion.lowStockThreshold));
+    setAllowBackorder(suggestion.allowBackorder);
+    setValue('isAvailable', suggestion.isAvailable);
+    setValue('inventoryTrackingEnabled', suggestion.inventoryTrackingEnabled);
+    setValue('inventoryQuantity', suggestion.inventoryQuantity);
+    setValue('lowStockThreshold', suggestion.lowStockThreshold);
+    setValue('allowBackorder', suggestion.allowBackorder);
+  };
+
+  const handleGenerateInventoryWithAi = async () => {
+    const itemName = watch('name')?.trim();
+    const itemCategory = watchedValues.category?.trim();
+
+    if (!itemName || !itemCategory) {
+      toast({
+        title: 'Add the basics first',
+        description: 'Enter at least the item name and category so AI can suggest sensible inventory settings.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const prompt = [
+      'You are helping a merchant choose starting inventory settings for one menu item.',
+      'Return ONLY valid JSON with this exact shape:',
+      '{"isAvailable":true,"inventoryTrackingEnabled":true,"inventoryQuantity":24,"lowStockThreshold":5,"allowBackorder":false,"rationale":"...","tips":["...","..."]}',
+      'Rules:',
+      '- inventoryQuantity must be a non-negative integer',
+      '- lowStockThreshold must be a non-negative integer and less than or equal to inventoryQuantity',
+      '- prefer inventoryTrackingEnabled=true for food or limited items',
+      '- prefer allowBackorder=false unless there is a strong reason otherwise',
+      '- keep rationale under 160 characters',
+      '- max 3 short tips',
+      `Item name: ${itemName}`,
+      `Category: ${itemCategory}`,
+      `Price: ${watchedValues.price || 0}`,
+      `Description: ${watchedValues.description || 'N/A'}`,
+      `Deal type: ${selectedDealType || 'STANDARD'}`,
+      `Existing quantity: ${inventoryQuantity || 'none'}`,
+      `Existing threshold: ${lowStockThreshold || 'none'}`,
+    ].join('\n');
+
+    try {
+      const result = await aiChat.mutateAsync({ message: prompt });
+      const suggestion = parseInventoryAiSuggestion(result.reply);
+
+      if (!suggestion) {
+        throw new Error('AI returned an unexpected format.');
+      }
+
+      setInventoryAiSuggestion(suggestion);
+      applyInventoryAiSuggestion(suggestion);
+      toast({
+        title: 'AI inventory suggestion ready',
+        description: 'We filled the inventory settings. Review them before saving.',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Something went wrong while talking to AI.';
+      toast({
+        title: 'Could not generate inventory suggestion',
+        description: message,
+        variant: 'destructive',
+      });
     }
   };
 
@@ -305,6 +484,208 @@ export const MenuItemFormPage = () => {
               <p className="text-xs text-neutral-500">
                 Upload up to 5 images to showcase your menu item. Supported formats: JPG, PNG, WebP.
               </p>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="font-semibold text-neutral-900">Availability & Inventory</h3>
+                  <p className="mt-1 text-sm text-neutral-600">
+                    Control whether this item is available and optionally track stock levels.
+                  </p>
+                </div>
+                <span
+                  className={cn(
+                    'rounded-full px-3 py-1 text-xs font-semibold',
+                    !isAvailable
+                      ? 'bg-red-100 text-red-700'
+                      : inventoryTrackingEnabled && parsedInventoryQuantity !== null && parsedInventoryQuantity <= 0 && !allowBackorder
+                        ? 'bg-red-100 text-red-700'
+                        : inventoryTrackingEnabled &&
+                            parsedInventoryQuantity !== null &&
+                            parsedLowStockThreshold !== null &&
+                            parsedInventoryQuantity <= parsedLowStockThreshold
+                          ? 'bg-amber-100 text-amber-700'
+                          : inventoryTrackingEnabled
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-slate-100 text-slate-700'
+                  )}
+                >
+                  {!isAvailable
+                    ? 'Out of Stock'
+                    : inventoryTrackingEnabled
+                      ? 'Tracked'
+                      : 'Untracked'}
+                </span>
+              </div>
+
+              {aiEnabled && (
+                <div className="rounded-xl border border-[#f0ddd0] bg-[linear-gradient(135deg,#fff8f2_0%,#fff1e5_100%)] p-4 shadow-[0_12px_30px_rgba(82,58,40,0.06)]">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex items-start gap-3">
+                      <div className="rounded-full bg-white/80 p-2 text-[#bf6545]">
+                        <Wand2 className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-[#203247]">AI Inventory Assistant</p>
+                        <p className="mt-1 text-sm text-[#607084]">
+                          Suggest a starting quantity, low-stock threshold, and backorder rule from this item&apos;s details.
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={handleGenerateInventoryWithAi}
+                      disabled={aiChat.isPending}
+                      className="shrink-0 border-[#ead6c9] bg-white/80 text-[#203247] hover:bg-white"
+                    >
+                      {aiChat.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Thinking...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="mr-2 h-4 w-4" />
+                          Suggest Inventory
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {inventoryAiSuggestion && (
+                    <div className="mt-4 rounded-lg border border-white/80 bg-white/85 p-4">
+                      <div className="flex items-start gap-2 text-[#203247]">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
+                        <div>
+                          <p className="text-sm font-semibold">AI recommendation applied</p>
+                          <p className="mt-1 text-sm text-[#607084]">{inventoryAiSuggestion.rationale}</p>
+                        </div>
+                      </div>
+                      {inventoryAiSuggestion.tips && inventoryAiSuggestion.tips.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {inventoryAiSuggestion.tips.map((tip, index) => (
+                            <span
+                              key={`${tip}-${index}`}
+                              className="rounded-full bg-[#f7ede5] px-3 py-1 text-xs font-medium text-[#7b5c49]"
+                            >
+                              {tip}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isAvailable"
+                  checked={isAvailable}
+                  onChange={(e) => {
+                    setIsAvailable(e.target.checked);
+                    setValue('isAvailable', e.target.checked);
+                  }}
+                  className="h-4 w-4 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                />
+                <Label htmlFor="isAvailable" className="font-medium text-neutral-800">
+                  Item is available to customers
+                </Label>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="inventoryTrackingEnabled"
+                  checked={inventoryTrackingEnabled}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setInventoryTrackingEnabled(checked);
+                    setValue('inventoryTrackingEnabled', checked);
+                    if (!checked) {
+                      setInventoryQuantity('');
+                      setLowStockThreshold('');
+                      setAllowBackorder(false);
+                      setValue('inventoryQuantity', null);
+                      setValue('lowStockThreshold', null);
+                      setValue('allowBackorder', false);
+                    }
+                  }}
+                  className="h-4 w-4 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                />
+                <Label htmlFor="inventoryTrackingEnabled" className="font-medium text-neutral-800">
+                  Track inventory quantity
+                </Label>
+              </div>
+
+              {inventoryTrackingEnabled && (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="inventoryQuantity">Current Quantity *</Label>
+                    <Input
+                      id="inventoryQuantity"
+                      type="number"
+                      min="0"
+                      step="1"
+                      placeholder="e.g., 24"
+                      value={inventoryQuantity}
+                      onChange={(e) => {
+                        setInventoryQuantity(e.target.value);
+                        setValue('inventoryQuantity', e.target.value ? parseInt(e.target.value, 10) : null);
+                      }}
+                      className={cn(inventoryQuantityInvalid && 'border-red-500')}
+                    />
+                    {inventoryQuantityInvalid && (
+                      <p className="text-sm text-red-600 flex items-center gap-1">
+                        <AlertCircle className="h-4 w-4" />
+                        Enter a non-negative whole number.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="lowStockThreshold">Low Stock Threshold</Label>
+                    <Input
+                      id="lowStockThreshold"
+                      type="number"
+                      min="0"
+                      step="1"
+                      placeholder="e.g., 5"
+                      value={lowStockThreshold}
+                      onChange={(e) => {
+                        setLowStockThreshold(e.target.value);
+                        setValue('lowStockThreshold', e.target.value ? parseInt(e.target.value, 10) : null);
+                      }}
+                      className={cn(lowStockThresholdInvalid && 'border-red-500')}
+                    />
+                    {lowStockThresholdInvalid && (
+                      <p className="text-sm text-red-600 flex items-center gap-1">
+                        <AlertCircle className="h-4 w-4" />
+                        Threshold must be a non-negative whole number and cannot exceed current quantity.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="sm:col-span-2 flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="allowBackorder"
+                      checked={allowBackorder}
+                      onChange={(e) => {
+                        setAllowBackorder(e.target.checked);
+                        setValue('allowBackorder', e.target.checked);
+                      }}
+                      className="h-4 w-4 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                    />
+                    <Label htmlFor="allowBackorder" className="font-medium text-neutral-800">
+                      Allow item to stay visible when quantity reaches 0
+                    </Label>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -505,7 +886,13 @@ export const MenuItemFormPage = () => {
         <div className="flex items-center gap-4">
           <Button
             type="submit"
-            disabled={isSubmitting || createMenuItemMutation.isPending || updateMenuItemMutation.isPending}
+            disabled={
+              isSubmitting ||
+              createMenuItemMutation.isPending ||
+              updateMenuItemMutation.isPending ||
+              inventoryQuantityInvalid ||
+              lowStockThresholdInvalid
+            }
             className="flex-1"
           >
             {(isSubmitting || createMenuItemMutation.isPending || updateMenuItemMutation.isPending) ? (

@@ -14,6 +14,29 @@ import {
 } from 'lucide-react';
 import { useModal } from '@/context/ModalContext';
 import { useDeleteMenuItem } from '@/hooks/useMerchantMenu';
+import { cn } from '@/lib/utils';
+
+const getInventoryTone = (item: MenuItem) => {
+  switch (item.inventoryStatus) {
+    case 'OUT_OF_STOCK':
+      return 'bg-red-100 text-red-700';
+    case 'LOW_STOCK':
+      return 'bg-amber-100 text-amber-700';
+    case 'IN_STOCK':
+      return 'bg-emerald-100 text-emerald-700';
+    default:
+      return 'bg-slate-100 text-slate-700';
+  }
+};
+
+const getInventoryLabel = (item: MenuItem) => {
+  if (item.inventoryStatus === 'UNTRACKED') return 'Untracked';
+  if (item.inventoryStatus === 'OUT_OF_STOCK') return 'Out of Stock';
+  if (item.inventoryStatus === 'LOW_STOCK') {
+    return item.inventoryQuantity != null ? `Low Stock: ${item.inventoryQuantity}` : 'Low Stock';
+  }
+  return item.inventoryQuantity != null ? `${item.inventoryQuantity} in stock` : 'In Stock';
+};
 
 const ImageGallery = ({ images }: { images: MenuItem['images'] }) => {
   if (!images || images.length === 0) {
@@ -139,6 +162,9 @@ const MenuItemDetailCard = ({ item, onEdit, onDelete }: {
           <span className="rounded-full bg-neutral-100 px-3 py-1 text-sm font-medium text-neutral-700">
             {item.category}
           </span>
+          <span className={cn('rounded-full px-3 py-1 text-sm font-medium', getInventoryTone(item))}>
+            {getInventoryLabel(item)}
+          </span>
           <div className="flex items-center gap-1 text-2xl font-bold text-green-600">
             <DollarSign className="h-5 w-5" />
             {item.price.toFixed(2)}
@@ -170,6 +196,12 @@ const MenuItemDetailCard = ({ item, onEdit, onDelete }: {
               <h4 className="font-medium text-neutral-900 mb-1">Category</h4>
               <p className="text-sm text-neutral-600">{item.category}</p>
             </div>
+            <div>
+              <h4 className="font-medium text-neutral-900 mb-1">Availability</h4>
+              <p className="text-sm text-neutral-600">
+                {item.isAvailable ? 'Visible to customers' : 'Hidden from customers'}
+              </p>
+            </div>
           </div>
           
           <div className="space-y-4">
@@ -180,6 +212,14 @@ const MenuItemDetailCard = ({ item, onEdit, onDelete }: {
             <div>
               <h4 className="font-medium text-neutral-900 mb-1">Last Updated</h4>
               <p className="text-sm text-neutral-600">{formatDate(item.updatedAt)}</p>
+            </div>
+            <div>
+              <h4 className="font-medium text-neutral-900 mb-1">Inventory Settings</h4>
+              <p className="text-sm text-neutral-600">
+                {item.inventoryTrackingEnabled
+                  ? `Tracked quantity${item.lowStockThreshold != null ? `, low stock at ${item.lowStockThreshold}` : ''}${item.allowBackorder ? ', backorders allowed' : ''}`
+                  : 'Inventory tracking is off'}
+              </p>
             </div>
           </div>
         </div>

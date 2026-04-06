@@ -113,9 +113,9 @@ export const BulkMenuUpload: React.FC<BulkMenuUploadProps> = ({ isOpen, onClose 
 
   const downloadTemplate = () => {
     const csvContent = [
-      'name,price,category,description,isAvailable,imageUrl,preparationTime,calories,allergens,dietaryInfo,ingredients',
-      'Margherita Pizza,15.99,Pizza,Classic tomato and mozzarella,true,https://example.com/pizza.jpg,20,300,"gluten,dairy","vegetarian","tomato,mozzarella,basil"',
-      'Caesar Salad,12.50,Salad,Fresh romaine with caesar dressing,true,https://example.com/salad.jpg,10,200,"dairy","vegetarian","romaine,parmesan,croutons"'
+      'name,price,category,description,isAvailable,inventoryTrackingEnabled,inventoryQuantity,lowStockThreshold,allowBackorder,imageUrl,preparationTime,calories,allergens,dietaryInfo,ingredients',
+      'Margherita Pizza,15.99,Pizza,Classic tomato and mozzarella,true,true,24,5,false,https://example.com/pizza.jpg,20,300,"gluten,dairy","vegetarian","tomato,mozzarella,basil"',
+      'Caesar Salad,12.50,Salad,Fresh romaine with caesar dressing,true,false,,,false,https://example.com/salad.jpg,10,200,"dairy","vegetarian","romaine,parmesan,croutons"'
     ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -156,6 +156,9 @@ export const BulkMenuUpload: React.FC<BulkMenuUploadProps> = ({ isOpen, onClose 
                 />
                 <p className="mt-1 text-sm text-neutral-500">
                   Supported formats: CSV, Excel (.xlsx, .xls)
+                </p>
+                <p className="mt-1 text-xs text-neutral-500">
+                  Inventory columns supported: <code>isAvailable</code>, <code>inventoryTrackingEnabled</code>, <code>inventoryQuantity</code>, <code>lowStockThreshold</code>, and <code>allowBackorder</code>.
                 </p>
               </div>
 

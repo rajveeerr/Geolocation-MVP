@@ -149,6 +149,13 @@ class ApiClient {
     });
   }
 
+  public patch<T, U>(endpoint: string, payload: U): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  }
+
   public delete<T>(endpoint: string): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { method: 'DELETE' });
   }
@@ -160,5 +167,6 @@ export const apiGet = api.get.bind(api);
 export const apiPost = api.post.bind(api);
 export const apiPostFormData = api.postFormData.bind(api);
 export const apiPut = api.put.bind(api);
+export const apiPatch = api.patch.bind(api);
 export const apiDelete = api.delete.bind(api);
 export { api };
