@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   Utensils,
   Clock,
   Sparkles,
   LayoutGrid,
+  Boxes,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -76,6 +77,22 @@ const MenuManagementPageV2: React.FC = () => {
       ? `Food Truck — ${selectedStore.city?.name ?? selectedStore.address}`
       : selectedStore.address
     : `All Stores (${storesData?.total ?? stores.length})`;
+
+  const inventoryStats = useMemo(() => {
+    return collections.reduce(
+      (acc, collection) => {
+        for (const item of collection.items ?? []) {
+          const status = item.menuItem?.inventoryStatus;
+          if (status === 'IN_STOCK') acc.inStock += 1;
+          if (status === 'LOW_STOCK') acc.lowStock += 1;
+          if (status === 'OUT_OF_STOCK') acc.outOfStock += 1;
+          if (status === 'UNTRACKED') acc.untracked += 1;
+        }
+        return acc;
+      },
+      { inStock: 0, lowStock: 0, outOfStock: 0, untracked: 0 },
+    );
+  }, [collections]);
 
   // --- Handlers ---
   const handleTemplateClick = useCallback((template: MenuTemplate) => {
@@ -172,6 +189,31 @@ const MenuManagementPageV2: React.FC = () => {
       </div>
 
       {/* Tab content — always a two-column grid */}
+      <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-4">
+        <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">In Stock</p>
+          <p className="mt-2 text-2xl font-bold text-emerald-600">{inventoryStats.inStock}</p>
+        </div>
+        <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">Low Stock</p>
+          <p className="mt-2 text-2xl font-bold text-amber-600">{inventoryStats.lowStock}</p>
+        </div>
+        <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">Out Of Stock</p>
+          <p className="mt-2 text-2xl font-bold text-red-600">{inventoryStats.outOfStock}</p>
+        </div>
+        <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">Inventory Coverage</p>
+              <p className="mt-2 text-2xl font-bold text-neutral-900">{collections.length}</p>
+              <p className="mt-1 text-xs text-neutral-500">{inventoryStats.untracked} untracked items in these menus</p>
+            </div>
+            <Boxes className="h-8 w-8 text-brand" />
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left column: Create section */}
         <div className="space-y-4">
