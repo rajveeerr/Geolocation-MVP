@@ -94,6 +94,89 @@ const parseInventoryAiSuggestion = (reply: string): InventoryAiSuggestion | null
   return null;
 };
 
+const hourOptions = Array.from({ length: 12 }, (_, index) => String(index + 1));
+const minuteOptions = ['00', '15', '30', '45'];
+
+const to12HourParts = (value: string) => {
+  if (!value || !/^\d{2}:\d{2}$/.test(value)) {
+    return { hour: '', minute: '00', period: 'AM' as 'AM' | 'PM' };
+  }
+
+  const [hourString, minute] = value.split(':');
+  const hour24 = Number(hourString);
+  const period = hour24 >= 12 ? 'PM' : 'AM';
+  const normalizedHour = hour24 % 12 || 12;
+
+  return { hour: String(normalizedHour), minute, period };
+};
+
+const from12HourParts = (hour: string, minute: string, period: 'AM' | 'PM') => {
+  if (!hour) return '';
+
+  const hourNumber = Number(hour);
+  if (!Number.isFinite(hourNumber)) return '';
+
+  let hour24 = hourNumber % 12;
+  if (period === 'PM') hour24 += 12;
+
+  return `${String(hour24).padStart(2, '0')}:${minute}`;
+};
+
+const TwelveHourTimeField = ({
+  id,
+  label,
+  value,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) => {
+  const parts = to12HourParts(value);
+
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={id}>{label}</Label>
+      <div className="grid grid-cols-[1fr_auto_1fr_1fr] items-center gap-2 rounded-md border border-neutral-300 bg-white px-3 py-2">
+        <select
+          id={id}
+          value={parts.hour}
+          onChange={(e) => onChange(from12HourParts(e.target.value, parts.minute, parts.period))}
+          className="bg-transparent text-sm text-neutral-900 outline-none"
+        >
+          <option value="">Hour</option>
+          {hourOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+        <span className="text-neutral-400">:</span>
+        <select
+          value={parts.minute}
+          onChange={(e) => onChange(from12HourParts(parts.hour, e.target.value, parts.period))}
+          className="bg-transparent text-sm text-neutral-900 outline-none"
+        >
+          {minuteOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+        <select
+          value={parts.period}
+          onChange={(e) => onChange(from12HourParts(parts.hour, parts.minute, e.target.value as 'AM' | 'PM'))}
+          className="bg-transparent text-sm font-medium text-neutral-900 outline-none"
+        >
+          <option value="AM">AM</option>
+          <option value="PM">PM</option>
+        </select>
+      </div>
+    </div>
+  );
+};
+
 export const MenuItemFormPage = () => {
   const navigate = useNavigate();
   const { itemId } = useParams();
@@ -801,22 +884,17 @@ export const MenuItemFormPage = () => {
                 </div>
                 {isSurprise && (
                   <div className="space-y-2">
-                    <Label htmlFor="surpriseRevealTime">Reveal Time (24-hour format)</Label>
-                    <div className="relative">
-                      <Clock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
-                      <Input
-                        id="surpriseRevealTime"
-                        type="time"
-                        value={surpriseRevealTime}
-                        onChange={(e) => {
-                          setSurpriseRevealTime(e.target.value);
-                          setValue('surpriseRevealTime', e.target.value || null);
-                        }}
-                        className="pl-10"
-                      />
-                    </div>
+                    <TwelveHourTimeField
+                      id="surpriseRevealTime"
+                      label="Reveal Time"
+                      value={surpriseRevealTime}
+                      onChange={(nextValue) => {
+                        setSurpriseRevealTime(nextValue);
+                        setValue('surpriseRevealTime', nextValue || null);
+                      }}
+                    />
                     <p className="text-xs text-purple-700">
-                      When customers can see this surprise deal (e.g., 17:00 for 5 PM)
+                      When customers can see this surprise deal in 12-hour format.
                     </p>
                   </div>
                 )}
@@ -831,30 +909,24 @@ export const MenuItemFormPage = () => {
                   Time Restrictions (Optional)
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="validStartTime">Start Time</Label>
-                    <Input
-                      id="validStartTime"
-                      type="time"
-                      value={validStartTime}
-                      onChange={(e) => {
-                        setValidStartTime(e.target.value);
-                        setValue('validStartTime', e.target.value || null);
-                      }}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="validEndTime">End Time</Label>
-                    <Input
-                      id="validEndTime"
-                      type="time"
-                      value={validEndTime}
-                      onChange={(e) => {
-                        setValidEndTime(e.target.value);
-                        setValue('validEndTime', e.target.value || null);
-                      }}
-                    />
-                  </div>
+                  <TwelveHourTimeField
+                    id="validStartTime"
+                    label="Start Time"
+                    value={validStartTime}
+                    onChange={(nextValue) => {
+                      setValidStartTime(nextValue);
+                      setValue('validStartTime', nextValue || null);
+                    }}
+                  />
+                  <TwelveHourTimeField
+                    id="validEndTime"
+                    label="End Time"
+                    value={validEndTime}
+                    onChange={(nextValue) => {
+                      setValidEndTime(nextValue);
+                      setValue('validEndTime', nextValue || null);
+                    }}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="validDays">Valid Days (Optional)</Label>
