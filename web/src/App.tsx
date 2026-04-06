@@ -36,6 +36,11 @@ const MerchantDashboardPage = React.lazy(() =>
     default: m.MerchantDashboardPage,
   })),
 );
+const MerchantBusinessPage = React.lazy(() =>
+  import('./pages/merchant/MerchantBusinessPage').then((m) => ({
+    default: m.MerchantBusinessPage,
+  })),
+);
 const MerchantAnalyticsPage = React.lazy(() =>
   import('./pages/merchant/MerchantAnalyticsPage').then((m) => ({
     default: m.MerchantAnalyticsPage,
@@ -471,6 +476,18 @@ function App() {
                   <Route path={PATHS.PAYMENT_CANCEL} element={<PaymentCancelPage />} />
                 </Route>
 
+                <Route
+                  path={PATHS.MERCHANT_BUSINESS}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantBusinessPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
                 <Route
                   path={PATHS.MERCHANT_DASHBOARD}
                   element={

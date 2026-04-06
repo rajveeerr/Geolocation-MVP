@@ -111,6 +111,13 @@ export const DealBasicsStep = () => {
     }
   };
 
+  const fieldShell =
+    'rounded-[1.75rem] border border-white/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(255,248,242,0.92))] p-5 shadow-[0_18px_50px_rgba(82,58,40,0.08)] sm:p-6';
+  const validationTone = (isValid: boolean) =>
+    isValid
+      ? 'border-emerald-200 bg-emerald-50/90 text-emerald-700'
+      : 'border-rose-200 bg-rose-50/90 text-rose-700';
+
   return (
     <OnboardingStepLayout
       title="Describe your deal"
@@ -134,20 +141,59 @@ export const DealBasicsStep = () => {
       isNextDisabled={!isFormValid}
       progress={25}
     >
-      <div className="space-y-8">
+      <div className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]"
+        >
+          <div className="rounded-[1.9rem] border border-[#f0ddd0] bg-[linear-gradient(135deg,#fff8f2_0%,#fff1e5_52%,#fde7df_100%)] p-6 shadow-[0_22px_60px_rgba(82,58,40,0.10)]">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/75 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#bf6545]">
+              <Sparkles className="h-3.5 w-3.5" />
+              Deal Identity
+            </div>
+            <h2 className="mt-4 font-serif text-[1.9rem] font-semibold tracking-tight text-[#203247]">
+              Build a deal that feels polished before anyone sees the price.
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-[#607084]">
+              Start with the headline, category, and story. This is the part customers notice first, so the form now leads with clarity instead of a plain input stack.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+            <div className="rounded-[1.5rem] border border-white/80 bg-white/82 p-4 shadow-[0_14px_38px_rgba(82,58,40,0.06)]">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#95a1af]">This Step</div>
+              <div className="mt-2 text-base font-semibold text-[#203247]">Offer basics</div>
+              <div className="mt-1 text-sm leading-6 text-[#6f7d8f]">Name it well, classify it cleanly, and explain why it matters.</div>
+            </div>
+            <div className="rounded-[1.5rem] border border-white/80 bg-[#203247] p-4 shadow-[0_14px_38px_rgba(32,50,71,0.20)]">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/55">Momentum</div>
+              <div className="mt-2 text-base font-semibold text-white">Strong titles convert better</div>
+              <div className="mt-1 text-sm leading-6 text-white/72">Use a clear offer and concrete value so customers instantly know what they get.</div>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Deal Title Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-4"
+          className={fieldShell}
         >
-          <div className="flex items-center gap-2">
-            <Tag className="h-5 w-5 text-brand-primary-600" />
-            <Label htmlFor="title" className="text-lg font-semibold text-neutral-900">
-              Deal Title
-            </Label>
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[#fff0e8] text-[#ff7a59]">
+              <Tag className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#97a2b1]">
+                Headline
+              </div>
+              <Label htmlFor="title" className="mt-1 block text-xl font-semibold text-[#203247]">
+                Deal Title
+              </Label>
+            </div>
           </div>
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm leading-7 text-[#607084]">
             Make it catchy and clear. A great title increases engagement by 40%.
           </p>
 
@@ -163,11 +209,11 @@ export const DealBasicsStep = () => {
                 })
               }
               placeholder="e.g., 2-for-1 Tacos, Happy Hour Special"
-              className={`h-12 text-base transition-all ${state.title && !titleValidation.isValid
-                ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
+              className={`h-14 rounded-[1.2rem] border bg-white/90 px-4 text-base text-[#203247] shadow-none placeholder:text-[#9aa5b3] transition-all focus-visible:ring-2 ${state.title && !titleValidation.isValid
+                ? 'border-rose-300 focus-visible:border-rose-500 focus-visible:ring-rose-500/20'
                 : state.title && titleValidation.isValid
-                  ? 'border-green-300 focus:border-green-500 focus:ring-green-500/20'
-                  : 'focus:ring-brand-primary-500/20'
+                  ? 'border-emerald-300 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20'
+                  : 'border-[#eaded2] focus-visible:border-[#ff8a66] focus-visible:ring-[#ff8a66]/20'
                 }`}
             />
             {state.title && (
@@ -192,10 +238,7 @@ export const DealBasicsStep = () => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className={`rounded-lg p-3 text-sm ${titleValidation.isValid
-                  ? 'bg-green-50 text-green-700 border border-green-200'
-                  : 'bg-red-50 text-red-700 border border-red-200'
-                  }`}
+                className={`rounded-[1.1rem] border p-3 text-sm ${validationTone(titleValidation.isValid)}`}
               >
                 <div className="flex items-center gap-2">
                   {titleValidation.isValid ? (
@@ -218,14 +261,14 @@ export const DealBasicsStep = () => {
             >
               <div className="flex items-center gap-2">
                 <Lightbulb className="h-4 w-4 text-amber-500" />
-                <span className="text-sm font-medium text-neutral-700">Suggested titles:</span>
+                <span className="text-sm font-medium text-[#5b6a7d]">Suggested titles:</span>
               </div>
               <div className="flex flex-wrap gap-2">
                 {getTitleSuggestions().map((suggestion, index) => (
                   <motion.button
                     key={index}
                     onClick={() => dispatch({ type: 'UPDATE_FIELD', field: 'title', value: suggestion })}
-                    className="rounded-full bg-neutral-100 px-3 py-1 text-sm text-neutral-600 hover:bg-brand-primary-100 hover:text-brand-primary-700 transition-colors"
+                    className="rounded-full border border-[#efd8ca] bg-white/90 px-3.5 py-1.5 text-sm text-[#5c6b7c] transition-colors hover:border-[#ffb08a] hover:bg-[#fff1e8] hover:text-[#bf6545]"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -242,15 +285,22 @@ export const DealBasicsStep = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="space-y-4"
+          className={fieldShell}
         >
-          <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-brand-primary-600" />
-            <Label htmlFor="category" className="text-lg font-semibold text-neutral-900">
-              Category
-            </Label>
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[#eef5fb] text-[#305f89]">
+              <FileText className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#97a2b1]">
+                Classification
+              </div>
+              <Label htmlFor="category" className="mt-1 block text-xl font-semibold text-[#203247]">
+                Category
+              </Label>
+            </div>
           </div>
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm leading-7 text-[#607084]">
             Choose the category that best represents your business.
           </p>
 
@@ -269,20 +319,27 @@ export const DealBasicsStep = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="space-y-4"
+          className={fieldShell}
         >
-          <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-brand-primary-600" />
-            <Label htmlFor="description" className="text-lg font-semibold text-neutral-900">
-              Description
-            </Label>
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[#fff3dd] text-[#cb8a1a]">
+              <FileText className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#97a2b1]">
+                Story
+              </div>
+              <Label htmlFor="description" className="mt-1 block text-xl font-semibold text-[#203247]">
+                Description
+              </Label>
+            </div>
           </div>
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm leading-7 text-[#607084]">
             Provide details about what's included. Be specific to attract the right customers.
           </p>
 
           {/* Description + inline AI bar */}
-          <div className="overflow-hidden rounded-xl border border-neutral-200 focus-within:border-brand-primary-400 focus-within:ring-1 focus-within:ring-brand-primary-200 transition-colors">
+          <div className="overflow-hidden rounded-[1.35rem] border border-[#eaded2] bg-white/92 transition-colors focus-within:border-[#ff8a66] focus-within:ring-2 focus-within:ring-[#ff8a66]/15">
             <Textarea
               id="description"
               value={state.description}
@@ -294,39 +351,34 @@ export const DealBasicsStep = () => {
                 })
               }
               placeholder="Describe what customers get, any restrictions, and what makes this deal special..."
-              className={`min-h-[120px] text-base resize-none rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 ${state.description && !descriptionValidation.isValid
-                ? ''
-                : state.description && descriptionValidation.isValid
-                  ? ''
-                  : ''
-                }`}
+              className="min-h-[140px] resize-none rounded-none border-0 bg-transparent px-4 py-4 text-base text-[#203247] shadow-none placeholder:text-[#9aa5b3] focus-visible:ring-0 focus-visible:ring-offset-0"
             />
             {/* Inline AI bar */}
-            <div className="border-t border-neutral-200 bg-neutral-50">
+            <div className="border-t border-[#f0e5da] bg-[linear-gradient(180deg,#fffaf6_0%,#fff4ec_100%)]">
               {!showAiBar ? (
                 <button
                   type="button"
                   onClick={() => setShowAiBar(true)}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-xs text-neutral-500 hover:bg-neutral-100 transition-colors"
+                  className="flex w-full items-center gap-2 px-4 py-3 text-xs text-[#6b7a8c] transition-colors hover:bg-[#fff1e8]"
                 >
-                  <Sparkles className="h-3.5 w-3.5 text-brand-primary-500" />
+                  <Sparkles className="h-3.5 w-3.5 text-[#ff7a59]" />
                   <span>Describe your idea and let AI draft it...</span>
                 </button>
               ) : (
-                <div className="flex items-center gap-2 px-3 py-2">
-                  <Sparkles className="h-4 w-4 shrink-0 text-brand-primary-500" />
+                <div className="flex items-center gap-2 px-4 py-3">
+                  <Sparkles className="h-4 w-4 shrink-0 text-[#ff7a59]" />
                   <input
                     value={aiIntent}
                     onChange={(e) => setAiIntent(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleGenerateWithAi(); } }}
                     placeholder="e.g. Happy hour, half price cocktails, 5pm to 8pm on weekdays"
-                    className="min-w-0 flex-1 bg-transparent text-sm text-neutral-800 placeholder:text-neutral-400 outline-none"
+                    className="min-w-0 flex-1 bg-transparent text-sm text-[#203247] outline-none placeholder:text-[#97a3b4]"
                     autoFocus
                   />
                   <button
                     type="button"
                     onClick={() => { setShowAiBar(false); setAiIntent(''); }}
-                    className="shrink-0 text-sm font-medium text-neutral-500 hover:text-neutral-700"
+                    className="shrink-0 text-sm font-medium text-[#7a8798] hover:text-[#203247]"
                   >
                     Cancel
                   </button>
@@ -334,7 +386,7 @@ export const DealBasicsStep = () => {
                     type="button"
                     onClick={handleGenerateWithAi}
                     disabled={aiDealMutation.isPending}
-                    className="shrink-0 rounded-full bg-neutral-200 px-3 py-1 text-sm font-medium text-neutral-700 hover:bg-neutral-300 disabled:opacity-60 transition-colors"
+                    className="shrink-0 rounded-full bg-[#203247] px-3.5 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#17263a] disabled:opacity-60"
                   >
                     {aiDealMutation.isPending ? (
                       <span className="flex items-center gap-1">
@@ -365,11 +417,11 @@ export const DealBasicsStep = () => {
 
           {/* Character count */}
           <div className="flex justify-between items-center text-sm">
-            <span className={`${descriptionValidation.isValid ? 'text-green-600' : 'text-red-600'}`}>
+            <span className={`${descriptionValidation.isValid ? 'text-emerald-600' : 'text-rose-600'}`}>
               {state.description.length}/1000 characters
             </span>
             {state.description && (
-              <span className="text-neutral-500">
+              <span className="text-[#7a8798]">
                 {descriptionValidation.isValid ? 'Perfect!' : 'Keep going...'}
               </span>
             )}
@@ -382,10 +434,7 @@ export const DealBasicsStep = () => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className={`rounded-lg p-3 text-sm ${descriptionValidation.isValid
-                  ? 'bg-green-50 text-green-700 border border-green-200'
-                  : 'bg-red-50 text-red-700 border border-red-200'
-                  }`}
+                className={`rounded-[1.1rem] border p-3 text-sm ${validationTone(descriptionValidation.isValid)}`}
               >
                 <div className="flex items-center gap-2">
                   {descriptionValidation.isValid ? (
@@ -405,21 +454,21 @@ export const DealBasicsStep = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="rounded-lg border border-neutral-200 bg-neutral-50 p-4"
+          className="rounded-[1.75rem] border border-[#eaded2] bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(244,248,252,0.86))] p-5 shadow-[0_16px_40px_rgba(82,58,40,0.06)]"
         >
           <button
             onClick={() => setShowTips(!showTips)}
             className="flex w-full items-center justify-between"
           >
             <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-brand-primary-600" />
-              <span className="font-medium text-neutral-900">Pro Tips for Better Deals</span>
+              <Sparkles className="h-5 w-5 text-[#ff7a59]" />
+              <span className="font-medium text-[#203247]">Pro Tips for Better Deals</span>
             </div>
             <motion.div
               animate={{ rotate: showTips ? 180 : 0 }}
               transition={{ duration: 0.2 }}
             >
-              <svg className="h-5 w-5 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-5 w-5 text-[#7a8798]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </motion.div>
@@ -436,22 +485,22 @@ export const DealBasicsStep = () => {
                 <div className="flex items-start gap-3">
                   <TrendingUp className="h-4 w-4 text-green-500 mt-1" />
                   <div>
-                    <div className="font-medium text-neutral-900">Use Numbers</div>
-                    <div className="text-sm text-neutral-600">"50% Off" or "2-for-1" are more compelling than "Big Discount"</div>
+                    <div className="font-medium text-[#203247]">Use Numbers</div>
+                    <div className="text-sm text-[#607084]">"50% Off" or "2-for-1" are more compelling than "Big Discount"</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Users className="h-4 w-4 text-blue-500 mt-1" />
                   <div>
-                    <div className="font-medium text-neutral-900">Be Specific</div>
-                    <div className="text-sm text-neutral-600">Include what's included, any restrictions, and expiration details</div>
+                    <div className="font-medium text-[#203247]">Be Specific</div>
+                    <div className="text-sm text-[#607084]">Include what's included, any restrictions, and expiration details</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Star className="h-4 w-4 text-amber-500 mt-1" />
                   <div>
-                    <div className="font-medium text-neutral-900">Create Urgency</div>
-                    <div className="text-sm text-neutral-600">Use words like "Limited Time" or "This Week Only"</div>
+                    <div className="font-medium text-[#203247]">Create Urgency</div>
+                    <div className="text-sm text-[#607084]">Use words like "Limited Time" or "This Week Only"</div>
                   </div>
                 </div>
               </motion.div>

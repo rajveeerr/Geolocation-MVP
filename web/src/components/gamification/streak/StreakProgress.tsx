@@ -7,7 +7,10 @@ export const StreakProgress = ({ streak }: { streak?: StreakInfo }) => {
   const current = Math.min(streak.currentStreak ?? 0, TOTAL_WEEKS);
 
   return (
-    <div className="flex items-center gap-2" aria-label={`Streak progress ${current} of ${TOTAL_WEEKS} weeks`}>
+    <div
+      className="flex flex-wrap items-center gap-3"
+      aria-label={`Streak progress ${current} of ${TOTAL_WEEKS} weeks`}
+    >
       {Array.from({ length: TOTAL_WEEKS }).map((_, i) => {
         const idx = i + 1;
         const filled = idx <= current;
@@ -15,10 +18,10 @@ export const StreakProgress = ({ streak }: { streak?: StreakInfo }) => {
           <div
             key={idx}
             className={
-              'h-7 w-7 rounded-full border flex items-center justify-center text-[11px] font-bold ' +
+              'flex h-11 w-11 items-center justify-center rounded-full border text-xs font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] transition-all duration-300 ' +
               (filled
-                ? 'bg-emerald-500 border-emerald-600 text-white shadow-sm'
-                : 'bg-neutral-100 border-neutral-200 text-neutral-400')
+                ? 'border-neutral-900 bg-neutral-900 text-white shadow-[0_14px_30px_rgba(15,23,42,0.18)]'
+                : 'border-black/10 bg-white/70 text-neutral-400 backdrop-blur')
             }
             title={`Week ${idx}${filled ? ' achieved' : ''}`}
           >
@@ -29,5 +32,3 @@ export const StreakProgress = ({ streak }: { streak?: StreakInfo }) => {
     </div>
   );
 };
-
-

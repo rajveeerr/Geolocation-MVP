@@ -70,12 +70,6 @@ const navSections: MerchantNavSection[] = [
         icon: CircleDollarSign,
         match: (pathname) => pathname.startsWith(PATHS.MERCHANT_KICKBACKS),
       },
-      {
-        label: 'Profile',
-        to: PATHS.PROFILE,
-        icon: UserCircle2,
-        match: (pathname) => pathname.startsWith(PATHS.PROFILE),
-      },
     ],
   },
   {
@@ -204,9 +198,26 @@ const navSections: MerchantNavSection[] = [
       },
     ],
   },
+  {
+    id: 'business',
+    label: 'My Business',
+    items: [
+      {
+        label: 'Business Profile',
+        to: PATHS.MERCHANT_BUSINESS,
+        icon: Building2,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_BUSINESS),
+      },
+    ],
+  },
 ];
 
 const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; subtitle: string }> = [
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_BUSINESS),
+    title: 'My Business',
+    subtitle: 'Review the identity, status, and core details behind your merchant account.',
+  },
   {
     match: (pathname) => pathname === PATHS.MERCHANT_DASHBOARD,
     title: 'Merchant Dashboard',
@@ -577,7 +588,7 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
                     <Menu className="h-5 w-5" />
                   </button>
 
-                  <Link to={PATHS.MERCHANT_DASHBOARD} className="hidden items-center gap-3 lg:flex">
+                  <Link to={PATHS.MERCHANT_DASHBOARD} className="flex min-w-0 items-center gap-3 lg:hidden">
                     <span className="flex h-10 w-10 items-center justify-center rounded-[1rem] bg-neutral-950 text-sm font-semibold text-white">
                       {merchantInitials}
                     </span>

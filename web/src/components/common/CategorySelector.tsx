@@ -7,6 +7,7 @@ interface CategorySelectorProps {
   value?: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  label?: string;
   className?: string;
   disabled?: boolean;
   required?: boolean;
@@ -18,6 +19,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
   value,
   onChange,
   placeholder = "Select a category",
+  label,
   className,
   disabled = false,
   required = false,
@@ -74,27 +76,34 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 
   return (
     <div className={cn("relative", className)} ref={dropdownRef}>
+      {label ? (
+        <label className="mb-2 block text-sm font-medium text-[#4c5b6d]">
+          {label}
+          {required ? <span className="ml-1 text-rose-500">*</span> : null}
+        </label>
+      ) : null}
+
       {/* Trigger Button */}
       <button
         type="button"
         onClick={handleToggle}
         disabled={disabled || isLoading}
         className={cn(
-          "w-full flex items-center justify-between rounded-lg border border-neutral-300 bg-white px-4 py-3 text-sm transition-colors",
-          "focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20",
+          "w-full flex items-center justify-between rounded-[1.35rem] border border-[#e7d9ca] bg-[linear-gradient(180deg,#ffffff_0%,#fff8f3_100%)] px-4 py-3.5 text-sm text-[#203247] shadow-[0_12px_28px_rgba(82,58,40,0.06)] transition-all duration-200",
+          "focus:border-[#ff8a66] focus:outline-none focus:ring-2 focus:ring-[#ff8a66]/20",
           "disabled:cursor-not-allowed disabled:bg-neutral-50 disabled:text-neutral-500",
           error && "border-red-500 focus:border-red-500 focus:ring-red-500/20",
-          isOpen && "border-brand-primary-500 ring-2 ring-brand-primary-500/20"
+          isOpen && "border-[#ff8a66] ring-2 ring-[#ff8a66]/20"
         )}
       >
         <div className="flex items-center gap-2 min-w-0 flex-1">
           {selectedCategory ? (
             <>
               <span className="text-base">{selectedCategory.icon}</span>
-              <span className="truncate">{selectedCategory.label}</span>
+              <span className="truncate font-medium">{selectedCategory.label}</span>
             </>
           ) : (
-            <span className="text-neutral-500 truncate">
+            <span className="truncate text-[#8a94a5]">
               {isLoading ? "Loading categories..." : placeholder}
             </span>
           )}
@@ -104,29 +113,26 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
           <Loader2 className="h-4 w-4 animate-spin text-neutral-400 flex-shrink-0" />
         ) : (
           <ChevronDown 
-            className={cn(
-              "h-4 w-4 text-neutral-400 flex-shrink-0 transition-transform",
-              isOpen && "rotate-180"
-            )} 
+            className={cn("h-4 w-4 flex-shrink-0 text-[#8a94a5] transition-transform", isOpen && "rotate-180")} 
           />
         )}
       </button>
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg max-h-60 overflow-hidden">
+        <div className="absolute z-50 mt-2 max-h-72 w-full overflow-hidden rounded-[1.35rem] border border-[#eaded2] bg-[rgba(255,250,246,0.98)] shadow-[0_24px_60px_rgba(82,58,40,0.16)] backdrop-blur-xl">
           {/* Search Input */}
           {searchable && (
-            <div className="p-2 border-b border-neutral-100">
+            <div className="border-b border-[#f0e5da] p-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#97a3b4]" />
                 <input
                   ref={searchRef}
                   type="text"
                   placeholder="Search categories..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20 focus:border-brand-primary-500"
+                  className="w-full rounded-2xl border border-[#eaded2] bg-white/90 py-2.5 pl-9 pr-3 text-sm text-[#203247] outline-none transition-all placeholder:text-[#97a3b4] focus:border-[#ff8a66] focus:ring-2 focus:ring-[#ff8a66]/15"
                 />
               </div>
             </div>
@@ -141,27 +147,27 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                   type="button"
                   onClick={() => handleSelect(category.value)}
                   className={cn(
-                    "w-full flex items-center gap-3 px-4 py-3 text-sm text-left transition-colors",
-                    "hover:bg-neutral-50 focus:bg-neutral-50 focus:outline-none",
-                    value === category.value && "bg-brand-primary-50 text-brand-primary-700"
+                    "w-full flex items-center gap-3 px-4 py-3 text-left text-sm transition-colors",
+                    "hover:bg-[#fff2ea] focus:bg-[#fff2ea] focus:outline-none",
+                    value === category.value && "bg-[#fff0e8] text-[#c35e3f]"
                   )}
                 >
                   <span className="text-base flex-shrink-0">{category.icon}</span>
                   <div className="min-w-0 flex-1">
-                    <div className="font-medium truncate">{category.label}</div>
+                    <div className="truncate font-medium">{category.label}</div>
                     {category.description && (
-                      <div className="text-xs text-neutral-500 truncate">
+                      <div className="truncate text-xs text-[#7a8798]">
                         {category.description}
                       </div>
                     )}
                   </div>
                   {value === category.value && (
-                    <Check className="h-4 w-4 text-brand-primary-600 flex-shrink-0" />
+                    <Check className="h-4 w-4 flex-shrink-0 text-[#ff7a59]" />
                   )}
                 </button>
               ))
             ) : (
-              <div className="px-4 py-3 text-sm text-neutral-500 text-center">
+              <div className="px-4 py-4 text-center text-sm text-[#7a8798]">
                 {searchTerm ? "No categories found" : "No categories available"}
               </div>
             )}
@@ -183,7 +189,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 
       {/* Selected category description */}
       {selectedCategory && selectedCategory.description && !isOpen && (
-        <p className="mt-1 text-xs text-neutral-500">
+        <p className="mt-2 text-xs leading-5 text-[#7a8798]">
           {selectedCategory.description}
         </p>
       )}

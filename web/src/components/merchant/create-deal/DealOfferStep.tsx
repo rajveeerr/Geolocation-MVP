@@ -56,12 +56,28 @@ export const DealOfferStep = () => {
   const navigate = useNavigate();
   const [showTips, setShowTips] = useState(false);
 
+  const setExclusiveOfferKind = (kind: 'percentage' | 'amount' | 'custom') => {
+    dispatch({ type: 'SET_STANDARD_OFFER_KIND', kind });
+
+    if (kind !== 'percentage' && state.discountPercentage !== null) {
+      dispatch({ type: 'UPDATE_FIELD', field: 'discountPercentage', value: null });
+    }
+
+    if (kind !== 'amount' && state.discountAmount !== null) {
+      dispatch({ type: 'UPDATE_FIELD', field: 'discountAmount', value: null });
+    }
+
+    if (kind !== 'custom' && state.customOfferDisplay) {
+      dispatch({ type: 'UPDATE_FIELD', field: 'customOfferDisplay', value: '' });
+    }
+  };
+
   // Real-time validation
   const percentageValidation = {
-    isValid: state.discountPercentage !== null && state.discountPercentage > 0 && state.discountPercentage <= 100,
+    isValid: state.discountPercentage !== null && state.discountPercentage > 0 && state.discountPercentage <= 60,
     message: state.discountPercentage === null ? 'Enter a percentage' :
              state.discountPercentage <= 0 ? 'Percentage must be greater than 0' :
-             state.discountPercentage > 100 ? 'Percentage cannot exceed 100%' :
+             state.discountPercentage > 60 ? 'Percentage cannot exceed 60%' :
              'Perfect!'
   };
 
@@ -188,9 +204,7 @@ export const DealOfferStep = () => {
             subtitle="A clear percent discount shown on the deal card"
             selected={state.standardOfferKind === 'percentage'}
             ariaPressed={state.standardOfferKind === 'percentage'}
-            onClick={() =>
-              dispatch({ type: 'SET_STANDARD_OFFER_KIND', kind: 'percentage' })
-            }
+            onClick={() => setExclusiveOfferKind('percentage')}
           />
           <OfferCard
             icon={<Minus className="h-6 w-6" />}
@@ -198,9 +212,7 @@ export const DealOfferStep = () => {
             subtitle="A dollar amount taken off — great for simple messaging"
             selected={state.standardOfferKind === 'amount'}
             ariaPressed={state.standardOfferKind === 'amount'}
-            onClick={() =>
-              dispatch({ type: 'SET_STANDARD_OFFER_KIND', kind: 'amount' })
-            }
+            onClick={() => setExclusiveOfferKind('amount')}
           />
           <OfferCard
             icon={<Sparkles className="h-6 w-6" />}
@@ -208,17 +220,14 @@ export const DealOfferStep = () => {
             subtitle="Create your own offer text like 'Buy 2 Get 1 Free'"
             selected={state.standardOfferKind === 'custom'}
             ariaPressed={state.standardOfferKind === 'custom'}
-            onClick={() =>
-              dispatch({ type: 'SET_STANDARD_OFFER_KIND', kind: 'custom' })
-            }
+            onClick={() => setExclusiveOfferKind('custom')}
           />
         </div>
 
         {/* Enhanced Input Sections with Validation */}
         <div className="space-y-10 max-w-4xl mx-auto">
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-2">
-            {(state.standardOfferKind === 'percentage' ||
-              state.discountPercentage !== null) && (
+            {state.standardOfferKind === 'percentage' && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -231,7 +240,7 @@ export const DealOfferStep = () => {
               </Label>
               </div>
               <p className="text-sm text-neutral-600">
-                Choose a percentage that's attractive but sustainable for your business.
+                Use the slider to fine-tune the discount, or pick a quick preset below.
               </p>
 
               <div className="space-y-4">
@@ -255,7 +264,7 @@ export const DealOfferStep = () => {
                       }
                     }}
                     min={1}
-                    max={100}
+                    max={60}
                     step={1}
                     suffix="%"
                     showEditButton={true}
@@ -297,7 +306,7 @@ export const DealOfferStep = () => {
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
-            {(state.dealType === 'REDEEM_NOW' ? [15, 30, 45, 50, 75] : [10, 20, 30, 50]).map((p) => (
+            {(state.dealType === 'REDEEM_NOW' ? [15, 30, 45, 50, 75] : [50, 60]).map((p) => (
                       <motion.button
                       key={p}
                       onClick={() =>
@@ -325,8 +334,7 @@ export const DealOfferStep = () => {
             </motion.div>
           )}
 
-          {(state.standardOfferKind === 'amount' ||
-            state.discountAmount !== null) && (
+          {state.standardOfferKind === 'amount' && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

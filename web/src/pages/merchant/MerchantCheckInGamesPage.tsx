@@ -32,6 +32,10 @@ const REWARD_TYPES: MerchantCheckInGameReward['rewardType'][] = [
   'COINS',
   'BONUS_POINTS',
 ];
+const ALLOWED_PERCENTAGE_REWARD_VALUES = [50, 60] as const;
+
+const formatPercentageRewardLabel = (value: number) => `UP TO ${value}% OFF`;
+const formatPercentageRewardTitle = (value: number) => `Up to ${value}% Off`;
 
 type CheckInGamePreset = {
   id: string;
@@ -71,7 +75,7 @@ const CHECK_IN_GAME_PRESETS: CheckInGamePreset[] = [
       rewards: [
         { label: 'Up to $10 Off', rewardType: 'DISCOUNT_FIXED', rewardValue: 10, rewardLabel: 'UP TO $10 OFF', probabilityWeight: 5, isActive: true },
         { label: '10 Coins', rewardType: 'COINS', rewardValue: 10, rewardLabel: '10 Bonus Coins', probabilityWeight: 4, isActive: true },
-        { label: '50% Off', rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 50, rewardLabel: '50% OFF', probabilityWeight: 2, isActive: true },
+        { label: formatPercentageRewardTitle(50), rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 50, rewardLabel: formatPercentageRewardLabel(50), probabilityWeight: 2, isActive: true },
         { label: 'Free Drink', rewardType: 'FREE_ITEM', rewardValue: 1, rewardLabel: 'Free Drink', probabilityWeight: 1, isActive: true },
       ],
     },
@@ -89,7 +93,7 @@ const CHECK_IN_GAME_PRESETS: CheckInGamePreset[] = [
       rewardExpiryHours: 48,
       rewards: [
         { label: 'Up to $20 Off', rewardType: 'DISCOUNT_FIXED', rewardValue: 20, rewardLabel: 'UP TO $20 OFF', probabilityWeight: 4, isActive: true },
-        { label: '75% Off', rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 75, rewardLabel: '75% OFF', probabilityWeight: 2, isActive: true },
+        { label: formatPercentageRewardTitle(60), rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 60, rewardLabel: formatPercentageRewardLabel(60), probabilityWeight: 2, isActive: true },
         { label: '25 Coins', rewardType: 'COINS', rewardValue: 25, rewardLabel: '25 Bonus Coins', probabilityWeight: 2, isActive: true },
         { label: 'Free Dessert', rewardType: 'FREE_ITEM', rewardValue: 1, rewardLabel: 'Free Dessert', probabilityWeight: 1, isActive: true },
       ],
@@ -108,7 +112,7 @@ const CHECK_IN_GAME_PRESETS: CheckInGamePreset[] = [
       rewardExpiryHours: 12,
       rewards: [
         { label: '5 Coins', rewardType: 'COINS', rewardValue: 5, rewardLabel: '5 Bonus Coins', probabilityWeight: 5, isActive: true },
-        { label: '50% Off', rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 50, rewardLabel: '50% OFF', probabilityWeight: 4, isActive: true },
+        { label: formatPercentageRewardTitle(50), rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 50, rewardLabel: formatPercentageRewardLabel(50), probabilityWeight: 4, isActive: true },
         { label: 'Up to $8 Off', rewardType: 'DISCOUNT_FIXED', rewardValue: 8, rewardLabel: 'UP TO $8 OFF', probabilityWeight: 2, isActive: true },
         { label: 'Free Add-on', rewardType: 'FREE_ITEM', rewardValue: 1, rewardLabel: 'Free Add-on', probabilityWeight: 1, isActive: true },
       ],
@@ -118,10 +122,23 @@ const CHECK_IN_GAME_PRESETS: CheckInGamePreset[] = [
 
 const cloneReward = (reward: MerchantCheckInGameReward): MerchantCheckInGameReward => ({ ...reward });
 
+const sanitizePercentageRewardValue = (value: number) =>
+  ALLOWED_PERCENTAGE_REWARD_VALUES.includes(value as (typeof ALLOWED_PERCENTAGE_REWARD_VALUES)[number])
+    ? value
+    : ALLOWED_PERCENTAGE_REWARD_VALUES[0];
+
+const sanitizeReward = (reward: MerchantCheckInGameReward): MerchantCheckInGameReward =>
+  reward.rewardType === 'DISCOUNT_PERCENTAGE'
+    ? { ...reward, rewardValue: sanitizePercentageRewardValue(Number(reward.rewardValue) || 0) }
+    : reward;
+
 const normalizeReward = (reward: MerchantCheckInGameReward) => ({
   label: reward.label.trim(),
   rewardType: reward.rewardType,
-  rewardValue: Number(reward.rewardValue) || 0,
+  rewardValue:
+    reward.rewardType === 'DISCOUNT_PERCENTAGE'
+      ? sanitizePercentageRewardValue(Number(reward.rewardValue) || 0)
+      : Number(reward.rewardValue) || 0,
   rewardLabel: reward.rewardLabel?.trim() || '',
   probabilityWeight: Number(reward.probabilityWeight) || 0,
   isActive: reward.isActive,
@@ -220,7 +237,7 @@ const previewRewardLabel = (reward: MerchantCheckInGameReward) => {
 
   switch (reward.rewardType) {
     case 'DISCOUNT_PERCENTAGE':
-      return `${reward.rewardValue}% OFF`;
+      return formatPercentageRewardLabel(reward.rewardValue);
     case 'DISCOUNT_FIXED':
       return `$${reward.rewardValue.toFixed(0)} OFF`;
     case 'COINS':
@@ -278,7 +295,7 @@ export function MerchantCheckInGamesPage() {
     setForm((current) => {
       if (!current) return current;
       const rewards = [...current.rewards];
-      rewards[index] = { ...rewards[index], ...patch };
+      rewards[index] = sanitizeReward({ ...rewards[index], ...patch });
       setSelectedPresetId('custom');
       setBuilderMode('manual');
       return { ...current, rewards };
@@ -336,7 +353,7 @@ export function MerchantCheckInGamesPage() {
     try {
       await saveMutation.mutateAsync({
         ...form,
-        rewards: form.rewards.filter((reward) => reward.label.trim().length > 0),
+        rewards: form.rewards.filter((reward) => reward.label.trim().length > 0).map(sanitizeReward),
       });
       toast({ title: 'Saved', description: 'Check-in game settings updated.' });
     } catch (error: any) {
@@ -728,12 +745,16 @@ export function MerchantCheckInGamesPage() {
                       <div className="grid gap-4 md:grid-cols-2">
                         <label>
                           <span className={editorFieldLabelClass}>Reward title</span>
-                          <input
-                            className={editorInputClass}
-                            placeholder="Reward title"
-                            value={reward.label}
-                            onChange={(event) => updateReward(index, { label: event.target.value })}
-                          />
+                        <input
+                          className={editorInputClass}
+                          placeholder={
+                            reward.rewardType === 'DISCOUNT_PERCENTAGE'
+                              ? formatPercentageRewardTitle(sanitizePercentageRewardValue(Number(reward.rewardValue) || 0))
+                              : 'Reward title'
+                          }
+                          value={reward.label}
+                          onChange={(event) => updateReward(index, { label: event.target.value })}
+                        />
                         </label>
                         <label>
                           <span className={editorFieldLabelClass}>Reward type</span>
@@ -756,7 +777,11 @@ export function MerchantCheckInGamesPage() {
                         <span className={editorFieldLabelClass}>Customer-facing label</span>
                         <input
                           className={editorInputClass}
-                          placeholder="What the customer sees after winning"
+                          placeholder={
+                            reward.rewardType === 'DISCOUNT_PERCENTAGE'
+                              ? formatPercentageRewardLabel(sanitizePercentageRewardValue(Number(reward.rewardValue) || 0))
+                              : 'What the customer sees after winning'
+                          }
                           value={reward.rewardLabel || ''}
                           onChange={(event) => updateReward(index, { rewardLabel: event.target.value })}
                         />
@@ -765,15 +790,29 @@ export function MerchantCheckInGamesPage() {
                     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
                       <label>
                         <span className={editorFieldLabelClass}>Reward value</span>
-                        <input
-                          className={editorInputClass}
-                          type="number"
-                          min={0}
-                          step="0.01"
-                          placeholder="0"
-                          value={reward.rewardValue}
-                          onChange={(event) => updateReward(index, { rewardValue: Number(event.target.value) || 0 })}
-                        />
+                        {reward.rewardType === 'DISCOUNT_PERCENTAGE' ? (
+                          <select
+                            className={editorInputClass}
+                            value={sanitizePercentageRewardValue(Number(reward.rewardValue) || 0)}
+                            onChange={(event) => updateReward(index, { rewardValue: Number(event.target.value) || 50 })}
+                          >
+                            {ALLOWED_PERCENTAGE_REWARD_VALUES.map((value) => (
+                              <option key={value} value={value}>
+                                {formatPercentageRewardTitle(value)}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            className={editorInputClass}
+                            type="number"
+                            min={0}
+                            step="0.01"
+                            placeholder="0"
+                            value={reward.rewardValue}
+                            onChange={(event) => updateReward(index, { rewardValue: Number(event.target.value) || 0 })}
+                          />
+                        )}
                       </label>
                       <label>
                         <span className={editorFieldLabelClass}>Chance level</span>

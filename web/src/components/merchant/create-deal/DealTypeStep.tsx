@@ -1,55 +1,218 @@
-// web/src/components/merchant/create-deal/DealTypeStep.tsx
 import { useNavigate } from 'react-router-dom';
-import { useDealCreation } from '@/context/DealCreationContext';
-import { OnboardingStepLayout } from '../onboarding/OnboardingStepLayout';
-import { Tag, Clock, Repeat, Calendar, Gift, Eye, EyeOff, Trophy, Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
+import {
+  ArrowRight,
+  Calendar,
+  Clock,
+  EyeOff,
+  Gift,
+  Repeat,
+  Tag,
+  Trophy,
+  Zap,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routing/paths';
-import { motion } from 'framer-motion';
+import { useDealCreation } from '@/context/DealCreationContext';
+import { OnboardingStepLayout } from '../onboarding/OnboardingStepLayout';
 
-const DealTypeButton = ({
-  icon,
+type DealTypeValue = 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' | 'REDEEM_NOW' | 'HIDDEN' | 'BOUNTY';
+
+const dealTypes: Array<{
+  value: DealTypeValue;
+  title: string;
+  eyebrow: string;
+  summary: string;
+  bestFor: string;
+  accent: string;
+  selectedAccent: string;
+  iconWrap: string;
+  icon: typeof Tag;
+}> = [
+  {
+    value: 'STANDARD',
+    title: 'Item Deal',
+    eyebrow: 'Core offer',
+    summary: 'Promote a single menu item, combo, or short campaign with flexible pricing.',
+    bestFor: 'Flash promos and product pushes',
+    accent: 'from-[#fff7ed] via-white to-[#fff1f2]',
+    selectedAccent: 'from-[#ff5a36] via-[#ff3d2e] to-[#ff1744]',
+    iconWrap: 'bg-[#fff0e8] text-[#ff5a36]',
+    icon: Tag,
+  },
+  {
+    value: 'HAPPY_HOUR',
+    title: 'Happy Hour',
+    eyebrow: 'Traffic builder',
+    summary: 'Use short windows and curated pricing to fill slower hours with urgency.',
+    bestFor: 'Afternoon and late-night traffic',
+    accent: 'from-[#ecfeff] via-white to-[#eff6ff]',
+    selectedAccent: 'from-[#0f766e] via-[#0ea5a4] to-[#0284c7]',
+    iconWrap: 'bg-[#e6fffb] text-[#0f766e]',
+    icon: Clock,
+  },
+  {
+    value: 'RECURRING',
+    title: 'Daily Deal',
+    eyebrow: 'Habit loop',
+    summary: 'Create repeatable weekly moments like Taco Tuesday or Wine Wednesday.',
+    bestFor: 'Recurring weekly rituals',
+    accent: 'from-[#eef2ff] via-white to-[#f5f3ff]',
+    selectedAccent: 'from-[#4338ca] via-[#5b21b6] to-[#7c3aed]',
+    iconWrap: 'bg-[#eef2ff] text-[#4338ca]',
+    icon: Repeat,
+  },
+  {
+    value: 'REDEEM_NOW',
+    title: 'Redeem Now',
+    eyebrow: 'Instant unlock',
+    summary: 'Drive immediate action with a spend threshold and a fixed reward.',
+    bestFor: 'Fast conversion and same-day visits',
+    accent: 'from-[#fff7ed] via-white to-[#fffbeb]',
+    selectedAccent: 'from-[#f97316] via-[#fb923c] to-[#f59e0b]',
+    iconWrap: 'bg-[#fff1e6] text-[#f97316]',
+    icon: Zap,
+  },
+  {
+    value: 'HIDDEN',
+    title: 'Hidden Deal',
+    eyebrow: 'Exclusive access',
+    summary: 'Unlock members-only or code-based offers that feel secret and premium.',
+    bestFor: 'VIP moments and discovery-based offers',
+    accent: 'from-[#f5f3ff] via-white to-[#faf5ff]',
+    selectedAccent: 'from-[#6d28d9] via-[#7c3aed] to-[#a855f7]',
+    iconWrap: 'bg-[#f3e8ff] text-[#7c3aed]',
+    icon: EyeOff,
+  },
+  {
+    value: 'BOUNTY',
+    title: 'Bounty Deal',
+    eyebrow: 'Reward loop',
+    summary: 'Incentivize guests with referrals, check-ins, or outcome-based rewards.',
+    bestFor: 'Growth campaigns and social reach',
+    accent: 'from-[#ecfdf5] via-white to-[#f0fdf4]',
+    selectedAccent: 'from-[#15803d] via-[#16a34a] to-[#22c55e]',
+    iconWrap: 'bg-[#e9fff1] text-[#15803d]',
+    icon: Trophy,
+  },
+];
+
+const dealTypeDescriptions: Record<DealTypeValue, string> = {
+  STANDARD: 'A flexible format for one-time promotions, featured items, and seasonal offers.',
+  HAPPY_HOUR: 'Short, high-intent offer windows designed to increase traffic during quieter times.',
+  RECURRING: 'A repeating schedule that turns a promotion into something customers remember every week.',
+  REDEEM_NOW: 'A spend-threshold offer that gives guests an immediate incentive to convert right now.',
+  HIDDEN: 'A gated offer that feels private, surprising, or earned through special access.',
+  BOUNTY: 'A performance-style offer that rewards actions like referrals, attendance, or check-ins.',
+};
+
+function DealTypeCard({
   title,
+  eyebrow,
+  summary,
+  bestFor,
+  icon: Icon,
   isSelected,
+  accent,
+  selectedAccent,
+  iconWrap,
   onClick,
-  delay = 0,
-}: any) => (
-  <motion.button
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay, duration: 0.3 }}
-    onClick={onClick}
-    whileHover={{ scale: 1.02 }}
-    whileTap={{ scale: 0.98 }}
-    className={cn(
-      'group relative flex flex-col items-center justify-center rounded-xl border-2 p-4 text-center transition-all duration-300 min-h-[100px]',
-      isSelected
-        ? 'border-primary bg-primary text-white shadow-lg'
-        : 'border-neutral-200 bg-white text-neutral-700 hover:border-primary/30 hover:shadow-md',
-    )}
-  >
-    <motion.div
+  delay,
+}: {
+  title: string;
+  eyebrow: string;
+  summary: string;
+  bestFor: string;
+  icon: typeof Tag;
+  isSelected: boolean;
+  accent: string;
+  selectedAccent: string;
+  iconWrap: string;
+  onClick: () => void;
+  delay: number;
+}) {
+  return (
+    <motion.button
+      type="button"
+      onClick={onClick}
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.34 }}
+      whileHover={{ y: -4 }}
+      whileTap={{ scale: 0.985 }}
       className={cn(
-        'flex h-10 w-10 items-center justify-center rounded-lg transition-all duration-300 mb-2',
+        'group relative overflow-hidden rounded-[1.65rem] border p-5 text-left transition-all duration-300',
+        'min-h-[220px] shadow-[0_12px_28px_rgba(15,23,42,0.06)]',
         isSelected
-          ? 'bg-white/20 text-white'
-          : 'bg-neutral-100 text-neutral-600 group-hover:bg-primary/10 group-hover:text-primary',
+          ? 'border-transparent text-white shadow-[0_18px_40px_rgba(15,23,42,0.14)]'
+          : 'border-neutral-200/80 bg-white text-neutral-900 hover:border-neutral-300 hover:shadow-[0_18px_36px_rgba(15,23,42,0.08)]',
       )}
-      whileHover={{ rotate: 5 }}
     >
-      {icon}
-    </motion.div>
-    
-    <h3 className="text-base font-bold">{title}</h3>
-  </motion.button>
-);
+      <div
+        className={cn(
+          'absolute inset-0 bg-gradient-to-br transition-opacity duration-300',
+          isSelected ? selectedAccent : accent,
+        )}
+      />
+      <div className={cn('absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100', !isSelected && 'bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.95),rgba(255,255,255,0)_45%)]')} />
+
+      <div className="relative flex h-full flex-col">
+        <div className="flex items-start justify-between gap-4">
+          <div
+            className={cn(
+              'flex h-12 w-12 items-center justify-center rounded-[1rem] border transition-colors duration-300',
+              isSelected
+                ? 'border-white/20 bg-white/15 text-white'
+                : `border-transparent ${iconWrap}`,
+            )}
+          >
+            <Icon className="h-5 w-5" />
+          </div>
+          <div
+            className={cn(
+              'rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]',
+              isSelected ? 'bg-white/15 text-white/90' : 'bg-neutral-950/5 text-neutral-500',
+            )}
+          >
+            {eyebrow}
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="text-[1.3rem] font-semibold tracking-tight">{title}</h3>
+          <p className={cn('mt-3 text-[14px] leading-6', isSelected ? 'text-white/88' : 'text-neutral-600')}>
+            {summary}
+          </p>
+        </div>
+
+        <div className="mt-auto flex items-end justify-between gap-4 pt-6">
+          <div>
+            <div className={cn('text-[11px] font-semibold uppercase tracking-[0.16em]', isSelected ? 'text-white/65' : 'text-neutral-400')}>
+              Best For
+            </div>
+            <div className={cn('mt-1 text-[13px] font-medium', isSelected ? 'text-white' : 'text-neutral-700')}>
+              {bestFor}
+            </div>
+          </div>
+          <div
+            className={cn(
+              'flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300',
+              isSelected ? 'bg-white text-neutral-900' : 'bg-neutral-100 text-neutral-500 group-hover:bg-neutral-900 group-hover:text-white',
+            )}
+          >
+            <ArrowRight className="h-4 w-4" />
+          </div>
+        </div>
+      </div>
+    </motion.button>
+  );
+}
 
 export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
   const { state, dispatch } = useDealCreation();
   const navigate = useNavigate();
 
   const handleNext = () => {
-    // Navigate to deal-type-specific steps
     if (state.dealType === 'BOUNTY') {
       navigate('/merchant/deals/create/bounty');
     } else if (state.dealType === 'HIDDEN') {
@@ -57,146 +220,124 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
     } else if (state.dealType === 'REDEEM_NOW') {
       navigate('/merchant/deals/create/redeem-now');
     } else if (state.dealType === 'RECURRING') {
-      // Daily Deal goes directly to weekday selection
       navigate('/merchant/deals/create/daily-deal/weekdays');
     } else {
-      // For STANDARD, HAPPY_HOUR, go to basics
       onNext();
     }
   };
 
+  const selectedType = state.dealType as DealTypeValue | null;
+
   return (
     <OnboardingStepLayout
-      title="What kind of deal are you creating?"
-      subtitle="Choose the type that best fits your business goals"
+      title="Design the right deal format"
+      subtitle="Pick the offer structure that matches how you want customers to discover, redeem, and return."
       onNext={handleNext}
       onBack={() => navigate(PATHS.MERCHANT_DASHBOARD)}
       isNextDisabled={!state.dealType}
       progress={15}
+      nextButtonText={selectedType ? 'Build this deal' : 'Select a deal type'}
+      contentClassName="w-full max-w-7xl"
     >
-      <div className="space-y-8 max-w-5xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
+      <div className="mx-auto w-full max-w-6xl space-y-8">
+        <motion.section
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center"
+          transition={{ duration: 0.35 }}
+          className="overflow-hidden rounded-[2rem] border border-neutral-200/80 bg-gradient-to-br from-[#fff8f2] via-white to-[#eef4ff] p-6 shadow-[0_12px_30px_rgba(15,23,42,0.06)] sm:p-7"
         >
-          <p className="text-neutral-600 text-lg">
-            Select the deal type that matches your marketing strategy
-          </p>
-        </motion.div>
-
-        {/* Deal type buttons - 2 rows of 3 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-6xl mx-auto">
-          {/* First row - Basic deal types */}
-          <DealTypeButton
-            icon={<Tag className="h-5 w-5" />}
-            title="Item Deal"
-            isSelected={state.dealType === 'STANDARD'}
-            onClick={() =>
-              dispatch({ type: 'SET_FIELD', field: 'dealType', value: 'STANDARD' })
-            }
-            delay={0.1}
-          />
-          
-          <DealTypeButton
-            icon={<Clock className="h-5 w-5" />}
-            title="Happy Hour"
-            isSelected={state.dealType === 'HAPPY_HOUR'}
-            onClick={() =>
-              dispatch({ type: 'SET_FIELD', field: 'dealType', value: 'HAPPY_HOUR' })
-            }
-            delay={0.2}
-          />
-          
-          <DealTypeButton
-            icon={<Repeat className="h-5 w-5" />}
-            title="Daily Deal"
-            isSelected={state.dealType === 'RECURRING'}
-            onClick={() =>
-              dispatch({ type: 'SET_FIELD', field: 'dealType', value: 'RECURRING' })
-            }
-            delay={0.3}
-          />
-
-          {/* Second row - Redeem now and hidden deals */}
-          <DealTypeButton
-            icon={<Zap className="h-5 w-5" />}
-            title="Redeem Now"
-            isSelected={state.dealType === 'REDEEM_NOW'}
-            onClick={() =>
-              dispatch({ type: 'SET_FIELD', field: 'dealType', value: 'REDEEM_NOW' })
-            }
-            delay={0.4}
-          />
-          
-          <DealTypeButton
-            icon={<EyeOff className="h-5 w-5" />}
-            title="Hidden Deal"
-            isSelected={state.dealType === 'HIDDEN'}
-            onClick={() =>
-              dispatch({ type: 'SET_FIELD', field: 'dealType', value: 'HIDDEN' })
-            }
-            delay={0.5}
-          />
-          
-          <DealTypeButton
-            icon={<Trophy className="h-5 w-5" />}
-            title="Bounty Deal"
-            isSelected={state.dealType === 'BOUNTY'}
-            onClick={() =>
-              dispatch({ type: 'SET_FIELD', field: 'dealType', value: 'BOUNTY' })
-            }
-            delay={0.6}
-          />
-        </div>
-
-        {/* Deal type descriptions */}
-        {state.dealType && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="rounded-lg border border-neutral-200 bg-neutral-50 p-6 max-w-3xl mx-auto"
-          >
-            <div className="text-center">
-              <h4 className="font-semibold text-neutral-900 mb-3">
-                {state.dealType === 'STANDARD' && 'Item Deal'}
-                {state.dealType === 'HAPPY_HOUR' && 'Happy Hour'}
-                {state.dealType === 'RECURRING' && 'Daily Deal'}
-                {state.dealType === 'REDEEM_NOW' && 'Redeem Now Deal'}
-                {state.dealType === 'HIDDEN' && 'Hidden Deal'}
-                {state.dealType === 'BOUNTY' && 'Bounty Deal'}
-              </h4>
-              <p className="text-neutral-600 leading-relaxed">
-                {state.dealType === 'STANDARD' && 'Perfect for promotions, sales, and special offers that run for a specific time period.'}
-                {state.dealType === 'HAPPY_HOUR' && 'Create urgency with time-limited offers during specific hours to boost traffic.'}
-                {state.dealType === 'RECURRING' && 'Set up daily repeating offers to build customer habits and consistent foot traffic.'}
-                {state.dealType === 'REDEEM_NOW' && 'Spend-based deals where customers spend a minimum amount to unlock instant discounts (e.g., Spend $25 to get 50% off).'}
-                {state.dealType === 'HIDDEN' && 'Exclusive deals that are only visible to customers who have special access or codes.'}
-                {state.dealType === 'BOUNTY' && 'Reward-based deals where customers earn points or rewards for completing specific actions.'}
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <div className="inline-flex items-center rounded-full bg-neutral-950 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
+                Create Deal
+              </div>
+              <h2 className="mt-4 text-[1.6rem] font-semibold tracking-tight text-neutral-950 sm:text-[2rem]">
+                Start with the format, then we&apos;ll shape the offer around it.
+              </h2>
+              <p className="mt-3 text-[14px] leading-7 text-neutral-600 sm:text-[15px]">
+                Each path is tuned for a different business goal, from filling slow hours to launching a high-converting drop.
               </p>
             </div>
-          </motion.div>
-        )}
 
-        {/* Help section */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="rounded-lg border border-neutral-200 bg-neutral-50 p-6 max-w-3xl mx-auto"
-        >
-          <div className="flex items-start gap-4">
-            <Calendar className="h-6 w-6 text-neutral-600 mt-1 flex-shrink-0" />
-            <div>
-              <h4 className="font-semibold text-neutral-900 mb-2">Need help choosing?</h4>
-              <p className="text-neutral-600 leading-relaxed">
-                <strong>Item Deal</strong> for one-time promotions, <strong>Happy Hour</strong> for daily specials, 
-                or <strong>Daily Deal</strong> for repeating deals like "Taco Tuesday" or "Wine Wednesday".
-              </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-[1.2rem] border border-white/70 bg-white/85 p-4 shadow-sm">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Step</div>
+                <div className="mt-2 text-[15px] font-semibold text-neutral-900">1 of the setup flow</div>
+                <div className="mt-1 text-[13px] text-neutral-500">Choose your structure before pricing, media, and schedule.</div>
+              </div>
+              <div className="rounded-[1.2rem] border border-white/70 bg-white/85 p-4 shadow-sm">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Tip</div>
+                <div className="mt-2 text-[15px] font-semibold text-neutral-900">Keep it focused</div>
+                <div className="mt-1 text-[13px] text-neutral-500">Simple formats usually launch faster and perform more consistently.</div>
+              </div>
             </div>
           </div>
-        </motion.div>
+        </motion.section>
+
+        <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {dealTypes.map((dealType, index) => (
+            <DealTypeCard
+              key={dealType.value}
+              title={dealType.title}
+              eyebrow={dealType.eyebrow}
+              summary={dealType.summary}
+              bestFor={dealType.bestFor}
+              icon={dealType.icon}
+              accent={dealType.accent}
+              selectedAccent={dealType.selectedAccent}
+              iconWrap={dealType.iconWrap}
+              isSelected={state.dealType === dealType.value}
+              onClick={() => dispatch({ type: 'SET_FIELD', field: 'dealType', value: dealType.value })}
+              delay={0.08 + index * 0.06}
+            />
+          ))}
+        </section>
+
+        <div className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.35 }}
+            className="rounded-[1.65rem] border border-neutral-200/80 bg-white/92 p-5 shadow-[0_10px_26px_rgba(15,23,42,0.05)] sm:p-6"
+          >
+            <div className="flex items-start gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-neutral-100 text-neutral-800">
+                <Gift className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="text-[15px] font-semibold text-neutral-900">
+                  {selectedType ? dealTypes.find((item) => item.value === selectedType)?.title : 'Choose a deal type'}
+                </div>
+                <p className="mt-1 text-[13px] leading-6 text-neutral-600">
+                  {selectedType
+                    ? dealTypeDescriptions[selectedType]
+                    : 'Select one of the formats above to preview the strategy behind it and continue to the right flow.'}
+                </p>
+              </div>
+            </div>
+          </motion.section>
+
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.28, duration: 0.35 }}
+            className="rounded-[1.65rem] border border-neutral-200/80 bg-gradient-to-br from-white via-white to-[#f7f8fb] p-5 shadow-[0_10px_26px_rgba(15,23,42,0.05)] sm:p-6"
+          >
+            <div className="flex items-start gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-neutral-100 text-neutral-800">
+                <Calendar className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="text-[15px] font-semibold text-neutral-900">Need help choosing?</div>
+                <p className="mt-1 text-[13px] leading-6 text-neutral-600">
+                  Use <span className="font-medium text-neutral-900">Item Deal</span> for a simple promotion,
+                  <span className="font-medium text-neutral-900"> Happy Hour</span> for time-boxed traffic,
+                  and <span className="font-medium text-neutral-900">Daily Deal</span> for repeatable weekly patterns.
+                </p>
+              </div>
+            </div>
+          </motion.section>
+        </div>
       </div>
     </OnboardingStepLayout>
   );
