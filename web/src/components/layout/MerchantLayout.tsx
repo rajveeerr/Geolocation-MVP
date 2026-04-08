@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   BarChart3,
+  Boxes,
   Building2,
   ChevronDown,
   CircleDollarSign,
@@ -105,6 +106,12 @@ const navSections: MerchantNavSection[] = [
         to: PATHS.MERCHANT_MENU_COLLECTIONS,
         icon: UtensilsCrossed,
         match: (pathname) => pathname.startsWith(PATHS.MERCHANT_MENU_COLLECTIONS),
+      },
+      {
+        label: 'Inventory',
+        to: PATHS.MERCHANT_INVENTORY,
+        icon: Boxes,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_INVENTORY),
       },
       {
         label: 'Stores',
@@ -232,6 +239,11 @@ const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; s
     match: (pathname) => pathname.startsWith('/merchant/menu'),
     title: 'Menu',
     subtitle: 'Keep your menu structured, current, and ready to publish.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_INVENTORY),
+    title: 'Inventory',
+    subtitle: 'Track stock levels, restock items, and prevent overselling.',
   },
   {
     match: (pathname) => pathname.startsWith('/merchant/stores'),

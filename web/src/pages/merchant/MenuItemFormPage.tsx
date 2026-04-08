@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ImageUpload } from '@/components/common/ImageUpload';
 import { CategoryDropdown } from '@/components/common/CategoryDropdown';
+import { TwelveHourTimeField } from '@/components/common/TwelveHourTimeField';
 import { PATHS } from '@/routing/paths';
 import { useCreateMenuItem, useUpdateMenuItem, useMerchantMenu, type CreateMenuItemData, type UpdateMenuItemData, type MenuItemImage, type MenuDealType } from '@/hooks/useMerchantMenu';
 import { useDealTypes } from '@/hooks/useDealTypes';
@@ -92,89 +93,6 @@ const parseInventoryAiSuggestion = (reply: string): InventoryAiSuggestion | null
   }
 
   return null;
-};
-
-const hourOptions = Array.from({ length: 12 }, (_, index) => String(index + 1));
-const minuteOptions = ['00', '15', '30', '45'];
-
-const to12HourParts = (value: string) => {
-  if (!value || !/^\d{2}:\d{2}$/.test(value)) {
-    return { hour: '', minute: '00', period: 'AM' as 'AM' | 'PM' };
-  }
-
-  const [hourString, minute] = value.split(':');
-  const hour24 = Number(hourString);
-  const period = hour24 >= 12 ? 'PM' : 'AM';
-  const normalizedHour = hour24 % 12 || 12;
-
-  return { hour: String(normalizedHour), minute, period };
-};
-
-const from12HourParts = (hour: string, minute: string, period: 'AM' | 'PM') => {
-  if (!hour) return '';
-
-  const hourNumber = Number(hour);
-  if (!Number.isFinite(hourNumber)) return '';
-
-  let hour24 = hourNumber % 12;
-  if (period === 'PM') hour24 += 12;
-
-  return `${String(hour24).padStart(2, '0')}:${minute}`;
-};
-
-const TwelveHourTimeField = ({
-  id,
-  label,
-  value,
-  onChange,
-}: {
-  id: string;
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) => {
-  const parts = to12HourParts(value);
-
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={id}>{label}</Label>
-      <div className="grid grid-cols-[1fr_auto_1fr_1fr] items-center gap-2 rounded-md border border-neutral-300 bg-white px-3 py-2">
-        <select
-          id={id}
-          value={parts.hour}
-          onChange={(e) => onChange(from12HourParts(e.target.value, parts.minute, parts.period))}
-          className="bg-transparent text-sm text-neutral-900 outline-none"
-        >
-          <option value="">Hour</option>
-          {hourOptions.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-        <span className="text-neutral-400">:</span>
-        <select
-          value={parts.minute}
-          onChange={(e) => onChange(from12HourParts(parts.hour, e.target.value, parts.period))}
-          className="bg-transparent text-sm text-neutral-900 outline-none"
-        >
-          {minuteOptions.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-        <select
-          value={parts.period}
-          onChange={(e) => onChange(from12HourParts(parts.hour, parts.minute, e.target.value as 'AM' | 'PM'))}
-          className="bg-transparent text-sm font-medium text-neutral-900 outline-none"
-        >
-          <option value="AM">AM</option>
-          <option value="PM">PM</option>
-        </select>
-      </div>
-    </div>
-  );
 };
 
 export const MenuItemFormPage = () => {
@@ -372,6 +290,54 @@ export const MenuItemFormPage = () => {
     setValue('allowBackorder', suggestion.allowBackorder);
   };
 
+  const handleGenerateDescriptionWithAi = async () => {
+    const itemName = watch('name')?.trim();
+    const itemCategory = watchedValues.category?.trim();
+
+    if (!itemName) {
+      toast({
+        title: 'Add an item name first',
+        description: 'AI needs at least the item name to write a description.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const prompt = [
+      'Write a single mouth-watering menu description in 1-2 sentences (max 240 chars).',
+      'Plain text only — no quotes, markdown, emojis, or labels. Do not include the item name.',
+      `name:${itemName}`,
+      itemCategory ? `category:${itemCategory}` : '',
+      watchedValues.price ? `price:$${watchedValues.price}` : '',
+    ].filter(Boolean).join('\n').slice(0, 400);
+
+    try {
+      const result = await aiChat.mutateAsync({ message: prompt });
+      const cleaned = result.reply
+        .trim()
+        .replace(/^["'`]+|["'`]+$/g, '')
+        .replace(/^description[:\-\s]+/i, '')
+        .slice(0, 500);
+
+      if (!cleaned) {
+        throw new Error('AI returned an empty response.');
+      }
+
+      setValue('description', cleaned, { shouldDirty: true });
+      toast({
+        title: 'Description ready',
+        description: 'AI drafted a description. Tweak it before saving.',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Something went wrong while talking to AI.';
+      toast({
+        title: 'Could not generate description',
+        description: message,
+        variant: 'destructive',
+      });
+    }
+  };
+
   const handleGenerateInventoryWithAi = async () => {
     const itemName = watch('name')?.trim();
     const itemCategory = watchedValues.category?.trim();
@@ -528,7 +494,31 @@ export const MenuItemFormPage = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor="description">Description</Label>
+                {aiEnabled && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleGenerateDescriptionWithAi}
+                    disabled={aiChat.isPending}
+                    className="h-7 gap-1.5 px-2 text-xs text-[#bf6545] hover:bg-[#fff1e5] hover:text-[#bf6545]"
+                  >
+                    {aiChat.isPending ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        Writing...
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 className="h-3.5 w-3.5" />
+                        Write with AI
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
               <textarea
                 id="description"
                 placeholder="Describe your menu item..."

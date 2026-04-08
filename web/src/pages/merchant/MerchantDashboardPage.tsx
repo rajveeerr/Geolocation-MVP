@@ -4,10 +4,11 @@ import { Link } from 'react-router-dom';
 import { PATHS } from '@/routing/paths';
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
-import { CalendarIcon, ClockIcon, DollarSign, Percent, BarChart3, Users, Gift } from 'lucide-react';
+import { CalendarIcon, ClockIcon, DollarSign, Percent, BarChart3, Users, Gift, AlertTriangle, PackageX, Boxes } from 'lucide-react';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useMerchantDashboardStats } from '@/hooks/useMerchantDashboardStats';
 import { useMerchantStores } from '@/hooks/useMerchantStores';
+import { useMerchantMenu } from '@/hooks/useMerchantMenu';
 import { useMerchantLoyaltyProgram } from '@/hooks/useMerchantLoyalty';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
@@ -205,6 +206,23 @@ export const MerchantDashboardPage = () => {
   const { data: storesData, isLoading: storesLoading } = useMerchantStores();
   const { data: aiInsights, isLoading: aiInsightsLoading } = useAiMerchantInsights();
   const merchantStores = storesData?.stores ?? [];
+
+  // Inventory health summary for the dashboard widget
+  const { data: menuData } = useMerchantMenu();
+  const inventoryHealth = useMemo(() => {
+    const items = menuData?.menuItems ?? [];
+    let lowStock = 0;
+    let outOfStock = 0;
+    const lowStockItems: { id: number; name: string; qty: number }[] = [];
+    items.forEach((it) => {
+      if (it.inventoryStatus === 'LOW_STOCK') {
+        lowStock += 1;
+        lowStockItems.push({ id: it.id, name: it.name, qty: it.inventoryQuantity ?? 0 });
+      }
+      if (it.inventoryStatus === 'OUT_OF_STOCK') outOfStock += 1;
+    });
+    return { lowStock, outOfStock, lowStockItems: lowStockItems.slice(0, 3) };
+  }, [menuData]);
 
   const { data: checkInSummary, isLoading: checkInSummaryLoading } = useQuery({
     queryKey: ['merchant-checkins-summary'],
@@ -481,6 +499,49 @@ export const MerchantDashboardPage = () => {
               </div>
             </div>
           </div>
+
+          {/* Inventory health alert */}
+          {(inventoryHealth.lowStock > 0 || inventoryHealth.outOfStock > 0) && (
+            <div className={cn(panelClass, 'mb-6 border-amber-200/80')}>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+                    <AlertTriangle className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-neutral-900">Inventory needs attention</h3>
+                    <p className="mt-0.5 text-xs text-neutral-600">
+                      {inventoryHealth.lowStock > 0 && (
+                        <span className="mr-3 inline-flex items-center gap-1">
+                          <Boxes className="h-3 w-3 text-amber-600" />
+                          <strong>{inventoryHealth.lowStock}</strong> low on stock
+                        </span>
+                      )}
+                      {inventoryHealth.outOfStock > 0 && (
+                        <span className="inline-flex items-center gap-1">
+                          <PackageX className="h-3 w-3 text-red-600" />
+                          <strong>{inventoryHealth.outOfStock}</strong> out of stock
+                        </span>
+                      )}
+                    </p>
+                    {inventoryHealth.lowStockItems.length > 0 && (
+                      <p className="mt-1 text-xs text-neutral-500">
+                        e.g.{' '}
+                        {inventoryHealth.lowStockItems
+                          .map((it) => `${it.name} (${it.qty})`)
+                          .join(', ')}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <Link to={PATHS.MERCHANT_INVENTORY}>
+                  <Button size="sm" className="rounded-xl">
+                    Open Inventory
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          )}
 
           {/* Business Type Card */}
           <div className="mb-6">
