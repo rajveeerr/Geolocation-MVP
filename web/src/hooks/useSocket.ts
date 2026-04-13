@@ -19,7 +19,7 @@ import { useAuth } from '@/context/useAuth';
 
 // Derive the WS base from the API base (strip trailing `/api`)
 function getSocketUrl(): string {
-    const apiBase = import.meta.env.VITE_API_URL || 'https://api.yohop.com/api';
+    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
     return apiBase.replace(/\/api\/?$/, '') || apiBase;
 }
 

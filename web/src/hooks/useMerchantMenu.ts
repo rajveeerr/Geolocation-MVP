@@ -20,6 +20,29 @@ export type MenuDealType =
   | 'REDEEM_NOW_SURPRISE'
   | 'RECURRING';
 
+export interface MenuItemVariant {
+  id: number;
+  sku: string;
+  label: string;
+  price: number;
+  inventoryQuantity?: number | null;
+  lowStockThreshold?: number | null;
+  isAvailable: boolean;
+  sortOrder: number;
+  inventoryStatus?: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'UNTRACKED';
+}
+
+export interface MenuItemVariantInput {
+  id?: number;
+  sku?: string;
+  label: string;
+  price: number;
+  inventoryQuantity?: number | null;
+  lowStockThreshold?: number | null;
+  isAvailable?: boolean;
+  sortOrder?: number;
+}
+
 export interface MenuItem {
   id: number;
   name: string;
@@ -44,6 +67,8 @@ export interface MenuItem {
   lowStockThreshold?: number | null;
   allowBackorder: boolean;
   inventoryStatus?: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'UNTRACKED';
+  hasVariants: boolean;
+  variants?: MenuItemVariant[];
   createdAt: string;
   updatedAt: string;
 }
@@ -69,6 +94,8 @@ export interface CreateMenuItemData {
   inventoryQuantity?: number | null;
   lowStockThreshold?: number | null;
   allowBackorder?: boolean;
+  hasVariants?: boolean;
+  variants?: MenuItemVariantInput[];
 }
 
 export interface UpdateMenuItemData {
@@ -92,6 +119,8 @@ export interface UpdateMenuItemData {
   inventoryQuantity?: number | null;
   lowStockThreshold?: number | null;
   allowBackorder?: boolean;
+  hasVariants?: boolean;
+  variants?: MenuItemVariantInput[];
 }
 
 export interface MenuItemsResponse {
@@ -282,6 +311,51 @@ export const useUpdateMenuItemInventory = () => {
     onError: (error: Error) => {
       toast({
         title: 'Error Updating Inventory',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+export const useUpdateVariantInventory = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({
+      itemId,
+      variantId,
+      data,
+    }: {
+      itemId: number;
+      variantId: number;
+      data: {
+        inventoryQuantity?: number | null;
+        lowStockThreshold?: number | null;
+        isAvailable?: boolean;
+      };
+    }) => {
+      const response = await apiPatch<{ variant: MenuItemVariant }, typeof data>(
+        `/merchants/me/menu/item/${itemId}/variant/${variantId}/inventory`,
+        data,
+      );
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to update variant inventory');
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['merchant-menu'] });
+      queryClient.invalidateQueries({ queryKey: ['merchantMenuItems'] });
+      toast({
+        title: 'Variant Updated',
+        description: 'Variant inventory has been updated.',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Error Updating Variant',
         description: error.message,
         variant: 'destructive',
       });

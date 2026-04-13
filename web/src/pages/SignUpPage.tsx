@@ -54,7 +54,7 @@ export const SignUpPage = () => {
 
   const handleSocialLogin = (provider: 'google' | 'apple') => {
     const redirectUri = window.location.origin + '/auth/callback';
-    const apiUrl = import.meta.env.VITE_API_URL || 'https://api.yohop.com';
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
     window.location.href = `${apiUrl}/api/auth/${provider}/start?redirectUri=${encodeURIComponent(redirectUri)}`;
   };
 

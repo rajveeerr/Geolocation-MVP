@@ -7,13 +7,13 @@ import { ImageUpload } from '@/components/common/ImageUpload';
 import { CategoryDropdown } from '@/components/common/CategoryDropdown';
 import { TwelveHourTimeField } from '@/components/common/TwelveHourTimeField';
 import { PATHS } from '@/routing/paths';
-import { useCreateMenuItem, useUpdateMenuItem, useMerchantMenu, type CreateMenuItemData, type UpdateMenuItemData, type MenuItemImage, type MenuDealType } from '@/hooks/useMerchantMenu';
+import { useCreateMenuItem, useUpdateMenuItem, useMerchantMenu, type CreateMenuItemData, type UpdateMenuItemData, type MenuItemImage, type MenuDealType, type MenuItemVariantInput } from '@/hooks/useMerchantMenu';
 import { useDealTypes } from '@/hooks/useDealTypes';
 import { useAiChat, useAiStatus } from '@/hooks/useAi';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  ArrowLeft, 
-  Utensils, 
+import {
+  ArrowLeft,
+  Utensils,
   Loader2,
   AlertCircle,
   DollarSign,
@@ -21,7 +21,10 @@ import {
   Sparkles,
   Info,
   Wand2,
-  CheckCircle2
+  CheckCircle2,
+  Plus,
+  Trash2,
+  Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
@@ -136,6 +139,22 @@ export const MenuItemFormPage = () => {
   );
   const [allowBackorder, setAllowBackorder] = useState(existingItem?.allowBackorder ?? false);
   const [inventoryAiSuggestion, setInventoryAiSuggestion] = useState<InventoryAiSuggestion | null>(null);
+  const [hasVariants, setHasVariants] = useState(existingItem?.hasVariants ?? false);
+  const [variants, setVariants] = useState<MenuItemVariantInput[]>(() => {
+    if (existingItem?.variants && existingItem.variants.length > 0) {
+      return existingItem.variants.map((v) => ({
+        id: v.id,
+        sku: v.sku,
+        label: v.label,
+        price: v.price,
+        inventoryQuantity: v.inventoryQuantity,
+        lowStockThreshold: v.lowStockThreshold,
+        isAvailable: v.isAvailable,
+        sortOrder: v.sortOrder,
+      }));
+    }
+    return [];
+  });
 
   const {
     register,
@@ -218,6 +237,23 @@ export const MenuItemFormPage = () => {
       );
       setAllowBackorder(existingItem.allowBackorder ?? false);
       
+      // Set existing variants if available
+      setHasVariants(existingItem.hasVariants ?? false);
+      if (existingItem.variants && existingItem.variants.length > 0) {
+        setVariants(existingItem.variants.map((v) => ({
+          id: v.id,
+          sku: v.sku,
+          label: v.label,
+          price: v.price,
+          inventoryQuantity: v.inventoryQuantity,
+          lowStockThreshold: v.lowStockThreshold,
+          isAvailable: v.isAvailable,
+          sortOrder: v.sortOrder,
+        })));
+      } else {
+        setVariants([]);
+      }
+
       // Set existing images if available
       if (existingItem.images && existingItem.images.length > 0) {
         setUploadedImages(existingItem.images);
@@ -260,6 +296,8 @@ export const MenuItemFormPage = () => {
         inventoryQuantity: inventoryTrackingEnabled && inventoryQuantity !== '' ? parseInt(inventoryQuantity, 10) : null,
         lowStockThreshold: inventoryTrackingEnabled && lowStockThreshold !== '' ? parseInt(lowStockThreshold, 10) : null,
         allowBackorder: inventoryTrackingEnabled ? allowBackorder : false,
+        hasVariants,
+        variants: hasVariants ? variants : undefined,
       };
 
       if (isEditing && itemId) {
@@ -550,6 +588,154 @@ export const MenuItemFormPage = () => {
               <p className="text-xs text-neutral-500">
                 Upload up to 5 images to showcase your menu item. Supported formats: JPG, PNG, WebP.
               </p>
+            </div>
+
+            {/* Variants Section */}
+            <div className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="hasVariants"
+                  checked={hasVariants}
+                  onChange={(e) => {
+                    setHasVariants(e.target.checked);
+                    if (e.target.checked && variants.length === 0) {
+                      setVariants([{ label: '', price: watchedValues.price || 0, sortOrder: 0 }]);
+                    }
+                  }}
+                  className="h-4 w-4 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                />
+                <Label htmlFor="hasVariants" className="font-medium text-neutral-800">
+                  This item has variants (sizes, colors, etc.)
+                </Label>
+              </div>
+
+              {hasVariants && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm text-neutral-500">
+                    <Layers className="h-4 w-4" />
+                    <span>Each variant gets its own price and optional SKU.</span>
+                  </div>
+
+                  {variants.map((variant, index) => (
+                    <div key={index} className="rounded-lg border border-neutral-200 bg-white p-3">
+                      <div className="flex items-start gap-3">
+                        <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
+                          <div className="space-y-1">
+                            <Label className="text-xs text-neutral-500">Label *</Label>
+                            <Input
+                              placeholder="e.g., Large"
+                              value={variant.label}
+                              onChange={(e) => {
+                                const updated = [...variants];
+                                updated[index] = { ...updated[index], label: e.target.value };
+                                setVariants(updated);
+                              }}
+                              className={cn(!variant.label && 'border-red-300')}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs text-neutral-500">Price *</Label>
+                            <div className="relative">
+                              <DollarSign className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-400" />
+                              <Input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                placeholder="0.00"
+                                value={variant.price || ''}
+                                onChange={(e) => {
+                                  const updated = [...variants];
+                                  updated[index] = { ...updated[index], price: parseFloat(e.target.value) || 0 };
+                                  setVariants(updated);
+                                }}
+                                className="pl-9"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs text-neutral-500">SKU (auto if empty)</Label>
+                            <Input
+                              placeholder="Auto-generated"
+                              value={variant.sku || ''}
+                              onChange={(e) => {
+                                const updated = [...variants];
+                                updated[index] = { ...updated[index], sku: e.target.value };
+                                setVariants(updated);
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setVariants(variants.filter((_, i) => i !== index));
+                            if (variants.length <= 1) setHasVariants(false);
+                          }}
+                          className="mt-5 rounded-md p-1.5 text-neutral-400 transition hover:bg-red-50 hover:text-red-500"
+                          title="Remove variant"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+
+                      {inventoryTrackingEnabled && (
+                        <div className="mt-3 grid grid-cols-2 gap-3 border-t border-neutral-100 pt-3">
+                          <div className="space-y-1">
+                            <Label className="text-xs text-neutral-500">Quantity</Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              step="1"
+                              placeholder="0"
+                              value={variant.inventoryQuantity ?? ''}
+                              onChange={(e) => {
+                                const updated = [...variants];
+                                updated[index] = {
+                                  ...updated[index],
+                                  inventoryQuantity: e.target.value ? parseInt(e.target.value, 10) : null,
+                                };
+                                setVariants(updated);
+                              }}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs text-neutral-500">Low Stock Threshold</Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              step="1"
+                              placeholder="5"
+                              value={variant.lowStockThreshold ?? ''}
+                              onChange={(e) => {
+                                const updated = [...variants];
+                                updated[index] = {
+                                  ...updated[index],
+                                  lowStockThreshold: e.target.value ? parseInt(e.target.value, 10) : null,
+                                };
+                                setVariants(updated);
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setVariants([...variants, { label: '', price: watchedValues.price || 0, sortOrder: variants.length }]);
+                    }}
+                    className="gap-1.5"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Add Variant
+                  </Button>
+                </div>
+              )}
             </div>
 
             <div className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">

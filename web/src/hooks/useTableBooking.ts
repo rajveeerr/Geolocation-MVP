@@ -164,7 +164,7 @@ async function fetchAvailability(merchantId: number, date: string, partySize: nu
   searchParams.append('partySize', partySize.toString());
 
   // Use environment variable or fallback
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.yohop.com/api';
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
   const url = `${API_BASE_URL}/table-booking/merchants/${merchantId}/availability?${searchParams.toString()}`;
 
   try {

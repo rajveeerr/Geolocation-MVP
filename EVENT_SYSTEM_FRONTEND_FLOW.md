@@ -927,7 +927,7 @@ cd backend && npm run dev
 cd web && npm run dev
 
 # 3. Verify API connectivity
-curl https://api.yohop.com/api/events
+curl http://localhost:3000/api/events
 ```
 
 Then proceed through phases sequentially. Each phase builds on the previous one.

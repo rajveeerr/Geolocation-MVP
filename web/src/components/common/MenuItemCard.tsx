@@ -57,7 +57,12 @@ const MenuItemCard = ({
 
       <div className="flex-1">
         <p className="font-semibold text-neutral-900">{item.name}</p>
-        <p className="text-sm text-neutral-500">${item.price.toFixed(2)}</p>
+        <p className="text-sm text-neutral-500">
+          {'hasVariants' in item && (item as any).hasVariants && (item as any).variants?.length > 0
+            ? `from $${Math.min(...(item as any).variants.map((v: any) => v.price)).toFixed(2)}`
+            : `$${item.price.toFixed(2)}`
+          }
+        </p>
       </div>
 
       <div>

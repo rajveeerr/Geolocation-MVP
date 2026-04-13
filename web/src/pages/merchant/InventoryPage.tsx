@@ -10,12 +10,17 @@ import {
   Minus,
   RefreshCcw,
   Filter,
+  ChevronDown,
+  ChevronRight,
+  Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   useMerchantMenu,
   useUpdateMenuItemInventory,
+  useUpdateVariantInventory,
   type MenuItem,
+  type MenuItemVariant,
 } from '@/hooks/useMerchantMenu';
 import { Button } from '@/components/common/Button';
 
@@ -41,10 +46,33 @@ const cardClass =
 const InventoryPage: React.FC = () => {
   const { data, isLoading, refetch, isRefetching } = useMerchantMenu();
   const updateInventory = useUpdateMenuItemInventory();
+  const updateVariantInventory = useUpdateVariantInventory();
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
+
+  const toggleExpanded = (itemId: number) => {
+    setExpandedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(itemId)) next.delete(itemId);
+      else next.add(itemId);
+      return next;
+    });
+  };
+
+  const adjustVariantQty = (itemId: number, variant: MenuItemVariant, delta: number) => {
+    const next = Math.max(0, (variant.inventoryQuantity ?? 0) + delta);
+    updateVariantInventory.mutate({
+      itemId,
+      variantId: variant.id,
+      data: {
+        inventoryQuantity: next,
+        ...(delta > 0 ? { isAvailable: true } : {}),
+      },
+    });
+  };
 
   const items = data?.menuItems ?? [];
 
@@ -57,21 +85,28 @@ const InventoryPage: React.FC = () => {
   const stats = useMemo(() => {
     const acc = { inStock: 0, lowStock: 0, outOfStock: 0, untracked: 0, totalUnits: 0 };
     items.forEach((it) => {
-      switch (it.inventoryStatus) {
-        case 'IN_STOCK':
-          acc.inStock += 1;
-          break;
-        case 'LOW_STOCK':
-          acc.lowStock += 1;
-          break;
-        case 'OUT_OF_STOCK':
-          acc.outOfStock += 1;
-          break;
-        default:
-          acc.untracked += 1;
-      }
-      if (it.inventoryTrackingEnabled && typeof it.inventoryQuantity === 'number') {
-        acc.totalUnits += it.inventoryQuantity;
+      if (it.hasVariants && it.variants && it.variants.length > 0) {
+        // Count each variant individually
+        it.variants.forEach((v) => {
+          const vs = v.inventoryStatus ?? 'UNTRACKED';
+          switch (vs) {
+            case 'IN_STOCK': acc.inStock += 1; break;
+            case 'LOW_STOCK': acc.lowStock += 1; break;
+            case 'OUT_OF_STOCK': acc.outOfStock += 1; break;
+            default: acc.untracked += 1;
+          }
+          if (typeof v.inventoryQuantity === 'number') acc.totalUnits += v.inventoryQuantity;
+        });
+      } else {
+        switch (it.inventoryStatus) {
+          case 'IN_STOCK': acc.inStock += 1; break;
+          case 'LOW_STOCK': acc.lowStock += 1; break;
+          case 'OUT_OF_STOCK': acc.outOfStock += 1; break;
+          default: acc.untracked += 1;
+        }
+        if (it.inventoryTrackingEnabled && typeof it.inventoryQuantity === 'number') {
+          acc.totalUnits += it.inventoryQuantity;
+        }
       }
     });
     return acc;
@@ -287,105 +322,214 @@ const InventoryPage: React.FC = () => {
               )}
               {filtered.map((item) => {
                 const status = item.inventoryStatus ?? 'UNTRACKED';
+                const hasVariantRows = item.hasVariants && item.variants && item.variants.length > 0;
+                const isExpanded = expandedItems.has(item.id);
                 return (
-                  <tr key={item.id} className="hover:bg-neutral-50/60">
-                    <td className="px-4 py-3">
-                      <Link
-                        to={`/merchant/menu/${item.id}`}
-                        className="font-medium text-neutral-900 hover:text-brand"
-                      >
-                        {item.name}
-                      </Link>
-                      {!item.isAvailable && (
-                        <span className="ml-2 rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-semibold uppercase text-neutral-500">
-                          Hidden
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-neutral-600">{item.category || '—'}</td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={cn(
-                          'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold',
-                          STATUS_TONES[status],
-                        )}
-                      >
-                        {STATUS_LABEL[status]}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-neutral-800">
-                      {item.inventoryTrackingEnabled
-                        ? (item.inventoryQuantity ?? 0)
-                        : '—'}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-neutral-500">
-                      {item.inventoryTrackingEnabled
-                        ? (item.lowStockThreshold ?? 0)
-                        : '—'}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-1">
-                        {item.inventoryTrackingEnabled ? (
-                          <>
+                  <React.Fragment key={item.id}>
+                    <tr className="hover:bg-neutral-50/60">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1.5">
+                          {hasVariantRows && (
                             <button
                               type="button"
-                              title="Decrement by 1"
-                              onClick={() => adjustQty(item, -1)}
-                              disabled={updateInventory.isPending}
-                              className="flex h-7 w-7 items-center justify-center rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-100 disabled:opacity-40"
+                              onClick={() => toggleExpanded(item.id)}
+                              className="rounded p-0.5 text-neutral-400 hover:text-neutral-700"
                             >
-                              <Minus className="h-3.5 w-3.5" />
+                              {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                             </button>
+                          )}
+                          <div>
+                            <Link
+                              to={`/merchant/menu/${item.id}`}
+                              className="font-medium text-neutral-900 hover:text-brand"
+                            >
+                              {item.name}
+                            </Link>
+                            {hasVariantRows && (
+                              <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-600 border border-indigo-100">
+                                <Layers className="h-3 w-3" />
+                                {item.variants!.length} variants
+                              </span>
+                            )}
+                            {!item.isAvailable && (
+                              <span className="ml-2 rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-semibold uppercase text-neutral-500">
+                                Hidden
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-neutral-600">{item.category || '—'}</td>
+                      <td className="px-4 py-3">
+                        {!hasVariantRows && (
+                          <span
+                            className={cn(
+                              'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold',
+                              STATUS_TONES[status],
+                            )}
+                          >
+                            {STATUS_LABEL[status]}
+                          </span>
+                        )}
+                        {hasVariantRows && (
+                          <span className="text-xs text-neutral-400 italic">per variant</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono text-neutral-800">
+                        {hasVariantRows
+                          ? '—'
+                          : item.inventoryTrackingEnabled
+                            ? (item.inventoryQuantity ?? 0)
+                            : '—'}
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono text-neutral-500">
+                        {hasVariantRows
+                          ? '—'
+                          : item.inventoryTrackingEnabled
+                            ? (item.lowStockThreshold ?? 0)
+                            : '—'}
+                      </td>
+                      <td className="px-4 py-3">
+                        {!hasVariantRows && (
+                          <div className="flex items-center justify-end gap-1">
+                            {item.inventoryTrackingEnabled ? (
+                              <>
+                                <button
+                                  type="button"
+                                  title="Decrement by 1"
+                                  onClick={() => adjustQty(item, -1)}
+                                  disabled={updateInventory.isPending}
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-100 disabled:opacity-40"
+                                >
+                                  <Minus className="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  title="Add 1"
+                                  onClick={() => adjustQty(item, 1)}
+                                  disabled={updateInventory.isPending}
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-100 disabled:opacity-40"
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => adjustQty(item, 10)}
+                                  disabled={updateInventory.isPending}
+                                  className="ml-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
+                                >
+                                  +10
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => toggleTracking(item)}
+                                disabled={updateInventory.isPending}
+                                className="rounded-lg border border-neutral-200 bg-white px-2 py-1 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 disabled:opacity-40"
+                              >
+                                Enable tracking
+                              </button>
+                            )}
+                            {item.isAvailable ? (
+                              <button
+                                type="button"
+                                onClick={() => markSoldOut(item)}
+                                disabled={updateInventory.isPending}
+                                className="ml-1 rounded-lg border border-red-200 bg-red-50 px-2 py-1 text-xs font-semibold text-red-700 hover:bg-red-100 disabled:opacity-40"
+                              >
+                                Sold out
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => markAvailable(item)}
+                                disabled={updateInventory.isPending}
+                                className="ml-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
+                              >
+                                Make available
+                              </button>
+                            )}
+                          </div>
+                        )}
+                        {hasVariantRows && !isExpanded && (
+                          <div className="flex justify-end">
                             <button
                               type="button"
-                              title="Add 1"
-                              onClick={() => adjustQty(item, 1)}
-                              disabled={updateInventory.isPending}
-                              className="flex h-7 w-7 items-center justify-center rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-100 disabled:opacity-40"
+                              onClick={() => toggleExpanded(item.id)}
+                              className="rounded-lg border border-neutral-200 bg-white px-2 py-1 text-xs font-semibold text-neutral-700 hover:bg-neutral-50"
                             >
-                              <Plus className="h-3.5 w-3.5" />
+                              Expand
                             </button>
-                            <button
-                              type="button"
-                              onClick={() => adjustQty(item, 10)}
-                              disabled={updateInventory.isPending}
-                              className="ml-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+
+                    {/* Variant sub-rows */}
+                    {hasVariantRows && isExpanded && item.variants!.map((variant) => {
+                      const vStatus = variant.inventoryStatus ?? 'UNTRACKED';
+                      return (
+                        <tr key={`v-${variant.id}`} className="bg-neutral-50/40">
+                          <td className="py-2.5 pl-12 pr-4">
+                            <div className="flex items-center gap-2">
+                              <span className="rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-[10px] text-neutral-500">
+                                {variant.sku}
+                              </span>
+                              <span className="text-sm text-neutral-700">{variant.label}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-2.5 text-xs text-neutral-400">—</td>
+                          <td className="px-4 py-2.5">
+                            <span
+                              className={cn(
+                                'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold',
+                                STATUS_TONES[vStatus],
+                              )}
                             >
-                              +10
-                            </button>
-                          </>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => toggleTracking(item)}
-                            disabled={updateInventory.isPending}
-                            className="rounded-lg border border-neutral-200 bg-white px-2 py-1 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 disabled:opacity-40"
-                          >
-                            Enable tracking
-                          </button>
-                        )}
-                        {item.isAvailable ? (
-                          <button
-                            type="button"
-                            onClick={() => markSoldOut(item)}
-                            disabled={updateInventory.isPending}
-                            className="ml-1 rounded-lg border border-red-200 bg-red-50 px-2 py-1 text-xs font-semibold text-red-700 hover:bg-red-100 disabled:opacity-40"
-                          >
-                            Sold out
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => markAvailable(item)}
-                            disabled={updateInventory.isPending}
-                            className="ml-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
-                          >
-                            Make available
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+                              {STATUS_LABEL[vStatus]}
+                            </span>
+                          </td>
+                          <td className="px-4 py-2.5 text-right font-mono text-neutral-800">
+                            {variant.inventoryQuantity ?? '—'}
+                          </td>
+                          <td className="px-4 py-2.5 text-right font-mono text-neutral-500">
+                            {variant.lowStockThreshold ?? '—'}
+                          </td>
+                          <td className="px-4 py-2.5">
+                            <div className="flex items-center justify-end gap-1">
+                              <button
+                                type="button"
+                                title="Decrement by 1"
+                                onClick={() => adjustVariantQty(item.id, variant, -1)}
+                                disabled={updateVariantInventory.isPending}
+                                className="flex h-7 w-7 items-center justify-center rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-100 disabled:opacity-40"
+                              >
+                                <Minus className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                title="Add 1"
+                                onClick={() => adjustVariantQty(item.id, variant, 1)}
+                                disabled={updateVariantInventory.isPending}
+                                className="flex h-7 w-7 items-center justify-center rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-100 disabled:opacity-40"
+                              >
+                                <Plus className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => adjustVariantQty(item.id, variant, 10)}
+                                disabled={updateVariantInventory.isPending}
+                                className="ml-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
+                              >
+                                +10
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </React.Fragment>
                 );
               })}
             </tbody>

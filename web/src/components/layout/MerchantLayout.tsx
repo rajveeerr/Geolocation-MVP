@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, useCallback, type ReactNode } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   BarChart3,
   Boxes,
   Building2,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   CircleDollarSign,
   Gift,
   Grid2x2,
@@ -309,12 +311,16 @@ function MerchantSidebar({
   merchantDisplayName,
   merchantTagline,
   merchantInitials,
+  collapsed = false,
+  onToggleCollapse,
 }: {
   pathname: string;
   onNavigate?: () => void;
   merchantDisplayName: string;
   merchantTagline: string;
   merchantInitials: string;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
 }) {
   const activeSection = getActiveSection(pathname);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() =>
@@ -335,18 +341,94 @@ function MerchantSidebar({
     }));
   };
 
+  // Collapsed mode: icon-only sidebar
+  if (collapsed) {
+    return (
+      <div className="flex h-full flex-col items-center">
+        <div className="border-b border-neutral-200/80 px-2 py-5 w-full flex flex-col items-center gap-3">
+          <Link to={PATHS.MERCHANT_DASHBOARD} onClick={onNavigate} title={merchantDisplayName}>
+            <span className="flex h-10 w-10 items-center justify-center rounded-[0.85rem] bg-[#111111] text-sm font-semibold text-white shadow-[0_8px_18px_rgba(17,17,17,0.18)]">
+              {merchantInitials}
+            </span>
+          </Link>
+          {onToggleCollapse ? (
+            <button
+              type="button"
+              onClick={onToggleCollapse}
+              title="Expand sidebar"
+              className="flex h-8 w-8 items-center justify-center rounded-[0.6rem] border border-neutral-200 bg-white text-neutral-400 transition hover:bg-neutral-50 hover:text-neutral-700"
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          ) : null}
+        </div>
+
+        <div className="flex-1 overflow-y-auto w-full px-2 py-4">
+          <div className="space-y-1">
+            {navSections.map((section) =>
+              section.items.map((item) => {
+                const isActive = item.match ? item.match(pathname) : pathname.startsWith(item.to);
+                const Icon = item.icon;
+
+                return (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    onClick={onNavigate}
+                    title={item.label}
+                    className={cn(
+                      'flex items-center justify-center rounded-[0.7rem] p-2.5 transition',
+                      isActive
+                        ? 'bg-neutral-100 text-neutral-950'
+                        : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-950',
+                    )}
+                  >
+                    <Icon className="h-[18px] w-[18px]" />
+                  </NavLink>
+                );
+              }),
+            )}
+          </div>
+        </div>
+
+        <div className="border-t border-neutral-200/80 px-2 py-3 w-full flex flex-col items-center">
+          <Link
+            to={PATHS.MERCHANT_DEALS_CREATE}
+            onClick={onNavigate}
+            title="Create deal"
+            className="flex h-10 w-10 items-center justify-center rounded-[0.85rem] bg-neutral-950 text-white transition hover:bg-neutral-800"
+          >
+            <Plus className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full flex-col">
       <div className="border-b border-neutral-200/80 px-5 py-5">
-        <Link to={PATHS.MERCHANT_DASHBOARD} onClick={onNavigate} className="inline-flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[#111111] text-sm font-semibold text-white shadow-[0_8px_18px_rgba(17,17,17,0.18)]">
-            {merchantInitials}
-          </span>
-          <span className="min-w-0">
-            <span className="block truncate text-[1.05rem] font-semibold tracking-tight text-neutral-950">{merchantDisplayName}</span>
-            <span className="block truncate text-xs text-neutral-500">{merchantTagline}</span>
-          </span>
-        </Link>
+        <div className="flex items-center justify-between gap-2">
+          <Link to={PATHS.MERCHANT_DASHBOARD} onClick={onNavigate} className="inline-flex min-w-0 items-center gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] bg-[#111111] text-sm font-semibold text-white shadow-[0_8px_18px_rgba(17,17,17,0.18)]">
+              {merchantInitials}
+            </span>
+            <span className="min-w-0">
+              <span className="block truncate text-[1.05rem] font-semibold tracking-tight text-neutral-950">{merchantDisplayName}</span>
+              <span className="block truncate text-xs text-neutral-500">{merchantTagline}</span>
+            </span>
+          </Link>
+          {onToggleCollapse ? (
+            <button
+              type="button"
+              onClick={onToggleCollapse}
+              title="Collapse sidebar"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.6rem] border border-neutral-200 bg-white text-neutral-400 transition hover:bg-neutral-50 hover:text-neutral-700"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-6">
@@ -537,12 +619,33 @@ function MerchantWorkspaceSearch({
   );
 }
 
+const SIDEBAR_COLLAPSED_KEY = 'merchant-sidebar-collapsed';
+
 export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { data: merchantData } = useMerchantStatus();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleSidebarCollapsed = useCallback(() => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     setMobileSidebarOpen(false);
@@ -575,13 +678,20 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
   return (
     <div className="min-h-screen bg-[#f5f5f7] text-neutral-900">
       <div className="flex min-h-screen">
-        <aside className="hidden w-[320px] shrink-0 border-r border-neutral-200/70 bg-[#fbfbfc] lg:block">
-          <div className="sticky top-0 flex h-screen flex-col">
+        <aside
+          className={cn(
+            'hidden shrink-0 border-r border-neutral-200/70 bg-[#fbfbfc] lg:block transition-[width] duration-300 ease-in-out',
+            sidebarCollapsed ? 'w-[72px]' : 'w-[320px]',
+          )}
+        >
+          <div className="sticky top-0 flex h-screen flex-col overflow-hidden">
             <MerchantSidebar
               pathname={location.pathname}
               merchantDisplayName={merchantName}
               merchantTagline={merchantTagline}
               merchantInitials={merchantInitials}
+              collapsed={sidebarCollapsed}
+              onToggleCollapse={toggleSidebarCollapsed}
             />
           </div>
         </aside>

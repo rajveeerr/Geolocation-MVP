@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit2, Trash2, Clock } from 'lucide-react';
+import { Edit2, Trash2, Clock, Layers } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { MenuCollection } from '@/hooks/useMenuCollections';
 
@@ -148,6 +148,12 @@ export const MenuListCard: React.FC<MenuListCardProps> = ({
                 )}
               >
                 <span>{item.menuItem?.name || 'Unnamed'}</span>
+                {item.menuItem?.hasVariants && item.menuItem?.variants && item.menuItem.variants.length > 0 && (
+                  <span className="inline-flex items-center gap-0.5 rounded-full bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 text-[10px] font-bold text-indigo-600">
+                    <Layers className="h-2.5 w-2.5" />
+                    {item.menuItem.variants.length}
+                  </span>
+                )}
                 <span
                   className={cn(
                     'rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide',
