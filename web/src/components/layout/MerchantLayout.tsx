@@ -23,6 +23,7 @@ import {
   UtensilsCrossed,
   WandSparkles,
   X,
+  FileText,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -208,6 +209,30 @@ const navSections: MerchantNavSection[] = [
     ],
   },
   {
+    id: 'content',
+    label: 'Content',
+    items: [
+      {
+        label: 'Blog Posts',
+        to: PATHS.MERCHANT_BLOG,
+        icon: FileText,
+        match: (pathname) => pathname === PATHS.MERCHANT_BLOG || pathname.includes('/merchant/blog/') && !pathname.includes('categories'),
+      },
+      {
+        label: 'Create Post',
+        to: PATHS.MERCHANT_BLOG_CREATE,
+        icon: FileText,
+        match: (pathname) => pathname === PATHS.MERCHANT_BLOG_CREATE,
+      },
+      {
+        label: 'Categories',
+        to: PATHS.MERCHANT_BLOG_CATEGORIES,
+        icon: FileText,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_BLOG_CATEGORIES),
+      },
+    ],
+  },
+  {
     id: 'business',
     label: 'My Business',
     items: [
@@ -222,6 +247,11 @@ const navSections: MerchantNavSection[] = [
 ];
 
 const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; subtitle: string }> = [
+  {
+    match: (pathname) => pathname.startsWith('/merchant/blog'),
+    title: 'Blog',
+    subtitle: 'Write and publish content for your customers.',
+  },
   {
     match: (pathname) => pathname.startsWith(PATHS.MERCHANT_BUSINESS),
     title: 'My Business',

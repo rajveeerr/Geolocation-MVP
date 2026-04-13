@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { PATHS } from '@/routing/paths';
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
-import { CalendarIcon, ClockIcon, DollarSign, Percent, BarChart3, Users, Gift, AlertTriangle, PackageX, Boxes } from 'lucide-react';
+import { CalendarIcon, ClockIcon, DollarSign, Percent, BarChart3, Users, Gift, AlertTriangle, PackageX, Boxes, Sparkles } from 'lucide-react';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useMerchantDashboardStats } from '@/hooks/useMerchantDashboardStats';
 import { useMerchantStores } from '@/hooks/useMerchantStores';
@@ -534,11 +534,19 @@ export const MerchantDashboardPage = () => {
                     )}
                   </div>
                 </div>
-                <Link to={PATHS.MERCHANT_INVENTORY}>
-                  <Button size="sm" className="rounded-xl">
-                    Open Inventory
-                  </Button>
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link to={`${PATHS.MERCHANT_INVENTORY}?analyze=true`}>
+                    <Button size="sm" variant="secondary" className="rounded-xl gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      AI Insights
+                    </Button>
+                  </Link>
+                  <Link to={PATHS.MERCHANT_INVENTORY}>
+                    <Button size="sm" className="rounded-xl">
+                      Open Inventory
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           )}

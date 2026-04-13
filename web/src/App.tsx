@@ -150,6 +150,11 @@ const MenuCollectionsPage = React.lazy(() =>
   import('./components/merchant/menu-collections/MenuCollectionsPage').then((m) => ({ default: m.MenuCollectionsPage })),
 );
 const InventoryPage = React.lazy(() => import('./pages/merchant/InventoryPage'));
+const BlogListPage = React.lazy(() => import('./pages/merchant/BlogListPage'));
+const BlogPostFormPage = React.lazy(() => import('./pages/merchant/BlogPostFormPage'));
+const BlogCategoriesPage = React.lazy(() => import('./pages/merchant/BlogCategoriesPage'));
+const MerchantBlogPage = React.lazy(() => import('./pages/public/MerchantBlogPage'));
+const BlogPostPage = React.lazy(() => import('./pages/public/BlogPostPage'));
 const StoreDetailPage = React.lazy(() =>
   import('./pages/merchant/StoreDetailPage').then((m) => ({ default: m.StoreDetailPage })),
 );
@@ -471,6 +476,24 @@ function App() {
                     path={PATHS.FOR_BUSINESSES}
                     element={<ForBusinessesPage />}
                   />
+                  {/* Public blog routes */}
+                  <Route
+                    path="/merchants/:merchantId/blog"
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MerchantBlogPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/blog/:merchantId/:slug"
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <BlogPostPage />
+                      </Suspense>
+                    }
+                  />
+
                   <Route path={PATHS.PRIVACY} element={<PrivacyPage />} />
                   <Route path={PATHS.TERMS} element={<TermsPage />} />
                   <Route path={PATHS.PAYMENT_SUCCESS} element={<PaymentSuccessPage />} />
@@ -777,6 +800,56 @@ function App() {
                       <MerchantLayout>
                         <Suspense fallback={<LoadingOverlay />}>
                           <InventoryPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Blog routes */}
+                <Route
+                  path={PATHS.MERCHANT_BLOG}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <BlogListPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_BLOG_CREATE}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <BlogPostFormPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_BLOG_EDIT}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <BlogPostFormPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_BLOG_CATEGORIES}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <BlogCategoriesPage />
                         </Suspense>
                       </MerchantLayout>
                     </ProtectedRoute>

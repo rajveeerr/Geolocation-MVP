@@ -381,3 +381,90 @@ export const useAiCityGuideItinerary = () => {
   });
 };
 
+// --- AI Inventory Management ---
+
+export interface AiInventoryAnalysis {
+  healthScore: number;
+  healthLabel: string;
+  summary: string;
+  categoryHealth: { category: string; status: string; insight: string; itemsNeedingAttention: number }[];
+  restockSuggestions: { itemName: string; currentQty: number; suggestedRestockQty: number; urgency: string; reason: string }[];
+  actionItems: string[];
+  tips: string[];
+}
+
+export interface AiInventoryAnalysisResponse {
+  analysis: AiInventoryAnalysis;
+}
+
+export interface AiBulkSetupSuggestion {
+  itemId: number;
+  inventoryTrackingEnabled: boolean;
+  inventoryQuantity: number;
+  lowStockThreshold: number;
+  allowBackorder: boolean;
+  rationale: string;
+}
+
+export interface AiBulkSetupResponse {
+  suggestions: AiBulkSetupSuggestion[];
+}
+
+export const useAiInventoryAnalysis = () => {
+  return useMutation({
+    mutationKey: ['ai-inventory-analyze'],
+    mutationFn: async () => {
+      const res = await apiGet<AiInventoryAnalysisResponse>('/ai/inventory/analyze');
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Failed to analyze inventory');
+      }
+      return res.data;
+    },
+  });
+};
+
+export const useAiInventoryBulkSetup = () => {
+  return useMutation({
+    mutationKey: ['ai-inventory-bulk-setup'],
+    mutationFn: async () => {
+      const res = await apiGet<AiBulkSetupResponse>('/ai/inventory/bulk-setup');
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Failed to generate bulk setup suggestions');
+      }
+      return res.data;
+    },
+  });
+};
+
+// --- AI Blog Draft ---
+
+export interface AiBlogDraftRequest {
+  topic: string;
+  tone?: string;
+}
+
+export interface AiBlogDraftSuggestion {
+  title: string;
+  excerpt: string;
+  content: string;
+  tags: string[];
+  suggestedCategory: string;
+}
+
+export interface AiBlogDraftResponse {
+  suggestion: AiBlogDraftSuggestion;
+}
+
+export const useAiBlogDraft = () => {
+  return useMutation({
+    mutationKey: ['ai-blog-generate'],
+    mutationFn: async (payload: AiBlogDraftRequest) => {
+      const res = await apiPost<AiBlogDraftResponse, AiBlogDraftRequest>('/ai/blog/generate', payload);
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Failed to generate blog draft');
+      }
+      return res.data;
+    },
+  });
+};
+

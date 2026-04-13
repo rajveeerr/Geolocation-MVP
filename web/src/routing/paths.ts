@@ -30,6 +30,12 @@ export const PATHS = {
   MERCHANT_ANALYTICS: '/merchant/analytics',
   MERCHANT_CHECKIN_GAMES: '/merchant/check-in-games',
 
+  // Blog (merchant)
+  MERCHANT_BLOG: '/merchant/blog',
+  MERCHANT_BLOG_CREATE: '/merchant/blog/create',
+  MERCHANT_BLOG_EDIT: '/merchant/blog/:postId/edit',
+  MERCHANT_BLOG_CATEGORIES: '/merchant/blog/categories',
+
   LOGIN: '/login',
   SIGNUP: '/signup',
   VERIFY_OTP: '/verify-otp',

@@ -7,6 +7,9 @@
       "Bash(find /c/Geolocation-MVP/backend/GeoLocationMVP-BE/src -type f -name \"*.ts\" -exec wc -l {} +)",
       "Bash(find /c/Geolocation-MVP/backend/GeoLocationMVP-BE -type f \\\\\\(-name *.test.ts -o -name *.spec.ts -o -name __tests__ \\\\\\))",
       "Bash(find /c/Geolocation-MVP -maxdepth 1 -name \"*.md\" -type f -exec basename {})"
+    ],
+    "additionalDirectories": [
+      "C:\\Geolocation-MVP\\web\\src\\pages"
     ]
   }
 }
