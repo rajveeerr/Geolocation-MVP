@@ -36,9 +36,19 @@ const MerchantDashboardPage = React.lazy(() =>
     default: m.MerchantDashboardPage,
   })),
 );
+const MerchantBusinessPage = React.lazy(() =>
+  import('./pages/merchant/MerchantBusinessPage').then((m) => ({
+    default: m.MerchantBusinessPage,
+  })),
+);
 const MerchantAnalyticsPage = React.lazy(() =>
   import('./pages/merchant/MerchantAnalyticsPage').then((m) => ({
     default: m.MerchantAnalyticsPage,
+  })),
+);
+const MerchantCheckInGamesPage = React.lazy(() =>
+  import('./pages/merchant/MerchantCheckInGamesPage').then((m) => ({
+    default: m.MerchantCheckInGamesPage,
   })),
 );
 const CreateDealPage = React.lazy(() =>
@@ -139,6 +149,12 @@ const MenuItemDetailPage = React.lazy(() =>
 const MenuCollectionsPage = React.lazy(() =>
   import('./components/merchant/menu-collections/MenuCollectionsPage').then((m) => ({ default: m.MenuCollectionsPage })),
 );
+const InventoryPage = React.lazy(() => import('./pages/merchant/InventoryPage'));
+const BlogListPage = React.lazy(() => import('./pages/merchant/BlogListPage'));
+const BlogPostFormPage = React.lazy(() => import('./pages/merchant/BlogPostFormPage'));
+const BlogCategoriesPage = React.lazy(() => import('./pages/merchant/BlogCategoriesPage'));
+const MerchantBlogPage = React.lazy(() => import('./pages/public/MerchantBlogPage'));
+const BlogPostPage = React.lazy(() => import('./pages/public/BlogPostPage'));
 const StoreDetailPage = React.lazy(() =>
   import('./pages/merchant/StoreDetailPage').then((m) => ({ default: m.StoreDetailPage })),
 );
@@ -168,6 +184,9 @@ const DiscoverEventsPage = React.lazy(() =>
 );
 const DiscoverServicesPage = React.lazy(() =>
   import('./pages/DiscoverServicesPage').then((m) => ({ default: m.DiscoverServicesPage })),
+);
+const CityGuidePage = React.lazy(() =>
+  import('./pages/CityGuidePage').then((m) => ({ default: m.CityGuidePage })),
 );
 const ServiceDetailPage = React.lazy(() =>
   import('./pages/ServiceDetailPage').then((m) => ({ default: m.ServiceDetailPage })),
@@ -227,6 +246,9 @@ const MerchantLoyaltyTransactionsPage = React.lazy(() =>
 );
 const AdminNudgesPage = React.lazy(() =>
   import('./pages/admin/AdminNudgesPage').then((m) => ({ default: m.AdminNudgesPage }))
+);
+const AdminGamesPage = React.lazy(() =>
+  import('./pages/admin/AdminGamesPage').then((m) => ({ default: m.AdminGamesPage }))
 );
 const NudgeHistoryPage = React.lazy(() =>
   import('./pages/NudgeHistoryPage').then((m) => ({ default: m.NudgeHistoryPage }))
@@ -387,6 +409,16 @@ function App() {
                     }
                   />
                   <Route
+                    path={PATHS.CITY_GUIDE}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <CityGuidePage />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
                     path={PATHS.SERVICE_DETAIL}
                     element={
                       <Suspense fallback={<LoadingOverlay />}>
@@ -444,12 +476,42 @@ function App() {
                     path={PATHS.FOR_BUSINESSES}
                     element={<ForBusinessesPage />}
                   />
+                  {/* Public blog routes */}
+                  <Route
+                    path="/merchants/:merchantId/blog"
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MerchantBlogPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/blog/:merchantId/:slug"
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <BlogPostPage />
+                      </Suspense>
+                    }
+                  />
+
                   <Route path={PATHS.PRIVACY} element={<PrivacyPage />} />
                   <Route path={PATHS.TERMS} element={<TermsPage />} />
                   <Route path={PATHS.PAYMENT_SUCCESS} element={<PaymentSuccessPage />} />
                   <Route path={PATHS.PAYMENT_CANCEL} element={<PaymentCancelPage />} />
                 </Route>
 
+                <Route
+                  path={PATHS.MERCHANT_BUSINESS}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantBusinessPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
                 <Route
                   path={PATHS.MERCHANT_DASHBOARD}
                   element={
@@ -731,6 +793,68 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path={PATHS.MERCHANT_INVENTORY}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <InventoryPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Blog routes */}
+                <Route
+                  path={PATHS.MERCHANT_BLOG}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <BlogListPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_BLOG_CREATE}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <BlogPostFormPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_BLOG_EDIT}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <BlogPostFormPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_BLOG_CATEGORIES}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <BlogCategoriesPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
 
                 <Route
                   path={PATHS.MERCHANT_ANALYTICS}
@@ -739,6 +863,18 @@ function App() {
                       <MerchantLayout>
                         <Suspense fallback={<LoadingOverlay />}>
                           <MerchantAnalyticsPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_CHECKIN_GAMES}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantCheckInGamesPage />
                         </Suspense>
                       </MerchantLayout>
                     </ProtectedRoute>
@@ -909,6 +1045,14 @@ function App() {
                     element={
                       <Suspense fallback={<LoadingOverlay />}>
                         <AdminNudgesPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={PATHS.ADMIN_GAMES}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <AdminGamesPage />
                       </Suspense>
                     }
                   />

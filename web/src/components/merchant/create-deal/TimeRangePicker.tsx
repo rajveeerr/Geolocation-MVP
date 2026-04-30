@@ -6,6 +6,7 @@ import { Plus, X, Clock, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
+import { TwelveHourTimeField } from '@/components/common/TwelveHourTimeField';
 
 type TimeRangePreset = 'everyday' | 'mon-fri' | 'weekends' | 'days';
 
@@ -219,39 +220,31 @@ export const TimeRangePicker = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-neutral-700 mb-2 block">Start Time</label>
-                  <div className="relative">
-                    <input
-                      type="time"
-                      value={state.timeRanges[0]?.start || '17:00'}
-                      onChange={(e) => {
-                        const updatedRanges = [...state.timeRanges];
-                        if (updatedRanges[0]) {
-                          updatedRanges[0] = { ...updatedRanges[0], start: e.target.value };
-                        }
-                        dispatch({ type: 'SET_FIELD', field: 'timeRanges', value: updatedRanges });
-                      }}
-                      className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-brand-primary-500 focus:ring-1 focus:ring-brand-primary-500"
-                    />
-                    <Clock className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400 pointer-events-none" />
-                  </div>
+                  <TwelveHourTimeField
+                    value={state.timeRanges[0]?.start || '17:00'}
+                    onChange={(value) => {
+                      const updatedRanges = [...state.timeRanges];
+                      if (updatedRanges[0]) {
+                        updatedRanges[0] = { ...updatedRanges[0], start: value };
+                      }
+                      dispatch({ type: 'SET_FIELD', field: 'timeRanges', value: updatedRanges });
+                    }}
+                    className="space-y-0"
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-neutral-700 mb-2 block">End Time</label>
-                  <div className="relative">
-                    <input
-                      type="time"
-                      value={state.timeRanges[0]?.end || '19:00'}
-                      onChange={(e) => {
-                        const updatedRanges = [...state.timeRanges];
-                        if (updatedRanges[0]) {
-                          updatedRanges[0] = { ...updatedRanges[0], end: e.target.value };
-                        }
-                        dispatch({ type: 'SET_FIELD', field: 'timeRanges', value: updatedRanges });
-                      }}
-                      className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-brand-primary-500 focus:ring-1 focus:ring-brand-primary-500"
-                    />
-                    <Clock className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400 pointer-events-none" />
-                  </div>
+                  <TwelveHourTimeField
+                    value={state.timeRanges[0]?.end || '19:00'}
+                    onChange={(value) => {
+                      const updatedRanges = [...state.timeRanges];
+                      if (updatedRanges[0]) {
+                        updatedRanges[0] = { ...updatedRanges[0], end: value };
+                      }
+                      dispatch({ type: 'SET_FIELD', field: 'timeRanges', value: updatedRanges });
+                    }}
+                    className="space-y-0"
+                  />
                 </div>
               </div>
               {state.timeRanges[0] && (
@@ -366,29 +359,21 @@ export const TimeRangePicker = () => {
                       {/* Start Time */}
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-neutral-700">Start Time</label>
-                        <div className="relative">
-                          <input
-                            type="time"
-                            value={range.start}
-                            onChange={(e) => dispatch({ type: 'UPDATE_TIME_RANGE', payload: { id: range.id, field: 'start', value: e.target.value }})}
-                            className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-brand-primary-500 focus:ring-1 focus:ring-brand-primary-500"
-                          />
-                                <Clock className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400 pointer-events-none" />
-                        </div>
+                        <TwelveHourTimeField
+                          value={range.start}
+                          onChange={(value) => dispatch({ type: 'UPDATE_TIME_RANGE', payload: { id: range.id, field: 'start', value }})}
+                          className="space-y-0"
+                        />
                       </div>
 
                       {/* End Time */}
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-neutral-700">End Time</label>
-                        <div className="relative">
-                          <input
-                            type="time"
-                            value={range.end}
-                            onChange={(e) => dispatch({ type: 'UPDATE_TIME_RANGE', payload: { id: range.id, field: 'end', value: e.target.value }})}
-                            className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-brand-primary-500 focus:ring-1 focus:ring-brand-primary-500"
-                          />
-                                <Clock className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400 pointer-events-none" />
-                        </div>
+                        <TwelveHourTimeField
+                          value={range.end}
+                          onChange={(value) => dispatch({ type: 'UPDATE_TIME_RANGE', payload: { id: range.id, field: 'end', value }})}
+                          className="space-y-0"
+                        />
                       </div>
                     </div>
                   </motion.div>

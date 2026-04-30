@@ -51,7 +51,7 @@ export function ServiceCheckInPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
       <div className="mb-6 flex items-center gap-3">
-        <Link to={PATHS.MERCHANT_SERVICES_MANAGE.replace(':serviceId', String(parsedServiceId))} className="rounded-lg bg-neutral-900 p-2 text-white">
+        <Link to={PATHS.MERCHANT_SERVICES_MANAGE.replace(':serviceId', String(parsedServiceId))} className="inline-flex items-center justify-center rounded-lg bg-neutral-900 p-2 text-white">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>

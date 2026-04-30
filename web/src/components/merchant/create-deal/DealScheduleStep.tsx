@@ -14,6 +14,16 @@ export const DealScheduleStep = () => {
   const navigate = useNavigate();
   const [showQuickOptions, setShowQuickOptions] = useState(false);
 
+  const timeOptions = Array.from({ length: 48 }, (_, index) => {
+    const hours24 = Math.floor(index / 2);
+    const minutes = index % 2 === 0 ? 0 : 30;
+    const period = hours24 >= 12 ? 'PM' : 'AM';
+    const hours12 = hours24 % 12 || 12;
+    const value = `${String(hours24).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    const label = `${hours12}:${String(minutes).padStart(2, '0')} ${period}`;
+    return { value, label };
+  });
+
   // The days of the week for the recurring selection
   const weekdays = [
     { key: 'MONDAY', label: 'Monday', short: 'Mon' },
@@ -155,6 +165,29 @@ export const DealScheduleStep = () => {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  const getDatePart = (value: string | null) => (value ? value.slice(0, 10) : '');
+  const getTimePart = (value: string | null) => (value && value.includes('T') ? value.slice(11, 16) : '');
+
+  const updateDateTimeField = (field: 'startTime' | 'endTime', part: 'date' | 'time', nextValue: string) => {
+    const currentValue = field === 'startTime' ? state.startTime : state.endTime;
+    const fallbackDate =
+      part === 'date'
+        ? nextValue
+        : getDatePart(currentValue) || formatDateTime(new Date()).slice(0, 10);
+    const fallbackTime = part === 'time' ? nextValue : getTimePart(currentValue) || '09:00';
+
+    const datePart = part === 'date' ? nextValue : fallbackDate;
+    const timePart = part === 'time' ? nextValue : fallbackTime;
+
+    if (!datePart || !timePart) return;
+
+    dispatch({
+      type: 'UPDATE_FIELD',
+      field,
+      value: `${datePart}T${timePart}`,
+    });
   };
 
   const handleQuickOption = (option: typeof quickOptions[0]) => {
@@ -329,21 +362,33 @@ export const DealScheduleStep = () => {
           </p>
                   <div className="space-y-2">
                     <div className="relative">
-          <Input
-            id="startTime"
-            type="datetime-local"
-            value={state.startTime}
-            onChange={(e) =>
-              dispatch({
-                type: 'UPDATE_FIELD',
-                field: 'startTime',
-                value: e.target.value,
-              })
-            }
-                        className="h-12 text-base transition-all focus:ring-2 focus:ring-brand-primary-500/20"
-                        min={formatDateTime(new Date())}
-                      />
-                      <Calendar className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_180px]">
+                        <div className="relative">
+                          <Input
+                            id="startTime"
+                            type="date"
+                            value={getDatePart(state.startTime)}
+                            onChange={(e) => updateDateTimeField('startTime', 'date', e.target.value)}
+                            className="h-12 text-base transition-all focus:ring-2 focus:ring-brand-primary-500/20"
+                            min={formatDateTime(new Date()).slice(0, 10)}
+                          />
+                          <Calendar className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
+                        </div>
+                        <div className="relative">
+                          <select
+                            value={getTimePart(state.startTime) || '09:00'}
+                            onChange={(e) => updateDateTimeField('startTime', 'time', e.target.value)}
+                            className="h-12 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20 md:text-sm"
+                          >
+                            {timeOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                          <Clock className="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
+                        </div>
+                      </div>
                     </div>
                     {/* Quick start time buttons */}
                     <div className="flex gap-2">
@@ -384,21 +429,33 @@ export const DealScheduleStep = () => {
           </p>
                   <div className="space-y-2">
                     <div className="relative">
-          <Input
-            id="endTime"
-            type="datetime-local"
-            value={state.endTime}
-            onChange={(e) =>
-              dispatch({
-                type: 'UPDATE_FIELD',
-                field: 'endTime',
-                value: e.target.value,
-              })
-            }
-                        className="h-12 text-base transition-all focus:ring-2 focus:ring-brand-primary-500/20"
-                        min={state.startTime || formatDateTime(new Date())}
-                      />
-                      <Calendar className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_180px]">
+                        <div className="relative">
+                          <Input
+                            id="endTime"
+                            type="date"
+                            value={getDatePart(state.endTime)}
+                            onChange={(e) => updateDateTimeField('endTime', 'date', e.target.value)}
+                            className="h-12 text-base transition-all focus:ring-2 focus:ring-brand-primary-500/20"
+                            min={getDatePart(state.startTime) || formatDateTime(new Date()).slice(0, 10)}
+                          />
+                          <Calendar className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
+                        </div>
+                        <div className="relative">
+                          <select
+                            value={getTimePart(state.endTime) || '18:00'}
+                            onChange={(e) => updateDateTimeField('endTime', 'time', e.target.value)}
+                            className="h-12 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20 md:text-sm"
+                          >
+                            {timeOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                          <Clock className="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
+                        </div>
+                      </div>
                     </div>
                     {/* Quick duration buttons */}
                     <div className="flex gap-2">

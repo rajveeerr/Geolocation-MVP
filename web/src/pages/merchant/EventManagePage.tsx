@@ -737,7 +737,7 @@ function EventManageContent() {
         <AlertCircle className="h-12 w-12 text-red-400" />
         <p className="text-red-600">Event not found</p>
         <Link to={PATHS.MERCHANT_EVENTS}>
-          <Button variant="secondary" className="rounded-lg">Back to Events</Button>
+          <Button variant="secondary" className="inline-flex items-center whitespace-nowrap rounded-lg">Back to Events</Button>
         </Link>
       </div>
     );
@@ -757,9 +757,9 @@ function EventManageContent() {
       <div className="mb-8">
         <button
           onClick={() => navigate(PATHS.MERCHANT_EVENTS)}
-          className="mb-4 flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-700"
+          className="mb-4 inline-flex items-center gap-2 whitespace-nowrap text-sm text-neutral-500 hover:text-neutral-700"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-4 w-4 shrink-0" />
           Back to Events
         </button>
 

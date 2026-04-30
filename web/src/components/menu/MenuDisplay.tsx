@@ -138,9 +138,24 @@ export const MenuDisplay = ({ merchantId, className }: MenuDisplayProps) => {
                       <span className="ml-2">{item.category}</span>
                     </CardDescription>
                   </div>
-                  <Badge variant={item.isAvailable ? 'default' : 'secondary'}>
-                    {item.isAvailable ? 'Available' : 'Unavailable'}
-                  </Badge>
+                  {(() => {
+                    if (!item.isAvailable) {
+                      return <Badge variant="secondary">Unavailable</Badge>;
+                    }
+                    if (item.inventoryStatus === 'OUT_OF_STOCK') {
+                      return item.allowBackorder
+                        ? <Badge variant="secondary">Backorder</Badge>
+                        : <Badge variant="destructive">Out of stock</Badge>;
+                    }
+                    if (item.inventoryStatus === 'LOW_STOCK') {
+                      return (
+                        <Badge variant="default" className="bg-amber-500 hover:bg-amber-500">
+                          Only {item.inventoryQuantity ?? 0} left
+                        </Badge>
+                      );
+                    }
+                    return <Badge variant="default">Available</Badge>;
+                  })()}
                 </div>
               </CardHeader>
               

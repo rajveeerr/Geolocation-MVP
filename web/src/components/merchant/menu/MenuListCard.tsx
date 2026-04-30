@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit2, Trash2, Clock } from 'lucide-react';
+import { Edit2, Trash2, Clock, Layers } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { MenuCollection } from '@/hooks/useMenuCollections';
 
@@ -19,6 +19,26 @@ function formatTime(time: string): string {
   if (h === 0) h = 12;
   else if (h > 12) h -= 12;
   return m > 0 ? `${h}:${mStr} ${suffix}` : `${h} ${suffix}`;
+}
+
+function getInventoryTone(status?: string) {
+  switch (status) {
+    case 'OUT_OF_STOCK':
+      return 'bg-red-100 text-red-700 border-red-200';
+    case 'LOW_STOCK':
+      return 'bg-amber-100 text-amber-700 border-amber-200';
+    case 'IN_STOCK':
+      return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+    default:
+      return 'bg-slate-100 text-slate-700 border-slate-200';
+  }
+}
+
+function getInventoryLabel(status?: string, quantity?: number | null) {
+  if (status === 'OUT_OF_STOCK') return 'Out';
+  if (status === 'LOW_STOCK') return quantity != null ? `Low ${quantity}` : 'Low';
+  if (status === 'IN_STOCK') return quantity != null ? `${quantity} in stock` : 'In stock';
+  return 'Untracked';
 }
 
 export const MenuListCard: React.FC<MenuListCardProps> = ({
@@ -120,15 +140,29 @@ export const MenuListCard: React.FC<MenuListCardProps> = ({
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             {(collection.items ?? []).slice(0, 5).map((item, idx) => (
-              <span
+              <div
                 key={item.menuItemId || idx}
                 className={cn(
-                  "inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-semibold",
+                  "inline-flex items-center gap-2 rounded-lg px-2.5 py-1 text-xs font-semibold",
                   "bg-neutral-50 border border-neutral-100 text-neutral-600 shadow-xs"
                 )}
               >
-                {item.menuItem?.name || 'Unnamed'}
-              </span>
+                <span>{item.menuItem?.name || 'Unnamed'}</span>
+                {item.menuItem?.hasVariants && item.menuItem?.variants && item.menuItem.variants.length > 0 && (
+                  <span className="inline-flex items-center gap-0.5 rounded-full bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 text-[10px] font-bold text-indigo-600">
+                    <Layers className="h-2.5 w-2.5" />
+                    {item.menuItem.variants.length}
+                  </span>
+                )}
+                <span
+                  className={cn(
+                    'rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide',
+                    getInventoryTone(item.menuItem?.inventoryStatus)
+                  )}
+                >
+                  {getInventoryLabel(item.menuItem?.inventoryStatus, item.menuItem?.inventoryQuantity)}
+                </span>
+              </div>
             ))}
             {itemCount > 5 && (
               <span className="text-xs font-bold text-brand ml-1">

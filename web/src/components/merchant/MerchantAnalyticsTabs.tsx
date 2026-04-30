@@ -1,5 +1,18 @@
-import { useState } from 'react';
-import { BarChart3, Users, DollarSign, TrendingUp, MapPin, Activity } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { TrendingDown, TrendingUp } from 'lucide-react';
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { useMerchantDealPerformance } from '@/hooks/useMerchantDealPerformance';
 import { useMerchantCustomerInsights } from '@/hooks/useMerchantCustomerInsights';
 import { useMerchantRevenueAnalytics } from '@/hooks/useMerchantRevenueAnalytics';
@@ -7,609 +20,559 @@ import { useMerchantEngagementMetrics } from '@/hooks/useMerchantEngagementMetri
 import { useMerchantPerformanceComparison } from '@/hooks/useMerchantPerformanceComparison';
 import { useMerchantCityPerformance } from '@/hooks/useMerchantCityPerformance';
 import { Loader2 } from 'lucide-react';
-
-interface TabProps {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  isActive: boolean;
-  onClick: () => void;
-}
-
-const Tab = ({ id, label, icon, isActive, onClick }: TabProps) => (
-  <button
-    onClick={onClick}
-    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
-      isActive
-        ? 'bg-brand-primary-100 text-brand-primary-700 border border-brand-primary-200'
-        : 'text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100'
-    }`}
-  >
-    {icon}
-    {label}
-  </button>
-);
+import { MerchantSegmentedControl, merchantPanelClass } from '@/components/merchant/MerchantAppleUI';
+import { cn } from '@/lib/utils';
 
 interface MerchantAnalyticsTabsProps {
   period?: 'last_7_days' | 'last_30_days' | 'this_month' | 'this_year' | 'all_time';
 }
 
-export const MerchantAnalyticsTabs = ({ period = 'last_30_days' }: MerchantAnalyticsTabsProps) => {
-  const [activeTab, setActiveTab] = useState('deal-performance');
+const chartColors = {
+  ink: '#111827',
+  slate: '#6b7280',
+  grid: '#e5e7eb',
+  blue: '#4f46e5',
+  blueSoft: '#c7d2fe',
+  green: '#10b981',
+  greenSoft: '#d1fae5',
+  amber: '#f59e0b',
+  amberSoft: '#fef3c7',
+  rose: '#f43f5e',
+  roseSoft: '#ffe4e6',
+};
 
-  const tabs = [
-    { id: 'deal-performance', label: 'Deal Performance', icon: <BarChart3 className="h-4 w-4" /> },
-    { id: 'customer-insights', label: 'Customer Insights', icon: <Users className="h-4 w-4" /> },
-    { id: 'revenue-analytics', label: 'Revenue Analytics', icon: <DollarSign className="h-4 w-4" /> },
-    { id: 'engagement-metrics', label: 'Engagement Metrics', icon: <Activity className="h-4 w-4" /> },
-    { id: 'performance-comparison', label: 'Performance Comparison', icon: <TrendingUp className="h-4 w-4" /> },
-    { id: 'city-performance', label: 'City Performance', icon: <MapPin className="h-4 w-4" /> },
-  ];
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: value >= 1000 ? 0 : 2,
+  }).format(value);
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'deal-performance':
-        return <DealPerformanceContent period={period} />;
-      case 'customer-insights':
-        return <CustomerInsightsContent period={period} />;
-      case 'revenue-analytics':
-        return <RevenueAnalyticsContent period={period} />;
-      case 'engagement-metrics':
-        return <EngagementMetricsContent period={period} />;
-      case 'performance-comparison':
-        return <PerformanceComparisonContent period={period} />;
-      case 'city-performance':
-        return <CityPerformanceContent period={period} />;
-      default:
-        return <DealPerformanceContent period={period} />;
-    }
-  };
+const formatCompactNumber = (value: number) =>
+  new Intl.NumberFormat('en-US', {
+    notation: value >= 1000 ? 'compact' : 'standard',
+    maximumFractionDigits: 1,
+  }).format(value);
+
+const formatDateLabel = (value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+};
+
+const LoadingState = () => (
+  <div className="flex items-center justify-center py-16">
+    <Loader2 className="h-6 w-6 animate-spin text-brand-primary-600" />
+  </div>
+);
+
+const ErrorState = ({ message }: { message: string }) => (
+  <div className="rounded-[1rem] border border-red-200 bg-red-50 p-4 text-sm text-red-700">{message}</div>
+);
+
+const AnalyticsStatCard = ({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+}) => (
+  <div className="rounded-[1rem] border border-neutral-200/80 bg-neutral-50/70 p-4">
+    <div className="text-[12px] font-medium text-neutral-500">{label}</div>
+    <div className="mt-2 text-[1.45rem] font-semibold tracking-tight text-neutral-950">{value}</div>
+    {hint ? <div className="mt-1 text-xs text-neutral-500">{hint}</div> : null}
+  </div>
+);
+
+const AnalyticsChartCard = ({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+}) => (
+  <div className={merchantPanelClass}>
+    <div className="mb-4">
+      <div className="text-[15px] font-semibold text-neutral-950">{title}</div>
+      {subtitle ? <div className="mt-1 text-[13px] text-neutral-500">{subtitle}</div> : null}
+    </div>
+    {children}
+  </div>
+);
+
+const TrendPill = ({
+  trend,
+  value,
+}: {
+  trend: 'up' | 'down' | 'stable';
+  value: number;
+}) => {
+  const isUp = trend === 'up';
+  const isDown = trend === 'down';
 
   return (
-    <div className="space-y-6">
-      {/* Tab Navigation */}
-      <div className="flex flex-wrap gap-2">
-        {tabs.map((tab) => (
-          <Tab
-            key={tab.id}
-            id={tab.id}
-            label={tab.label}
-            icon={tab.icon}
-            isActive={activeTab === tab.id}
-            onClick={() => setActiveTab(tab.id)}
-          />
-        ))}
-      </div>
-
-      {/* Tab Content */}
-      <div className="bg-white rounded-lg border border-neutral-200 p-6">
-        {renderTabContent()}
-      </div>
+    <div
+      className={cn(
+        'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold',
+        isUp
+          ? 'bg-emerald-50 text-emerald-700'
+          : isDown
+            ? 'bg-rose-50 text-rose-700'
+            : 'bg-neutral-100 text-neutral-600',
+      )}
+    >
+      {isUp ? <TrendingUp className="h-3 w-3" /> : isDown ? <TrendingDown className="h-3 w-3" /> : null}
+      {value > 0 ? '+' : ''}
+      {value.toFixed(1)}%
     </div>
   );
 };
 
-// Deal Performance Content
-const DealPerformanceContent = ({ period }: { period: string }) => {
-  const { data, isLoading, error } = useMerchantDealPerformance({ period: period as any });
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-brand-primary-600" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-red-600">Failed to load deal performance data</p>
-      </div>
-    );
-  }
+export const MerchantAnalyticsTabs = ({ period = 'last_30_days' }: MerchantAnalyticsTabsProps) => {
+  const [activeTab, setActiveTab] = useState<
+    'deal-performance' | 'customer-insights' | 'revenue-analytics' | 'engagement-metrics' | 'performance-comparison' | 'city-performance'
+  >('deal-performance');
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-neutral-900">Deal Performance Analytics</h3>
-      
-      {/* Summary Stats */}
-      {(data as any)?.summary && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-neutral-50 rounded-lg p-4">
-            <p className="text-sm text-neutral-600">Total Deals</p>
-            <p className="text-2xl font-bold text-neutral-900">{(data as any).summary.totalDeals}</p>
-          </div>
-          <div className="bg-neutral-50 rounded-lg p-4">
-            <p className="text-sm text-neutral-600">Active Deals</p>
-            <p className="text-2xl font-bold text-neutral-900">{(data as any).summary.activeDeals}</p>
-          </div>
-          <div className="bg-neutral-50 rounded-lg p-4">
-            <p className="text-sm text-neutral-600">Total Check-ins</p>
-            <p className="text-2xl font-bold text-neutral-900">{(data as any).summary.totalCheckIns}</p>
-          </div>
-          <div className="bg-neutral-50 rounded-lg p-4">
-            <p className="text-sm text-neutral-600">Total Saves</p>
-            <p className="text-2xl font-bold text-neutral-900">{(data as any).summary.totalSaves}</p>
-          </div>
+      <div className="space-y-3">
+        <div className="text-[13px] font-semibold text-neutral-900">Detailed views</div>
+        <div className="overflow-x-auto pb-1">
+          <MerchantSegmentedControl
+            value={activeTab}
+            onChange={setActiveTab}
+            options={[
+              { value: 'deal-performance', label: 'Deal Performance' },
+              { value: 'customer-insights', label: 'Customer Insights' },
+              { value: 'revenue-analytics', label: 'Revenue Analytics' },
+              { value: 'engagement-metrics', label: 'Engagement Metrics' },
+              { value: 'performance-comparison', label: 'Performance Comparison' },
+              { value: 'city-performance', label: 'City Performance' },
+            ]}
+            className="min-w-max"
+          />
         </div>
-      )}
+      </div>
 
-      {/* Deal List */}
-      {(data as any)?.deals && (data as any).deals.length > 0 && (
-        <div>
-          <h4 className="text-md font-semibold text-neutral-900 mb-4">Individual Deal Performance</h4>
-          <div className="space-y-4">
-            {(data as any).deals.map((deal: any) => (
-              <div key={deal.id} className="border border-neutral-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h5 className="font-medium text-neutral-900">{deal.title}</h5>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    deal.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
+      {activeTab === 'deal-performance' ? <DealPerformanceContent period={period} /> : null}
+      {activeTab === 'customer-insights' ? <CustomerInsightsContent period={period} /> : null}
+      {activeTab === 'revenue-analytics' ? <RevenueAnalyticsContent period={period} /> : null}
+      {activeTab === 'engagement-metrics' ? <EngagementMetricsContent period={period} /> : null}
+      {activeTab === 'performance-comparison' ? <PerformanceComparisonContent period={period} /> : null}
+      {activeTab === 'city-performance' ? <CityPerformanceContent period={period} /> : null}
+    </div>
+  );
+};
+
+const DealPerformanceContent = ({ period }: { period: string }) => {
+  const { data, isLoading, error } = useMerchantDealPerformance({ period: period as 'last_7_days' | 'last_30_days' | 'this_month' | 'this_year' });
+
+  const aggregatedSeries = useMemo(() => {
+    if (!data?.deals) return [];
+
+    const buckets = new Map<string, { date: string; checkIns: number; saves: number; revenue: number }>();
+
+    data.deals.forEach((deal) => {
+      deal.timeSeries.forEach((point) => {
+        const existing = buckets.get(point.date) ?? {
+          date: point.date,
+          checkIns: 0,
+          saves: 0,
+          revenue: 0,
+        };
+
+        existing.checkIns += point.checkIns;
+        existing.saves += point.saves;
+        existing.revenue += point.revenue;
+        buckets.set(point.date, existing);
+      });
+    });
+
+    return Array.from(buckets.values()).sort((a, b) => a.date.localeCompare(b.date));
+  }, [data]);
+
+  if (isLoading) return <LoadingState />;
+  if (error) return <ErrorState message="Failed to load deal performance data." />;
+  if (!data) return null;
+
+  return (
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-4 xl:grid-cols-5">
+        <AnalyticsStatCard label="Total deals" value={formatCompactNumber(data.summary.totalDeals)} />
+        <AnalyticsStatCard label="Active deals" value={formatCompactNumber(data.summary.activeDeals)} />
+        <AnalyticsStatCard label="Check-ins" value={formatCompactNumber(data.summary.totalCheckIns)} />
+        <AnalyticsStatCard label="Saves" value={formatCompactNumber(data.summary.totalSaves)} />
+        <AnalyticsStatCard label="Conversion" value={`${data.summary.averageConversionRate.toFixed(1)}%`} />
+      </div>
+
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.95fr)]">
+        <AnalyticsChartCard title="Deal momentum" subtitle="Check-ins and saves over time">
+          <div className="h-[260px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={aggregatedSeries}>
+                <defs>
+                  <linearGradient id="dealCheckins" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={chartColors.blue} stopOpacity={0.28} />
+                    <stop offset="100%" stopColor={chartColors.blue} stopOpacity={0.04} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} stroke={chartColors.grid} />
+                <XAxis dataKey="date" tickFormatter={formatDateLabel} tick={{ fontSize: 12, fill: chartColors.slate }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 12, fill: chartColors.slate }} axisLine={false} tickLine={false} />
+                <Tooltip />
+                <Area type="monotone" dataKey="checkIns" stroke={chartColors.blue} fill="url(#dealCheckins)" strokeWidth={2.5} />
+                <Line type="monotone" dataKey="saves" stroke={chartColors.green} strokeWidth={2} dot={false} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </AnalyticsChartCard>
+
+        <AnalyticsChartCard title="Top deals" subtitle="Strongest live offer performance">
+          <div className="space-y-3">
+            {data.deals.slice(0, 5).map((deal) => (
+              <div key={deal.id} className="rounded-[1rem] border border-neutral-200/80 bg-neutral-50/60 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-[13px] font-semibold text-neutral-900">{deal.title}</div>
+                    <div className="mt-1 text-xs text-neutral-500">{deal.category.name}</div>
+                  </div>
+                  <span className={cn('rounded-full px-2.5 py-1 text-xs font-semibold', deal.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-neutral-100 text-neutral-600')}>
                     {deal.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
-                <p className="text-sm text-neutral-600 mb-3">{deal.description}</p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div>
-                    <p className="text-xs text-neutral-500">Check-ins</p>
-                    <p className="font-semibold">{deal.performance.checkIns}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-neutral-500">Saves</p>
-                    <p className="font-semibold">{deal.performance.saves}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-neutral-500">Unique Users</p>
-                    <p className="font-semibold">{deal.performance.uniqueUsers}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-neutral-500">Kickback Events</p>
-                    <p className="font-semibold">{deal.performance.kickbackEvents}</p>
-                  </div>
+                <div className="mt-4 grid grid-cols-2 gap-3 text-[13px]">
+                  <div><span className="text-neutral-500">Check-ins</span><div className="mt-1 font-semibold text-neutral-900">{formatCompactNumber(deal.performance.checkIns)}</div></div>
+                  <div><span className="text-neutral-500">Saves</span><div className="mt-1 font-semibold text-neutral-900">{formatCompactNumber(deal.performance.saves)}</div></div>
+                  <div><span className="text-neutral-500">Unique users</span><div className="mt-1 font-semibold text-neutral-900">{formatCompactNumber(deal.performance.uniqueUsers)}</div></div>
+                  <div><span className="text-neutral-500">Kickbacks</span><div className="mt-1 font-semibold text-neutral-900">{formatCompactNumber(deal.performance.kickbackEvents)}</div></div>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      )}
+        </AnalyticsChartCard>
+      </div>
     </div>
   );
 };
 
-// Customer Insights Content
 const CustomerInsightsContent = ({ period }: { period: string }) => {
-  const { data, isLoading, error } = useMerchantCustomerInsights({ period: period as any });
+  const { data, isLoading, error } = useMerchantCustomerInsights({ period: period as 'last_7_days' | 'last_30_days' | 'this_month' | 'this_year' });
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-brand-primary-600" />
-      </div>
-    );
-  }
+  if (isLoading) return <LoadingState />;
+  if (error) return <ErrorState message="Failed to load customer insights data." />;
+  if (!data) return null;
 
-  if (error) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-red-600">Failed to load customer insights data</p>
-      </div>
-    );
-  }
+  const { customerOverview, activityLevels, customerSegments, topCustomers } = data.insights;
+  const activityData = [
+    { name: 'High', value: activityLevels.high, fill: chartColors.green },
+    { name: 'Medium', value: activityLevels.medium, fill: chartColors.amber },
+    { name: 'Low', value: activityLevels.low, fill: chartColors.rose },
+  ];
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-neutral-900">Customer Insights</h3>
-      
-      {/* Customer Overview */}
-      {(data as any)?.customerOverview && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-neutral-50 rounded-lg p-4">
-            <p className="text-sm text-neutral-600">Total Customers</p>
-            <p className="text-2xl font-bold text-neutral-900">{(data as any).customerOverview.totalCustomers}</p>
-          </div>
-          <div className="bg-neutral-50 rounded-lg p-4">
-            <p className="text-sm text-neutral-600">New Customers</p>
-            <p className="text-2xl font-bold text-neutral-900">{(data as any).customerOverview.newCustomers}</p>
-          </div>
-          <div className="bg-neutral-50 rounded-lg p-4">
-            <p className="text-sm text-neutral-600">Returning Customers</p>
-            <p className="text-2xl font-bold text-neutral-900">{(data as any).customerOverview.returningCustomers}</p>
-          </div>
-          <div className="bg-neutral-50 rounded-lg p-4">
-            <p className="text-sm text-neutral-600">Retention Rate</p>
-            <p className="text-2xl font-bold text-neutral-900">{(data as any).customerOverview.customerRetentionRate}%</p>
-          </div>
-        </div>
-      )}
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+        <AnalyticsStatCard label="Total customers" value={formatCompactNumber(customerOverview.totalCustomers)} />
+        <AnalyticsStatCard label="New customers" value={formatCompactNumber(customerOverview.newCustomers)} />
+        <AnalyticsStatCard label="Returning" value={formatCompactNumber(customerOverview.returningCustomers)} />
+        <AnalyticsStatCard label="Retention rate" value={`${customerOverview.customerRetentionRate.toFixed(1)}%`} />
+      </div>
 
-      {/* Activity Levels */}
-      {(data as any)?.activityLevels && (
-        <div>
-          <h4 className="text-md font-semibold text-neutral-900 mb-4">Customer Activity Levels</h4>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-green-50 rounded-lg p-4 text-center">
-              <p className="text-sm text-green-600">High Activity</p>
-              <p className="text-2xl font-bold text-green-800">{(data as any).activityLevels.high}</p>
-            </div>
-            <div className="bg-amber-50 rounded-lg p-4 text-center">
-              <p className="text-sm text-amber-600">Medium Activity</p>
-              <p className="text-2xl font-bold text-amber-800">{(data as any).activityLevels.medium}</p>
-            </div>
-            <div className="bg-red-50 rounded-lg p-4 text-center">
-              <p className="text-sm text-red-600">Low Activity</p>
-              <p className="text-2xl font-bold text-red-800">{(data as any).activityLevels.low}</p>
-            </div>
+      <div className="grid gap-5 xl:grid-cols-2">
+        <AnalyticsChartCard title="Activity profile" subtitle="How active your customer base is right now">
+          <div className="h-[250px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={activityData}>
+                <CartesianGrid vertical={false} stroke={chartColors.grid} />
+                <XAxis dataKey="name" tick={{ fontSize: 12, fill: chartColors.slate }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 12, fill: chartColors.slate }} axisLine={false} tickLine={false} />
+                <Tooltip />
+                <Bar dataKey="value" radius={[10, 10, 0, 0]} fill={chartColors.blue} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
+        </AnalyticsChartCard>
+
+        <AnalyticsChartCard title="Customer segments" subtitle="Segment size by customer behavior">
+          <div className="h-[250px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={customerSegments}>
+                <CartesianGrid vertical={false} stroke={chartColors.grid} />
+                <XAxis dataKey="segment" tick={{ fontSize: 12, fill: chartColors.slate }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 12, fill: chartColors.slate }} axisLine={false} tickLine={false} />
+                <Tooltip />
+                <Bar dataKey="count" radius={[10, 10, 0, 0]} fill={chartColors.green} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </AnalyticsChartCard>
+      </div>
+
+      <AnalyticsChartCard title="Top customers" subtitle="Recent high-value customers">
+        <div className="space-y-3">
+          {topCustomers.slice(0, 5).map((customer) => (
+            <div key={customer.id} className="flex items-center justify-between rounded-[1rem] border border-neutral-200/80 bg-neutral-50/60 p-4">
+              <div>
+                <div className="text-[13px] font-semibold text-neutral-900">{customer.name}</div>
+                <div className="mt-1 text-xs text-neutral-500">
+                  {customer.checkInCount} check-ins · Last active {formatDateLabel(customer.lastActive)}
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-[13px] font-semibold text-neutral-900">{formatCurrency(customer.totalSpend)}</div>
+                <div className="mt-1 text-xs text-neutral-500">{formatCompactNumber(customer.totalPoints)} pts</div>
+              </div>
+            </div>
+          ))}
         </div>
-      )}
+      </AnalyticsChartCard>
     </div>
   );
 };
 
-// Revenue Analytics Content
 const RevenueAnalyticsContent = ({ period }: { period: string }) => {
-  const { data, isLoading, error } = useMerchantRevenueAnalytics({ period: period as any });
+  const { data, isLoading, error } = useMerchantRevenueAnalytics({ period: period as 'last_7_days' | 'last_30_days' | 'this_month' | 'this_year' });
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-brand-primary-600" />
-      </div>
-    );
-  }
+  if (isLoading) return <LoadingState />;
+  if (error) return <ErrorState message="Failed to load revenue analytics data." />;
+  if (!data) return null;
 
-  if (error) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-red-600">Failed to load revenue analytics data</p>
-      </div>
-    );
-  }
+  const { analytics } = data;
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-neutral-900">Revenue Analytics</h3>
-      
-      {/* Summary Stats */}
-      {(data as any)?.summary && (
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className="bg-neutral-50 rounded-lg p-4">
-            <p className="text-sm text-neutral-600">Total Revenue</p>
-            <p className="text-2xl font-bold text-neutral-900">${(data as any).summary.totalRevenue}</p>
-          </div>
-          <div className="bg-neutral-50 rounded-lg p-4">
-            <p className="text-sm text-neutral-600">Kickback Paid</p>
-            <p className="text-2xl font-bold text-neutral-900">${(data as any).summary.totalKickbackPaid}</p>
-          </div>
-          <div className="bg-neutral-50 rounded-lg p-4">
-            <p className="text-sm text-neutral-600">Transactions</p>
-            <p className="text-2xl font-bold text-neutral-900">{(data as any).summary.totalTransactions}</p>
-          </div>
-          <div className="bg-neutral-50 rounded-lg p-4">
-            <p className="text-sm text-neutral-600">Avg Transaction</p>
-            <p className="text-2xl font-bold text-neutral-900">${(data as any).summary.averageTransactionValue}</p>
-          </div>
-          <div className="bg-neutral-50 rounded-lg p-4">
-            <p className="text-sm text-neutral-600">Kickback Rate</p>
-            <p className="text-2xl font-bold text-neutral-900">{(data as any).summary.kickbackRate}%</p>
-          </div>
-        </div>
-      )}
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+        <AnalyticsStatCard label="Total revenue" value={formatCurrency(analytics.totalRevenue.value)} hint={`${analytics.totalRevenue.change > 0 ? '+' : ''}${analytics.totalRevenue.change.toFixed(1)}% vs prior`} />
+        <AnalyticsStatCard label="Kickback paid" value={formatCurrency(analytics.kickbackAnalytics.totalKickbackPaid)} />
+        <AnalyticsStatCard label="Kickback earned" value={formatCurrency(analytics.kickbackAnalytics.totalKickbackEarned)} />
+        <AnalyticsStatCard label="Net kickback" value={formatCurrency(analytics.kickbackAnalytics.netKickback)} />
+      </div>
 
-      {/* Daily Trends */}
-      {(data as any)?.dailyTrends && (data as any).dailyTrends.length > 0 && (
-        <div>
-          <h4 className="text-md font-semibold text-neutral-900 mb-4">Daily Revenue Trends</h4>
-          <div className="bg-neutral-50 rounded-lg p-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {(data as any).dailyTrends.slice(-7).map((trend: any, index: number) => (
-                <div key={index} className="bg-white rounded-lg p-3">
-                  <p className="text-sm text-neutral-600">{new Date(trend.date).toLocaleDateString()}</p>
-                  <div className="mt-2 space-y-1">
-                    <div className="flex justify-between text-sm">
-                      <span>Revenue:</span>
-                      <span className="font-semibold">${trend.revenue}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Transactions:</span>
-                      <span className="font-semibold">{trend.transactions}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Kickback:</span>
-                      <span className="font-semibold">${trend.kickbackPaid}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.95fr)]">
+        <AnalyticsChartCard title="Revenue over time" subtitle="Order volume and revenue trend">
+          <div className="h-[270px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={analytics.revenueByTime}>
+                <defs>
+                  <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={chartColors.green} stopOpacity={0.3} />
+                    <stop offset="100%" stopColor={chartColors.green} stopOpacity={0.04} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} stroke={chartColors.grid} />
+                <XAxis dataKey="period" tick={{ fontSize: 12, fill: chartColors.slate }} axisLine={false} tickLine={false} />
+                <YAxis tickFormatter={(value) => formatCompactNumber(value)} tick={{ fontSize: 12, fill: chartColors.slate }} axisLine={false} tickLine={false} />
+                <Tooltip />
+                <Area type="monotone" dataKey="revenue" stroke={chartColors.green} fill="url(#revenueGradient)" strokeWidth={2.5} />
+                <Line type="monotone" dataKey="orders" stroke={chartColors.blue} dot={false} strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
-        </div>
-      )}
+        </AnalyticsChartCard>
+
+        <AnalyticsChartCard title="Revenue by category" subtitle="Contribution mix by category">
+          <div className="h-[270px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={analytics.revenueByCategory}>
+                <CartesianGrid vertical={false} stroke={chartColors.grid} />
+                <XAxis dataKey="category" tick={{ fontSize: 12, fill: chartColors.slate }} axisLine={false} tickLine={false} />
+                <YAxis tickFormatter={(value) => formatCompactNumber(value)} tick={{ fontSize: 12, fill: chartColors.slate }} axisLine={false} tickLine={false} />
+                <Tooltip />
+                <Bar dataKey="revenue" radius={[10, 10, 0, 0]} fill={chartColors.amber} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </AnalyticsChartCard>
+      </div>
     </div>
   );
 };
 
-// Engagement Metrics Content
 const EngagementMetricsContent = ({ period }: { period: string }) => {
-  const { data, isLoading, error } = useMerchantEngagementMetrics({ period: period as any });
+  const { data, isLoading, error } = useMerchantEngagementMetrics({ period: period as 'last_7_days' | 'last_30_days' | 'this_month' | 'this_year' });
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-brand-primary-600" />
-      </div>
-    );
-  }
+  if (isLoading) return <LoadingState />;
+  if (error) return <ErrorState message="Failed to load engagement metrics data." />;
+  if (!data) return null;
 
-  if (error) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-red-600">Failed to load engagement metrics data</p>
-      </div>
-    );
-  }
+  const { funnelMetrics, userBehavior, topEngagingDeals, timeBasedEngagement } = data.metrics;
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-neutral-900">Engagement Metrics</h3>
-      
-      {/* Funnel Metrics */}
-      {(data as any)?.funnelMetrics && (
-        <div>
-          <h4 className="text-md font-semibold text-neutral-900 mb-4">Conversion Funnel</h4>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-neutral-50 rounded-lg p-4">
-              <p className="text-sm text-neutral-600">Deal Views</p>
-              <p className="text-2xl font-bold text-neutral-900">{(data as any).funnelMetrics.totalDealViews}</p>
-            </div>
-            <div className="bg-neutral-50 rounded-lg p-4">
-              <p className="text-sm text-neutral-600">Deal Saves</p>
-              <p className="text-2xl font-bold text-neutral-900">{(data as any).funnelMetrics.totalDealSaves}</p>
-            </div>
-            <div className="bg-neutral-50 rounded-lg p-4">
-              <p className="text-sm text-neutral-600">Check-ins</p>
-              <p className="text-2xl font-bold text-neutral-900">{(data as any).funnelMetrics.totalCheckIns}</p>
-            </div>
-            <div className="bg-neutral-50 rounded-lg p-4">
-              <p className="text-sm text-neutral-600">Kickback Events</p>
-              <p className="text-2xl font-bold text-neutral-900">{(data as any).funnelMetrics.totalKickbackEvents}</p>
-            </div>
-          </div>
-          
-          {/* Conversion Rates */}
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-green-50 rounded-lg p-4">
-              <p className="text-sm text-green-600">Save Rate</p>
-              <p className="text-2xl font-bold text-green-800">{(data as any).funnelMetrics.conversionRates.saveRate}%</p>
-            </div>
-            <div className="bg-blue-50 rounded-lg p-4">
-              <p className="text-sm text-blue-600">Check-in Rate</p>
-              <p className="text-2xl font-bold text-blue-800">{(data as any).funnelMetrics.conversionRates.checkInRate}%</p>
-            </div>
-            <div className="bg-purple-50 rounded-lg p-4">
-              <p className="text-sm text-purple-600">Kickback Rate</p>
-              <p className="text-2xl font-bold text-purple-800">{(data as any).funnelMetrics.conversionRates.kickbackRate}%</p>
-            </div>
-          </div>
-        </div>
-      )}
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+        <AnalyticsStatCard label="Deal views" value={formatCompactNumber(funnelMetrics.totalViews)} />
+        <AnalyticsStatCard label="Deal saves" value={formatCompactNumber(funnelMetrics.totalSaves)} />
+        <AnalyticsStatCard label="Check-ins" value={formatCompactNumber(funnelMetrics.totalCheckIns)} />
+        <AnalyticsStatCard label="Kickbacks" value={formatCompactNumber(funnelMetrics.totalKickbackEvents)} />
+      </div>
 
-      {/* User Engagement */}
-      {(data as any)?.userEngagement && (
-        <div>
-          <h4 className="text-md font-semibold text-neutral-900 mb-4">User Engagement</h4>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-neutral-50 rounded-lg p-4">
-              <p className="text-sm text-neutral-600">Engaged Users</p>
-              <p className="text-2xl font-bold text-neutral-900">{(data as any).userEngagement.totalEngagedUsers}</p>
-            </div>
-            <div className="bg-neutral-50 rounded-lg p-4">
-              <p className="text-sm text-neutral-600">Retention Rate</p>
-              <p className="text-2xl font-bold text-neutral-900">{(data as any).userEngagement.customerRetentionRate}%</p>
-            </div>
-            <div className="bg-neutral-50 rounded-lg p-4">
-              <p className="text-sm text-neutral-600">Avg Engagement</p>
-              <p className="text-2xl font-bold text-neutral-900">{(data as any).userEngagement.averageEngagementPerUser}</p>
-            </div>
-            <div className="bg-neutral-50 rounded-lg p-4">
-              <p className="text-sm text-neutral-600">High Activity</p>
-              <p className="text-2xl font-bold text-neutral-900">{(data as any).userEngagement.engagementLevels.high}</p>
-            </div>
+      <div className="grid gap-5 xl:grid-cols-2">
+        <AnalyticsChartCard title="Engagement timeline" subtitle="Views, saves, and check-ins over time">
+          <div className="h-[260px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={timeBasedEngagement}>
+                <CartesianGrid vertical={false} stroke={chartColors.grid} />
+                <XAxis dataKey="period" tick={{ fontSize: 12, fill: chartColors.slate }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 12, fill: chartColors.slate }} axisLine={false} tickLine={false} />
+                <Tooltip />
+                <Line type="monotone" dataKey="views" stroke={chartColors.ink} strokeWidth={2.5} dot={false} />
+                <Line type="monotone" dataKey="saves" stroke={chartColors.blue} strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="checkIns" stroke={chartColors.green} strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
-        </div>
-      )}
+        </AnalyticsChartCard>
 
-      {/* Top Engaging Deals */}
-      {(data as any)?.topEngagingDeals && (data as any).topEngagingDeals.length > 0 && (
-        <div>
-          <h4 className="text-md font-semibold text-neutral-900 mb-4">Top Engaging Deals</h4>
-          <div className="space-y-3">
-            {(data as any).topEngagingDeals.map((deal: any) => (
-              <div key={deal.id} className="border border-neutral-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h5 className="font-medium text-neutral-900">{deal.title}</h5>
-                  <span className="text-sm text-neutral-600">{deal.category.name}</span>
+        <AnalyticsChartCard title="Conversion funnel" subtitle="How customers move through the funnel">
+          <div className="space-y-4">
+            {[
+              { label: 'View to save', value: funnelMetrics.conversionRates.viewToSave },
+              { label: 'Save to check-in', value: funnelMetrics.conversionRates.saveToCheckIn },
+              { label: 'Check-in to kickback', value: funnelMetrics.conversionRates.checkInToKickback },
+            ].map((item) => (
+              <div key={item.label}>
+                <div className="mb-2 flex items-center justify-between text-[13px]">
+                  <span className="text-neutral-600">{item.label}</span>
+                  <span className="font-semibold text-neutral-900">{item.value.toFixed(1)}%</span>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div>
-                    <p className="text-xs text-neutral-500">Engagement Score</p>
-                    <p className="font-semibold">{deal.engagementScore}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-neutral-500">Saves</p>
-                    <p className="font-semibold">{deal.saves}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-neutral-500">Check-ins</p>
-                    <p className="font-semibold">{deal.checkIns}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-neutral-500">Kickback Events</p>
-                    <p className="font-semibold">{deal.kickbackEvents}</p>
-                  </div>
+                <div className="h-2 rounded-full bg-neutral-100">
+                  <div className="h-2 rounded-full bg-neutral-900" style={{ width: `${Math.min(item.value, 100)}%` }} />
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Performance Comparison Content
-const PerformanceComparisonContent = ({ period }: { period: string }) => {
-  const { data, isLoading, error } = useMerchantPerformanceComparison({ period: period as any });
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-brand-primary-600" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-red-600">Failed to load performance comparison data</p>
-      </div>
-    );
-  }
-
-  const getTrendIcon = (trend: string) => {
-    switch (trend) {
-      case 'up': return '📈';
-      case 'down': return '📉';
-      default: return '➡️';
-    }
-  };
-
-  const getTrendColor = (trend: string) => {
-    switch (trend) {
-      case 'up': return 'text-green-600';
-      case 'down': return 'text-red-600';
-      default: return 'text-neutral-600';
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-neutral-900">Performance Comparison</h3>
-      
-      {/* Period Information */}
-      {(data as any)?.currentPeriod && (data as any)?.comparePeriod && (
-        <div className="bg-neutral-50 rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-neutral-600">Current Period</p>
-              <p className="font-semibold text-neutral-900">{(data as any).currentPeriod.replace('_', ' ')}</p>
-            </div>
-            <div>
-              <p className="text-sm text-neutral-600">Compared to</p>
-              <p className="font-semibold text-neutral-900">{(data as any).comparePeriod.replace('_', ' ')}</p>
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <AnalyticsStatCard label="Avg session" value={`${userBehavior.averageSessionDuration.toFixed(1)} min`} />
+              <AnalyticsStatCard label="Repeat rate" value={`${userBehavior.repeatCustomerRate.toFixed(1)}%`} />
             </div>
           </div>
-        </div>
-      )}
+        </AnalyticsChartCard>
+      </div>
 
-      {/* Metrics Comparison */}
-      {(data as any)?.currentMetrics && (data as any)?.compareMetrics && (data as any)?.changes && (
-        <div>
-          <h4 className="text-md font-semibold text-neutral-900 mb-4">Metrics Comparison</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries((data as any).currentMetrics).map(([key, currentValue]) => {
-              const compareValue = (data as any).compareMetrics[key];
-              const change = (data as any).changes[key];
-              const trend = (data as any).trends[key];
-              
-              return (
-                <div key={key} className="bg-white border border-neutral-200 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h5 className="font-medium text-neutral-900 capitalize">
-                      {key.replace(/([A-Z])/g, ' $1').trim()}
-                    </h5>
-                    <span className={`text-sm ${getTrendColor(trend)}`}>
-                      {getTrendIcon(trend)}
-                    </span>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-600">Current:</span>
-                      <span className="font-semibold">{currentValue as any}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-600">Previous:</span>
-                      <span className="font-semibold">{compareValue as any}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-600">Change:</span>
-                      <span className={`font-semibold ${getTrendColor(trend)}`}>
-                        {change > 0 ? '+' : ''}{change}
-                      </span>
-                    </div>
-                  </div>
+      <AnalyticsChartCard title="Top engaging deals" subtitle="Strongest attention and interaction rates">
+        <div className="space-y-3">
+          {topEngagingDeals.slice(0, 5).map((deal) => (
+            <div key={deal.dealId} className="rounded-[1rem] border border-neutral-200/80 bg-neutral-50/60 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="text-[13px] font-semibold text-neutral-900">{deal.title}</div>
+                  <div className="mt-1 text-xs text-neutral-500">{deal.engagementRate.toFixed(1)}% engagement rate</div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Date Ranges */}
-      {(data as any)?.dateRanges && (
-        <div>
-          <h4 className="text-md font-semibold text-neutral-900 mb-4">Date Ranges</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-blue-50 rounded-lg p-4">
-              <h5 className="font-medium text-blue-900 mb-2">Current Period</h5>
-              <p className="text-sm text-blue-700">
-                {new Date((data as any).dateRanges.current.from).toLocaleDateString()} - {new Date((data as any).dateRanges.current.to).toLocaleDateString()}
-              </p>
+                <TrendPill trend={deal.engagementRate > 20 ? 'up' : 'stable'} value={deal.engagementRate} />
+              </div>
             </div>
-            <div className="bg-green-50 rounded-lg p-4">
-              <h5 className="font-medium text-green-900 mb-2">Comparison Period</h5>
-              <p className="text-sm text-green-700">
-                {new Date((data as any).dateRanges.compare.from).toLocaleDateString()} - {new Date((data as any).dateRanges.compare.to).toLocaleDateString()}
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
-      )}
+      </AnalyticsChartCard>
     </div>
   );
 };
 
-// City Performance Content
-const CityPerformanceContent = ({ period }: { period: string }) => {
-  const { data, isLoading, error } = useMerchantCityPerformance({ period: period as any });
+const PerformanceComparisonContent = ({ period }: { period: string }) => {
+  const { data, isLoading, error } = useMerchantPerformanceComparison({
+    currentPeriod: period as 'last_7_days' | 'last_30_days' | 'this_month' | 'this_year',
+    previousPeriod: period as 'last_7_days' | 'last_30_days' | 'this_month' | 'this_year',
+  });
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-brand-primary-600" />
-      </div>
-    );
-  }
+  if (isLoading) return <LoadingState />;
+  if (error) return <ErrorState message="Failed to load performance comparison data." />;
+  if (!data) return null;
 
-  if (error) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-red-600">Failed to load city performance data</p>
-        <p className="text-sm text-neutral-500 mt-2">This API is currently returning an error</p>
-      </div>
-    );
-  }
+  const { comparison } = data;
+  const comparisonCards = [
+    { label: 'Gross sales', current: comparison.currentPeriod.metrics.grossSales, previous: comparison.previousPeriod.metrics.grossSales, comparison: comparison.comparisons.grossSales, currency: true },
+    { label: 'Order volume', current: comparison.currentPeriod.metrics.orderVolume, previous: comparison.previousPeriod.metrics.orderVolume, comparison: comparison.comparisons.orderVolume, currency: false },
+    { label: 'Avg order value', current: comparison.currentPeriod.metrics.averageOrderValue, previous: comparison.previousPeriod.metrics.averageOrderValue, comparison: comparison.comparisons.averageOrderValue, currency: true },
+    { label: 'Customers', current: comparison.currentPeriod.metrics.totalCustomers, previous: comparison.previousPeriod.metrics.totalCustomers, comparison: comparison.comparisons.totalCustomers, currency: false },
+    { label: 'Active deals', current: comparison.currentPeriod.metrics.activeDeals, previous: comparison.previousPeriod.metrics.activeDeals, comparison: comparison.comparisons.activeDeals, currency: false },
+    { label: 'Kickback earnings', current: comparison.currentPeriod.metrics.kickbackEarnings, previous: comparison.previousPeriod.metrics.kickbackEarnings, comparison: comparison.comparisons.kickbackEarnings, currency: true },
+  ];
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-neutral-900">City Performance</h3>
-      <div className="text-center py-8">
-        <p className="text-neutral-600">City performance data will be displayed here</p>
-        <p className="text-sm text-neutral-500 mt-2">API endpoint needs to be fixed</p>
+    <div className="space-y-5">
+      <AnalyticsChartCard title="Performance trend" subtitle="Current period against previous baseline">
+        <div className="h-[270px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={comparison.trends}>
+              <CartesianGrid vertical={false} stroke={chartColors.grid} />
+              <XAxis dataKey="period" tick={{ fontSize: 12, fill: chartColors.slate }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 12, fill: chartColors.slate }} axisLine={false} tickLine={false} />
+              <Tooltip />
+              <Line type="monotone" dataKey="grossSales" stroke={chartColors.blue} strokeWidth={2.5} dot={false} />
+              <Line type="monotone" dataKey="orderVolume" stroke={chartColors.green} strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="averageOrderValue" stroke={chartColors.amber} strokeWidth={2} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </AnalyticsChartCard>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {comparisonCards.map((item) => (
+          <div key={item.label} className="rounded-[1rem] border border-neutral-200/80 bg-neutral-50/70 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-[13px] font-medium text-neutral-600">{item.label}</div>
+              <TrendPill trend={item.comparison.trend} value={item.comparison.percentageChange} />
+            </div>
+            <div className="mt-3 text-[1.25rem] font-semibold text-neutral-950">
+              {item.currency ? formatCurrency(item.current) : formatCompactNumber(item.current)}
+            </div>
+            <div className="mt-1 text-xs text-neutral-500">
+              Previous: {item.currency ? formatCurrency(item.previous) : formatCompactNumber(item.previous)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const CityPerformanceContent = ({ period }: { period: string }) => {
+  const { data, isLoading, error } = useMerchantCityPerformance({ period: period as 'last_7_days' | 'last_30_days' | 'this_month' | 'this_year' });
+
+  if (isLoading) return <LoadingState />;
+  if (error) return <ErrorState message="Failed to load city performance data." />;
+  if (!data) return null;
+
+  const chartData = data.cities.map((city) => ({
+    cityName: city.cityName,
+    grossSales: city.totalPerformance.grossSales,
+    orderVolume: city.totalPerformance.orderVolume,
+  }));
+
+  return (
+    <div className="space-y-5">
+      <AnalyticsChartCard title="City revenue view" subtitle="Performance across active merchant cities">
+        <div className="h-[270px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData}>
+              <CartesianGrid vertical={false} stroke={chartColors.grid} />
+              <XAxis dataKey="cityName" tick={{ fontSize: 12, fill: chartColors.slate }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 12, fill: chartColors.slate }} axisLine={false} tickLine={false} />
+              <Tooltip />
+              <Bar dataKey="grossSales" radius={[10, 10, 0, 0]} fill={chartColors.blue} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </AnalyticsChartCard>
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        {data.cities.map((city) => (
+          <AnalyticsChartCard
+            key={city.cityId}
+            title={city.cityName}
+            subtitle={`${city.stores.length} store${city.stores.length === 1 ? '' : 's'} in this city`}
+          >
+            <div className="grid grid-cols-2 gap-4">
+              <AnalyticsStatCard label="Gross sales" value={formatCurrency(city.totalPerformance.grossSales)} />
+              <AnalyticsStatCard label="Order volume" value={formatCompactNumber(city.totalPerformance.orderVolume)} />
+              <AnalyticsStatCard label="Avg order value" value={formatCurrency(city.totalPerformance.averageOrderValue)} />
+              <AnalyticsStatCard label="Kickbacks" value={formatCurrency(city.totalPerformance.kickbackEarnings)} />
+            </div>
+          </AnalyticsChartCard>
+        ))}
       </div>
     </div>
   );

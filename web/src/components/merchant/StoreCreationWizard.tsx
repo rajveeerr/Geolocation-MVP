@@ -189,7 +189,7 @@ export const StoreCreationWizard = ({
           onClick={() => navigate(PATHS.MERCHANT_STORES)}
           className="mb-4"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="mr-2 h-4 w-4 shrink-0" />
           Back to Stores
         </Button>
         <h1 className="text-4xl font-bold text-neutral-900">
@@ -283,7 +283,7 @@ export const StoreCreationWizard = ({
             onClick={goToPreviousStep}
             disabled={isFirstStep}
           >
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="mr-2 h-4 w-4 shrink-0" />
             Previous
           </Button>
 

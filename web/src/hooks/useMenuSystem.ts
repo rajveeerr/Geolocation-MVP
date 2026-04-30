@@ -17,6 +17,11 @@ export interface MenuItem {
   preparationTime?: number;
   calories?: number;
   ingredients?: string[];
+  inventoryTrackingEnabled?: boolean;
+  inventoryQuantity?: number | null;
+  lowStockThreshold?: number | null;
+  allowBackorder?: boolean;
+  inventoryStatus?: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'UNTRACKED';
   merchant: {
     id: number;
     name: string;

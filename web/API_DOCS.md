@@ -237,7 +237,7 @@ The frontend uses the `ImageUpload` component which:
 
 **Example Logo Upload:**
 ```bash
-curl -X POST "https://api.yohop.com/api/media/upload" \
+curl -X POST "http://localhost:3000/api/media/upload" \
   -H "Authorization: Bearer <token>" \
   -F "file=@logo.png" \
   -F "context=business_logo"

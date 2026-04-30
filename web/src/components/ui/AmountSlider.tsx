@@ -1,7 +1,7 @@
 // web/src/components/ui/AmountSlider.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Edit2, DollarSign } from 'lucide-react';
+import { Edit2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface AmountSliderProps {
@@ -25,7 +25,7 @@ export const AmountSlider: React.FC<AmountSliderProps> = ({
   max = 1000,
   step = 1,
   label,
-  prefix = '$',
+  prefix = '',
   suffix = '',
   showEditButton = true,
   className,

@@ -12,6 +12,7 @@ export const PATHS = {
 
   // Merchant paths
   MERCHANT_DASHBOARD: '/merchant/dashboard',
+  MERCHANT_BUSINESS: '/merchant/business',
   MERCHANT_KICKBACKS: '/merchant/kickbacks',
   MERCHANT_ONBOARDING: '/merchant/onboarding',
   MERCHANT_DEALS_CREATE: '/merchant/deals/create',
@@ -25,7 +26,15 @@ export const PATHS = {
   MERCHANT_MENU_EDIT: '/merchant/menu/:itemId/edit',
   MERCHANT_MENU_DETAIL: '/merchant/menu/:itemId',
   MERCHANT_MENU_COLLECTIONS: '/merchant/menu/collections',
+  MERCHANT_INVENTORY: '/merchant/inventory',
   MERCHANT_ANALYTICS: '/merchant/analytics',
+  MERCHANT_CHECKIN_GAMES: '/merchant/check-in-games',
+
+  // Blog (merchant)
+  MERCHANT_BLOG: '/merchant/blog',
+  MERCHANT_BLOG_CREATE: '/merchant/blog/create',
+  MERCHANT_BLOG_EDIT: '/merchant/blog/:postId/edit',
+  MERCHANT_BLOG_CATEGORIES: '/merchant/blog/categories',
 
   LOGIN: '/login',
   SIGNUP: '/signup',
@@ -68,6 +77,7 @@ export const PATHS = {
   ADMIN_CITIES: '/admin/cities', // New route for the city management table
   ADMIN_CUSTOMERS: '/admin/customers', // New route for the customer list
   ADMIN_NUDGES: '/admin/nudges',
+  ADMIN_GAMES: '/admin/games',
 
   // Nudges (consumer)
   NUDGE_HISTORY: '/nudges/history',

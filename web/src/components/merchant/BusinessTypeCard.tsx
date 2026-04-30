@@ -1,16 +1,17 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Building2, MapPin, Edit3, Check, X } from 'lucide-react';
+import { Building2, Check, Edit3, MapPin, Store, X } from 'lucide-react';
 import { useMerchantStatus, useUpdateBusinessType } from '@/hooks/useBusinessType';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+import { merchantPanelClass } from '@/components/merchant/MerchantAppleUI';
 
 export const BusinessTypeCard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedType, setSelectedType] = useState<'NATIONAL' | 'LOCAL' | ''>('');
-  
+
   const { data: merchantData, isLoading } = useMerchantStatus();
   const updateBusinessType = useUpdateBusinessType();
 
@@ -41,30 +42,26 @@ export const BusinessTypeCard = () => {
     setIsEditing(false);
   };
 
-  const getBusinessTypeColor = (type: 'NATIONAL' | 'LOCAL') => {
-    return type === 'NATIONAL' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800';
-  };
+  const getBusinessTypeTone = (type: 'NATIONAL' | 'LOCAL') =>
+    type === 'NATIONAL'
+      ? 'bg-blue-50 text-blue-700 border-blue-100'
+      : 'bg-green-50 text-green-700 border-green-100';
 
-  const getBusinessTypeIcon = (type: 'NATIONAL' | 'LOCAL') => {
-    return type === 'NATIONAL' ? '🏢' : '🏪';
-  };
+  const getBusinessTypeLabel = (type: 'NATIONAL' | 'LOCAL') =>
+    type === 'NATIONAL' ? 'National chain' : 'Local business';
+
+  const getBusinessTypeIcon = (type: 'NATIONAL' | 'LOCAL') =>
+    type === 'NATIONAL' ? Building2 : Store;
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5" />
-            Business Type
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="animate-pulse space-y-2">
-            <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
-            <div className="h-4 bg-neutral-200 rounded w-1/3"></div>
-          </div>
-        </CardContent>
-      </Card>
+      <section className={merchantPanelClass}>
+        <div className="animate-pulse space-y-4">
+          <div className="h-5 w-36 rounded bg-neutral-200" />
+          <div className="h-4 w-64 rounded bg-neutral-200" />
+          <div className="h-14 w-full rounded-[1rem] bg-neutral-100" />
+        </div>
+      </section>
     );
   }
 
@@ -72,111 +69,91 @@ export const BusinessTypeCard = () => {
     return null;
   }
 
+  const BusinessTypeIcon = getBusinessTypeIcon(merchant.businessType);
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Building2 className="h-5 w-5" />
-          Business Type
-        </CardTitle>
-        <CardDescription>
-          Your business classification for better targeting and analytics
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {!isEditing ? (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{getBusinessTypeIcon(merchant.businessType)}</span>
-                <div>
-                  <p className="font-medium text-neutral-800">
-                    {merchant.businessName}
-                  </p>
-                  <p className="text-sm text-neutral-600">
-                    {merchant.businessType === 'NATIONAL' ? 'National Chain' : 'Local Business'}
-                  </p>
+    <section className={merchantPanelClass}>
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[0.95rem] bg-neutral-100 text-neutral-800">
+              <Building2 className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-[15px] font-semibold text-neutral-900">Business Type</h3>
+              <p className="mt-1 text-[13px] text-neutral-600">
+                Your business classification for better targeting and analytics.
+              </p>
+            </div>
+          </div>
+
+          {!isEditing ? (
+            <div className="mt-5 flex flex-col gap-4 rounded-[1.1rem] border border-neutral-200/80 bg-neutral-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[1rem] bg-white text-neutral-800 shadow-sm">
+                  <BusinessTypeIcon className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <div className="truncate text-[15px] font-semibold text-neutral-900">{merchant.businessName}</div>
+                  <div className="mt-1 text-[13px] text-neutral-600">{getBusinessTypeLabel(merchant.businessType)}</div>
+                  {merchant.address ? (
+                    <div className="mt-3 flex items-start gap-2 text-[13px] text-neutral-500">
+                      <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                      <span>{merchant.address}</span>
+                    </div>
+                  ) : null}
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge className={getBusinessTypeColor(merchant.businessType)}>
+
+              <div className="flex shrink-0 items-center gap-2 self-end sm:self-center">
+                <Badge className={cn('border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]', getBusinessTypeTone(merchant.businessType))}>
                   {merchant.businessType}
                 </Badge>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleEdit}
-                  className="h-8 w-8 p-0"
-                >
+                <Button variant="outline" size="icon" onClick={handleEdit} className="rounded-[0.9rem]">
                   <Edit3 className="h-4 w-4" />
                 </Button>
               </div>
             </div>
-            
-            {merchant.address && (
-              <div className="flex items-center gap-2 text-sm text-neutral-600">
-                <MapPin className="h-4 w-4" />
-                <span>{merchant.address}</span>
+          ) : (
+            <div className="mt-5 space-y-4 rounded-[1.1rem] border border-neutral-200/80 bg-neutral-50/60 p-4">
+              <div>
+                <label className="mb-2 block text-[13px] font-medium text-neutral-700">
+                  Select business type
+                </label>
+                <Select value={selectedType} onValueChange={(value) => setSelectedType(value as 'NATIONAL' | 'LOCAL')}>
+                  <SelectTrigger className="rounded-[0.95rem] border-neutral-200 bg-white">
+                    <SelectValue placeholder="Choose business type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="LOCAL">Local Business</SelectItem>
+                    <SelectItem value="NATIONAL">National Chain</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-neutral-700 mb-2 block">
-                Select Business Type
-              </label>
-              <Select value={selectedType} onValueChange={(value) => setSelectedType(value as 'NATIONAL' | 'LOCAL')}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose business type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="LOCAL">
-                    <div className="flex items-center gap-2">
-                      <span>🏪</span>
-                      <div>
-                        <div className="font-medium">Local Business</div>
-                        <div className="text-xs text-neutral-500">Independent, single-location business</div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="NATIONAL">
-                    <div className="flex items-center gap-2">
-                      <span>🏢</span>
-                      <div>
-                        <div className="font-medium">National Chain</div>
-                        <div className="text-xs text-neutral-500">Multi-location business or franchise</div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  onClick={handleSave}
+                  disabled={updateBusinessType.isPending}
+                  className="rounded-[0.9rem]"
+                >
+                  <Check className="mr-1.5 h-4 w-4" />
+                  {updateBusinessType.isPending ? 'Saving...' : 'Save'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleCancel}
+                  disabled={updateBusinessType.isPending}
+                  className="rounded-[0.9rem]"
+                >
+                  <X className="mr-1.5 h-4 w-4" />
+                  Cancel
+                </Button>
+              </div>
             </div>
-            
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                onClick={handleSave}
-                disabled={updateBusinessType.isPending}
-                className="flex-1"
-              >
-                <Check className="h-4 w-4 mr-1" />
-                {updateBusinessType.isPending ? 'Saving...' : 'Save'}
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleCancel}
-                disabled={updateBusinessType.isPending}
-                className="flex-1"
-              >
-                <X className="h-4 w-4 mr-1" />
-                Cancel
-              </Button>
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+          )}
+        </div>
+      </div>
+    </section>
   );
 };

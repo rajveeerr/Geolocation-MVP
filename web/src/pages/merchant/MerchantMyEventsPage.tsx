@@ -29,11 +29,14 @@ import { useToast } from '@/hooks/use-toast';
 
 const statusStyles: Record<string, string> = {
   DRAFT: 'bg-neutral-100 text-neutral-700',
-  PUBLISHED: 'bg-green-100 text-green-700',
-  CANCELLED: 'bg-red-100 text-red-700',
-  COMPLETED: 'bg-blue-100 text-blue-700',
+  PUBLISHED: 'bg-emerald-100 text-emerald-700',
+  CANCELLED: 'bg-rose-100 text-rose-700',
+  COMPLETED: 'bg-sky-100 text-sky-700',
   SOLD_OUT: 'bg-amber-100 text-amber-700',
 };
+
+const panelClass =
+  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 function StatusBadge({ status }: { status: string }) {
   const label = EVENT_STATUSES.find((s) => s.value === status)?.label ?? status;
@@ -66,10 +69,9 @@ function EventCard({
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+      className="group relative overflow-hidden rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)] transition hover:shadow-[0_12px_28px_rgba(15,23,42,0.06)]"
     >
-      {/* Cover Image */}
-      <div className="relative h-40 bg-gradient-to-br from-brand-primary-500/20 to-brand-primary-600/30">
+      <div className="relative h-40 bg-gradient-to-br from-neutral-100 via-white to-[#eef1f5]">
         {event.coverImageUrl ? (
           <img
             src={event.coverImageUrl}
@@ -78,31 +80,29 @@ function EventCard({
           />
         ) : (
           <div className="flex h-full items-center justify-center">
-            <Calendar className="h-12 w-12 text-brand-primary-400/60" />
+            <Calendar className="h-12 w-12 text-neutral-300" />
           </div>
         )}
         <div className="absolute left-3 top-3">
           <StatusBadge status={event.status} />
         </div>
         {isUpcoming && (
-          <div className="absolute right-3 top-3 rounded-full bg-white/90 px-2 py-0.5 text-xs font-medium text-green-700 backdrop-blur-sm">
+          <div className="absolute right-3 top-3 rounded-full bg-white/90 px-2 py-0.5 text-xs font-medium text-emerald-700 backdrop-blur-sm">
             Upcoming
           </div>
         )}
       </div>
 
-      {/* Content */}
-      <div className="p-4">
-        <h3 className="mb-1 text-lg font-bold text-neutral-900 line-clamp-1">
+      <div className="p-5">
+        <h3 className="mb-1 line-clamp-1 text-[1.02rem] font-semibold tracking-tight text-neutral-900">
           {event.title}
         </h3>
-        <p className="mb-3 text-sm text-neutral-500 line-clamp-2">
+        <p className="mb-4 line-clamp-2 text-[13px] leading-6 text-neutral-500">
           {event.shortDescription || event.description}
         </p>
 
-        {/* Meta */}
-        <div className="mb-4 space-y-1.5">
-          <div className="flex items-center gap-2 text-xs text-neutral-500">
+        <div className="mb-5 space-y-2">
+          <div className="flex items-center gap-2 text-[13px] text-neutral-500">
             <Clock className="h-3.5 w-3.5" />
             <span>
               {startDate.toLocaleDateString('en-US', {
@@ -119,17 +119,17 @@ function EventCard({
             </span>
           </div>
           {event.venueName && (
-            <div className="flex items-center gap-2 text-xs text-neutral-500">
+            <div className="flex items-center gap-2 text-[13px] text-neutral-500">
               <MapPin className="h-3.5 w-3.5" />
               <span className="line-clamp-1">{event.venueName}</span>
             </div>
           )}
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5 text-xs text-neutral-500">
+            <div className="flex items-center gap-1.5 text-[13px] text-neutral-500">
               <Users className="h-3.5 w-3.5" />
               <span>{event.currentAttendees} attending</span>
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-neutral-500">
+            <div className="flex items-center gap-1.5 text-[13px] text-neutral-500">
               <Ticket className="h-3.5 w-3.5" />
               <span>
                 {event.isFreeEvent
@@ -140,20 +140,19 @@ function EventCard({
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 border-t border-neutral-100 pt-4">
           <Link
             to={`/merchant/events/${event.id}`}
             className="flex-1"
           >
-            <Button variant="primary" size="sm" className="w-full rounded-lg">
+            <Button size="sm" className="w-full rounded-full bg-neutral-950 text-white hover:bg-neutral-800">
               <Eye className="mr-1.5 h-3.5 w-3.5" />
               Manage
             </Button>
           </Link>
           <button
             onClick={() => onDelete(event.id)}
-            className="rounded-lg border border-red-200 p-2 text-red-500 transition-colors hover:bg-red-50"
+            className="rounded-full border border-neutral-200 p-2 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-800"
             title="Delete event"
           >
             <Trash2 className="h-4 w-4" />
@@ -171,17 +170,17 @@ function EmptyState() {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-neutral-200 py-16"
+      className={cn(panelClass, 'flex flex-col items-center justify-center border-dashed py-16')}
     >
       <Calendar className="mb-4 h-16 w-16 text-neutral-300" />
-      <h3 className="mb-2 text-xl font-bold text-neutral-700">
+      <h3 className="mb-2 text-[1.4rem] font-semibold tracking-tight text-neutral-900">
         No events yet
       </h3>
-      <p className="mb-6 max-w-sm text-center text-neutral-500">
+      <p className="mb-6 max-w-sm text-center text-[13px] text-neutral-500 sm:text-sm">
         Create your first event and start selling tickets to your audience.
       </p>
       <Link to={PATHS.MERCHANT_EVENTS_CREATE}>
-        <Button size="md" className="rounded-full">
+        <Button size="md" className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800">
           <PlusCircle className="mr-2 h-4 w-4" />
           Create Event
         </Button>
@@ -247,26 +246,25 @@ function MerchantMyEventsContent() {
   }
 
   return (
-    <div className="container mx-auto max-w-screen-xl px-6 py-8">
-      {/* Header */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mx-auto max-w-screen-xl px-4 py-3 sm:px-1 sm:py-4">
+      <div className="mb-6 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900">My Events</h1>
-          <p className="mt-1 text-neutral-500">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Experiences</div>
+          <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-neutral-900">My Events</h1>
+          <p className="mt-2 text-[13px] text-neutral-500 sm:text-sm">
             Create and manage your events, ticket tiers, and add-ons.
           </p>
         </div>
         <Link to={PATHS.MERCHANT_EVENTS_CREATE}>
-          <Button size="md" className="rounded-full">
+          <Button size="md" className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800">
             <PlusCircle className="mr-2 h-4 w-4" />
             Create Event
           </Button>
         </Link>
       </div>
 
-      {/* Status Filters */}
       {events.length > 0 && (
-        <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-2">
+        <div className={cn(panelClass, 'mb-6 flex items-center gap-2 overflow-x-auto p-3')}>
           <Filter className="mr-1 h-4 w-4 flex-shrink-0 text-neutral-400" />
           {(['ALL', ...EVENT_STATUSES.map((s) => s.value)] as StatusFilter[]).map(
             (status) => {
@@ -281,9 +279,9 @@ function MerchantMyEventsContent() {
                   key={status}
                   onClick={() => setStatusFilter(status)}
                   className={cn(
-                    'flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
+                    'flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors',
                     statusFilter === status
-                      ? 'bg-brand-primary-500 text-white'
+                      ? 'bg-neutral-950 text-white'
                       : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200',
                   )}
                 >
@@ -309,7 +307,7 @@ function MerchantMyEventsContent() {
       {filteredEvents.length === 0 && events.length === 0 ? (
         <EmptyState />
       ) : filteredEvents.length === 0 ? (
-        <p className="py-12 text-center text-neutral-500">
+        <p className={cn(panelClass, 'py-12 text-center text-[13px] text-neutral-500 sm:text-sm')}>
           No events match this filter.
         </p>
       ) : (

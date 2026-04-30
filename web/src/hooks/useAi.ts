@@ -129,6 +129,109 @@ export interface AiNudgePersonalizeResponse {
   nudge: AiNudgeContent;
 }
 
+export interface AiCityGuideRequest {
+  lat: number;
+  lng: number;
+  radiusKm?: number;
+  intent?: string;
+  timeOfDay?: string;
+  preferences?: string[];
+}
+
+export interface AiCityGuideRecommendationRef {
+  candidateId: string;
+  reason?: string;
+}
+
+export interface AiCityGuideFollowUpRequest extends AiCityGuideRequest {
+  followUpQuestion: string;
+  previousRecommendations?: AiCityGuideRecommendationRef[];
+}
+
+export interface AiCityGuideItineraryRequest extends AiCityGuideRequest {
+  maxStops?: number;
+}
+
+export interface AiCityGuideEta {
+  walkingMinutes: number;
+  drivingMinutes: number;
+}
+
+export interface AiCityGuideCoordinates {
+  lat: number;
+  lng: number;
+}
+
+export interface AiCityGuideDealDetails {
+  dealId: number;
+  merchantId: number;
+  merchantName: string;
+  offerDisplay: string;
+  endsAt: string;
+}
+
+export interface AiCityGuideMerchantDetails {
+  merchantId: number;
+  vibeTags: string[];
+  amenities: string[];
+  activeDealCount: number;
+}
+
+export interface AiCityGuideEventDetails {
+  eventId: number;
+  eventType: string;
+  startDate: string;
+  venueName: string | null;
+}
+
+export type AiCityGuideItemDetails =
+  | AiCityGuideDealDetails
+  | AiCityGuideMerchantDetails
+  | AiCityGuideEventDetails;
+
+export interface AiCityGuideRecommendation {
+  candidateId: string;
+  type: 'merchant' | 'deal' | 'event';
+  title: string;
+  description: string;
+  reason: string;
+  bestFor: string[];
+  insiderTip: string;
+  distanceKm: number;
+  city: string | null;
+  coordinates: AiCityGuideCoordinates;
+  eta: AiCityGuideEta;
+  mapUrl: string;
+  details: AiCityGuideItemDetails;
+}
+
+export interface AiCityGuideRecommendationsResponse {
+  summary: string;
+  followUpQuestion: string;
+  recommendations: AiCityGuideRecommendation[];
+  generatedAt: string;
+}
+
+export interface AiCityGuideItineraryStop {
+  candidateId: string;
+  type: 'merchant' | 'deal' | 'event';
+  title: string;
+  reason: string;
+  visitWindow: string;
+  distanceKm: number;
+  eta: AiCityGuideEta;
+  mapUrl: string;
+  coordinates: AiCityGuideCoordinates;
+  details: AiCityGuideItemDetails;
+}
+
+export interface AiCityGuideItineraryResponse {
+  summary: string;
+  tips: string[];
+  stops: AiCityGuideItineraryStop[];
+  generatedAt: string;
+}
+
 // --- Hooks ---
 
 export const useAiStatus = () => {
@@ -224,6 +327,141 @@ export const useAiNudgePersonalize = () => {
       );
       if (!res.success || !res.data) {
         throw new Error(res.error || 'Failed to personalize nudge');
+      }
+      return res.data;
+    },
+  });
+};
+
+export const useAiCityGuideRecommend = () => {
+  return useMutation({
+    mutationKey: ['ai-city-guide-recommend'],
+    mutationFn: async (payload: AiCityGuideRequest) => {
+      const res = await apiPost<AiCityGuideRecommendationsResponse, AiCityGuideRequest>(
+        '/ai/city-guide/recommend',
+        payload,
+      );
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Failed to generate city guide recommendations');
+      }
+      return res.data;
+    },
+  });
+};
+
+export const useAiCityGuideFollowUp = () => {
+  return useMutation({
+    mutationKey: ['ai-city-guide-follow-up'],
+    mutationFn: async (payload: AiCityGuideFollowUpRequest) => {
+      const res = await apiPost<AiCityGuideRecommendationsResponse, AiCityGuideFollowUpRequest>(
+        '/ai/city-guide/follow-up',
+        payload,
+      );
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Failed to refine city guide recommendations');
+      }
+      return res.data;
+    },
+  });
+};
+
+export const useAiCityGuideItinerary = () => {
+  return useMutation({
+    mutationKey: ['ai-city-guide-itinerary'],
+    mutationFn: async (payload: AiCityGuideItineraryRequest) => {
+      const res = await apiPost<AiCityGuideItineraryResponse, AiCityGuideItineraryRequest>(
+        '/ai/city-guide/itinerary',
+        payload,
+      );
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Failed to generate itinerary');
+      }
+      return res.data;
+    },
+  });
+};
+
+// --- AI Inventory Management ---
+
+export interface AiInventoryAnalysis {
+  healthScore: number;
+  healthLabel: string;
+  summary: string;
+  categoryHealth: { category: string; status: string; insight: string; itemsNeedingAttention: number }[];
+  restockSuggestions: { itemName: string; currentQty: number; suggestedRestockQty: number; urgency: string; reason: string }[];
+  actionItems: string[];
+  tips: string[];
+}
+
+export interface AiInventoryAnalysisResponse {
+  analysis: AiInventoryAnalysis;
+}
+
+export interface AiBulkSetupSuggestion {
+  itemId: number;
+  inventoryTrackingEnabled: boolean;
+  inventoryQuantity: number;
+  lowStockThreshold: number;
+  allowBackorder: boolean;
+  rationale: string;
+}
+
+export interface AiBulkSetupResponse {
+  suggestions: AiBulkSetupSuggestion[];
+}
+
+export const useAiInventoryAnalysis = () => {
+  return useMutation({
+    mutationKey: ['ai-inventory-analyze'],
+    mutationFn: async () => {
+      const res = await apiGet<AiInventoryAnalysisResponse>('/ai/inventory/analyze');
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Failed to analyze inventory');
+      }
+      return res.data;
+    },
+  });
+};
+
+export const useAiInventoryBulkSetup = () => {
+  return useMutation({
+    mutationKey: ['ai-inventory-bulk-setup'],
+    mutationFn: async () => {
+      const res = await apiGet<AiBulkSetupResponse>('/ai/inventory/bulk-setup');
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Failed to generate bulk setup suggestions');
+      }
+      return res.data;
+    },
+  });
+};
+
+// --- AI Blog Draft ---
+
+export interface AiBlogDraftRequest {
+  topic: string;
+  tone?: string;
+}
+
+export interface AiBlogDraftSuggestion {
+  title: string;
+  excerpt: string;
+  content: string;
+  tags: string[];
+  suggestedCategory: string;
+}
+
+export interface AiBlogDraftResponse {
+  suggestion: AiBlogDraftSuggestion;
+}
+
+export const useAiBlogDraft = () => {
+  return useMutation({
+    mutationKey: ['ai-blog-generate'],
+    mutationFn: async (payload: AiBlogDraftRequest) => {
+      const res = await apiPost<AiBlogDraftResponse, AiBlogDraftRequest>('/ai/blog/generate', payload);
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Failed to generate blog draft');
       }
       return res.data;
     },

@@ -79,6 +79,7 @@ const SIDEBAR_NAV: SidebarEntry[] = [
     items: [
       { to: '/admin/master-data', icon: <Database className="h-[15px] w-[15px]" />, label: 'Master Data' },
       { to: PATHS.ADMIN_NUDGES, icon: <Bell className="h-[15px] w-[15px]" />, label: 'Nudges' },
+      { to: PATHS.ADMIN_GAMES, icon: <Award className="h-[15px] w-[15px]" />, label: 'Games' },
     ],
   },
   {

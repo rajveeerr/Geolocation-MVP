@@ -5,18 +5,26 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ImageUpload } from '@/components/common/ImageUpload';
 import { CategoryDropdown } from '@/components/common/CategoryDropdown';
+import { TwelveHourTimeField } from '@/components/common/TwelveHourTimeField';
 import { PATHS } from '@/routing/paths';
-import { useCreateMenuItem, useUpdateMenuItem, useMerchantMenu, type CreateMenuItemData, type UpdateMenuItemData, type MenuItemImage, type MenuDealType } from '@/hooks/useMerchantMenu';
+import { useCreateMenuItem, useUpdateMenuItem, useMerchantMenu, type CreateMenuItemData, type UpdateMenuItemData, type MenuItemImage, type MenuDealType, type MenuItemVariantInput } from '@/hooks/useMerchantMenu';
 import { useDealTypes } from '@/hooks/useDealTypes';
-import { 
-  ArrowLeft, 
-  Utensils, 
+import { useAiChat, useAiStatus } from '@/hooks/useAi';
+import { useToast } from '@/hooks/use-toast';
+import {
+  ArrowLeft,
+  Utensils,
   Loader2,
   AlertCircle,
   DollarSign,
   Clock,
   Sparkles,
-  Info
+  Info,
+  Wand2,
+  CheckCircle2,
+  Plus,
+  Trash2,
+  Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
@@ -36,10 +44,59 @@ const menuItemFormSchema = z.object({
   validStartTime: z.string().optional().nullable(),
   validEndTime: z.string().optional().nullable(),
   validDays: z.string().optional().nullable(),
+  isAvailable: z.boolean().optional(),
+  inventoryTrackingEnabled: z.boolean().optional(),
+  inventoryQuantity: z.number().int().min(0).optional().nullable(),
+  lowStockThreshold: z.number().int().min(0).optional().nullable(),
+  allowBackorder: z.boolean().optional(),
   // Remove imageUrl from schema since we're using the ImageUpload component
 });
 
 type MenuItemFormData = z.infer<typeof menuItemFormSchema>;
+
+type InventoryAiSuggestion = {
+  isAvailable: boolean;
+  inventoryTrackingEnabled: boolean;
+  inventoryQuantity: number;
+  lowStockThreshold: number;
+  allowBackorder: boolean;
+  rationale: string;
+  tips?: string[];
+};
+
+const parseInventoryAiSuggestion = (reply: string): InventoryAiSuggestion | null => {
+  const cleaned = reply.trim();
+  const fencedMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const jsonCandidate = fencedMatch?.[1] || cleaned;
+
+  try {
+    const parsed = JSON.parse(jsonCandidate);
+    if (
+      typeof parsed?.isAvailable === 'boolean' &&
+      typeof parsed?.inventoryTrackingEnabled === 'boolean' &&
+      Number.isInteger(parsed?.inventoryQuantity) &&
+      parsed.inventoryQuantity >= 0 &&
+      Number.isInteger(parsed?.lowStockThreshold) &&
+      parsed.lowStockThreshold >= 0 &&
+      typeof parsed?.allowBackorder === 'boolean' &&
+      typeof parsed?.rationale === 'string'
+    ) {
+      return {
+        isAvailable: parsed.isAvailable,
+        inventoryTrackingEnabled: parsed.inventoryTrackingEnabled,
+        inventoryQuantity: parsed.inventoryQuantity,
+        lowStockThreshold: parsed.lowStockThreshold,
+        allowBackorder: parsed.allowBackorder,
+        rationale: parsed.rationale,
+        tips: Array.isArray(parsed.tips) ? parsed.tips.filter((tip: unknown) => typeof tip === 'string').slice(0, 3) : [],
+      };
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+};
 
 export const MenuItemFormPage = () => {
   const navigate = useNavigate();
@@ -48,6 +105,9 @@ export const MenuItemFormPage = () => {
   
   const { data: menuData } = useMerchantMenu();
   const { data: dealTypesData } = useDealTypes();
+  const { data: aiStatus } = useAiStatus();
+  const aiChat = useAiChat();
+  const { toast } = useToast();
   const createMenuItemMutation = useCreateMenuItem();
   const updateMenuItemMutation = useUpdateMenuItem();
 
@@ -65,6 +125,36 @@ export const MenuItemFormPage = () => {
   const [validStartTime, setValidStartTime] = useState(existingItem?.validStartTime || '');
   const [validEndTime, setValidEndTime] = useState(existingItem?.validEndTime || '');
   const [validDays, setValidDays] = useState(existingItem?.validDays || '');
+  const [isAvailable, setIsAvailable] = useState(existingItem?.isAvailable ?? true);
+  const [inventoryTrackingEnabled, setInventoryTrackingEnabled] = useState(existingItem?.inventoryTrackingEnabled ?? false);
+  const [inventoryQuantity, setInventoryQuantity] = useState(
+    existingItem?.inventoryQuantity !== null && existingItem?.inventoryQuantity !== undefined
+      ? String(existingItem.inventoryQuantity)
+      : '',
+  );
+  const [lowStockThreshold, setLowStockThreshold] = useState(
+    existingItem?.lowStockThreshold !== null && existingItem?.lowStockThreshold !== undefined
+      ? String(existingItem.lowStockThreshold)
+      : '',
+  );
+  const [allowBackorder, setAllowBackorder] = useState(existingItem?.allowBackorder ?? false);
+  const [inventoryAiSuggestion, setInventoryAiSuggestion] = useState<InventoryAiSuggestion | null>(null);
+  const [hasVariants, setHasVariants] = useState(existingItem?.hasVariants ?? false);
+  const [variants, setVariants] = useState<MenuItemVariantInput[]>(() => {
+    if (existingItem?.variants && existingItem.variants.length > 0) {
+      return existingItem.variants.map((v) => ({
+        id: v.id,
+        sku: v.sku,
+        label: v.label,
+        price: v.price,
+        inventoryQuantity: v.inventoryQuantity,
+        lowStockThreshold: v.lowStockThreshold,
+        isAvailable: v.isAvailable,
+        sortOrder: v.sortOrder,
+      }));
+    }
+    return [];
+  });
 
   const {
     register,
@@ -87,10 +177,27 @@ export const MenuItemFormPage = () => {
       validStartTime: existingItem?.validStartTime || null,
       validEndTime: existingItem?.validEndTime || null,
       validDays: existingItem?.validDays || null,
+      isAvailable: existingItem?.isAvailable ?? true,
+      inventoryTrackingEnabled: existingItem?.inventoryTrackingEnabled ?? false,
+      inventoryQuantity: existingItem?.inventoryQuantity ?? null,
+      lowStockThreshold: existingItem?.lowStockThreshold ?? null,
+      allowBackorder: existingItem?.allowBackorder ?? false,
     }
   });
 
   const watchedValues = watch();
+  const parsedInventoryQuantity = inventoryQuantity !== '' ? Number(inventoryQuantity) : null;
+  const parsedLowStockThreshold = lowStockThreshold !== '' ? Number(lowStockThreshold) : null;
+  const inventoryQuantityInvalid =
+    inventoryTrackingEnabled &&
+    (parsedInventoryQuantity === null || !Number.isInteger(parsedInventoryQuantity) || parsedInventoryQuantity < 0);
+  const lowStockThresholdInvalid =
+    inventoryTrackingEnabled &&
+    parsedLowStockThreshold !== null &&
+    (!Number.isInteger(parsedLowStockThreshold) ||
+      parsedLowStockThreshold < 0 ||
+      (parsedInventoryQuantity !== null && parsedLowStockThreshold > parsedInventoryQuantity));
+  const aiEnabled = aiStatus?.aiEnabled ?? false;
 
   // Update form when existing item data loads
   useEffect(() => {
@@ -116,7 +223,37 @@ export const MenuItemFormPage = () => {
       setValidStartTime(existingItem.validStartTime || '');
       setValidEndTime(existingItem.validEndTime || '');
       setValidDays(existingItem.validDays || '');
+      setIsAvailable(existingItem.isAvailable ?? true);
+      setInventoryTrackingEnabled(existingItem.inventoryTrackingEnabled ?? false);
+      setInventoryQuantity(
+        existingItem.inventoryQuantity !== null && existingItem.inventoryQuantity !== undefined
+          ? String(existingItem.inventoryQuantity)
+          : '',
+      );
+      setLowStockThreshold(
+        existingItem.lowStockThreshold !== null && existingItem.lowStockThreshold !== undefined
+          ? String(existingItem.lowStockThreshold)
+          : '',
+      );
+      setAllowBackorder(existingItem.allowBackorder ?? false);
       
+      // Set existing variants if available
+      setHasVariants(existingItem.hasVariants ?? false);
+      if (existingItem.variants && existingItem.variants.length > 0) {
+        setVariants(existingItem.variants.map((v) => ({
+          id: v.id,
+          sku: v.sku,
+          label: v.label,
+          price: v.price,
+          inventoryQuantity: v.inventoryQuantity,
+          lowStockThreshold: v.lowStockThreshold,
+          isAvailable: v.isAvailable,
+          sortOrder: v.sortOrder,
+        })));
+      } else {
+        setVariants([]);
+      }
+
       // Set existing images if available
       if (existingItem.images && existingItem.images.length > 0) {
         setUploadedImages(existingItem.images);
@@ -134,6 +271,10 @@ export const MenuItemFormPage = () => {
 
   const onSubmit = async (data: MenuItemFormData) => {
     try {
+      if (inventoryQuantityInvalid || lowStockThresholdInvalid) {
+        return;
+      }
+
       const itemData: CreateMenuItemData | UpdateMenuItemData = {
         name: data.name,
         price: data.price,
@@ -150,6 +291,13 @@ export const MenuItemFormPage = () => {
         validStartTime: validStartTime || null,
         validEndTime: validEndTime || null,
         validDays: validDays || null,
+        isAvailable,
+        inventoryTrackingEnabled,
+        inventoryQuantity: inventoryTrackingEnabled && inventoryQuantity !== '' ? parseInt(inventoryQuantity, 10) : null,
+        lowStockThreshold: inventoryTrackingEnabled && lowStockThreshold !== '' ? parseInt(lowStockThreshold, 10) : null,
+        allowBackorder: inventoryTrackingEnabled ? allowBackorder : false,
+        hasVariants,
+        variants: hasVariants ? variants : undefined,
       };
 
       if (isEditing && itemId) {
@@ -162,8 +310,119 @@ export const MenuItemFormPage = () => {
       }
       
       navigate(PATHS.MERCHANT_MENU);
-    } catch (error) {
+    } catch {
       // Error handling is done in the mutation hooks
+    }
+  };
+
+  const applyInventoryAiSuggestion = (suggestion: InventoryAiSuggestion) => {
+    setIsAvailable(suggestion.isAvailable);
+    setInventoryTrackingEnabled(suggestion.inventoryTrackingEnabled);
+    setInventoryQuantity(String(suggestion.inventoryQuantity));
+    setLowStockThreshold(String(suggestion.lowStockThreshold));
+    setAllowBackorder(suggestion.allowBackorder);
+    setValue('isAvailable', suggestion.isAvailable);
+    setValue('inventoryTrackingEnabled', suggestion.inventoryTrackingEnabled);
+    setValue('inventoryQuantity', suggestion.inventoryQuantity);
+    setValue('lowStockThreshold', suggestion.lowStockThreshold);
+    setValue('allowBackorder', suggestion.allowBackorder);
+  };
+
+  const handleGenerateDescriptionWithAi = async () => {
+    const itemName = watch('name')?.trim();
+    const itemCategory = watchedValues.category?.trim();
+
+    if (!itemName) {
+      toast({
+        title: 'Add an item name first',
+        description: 'AI needs at least the item name to write a description.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const prompt = [
+      'Write a single mouth-watering menu description in 1-2 sentences (max 240 chars).',
+      'Plain text only — no quotes, markdown, emojis, or labels. Do not include the item name.',
+      `name:${itemName}`,
+      itemCategory ? `category:${itemCategory}` : '',
+      watchedValues.price ? `price:$${watchedValues.price}` : '',
+    ].filter(Boolean).join('\n').slice(0, 400);
+
+    try {
+      const result = await aiChat.mutateAsync({ message: prompt });
+      const cleaned = result.reply
+        .trim()
+        .replace(/^["'`]+|["'`]+$/g, '')
+        .replace(/^description[:\-\s]+/i, '')
+        .slice(0, 500);
+
+      if (!cleaned) {
+        throw new Error('AI returned an empty response.');
+      }
+
+      setValue('description', cleaned, { shouldDirty: true });
+      toast({
+        title: 'Description ready',
+        description: 'AI drafted a description. Tweak it before saving.',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Something went wrong while talking to AI.';
+      toast({
+        title: 'Could not generate description',
+        description: message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleGenerateInventoryWithAi = async () => {
+    const itemName = watch('name')?.trim();
+    const itemCategory = watchedValues.category?.trim();
+
+    if (!itemName || !itemCategory) {
+      toast({
+        title: 'Add the basics first',
+        description: 'Enter at least the item name and category so AI can suggest sensible inventory settings.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const prompt = [
+      'Return JSON only:',
+      '{"isAvailable":true,"inventoryTrackingEnabled":true,"inventoryQuantity":24,"lowStockThreshold":5,"allowBackorder":false,"rationale":"...","tips":["..."]}',
+      `name:${itemName}`,
+      `category:${itemCategory}`,
+      `price:${watchedValues.price || 0}`,
+      `desc:${(watchedValues.description || 'N/A').slice(0, 80)}`,
+      `deal:${selectedDealType || 'STANDARD'}`,
+      `qty:${inventoryQuantity || 'none'}`,
+      `threshold:${lowStockThreshold || 'none'}`,
+      'Use integers. threshold<=quantity. Prefer tracking on. Keep rationale short.',
+    ].join('\n').slice(0, 500);
+
+    try {
+      const result = await aiChat.mutateAsync({ message: prompt });
+      const suggestion = parseInventoryAiSuggestion(result.reply);
+
+      if (!suggestion) {
+        throw new Error('AI returned an unexpected format.');
+      }
+
+      setInventoryAiSuggestion(suggestion);
+      applyInventoryAiSuggestion(suggestion);
+      toast({
+        title: 'AI inventory suggestion ready',
+        description: 'We filled the inventory settings. Review them before saving.',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Something went wrong while talking to AI.';
+      toast({
+        title: 'Could not generate inventory suggestion',
+        description: message,
+        variant: 'destructive',
+      });
     }
   };
 
@@ -197,7 +456,7 @@ export const MenuItemFormPage = () => {
           onClick={() => navigate(PATHS.MERCHANT_MENU)}
           className="mb-4"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="mr-2 h-4 w-4 shrink-0" />
           Back to Menu
         </Button>
         <h1 className="text-4xl font-bold text-neutral-900">
@@ -273,7 +532,31 @@ export const MenuItemFormPage = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor="description">Description</Label>
+                {aiEnabled && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleGenerateDescriptionWithAi}
+                    disabled={aiChat.isPending}
+                    className="h-7 gap-1.5 px-2 text-xs text-[#bf6545] hover:bg-[#fff1e5] hover:text-[#bf6545]"
+                  >
+                    {aiChat.isPending ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        Writing...
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 className="h-3.5 w-3.5" />
+                        Write with AI
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
               <textarea
                 id="description"
                 placeholder="Describe your menu item..."
@@ -305,6 +588,356 @@ export const MenuItemFormPage = () => {
               <p className="text-xs text-neutral-500">
                 Upload up to 5 images to showcase your menu item. Supported formats: JPG, PNG, WebP.
               </p>
+            </div>
+
+            {/* Variants Section */}
+            <div className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="hasVariants"
+                  checked={hasVariants}
+                  onChange={(e) => {
+                    setHasVariants(e.target.checked);
+                    if (e.target.checked && variants.length === 0) {
+                      setVariants([{ label: '', price: watchedValues.price || 0, sortOrder: 0 }]);
+                    }
+                  }}
+                  className="h-4 w-4 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                />
+                <Label htmlFor="hasVariants" className="font-medium text-neutral-800">
+                  This item has variants (sizes, colors, etc.)
+                </Label>
+              </div>
+
+              {hasVariants && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm text-neutral-500">
+                    <Layers className="h-4 w-4" />
+                    <span>Each variant gets its own price and optional SKU.</span>
+                  </div>
+
+                  {variants.map((variant, index) => (
+                    <div key={index} className="rounded-lg border border-neutral-200 bg-white p-3">
+                      <div className="flex items-start gap-3">
+                        <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
+                          <div className="space-y-1">
+                            <Label className="text-xs text-neutral-500">Label *</Label>
+                            <Input
+                              placeholder="e.g., Large"
+                              value={variant.label}
+                              onChange={(e) => {
+                                const updated = [...variants];
+                                updated[index] = { ...updated[index], label: e.target.value };
+                                setVariants(updated);
+                              }}
+                              className={cn(!variant.label && 'border-red-300')}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs text-neutral-500">Price *</Label>
+                            <div className="relative">
+                              <DollarSign className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-400" />
+                              <Input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                placeholder="0.00"
+                                value={variant.price || ''}
+                                onChange={(e) => {
+                                  const updated = [...variants];
+                                  updated[index] = { ...updated[index], price: parseFloat(e.target.value) || 0 };
+                                  setVariants(updated);
+                                }}
+                                className="pl-9"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs text-neutral-500">SKU (auto if empty)</Label>
+                            <Input
+                              placeholder="Auto-generated"
+                              value={variant.sku || ''}
+                              onChange={(e) => {
+                                const updated = [...variants];
+                                updated[index] = { ...updated[index], sku: e.target.value };
+                                setVariants(updated);
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setVariants(variants.filter((_, i) => i !== index));
+                            if (variants.length <= 1) setHasVariants(false);
+                          }}
+                          className="mt-5 rounded-md p-1.5 text-neutral-400 transition hover:bg-red-50 hover:text-red-500"
+                          title="Remove variant"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+
+                      {inventoryTrackingEnabled && (
+                        <div className="mt-3 grid grid-cols-2 gap-3 border-t border-neutral-100 pt-3">
+                          <div className="space-y-1">
+                            <Label className="text-xs text-neutral-500">Quantity</Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              step="1"
+                              placeholder="0"
+                              value={variant.inventoryQuantity ?? ''}
+                              onChange={(e) => {
+                                const updated = [...variants];
+                                updated[index] = {
+                                  ...updated[index],
+                                  inventoryQuantity: e.target.value ? parseInt(e.target.value, 10) : null,
+                                };
+                                setVariants(updated);
+                              }}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs text-neutral-500">Low Stock Threshold</Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              step="1"
+                              placeholder="5"
+                              value={variant.lowStockThreshold ?? ''}
+                              onChange={(e) => {
+                                const updated = [...variants];
+                                updated[index] = {
+                                  ...updated[index],
+                                  lowStockThreshold: e.target.value ? parseInt(e.target.value, 10) : null,
+                                };
+                                setVariants(updated);
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setVariants([...variants, { label: '', price: watchedValues.price || 0, sortOrder: variants.length }]);
+                    }}
+                    className="gap-1.5"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Add Variant
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="font-semibold text-neutral-900">Availability & Inventory</h3>
+                  <p className="mt-1 text-sm text-neutral-600">
+                    Control whether this item is available and optionally track stock levels.
+                  </p>
+                </div>
+                <span
+                  className={cn(
+                    'rounded-full px-3 py-1 text-xs font-semibold',
+                    !isAvailable
+                      ? 'bg-red-100 text-red-700'
+                      : inventoryTrackingEnabled && parsedInventoryQuantity !== null && parsedInventoryQuantity <= 0 && !allowBackorder
+                        ? 'bg-red-100 text-red-700'
+                        : inventoryTrackingEnabled &&
+                            parsedInventoryQuantity !== null &&
+                            parsedLowStockThreshold !== null &&
+                            parsedInventoryQuantity <= parsedLowStockThreshold
+                          ? 'bg-amber-100 text-amber-700'
+                          : inventoryTrackingEnabled
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-slate-100 text-slate-700'
+                  )}
+                >
+                  {!isAvailable
+                    ? 'Out of Stock'
+                    : inventoryTrackingEnabled
+                      ? 'Tracked'
+                      : 'Untracked'}
+                </span>
+              </div>
+
+              {aiEnabled && (
+                <div className="rounded-xl border border-[#f0ddd0] bg-[linear-gradient(135deg,#fff8f2_0%,#fff1e5_100%)] p-4 shadow-[0_12px_30px_rgba(82,58,40,0.06)]">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex items-start gap-3">
+                      <div className="rounded-full bg-white/80 p-2 text-[#bf6545]">
+                        <Wand2 className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-[#203247]">AI Inventory Assistant</p>
+                        <p className="mt-1 text-sm text-[#607084]">
+                          Suggest a starting quantity, low-stock threshold, and backorder rule from this item&apos;s details.
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={handleGenerateInventoryWithAi}
+                      disabled={aiChat.isPending}
+                      className="shrink-0 border-[#ead6c9] bg-white/80 text-[#203247] hover:bg-white"
+                    >
+                      {aiChat.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Thinking...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="mr-2 h-4 w-4" />
+                          Suggest Inventory
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {inventoryAiSuggestion && (
+                    <div className="mt-4 rounded-lg border border-white/80 bg-white/85 p-4">
+                      <div className="flex items-start gap-2 text-[#203247]">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
+                        <div>
+                          <p className="text-sm font-semibold">AI recommendation applied</p>
+                          <p className="mt-1 text-sm text-[#607084]">{inventoryAiSuggestion.rationale}</p>
+                        </div>
+                      </div>
+                      {inventoryAiSuggestion.tips && inventoryAiSuggestion.tips.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {inventoryAiSuggestion.tips.map((tip, index) => (
+                            <span
+                              key={`${tip}-${index}`}
+                              className="rounded-full bg-[#f7ede5] px-3 py-1 text-xs font-medium text-[#7b5c49]"
+                            >
+                              {tip}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isAvailable"
+                  checked={isAvailable}
+                  onChange={(e) => {
+                    setIsAvailable(e.target.checked);
+                    setValue('isAvailable', e.target.checked);
+                  }}
+                  className="h-4 w-4 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                />
+                <Label htmlFor="isAvailable" className="font-medium text-neutral-800">
+                  Item is available to customers
+                </Label>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="inventoryTrackingEnabled"
+                  checked={inventoryTrackingEnabled}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setInventoryTrackingEnabled(checked);
+                    setValue('inventoryTrackingEnabled', checked);
+                    if (!checked) {
+                      setInventoryQuantity('');
+                      setLowStockThreshold('');
+                      setAllowBackorder(false);
+                      setValue('inventoryQuantity', null);
+                      setValue('lowStockThreshold', null);
+                      setValue('allowBackorder', false);
+                    }
+                  }}
+                  className="h-4 w-4 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                />
+                <Label htmlFor="inventoryTrackingEnabled" className="font-medium text-neutral-800">
+                  Track inventory quantity
+                </Label>
+              </div>
+
+              {inventoryTrackingEnabled && (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="inventoryQuantity">Current Quantity *</Label>
+                    <Input
+                      id="inventoryQuantity"
+                      type="number"
+                      min="0"
+                      step="1"
+                      placeholder="e.g., 24"
+                      value={inventoryQuantity}
+                      onChange={(e) => {
+                        setInventoryQuantity(e.target.value);
+                        setValue('inventoryQuantity', e.target.value ? parseInt(e.target.value, 10) : null);
+                      }}
+                      className={cn(inventoryQuantityInvalid && 'border-red-500')}
+                    />
+                    {inventoryQuantityInvalid && (
+                      <p className="text-sm text-red-600 flex items-center gap-1">
+                        <AlertCircle className="h-4 w-4" />
+                        Enter a non-negative whole number.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="lowStockThreshold">Low Stock Threshold</Label>
+                    <Input
+                      id="lowStockThreshold"
+                      type="number"
+                      min="0"
+                      step="1"
+                      placeholder="e.g., 5"
+                      value={lowStockThreshold}
+                      onChange={(e) => {
+                        setLowStockThreshold(e.target.value);
+                        setValue('lowStockThreshold', e.target.value ? parseInt(e.target.value, 10) : null);
+                      }}
+                      className={cn(lowStockThresholdInvalid && 'border-red-500')}
+                    />
+                    {lowStockThresholdInvalid && (
+                      <p className="text-sm text-red-600 flex items-center gap-1">
+                        <AlertCircle className="h-4 w-4" />
+                        Threshold must be a non-negative whole number and cannot exceed current quantity.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="sm:col-span-2 flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="allowBackorder"
+                      checked={allowBackorder}
+                      onChange={(e) => {
+                        setAllowBackorder(e.target.checked);
+                        setValue('allowBackorder', e.target.checked);
+                      }}
+                      className="h-4 w-4 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                    />
+                    <Label htmlFor="allowBackorder" className="font-medium text-neutral-800">
+                      Allow item to stay visible when quantity reaches 0
+                    </Label>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -427,22 +1060,17 @@ export const MenuItemFormPage = () => {
                 </div>
                 {isSurprise && (
                   <div className="space-y-2">
-                    <Label htmlFor="surpriseRevealTime">Reveal Time (24-hour format)</Label>
-                    <div className="relative">
-                      <Clock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
-                      <Input
-                        id="surpriseRevealTime"
-                        type="time"
-                        value={surpriseRevealTime}
-                        onChange={(e) => {
-                          setSurpriseRevealTime(e.target.value);
-                          setValue('surpriseRevealTime', e.target.value || null);
-                        }}
-                        className="pl-10"
-                      />
-                    </div>
+                    <TwelveHourTimeField
+                      id="surpriseRevealTime"
+                      label="Reveal Time"
+                      value={surpriseRevealTime}
+                      onChange={(nextValue) => {
+                        setSurpriseRevealTime(nextValue);
+                        setValue('surpriseRevealTime', nextValue || null);
+                      }}
+                    />
                     <p className="text-xs text-purple-700">
-                      When customers can see this surprise deal (e.g., 17:00 for 5 PM)
+                      When customers can see this surprise deal in 12-hour format.
                     </p>
                   </div>
                 )}
@@ -457,30 +1085,24 @@ export const MenuItemFormPage = () => {
                   Time Restrictions (Optional)
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="validStartTime">Start Time</Label>
-                    <Input
-                      id="validStartTime"
-                      type="time"
-                      value={validStartTime}
-                      onChange={(e) => {
-                        setValidStartTime(e.target.value);
-                        setValue('validStartTime', e.target.value || null);
-                      }}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="validEndTime">End Time</Label>
-                    <Input
-                      id="validEndTime"
-                      type="time"
-                      value={validEndTime}
-                      onChange={(e) => {
-                        setValidEndTime(e.target.value);
-                        setValue('validEndTime', e.target.value || null);
-                      }}
-                    />
-                  </div>
+                  <TwelveHourTimeField
+                    id="validStartTime"
+                    label="Start Time"
+                    value={validStartTime}
+                    onChange={(nextValue) => {
+                      setValidStartTime(nextValue);
+                      setValue('validStartTime', nextValue || null);
+                    }}
+                  />
+                  <TwelveHourTimeField
+                    id="validEndTime"
+                    label="End Time"
+                    value={validEndTime}
+                    onChange={(nextValue) => {
+                      setValidEndTime(nextValue);
+                      setValue('validEndTime', nextValue || null);
+                    }}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="validDays">Valid Days (Optional)</Label>
@@ -505,7 +1127,13 @@ export const MenuItemFormPage = () => {
         <div className="flex items-center gap-4">
           <Button
             type="submit"
-            disabled={isSubmitting || createMenuItemMutation.isPending || updateMenuItemMutation.isPending}
+            disabled={
+              isSubmitting ||
+              createMenuItemMutation.isPending ||
+              updateMenuItemMutation.isPending ||
+              inventoryQuantityInvalid ||
+              lowStockThresholdInvalid
+            }
             className="flex-1"
           >
             {(isSubmitting || createMenuItemMutation.isPending || updateMenuItemMutation.isPending) ? (

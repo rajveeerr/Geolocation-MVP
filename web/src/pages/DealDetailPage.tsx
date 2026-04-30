@@ -13,7 +13,7 @@ import {
   ThumbsUp, Check, Search, SlidersHorizontal, Zap, ChevronDown,
 } from 'lucide-react';
 import { useCheckIn } from '@/hooks/useCheckIn';
-import { CheckInModal } from '@/components/deals/CheckInModal';
+import { PostCheckInGameModal } from '@/components/gamification/PostCheckInGameModal';
 import { TableBookingModal } from '@/components/table-booking/TableBookingModal';
 import { LeaderboardTab } from '@/components/deals/detail-tabs/LeaderboardTab';
 import { EventsTab } from '@/components/deals/detail-tabs/EventsTab';
@@ -596,7 +596,32 @@ export const DealDetailPage = () => {
   const [leftTab, setLeftTab] = useState<LeftTab>('info');
   const [rightTab, setRightTab] = useState<RightTab>('menu');
   const [showCheckInModal, setShowCheckInModal] = useState(false);
-  const [checkInResult, setCheckInResult] = useState<{ pointsEarned: number } | null>(null);
+  const [checkInResult, setCheckInResult] = useState<{
+    pointsEarned: number;
+    eligibleRewards?: Array<{
+      id: number;
+      title: string;
+      description?: string | null;
+      rewardType: string;
+      rewardAmount: number;
+      checkInCondition: 'ANY_CHECKIN' | 'FIRST_VISIT' | 'BIRTHDAY';
+      expiresAt: string;
+    }>;
+    lotteryEntry?: {
+      gameId: string;
+      entered: boolean;
+      newEntry: boolean;
+      totalEntries: number;
+      drawAt: string;
+    } | null;
+    gameSession?: {
+      sessionToken: string;
+      gameType: 'SCRATCH_CARD' | 'SPIN_WHEEL' | 'PICK_A_CARD';
+      title: string;
+      subtitle?: string | null;
+      expiresAt: string;
+    } | null;
+  } | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showHoursDropdown, setShowHoursDropdown] = useState(false);
   const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
@@ -604,7 +629,12 @@ export const DealDetailPage = () => {
   const { isCheckingIn, checkIn } = useCheckIn({
     onSuccess: (data) => {
       if (data.withinRange) {
-        setCheckInResult({ pointsEarned: data.pointsEarned });
+        setCheckInResult({
+          pointsEarned: data.pointsEarned,
+          eligibleRewards: data.eligibleRewards,
+          lotteryEntry: data.lotteryEntry,
+          gameSession: data.gameSession,
+        });
         setShowCheckInModal(true);
       }
     },
@@ -1352,7 +1382,7 @@ export const DealDetailPage = () => {
       {/*  MODALS                                                       */}
       {/* ============================================================ */}
       {showCheckInModal && deal && (
-        <CheckInModal
+        <PostCheckInGameModal
           isOpen={showCheckInModal}
           onClose={() => {
             setShowCheckInModal(false);
@@ -1360,6 +1390,9 @@ export const DealDetailPage = () => {
           }}
           deal={deal}
           pointsEarned={checkInResult?.pointsEarned || 50}
+          eligibleRewards={checkInResult?.eligibleRewards || []}
+          lotteryEntry={checkInResult?.lotteryEntry || null}
+          gameSession={checkInResult?.gameSession || null}
           onCheckOut={() => {
             setShowCheckInModal(false);
             setCheckInResult(null);

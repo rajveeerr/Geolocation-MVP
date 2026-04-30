@@ -1,6 +1,7 @@
 import { DollarSign, ShoppingCart, TrendingUp, Gift, Calendar, Heart, Zap } from 'lucide-react';
 import { useMerchantDashboardStats } from '@/hooks/useMerchantDashboardStats';
 import { Loader2 } from 'lucide-react';
+import { merchantPanelClass } from '@/components/merchant/MerchantAppleUI';
 
 interface KPICardProps {
   title: string;
@@ -21,25 +22,25 @@ const KPICard = ({ title, value, icon, color, subtitle, isLoading }: KPICardProp
   };
 
   return (
-    <div className="bg-white rounded-lg border border-neutral-200 p-6 shadow-sm">
+    <div className="rounded-[1.2rem] border border-neutral-200/80 bg-white/95 p-4 shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-neutral-600">{title}</p>
+          <p className="text-[13px] font-medium text-neutral-600">{title}</p>
           <div className="mt-2">
             {isLoading ? (
               <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
             ) : (
-              <p className="text-2xl font-bold text-neutral-900">
+              <p className="text-[1.5rem] font-bold tracking-tight text-neutral-900">
                 {typeof value === 'number' ? value.toLocaleString() : value}
               </p>
             )}
           </div>
           {subtitle && (
-            <p className="text-xs text-neutral-500 mt-1">{subtitle}</p>
+            <p className="mt-1 text-xs text-neutral-500">{subtitle}</p>
           )}
         </div>
-        <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
-          {icon}
+        <div className={`rounded-[0.95rem] p-3 ${colorClasses[color]}`}>
+          <div className="h-5 w-5">{icon}</div>
         </div>
       </div>
     </div>
@@ -55,7 +56,7 @@ export const MerchantKPICards = ({ period = 'all_time' }: MerchantKPICardsProps)
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="rounded-[1.2rem] border border-red-200 bg-red-50 p-4">
         <p className="text-red-800 text-sm">Failed to load dashboard statistics</p>
       </div>
     );
@@ -63,16 +64,14 @@ export const MerchantKPICards = ({ period = 'all_time' }: MerchantKPICardsProps)
 
   return (
     <div className="space-y-6">
-      {/* Period Selector */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-neutral-900">Key Performance Indicators</h2>
-        <div className="text-sm text-neutral-600">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="text-[15px] font-semibold text-neutral-900">Key performance indicators</h2>
+        <div className="text-[13px] text-neutral-600">
           Period: {stats?.period?.replace('_', ' ') || period.replace('_', ' ')}
         </div>
       </div>
 
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <KPICard
           title="Gross Sales"
           value={stats?.kpis.grossSales || 0}
@@ -110,8 +109,7 @@ export const MerchantKPICards = ({ period = 'all_time' }: MerchantKPICardsProps)
         />
       </div>
 
-      {/* Additional Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <KPICard
           title="Active Deals"
           value={stats?.metrics.activeDeals || 0}
@@ -140,10 +138,9 @@ export const MerchantKPICards = ({ period = 'all_time' }: MerchantKPICardsProps)
         />
       </div>
 
-      {/* Date Range Info */}
       {stats?.dateRange && (
-        <div className="bg-neutral-50 rounded-lg p-4">
-          <p className="text-sm text-neutral-600">
+        <div className={merchantPanelClass}>
+          <p className="text-[13px] text-neutral-600">
             <span className="font-medium">Date Range:</span>{' '}
             {stats.dateRange.from 
               ? `${new Date(stats.dateRange.from).toLocaleDateString()} - ${new Date(stats.dateRange.to).toLocaleDateString()}`

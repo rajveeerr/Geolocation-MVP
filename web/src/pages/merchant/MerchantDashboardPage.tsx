@@ -4,10 +4,11 @@ import { Link } from 'react-router-dom';
 import { PATHS } from '@/routing/paths';
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
-import { CalendarIcon, ClockIcon, DollarSign, Percent, BarChart3, Users, Settings, Gift } from 'lucide-react';
+import { CalendarIcon, ClockIcon, DollarSign, Percent, BarChart3, Users, Gift, AlertTriangle, PackageX, Boxes, Sparkles } from 'lucide-react';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useMerchantDashboardStats } from '@/hooks/useMerchantDashboardStats';
 import { useMerchantStores } from '@/hooks/useMerchantStores';
+import { useMerchantMenu } from '@/hooks/useMerchantMenu';
 import { useMerchantLoyaltyProgram } from '@/hooks/useMerchantLoyalty';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
@@ -41,6 +42,9 @@ interface MerchantCheckInSummaryResponse {
   };
 }
 
+const panelClass =
+  'rounded-[1.4rem] border border-neutral-200/80 bg-white/92 p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)] backdrop-blur';
+
 const DealCard = ({ deal }: { deal: Deal }) => {
   const isActive =
     new Date() >= new Date(deal.startTime) &&
@@ -48,11 +52,11 @@ const DealCard = ({ deal }: { deal: Deal }) => {
   const isExpired = new Date() > new Date(deal.endTime);
 
   return (
-    <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
-      <div className="mb-4 flex items-start justify-between">
-        <h3 className="text-xl font-semibold text-neutral-800">{deal.title}</h3>
+    <div className="rounded-[1.3rem] border border-neutral-200/80 bg-white/95 p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)] transition-shadow hover:shadow-[0_12px_28px_rgba(15,23,42,0.06)]">
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <h3 className="text-[17px] font-semibold text-neutral-800">{deal.title}</h3>
         <span
-          className={`rounded-full px-3 py-1 text-sm font-medium ${
+          className={`rounded-full px-2.5 py-1 text-xs font-medium ${
             isActive
               ? 'bg-green-100 text-green-800'
               : isExpired
@@ -64,12 +68,12 @@ const DealCard = ({ deal }: { deal: Deal }) => {
         </span>
       </div>
 
-      <p className="mb-4 text-neutral-600">{deal.description}</p>
+      <p className="mb-4 text-sm text-neutral-600">{deal.description}</p>
 
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Percent className="h-4 w-4 text-brand-primary-600" />
-          <span className="font-medium">
+          <span className="text-sm font-medium">
             {deal.discountPercentage
               ? `${deal.discountPercentage}% OFF`
               : `$${deal.discountAmount} OFF`}
@@ -78,7 +82,7 @@ const DealCard = ({ deal }: { deal: Deal }) => {
 
         <div className="flex items-center gap-2">
           <CalendarIcon className="h-4 w-4 text-neutral-500" />
-          <span className="text-sm text-neutral-600">
+          <span className="text-xs text-neutral-600">
             {new Date(deal.startTime).toLocaleDateString()} -{' '}
             {new Date(deal.endTime).toLocaleDateString()}
           </span>
@@ -86,14 +90,14 @@ const DealCard = ({ deal }: { deal: Deal }) => {
 
         <div className="flex items-center gap-2">
           <ClockIcon className="h-4 w-4 text-neutral-500" />
-          <span className="text-sm text-neutral-600">
+          <span className="text-xs text-neutral-600">
             Created {new Date(deal.createdAt).toLocaleDateString()}
           </span>
         </div>
       </div>
 
       <div className="mt-4 border-t border-neutral-100 pt-4">
-        <p className="text-sm text-neutral-500">
+        <p className="text-xs text-neutral-500">
           <strong>Redemption:</strong> {deal.redemptionInstructions}
         </p>
       </div>
@@ -126,15 +130,15 @@ const LoyaltyProgramCard = () => {
   const hasProgram = loyaltyProgram?.program && !loyaltyProgram.error;
 
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+    <div className={cn(panelClass, 'bg-gradient-to-br from-white via-white to-[#f6f7f9]')}>
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-primary-100">
-            <Gift className="h-6 w-6 text-brand-primary-600" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-[0.95rem] border border-neutral-200/80 bg-neutral-100 text-neutral-700">
+            <Gift className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-neutral-900">Loyalty Program</h3>
-            <p className="mt-1 text-sm text-neutral-600">
+            <h3 className="text-[15px] font-semibold text-neutral-900">Loyalty Program</h3>
+            <p className="mt-1 text-[13px] text-neutral-600">
               {isLoading 
                 ? 'Checking status...' 
                 : hasProgram 
@@ -148,24 +152,34 @@ const LoyaltyProgramCard = () => {
       <div className="mt-4">
         {isLoading ? (
           <div className="animate-pulse">
-            <div className="h-10 w-32 rounded-md bg-neutral-200" />
+            <div className="h-10 w-32 rounded-xl bg-neutral-200" />
           </div>
         ) : hasProgram ? (
           <div className="flex gap-3">
             <Link to={PATHS.MERCHANT_LOYALTY_ANALYTICS}>
-              <Button variant="primary" size="sm" className="rounded-lg">
+              <Button
+                size="sm"
+                className="rounded-xl bg-neutral-950 text-xs text-white hover:bg-neutral-800"
+              >
                 View Program
               </Button>
             </Link>
             <Link to={PATHS.MERCHANT_LOYALTY_PROGRAM}>
-              <Button variant="secondary" size="sm" className="rounded-lg">
+              <Button
+                variant="secondary"
+                size="sm"
+                className="rounded-xl border-neutral-200 bg-white text-xs text-neutral-700 hover:bg-neutral-50"
+              >
                 Manage Settings
               </Button>
             </Link>
           </div>
         ) : (
           <Link to={PATHS.MERCHANT_LOYALTY_SETUP}>
-            <Button variant="primary" size="sm" className="rounded-lg">
+            <Button
+              size="sm"
+              className="rounded-xl bg-neutral-950 text-xs text-white hover:bg-neutral-800"
+            >
               Set Up Loyalty Program
             </Button>
           </Link>
@@ -193,6 +207,23 @@ export const MerchantDashboardPage = () => {
   const { data: aiInsights, isLoading: aiInsightsLoading } = useAiMerchantInsights();
   const merchantStores = storesData?.stores ?? [];
 
+  // Inventory health summary for the dashboard widget
+  const { data: menuData } = useMerchantMenu();
+  const inventoryHealth = useMemo(() => {
+    const items = menuData?.menuItems ?? [];
+    let lowStock = 0;
+    let outOfStock = 0;
+    const lowStockItems: { id: number; name: string; qty: number }[] = [];
+    items.forEach((it) => {
+      if (it.inventoryStatus === 'LOW_STOCK') {
+        lowStock += 1;
+        lowStockItems.push({ id: it.id, name: it.name, qty: it.inventoryQuantity ?? 0 });
+      }
+      if (it.inventoryStatus === 'OUT_OF_STOCK') outOfStock += 1;
+    });
+    return { lowStock, outOfStock, lowStockItems: lowStockItems.slice(0, 3) };
+  }, [menuData]);
+
   const { data: checkInSummary, isLoading: checkInSummaryLoading } = useQuery({
     queryKey: ['merchant-checkins-summary'],
     queryFn: () =>
@@ -215,7 +246,7 @@ export const MerchantDashboardPage = () => {
     enabled: !!merchantStatus && merchantStatus === 'APPROVED',
   });
 
-  const deals = dealsData?.data?.deals || [];
+  const deals = useMemo(() => dealsData?.data?.deals ?? [], [dealsData?.data?.deals]);
   const isLoading = dealsLoading;
   const error = dealsError;
 
@@ -242,12 +273,12 @@ export const MerchantDashboardPage = () => {
 
   if (merchantLoading) {
     return (
-      <div className="container mx-auto max-w-7xl px-4 py-12">
+      <div className="space-y-6">
         <div className="animate-pulse">
-          <div className="mb-8 h-8 w-64 rounded bg-neutral-200" />
-          <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-6">
+          <div className="h-24 rounded-[2rem] bg-neutral-200/80" />
+          <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-24 rounded bg-neutral-200" />
+              <div key={i} className="h-28 rounded-[1.5rem] bg-neutral-200/80" />
             ))}
           </div>
         </div>
@@ -257,35 +288,62 @@ export const MerchantDashboardPage = () => {
 
   if (!merchantStatus) {
     return (
-      <div className="container mx-auto max-w-4xl px-4 py-12">
-        <div className="text-center">
-          <h1 className="mb-4 text-4xl font-bold">Join as a Merchant</h1>
+      <div className={cn(panelClass, 'mx-auto max-w-3xl py-10 text-center')}>
+          <h1 className="mb-4 text-4xl font-semibold tracking-tight text-neutral-900">Join as a Merchant</h1>
           <p className="mb-8 text-neutral-600">
             Start creating deals and reach new customers
           </p>
           <Link to={PATHS.MERCHANT_ONBOARDING}>
-            <Button size="lg">Become a Merchant</Button>
+            <Button size="lg" className="rounded-xl px-6">Become a Merchant</Button>
           </Link>
-        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-12">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-bold">Your Dashboard</h1>
-          <p className="mt-2 text-neutral-600">
-            Manage your deals and track performance
-          </p>
+    <div className="space-y-5">
+      <div className="overflow-hidden rounded-[1.6rem] border border-neutral-200/80 bg-gradient-to-br from-white via-white to-[#f1f3f7] p-5 shadow-[0_10px_28px_rgba(15,23,42,0.05)] sm:p-6">
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
+              Merchant overview
+            </div>
+            <h2 className="mt-3 text-[1.8rem] font-semibold tracking-tight text-neutral-900 sm:text-[2rem]">
+              Calmer operations across deals, stores, guests, and rewards.
+            </h2>
+            <p className="mt-2 text-[13px] leading-6 text-neutral-600 sm:text-sm">
+              This dashboard now leans into a smaller, cleaner Apple-style control surface with quieter cards and clearer actions.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-[1.2rem] border border-neutral-200/80 bg-white/90 p-4 shadow-sm">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Merchant status</div>
+              <div className="mt-2 text-[15px] font-semibold text-neutral-900">{merchantStatus}</div>
+              <div className="mt-1 text-[13px] text-neutral-500">
+                {merchantStores.length} store{merchantStores.length === 1 ? '' : 's'} connected
+              </div>
+            </div>
+            <div className="rounded-[1.2rem] border border-neutral-200/80 bg-white/90 p-4 shadow-sm">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Customer activity</div>
+              <div className="mt-2 text-[15px] font-semibold text-neutral-900">
+                {checkInSummaryLoading ? '...' : `${totalCheckIns} tap-ins`}
+              </div>
+              <div className="mt-1 text-[13px] text-neutral-500">Live check-in momentum across your locations</div>
+            </div>
+          </div>
         </div>
+
         {merchantStatus === 'APPROVED' && (
-          <div className="flex gap-3">
+          <div className="mt-6 flex flex-wrap gap-3">
             <Link to={PATHS.MERCHANT_ANALYTICS}>
-              <Button variant="secondary" size="lg" className="rounded-lg">
-                <BarChart3 className="h-4 w-4 mr-2" />
+              <Button variant="secondary" size="lg" className="rounded-xl border-neutral-200 text-sm">
+                <BarChart3 className="mr-2 h-4 w-4" />
                 View Analytics
+              </Button>
+            </Link>
+            <Link to={PATHS.MERCHANT_DEALS_CREATE}>
+              <Button size="lg" className="rounded-xl text-sm">
+                Create New Deal
               </Button>
             </Link>
           </div>
@@ -293,7 +351,7 @@ export const MerchantDashboardPage = () => {
       </div>
 
       {merchantStatus === 'PENDING' && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 sm:p-8">
+        <div className="rounded-[1.75rem] border border-amber-200/80 bg-amber-50/90 p-6 shadow-sm sm:p-8">
           <h2 className="text-2xl font-bold text-amber-800">
             Application Pending
           </h2>
@@ -301,22 +359,22 @@ export const MerchantDashboardPage = () => {
             Your application to become a merchant is currently under review. This usually takes 1-2 business days. We'll notify you via email once it's approved.
           </p>
 
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white rounded-lg p-4 border border-amber-200">
-              <h3 className="font-semibold text-amber-800 mb-2">Prepare Your Menu</h3>
-              <p className="text-sm text-amber-700 mb-4">
+          <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="rounded-[1.25rem] border border-amber-200 bg-white p-4">
+              <h3 className="mb-2 font-semibold text-amber-800">Prepare Your Menu</h3>
+              <p className="mb-4 text-sm text-amber-700">
                 While waiting for approval, you can start setting up your menu items.
               </p>
-              <Link to={PATHS.MERCHANT_MENU_MANAGEMENT}>
-                <Button variant="outline" size="sm" className="w-full">
+              <Link to={PATHS.MERCHANT_MENU}>
+                <Button variant="secondary" size="sm" className="w-full rounded-xl">
                   Manage Menu
                 </Button>
               </Link>
             </div>
             
-            <div className="bg-white rounded-lg p-4 border border-amber-200">
-              <h3 className="font-semibold text-amber-800 mb-2">Explore Deals</h3>
-              <p className="text-sm text-amber-700 mb-4">
+            <div className="rounded-[1.25rem] border border-amber-200 bg-white p-4">
+              <h3 className="mb-2 font-semibold text-amber-800">Explore Deals</h3>
+              <p className="mb-4 text-sm text-amber-700">
                 See what other merchants are offering to get inspired.
               </p>
               <ExploreDealsPreview />
@@ -328,15 +386,15 @@ export const MerchantDashboardPage = () => {
       {merchantStatus === 'APPROVED' && (
         <>
           {/* Custom Tabs Navigation - matching kickback page style */}
-          <div className="mb-6">
-            <div className="flex items-center gap-2 rounded-full bg-neutral-100 p-1">
+          <div className="mb-5">
+            <div className="inline-flex flex-wrap items-center gap-2 rounded-[1.1rem] border border-neutral-200/80 bg-white/90 p-1.5 shadow-sm">
               <button
                 onClick={() => setActiveTab('overview')}
                 className={cn(
-                  'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                  'rounded-[0.9rem] px-3.5 py-2 text-[13px] font-semibold transition-all duration-200',
                   activeTab === 'overview'
-                    ? 'bg-black text-white shadow-sm'
-                    : 'text-neutral-600 hover:bg-neutral-200/50',
+                    ? 'bg-neutral-900 text-white shadow-sm'
+                    : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
                 )}
               >
                 Overview
@@ -344,10 +402,10 @@ export const MerchantDashboardPage = () => {
               <button
                 onClick={() => setActiveTab('deals')}
                 className={cn(
-                  'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                  'rounded-[0.9rem] px-3.5 py-2 text-[13px] font-semibold transition-all duration-200',
                   activeTab === 'deals'
-                    ? 'bg-black text-white shadow-sm'
-                    : 'text-neutral-600 hover:bg-neutral-200/50',
+                    ? 'bg-neutral-900 text-white shadow-sm'
+                    : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
                 )}
               >
                 Deals
@@ -355,10 +413,10 @@ export const MerchantDashboardPage = () => {
               <button
                 onClick={() => setActiveTab('analytics')}
                 className={cn(
-                  'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                  'rounded-[0.9rem] px-3.5 py-2 text-[13px] font-semibold transition-all duration-200',
                   activeTab === 'analytics'
-                    ? 'bg-black text-white shadow-sm'
-                    : 'text-neutral-600 hover:bg-neutral-200/50',
+                    ? 'bg-neutral-900 text-white shadow-sm'
+                    : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
                 )}
               >
                 Analytics
@@ -366,10 +424,10 @@ export const MerchantDashboardPage = () => {
               <button
                 onClick={() => setActiveTab('booking')}
                 className={cn(
-                  'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                  'rounded-[0.9rem] px-3.5 py-2 text-[13px] font-semibold transition-all duration-200',
                   activeTab === 'booking'
-                    ? 'bg-black text-white shadow-sm'
-                    : 'text-neutral-600 hover:bg-neutral-200/50',
+                    ? 'bg-neutral-900 text-white shadow-sm'
+                    : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
                 )}
               >
                 Table Booking
@@ -379,14 +437,14 @@ export const MerchantDashboardPage = () => {
 
           {/* Tab Content */}
           {activeTab === 'overview' && (
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Dynamic KPI Row */}
-              <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className={panelClass}>
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm text-neutral-500">Gross sales</h4>
-                  <p className="mt-2 text-2xl font-extrabold text-neutral-900 flex items-baseline gap-2">
+                  <h4 className="text-[13px] text-neutral-500">Gross sales</h4>
+                  <p className="mt-2 flex items-baseline gap-2 text-[1.55rem] font-bold text-neutral-900">
                     <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-neutral-100 text-neutral-700">
                       <DollarSign className="h-3 w-3" />
                     </span>
@@ -396,20 +454,20 @@ export const MerchantDashboardPage = () => {
               </div>
             </div>
 
-            <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div className={panelClass}>
               <div>
-                <h4 className="text-sm text-neutral-500">Order Volume</h4>
-                <p className="mt-2 text-2xl font-extrabold text-neutral-900">
+                <h4 className="text-[13px] text-neutral-500">Order volume</h4>
+                <p className="mt-2 text-[1.55rem] font-bold text-neutral-900">
                   {statsLoading ? '...' : dashboardStats?.kpis.orderVolume || 0}
                 </p>
               </div>
             </div>
 
-            <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div className={panelClass}>
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm text-neutral-500">Tap-ins</h4>
-                  <p className="mt-2 text-2xl font-extrabold text-neutral-900 flex items-baseline gap-2">
+                  <h4 className="text-[13px] text-neutral-500">Tap-ins</h4>
+                  <p className="mt-2 flex items-baseline gap-2 text-[1.55rem] font-bold text-neutral-900">
                     <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-neutral-100 text-neutral-700">
                       <Users className="h-3 w-3" />
                     </span>
@@ -419,11 +477,11 @@ export const MerchantDashboardPage = () => {
               </div>
             </div>
 
-            <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div className={panelClass}>
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm text-neutral-500">Bounty Earnings</h4>
-                  <p className="mt-2 text-2xl font-extrabold text-neutral-900 flex items-baseline gap-2">
+                  <h4 className="text-[13px] text-neutral-500">Bounty earnings</h4>
+                  <p className="mt-2 flex items-baseline gap-2 text-[1.55rem] font-bold text-neutral-900">
                     <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-neutral-100 text-neutral-700">
                       <DollarSign className="h-3 w-3" />
                     </span>
@@ -433,14 +491,65 @@ export const MerchantDashboardPage = () => {
               </div>
               <div className="mt-4 space-y-2">
                 <Link to={PATHS.MERCHANT_KICKBACKS}>
-                  <Button size="sm" variant="ghost" className="w-full">View Kickback Earnings</Button>
+                  <Button size="sm" variant="ghost" className="w-full text-xs">View Kickback Earnings</Button>
                 </Link>
                 <Link to={PATHS.MERCHANT_ANALYTICS}>
-                  <Button size="sm" variant="ghost" className="w-full">View Analytics</Button>
+                  <Button size="sm" variant="ghost" className="w-full text-xs">View Analytics</Button>
                 </Link>
               </div>
             </div>
           </div>
+
+          {/* Inventory health alert */}
+          {(inventoryHealth.lowStock > 0 || inventoryHealth.outOfStock > 0) && (
+            <div className={cn(panelClass, 'mb-6 border-amber-200/80')}>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+                    <AlertTriangle className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-neutral-900">Inventory needs attention</h3>
+                    <p className="mt-0.5 text-xs text-neutral-600">
+                      {inventoryHealth.lowStock > 0 && (
+                        <span className="mr-3 inline-flex items-center gap-1">
+                          <Boxes className="h-3 w-3 text-amber-600" />
+                          <strong>{inventoryHealth.lowStock}</strong> low on stock
+                        </span>
+                      )}
+                      {inventoryHealth.outOfStock > 0 && (
+                        <span className="inline-flex items-center gap-1">
+                          <PackageX className="h-3 w-3 text-red-600" />
+                          <strong>{inventoryHealth.outOfStock}</strong> out of stock
+                        </span>
+                      )}
+                    </p>
+                    {inventoryHealth.lowStockItems.length > 0 && (
+                      <p className="mt-1 text-xs text-neutral-500">
+                        e.g.{' '}
+                        {inventoryHealth.lowStockItems
+                          .map((it) => `${it.name} (${it.qty})`)
+                          .join(', ')}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Link to={`${PATHS.MERCHANT_INVENTORY}?analyze=true`}>
+                    <Button size="sm" variant="secondary" className="rounded-xl gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      AI Insights
+                    </Button>
+                  </Link>
+                  <Link to={PATHS.MERCHANT_INVENTORY}>
+                    <Button size="sm" className="rounded-xl">
+                      Open Inventory
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Business Type Card */}
           <div className="mb-6">
@@ -453,14 +562,14 @@ export const MerchantDashboardPage = () => {
           </div>
 
           {/* AI Merchant Insights */}
-          <div className="mb-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+          <div className={cn(panelClass, 'mb-6')}>
             <div className="mb-3 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-900 text-white">
                   <BarChart3 className="h-4 w-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-neutral-900">AI business insights</h3>
+                  <h3 className="text-[13px] font-semibold text-neutral-900">AI business insights</h3>
                   <p className="text-xs text-neutral-500">
                     Quick, plain‑English summary of how your deals are performing.
                   </p>
@@ -478,13 +587,13 @@ export const MerchantDashboardPage = () => {
 
             {!aiInsightsLoading && aiInsights && (
               <div className="space-y-4">
-                <p className="text-sm text-neutral-800">{aiInsights.insights.summary}</p>
+                <p className="text-[13px] text-neutral-800">{aiInsights.insights.summary}</p>
                 {aiInsights.insights.topInsights.length > 0 && (
                   <div>
                     <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">
                       What we&apos;re seeing
                     </p>
-                    <ul className="space-y-1 text-sm text-neutral-700">
+                    <ul className="space-y-1 text-[13px] text-neutral-700">
                       {aiInsights.insights.topInsights.slice(0, 3).map((point, idx) => (
                         <li key={idx}>• {point}</li>
                       ))}
@@ -496,10 +605,10 @@ export const MerchantDashboardPage = () => {
                     <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">
                       Recommended next moves
                     </p>
-                    <ul className="space-y-2 text-sm text-neutral-700">
+                    <ul className="space-y-2 text-[13px] text-neutral-700">
                       {aiInsights.insights.recommendations.slice(0, 2).map((rec, idx) => (
                         <li key={idx} className="rounded-lg bg-neutral-50 p-2">
-                          <div className="font-medium text-neutral-900">{rec.title}</div>
+                          <div className="text-[13px] font-medium text-neutral-900">{rec.title}</div>
                           <div className="text-xs text-neutral-600">{rec.description}</div>
                         </li>
                       ))}
@@ -511,11 +620,11 @@ export const MerchantDashboardPage = () => {
           </div>
 
           {/* Dynamic Region badges - using real merchant store data */}
-          <div className="mb-6 flex flex-wrap items-center gap-3">
+          <div className="mb-5 flex flex-wrap items-center gap-3">
             {storesLoading ? (
               // Loading state
               Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="rounded-md bg-neutral-200 px-4 py-2 text-sm animate-pulse">
+                <div key={i} className="animate-pulse rounded-[1rem] bg-neutral-200 px-4 py-2 text-sm">
                   <div className="h-4 w-20 bg-neutral-300 rounded mb-1"></div>
                   <div className="h-3 w-16 bg-neutral-300 rounded"></div>
                 </div>
@@ -525,11 +634,14 @@ export const MerchantDashboardPage = () => {
               merchantStores
                 .filter((store) => store.city) // Filter out stores without city data
                 .map((store) => (
-                  <div key={store.id} className="rounded-md bg-neutral-900 px-4 py-2 text-white text-sm">
+                  <div
+                    key={store.id}
+                    className="rounded-[1rem] border border-neutral-200/80 bg-white/92 px-4 py-2 text-[13px] text-neutral-900 shadow-sm"
+                  >
                     <div className="font-semibold">{store.city?.name || 'Unknown City'}</div>
-                    <div className="text-xs text-neutral-200">
+                    <div className="text-xs text-neutral-500">
                       {store.active ? 'Active' : 'Inactive'} 
-                      <span className="text-green-400 ml-2">
+                      <span className="ml-2 text-emerald-600">
                         {store.active ? '100%' : '0%'}
                       </span>
                     </div>
@@ -537,7 +649,7 @@ export const MerchantDashboardPage = () => {
                 ))
             ) : (
               // No stores state
-              <div className="rounded-md bg-neutral-100 px-4 py-2 text-sm text-neutral-600">
+              <div className="rounded-[1rem] bg-neutral-100 px-4 py-2 text-[13px] text-neutral-600">
                 <div className="font-semibold">No Stores</div>
                 <div className="text-xs text-neutral-500">Create your first store to see city performance</div>
               </div>
@@ -545,9 +657,9 @@ export const MerchantDashboardPage = () => {
           </div>
 
           {/* Chart + Store List */}
-          <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div className="col-span-2 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-              <h4 className="text-sm text-neutral-600 mb-4">Sales (Last 7 days)</h4>
+          <div className="mb-7 grid grid-cols-1 gap-5 lg:grid-cols-3">
+            <div className={cn(panelClass, 'col-span-2')}>
+              <h4 className="mb-4 text-[13px] text-neutral-600">Sales (Last 7 days)</h4>
               <div className="flex items-center justify-center h-56">
                 <div className="text-center">
                   <div className="text-4xl text-neutral-300 mb-2">📊</div>
@@ -557,9 +669,9 @@ export const MerchantDashboardPage = () => {
               </div>
             </div>
 
-            <div className="col-span-1 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div className={cn(panelClass, 'col-span-1')}>
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-sm text-neutral-600">Sales by Store</h4>
+                <h4 className="text-[13px] text-neutral-600">Sales by store</h4>
                 <Link to={PATHS.MERCHANT_STORES}>
                   <Button variant="ghost" size="sm" className="text-xs">
                     Manage Stores
@@ -587,7 +699,7 @@ export const MerchantDashboardPage = () => {
                           store.active ? 'bg-green-500' : 'bg-red-500'
                         }`} />
                         <div className="min-w-0 flex-1">
-                          <span className="text-sm text-neutral-800 block truncate">
+                          <span className="block truncate text-[13px] text-neutral-800">
                             {store.address}
                           </span>
                           <span className="text-xs text-neutral-500">
@@ -595,7 +707,7 @@ export const MerchantDashboardPage = () => {
                           </span>
                         </div>
                       </div>
-                      <div className="text-sm text-neutral-600">
+                      <div className="text-[13px] text-neutral-600">
                         <span className="text-neutral-500">0</span>
                         <span className="text-green-500 ml-2">0%</span>
                       </div>
@@ -616,7 +728,7 @@ export const MerchantDashboardPage = () => {
           </div>
 
           {/* Check-in Feed */}
-          <div className="mb-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+          <div className={cn(panelClass, 'mb-8')}>
             <CheckInFeed limit={10} autoRefresh={true} refreshInterval={30000} />
           </div>
             </div>
@@ -626,8 +738,8 @@ export const MerchantDashboardPage = () => {
             <div className="space-y-6">
               <div className="mb-6">
                 <div className="mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
-                  <h2 className="text-2xl font-bold">Your Deals</h2>
-                  <div className="flex items-center gap-2 rounded-full border bg-neutral-100 p-1">
+                  <h2 className="text-[1.4rem] font-semibold tracking-tight text-neutral-900">Your deals</h2>
+                  <div className="flex items-center gap-2 rounded-full border border-neutral-200 bg-neutral-100 p-1">
                     {(
                       [
                         'all',
@@ -640,7 +752,7 @@ export const MerchantDashboardPage = () => {
                         key={filter}
                         onClick={() => setActiveFilter(filter)}
                         className={cn(
-                          'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
+                          'rounded-full px-4 py-1.5 text-[13px] font-semibold transition-all duration-200',
                           activeFilter === filter
                             ? 'bg-white text-brand-primary-600 shadow-sm'
                             : 'text-neutral-600 hover:bg-neutral-200/50',
@@ -662,12 +774,12 @@ export const MerchantDashboardPage = () => {
                   </div>
                 ) : filteredDeals.length === 0 ? (
                   <div className="rounded-lg border border-neutral-200 bg-white py-12 text-center">
-                    <h3 className="mb-2 text-xl font-semibold text-neutral-800">
+                    <h3 className="mb-2 text-[1.1rem] font-semibold text-neutral-800">
                       {activeFilter === 'all'
                         ? 'No deals yet'
                         : `No ${activeFilter} deals found`}
                     </h3>
-                    <p className="mb-6 text-neutral-600">
+                    <p className="mb-6 text-sm text-neutral-600">
                       {activeFilter === 'all'
                         ? 'Create your first deal to start attracting customers'
                         : 'Try selecting a different filter to see your other deals.'}
@@ -692,8 +804,8 @@ export const MerchantDashboardPage = () => {
           {activeTab === 'analytics' && (
             <div className="space-y-6">
               <div className="text-center py-12">
-                <h3 className="text-xl font-semibold mb-4">Advanced Analytics</h3>
-                <p className="text-neutral-600 mb-6">Detailed performance insights and analytics</p>
+                <h3 className="mb-4 text-[1.1rem] font-semibold">Advanced analytics</h3>
+                <p className="mb-6 text-sm text-neutral-600">Detailed performance insights and analytics</p>
                 <Link to={PATHS.MERCHANT_ANALYTICS}>
                   <Button size="lg">View Full Analytics</Button>
                 </Link>

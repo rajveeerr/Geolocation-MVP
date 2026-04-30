@@ -11,11 +11,32 @@ import {
   Calendar,
   Image as ImageIcon,
   AlertCircle,
-  Loader2
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useModal } from '@/context/ModalContext';
 import { useDeleteMenuItem } from '@/hooks/useMerchantMenu';
+import { cn } from '@/lib/utils';
+
+const getInventoryTone = (item: MenuItem) => {
+  switch (item.inventoryStatus) {
+    case 'OUT_OF_STOCK':
+      return 'bg-red-100 text-red-700';
+    case 'LOW_STOCK':
+      return 'bg-amber-100 text-amber-700';
+    case 'IN_STOCK':
+      return 'bg-emerald-100 text-emerald-700';
+    default:
+      return 'bg-slate-100 text-slate-700';
+  }
+};
+
+const getInventoryLabel = (item: MenuItem) => {
+  if (item.inventoryStatus === 'UNTRACKED') return 'Untracked';
+  if (item.inventoryStatus === 'OUT_OF_STOCK') return 'Out of Stock';
+  if (item.inventoryStatus === 'LOW_STOCK') {
+    return item.inventoryQuantity != null ? `Low Stock: ${item.inventoryQuantity}` : 'Low Stock';
+  }
+  return item.inventoryQuantity != null ? `${item.inventoryQuantity} in stock` : 'In Stock';
+};
 
 const ImageGallery = ({ images }: { images: MenuItem['images'] }) => {
   if (!images || images.length === 0) {
@@ -43,7 +64,7 @@ const ImageGallery = ({ images }: { images: MenuItem['images'] }) => {
       {/* Thumbnail Gallery */}
       {images.length > 1 && (
         <div className="grid grid-cols-4 gap-2">
-          {images.slice(1).map((image, index) => (
+          {images.slice(1).map((image) => (
             <div key={image.id} className="aspect-square rounded-lg overflow-hidden bg-neutral-100">
               <img
                 src={image.url}
@@ -83,7 +104,7 @@ const MenuItemDetailCard = ({ item, onEdit, onDelete }: {
         month: 'long',
         day: 'numeric'
       });
-    } catch (error) {
+    } catch {
       return 'Recently';
     }
   };
@@ -141,6 +162,9 @@ const MenuItemDetailCard = ({ item, onEdit, onDelete }: {
           <span className="rounded-full bg-neutral-100 px-3 py-1 text-sm font-medium text-neutral-700">
             {item.category}
           </span>
+          <span className={cn('rounded-full px-3 py-1 text-sm font-medium', getInventoryTone(item))}>
+            {getInventoryLabel(item)}
+          </span>
           <div className="flex items-center gap-1 text-2xl font-bold text-green-600">
             <DollarSign className="h-5 w-5" />
             {item.price.toFixed(2)}
@@ -172,6 +196,12 @@ const MenuItemDetailCard = ({ item, onEdit, onDelete }: {
               <h4 className="font-medium text-neutral-900 mb-1">Category</h4>
               <p className="text-sm text-neutral-600">{item.category}</p>
             </div>
+            <div>
+              <h4 className="font-medium text-neutral-900 mb-1">Availability</h4>
+              <p className="text-sm text-neutral-600">
+                {item.isAvailable ? 'Visible to customers' : 'Hidden from customers'}
+              </p>
+            </div>
           </div>
           
           <div className="space-y-4">
@@ -182,6 +212,14 @@ const MenuItemDetailCard = ({ item, onEdit, onDelete }: {
             <div>
               <h4 className="font-medium text-neutral-900 mb-1">Last Updated</h4>
               <p className="text-sm text-neutral-600">{formatDate(item.updatedAt)}</p>
+            </div>
+            <div>
+              <h4 className="font-medium text-neutral-900 mb-1">Inventory Settings</h4>
+              <p className="text-sm text-neutral-600">
+                {item.inventoryTrackingEnabled
+                  ? `Tracked quantity${item.lowStockThreshold != null ? `, low stock at ${item.lowStockThreshold}` : ''}${item.allowBackorder ? ', backorders allowed' : ''}`
+                  : 'Inventory tracking is off'}
+              </p>
             </div>
           </div>
         </div>
@@ -285,7 +323,7 @@ export const MenuItemDetailPage = () => {
           onClick={() => navigate(PATHS.MERCHANT_MENU)}
           className="mb-4"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="mr-2 h-4 w-4 shrink-0" />
           Back to Menu
         </Button>
       </div>

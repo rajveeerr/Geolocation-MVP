@@ -16,6 +16,7 @@ import {
   type BulkItemData,
 } from '@/hooks/useMenuCollections';
 import { useMerchantMenu, type MenuItem } from '@/hooks/useMerchantMenu';
+import { TwelveHourTimeField } from '@/components/common/TwelveHourTimeField';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -43,16 +44,6 @@ interface HappyHourItemRow {
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
-
-/** Convert "HH:MM" (24h) → "HH:MM AM/PM" for display */
-function to12h(time24: string): string {
-  const [hStr, mStr] = time24.split(':');
-  let h = parseInt(hStr, 10);
-  const suffix = h >= 12 ? 'PM' : 'AM';
-  if (h === 0) h = 12;
-  else if (h > 12) h -= 12;
-  return `${h.toString().padStart(2, '0')}:${mStr} ${suffix}`;
-}
 
 /** Calculate duration between two "HH:MM" strings */
 function getDuration(start: string, end: string): { hours: number; label: string } {
@@ -258,22 +249,11 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
                 <label className="text-xs font-bold uppercase tracking-wider text-neutral-500 block">
                   Start Time
                 </label>
-                <div className="relative group">
-                  <input
-                    type="time"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    className={cn(
-                      "w-full rounded-xl bg-white border border-neutral-200 text-neutral-900 text-base font-medium px-4 py-3.5",
-                      "focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all",
-                      "group-hover:border-neutral-300"
-                    )}
-                  />
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <Clock className="h-4 w-4 text-neutral-400" />
-                  </div>
-                </div>
-                <p className="text-sm font-medium text-neutral-400 pl-1">{to12h(startTime)}</p>
+                <TwelveHourTimeField
+                  value={startTime}
+                  onChange={setStartTime}
+                  className="space-y-0"
+                />
               </div>
 
               {/* End Time */}
@@ -281,22 +261,11 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
                 <label className="text-xs font-bold uppercase tracking-wider text-neutral-500 block">
                   End Time
                 </label>
-                <div className="relative group">
-                  <input
-                    type="time"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    className={cn(
-                      "w-full rounded-xl bg-white border border-neutral-200 text-neutral-900 text-base font-medium px-4 py-3.5",
-                      "focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all",
-                      "group-hover:border-neutral-300"
-                    )}
-                  />
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <Clock className="h-4 w-4 text-neutral-400" />
-                  </div>
-                </div>
-                <p className="text-sm font-medium text-neutral-400 pl-1">{to12h(endTime)}</p>
+                <TwelveHourTimeField
+                  value={endTime}
+                  onChange={setEndTime}
+                  className="space-y-0"
+                />
               </div>
 
               {/* Duration badge */}

@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/common/Button';
 import { PATHS } from '@/routing/paths';
-import { useMerchantMenu, useDeleteMenuItem, type MenuItem } from '@/hooks/useMerchantMenu';
+import { useMerchantMenu, useDeleteMenuItem, useUpdateMenuItemInventory, type MenuItem } from '@/hooks/useMerchantMenu';
 import { BulkMenuUpload } from '@/components/merchant/BulkMenuUpload';
 import { 
   Plus, 
@@ -17,17 +17,39 @@ import {
   List,
   Eye,
   Table,
-  Upload
+  Upload,
+  Boxes
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 // Removed shadcn tabs import - using custom styling
 
+const getInventoryTone = (item: MenuItem) => {
+  switch (item.inventoryStatus) {
+    case 'OUT_OF_STOCK':
+      return 'bg-red-100 text-red-700';
+    case 'LOW_STOCK':
+      return 'bg-amber-100 text-amber-700';
+    case 'IN_STOCK':
+      return 'bg-emerald-100 text-emerald-700';
+    default:
+      return 'bg-slate-100 text-slate-700';
+  }
+};
+
+const getInventoryLabel = (item: MenuItem) => {
+  if (item.inventoryStatus === 'UNTRACKED') return 'Untracked';
+  if (item.inventoryStatus === 'OUT_OF_STOCK') return 'Out of Stock';
+  if (item.inventoryStatus === 'LOW_STOCK') return item.inventoryQuantity != null ? `Low Stock: ${item.inventoryQuantity}` : 'Low Stock';
+  return item.inventoryQuantity != null ? `${item.inventoryQuantity} in stock` : 'In Stock';
+};
+
 // List View Component
-const MenuItemListRow = ({ item, onEdit, onDelete, onView }: { 
+const MenuItemListRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: { 
   item: MenuItem; 
   onEdit: (item: MenuItem) => void;
   onDelete: (item: MenuItem) => void;
   onView: (item: MenuItem) => void;
+  onQuickInventory: (item: MenuItem, action: 'restock' | 'soldout' | 'toggle-availability') => void;
 }) => {
   const formatCurrency = (price: number) =>
     new Intl.NumberFormat('en-US', {
@@ -87,6 +109,9 @@ const MenuItemListRow = ({ item, onEdit, onDelete, onView }: {
               <span className="px-2 py-1 bg-neutral-100 rounded-full text-xs font-medium">
                 {item.category}
               </span>
+              <span className={cn('rounded-full px-2 py-1 text-xs font-medium', getInventoryTone(item))}>
+                {getInventoryLabel(item)}
+              </span>
               <span>•</span>
               <span>Updated {formatDate(item.updatedAt)}</span>
             </div>
@@ -96,6 +121,24 @@ const MenuItemListRow = ({ item, onEdit, onDelete, onView }: {
 
       {/* Actions */}
       <div className="flex items-center gap-2">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => onQuickInventory(item, item.isAvailable ? 'soldout' : 'toggle-availability')}
+          className="flex items-center gap-1 hover:bg-neutral-100"
+        >
+          {item.isAvailable ? 'Sold Out' : 'Available'}
+        </Button>
+        {item.inventoryTrackingEnabled && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onQuickInventory(item, 'restock')}
+            className="flex items-center gap-1 hover:bg-emerald-50 hover:text-emerald-700"
+          >
+            +10
+          </Button>
+        )}
         <Button
           variant="secondary"
           size="sm"
@@ -129,11 +172,12 @@ const MenuItemListRow = ({ item, onEdit, onDelete, onView }: {
 };
 
 // Table View Component
-const MenuItemTableRow = ({ item, onEdit, onDelete, onView }: { 
+const MenuItemTableRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: { 
   item: MenuItem; 
   onEdit: (item: MenuItem) => void;
   onDelete: (item: MenuItem) => void;
   onView: (item: MenuItem) => void;
+  onQuickInventory: (item: MenuItem, action: 'restock' | 'soldout' | 'toggle-availability') => void;
 }) => {
   const formatCurrency = (price: number) =>
     new Intl.NumberFormat('en-US', {
@@ -199,6 +243,12 @@ const MenuItemTableRow = ({ item, onEdit, onDelete, onView }: {
         </span>
       </td>
 
+      <td className="px-4 py-3">
+        <span className={cn('rounded-full px-2 py-1 text-xs font-medium', getInventoryTone(item))}>
+          {getInventoryLabel(item)}
+        </span>
+      </td>
+
       {/* Updated Date */}
       <td className="px-4 py-3 text-sm text-neutral-500">
         {formatDate(item.updatedAt)}
@@ -207,6 +257,14 @@ const MenuItemTableRow = ({ item, onEdit, onDelete, onView }: {
       {/* Actions */}
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onQuickInventory(item, item.isAvailable ? 'soldout' : 'toggle-availability')}
+            className="flex items-center gap-1 hover:bg-neutral-100"
+          >
+            {item.isAvailable ? 'Sold Out' : 'Available'}
+          </Button>
           <Button
             variant="secondary"
             size="sm"
@@ -237,11 +295,12 @@ const MenuItemTableRow = ({ item, onEdit, onDelete, onView }: {
   );
 };
 
-const MenuItemCard = ({ item, onEdit, onDelete, onView }: { 
+const MenuItemCard = ({ item, onEdit, onDelete, onView, onQuickInventory }: { 
   item: MenuItem; 
   onEdit: (item: MenuItem) => void;
   onDelete: (item: MenuItem) => void;
   onView: (item: MenuItem) => void;
+  onQuickInventory: (item: MenuItem, action: 'restock' | 'soldout' | 'toggle-availability') => void;
 }) => {
 
   const formatDate = (dateString: string | null | undefined) => {
@@ -260,9 +319,6 @@ const MenuItemCard = ({ item, onEdit, onDelete, onView }: {
       return 'Recently';
     }
   };
-
-  // Debug logging to see what data we're receiving
-  console.log('MenuItem data:', item);
 
   // Get images to display (prioritize new images array over legacy imageUrl)
   const displayImages = item.images && item.images.length > 0 
@@ -289,6 +345,9 @@ const MenuItemCard = ({ item, onEdit, onDelete, onView }: {
             <div className="mt-1 flex items-center gap-2">
               <span className="rounded-full bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-700">
                 {item.category}
+              </span>
+              <span className={cn('rounded-full px-2 py-1 text-xs font-medium', getInventoryTone(item))}>
+                {getInventoryLabel(item)}
               </span>
               <span className="flex items-center gap-1 text-sm font-semibold text-green-600">
                 <DollarSign className="h-3 w-3" />
@@ -336,6 +395,24 @@ const MenuItemCard = ({ item, onEdit, onDelete, onView }: {
       </div>
 
       <div className="flex items-center gap-2">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => onQuickInventory(item, item.isAvailable ? 'soldout' : 'toggle-availability')}
+          className="flex-1"
+        >
+          {item.isAvailable ? 'Sold Out' : 'Make Available'}
+        </Button>
+        {item.inventoryTrackingEnabled && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onQuickInventory(item, 'restock')}
+            className="text-emerald-700 hover:text-emerald-800 hover:border-emerald-300"
+          >
+            +10
+          </Button>
+        )}
         <Button
           variant="secondary"
           size="sm"
@@ -389,6 +466,7 @@ export const MenuManagementPage = () => {
   const navigate = useNavigate();
   const { data: menuData, isLoading, error } = useMerchantMenu();
   const deleteMenuItemMutation = useDeleteMenuItem();
+  const updateInventoryMutation = useUpdateMenuItemInventory();
   const [activeTab, setActiveTab] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table'>('grid');
   const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
@@ -415,6 +493,18 @@ export const MenuManagementPage = () => {
     return Object.keys(menuItemsByCategory).sort();
   }, [menuItemsByCategory]);
 
+  const inventoryStats = useMemo(() => {
+    return menuItems.reduce(
+      (acc, item) => {
+        if (item.inventoryTrackingEnabled) acc.tracked += 1;
+        if (item.inventoryStatus === 'LOW_STOCK') acc.lowStock += 1;
+        if (item.inventoryStatus === 'OUT_OF_STOCK') acc.outOfStock += 1;
+        return acc;
+      },
+      { tracked: 0, lowStock: 0, outOfStock: 0 },
+    );
+  }, [menuItems]);
+
 
   const handleEdit = (item: MenuItem) => {
     navigate(`/merchant/menu/${item.id}/edit`);
@@ -428,6 +518,48 @@ export const MenuManagementPage = () => {
     if (window.confirm(`Are you sure you want to delete "${item.name}"? This action cannot be undone.`)) {
       deleteMenuItemMutation.mutate(item.id);
     }
+  };
+
+  const handleQuickInventory = (item: MenuItem, action: 'restock' | 'soldout' | 'toggle-availability') => {
+    if (action === 'restock') {
+      const nextQuantity = (item.inventoryQuantity ?? 0) + 10;
+      updateInventoryMutation.mutate({
+        itemId: item.id,
+        data: {
+          isAvailable: true,
+          inventoryTrackingEnabled: true,
+          inventoryQuantity: nextQuantity,
+          lowStockThreshold: item.lowStockThreshold ?? 5,
+          allowBackorder: item.allowBackorder ?? false,
+        },
+      });
+      return;
+    }
+
+    if (action === 'soldout') {
+      updateInventoryMutation.mutate({
+        itemId: item.id,
+        data: {
+          isAvailable: false,
+          inventoryTrackingEnabled: item.inventoryTrackingEnabled,
+          inventoryQuantity: item.inventoryTrackingEnabled ? 0 : item.inventoryQuantity,
+          lowStockThreshold: item.lowStockThreshold ?? null,
+          allowBackorder: item.allowBackorder ?? false,
+        },
+      });
+      return;
+    }
+
+    updateInventoryMutation.mutate({
+      itemId: item.id,
+      data: {
+        isAvailable: true,
+        inventoryTrackingEnabled: item.inventoryTrackingEnabled,
+        inventoryQuantity: item.inventoryQuantity ?? null,
+        lowStockThreshold: item.lowStockThreshold ?? null,
+        allowBackorder: item.allowBackorder ?? false,
+      },
+    });
   };
 
   if (isLoading) {
@@ -468,7 +600,7 @@ export const MenuManagementPage = () => {
         <div>
           <h1 className="text-4xl font-bold text-neutral-900">Menu Management</h1>
           <p className="mt-2 text-neutral-600">
-            Manage your menu items and pricing
+            Manage your menu items, pricing, and inventory
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -545,7 +677,7 @@ export const MenuManagementPage = () => {
       ) : (
         <>
           {/* Stats Cards */}
-          <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
@@ -579,6 +711,21 @@ export const MenuManagementPage = () => {
                   </p>
                 </div>
                 <DollarSign className="h-8 w-8 text-blue-600" />
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm text-neutral-500">Inventory Alerts</h4>
+                  <p className="mt-2 text-2xl font-extrabold text-neutral-900">
+                    {inventoryStats.lowStock + inventoryStats.outOfStock}
+                  </p>
+                  <p className="mt-1 text-xs text-neutral-500">
+                    {inventoryStats.tracked} tracked, {inventoryStats.outOfStock} out of stock
+                  </p>
+                </div>
+                <Boxes className="h-8 w-8 text-amber-600" />
               </div>
             </div>
           </div>
@@ -624,6 +771,7 @@ export const MenuManagementPage = () => {
                       onEdit={handleEdit}
                       onDelete={handleDelete}
                       onView={handleView}
+                      onQuickInventory={handleQuickInventory}
                     />
                   ) : (
                     <MenuItemListRow
@@ -632,6 +780,7 @@ export const MenuManagementPage = () => {
                       onEdit={handleEdit}
                       onDelete={handleDelete}
                       onView={handleView}
+                      onQuickInventory={handleQuickInventory}
                     />
                   )
                 )}
@@ -649,6 +798,7 @@ export const MenuManagementPage = () => {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onView={handleView}
+                onQuickInventory={handleQuickInventory}
               />
                     ) : (
                       <MenuItemListRow
@@ -657,6 +807,7 @@ export const MenuManagementPage = () => {
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                         onView={handleView}
+                        onQuickInventory={handleQuickInventory}
                       />
                     )
                   )}

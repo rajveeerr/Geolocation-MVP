@@ -114,7 +114,7 @@ function EventCheckInPageInner() {
       <div className="flex items-center gap-3 mb-6">
         <Link
           to={PATHS.MERCHANT_EVENTS_MANAGE.replace(':eventId', eventId!)}
-          className="p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 transition-colors"
+          className="inline-flex items-center justify-center rounded-lg bg-zinc-900 p-2 transition-colors hover:bg-zinc-800"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>

@@ -226,8 +226,8 @@ function ServiceManageInner() {
     <div className="mx-auto max-w-6xl px-2 py-4">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <Link to={PATHS.MERCHANT_SERVICES} className="inline-flex items-center gap-1 text-sm font-medium text-brand-primary-600 hover:underline">
-            <ArrowLeft className="h-4 w-4" /> Back to services
+          <Link to={PATHS.MERCHANT_SERVICES} className="inline-flex items-center gap-2 whitespace-nowrap text-sm font-medium text-brand-primary-600 hover:underline">
+            <ArrowLeft className="h-4 w-4 shrink-0" /> Back to services
           </Link>
           <h1 className="mt-2 text-2xl font-bold text-neutral-900">Manage Service</h1>
           <p className="text-sm text-neutral-500">Status: <span className="font-semibold">{service.status}</span></p>

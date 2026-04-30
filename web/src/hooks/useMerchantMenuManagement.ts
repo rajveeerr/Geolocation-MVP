@@ -11,6 +11,11 @@ export interface MenuItem {
   price: number;
   category: string;
   isAvailable: boolean;
+  inventoryTrackingEnabled?: boolean;
+  inventoryQuantity?: number | null;
+  lowStockThreshold?: number | null;
+  allowBackorder?: boolean;
+  inventoryStatus?: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'UNTRACKED';
   imageUrl?: string;
   allergens?: string[];
   dietaryInfo?: string[];
@@ -27,6 +32,10 @@ export interface CreateMenuItemRequest {
   price: number;
   category: string;
   isAvailable?: boolean;
+  inventoryTrackingEnabled?: boolean;
+  inventoryQuantity?: number | null;
+  lowStockThreshold?: number | null;
+  allowBackorder?: boolean;
   imageUrl?: string;
   allergens?: string[];
   dietaryInfo?: string[];
@@ -41,6 +50,10 @@ export interface UpdateMenuItemRequest {
   price?: number;
   category?: string;
   isAvailable?: boolean;
+  inventoryTrackingEnabled?: boolean;
+  inventoryQuantity?: number | null;
+  lowStockThreshold?: number | null;
+  allowBackorder?: boolean;
   imageUrl?: string;
   allergens?: string[];
   dietaryInfo?: string[];
@@ -51,13 +64,13 @@ export interface UpdateMenuItemRequest {
 
 export interface MenuItemsResponse {
   success: boolean;
-  items: MenuItem[];
+  menuItems: MenuItem[];
   error?: string;
 }
 
 export interface MenuItemResponse {
   success: boolean;
-  item: MenuItem;
+  menuItem: MenuItem;
   error?: string;
 }
 
@@ -71,7 +84,7 @@ export const useMerchantMenuItems = () => {
       if (!res.success || !res.data) {
         throw new Error(res.error || 'Failed to fetch menu items');
       }
-      return res.data.items;
+      return res.data.menuItems;
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
@@ -82,14 +95,15 @@ export const useCreateMenuItem = () => {
 
   return useMutation<MenuItem, Error, CreateMenuItemRequest>({
     mutationFn: async (data) => {
-      const res = await apiPost<MenuItemResponse>('/merchants/me/menu/item', data);
+      const res = await apiPost<MenuItemResponse, CreateMenuItemRequest>('/merchants/me/menu/item', data);
       if (!res.success || !res.data) {
         throw new Error(res.error || 'Failed to create menu item');
       }
-      return res.data.item;
+      return res.data.menuItem;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['merchantMenuItems'] });
+      queryClient.invalidateQueries({ queryKey: ['merchant-menu'] });
     },
   });
 };
@@ -99,14 +113,15 @@ export const useUpdateMenuItem = () => {
 
   return useMutation<MenuItem, Error, { itemId: number; data: UpdateMenuItemRequest }>({
     mutationFn: async ({ itemId, data }) => {
-      const res = await apiPut<MenuItemResponse>(`/merchants/me/menu/item/${itemId}`, data);
+      const res = await apiPut<MenuItemResponse, UpdateMenuItemRequest>(`/merchants/me/menu/item/${itemId}`, data);
       if (!res.success || !res.data) {
         throw new Error(res.error || 'Failed to update menu item');
       }
-      return res.data.item;
+      return res.data.menuItem;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['merchantMenuItems'] });
+      queryClient.invalidateQueries({ queryKey: ['merchant-menu'] });
     },
   });
 };
@@ -123,6 +138,7 @@ export const useDeleteMenuItem = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['merchantMenuItems'] });
+      queryClient.invalidateQueries({ queryKey: ['merchant-menu'] });
     },
   });
 };
@@ -163,7 +179,7 @@ export const useBulkUploadMenuItems = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.yohop.com/api';
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
       const response = await fetch(`${API_BASE_URL}/merchants/me/menu/bulk-upload`, {
         method: 'POST',
         headers: {
@@ -186,6 +202,7 @@ export const useBulkUploadMenuItems = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['merchantMenuItems'] });
+      queryClient.invalidateQueries({ queryKey: ['merchant-menu'] });
     },
   });
 };
