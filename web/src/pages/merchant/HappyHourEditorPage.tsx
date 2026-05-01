@@ -796,7 +796,7 @@ const HappyHourEditorContent = () => {
           </AnimatePresence>
         </div>
 
-        <div className="fixed left-0 right-0 bottom-6 px-4">
+        <div className="fixed bottom-6 left-0 right-0 px-4 lg:left-[320px] lg:px-8">
           <div className="max-w-4xl mx-auto">
             <Button onClick={handleSubmit} disabled={isSubmitting} size="lg" className="w-full rounded-lg">
               {isSubmitting ? <Loader2 className="animate-spin" /> : 'Save Happy Hour Deal'}

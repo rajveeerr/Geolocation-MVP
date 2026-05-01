@@ -48,6 +48,9 @@ export const MenuListCard: React.FC<MenuListCardProps> = ({
   className,
 }) => {
   const itemCount = collection._count?.items ?? collection.items?.length ?? 0;
+  const [isExpanded, setIsExpanded] = React.useState(false);
+  const visibleItems = isExpanded ? (collection.items ?? []) : (collection.items ?? []).slice(0, 3);
+  const hasMoreItems = itemCount > 3;
 
   return (
     <div
@@ -139,7 +142,7 @@ export const MenuListCard: React.FC<MenuListCardProps> = ({
             </p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            {(collection.items ?? []).slice(0, 5).map((item, idx) => (
+            {visibleItems.map((item, idx) => (
               <div
                 key={item.menuItemId || idx}
                 className={cn(
@@ -164,12 +167,16 @@ export const MenuListCard: React.FC<MenuListCardProps> = ({
                 </span>
               </div>
             ))}
-            {itemCount > 5 && (
-              <span className="text-xs font-bold text-brand ml-1">
-                +{itemCount - 5} more
-              </span>
-            )}
           </div>
+          {hasMoreItems ? (
+            <button
+              type="button"
+              onClick={() => setIsExpanded((current) => !current)}
+              className="mt-3 text-xs font-semibold text-brand hover:text-brand-hover transition-colors"
+            >
+              {isExpanded ? 'Show less' : `Show all ${itemCount} items`}
+            </button>
+          ) : null}
         </div>
       )}
     </div>

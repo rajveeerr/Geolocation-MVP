@@ -776,14 +776,6 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
                 <div className="flex items-center gap-2 sm:gap-3">
                   <MerchantWorkspaceSearch onNavigateTo={(to) => navigate(to)} />
 
-                  <Link
-                    to={PATHS.MERCHANT_DEALS_CREATE}
-                    className="inline-flex h-11 items-center justify-center rounded-full bg-neutral-950 px-5 text-[13px] font-semibold text-white transition hover:bg-neutral-800"
-                  >
-                    <Plus className="mr-1.5 h-4 w-4" />
-                    Create
-                  </Link>
-
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button

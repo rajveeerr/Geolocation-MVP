@@ -3,9 +3,11 @@ import { useState, useMemo, useEffect } from 'react';
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { Button } from '@/components/common/Button';
 import { useNavigationHistory } from '@/hooks/useNavigationHistory';
-import { useSavedDeals } from '@/hooks/useSavedDeals';
 import { useDealDetail, usePublicMenuCollections } from '@/hooks/useDealDetail';
+import { useBulkOrderCart } from '@/hooks/useBulkOrderCart';
+import { useBulkQuote, useCreateBulkOrder } from '@/hooks/useMenuSystem';
 import { useCountdown } from '@/hooks/useCountdown';
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import {
   Heart, ChevronLeft, ChevronRight, Share2, Phone, MapPin, Star,
@@ -17,7 +19,6 @@ import { PostCheckInGameModal } from '@/components/gamification/PostCheckInGameM
 import { TableBookingModal } from '@/components/table-booking/TableBookingModal';
 import { LeaderboardTab } from '@/components/deals/detail-tabs/LeaderboardTab';
 import { EventsTab } from '@/components/deals/detail-tabs/EventsTab';
-import { ImageSlideshow } from '@/components/landing/ImageSlideshow';
 import {
   placeholderReviews, placeholderRatingsSummary, placeholderArticles,
   placeholderVibeTags, placeholderHours, placeholderThingsToKnow,
@@ -592,7 +593,6 @@ export const DealDetailPage = () => {
   const { dealId } = useParams<{ dealId: string }>();
   const navigate = useNavigate();
   const { canGoBack, goBack } = useNavigationHistory();
-  const { savedDealIds, saveDeal, unsaveDeal } = useSavedDeals();
   const [leftTab, setLeftTab] = useState<LeftTab>('info');
   const [rightTab, setRightTab] = useState<RightTab>('menu');
   const [showCheckInModal, setShowCheckInModal] = useState(false);
@@ -625,6 +625,10 @@ export const DealDetailPage = () => {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showHoursDropdown, setShowHoursDropdown] = useState(false);
   const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
+  const { toast } = useToast();
+  const { peopleCount, items, setPeopleCount, removeItem, clearCart } = useBulkOrderCart();
+  const bulkQuote = useBulkQuote();
+  const createBulkOrder = useCreateBulkOrder();
 
   const { isCheckingIn, checkIn } = useCheckIn({
     onSuccess: (data) => {
@@ -791,9 +795,6 @@ export const DealDetailPage = () => {
   }
 
   /* ---------- Derived state ---------- */
-  const isSaved = savedDealIds.has(deal.id.toString());
-  const handleSave = () =>
-    isSaved ? unsaveDeal(deal.id.toString()) : saveDeal(deal.id.toString());
   const handleCheckIn = () => {
     if (dealId) checkIn(dealId);
   };
@@ -820,6 +821,51 @@ export const DealDetailPage = () => {
     typeof deal.category === 'object'
       ? deal.category?.label || ''
       : String(deal.category || '');
+  const merchantCartItems = items.filter((item) => item.merchantId === deal.merchant.id);
+  const merchantCartSubtotal = merchantCartItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+
+  const handlePlaceBulkOrder = async () => {
+    if (merchantCartItems.length === 0) {
+      toast({
+        title: 'Cart is empty',
+        description: 'Add at least one menu item before placing a bulk order.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      await bulkQuote.mutateAsync({
+        peopleCount,
+        items: merchantCartItems.map((item) => ({
+          menuItemId: item.menuItemId,
+          variantId: item.variantId ?? null,
+          quantity: item.quantity,
+        })),
+      });
+
+      const order = await createBulkOrder.mutateAsync({
+        peopleCount,
+        items: merchantCartItems.map((item) => ({
+          menuItemId: item.menuItemId,
+          variantId: item.variantId ?? null,
+          quantity: item.quantity,
+        })),
+      });
+
+      toast({
+        title: 'Bulk order created',
+        description: `Order ${order.order.orderNumber} has been created successfully.`,
+      });
+      clearCart();
+    } catch (error) {
+      toast({
+        title: 'Could not place order',
+        description: error instanceof Error ? error.message : 'Something went wrong.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   /* ================================================================ */
   /*  RENDER                                                           */
@@ -1311,6 +1357,70 @@ export const DealDetailPage = () => {
             {/* ---------- MENU ---------- */}
             {rightTab === 'menu' && (
               <div className="space-y-8">
+                <section className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold text-neutral-900">Bulk order planner</h3>
+                      <p className="text-sm text-neutral-500">
+                        Set people count, add menu items, then place one combined order.
+                      </p>
+                    </div>
+                    <div className="w-full sm:w-44">
+                      <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                        Number of people
+                      </label>
+                      <input
+                        type="number"
+                        min={1}
+                        step={1}
+                        value={peopleCount}
+                        onChange={(e) => setPeopleCount(Math.max(1, Number(e.target.value || 1)))}
+                        className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  {merchantCartItems.length > 0 ? (
+                    <div className="mt-4 space-y-2">
+                      {merchantCartItems.map((item) => (
+                        <div key={`${item.menuItemId}-${item.variantId ?? 'base'}`} className="flex items-center justify-between text-sm">
+                          <div>
+                            <span className="font-medium text-neutral-800">{item.name}</span>
+                            {item.variantLabel ? <span className="text-neutral-500"> ({item.variantLabel})</span> : null}
+                            <span className="text-neutral-500"> x{item.quantity}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="font-semibold">${(item.unitPrice * item.quantity).toFixed(2)}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeItem(item.menuItemId, item.variantId)}
+                              className="text-xs text-red-600"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-4 text-sm text-neutral-500">No items added yet.</p>
+                  )}
+
+                  <div className="mt-4 flex flex-col gap-2 border-t border-neutral-100 pt-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-sm text-neutral-600">
+                      Subtotal: <span className="font-bold text-neutral-900">${merchantCartSubtotal.toFixed(2)}</span>
+                      {' '}• Per person: <span className="font-bold text-neutral-900">${(merchantCartSubtotal / Math.max(peopleCount, 1)).toFixed(2)}</span>
+                    </p>
+                    <Button
+                      size="sm"
+                      onClick={handlePlaceBulkOrder}
+                      disabled={merchantCartItems.length === 0 || bulkQuote.isPending || createBulkOrder.isPending}
+                    >
+                      {createBulkOrder.isPending ? 'Placing order...' : 'Place bulk order'}
+                    </Button>
+                  </div>
+                </section>
+
                 {menuCollections.length > 0 ? (
                   <>
                     <div className="space-y-8">

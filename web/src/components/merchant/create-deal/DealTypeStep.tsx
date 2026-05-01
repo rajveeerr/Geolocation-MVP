@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
-  Calendar,
   Clock,
   EyeOff,
   Gift,
@@ -212,18 +211,27 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
   const { state, dispatch } = useDealCreation();
   const navigate = useNavigate();
 
-  const handleNext = () => {
-    if (state.dealType === 'BOUNTY') {
+  const navigateForDealType = (dealType: DealTypeValue | null) => {
+    if (dealType === 'BOUNTY') {
       navigate('/merchant/deals/create/bounty');
-    } else if (state.dealType === 'HIDDEN') {
+    } else if (dealType === 'HIDDEN') {
       navigate('/merchant/deals/create/hidden');
-    } else if (state.dealType === 'REDEEM_NOW') {
+    } else if (dealType === 'REDEEM_NOW') {
       navigate('/merchant/deals/create/redeem-now');
-    } else if (state.dealType === 'RECURRING') {
+    } else if (dealType === 'RECURRING') {
       navigate('/merchant/deals/create/daily-deal/weekdays');
     } else {
       onNext();
     }
+  };
+
+  const handleNext = () => {
+    navigateForDealType(state.dealType as DealTypeValue | null);
+  };
+
+  const handleDealTypeSelect = (dealType: DealTypeValue) => {
+    dispatch({ type: 'SET_FIELD', field: 'dealType', value: dealType });
+    navigateForDealType(dealType);
   };
 
   const selectedType = state.dealType as DealTypeValue | null;
@@ -239,41 +247,7 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
       nextButtonText={selectedType ? 'Build this deal' : 'Select a deal type'}
       contentClassName="w-full max-w-7xl"
     >
-      <div className="mx-auto w-full max-w-6xl space-y-8">
-        <motion.section
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="overflow-hidden rounded-[2rem] border border-neutral-200/80 bg-gradient-to-br from-[#fff8f2] via-white to-[#eef4ff] p-6 shadow-[0_12px_30px_rgba(15,23,42,0.06)] sm:p-7"
-        >
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-3xl">
-              <div className="inline-flex items-center rounded-full bg-neutral-950 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
-                Create Deal
-              </div>
-              <h2 className="mt-4 text-[1.6rem] font-semibold tracking-tight text-neutral-950 sm:text-[2rem]">
-                Start with the format, then we&apos;ll shape the offer around it.
-              </h2>
-              <p className="mt-3 text-[14px] leading-7 text-neutral-600 sm:text-[15px]">
-                Each path is tuned for a different business goal, from filling slow hours to launching a high-converting drop.
-              </p>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-[1.2rem] border border-white/70 bg-white/85 p-4 shadow-sm">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Step</div>
-                <div className="mt-2 text-[15px] font-semibold text-neutral-900">1 of the setup flow</div>
-                <div className="mt-1 text-[13px] text-neutral-500">Choose your structure before pricing, media, and schedule.</div>
-              </div>
-              <div className="rounded-[1.2rem] border border-white/70 bg-white/85 p-4 shadow-sm">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Tip</div>
-                <div className="mt-2 text-[15px] font-semibold text-neutral-900">Keep it focused</div>
-                <div className="mt-1 text-[13px] text-neutral-500">Simple formats usually launch faster and perform more consistently.</div>
-              </div>
-            </div>
-          </div>
-        </motion.section>
-
+      <div className="mx-auto w-full max-w-6xl space-y-8 pb-2">
         <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {dealTypes.map((dealType, index) => (
             <DealTypeCard
@@ -287,57 +261,34 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
               selectedAccent={dealType.selectedAccent}
               iconWrap={dealType.iconWrap}
               isSelected={state.dealType === dealType.value}
-              onClick={() => dispatch({ type: 'SET_FIELD', field: 'dealType', value: dealType.value })}
+              onClick={() => handleDealTypeSelect(dealType.value)}
               delay={0.08 + index * 0.06}
             />
           ))}
         </section>
 
-        <div className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-          <motion.section
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.35 }}
-            className="rounded-[1.65rem] border border-neutral-200/80 bg-white/92 p-5 shadow-[0_10px_26px_rgba(15,23,42,0.05)] sm:p-6"
-          >
-            <div className="flex items-start gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-neutral-100 text-neutral-800">
-                <Gift className="h-5 w-5" />
-              </div>
-              <div>
-                <div className="text-[15px] font-semibold text-neutral-900">
-                  {selectedType ? dealTypes.find((item) => item.value === selectedType)?.title : 'Choose a deal type'}
-                </div>
-                <p className="mt-1 text-[13px] leading-6 text-neutral-600">
-                  {selectedType
-                    ? dealTypeDescriptions[selectedType]
-                    : 'Select one of the formats above to preview the strategy behind it and continue to the right flow.'}
-                </p>
-              </div>
+        <motion.section
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.35 }}
+          className="rounded-[1.65rem] bg-white/95 p-5 shadow-[0_12px_28px_rgba(15,23,42,0.07)] ring-1 ring-neutral-200/75 sm:p-6"
+        >
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[hsl(var(--brand-50))] text-[hsl(var(--brand-primary))]">
+              <Gift className="h-5 w-5" />
             </div>
-          </motion.section>
-
-          <motion.section
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.28, duration: 0.35 }}
-            className="rounded-[1.65rem] border border-neutral-200/80 bg-gradient-to-br from-white via-white to-[#f7f8fb] p-5 shadow-[0_10px_26px_rgba(15,23,42,0.05)] sm:p-6"
-          >
-            <div className="flex items-start gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-neutral-100 text-neutral-800">
-                <Calendar className="h-5 w-5" />
+            <div>
+              <div className="text-[15px] font-semibold text-neutral-900">
+                {selectedType ? dealTypes.find((item) => item.value === selectedType)?.title : 'Choose a deal type'}
               </div>
-              <div>
-                <div className="text-[15px] font-semibold text-neutral-900">Need help choosing?</div>
-                <p className="mt-1 text-[13px] leading-6 text-neutral-600">
-                  Use <span className="font-medium text-neutral-900">Item Deal</span> for a simple promotion,
-                  <span className="font-medium text-neutral-900"> Happy Hour</span> for time-boxed traffic,
-                  and <span className="font-medium text-neutral-900">Daily Deal</span> for repeatable weekly patterns.
-                </p>
-              </div>
+              <p className="mt-1 text-[13px] leading-6 text-neutral-600">
+                {selectedType
+                  ? dealTypeDescriptions[selectedType]
+                  : 'Select a format above to preview the strategy, then continue with a focused creation flow.'}
+              </p>
             </div>
-          </motion.section>
-        </div>
+          </div>
+        </motion.section>
       </div>
     </OnboardingStepLayout>
   );

@@ -45,6 +45,7 @@ export interface DetailedDeal {
   kickbackEnabled: boolean;
   menuItems: Array<{
     id: number;
+    merchantId?: number;
     name: string;
     description: string;
     originalPrice: number;
@@ -52,6 +53,14 @@ export interface DetailedDeal {
     imageUrl: string | null;
     images?: string[];
     category: string;
+    hasVariants?: boolean;
+    variants?: Array<{
+      id: number;
+      label: string;
+      price: number;
+      servesCount?: number | null;
+      isAvailable?: boolean;
+    }>;
   }>;
   hasMenuItems: boolean;
   merchant: {
@@ -135,6 +144,7 @@ export interface PublicMenuCollectionItem {
   notes: string | null;
   menuItem: {
     id: number;
+    merchantId?: number;
     name: string;
     price: number;
     category: string;
@@ -144,6 +154,14 @@ export interface PublicMenuCollectionItem {
     dealType?: string | null;
     isHappyHour?: boolean;
     happyHourPrice?: number | null;
+    hasVariants?: boolean;
+    variants?: Array<{
+      id: number;
+      label: string;
+      price: number;
+      servesCount?: number | null;
+      isAvailable?: boolean;
+    }>;
   };
 }
 

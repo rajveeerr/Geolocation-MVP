@@ -140,6 +140,13 @@ export const MenuItemFormPage = () => {
   const [allowBackorder, setAllowBackorder] = useState(existingItem?.allowBackorder ?? false);
   const [inventoryAiSuggestion, setInventoryAiSuggestion] = useState<InventoryAiSuggestion | null>(null);
   const [hasVariants, setHasVariants] = useState(existingItem?.hasVariants ?? false);
+  const [isBulkOrderEnabled, setIsBulkOrderEnabled] = useState(existingItem?.isBulkOrderEnabled ?? false);
+  const [defaultPeopleCount, setDefaultPeopleCount] = useState(
+    existingItem?.defaultPeopleCount != null ? String(existingItem.defaultPeopleCount) : '',
+  );
+  const [minPeopleCount, setMinPeopleCount] = useState(
+    existingItem?.minPeopleCount != null ? String(existingItem.minPeopleCount) : '',
+  );
   const [variants, setVariants] = useState<MenuItemVariantInput[]>(() => {
     if (existingItem?.variants && existingItem.variants.length > 0) {
       return existingItem.variants.map((v) => ({
@@ -147,6 +154,7 @@ export const MenuItemFormPage = () => {
         sku: v.sku,
         label: v.label,
         price: v.price,
+        servesCount: v.servesCount,
         inventoryQuantity: v.inventoryQuantity,
         lowStockThreshold: v.lowStockThreshold,
         isAvailable: v.isAvailable,
@@ -198,6 +206,21 @@ export const MenuItemFormPage = () => {
       parsedLowStockThreshold < 0 ||
       (parsedInventoryQuantity !== null && parsedLowStockThreshold > parsedInventoryQuantity));
   const aiEnabled = aiStatus?.aiEnabled ?? false;
+  const parsedDefaultPeopleCount = defaultPeopleCount !== '' ? Number(defaultPeopleCount) : null;
+  const parsedMinPeopleCount = minPeopleCount !== '' ? Number(minPeopleCount) : null;
+  const defaultPeopleCountInvalid =
+    isBulkOrderEnabled &&
+    parsedDefaultPeopleCount !== null &&
+    (!Number.isInteger(parsedDefaultPeopleCount) || parsedDefaultPeopleCount < 1);
+  const minPeopleCountInvalid =
+    isBulkOrderEnabled &&
+    parsedMinPeopleCount !== null &&
+    (!Number.isInteger(parsedMinPeopleCount) || parsedMinPeopleCount < 1);
+  const peopleCountRangeInvalid =
+    isBulkOrderEnabled &&
+    parsedDefaultPeopleCount !== null &&
+    parsedMinPeopleCount !== null &&
+    parsedDefaultPeopleCount < parsedMinPeopleCount;
 
   // Update form when existing item data loads
   useEffect(() => {
@@ -236,6 +259,9 @@ export const MenuItemFormPage = () => {
           : '',
       );
       setAllowBackorder(existingItem.allowBackorder ?? false);
+      setIsBulkOrderEnabled(existingItem.isBulkOrderEnabled ?? false);
+      setDefaultPeopleCount(existingItem.defaultPeopleCount != null ? String(existingItem.defaultPeopleCount) : '');
+      setMinPeopleCount(existingItem.minPeopleCount != null ? String(existingItem.minPeopleCount) : '');
       
       // Set existing variants if available
       setHasVariants(existingItem.hasVariants ?? false);
@@ -245,6 +271,7 @@ export const MenuItemFormPage = () => {
           sku: v.sku,
           label: v.label,
           price: v.price,
+          servesCount: v.servesCount,
           inventoryQuantity: v.inventoryQuantity,
           lowStockThreshold: v.lowStockThreshold,
           isAvailable: v.isAvailable,
@@ -274,6 +301,9 @@ export const MenuItemFormPage = () => {
       if (inventoryQuantityInvalid || lowStockThresholdInvalid) {
         return;
       }
+      if (defaultPeopleCountInvalid || minPeopleCountInvalid || peopleCountRangeInvalid) {
+        return;
+      }
 
       const itemData: CreateMenuItemData | UpdateMenuItemData = {
         name: data.name,
@@ -297,6 +327,9 @@ export const MenuItemFormPage = () => {
         lowStockThreshold: inventoryTrackingEnabled && lowStockThreshold !== '' ? parseInt(lowStockThreshold, 10) : null,
         allowBackorder: inventoryTrackingEnabled ? allowBackorder : false,
         hasVariants,
+        isBulkOrderEnabled,
+        defaultPeopleCount: isBulkOrderEnabled && defaultPeopleCount !== '' ? parseInt(defaultPeopleCount, 10) : null,
+        minPeopleCount: isBulkOrderEnabled && minPeopleCount !== '' ? parseInt(minPeopleCount, 10) : null,
         variants: hasVariants ? variants : undefined,
       };
 
@@ -620,7 +653,7 @@ export const MenuItemFormPage = () => {
                   {variants.map((variant, index) => (
                     <div key={index} className="rounded-lg border border-neutral-200 bg-white p-3">
                       <div className="flex items-start gap-3">
-                        <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
+                        <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-4">
                           <div className="space-y-1">
                             <Label className="text-xs text-neutral-500">Label *</Label>
                             <Input
@@ -661,6 +694,24 @@ export const MenuItemFormPage = () => {
                               onChange={(e) => {
                                 const updated = [...variants];
                                 updated[index] = { ...updated[index], sku: e.target.value };
+                                setVariants(updated);
+                              }}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs text-neutral-500">Serves (people)</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              step="1"
+                              placeholder="e.g., 10"
+                              value={variant.servesCount ?? ''}
+                              onChange={(e) => {
+                                const updated = [...variants];
+                                updated[index] = {
+                                  ...updated[index],
+                                  servesCount: e.target.value ? parseInt(e.target.value, 10) : null,
+                                };
                                 setVariants(updated);
                               }}
                             />
@@ -939,6 +990,75 @@ export const MenuItemFormPage = () => {
                 </div>
               )}
             </div>
+
+            <div className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isBulkOrderEnabled"
+                  checked={isBulkOrderEnabled}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setIsBulkOrderEnabled(checked);
+                    if (!checked) {
+                      setDefaultPeopleCount('');
+                      setMinPeopleCount('');
+                    }
+                  }}
+                  className="h-4 w-4 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                />
+                <Label htmlFor="isBulkOrderEnabled" className="font-medium text-neutral-800">
+                  Enable bulk order settings for this item
+                </Label>
+              </div>
+
+              {isBulkOrderEnabled && (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="defaultPeopleCount">Default people count</Label>
+                    <Input
+                      id="defaultPeopleCount"
+                      type="number"
+                      min="1"
+                      step="1"
+                      placeholder="e.g., 10"
+                      value={defaultPeopleCount}
+                      onChange={(e) => setDefaultPeopleCount(e.target.value)}
+                      className={cn((defaultPeopleCountInvalid || peopleCountRangeInvalid) && 'border-red-500')}
+                    />
+                    {(defaultPeopleCountInvalid || peopleCountRangeInvalid) && (
+                      <p className="flex items-center gap-1 text-sm text-red-600">
+                        <AlertCircle className="h-4 w-4" />
+                        {defaultPeopleCountInvalid
+                          ? 'Default people count must be a positive whole number.'
+                          : 'Default people count cannot be lower than minimum people count.'}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="minPeopleCount">Minimum people count</Label>
+                    <Input
+                      id="minPeopleCount"
+                      type="number"
+                      min="1"
+                      step="1"
+                      placeholder="e.g., 5"
+                      value={minPeopleCount}
+                      onChange={(e) => setMinPeopleCount(e.target.value)}
+                      className={cn((minPeopleCountInvalid || peopleCountRangeInvalid) && 'border-red-500')}
+                    />
+                    {(minPeopleCountInvalid || peopleCountRangeInvalid) && (
+                      <p className="flex items-center gap-1 text-sm text-red-600">
+                        <AlertCircle className="h-4 w-4" />
+                        {minPeopleCountInvalid
+                          ? 'Minimum people count must be a positive whole number.'
+                          : 'Minimum people count cannot exceed default people count.'}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -1132,7 +1252,10 @@ export const MenuItemFormPage = () => {
               createMenuItemMutation.isPending ||
               updateMenuItemMutation.isPending ||
               inventoryQuantityInvalid ||
-              lowStockThresholdInvalid
+              lowStockThresholdInvalid ||
+              defaultPeopleCountInvalid ||
+              minPeopleCountInvalid ||
+              peopleCountRangeInvalid
             }
             className="flex-1"
           >

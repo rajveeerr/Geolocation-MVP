@@ -25,6 +25,7 @@ export interface MenuItemVariant {
   sku: string;
   label: string;
   price: number;
+  servesCount?: number | null;
   inventoryQuantity?: number | null;
   lowStockThreshold?: number | null;
   isAvailable: boolean;
@@ -37,6 +38,7 @@ export interface MenuItemVariantInput {
   sku?: string;
   label: string;
   price: number;
+  servesCount?: number | null;
   inventoryQuantity?: number | null;
   lowStockThreshold?: number | null;
   isAvailable?: boolean;
@@ -68,6 +70,9 @@ export interface MenuItem {
   allowBackorder: boolean;
   inventoryStatus?: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'UNTRACKED';
   hasVariants: boolean;
+  isBulkOrderEnabled: boolean;
+  defaultPeopleCount?: number | null;
+  minPeopleCount?: number | null;
   variants?: MenuItemVariant[];
   createdAt: string;
   updatedAt: string;
@@ -95,6 +100,9 @@ export interface CreateMenuItemData {
   lowStockThreshold?: number | null;
   allowBackorder?: boolean;
   hasVariants?: boolean;
+  isBulkOrderEnabled?: boolean;
+  defaultPeopleCount?: number | null;
+  minPeopleCount?: number | null;
   variants?: MenuItemVariantInput[];
 }
 
@@ -120,11 +128,20 @@ export interface UpdateMenuItemData {
   lowStockThreshold?: number | null;
   allowBackorder?: boolean;
   hasVariants?: boolean;
+  isBulkOrderEnabled?: boolean;
+  defaultPeopleCount?: number | null;
+  minPeopleCount?: number | null;
   variants?: MenuItemVariantInput[];
 }
 
 export interface MenuItemsResponse {
   menuItems: MenuItem[];
+}
+
+export interface InventoryAlert {
+  level: 'LOW_STOCK' | 'OUT_OF_STOCK';
+  title: string;
+  message: string;
 }
 
 const toMenuItemImages = (imageUrls?: string[] | null): MenuItemImage[] =>
@@ -289,7 +306,7 @@ export const useUpdateMenuItemInventory = () => {
         'isAvailable' | 'inventoryTrackingEnabled' | 'inventoryQuantity' | 'lowStockThreshold' | 'allowBackorder'
       >;
     }) => {
-      const response = await apiPatch<{ menuItem: MenuItem }, typeof data>(
+      const response = await apiPatch<{ menuItem: MenuItem; inventoryAlert?: InventoryAlert }, typeof data>(
         `/merchants/me/menu/item/${itemId}/inventory`,
         data,
       );
@@ -298,6 +315,7 @@ export const useUpdateMenuItemInventory = () => {
       }
       return {
         menuItem: normalizeMenuItem(response.data.menuItem),
+        inventoryAlert: response.data.inventoryAlert,
       };
     },
     onSuccess: (data) => {
@@ -307,6 +325,13 @@ export const useUpdateMenuItemInventory = () => {
         title: 'Inventory Updated',
         description: `${data.menuItem.name} inventory has been updated.`,
       });
+      if (data.inventoryAlert) {
+        toast({
+          title: data.inventoryAlert.title,
+          description: data.inventoryAlert.message,
+          variant: data.inventoryAlert.level === 'OUT_OF_STOCK' ? 'destructive' : undefined,
+        });
+      }
     },
     onError: (error: Error) => {
       toast({
@@ -336,7 +361,7 @@ export const useUpdateVariantInventory = () => {
         isAvailable?: boolean;
       };
     }) => {
-      const response = await apiPatch<{ variant: MenuItemVariant }, typeof data>(
+      const response = await apiPatch<{ variant: MenuItemVariant; inventoryAlert?: InventoryAlert }, typeof data>(
         `/merchants/me/menu/item/${itemId}/variant/${variantId}/inventory`,
         data,
       );
@@ -345,13 +370,20 @@ export const useUpdateVariantInventory = () => {
       }
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['merchant-menu'] });
       queryClient.invalidateQueries({ queryKey: ['merchantMenuItems'] });
       toast({
         title: 'Variant Updated',
         description: 'Variant inventory has been updated.',
       });
+      if (data.inventoryAlert) {
+        toast({
+          title: data.inventoryAlert.title,
+          description: data.inventoryAlert.message,
+          variant: data.inventoryAlert.level === 'OUT_OF_STOCK' ? 'destructive' : undefined,
+        });
+      }
     },
     onError: (error: Error) => {
       toast({

@@ -207,7 +207,7 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
       <DialogContent
         className={cn(
           'bg-white border border-neutral-200 text-neutral-800',
-          'sm:max-w-2xl max-h-[90vh] flex flex-col p-0 rounded-2xl overflow-hidden'
+          'sm:max-w-5xl max-h-[90vh] flex flex-col p-0 rounded-2xl overflow-hidden'
         )}
       >
         {/* Header */}
@@ -243,10 +243,10 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
               <span className="text-sm font-bold text-neutral-900">Happy Hour Schedule</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
               {/* Start Time */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-neutral-500 block">
+              <div className="space-y-2.5">
+                <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-neutral-500">
                   Start Time
                 </label>
                 <TwelveHourTimeField
@@ -257,8 +257,8 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
               </div>
 
               {/* End Time */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-neutral-500 block">
+              <div className="space-y-2.5">
+                <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-neutral-500">
                   End Time
                 </label>
                 <TwelveHourTimeField
@@ -269,11 +269,11 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
               </div>
 
               {/* Duration badge */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-neutral-500 block">
+              <div className="space-y-2.5">
+                <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-neutral-500">
                   Total Duration
                 </label>
-                <div className="flex h-[60px] items-center justify-center rounded-xl border border-dashed border-brand/30 bg-white/50 px-4">
+                <div className="flex h-[70px] items-center justify-center rounded-xl border border-dashed border-brand/30 bg-white px-4">
                   <p className="text-2xl font-black text-neutral-900 tracking-tight">
                     {duration.label.split(' ')[0]}
                     <span className="text-sm font-bold text-neutral-400 ml-1">

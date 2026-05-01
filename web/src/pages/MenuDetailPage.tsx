@@ -1,6 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo } from 'react';
 import { useDealDetail, usePublicMenuCollections } from '@/hooks/useDealDetail';
+import { useBulkOrderCart } from '@/hooks/useBulkOrderCart';
+import { useBulkQuote } from '@/hooks/useMenuSystem';
+import { useToast } from '@/hooks/use-toast';
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { cn } from '@/lib/utils';
 import {
@@ -85,8 +88,13 @@ export const MenuDetailPage = () => {
     typeof deal?.merchant?.id === 'number' ? deal.merchant.id : null,
   );
 
+  const { toast } = useToast();
+  const { peopleCount, addItem } = useBulkOrderCart();
+  const bulkQuote = useBulkQuote();
+
   const [imgIdx, setImgIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
   const [addOns, setAddOns] = useState(placeholderAddOns);
 
   /* Find the specific menu item */
@@ -103,6 +111,7 @@ export const MenuDetailPage = () => {
         if (String(source.id) === itemId) {
           return {
             id: source.id,
+            merchantId: source.merchantId,
             name: source.name,
             description: source.description,
             originalPrice: source.price,
@@ -117,6 +126,8 @@ export const MenuDetailPage = () => {
             imageUrl: source.imageUrl,
             images: source.imageUrls || [],
             category: source.category,
+            hasVariants: Boolean(source.hasVariants),
+            variants: source.variants || [],
           };
         }
       }
@@ -146,6 +157,11 @@ export const MenuDetailPage = () => {
   const price = menuItem?.discountedPrice || menuItem?.originalPrice || 0;
   const originalPrice = menuItem?.originalPrice || 0;
   const hasDiscount = menuItem?.discountedPrice && menuItem.discountedPrice < originalPrice;
+  const selectedVariant = useMemo(
+    () => menuItem?.variants?.find((variant: any) => variant.id === selectedVariantId) ?? null,
+    [menuItem, selectedVariantId],
+  );
+  const effectiveUnitPrice = selectedVariant ? Number(selectedVariant.price) : price;
 
   const handleAddOnQty = (id: number, delta: number) => {
     setAddOns((prev) =>
@@ -154,10 +170,50 @@ export const MenuDetailPage = () => {
   };
 
   const totalPrice = useMemo(() => {
-    const itemTotal = price * quantity;
+    const itemTotal = effectiveUnitPrice * quantity;
     const addOnTotal = addOns.reduce((sum, a) => sum + a.price * a.quantity, 0) * quantity;
     return itemTotal + addOnTotal;
-  }, [price, quantity, addOns]);
+  }, [effectiveUnitPrice, quantity, addOns]);
+
+  const handleAddToOrder = async () => {
+    if (!menuItem) return;
+    if (menuItem.hasVariants && !selectedVariant) {
+      toast({
+        title: 'Select a serving option',
+        description: 'Choose a variant before adding this item to your bulk order.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const variantId = selectedVariant?.id ?? null;
+    const unitPrice = selectedVariant ? Number(selectedVariant.price) : Number(price);
+
+    addItem({
+      menuItemId: menuItem.id,
+      merchantId: menuItem.merchantId || deal?.merchant?.id || 0,
+      name: menuItem.name,
+      unitPrice,
+      quantity,
+      variantId,
+      variantLabel: selectedVariant?.label ?? null,
+      servesCount: selectedVariant?.servesCount ?? null,
+    });
+
+    try {
+      await bulkQuote.mutateAsync({
+        peopleCount,
+        items: [{ menuItemId: menuItem.id, variantId, quantity }],
+      });
+    } catch {
+      // Quote errors are handled at checkout level; still allow local add.
+    }
+
+    toast({
+      title: 'Added to bulk order',
+      description: `${quantity} x ${menuItem.name}${selectedVariant ? ` (${selectedVariant.label})` : ''} added.`,
+    });
+  };
 
   const prevImg = () => setImgIdx((i) => (i - 1 + images.length) % images.length);
   const nextImg = () => setImgIdx((i) => (i + 1) % images.length);
@@ -307,6 +363,33 @@ export const MenuDetailPage = () => {
 
             {/* Most popular combos – placeholder */}
             <div>
+              {menuItem?.hasVariants && Array.isArray(menuItem.variants) && menuItem.variants.length > 0 && (
+                <div className="mb-5 rounded-xl border border-neutral-200 p-3">
+                  <h3 className="mb-2 text-sm font-bold text-neutral-900">Serving options</h3>
+                  <div className="space-y-2">
+                    {menuItem.variants.map((variant: any) => (
+                      <button
+                        type="button"
+                        key={variant.id}
+                        onClick={() => setSelectedVariantId(variant.id)}
+                        className={cn(
+                          'w-full rounded-lg border px-3 py-2 text-left text-sm',
+                          selectedVariantId === variant.id ? 'border-[#8B1A1A] bg-red-50' : 'border-neutral-200',
+                        )}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold">{variant.label}</span>
+                          <span>${Number(variant.price).toFixed(2)}</span>
+                        </div>
+                        {variant.servesCount ? (
+                          <p className="mt-0.5 text-xs text-neutral-500">Serves about {variant.servesCount} people</p>
+                        ) : null}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <h3 className="text-sm font-bold text-neutral-900 mb-3">Most popular</h3>
               <div className="flex gap-3">
                 <label className="flex-1 flex items-center gap-3 p-3 rounded-xl border border-neutral-200 cursor-pointer hover:border-neutral-300 transition-colors">
@@ -474,9 +557,8 @@ export const MenuDetailPage = () => {
           </div>
           {/* Add to order */}
           <button
-            disabled
-            className="px-6 py-2.5 rounded-full bg-[#1a1a2e] text-white text-sm font-bold cursor-not-allowed opacity-80 flex items-center gap-1"
-            title="Online ordering coming soon"
+            onClick={handleAddToOrder}
+            className="px-6 py-2.5 rounded-full bg-[#1a1a2e] text-white text-sm font-bold flex items-center gap-1"
           >
             Add {quantity} to order • ${totalPrice.toFixed(2)}
           </button>

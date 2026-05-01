@@ -99,6 +99,62 @@ export interface MenuCollectionResponse {
   collection: MenuCollection;
 }
 
+const DELETED_COLLECTION_IDS_KEY = 'deletedMenuCollectionIds';
+
+const getDeletedCollectionIds = (): Set<number> => {
+  try {
+    const raw = localStorage.getItem(DELETED_COLLECTION_IDS_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return new Set();
+    return new Set(parsed.map((id) => Number(id)).filter((id) => Number.isFinite(id)));
+  } catch {
+    return new Set();
+  }
+};
+
+const saveDeletedCollectionIds = (ids: Set<number>) => {
+  try {
+    localStorage.setItem(DELETED_COLLECTION_IDS_KEY, JSON.stringify(Array.from(ids)));
+  } catch {
+    // ignore storage failures
+  }
+};
+
+const refreshCollectionQueries = async (
+  queryClient: ReturnType<typeof useQueryClient>,
+  collectionId?: number,
+  immediateRefetch = true,
+) => {
+  await queryClient.invalidateQueries({ queryKey: ['menu-collections'], refetchType: 'active' });
+  if (immediateRefetch) {
+    await queryClient.refetchQueries({ queryKey: ['menu-collections'], type: 'active' });
+  }
+  if (collectionId) {
+    await queryClient.invalidateQueries({ queryKey: ['menu-collection', collectionId], refetchType: 'active' });
+    if (immediateRefetch) {
+      await queryClient.refetchQueries({ queryKey: ['menu-collection', collectionId], type: 'active' });
+    }
+  }
+};
+
+const updateMenuCollectionListCaches = (
+  queryClient: ReturnType<typeof useQueryClient>,
+  updater: (collection: MenuCollection) => MenuCollection | null,
+) => {
+  const listCaches = queryClient.getQueriesData<MenuCollectionsResponse>({ queryKey: ['menu-collections'] });
+  listCaches.forEach(([key, cached]) => {
+    if (!cached?.collections) return;
+    const nextCollections = cached.collections
+      .map((collection) => updater(collection))
+      .filter((collection): collection is MenuCollection => collection !== null);
+    queryClient.setQueryData<MenuCollectionsResponse>(key, {
+      ...cached,
+      collections: nextCollections,
+    });
+  });
+};
+
 // Hook to fetch all menu collections for the authenticated merchant
 // Optionally filter by menuType and storeId
 export const useMenuCollections = (menuType?: MenuCollectionType, storeId?: number | null) => {
@@ -114,7 +170,11 @@ export const useMenuCollections = (menuType?: MenuCollectionType, storeId?: numb
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to fetch menu collections');
       }
-      return response.data;
+      const deletedIds = getDeletedCollectionIds();
+      return {
+        ...response.data,
+        collections: (response.data.collections || []).filter((collection) => !deletedIds.has(collection.id)),
+      };
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -150,12 +210,32 @@ export const useCreateMenuCollection = () => {
       }
       return response.data;
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['menu-collections'] });
+    onSuccess: async (data) => {
+      const created = data.collection;
+      const listCaches = queryClient.getQueriesData<MenuCollectionsResponse>({ queryKey: ['menu-collections'] });
+      listCaches.forEach(([key, cached]) => {
+        if (!cached?.collections) return;
+        const queryKey = Array.isArray(key) ? key : [];
+        const menuTypeFilter = queryKey[1] as string | undefined;
+        const storeFilter = queryKey[2] as string | number | undefined;
+        const matchesMenuType = !menuTypeFilter || menuTypeFilter === 'all' || menuTypeFilter === created.menuType;
+        const matchesStore =
+          !storeFilter ||
+          storeFilter === 'all-stores' ||
+          String(storeFilter) === String(created.storeId ?? '');
+        if (!matchesMenuType || !matchesStore) return;
+        const exists = cached.collections.some((collection) => collection.id === created.id);
+        if (exists) return;
+        queryClient.setQueryData<MenuCollectionsResponse>(key, {
+          ...cached,
+          collections: [created, ...cached.collections],
+        });
+      });
       toast({
         title: 'Collection Created!',
         description: `${data.collection.name} has been created successfully.`,
       });
+      await refreshCollectionQueries(queryClient, data.collection.id);
     },
     onError: (error: Error) => {
       toast({
@@ -216,13 +296,17 @@ export const useUpdateMenuCollection = () => {
       }
       return response.data;
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['menu-collections'] });
-      queryClient.invalidateQueries({ queryKey: ['menu-collection', data.collection.id] });
+    onSuccess: async (data) => {
+      const updated = data.collection;
+      updateMenuCollectionListCaches(queryClient, (collection) =>
+        collection.id === updated.id ? { ...collection, ...updated } : collection,
+      );
+      queryClient.setQueryData<MenuCollectionResponse>(['menu-collection', updated.id], { collection: updated });
       toast({
         title: 'Collection Updated!',
         description: `${data.collection.name} has been updated successfully.`,
       });
+      await refreshCollectionQueries(queryClient, updated.id);
     },
     onError: (error: Error) => {
       toast({
@@ -247,12 +331,20 @@ export const useDeleteMenuCollection = () => {
       }
       return response.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['menu-collections'] });
+    onSuccess: async (_data, collectionId) => {
+      const deletedIds = getDeletedCollectionIds();
+      deletedIds.add(collectionId);
+      saveDeletedCollectionIds(deletedIds);
+
+      updateMenuCollectionListCaches(queryClient, (collection) =>
+        collection.id === collectionId ? null : collection,
+      );
+      queryClient.removeQueries({ queryKey: ['menu-collection', collectionId] });
       toast({
         title: 'Collection Deleted',
         description: 'Menu collection has been deleted successfully.',
       });
+      await queryClient.invalidateQueries({ queryKey: ['menu-collections'], refetchType: 'none' });
     },
     onError: (error: Error) => {
       toast({
@@ -302,13 +394,12 @@ export const useAddItemsToCollection = () => {
       }
       return response.data;
     },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['menu-collections'] });
-      queryClient.invalidateQueries({ queryKey: ['menu-collection', variables.collectionId] });
+    onSuccess: async (data, variables) => {
       toast({
         title: 'Items Added!',
         description: data.message || `Added ${data.itemsAdded} items to the collection.`,
       });
+      await refreshCollectionQueries(queryClient, variables.collectionId);
     },
     onError: (error: Error) => {
       toast({
@@ -335,13 +426,34 @@ export const useRemoveItemFromCollection = () => {
       }
       return response.data;
     },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['menu-collections'] });
-      queryClient.invalidateQueries({ queryKey: ['menu-collection', variables.collectionId] });
+    onSuccess: async (data, variables) => {
+      updateMenuCollectionListCaches(queryClient, (collection) => {
+        if (collection.id !== variables.collectionId) return collection;
+        return {
+          ...collection,
+          items: (collection.items || []).filter((item) => item.menuItemId !== variables.itemId),
+          _count: collection._count
+            ? { ...collection._count, items: Math.max(0, collection._count.items - 1) }
+            : collection._count,
+        };
+      });
+      const detailCache = queryClient.getQueryData<MenuCollectionResponse>(['menu-collection', variables.collectionId]);
+      if (detailCache?.collection) {
+        queryClient.setQueryData<MenuCollectionResponse>(['menu-collection', variables.collectionId], {
+          collection: {
+            ...detailCache.collection,
+            items: (detailCache.collection.items || []).filter((item) => item.menuItemId !== variables.itemId),
+            _count: detailCache.collection._count
+              ? { ...detailCache.collection._count, items: Math.max(0, detailCache.collection._count.items - 1) }
+              : detailCache.collection._count,
+          },
+        });
+      }
       toast({
         title: 'Item Removed',
         description: data?.message || 'Item has been removed from the collection.',
       });
+      await refreshCollectionQueries(queryClient, variables.collectionId);
     },
     onError: (error: Error) => {
       toast({

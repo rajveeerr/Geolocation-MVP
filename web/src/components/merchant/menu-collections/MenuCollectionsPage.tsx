@@ -11,13 +11,39 @@ interface CollectionFormProps {
   open: boolean;
   onClose: () => void;
   initial?: Partial<MenuCollection>;
-  onSubmit: (data: { name: string; description?: string }) => Promise<void> | void;
+  onSubmit: (data: { name: string; description?: string; menuItems?: Array<{ id: number; sortOrder: number }> }) => Promise<void> | void;
   isSubmitting?: boolean;
 }
 
 const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: CollectionFormProps) => {
+  const { data: menuData } = useMerchantMenu();
+  const addItems = useAddItemsToCollection();
+  const removeItem = useRemoveItemFromCollection();
   const [name, setName] = useState(initial?.name || '');
   const [description, setDescription] = useState(initial?.description || '');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
+  const [createStep, setCreateStep] = useState<1 | 2>(1);
+  const [editSearchTerm, setEditSearchTerm] = useState('');
+  const [editSelectedItems, setEditSelectedItems] = useState<Set<number>>(new Set());
+
+  const menuItems = menuData?.menuItems || [];
+  const isEditMode = Boolean(initial?.id);
+  const collectionId = initial?.id ?? null;
+  const { data: editingCollectionData } = useMenuCollection(isEditMode ? collectionId : null);
+  const editingItems = editingCollectionData?.collection?.items ?? initial?.items ?? [];
+  const editingItemIds = new Set(editingItems.map((item) => item.menuItemId));
+  const filteredItems = menuItems.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.description?.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+  const editableAvailableItems = menuItems.filter((item) => !editingItemIds.has(item.id));
+  const filteredEditableItems = editableAvailableItems.filter((item) =>
+    item.name.toLowerCase().includes(editSearchTerm.toLowerCase()) ||
+    item.category.toLowerCase().includes(editSearchTerm.toLowerCase()) ||
+    item.description?.toLowerCase().includes(editSearchTerm.toLowerCase()),
+  );
 
   useEffect(() => {
     if (open && initial) {
@@ -28,6 +54,53 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
       setDescription('');
     }
   }, [open, initial]);
+
+  useEffect(() => {
+    if (!open) {
+      setSearchTerm('');
+      setSelectedItems(new Set());
+      setCreateStep(1);
+      setEditSearchTerm('');
+      setEditSelectedItems(new Set());
+    }
+  }, [open]);
+
+  const toggleItemSelection = (itemId: number) => {
+    setSelectedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(itemId)) {
+        next.delete(itemId);
+      } else {
+        next.add(itemId);
+      }
+      return next;
+    });
+  };
+
+  const toggleEditableItemSelection = (itemId: number) => {
+    setEditSelectedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(itemId)) {
+        next.delete(itemId);
+      } else {
+        next.add(itemId);
+      }
+      return next;
+    });
+  };
+
+  const handleAddItemsInEdit = async () => {
+    if (!collectionId || editSelectedItems.size === 0) return;
+    await addItems.mutateAsync({
+      collectionId,
+      menuItems: Array.from(editSelectedItems).map((id, index) => ({
+        id,
+        sortOrder: editingItems.length + index,
+      })),
+    });
+    setEditSelectedItems(new Set());
+    setEditSearchTerm('');
+  };
 
   return (
     <AnimatePresence>
@@ -48,35 +121,223 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-neutral-900">{initial?.id ? 'Edit Collection' : 'New Collection'}</h3>
+              <h3 className="text-lg font-semibold text-neutral-900">{isEditMode ? 'Edit Collection' : 'New Collection'}</h3>
               <button onClick={onClose} className="rounded-md p-1 text-neutral-500 hover:bg-neutral-100">
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="mb-1 block text-sm font-medium text-neutral-700">Name</label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Happy Hour Menu" />
+            {!isEditMode ? (
+              <div className="mb-4 rounded-xl border border-neutral-200 bg-neutral-50 p-3">
+                <div className="flex items-center justify-between text-xs font-medium text-neutral-500">
+                  <span className={cn(createStep === 1 && 'text-neutral-900')}>Step 1: Details</span>
+                  <span className={cn(createStep === 2 && 'text-neutral-900')}>Step 2: Items</span>
+                </div>
+                <div className="mt-2 h-1.5 rounded-full bg-neutral-200">
+                  <div
+                    className={cn(
+                      'h-1.5 rounded-full bg-brand-primary-500 transition-all',
+                      createStep === 1 ? 'w-1/2' : 'w-full',
+                    )}
+                  />
+                </div>
               </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-neutral-700">Description</label>
-                <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Special drinks and appetizers" />
-              </div>
+            ) : null}
+
+            <div className="space-y-4 max-h-[65vh] overflow-y-auto pr-1">
+              {(isEditMode || createStep === 1) ? (
+                <>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-neutral-700">Name</label>
+                    <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Happy Hour Menu" />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-neutral-700">Description</label>
+                    <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Special drinks and appetizers" />
+                  </div>
+                </>
+              ) : null}
+
+              {isEditMode ? (
+                <div className="space-y-4 rounded-xl border border-neutral-200 p-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-neutral-900">Manage Items</p>
+                    <p className="text-xs text-neutral-500">{editingItems.length} in collection</p>
+                  </div>
+
+                  <div className="space-y-2 rounded-lg border border-neutral-200 p-2">
+                    {editingItems.length === 0 ? (
+                      <p className="py-4 text-center text-sm text-neutral-500">No items in this collection yet.</p>
+                    ) : (
+                      editingItems.map((collectionItem) => (
+                        <div key={collectionItem.menuItemId} className="flex items-center justify-between rounded-lg border border-neutral-100 bg-neutral-50 px-3 py-2">
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium text-neutral-900">{collectionItem.menuItem.name}</p>
+                            <p className="text-xs text-neutral-500">{collectionItem.menuItem.category}</p>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => collectionId && removeItem.mutateAsync({ collectionId, itemId: collectionItem.menuItemId })}
+                            disabled={removeItem.isPending}
+                            className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-neutral-700">Add More Items</label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+                      <Input
+                        value={editSearchTerm}
+                        onChange={(e) => setEditSearchTerm(e.target.value)}
+                        placeholder="Search menu items to add..."
+                        className="pl-10"
+                      />
+                    </div>
+                    <div className="max-h-52 space-y-2 overflow-y-auto rounded-lg border border-neutral-200 p-2">
+                      {filteredEditableItems.length === 0 ? (
+                        <p className="py-4 text-center text-sm text-neutral-500">No additional items available.</p>
+                      ) : (
+                        filteredEditableItems.map((item) => {
+                          const isSelected = editSelectedItems.has(item.id);
+                          return (
+                            <button
+                              key={item.id}
+                              type="button"
+                              onClick={() => toggleEditableItemSelection(item.id)}
+                              className={cn(
+                                'w-full rounded-lg border px-3 py-2 text-left transition',
+                                isSelected
+                                  ? 'border-brand-primary-500 bg-brand-primary-50'
+                                  : 'border-neutral-200 bg-white hover:border-neutral-300',
+                              )}
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="min-w-0">
+                                  <p className="truncate text-sm font-medium text-neutral-900">{item.name}</p>
+                                  <p className="text-xs text-neutral-500">{item.category} • ${item.price.toFixed(2)}</p>
+                                </div>
+                                {isSelected ? <Check className="h-4 w-4 text-brand-primary-600" /> : null}
+                              </div>
+                            </button>
+                          );
+                        })
+                      )}
+                    </div>
+                    <div className="flex justify-end">
+                      <Button
+                        type="button"
+                        onClick={handleAddItemsInEdit}
+                        disabled={editSelectedItems.size === 0 || addItems.isPending}
+                      >
+                        {addItems.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        Add Selected Items
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              {!isEditMode && createStep === 2 ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-sm font-medium text-neutral-700">Add Items (Optional)</label>
+                    <span className="text-xs text-neutral-500">
+                      {selectedItems.size} selected
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+                    <Input
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Search menu items..."
+                      className="pl-10"
+                    />
+                  </div>
+                  <div className="max-h-60 space-y-2 overflow-y-auto rounded-lg border border-neutral-200 p-2">
+                    {filteredItems.length === 0 ? (
+                      <div className="py-6 text-center text-sm text-neutral-500">
+                        No menu items found.
+                      </div>
+                    ) : (
+                      filteredItems.map((item) => {
+                        const isSelected = selectedItems.has(item.id);
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => toggleItemSelection(item.id)}
+                            className={cn(
+                              'w-full rounded-lg border px-3 py-2 text-left transition',
+                              isSelected
+                                ? 'border-brand-primary-500 bg-brand-primary-50'
+                                : 'border-neutral-200 bg-white hover:border-neutral-300',
+                            )}
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="truncate text-sm font-semibold text-neutral-900">{item.name}</div>
+                                <div className="mt-0.5 text-xs text-neutral-500">
+                                  {item.category} • ${item.price.toFixed(2)}
+                                </div>
+                              </div>
+                              {isSelected ? (
+                                <Check className="h-4 w-4 shrink-0 text-brand-primary-600" />
+                              ) : null}
+                            </div>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                  <p className="text-xs text-neutral-500">
+                    You can create now and still add or remove items later from the collection card.
+                  </p>
+                </div>
+              ) : null}
             </div>
 
             <div className="mt-6 flex items-center justify-end gap-3">
               <Button variant="secondary" onClick={onClose}>Cancel</Button>
-              <Button
-                onClick={async () => {
-                  await onSubmit({ name: name.trim(), description: description.trim() || undefined });
-                  onClose();
-                }}
-                disabled={!name.trim() || isSubmitting}
-              >
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save
-              </Button>
+              {!isEditMode && createStep === 1 ? (
+                <Button onClick={() => setCreateStep(2)} disabled={!name.trim()}>
+                  Next: Select Items
+                </Button>
+              ) : null}
+              {!isEditMode && createStep === 2 ? (
+                <Button variant="secondary" onClick={() => setCreateStep(1)}>
+                  Back
+                </Button>
+              ) : null}
+              {(isEditMode || createStep === 2) ? (
+                <Button
+                  onClick={async () => {
+                    await onSubmit({
+                      name: name.trim(),
+                      description: description.trim() || undefined,
+                      menuItems: !isEditMode
+                        ? Array.from(selectedItems).map((id, index) => ({
+                            id,
+                            sortOrder: index,
+                          }))
+                        : undefined,
+                    });
+                    onClose();
+                  }}
+                  disabled={!name.trim() || isSubmitting}
+                >
+                  {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isEditMode ? 'Save' : 'Create Collection'}
+                </Button>
+              ) : null}
             </div>
           </motion.div>
         </motion.div>
@@ -629,11 +890,33 @@ export const MenuCollectionsPage = () => {
   const [editing, setEditing] = useState<MenuCollection | null>(null);
   const [addingItemsTo, setAddingItemsTo] = useState<MenuCollection | null>(null);
   const [viewingCollection, setViewingCollection] = useState<number | null>(null);
+  const [deletingCollection, setDeletingCollection] = useState<MenuCollection | null>(null);
+  const [hiddenCollectionIds, setHiddenCollectionIds] = useState<Set<number>>(new Set());
 
-  const collections = data?.collections || [];
+  const collections = (data?.collections || []).filter((collection) => !hiddenCollectionIds.has(collection.id));
   const filtered = collections.filter((c) =>
     c.name.toLowerCase().includes(query.toLowerCase()) || c.description?.toLowerCase().includes(query.toLowerCase())
   );
+
+  const handleConfirmDelete = async () => {
+    if (!deletingCollection) return;
+    const targetId = deletingCollection.id;
+    setHiddenCollectionIds((prev) => new Set(prev).add(targetId));
+    setDeletingCollection(null);
+    if (viewingCollection === targetId) setViewingCollection(null);
+    if (editing?.id === targetId) setEditing(null);
+    if (addingItemsTo?.id === targetId) setAddingItemsTo(null);
+
+    try {
+      await deleteCollection.mutateAsync(targetId);
+    } catch {
+      setHiddenCollectionIds((prev) => {
+        const next = new Set(prev);
+        next.delete(targetId);
+        return next;
+      });
+    }
+  };
 
   return (
     <div className="mx-auto max-w-5xl p-4 sm:p-6">
@@ -737,7 +1020,7 @@ export const MenuCollectionsPage = () => {
                       size="sm"
                       onClick={async (e) => {
                         e.stopPropagation();
-                        await deleteCollection.mutateAsync(c.id);
+                        setDeletingCollection(c);
                       }}
                       className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                       title="Delete"
@@ -848,6 +1131,46 @@ export const MenuCollectionsPage = () => {
         onClose={() => setViewingCollection(null)}
         collectionId={viewingCollection}
       />
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deletingCollection ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            onClick={() => setDeletingCollection(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: 'tween', duration: 0.2 }}
+              className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-lg font-semibold text-neutral-900">Delete Collection?</h3>
+              <p className="mt-2 text-sm text-neutral-600">
+                This will permanently delete <span className="font-semibold text-neutral-900">{deletingCollection.name}</span>.
+              </p>
+              <div className="mt-6 flex items-center justify-end gap-3">
+                <Button variant="secondary" onClick={() => setDeletingCollection(null)}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleConfirmDelete}
+                  disabled={deleteCollection.isPending}
+                  className="bg-red-600 text-white hover:bg-red-700"
+                >
+                  {deleteCollection.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  Delete
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 };

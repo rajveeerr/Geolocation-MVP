@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { PATHS } from '@/routing/paths';
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
-import { CalendarIcon, ClockIcon, DollarSign, Percent, BarChart3, Users, Gift, AlertTriangle, PackageX, Boxes, Sparkles } from 'lucide-react';
+import { CalendarIcon, ClockIcon, DollarSign, Percent, BarChart3, Users, Gift, AlertTriangle, PackageX, Boxes, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useMerchantDashboardStats } from '@/hooks/useMerchantDashboardStats';
 import { useMerchantStores } from '@/hooks/useMerchantStores';
@@ -214,14 +214,24 @@ export const MerchantDashboardPage = () => {
     let lowStock = 0;
     let outOfStock = 0;
     const lowStockItems: { id: number; name: string; qty: number }[] = [];
+    const outOfStockItems: { id: number; name: string }[] = [];
     items.forEach((it) => {
       if (it.inventoryStatus === 'LOW_STOCK') {
         lowStock += 1;
         lowStockItems.push({ id: it.id, name: it.name, qty: it.inventoryQuantity ?? 0 });
       }
-      if (it.inventoryStatus === 'OUT_OF_STOCK') outOfStock += 1;
+      if (it.inventoryStatus === 'OUT_OF_STOCK') {
+        outOfStock += 1;
+        outOfStockItems.push({ id: it.id, name: it.name });
+      }
     });
-    return { lowStock, outOfStock, lowStockItems: lowStockItems.slice(0, 3) };
+    return {
+      lowStock,
+      outOfStock,
+      totalAlerts: lowStock + outOfStock,
+      lowStockItems: lowStockItems.slice(0, 4),
+      outOfStockItems: outOfStockItems.slice(0, 4),
+    };
   }, [menuData]);
 
   const { data: checkInSummary, isLoading: checkInSummaryLoading } = useQuery({
@@ -500,41 +510,76 @@ export const MerchantDashboardPage = () => {
             </div>
           </div>
 
-          {/* Inventory health alert */}
-          {(inventoryHealth.lowStock > 0 || inventoryHealth.outOfStock > 0) && (
-            <div className={cn(panelClass, 'mb-6 border-amber-200/80')}>
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-start gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
-                    <AlertTriangle className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-neutral-900">Inventory needs attention</h3>
-                    <p className="mt-0.5 text-xs text-neutral-600">
-                      {inventoryHealth.lowStock > 0 && (
-                        <span className="mr-3 inline-flex items-center gap-1">
-                          <Boxes className="h-3 w-3 text-amber-600" />
-                          <strong>{inventoryHealth.lowStock}</strong> low on stock
-                        </span>
-                      )}
-                      {inventoryHealth.outOfStock > 0 && (
-                        <span className="inline-flex items-center gap-1">
-                          <PackageX className="h-3 w-3 text-red-600" />
-                          <strong>{inventoryHealth.outOfStock}</strong> out of stock
-                        </span>
-                      )}
-                    </p>
-                    {inventoryHealth.lowStockItems.length > 0 && (
-                      <p className="mt-1 text-xs text-neutral-500">
-                        e.g.{' '}
-                        {inventoryHealth.lowStockItems
-                          .map((it) => `${it.name} (${it.qty})`)
-                          .join(', ')}
+          {/* Inventory notification panel */}
+          <div
+            className={cn(
+              panelClass,
+              'mb-6',
+              inventoryHealth.totalAlerts > 0
+                ? 'border-amber-200/80 bg-gradient-to-br from-amber-50/40 to-white'
+                : 'border-emerald-200/80 bg-gradient-to-br from-emerald-50/50 to-white',
+            )}
+          >
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div className="flex min-w-0 items-start gap-3">
+                  {inventoryHealth.totalAlerts > 0 ? (
+                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+                      <AlertTriangle className="h-5 w-5" />
+                    </div>
+                  ) : (
+                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                      <CheckCircle2 className="h-5 w-5" />
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-semibold text-neutral-900">Inventory notifications</h3>
+                    {inventoryHealth.totalAlerts > 0 ? (
+                      <>
+                        <p className="mt-0.5 text-xs text-neutral-600">
+                          <span className="mr-3 inline-flex items-center gap-1">
+                            <Boxes className="h-3 w-3 text-amber-600" />
+                            <strong>{inventoryHealth.lowStock}</strong> low on stock
+                          </span>
+                          <span className="inline-flex items-center gap-1">
+                            <PackageX className="h-3 w-3 text-red-600" />
+                            <strong>{inventoryHealth.outOfStock}</strong> out of stock
+                          </span>
+                        </p>
+
+                        <div className="mt-3 space-y-2">
+                          {inventoryHealth.outOfStockItems.map((it) => (
+                            <div
+                              key={`oos-${it.id}`}
+                              className="flex items-center justify-between gap-3 rounded-lg border border-red-100 bg-red-50/60 px-3 py-2"
+                            >
+                              <span className="truncate text-xs font-medium text-red-700">{it.name}</span>
+                              <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wide text-red-600">
+                                Out of stock
+                              </span>
+                            </div>
+                          ))}
+                          {inventoryHealth.lowStockItems.map((it) => (
+                            <div
+                              key={`low-${it.id}`}
+                              className="flex items-center justify-between gap-3 rounded-lg border border-amber-100 bg-amber-50/60 px-3 py-2"
+                            >
+                              <span className="truncate text-xs font-medium text-amber-800">{it.name}</span>
+                              <span className="shrink-0 text-[11px] font-semibold text-amber-700">
+                                {it.qty} left
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <p className="mt-1.5 text-xs text-emerald-700">
+                        All inventory levels look healthy right now. No low-stock or out-of-stock alerts.
                       </p>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+
+                <div className="flex shrink-0 items-center gap-2">
                   <Link to={`${PATHS.MERCHANT_INVENTORY}?analyze=true`}>
                     <Button size="sm" variant="secondary" className="rounded-xl gap-1.5">
                       <Sparkles className="h-3.5 w-3.5" />
@@ -549,7 +594,6 @@ export const MerchantDashboardPage = () => {
                 </div>
               </div>
             </div>
-          )}
 
           {/* Business Type Card */}
           <div className="mb-6">
@@ -729,7 +773,13 @@ export const MerchantDashboardPage = () => {
 
           {/* Check-in Feed */}
           <div className={cn(panelClass, 'mb-8')}>
-            <CheckInFeed limit={10} autoRefresh={true} refreshInterval={30000} />
+            <CheckInFeed
+              limit={5}
+              expandedLimit={25}
+              canViewMore={true}
+              autoRefresh={true}
+              refreshInterval={30000}
+            />
           </div>
             </div>
           )}

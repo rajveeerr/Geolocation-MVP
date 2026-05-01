@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { apiGet } from '@/services/api';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { apiGet, apiPost } from '@/services/api';
 
 // Menu System Types
 
@@ -50,6 +50,48 @@ export interface MenuItemsResponse {
     totalPages: number;
   };
   error?: string;
+}
+
+export interface BulkOrderLineInput {
+  menuItemId: number;
+  variantId?: number | null;
+  quantity: number;
+}
+
+export interface BulkQuoteResponse {
+  ok: boolean;
+  peopleCount: number;
+  merchantId: number;
+  lines: Array<{
+    menuItemId: number;
+    variantId: number | null;
+    name: string;
+    variantLabel: string | null;
+    quantity: number;
+    unitPrice: number;
+    lineTotal: number;
+    servesCount: number | null;
+    servesTotal: number | null;
+    recommendedQty: number | null;
+    coverageDelta: number | null;
+    backorder: boolean;
+    availableQty: number | null;
+  }>;
+  subtotal: number;
+  effectivePerPerson: number;
+  coverageSummary: {
+    servedPeople: number;
+    peopleCount: number;
+    shortBy: number;
+    overBy: number;
+  };
+}
+
+export interface CreateBulkOrderPayload {
+  peopleCount: number;
+  items: BulkOrderLineInput[];
+  notes?: string;
+  paymentMethod?: string;
 }
 
 export interface MenuCategoriesResponse {
@@ -104,5 +146,32 @@ export const useMenuCategories = () => {
       return res.data.categories;
     },
     staleTime: 10 * 60 * 1000, // Cache for 10 minutes
+  });
+};
+
+export const useBulkQuote = () => {
+  return useMutation({
+    mutationFn: async (payload: { peopleCount: number; items: BulkOrderLineInput[] }) => {
+      const res = await apiPost<BulkQuoteResponse, typeof payload>('/menu/bulk-quote', payload);
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Failed to compute bulk quote');
+      }
+      return res.data;
+    },
+  });
+};
+
+export const useCreateBulkOrder = () => {
+  return useMutation({
+    mutationFn: async (payload: CreateBulkOrderPayload) => {
+      const res = await apiPost<{ ok: boolean; order: { id: number; orderNumber: string } }, CreateBulkOrderPayload>(
+        '/menu/orders',
+        payload,
+      );
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Failed to create bulk order');
+      }
+      return res.data;
+    },
   });
 };
