@@ -79,6 +79,13 @@ export interface BulkItemData {
   category?: string;
   imageUrl?: string;
   imageUrls?: string[];
+  inventoryTrackingEnabled?: boolean;
+  inventoryQuantity?: number | null;
+  lowStockThreshold?: number | null;
+  allowBackorder?: boolean;
+  isBulkOrderEnabled?: boolean;
+  defaultPeopleCount?: number | null;
+  minPeopleCount?: number | null;
   isHappyHour?: boolean;
   happyHourPrice?: number;
   discountPercent?: number;

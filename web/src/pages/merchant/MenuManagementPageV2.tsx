@@ -11,10 +11,12 @@ import { useToast } from '@/hooks/use-toast';
 import {
   useMenuCollections,
   useDeleteMenuCollection,
+  useAddItemsToCollection,
   type MenuCollection,
   type MenuCollectionType,
 } from '@/hooks/useMenuCollections';
 import { useMerchantStores } from '@/hooks/useMerchantStores';
+import { useMerchantMenu } from '@/hooks/useMerchantMenu';
 import {
   STANDARD_TEMPLATES,
   HAPPY_HOUR_TEMPLATES,
@@ -58,18 +60,24 @@ const MenuManagementPageV2: React.FC = () => {
   const [hhSubType, setHhSubType] = useState<string | undefined>();
   const [hhStartTime, setHhStartTime] = useState('16:00');
   const [hhEndTime, setHhEndTime] = useState('19:00');
+  const [assignCollectionId, setAssignCollectionId] = useState<number | null>(null);
 
   const { toast: _toast } = useToast();
 
   // --- Data ---
   const { data: storesData } = useMerchantStores();
+  const { data: merchantMenuData, isLoading: isLoadingMerchantMenu } = useMerchantMenu();
   const { data: collectionsData, isLoading } = useMenuCollections(
     activeTab as MenuCollectionType,
     selectedStoreId
   );
+  const { data: allCollectionsData } = useMenuCollections(undefined, selectedStoreId);
   const deleteCollection = useDeleteMenuCollection();
+  const addItemsToCollection = useAddItemsToCollection();
 
   const collections = collectionsData?.collections ?? [];
+  const allCollections = allCollectionsData?.collections ?? [];
+  const merchantItems = merchantMenuData?.menuItems ?? [];
   const stores = storesData?.stores ?? [];
   const selectedStore = stores.find((store) => store.id === selectedStoreId);
   const selectedStoreLabel = selectedStore
@@ -79,20 +87,59 @@ const MenuManagementPageV2: React.FC = () => {
     : `All Stores (${storesData?.total ?? stores.length})`;
 
   const inventoryStats = useMemo(() => {
-    return collections.reduce(
-      (acc, collection) => {
-        for (const item of collection.items ?? []) {
-          const status = item.menuItem?.inventoryStatus;
-          if (status === 'IN_STOCK') acc.inStock += 1;
-          if (status === 'LOW_STOCK') acc.lowStock += 1;
-          if (status === 'OUT_OF_STOCK') acc.outOfStock += 1;
-          if (status === 'UNTRACKED') acc.untracked += 1;
+    return merchantItems.reduce(
+      (acc, item) => {
+        if (item.hasVariants && item.variants && item.variants.length > 0) {
+          item.variants.forEach((variant) => {
+            const status = variant.inventoryStatus ?? 'UNTRACKED';
+            if (status === 'IN_STOCK') acc.inStock += 1;
+            if (status === 'LOW_STOCK') acc.lowStock += 1;
+            if (status === 'OUT_OF_STOCK') acc.outOfStock += 1;
+            if (status === 'UNTRACKED') acc.untracked += 1;
+          });
+          return acc;
         }
+
+        const status = item.inventoryStatus ?? 'UNTRACKED';
+        if (status === 'IN_STOCK') acc.inStock += 1;
+        if (status === 'LOW_STOCK') acc.lowStock += 1;
+        if (status === 'OUT_OF_STOCK') acc.outOfStock += 1;
+        if (status === 'UNTRACKED') acc.untracked += 1;
         return acc;
       },
       { inStock: 0, lowStock: 0, outOfStock: 0, untracked: 0 },
     );
-  }, [collections]);
+  }, [merchantItems]);
+
+  const assignedMenuItemIds = useMemo(() => {
+    const assigned = new Set<number>();
+    for (const collection of allCollections) {
+      for (const item of collection.items ?? []) {
+        if (item.menuItemId) assigned.add(item.menuItemId);
+      }
+    }
+    return assigned;
+  }, [allCollections]);
+
+  const unassignedItems = useMemo(
+    () => merchantItems.filter((item) => !assignedMenuItemIds.has(item.id)),
+    [merchantItems, assignedMenuItemIds],
+  );
+
+  const assignableCollections = collections.length > 0 ? collections : allCollections;
+  const merchantItemsById = useMemo(
+    () =>
+      merchantItems.reduce<Record<number, (typeof merchantItems)[number]>>((acc, item) => {
+        acc[item.id] = item;
+        return acc;
+      }, {}),
+    [merchantItems],
+  );
+
+  const activeAssignCollectionId =
+    assignCollectionId && assignableCollections.some((c) => c.id === assignCollectionId)
+      ? assignCollectionId
+      : assignableCollections[0]?.id ?? null;
 
   // --- Handlers ---
   const handleTemplateClick = useCallback((template: MenuTemplate) => {
@@ -141,6 +188,29 @@ const MenuManagementPageV2: React.FC = () => {
     [deleteCollection]
   );
 
+  const handleAssignItemToCollection = useCallback(
+    async (menuItemId: number) => {
+      if (!activeAssignCollectionId) {
+        _toast({
+          title: 'Create a collection first',
+          description: 'You need at least one collection before assigning items.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      try {
+        await addItemsToCollection.mutateAsync({
+          collectionId: activeAssignCollectionId,
+          menuItems: [{ id: menuItemId }],
+        });
+      } catch {
+        // toast handled in mutation hook
+      }
+    },
+    [activeAssignCollectionId, addItemsToCollection, _toast],
+  );
+
   // --- Render ---
   return (
     <div className="min-h-screen">
@@ -182,8 +252,10 @@ const MenuManagementPageV2: React.FC = () => {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">Inventory Coverage</p>
-              <p className="mt-2 text-2xl font-bold text-neutral-900">{collections.length}</p>
-              <p className="mt-1 text-xs text-neutral-500">{inventoryStats.untracked} untracked items in these menus</p>
+              <p className="mt-2 text-2xl font-bold text-neutral-900">
+                {merchantItems.length === 0 ? '0/0' : `${merchantItems.length - unassignedItems.length}/${merchantItems.length}`}
+              </p>
+              <p className="mt-1 text-xs text-neutral-500">{unassignedItems.length} catalog items still unassigned</p>
             </div>
             <Boxes className="h-8 w-8 text-brand" />
           </div>
@@ -280,12 +352,81 @@ const MenuManagementPageV2: React.FC = () => {
                 <MenuListCard
                   key={col.id}
                   collection={col}
+                  merchantItemsById={merchantItemsById}
                   onEdit={handleEditCollection}
                   onDelete={handleDeleteCollection}
                 />
               ))}
             </div>
           )}
+
+          <div className="mt-6 space-y-3 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-neutral-400">
+                  Unassigned Items
+                </h3>
+                <p className="mt-1 text-xs text-neutral-500">
+                  Items created directly in catalog but not yet assigned to any menu collection.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-semibold text-neutral-600">
+                  {unassignedItems.length}
+                </span>
+                {assignableCollections.length > 0 && (
+                  <select
+                    value={activeAssignCollectionId ?? ''}
+                    onChange={(e) => setAssignCollectionId(Number(e.target.value))}
+                    className="rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-xs font-medium text-neutral-700"
+                  >
+                    {assignableCollections.map((collection) => (
+                      <option key={collection.id} value={collection.id}>
+                        {collection.name} ({collection.menuType})
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            </div>
+
+            {isLoadingMerchantMenu ? (
+              <div className="h-14 animate-pulse rounded-lg bg-neutral-100" />
+            ) : unassignedItems.length === 0 ? (
+              <p className="rounded-lg border border-dashed border-neutral-200 bg-neutral-50 px-3 py-4 text-center text-xs text-neutral-500">
+                No unassigned items in this tab.
+              </p>
+            ) : (
+              <div className="max-h-56 space-y-2 overflow-y-auto pr-1">
+                {unassignedItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between rounded-lg border border-neutral-200 px-3 py-2"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-neutral-800">{item.name}</p>
+                      <p className="text-xs text-neutral-500">
+                        ${item.price.toFixed(2)} {item.category ? `• ${item.category}` : ''}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleAssignItemToCollection(item.id)}
+                      disabled={addItemsToCollection.isPending || assignableCollections.length === 0}
+                      className={cn(
+                        'rounded-lg px-2.5 py-1.5 text-xs font-semibold',
+                        assignableCollections.length === 0
+                          ? 'cursor-not-allowed bg-neutral-100 text-neutral-400'
+                          : 'bg-brand/10 text-brand hover:bg-brand/20',
+                      )}
+                    >
+                      Assign
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

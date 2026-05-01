@@ -341,6 +341,7 @@ function MerchantSidebar({
   merchantDisplayName,
   merchantTagline,
   merchantInitials,
+  merchantLogoUrl,
   collapsed = false,
   onToggleCollapse,
 }: {
@@ -349,10 +350,12 @@ function MerchantSidebar({
   merchantDisplayName: string;
   merchantTagline: string;
   merchantInitials: string;
+  merchantLogoUrl?: string | null;
   collapsed?: boolean;
   onToggleCollapse?: () => void;
 }) {
   const activeSection = getActiveSection(pathname);
+  const [logoLoadFailed, setLogoLoadFailed] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(navSections.map((section) => [section.id, section.id === activeSection.id])),
   );
@@ -363,6 +366,10 @@ function MerchantSidebar({
       [activeSection.id]: true,
     }));
   }, [activeSection.id]);
+
+  useEffect(() => {
+    setLogoLoadFailed(false);
+  }, [merchantLogoUrl]);
 
   const toggleSection = (sectionId: string) => {
     setExpandedSections((current) => ({
@@ -377,9 +384,20 @@ function MerchantSidebar({
       <div className="flex h-full flex-col items-center">
         <div className="border-b border-neutral-200/80 px-2 py-5 w-full flex flex-col items-center gap-3">
           <Link to={PATHS.MERCHANT_DASHBOARD} onClick={onNavigate} title={merchantDisplayName}>
-            <span className="flex h-10 w-10 items-center justify-center rounded-[0.85rem] bg-[#111111] text-sm font-semibold text-white shadow-[0_8px_18px_rgba(17,17,17,0.18)]">
-              {merchantInitials}
-            </span>
+            {merchantLogoUrl && !logoLoadFailed ? (
+              <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-neutral-200 bg-white shadow-[0_8px_18px_rgba(17,17,17,0.18)]">
+                <img
+                  src={merchantLogoUrl}
+                  alt={merchantDisplayName}
+                  className="h-full w-full object-cover object-center"
+                  onError={() => setLogoLoadFailed(true)}
+                />
+              </span>
+            ) : (
+              <span className="flex h-10 w-10 items-center justify-center rounded-[0.85rem] bg-[#111111] text-sm font-semibold text-white shadow-[0_8px_18px_rgba(17,17,17,0.18)]">
+                {merchantInitials}
+              </span>
+            )}
           </Link>
           {onToggleCollapse ? (
             <button
@@ -440,9 +458,20 @@ function MerchantSidebar({
       <div className="border-b border-neutral-200/80 px-5 py-5">
         <div className="flex items-center justify-between gap-2">
           <Link to={PATHS.MERCHANT_DASHBOARD} onClick={onNavigate} className="inline-flex min-w-0 items-center gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] bg-[#111111] text-sm font-semibold text-white shadow-[0_8px_18px_rgba(17,17,17,0.18)]">
-              {merchantInitials}
-            </span>
+            {merchantLogoUrl && !logoLoadFailed ? (
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-neutral-200 bg-white shadow-[0_8px_18px_rgba(17,17,17,0.18)]">
+                <img
+                  src={merchantLogoUrl}
+                  alt={merchantDisplayName}
+                  className="h-full w-full object-cover object-center"
+                  onError={() => setLogoLoadFailed(true)}
+                />
+              </span>
+            ) : (
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] bg-[#111111] text-sm font-semibold text-white shadow-[0_8px_18px_rgba(17,17,17,0.18)]">
+                {merchantInitials}
+              </span>
+            )}
             <span className="min-w-0">
               <span className="block truncate text-[1.05rem] font-semibold tracking-tight text-neutral-950">{merchantDisplayName}</span>
               <span className="block truncate text-xs text-neutral-500">{merchantTagline}</span>
@@ -692,9 +721,12 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
 
   const activeSection = useMemo(() => getActiveSection(location.pathname), [location.pathname]);
   const merchantName = merchantData?.data?.merchant?.businessName?.trim() || user?.name?.trim() || 'Merchant Business';
+  const profileAvatarUrl = user?.avatarUrl || null;
+  const merchantLogoUrl = merchantData?.data?.merchant?.logoUrl || null;
   const merchantStatus = merchantData?.data?.merchant?.status;
   const merchantCity = merchantData?.data?.merchant?.city?.trim();
   const merchantInitials = getInitials(merchantName);
+  const [mobileLogoLoadFailed, setMobileLogoLoadFailed] = useState(false);
   const profileName = user?.name?.trim() || 'Merchant';
   const merchantTagline =
     merchantCity && merchantStatus
@@ -704,6 +736,10 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
         : merchantStatus
           ? `${merchantStatus.toLowerCase()} merchant workspace`
           : 'Refined control center';
+
+  useEffect(() => {
+    setMobileLogoLoadFailed(false);
+  }, [merchantLogoUrl]);
 
   return (
     <div className="min-h-screen bg-[#f5f5f7] text-neutral-900">
@@ -720,6 +756,7 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
               merchantDisplayName={merchantName}
               merchantTagline={merchantTagline}
               merchantInitials={merchantInitials}
+              merchantLogoUrl={merchantLogoUrl}
               collapsed={sidebarCollapsed}
               onToggleCollapse={toggleSidebarCollapsed}
             />
@@ -741,9 +778,20 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
                   </button>
 
                   <Link to={PATHS.MERCHANT_DASHBOARD} className="flex min-w-0 items-center gap-3 lg:hidden">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-[1rem] bg-neutral-950 text-sm font-semibold text-white">
-                      {merchantInitials}
-                    </span>
+                    {merchantLogoUrl && !mobileLogoLoadFailed ? (
+                      <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-neutral-200 bg-white">
+                        <img
+                          src={merchantLogoUrl}
+                          alt={merchantName}
+                          className="h-full w-full object-cover object-center"
+                          onError={() => setMobileLogoLoadFailed(true)}
+                        />
+                      </span>
+                    ) : (
+                      <span className="flex h-10 w-10 items-center justify-center rounded-[1rem] bg-neutral-950 text-sm font-semibold text-white">
+                        {merchantInitials}
+                      </span>
+                    )}
                     <div className="min-w-0">
                       <div className="max-w-[280px] truncate text-[15px] font-semibold tracking-tight text-neutral-950">{merchantName}</div>
                       <div className="max-w-[280px] truncate text-xs text-neutral-500">{merchantTagline}</div>
@@ -783,8 +831,16 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
                         className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-2.5 py-1.5 text-[13px] text-neutral-700 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-50"
                       >
                         <span className="hidden max-w-[120px] truncate font-medium sm:inline">{profileName}</span>
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#d9f99d] text-neutral-900">
-                          <UserCircle2 className="h-4 w-4" />
+                        <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-neutral-200 bg-white text-neutral-900">
+                          {profileAvatarUrl ? (
+                            <img
+                              src={profileAvatarUrl}
+                              alt={profileName}
+                              className="h-full w-full object-cover object-center"
+                            />
+                          ) : (
+                            <UserCircle2 className="h-4 w-4" />
+                          )}
                         </span>
                         <ChevronDown className="hidden h-4 w-4 text-neutral-400 sm:block" />
                       </button>
@@ -892,6 +948,7 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
                 merchantDisplayName={merchantName}
                 merchantTagline={merchantTagline}
                 merchantInitials={merchantInitials}
+                merchantLogoUrl={merchantLogoUrl}
               />
             </div>
           </div>

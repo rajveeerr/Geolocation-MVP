@@ -18,6 +18,7 @@ import { MerchantTableBookingDashboard } from '@/components/table-booking/Mercha
 import { BusinessTypeCard } from '@/components/merchant/BusinessTypeCard';
 import { CheckInFeed } from '@/components/merchant/CheckInFeed';
 import { useAiMerchantInsights } from '@/hooks/useAi';
+import { useAuth } from '@/context/useAuth';
 
 interface Deal {
   id: string;
@@ -195,7 +196,9 @@ export const MerchantDashboardPage = () => {
   const [activeTab, setActiveTab] = useState('overview');
 
   const { data: merchantData, isLoading: merchantLoading } = useMerchantStatus();
+  const { user } = useAuth();
   const merchantStatus = merchantData?.data?.merchant?.status;
+  const profileAvatarUrl = user?.avatarUrl || null;
 
   // Fetch dashboard stats for dynamic KPI cards
   const { data: dashboardStats, isLoading: statsLoading } = useMerchantDashboardStats({ 
@@ -332,6 +335,16 @@ export const MerchantDashboardPage = () => {
               <div className="mt-1 text-[13px] text-neutral-500">
                 {merchantStores.length} store{merchantStores.length === 1 ? '' : 's'} connected
               </div>
+              {profileAvatarUrl ? (
+                <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-2.5 py-1">
+                  <img
+                    src={profileAvatarUrl}
+                    alt={user?.name || 'Profile avatar'}
+                    className="h-6 w-6 rounded-full object-cover object-center"
+                  />
+                  <span className="text-[11px] font-medium text-neutral-600">Profile photo active</span>
+                </div>
+              ) : null}
             </div>
             <div className="rounded-[1.2rem] border border-neutral-200/80 bg-white/90 p-4 shadow-sm">
               <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Customer activity</div>

@@ -451,10 +451,12 @@ const ComingSoonOverlay = ({ feature }: { feature: string }) => (
 const MenuCardFigma = ({
   item,
   onClick,
+  onAddToOrder,
 }: {
   item: any;
   deal?: any;
   onClick?: () => void;
+  onAddToOrder?: () => void;
 }) => {
   const discountAmount = item.originalPrice - item.discountedPrice;
   const discountPercent = item.originalPrice > 0
@@ -562,12 +564,14 @@ const MenuCardFigma = ({
         {/* Action row */}
         <div className="flex items-center gap-2 mt-3">
           <button
-            disabled
-            onClick={(e) => e.stopPropagation()}
-            className="flex-1 flex items-center justify-between pl-3 pr-1 py-1 rounded-full bg-white cursor-not-allowed"
-            title="Online ordering coming soon"
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddToOrder?.();
+            }}
+            className="flex-1 flex items-center justify-between pl-3 pr-1 py-1 rounded-full bg-white hover:bg-neutral-100 transition-colors"
+            title="Add item to bulk order planner"
           >
-            <span className="text-[11px] font-semibold text-[#1a1a2e] whitespace-nowrap">Add to Basket</span>
+            <span className="text-[11px] font-semibold text-[#1a1a2e] whitespace-nowrap">Add to order</span>
             <span className="w-8 h-8 rounded-full bg-[#1a1a2e] flex items-center justify-center flex-shrink-0">
               <ShoppingCart className="h-3.5 w-3.5 text-white" />
             </span>
@@ -626,7 +630,7 @@ export const DealDetailPage = () => {
   const [showHoursDropdown, setShowHoursDropdown] = useState(false);
   const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
   const { toast } = useToast();
-  const { peopleCount, items, setPeopleCount, removeItem, clearCart } = useBulkOrderCart();
+  const { peopleCount, items, setPeopleCount, addItem, removeItem, clearCart } = useBulkOrderCart();
   const bulkQuote = useBulkQuote();
   const createBulkOrder = useCreateBulkOrder();
 
@@ -823,6 +827,30 @@ export const DealDetailPage = () => {
       : String(deal.category || '');
   const merchantCartItems = items.filter((item) => item.merchantId === deal.merchant.id);
   const merchantCartSubtotal = merchantCartItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+
+  const handleAddCardItemToBulkOrder = (menuItem: any) => {
+    const unitPrice = Number(menuItem.discountedPrice ?? menuItem.originalPrice ?? 0);
+    if (!Number.isFinite(unitPrice) || unitPrice <= 0) {
+      toast({
+        title: 'Cannot add item',
+        description: 'This menu item has invalid pricing.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    addItem({
+      menuItemId: Number(menuItem.id),
+      merchantId: Number(deal.merchant.id),
+      name: menuItem.name,
+      unitPrice,
+      quantity: 1,
+    });
+    toast({
+      title: 'Added to bulk order',
+      description: `${menuItem.name} added to planner.`,
+    });
+  };
 
   const handlePlaceBulkOrder = async () => {
     if (merchantCartItems.length === 0) {
@@ -1414,9 +1442,10 @@ export const DealDetailPage = () => {
                     <Button
                       size="sm"
                       onClick={handlePlaceBulkOrder}
-                      disabled={merchantCartItems.length === 0 || bulkQuote.isPending || createBulkOrder.isPending}
+                      disabled={true}
+                      title="Payments are not enabled yet"
                     >
-                      {createBulkOrder.isPending ? 'Placing order...' : 'Place bulk order'}
+                      Order Now
                     </Button>
                   </div>
                 </section>
@@ -1460,6 +1489,7 @@ export const DealDetailPage = () => {
                                 item={item}
                                 deal={deal}
                                 onClick={() => navigate(`/deals/${dealId}/menu/${item.id}`)}
+                                onAddToOrder={() => handleAddCardItemToBulkOrder(item)}
                               />
                             ))}
                           </div>

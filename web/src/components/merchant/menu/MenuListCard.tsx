@@ -5,6 +5,7 @@ import type { MenuCollection } from '@/hooks/useMenuCollections';
 
 interface MenuListCardProps {
   collection: MenuCollection;
+  merchantItemsById?: Record<number, MenuCollection['items'][number]['menuItem'] | undefined>;
   onEdit: (collection: MenuCollection) => void;
   onDelete: (collection: MenuCollection) => void;
   className?: string;
@@ -21,7 +22,10 @@ function formatTime(time: string): string {
   return m > 0 ? `${h}:${mStr} ${suffix}` : `${h} ${suffix}`;
 }
 
-function getInventoryTone(status?: string) {
+function getInventoryTone(status?: string, hasVariants?: boolean) {
+  if (hasVariants) {
+    return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+  }
   switch (status) {
     case 'OUT_OF_STOCK':
       return 'bg-red-100 text-red-700 border-red-200';
@@ -34,7 +38,8 @@ function getInventoryTone(status?: string) {
   }
 }
 
-function getInventoryLabel(status?: string, quantity?: number | null) {
+function getInventoryLabel(status?: string, quantity?: number | null, hasVariants?: boolean) {
+  if (hasVariants) return 'Per variant';
   if (status === 'OUT_OF_STOCK') return 'Out';
   if (status === 'LOW_STOCK') return quantity != null ? `Low ${quantity}` : 'Low';
   if (status === 'IN_STOCK') return quantity != null ? `${quantity} in stock` : 'In stock';
@@ -43,6 +48,7 @@ function getInventoryLabel(status?: string, quantity?: number | null) {
 
 export const MenuListCard: React.FC<MenuListCardProps> = ({
   collection,
+  merchantItemsById = {},
   onEdit,
   onDelete,
   className,
@@ -142,31 +148,38 @@ export const MenuListCard: React.FC<MenuListCardProps> = ({
             </p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            {visibleItems.map((item, idx) => (
-              <div
-                key={item.menuItemId || idx}
-                className={cn(
-                  "inline-flex items-center gap-2 rounded-lg px-2.5 py-1 text-xs font-semibold",
-                  "bg-neutral-50 border border-neutral-100 text-neutral-600 shadow-xs"
-                )}
-              >
-                <span>{item.menuItem?.name || 'Unnamed'}</span>
-                {item.menuItem?.hasVariants && item.menuItem?.variants && item.menuItem.variants.length > 0 && (
-                  <span className="inline-flex items-center gap-0.5 rounded-full bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 text-[10px] font-bold text-indigo-600">
-                    <Layers className="h-2.5 w-2.5" />
-                    {item.menuItem.variants.length}
-                  </span>
-                )}
-                <span
+            {visibleItems.map((item, idx) => {
+              const canonicalMenuItem = merchantItemsById[item.menuItemId] ?? item.menuItem;
+              return (
+                <div
+                  key={item.menuItemId || idx}
                   className={cn(
-                    'rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide',
-                    getInventoryTone(item.menuItem?.inventoryStatus)
+                    "inline-flex items-center gap-2 rounded-lg px-2.5 py-1 text-xs font-semibold",
+                    "bg-neutral-50 border border-neutral-100 text-neutral-600 shadow-xs"
                   )}
                 >
-                  {getInventoryLabel(item.menuItem?.inventoryStatus, item.menuItem?.inventoryQuantity)}
-                </span>
-              </div>
-            ))}
+                  <span>{canonicalMenuItem?.name || 'Unnamed'}</span>
+                  {canonicalMenuItem?.hasVariants && canonicalMenuItem?.variants && canonicalMenuItem.variants.length > 0 && (
+                    <span className="inline-flex items-center gap-0.5 rounded-full bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 text-[10px] font-bold text-indigo-600">
+                      <Layers className="h-2.5 w-2.5" />
+                      {canonicalMenuItem.variants.length}
+                    </span>
+                  )}
+                  <span
+                    className={cn(
+                      'rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide',
+                      getInventoryTone(canonicalMenuItem?.inventoryStatus, canonicalMenuItem?.hasVariants)
+                    )}
+                  >
+                    {getInventoryLabel(
+                      canonicalMenuItem?.inventoryStatus,
+                      canonicalMenuItem?.inventoryQuantity,
+                      canonicalMenuItem?.hasVariants
+                    )}
+                  </span>
+                </div>
+              );
+            })}
           </div>
           {hasMoreItems ? (
             <button

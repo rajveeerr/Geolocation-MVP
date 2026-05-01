@@ -27,6 +27,7 @@ export interface AuthContextType {
   isSigningUp: boolean;
   logout: () => void;
   handleSocialToken: (token: string) => Promise<void>;
+  refetchUser: () => Promise<unknown>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(

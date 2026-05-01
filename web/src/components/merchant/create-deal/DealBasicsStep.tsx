@@ -166,10 +166,12 @@ export const DealBasicsStep = () => {
               <div className="mt-2 text-base font-semibold text-[#203247]">Offer basics</div>
               <div className="mt-1 text-sm leading-6 text-[#6f7d8f]">Name it well, classify it cleanly, and explain why it matters.</div>
             </div>
-            <div className="rounded-[1.5rem] border border-white/80 bg-[#203247] p-4 shadow-[0_14px_38px_rgba(32,50,71,0.20)]">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/55">Momentum</div>
+            <div className="rounded-[1.5rem] border border-white/70 bg-[#13273f] p-4 shadow-[0_14px_38px_rgba(19,39,63,0.30)]">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/75">Momentum</div>
               <div className="mt-2 text-base font-semibold text-white">Strong titles convert better</div>
-              <div className="mt-1 text-sm leading-6 text-white/72">Use a clear offer and concrete value so customers instantly know what they get.</div>
+              <div className="mt-1 text-sm leading-6 text-white/95">
+                Use a clear offer and concrete value so customers instantly know what they get.
+              </div>
             </div>
           </div>
         </motion.div>

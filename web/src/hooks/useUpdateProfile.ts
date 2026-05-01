@@ -35,6 +35,7 @@ export const useUpdateProfile = () => {
       return response.data;
     },
     onSuccess: (data) => {
+      queryClient.setQueryData(['user'], data.user);
       queryClient.invalidateQueries({ queryKey: ['userProfile'] });
       refetchUser(); // Re-fetch user data to update context
       toast.success(data.message || 'Profile updated successfully!');
@@ -58,6 +59,7 @@ export const useUpdateAvatar = () => {
       return response.data;
     },
     onSuccess: (data) => {
+      queryClient.setQueryData(['user'], data.user);
       queryClient.invalidateQueries({ queryKey: ['userProfile'] });
       refetchUser(); // Re-fetch user data to update context
       toast.success(data.message || 'Avatar updated successfully!');

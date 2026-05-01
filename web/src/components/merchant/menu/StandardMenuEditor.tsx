@@ -41,6 +41,13 @@ export interface MenuEditorItem {
   description: string;
   category: string;
   imageUrls: string[];
+  inventoryTrackingEnabled: boolean;
+  inventoryQuantity: number | null;
+  lowStockThreshold: number | null;
+  allowBackorder: boolean;
+  isBulkOrderEnabled: boolean;
+  defaultPeopleCount: number | null;
+  minPeopleCount: number | null;
 }
 
 interface StandardMenuEditorProps {
@@ -70,6 +77,13 @@ const emptyRow = (): MenuEditorItem => ({
   description: '',
   category: '',
   imageUrls: [],
+  inventoryTrackingEnabled: true,
+  inventoryQuantity: 0,
+  lowStockThreshold: 5,
+  allowBackorder: false,
+  isBulkOrderEnabled: false,
+  defaultPeopleCount: null,
+  minPeopleCount: null,
 });
 
 const MENU_CATEGORIES = ['Entree', 'Side', 'Drink', 'Dessert', 'Kids'];
@@ -125,6 +139,13 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
             description: ci.menuItem.description || '',
             category: ci.menuItem.category || '',
             imageUrls: ci.menuItem.imageUrls || [],
+            inventoryTrackingEnabled: ci.menuItem.inventoryTrackingEnabled ?? true,
+            inventoryQuantity: ci.menuItem.inventoryQuantity ?? 0,
+            lowStockThreshold: ci.menuItem.lowStockThreshold ?? 5,
+            allowBackorder: ci.menuItem.allowBackorder ?? false,
+            isBulkOrderEnabled: ci.menuItem.isBulkOrderEnabled ?? false,
+            defaultPeopleCount: ci.menuItem.defaultPeopleCount ?? null,
+            minPeopleCount: ci.menuItem.minPeopleCount ?? null,
           }))
         );
       } else {
@@ -202,6 +223,13 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
           description: i.description.trim() || undefined,
           category: i.category.trim() || undefined,
           imageUrls: i.imageUrls,
+          inventoryTrackingEnabled: i.inventoryTrackingEnabled,
+          inventoryQuantity: i.inventoryTrackingEnabled ? (i.inventoryQuantity ?? 0) : null,
+          lowStockThreshold: i.inventoryTrackingEnabled ? (i.lowStockThreshold ?? 0) : null,
+          allowBackorder: i.inventoryTrackingEnabled ? i.allowBackorder : false,
+          isBulkOrderEnabled: i.isBulkOrderEnabled,
+          defaultPeopleCount: i.isBulkOrderEnabled ? i.defaultPeopleCount : null,
+          minPeopleCount: i.isBulkOrderEnabled ? i.minPeopleCount : null,
         }));
 
         await bulkUpdate.mutateAsync({
@@ -228,6 +256,13 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
           description: i.description.trim() || undefined,
           category: i.category.trim() || undefined,
           imageUrls: i.imageUrls,
+          inventoryTrackingEnabled: i.inventoryTrackingEnabled,
+          inventoryQuantity: i.inventoryTrackingEnabled ? (i.inventoryQuantity ?? 0) : null,
+          lowStockThreshold: i.inventoryTrackingEnabled ? (i.lowStockThreshold ?? 0) : null,
+          allowBackorder: i.inventoryTrackingEnabled ? i.allowBackorder : false,
+          isBulkOrderEnabled: i.isBulkOrderEnabled,
+          defaultPeopleCount: i.isBulkOrderEnabled ? i.defaultPeopleCount : null,
+          minPeopleCount: i.isBulkOrderEnabled ? i.minPeopleCount : null,
         }));
 
         await bulkUpdate.mutateAsync({
@@ -458,6 +493,194 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                              />
                            </div>
                          </div>
+                      </div>
+                      <div className="mt-1 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+                            Track inventory
+                          </label>
+                          <input
+                            type="checkbox"
+                            checked={item.inventoryTrackingEnabled}
+                            onChange={(e) =>
+                              setItems((prev) =>
+                                prev.map((row) =>
+                                  row.tempId === item.tempId
+                                    ? {
+                                        ...row,
+                                        inventoryTrackingEnabled: e.target.checked,
+                                        inventoryQuantity: e.target.checked
+                                          ? (row.inventoryQuantity ?? 0)
+                                          : null,
+                                        lowStockThreshold: e.target.checked
+                                          ? (row.lowStockThreshold ?? 5)
+                                          : null,
+                                        allowBackorder: e.target.checked ? row.allowBackorder : false,
+                                      }
+                                    : row
+                                )
+                              )
+                            }
+                            className="h-4 w-4 rounded border-neutral-300 text-brand focus:ring-brand"
+                          />
+                        </div>
+                        {item.inventoryTrackingEnabled ? (
+                          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                            <div>
+                              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+                                In stock
+                              </label>
+                              <Input
+                                type="number"
+                                min="0"
+                                step="1"
+                                value={item.inventoryQuantity ?? 0}
+                                onChange={(e) =>
+                                  setItems((prev) =>
+                                    prev.map((row) =>
+                                      row.tempId === item.tempId
+                                        ? {
+                                            ...row,
+                                            inventoryQuantity: Math.max(0, Number(e.target.value || 0)),
+                                          }
+                                        : row
+                                    )
+                                  )
+                                }
+                                className="h-9 text-sm bg-white border-neutral-200"
+                              />
+                            </div>
+                            <div>
+                              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+                                Low stock at
+                              </label>
+                              <Input
+                                type="number"
+                                min="0"
+                                step="1"
+                                value={item.lowStockThreshold ?? 0}
+                                onChange={(e) =>
+                                  setItems((prev) =>
+                                    prev.map((row) =>
+                                      row.tempId === item.tempId
+                                        ? {
+                                            ...row,
+                                            lowStockThreshold: Math.max(0, Number(e.target.value || 0)),
+                                          }
+                                        : row
+                                    )
+                                  )
+                                }
+                                className="h-9 text-sm bg-white border-neutral-200"
+                              />
+                            </div>
+                            <label className="flex items-center gap-2 text-xs font-medium text-neutral-600 sm:pt-6">
+                              <input
+                                type="checkbox"
+                                checked={item.allowBackorder}
+                                onChange={(e) =>
+                                  setItems((prev) =>
+                                    prev.map((row) =>
+                                      row.tempId === item.tempId
+                                        ? { ...row, allowBackorder: e.target.checked }
+                                        : row
+                                    )
+                                  )
+                                }
+                                className="h-4 w-4 rounded border-neutral-300 text-brand focus:ring-brand"
+                              />
+                              Allow backorders
+                            </label>
+                          </div>
+                        ) : (
+                          <p className="mt-2 text-xs text-neutral-500">
+                            Inventory is untracked for this item.
+                          </p>
+                        )}
+                      </div>
+                      <div className="mt-1 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+                            Bulk ordering
+                          </label>
+                          <input
+                            type="checkbox"
+                            checked={item.isBulkOrderEnabled}
+                            onChange={(e) =>
+                              setItems((prev) =>
+                                prev.map((row) =>
+                                  row.tempId === item.tempId
+                                    ? {
+                                        ...row,
+                                        isBulkOrderEnabled: e.target.checked,
+                                        defaultPeopleCount: e.target.checked
+                                          ? (row.defaultPeopleCount ?? 10)
+                                          : null,
+                                        minPeopleCount: e.target.checked ? (row.minPeopleCount ?? 1) : null,
+                                      }
+                                    : row
+                                )
+                              )
+                            }
+                            className="h-4 w-4 rounded border-neutral-300 text-brand focus:ring-brand"
+                          />
+                        </div>
+                        {item.isBulkOrderEnabled ? (
+                          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div>
+                              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+                                Default people count
+                              </label>
+                              <Input
+                                type="number"
+                                min="1"
+                                step="1"
+                                value={item.defaultPeopleCount ?? 10}
+                                onChange={(e) =>
+                                  setItems((prev) =>
+                                    prev.map((row) =>
+                                      row.tempId === item.tempId
+                                        ? {
+                                            ...row,
+                                            defaultPeopleCount: Math.max(1, Number(e.target.value || 1)),
+                                          }
+                                        : row
+                                    )
+                                  )
+                                }
+                                className="h-9 text-sm bg-white border-neutral-200"
+                              />
+                            </div>
+                            <div>
+                              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+                                Minimum people count
+                              </label>
+                              <Input
+                                type="number"
+                                min="1"
+                                step="1"
+                                value={item.minPeopleCount ?? 1}
+                                onChange={(e) =>
+                                  setItems((prev) =>
+                                    prev.map((row) =>
+                                      row.tempId === item.tempId
+                                        ? {
+                                            ...row,
+                                            minPeopleCount: Math.max(1, Number(e.target.value || 1)),
+                                          }
+                                        : row
+                                    )
+                                  )
+                                }
+                                className="h-9 text-sm bg-white border-neutral-200"
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="mt-2 text-xs text-neutral-500">
+                            Item uses regular single-serving ordering.
+                          </p>
+                        )}
                       </div>
                     </div>
 

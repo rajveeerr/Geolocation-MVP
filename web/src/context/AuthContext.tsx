@@ -54,6 +54,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     },
   });
 
+  const refetchUser = () => queryClient.invalidateQueries({ queryKey: ['user'] });
+
   const { mutateAsync: login, isPending: isLoggingIn } = useMutation({
     mutationFn: (credentials: LoginFormValues) =>
       apiPost<{ token: string }, LoginFormValues>('/auth/login', credentials),
@@ -136,6 +138,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isSigningUp,
     logout,
     handleSocialToken,
+    refetchUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
