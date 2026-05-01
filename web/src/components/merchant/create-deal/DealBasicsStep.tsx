@@ -142,40 +142,6 @@ export const DealBasicsStep = () => {
       progress={25}
     >
       <div className="space-y-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]"
-        >
-          <div className="rounded-[1.9rem] border border-[#f0ddd0] bg-[linear-gradient(135deg,#fff8f2_0%,#fff1e5_52%,#fde7df_100%)] p-6 shadow-[0_22px_60px_rgba(82,58,40,0.10)]">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/75 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#bf6545]">
-              <Sparkles className="h-3.5 w-3.5" />
-              Deal Identity
-            </div>
-            <h2 className="mt-4 font-serif text-[1.9rem] font-semibold tracking-tight text-[#203247]">
-              Build a deal that feels polished before anyone sees the price.
-            </h2>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-[#607084]">
-              Start with the headline, category, and story. This is the part customers notice first, so the form now leads with clarity instead of a plain input stack.
-            </p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-            <div className="rounded-[1.5rem] border border-white/80 bg-white/82 p-4 shadow-[0_14px_38px_rgba(82,58,40,0.06)]">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#95a1af]">This Step</div>
-              <div className="mt-2 text-base font-semibold text-[#203247]">Offer basics</div>
-              <div className="mt-1 text-sm leading-6 text-[#6f7d8f]">Name it well, classify it cleanly, and explain why it matters.</div>
-            </div>
-            <div className="rounded-[1.5rem] border border-white/70 bg-[#13273f] p-4 shadow-[0_14px_38px_rgba(19,39,63,0.30)]">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/75">Momentum</div>
-              <div className="mt-2 text-base font-semibold text-white">Strong titles convert better</div>
-              <div className="mt-1 text-sm leading-6 text-white/95">
-                Use a clear offer and concrete value so customers instantly know what they get.
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
         {/* Deal Title Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

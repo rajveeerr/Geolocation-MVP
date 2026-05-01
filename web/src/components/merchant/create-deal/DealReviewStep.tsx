@@ -910,12 +910,12 @@ export const DealReviewStep = () => {
             </div>
           )}
           
-          {/* Menu Collection Info */}
+          {/* Package Info */}
           {state.useMenuCollection && state.menuCollectionId && (
             <div className="rounded-lg border bg-white p-4">
-              <h3 className="mb-2 font-semibold text-neutral-900">Menu Collection</h3>
+              <h3 className="mb-2 font-semibold text-neutral-900">Package</h3>
               <p className="text-sm text-neutral-600">
-                Using menu collection (ID: {state.menuCollectionId})
+                Using package (ID: {state.menuCollectionId})
               </p>
             </div>
           )}
@@ -1190,7 +1190,7 @@ export const DealReviewStep = () => {
                           <p className="text-neutral-600">• Selected items for tap-ins: {state.hiddenDealVisibility.tapInMenuItems.length} items</p>
                         )}
                         {state.hiddenDealVisibility.tapInMenuCollectionId && (
-                          <p className="text-neutral-600">• Using menu collection for tap-ins</p>
+                          <p className="text-neutral-600">• Using package for tap-ins</p>
                         )}
                       </div>
                     )}

@@ -1499,7 +1499,7 @@ export const DealDetailPage = () => {
                   </>
                 ) : (
                   <div className="text-center py-16 text-neutral-400 text-sm">
-                    No menu collections available for this deal.
+                    No packages available for this deal.
                   </div>
                 )}
               </div>

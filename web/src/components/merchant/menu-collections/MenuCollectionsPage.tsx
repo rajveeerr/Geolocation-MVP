@@ -923,11 +923,11 @@ export const MenuCollectionsPage = () => {
       {/* Header */}
       <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Menu Collections</h1>
-          <p className="text-sm text-neutral-600">Create, edit, and reuse item collections for faster deal creation.</p>
+          <h1 className="text-2xl font-bold text-neutral-900">Packages</h1>
+          <p className="text-sm text-neutral-600">Create, edit, and reuse packages for faster deal creation.</p>
         </div>
         <Button onClick={() => setIsCreateOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" /> New Collection
+          <Plus className="mr-2 h-4 w-4" /> New Package
         </Button>
       </div>
 
@@ -938,7 +938,7 @@ export const MenuCollectionsPage = () => {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search collections..."
+            placeholder="Search packages..."
             className="pl-10"
           />
         </div>
@@ -947,15 +947,15 @@ export const MenuCollectionsPage = () => {
       {/* Content */}
       {isLoading ? (
         <div className="flex items-center justify-center py-24 text-neutral-600">
-          <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading collections...
+          <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading packages...
         </div>
       ) : error ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">Failed to load collections.</div>
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">Failed to load packages.</div>
       ) : filtered.length === 0 ? (
         <div className="rounded-lg border-2 border-dashed border-neutral-200 p-10 text-center">
           <Package className="mx-auto mb-3 h-10 w-10 text-neutral-400" />
-          <h3 className="mb-1 text-lg font-semibold text-neutral-900">No collections found</h3>
-          <p className="mb-4 text-neutral-600">Create your first collection to get started.</p>
+          <h3 className="mb-1 text-lg font-semibold text-neutral-900">No packages found</h3>
+          <p className="mb-4 text-neutral-600">Create your first package to get started.</p>
           <Button onClick={() => setIsCreateOpen(true)}>
             <Plus className="mr-2 h-4 w-4" /> Create Collection
           </Button>

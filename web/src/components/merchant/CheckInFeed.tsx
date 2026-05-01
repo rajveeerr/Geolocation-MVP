@@ -122,6 +122,14 @@ export const CheckInFeed: React.FC<CheckInFeedProps> = ({
     }
   };
 
+  const getInitials = (name: string) =>
+    name
+      .split(' ')
+      .map((part) => part[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase();
+
   const toggleCheckInExpanded = (checkInId: number) => {
     setExpandedCheckInIds((prev) => {
       const next = new Set(prev);
@@ -197,6 +205,7 @@ export const CheckInFeed: React.FC<CheckInFeedProps> = ({
       <div className="space-y-3">
         {data.checkIns.map((checkIn) => {
           const isCheckInExpanded = expandedCheckInIds.has(checkIn.id);
+          const avatarSrc = checkIn.user.avatarUrl || checkIn.user.profilePicture || '';
 
           return (
             <div
@@ -209,9 +218,9 @@ export const CheckInFeed: React.FC<CheckInFeedProps> = ({
                 className="flex w-full items-center gap-3 text-left"
               >
                 <div className="shrink-0">
-                  {checkIn.user.avatarUrl || checkIn.user.profilePicture ? (
+                  {avatarSrc ? (
                     <img
-                      src={checkIn.user.avatarUrl || checkIn.user.profilePicture || ''}
+                      src={avatarSrc}
                       alt={checkIn.user.name}
                       className="h-10 w-10 rounded-[0.8rem] object-cover"
                     />
@@ -270,21 +279,87 @@ export const CheckInFeed: React.FC<CheckInFeedProps> = ({
               </button>
 
               {isCheckInExpanded ? (
-                <div className="mt-3 grid gap-2 rounded-[0.8rem] border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-600 sm:grid-cols-2">
-                  <p><span className="font-semibold text-neutral-800">Check-in ID:</span> {checkIn.id}</p>
-                  <p><span className="font-semibold text-neutral-800">User ID:</span> {checkIn.userId}</p>
-                  <p><span className="font-semibold text-neutral-800">Deal ID:</span> {checkIn.deal.id}</p>
-                  <p><span className="font-semibold text-neutral-800">Category:</span> {checkIn.deal.category}</p>
-                  <p><span className="font-semibold text-neutral-800">User Email:</span> {checkIn.user.email || '-'}</p>
-                  <p><span className="font-semibold text-neutral-800">Points:</span> {checkIn.user.points}</p>
-                  <p><span className="font-semibold text-neutral-800">Distance:</span> {Math.round(checkIn.location.distanceMeters)} meters</p>
-                  <p><span className="font-semibold text-neutral-800">Checked In At:</span> {formatExactTime(checkIn.checkedInAt)}</p>
-                  <p><span className="font-semibold text-neutral-800">Latitude:</span> {checkIn.location.latitude}</p>
-                  <p><span className="font-semibold text-neutral-800">Longitude:</span> {checkIn.location.longitude}</p>
+                <div className="mt-3 rounded-[0.9rem] border border-neutral-200 bg-neutral-50 p-3">
+                  <div className="grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
+                    <div className="rounded-[0.8rem] border border-neutral-200 bg-white p-3">
+                      <div className="mb-3 flex items-center gap-3">
+                        {avatarSrc ? (
+                          <img
+                            src={avatarSrc}
+                            alt={checkIn.user.name}
+                            className="h-12 w-12 rounded-full object-cover ring-2 ring-neutral-100"
+                          />
+                        ) : (
+                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary-100 text-xs font-bold text-brand-primary-700">
+                            {getInitials(checkIn.user.name || 'Guest')}
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-neutral-900">
+                            {checkIn.user.name || 'Anonymous User'}
+                          </p>
+                          <p className="truncate text-xs text-neutral-500">
+                            {checkIn.user.email || 'No email available'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="grid gap-2 text-xs text-neutral-600 sm:grid-cols-2">
+                        <p>
+                          <span className="font-semibold text-neutral-800">Customer ID:</span>{' '}
+                          {checkIn.userId}
+                        </p>
+                        <p>
+                          <span className="font-semibold text-neutral-800">Points:</span>{' '}
+                          {checkIn.user.points.toLocaleString()}
+                        </p>
+                        <p>
+                          <span className="font-semibold text-neutral-800">Distance:</span>{' '}
+                          {Math.round(checkIn.location.distanceMeters)} meters
+                        </p>
+                        <p>
+                          <span className="font-semibold text-neutral-800">Checked in:</span>{' '}
+                          {formatExactTime(checkIn.checkedInAt)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="rounded-[0.8rem] border border-neutral-200 bg-white p-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-400">
+                        Check-in Context
+                      </p>
+                      <div className="mt-3 space-y-2 text-xs text-neutral-600">
+                        <p>
+                          <span className="font-semibold text-neutral-800">Deal:</span>{' '}
+                          {checkIn.deal.title}
+                        </p>
+                        <p>
+                          <span className="font-semibold text-neutral-800">Category:</span>{' '}
+                          {checkIn.deal.category}
+                        </p>
+                        <p>
+                          <span className="font-semibold text-neutral-800">Deal ID:</span>{' '}
+                          {checkIn.deal.id}
+                        </p>
+                        <p>
+                          <span className="font-semibold text-neutral-800">Check-in ID:</span>{' '}
+                          {checkIn.id}
+                        </p>
+                        <p>
+                          <span className="font-semibold text-neutral-800">Coordinates:</span>{' '}
+                          {checkIn.location.latitude}, {checkIn.location.longitude}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   {checkIn.deal.description ? (
-                    <p className="sm:col-span-2">
-                      <span className="font-semibold text-neutral-800">Deal Description:</span> {checkIn.deal.description}
-                    </p>
+                    <div className="mt-3 rounded-[0.8rem] border border-neutral-200 bg-white p-3 text-xs text-neutral-600">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-400">
+                        Deal Description
+                      </p>
+                      <p className="mt-2 leading-5">{checkIn.deal.description}</p>
+                    </div>
                   ) : null}
                 </div>
               ) : null}

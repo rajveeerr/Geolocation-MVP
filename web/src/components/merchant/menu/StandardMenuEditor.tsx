@@ -184,6 +184,13 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
       description: p.description || '',
       category: p.category || '',
       imageUrls: [],
+      inventoryTrackingEnabled: true,
+      inventoryQuantity: 0,
+      lowStockThreshold: 5,
+      allowBackorder: false,
+      isBulkOrderEnabled: false,
+      defaultPeopleCount: null,
+      minPeopleCount: null,
     }));
     setItems((prev) => {
       // Replace empty rows, append to non-empty

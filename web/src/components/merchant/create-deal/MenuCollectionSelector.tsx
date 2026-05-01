@@ -101,15 +101,15 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <label className="text-sm font-semibold text-neutral-900">Menu Collection</label>
+          <label className="text-sm font-semibold text-neutral-900">Package</label>
           <p className="text-xs text-neutral-600 mt-0.5">
-            Select a saved collection to add all its items to this deal
+            Select a saved package to add all its items to this deal
           </p>
         </div>
         <Link to={PATHS.MERCHANT_MENU_COLLECTIONS || '/merchant/menu/collections'}>
           <Button variant="secondary" size="sm">
             <Plus className="mr-2 h-4 w-4" />
-            New Collection
+            New Package
           </Button>
         </Link>
       </div>
@@ -183,12 +183,12 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
                 </div>
                 <div>
                   <div className="font-medium text-neutral-900">
-                    {collections.length === 0 ? 'No collections available' : 'Select a collection'}
+                    {collections.length === 0 ? 'No packages available' : 'Select a package'}
                   </div>
                   <div className="text-xs text-neutral-600 mt-0.5">
                     {collections.length === 0 
-                      ? 'Create a collection first to use it here'
-                      : `${collections.length} collection${collections.length !== 1 ? 's' : ''} available`
+                      ? 'Create a package first to use it here'
+                      : `${collections.length} package${collections.length !== 1 ? 's' : ''} available`
                     }
                   </div>
                 </div>
@@ -217,7 +217,7 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
                     <Input
-                      placeholder="Search collections..."
+                      placeholder="Search packages..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-10 h-9"
@@ -232,7 +232,7 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
                     <div className="p-6 text-center">
                       <FolderOpen className="mx-auto h-8 w-8 text-neutral-400 mb-2" />
                       <p className="text-sm text-neutral-600">
-                        {searchTerm ? 'No collections match your search' : 'No collections found'}
+                        {searchTerm ? 'No packages match your search' : 'No packages found'}
                       </p>
                     </div>
                   ) : (
@@ -302,7 +302,7 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
                       className="flex items-center justify-center gap-2 text-sm font-medium text-brand-primary-600 hover:text-brand-primary-700"
                     >
                       <Plus className="h-4 w-4" />
-                      Create New Collection
+                      Create New Package
                     </Link>
                   </div>
                 )}
@@ -316,14 +316,14 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
       {!isOpen && collections.length === 0 && (
         <div className="rounded-lg border-2 border-dashed border-neutral-300 bg-neutral-50 p-6 text-center">
           <Package className="mx-auto h-10 w-10 text-neutral-400 mb-3" />
-          <h4 className="font-semibold text-neutral-900 mb-1">No Collections Yet</h4>
+          <h4 className="font-semibold text-neutral-900 mb-1">No Packages Yet</h4>
           <p className="text-sm text-neutral-600 mb-4">
-            Create a menu collection to quickly add multiple items to your deals
+            Create a package to quickly add multiple items to your deals
           </p>
           <Link to={PATHS.MERCHANT_MENU_COLLECTIONS || '/merchant/menu/collections'}>
             <Button size="sm">
               <Plus className="mr-2 h-4 w-4" />
-              Create Your First Collection
+              Create Your First Package
             </Button>
           </Link>
         </div>

@@ -105,7 +105,7 @@ const navSections: MerchantNavSection[] = [
         match: (pathname) => pathname === PATHS.MERCHANT_MENU_CREATE,
       },
       {
-        label: 'Collections',
+        label: 'Packages',
         to: PATHS.MERCHANT_MENU_COLLECTIONS,
         icon: UtensilsCrossed,
         match: (pathname) => pathname.startsWith(PATHS.MERCHANT_MENU_COLLECTIONS),

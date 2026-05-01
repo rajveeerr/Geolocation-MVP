@@ -540,11 +540,11 @@ export const DealMenuStep = () => {
                   "font-semibold",
                   useCollection ? "text-brand-primary-900" : "text-neutral-700"
                 )}>
-                  Use Collection
+                  Use Package
                 </span>
               </div>
               <p className="text-xs text-neutral-600">
-                Select from saved menu collections
+                Select from saved packages
               </p>
             </button>
           </div>
@@ -589,10 +589,10 @@ export const DealMenuStep = () => {
                   <Package className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
                     <h4 className="text-sm font-semibold text-amber-900 mb-1">
-                      Select a Collection
+                      Select a Package
                     </h4>
                     <p className="text-sm text-amber-700">
-                      Choose a menu collection above to add all its items to this deal. You can create new collections from the menu management page.
+                      Choose a package above to add all its items to this deal. You can create new packages from the menu management page.
                     </p>
                   </div>
                 </div>
