@@ -1,17 +1,32 @@
 import { useState, useEffect } from 'react';
 import { useMenuCollections, useCreateMenuCollection, useDeleteMenuCollection, useUpdateMenuCollection, useAddItemsToCollection, useRemoveItemFromCollection, useMenuCollection, type MenuCollection } from '@/hooks/useMenuCollections';
-import { useMerchantMenu, type MenuItem } from '@/hooks/useMerchantMenu';
+import { useMerchantMenu } from '@/hooks/useMerchantMenu';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/ui/input';
+import { ImageUploadModal } from '@/components/common/ImageUploadModal';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Package, Pencil, Trash2, X, Loader2, Check, Utensils, Image as ImageIcon, Eye, DollarSign } from 'lucide-react';
+import { Plus, Search, Package, Pencil, Trash2, X, Loader2, Check, Utensils, Image as ImageIcon, Upload, Users, DollarSign, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  formatServesLabel,
+  getCollectionCoverImage,
+  getCollectionEffectiveItemPrice,
+  getCollectionSuggestedSubtotal,
+} from '@/lib/menuCollectionPackages';
 
 interface CollectionFormProps {
   open: boolean;
   onClose: () => void;
   initial?: Partial<MenuCollection>;
-  onSubmit: (data: { name: string; description?: string; menuItems?: Array<{ id: number; sortOrder: number }> }) => Promise<void> | void;
+  onSubmit: (data: {
+    name: string;
+    description?: string;
+    coverImageUrl?: string;
+    servesCount?: number | null;
+    packagePrice?: number | null;
+    displayOrder?: number | null;
+    menuItems?: Array<{ id: number; sortOrder: number }>;
+  }) => Promise<void> | void;
   isSubmitting?: boolean;
 }
 
@@ -21,11 +36,15 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
   const removeItem = useRemoveItemFromCollection();
   const [name, setName] = useState(initial?.name || '');
   const [description, setDescription] = useState(initial?.description || '');
+  const [coverImageUrl, setCoverImageUrl] = useState(initial?.coverImageUrl || '');
+  const [servesCount, setServesCount] = useState(initial?.servesCount ? String(initial.servesCount) : '');
+  const [packagePrice, setPackagePrice] = useState(initial?.packagePrice != null ? String(initial.packagePrice) : '');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
-  const [createStep, setCreateStep] = useState<1 | 2>(1);
+  const [createStep, setCreateStep] = useState<1 | 2 | 3>(1);
   const [editSearchTerm, setEditSearchTerm] = useState('');
   const [editSelectedItems, setEditSelectedItems] = useState<Set<number>>(new Set());
+  const [showImageUpload, setShowImageUpload] = useState(false);
 
   const menuItems = menuData?.menuItems || [];
   const isEditMode = Boolean(initial?.id);
@@ -49,9 +68,15 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
     if (open && initial) {
       setName(initial.name || '');
       setDescription(initial.description || '');
+      setCoverImageUrl(initial.coverImageUrl || '');
+      setServesCount(initial.servesCount ? String(initial.servesCount) : '');
+      setPackagePrice(initial.packagePrice != null ? String(initial.packagePrice) : '');
     } else if (open && !initial) {
       setName('');
       setDescription('');
+      setCoverImageUrl('');
+      setServesCount('');
+      setPackagePrice('');
     }
   }, [open, initial]);
 
@@ -62,8 +87,29 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
       setCreateStep(1);
       setEditSearchTerm('');
       setEditSelectedItems(new Set());
+      setShowImageUpload(false);
     }
   }, [open]);
+
+  const selectedCreateItems = menuItems.filter((item) => selectedItems.has(item.id));
+  const pricingItems = isEditMode
+    ? editingItems
+    : selectedCreateItems.map((item, index) => ({
+        collectionId: -1,
+        menuItemId: item.id,
+        sortOrder: index,
+        isActive: true,
+        customPrice: null,
+        customDiscount: null,
+        notes: null,
+        menuItem: item,
+      }));
+  const suggestedSubtotal = pricingItems.reduce((sum, item) => sum + getCollectionEffectiveItemPrice(item), 0);
+  const parsedPackagePrice = packagePrice.trim().length > 0 ? Number(packagePrice) : null;
+  const packageSavings =
+    parsedPackagePrice != null && Number.isFinite(parsedPackagePrice) ? suggestedSubtotal - parsedPackagePrice : null;
+  const effectiveCoverImage =
+    coverImageUrl || pricingItems.find((item) => item.menuItem.imageUrl || item.menuItem.images?.[0]?.url)?.menuItem.imageUrl || '';
 
   const toggleItemSelection = (itemId: number) => {
     setSelectedItems((prev) => {
@@ -117,11 +163,11 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ type: 'tween', duration: 0.2 }}
-            className="relative z-50 w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"
+            className="relative z-50 w-full max-w-3xl rounded-2xl bg-white p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-neutral-900">{isEditMode ? 'Edit Collection' : 'New Collection'}</h3>
+              <h3 className="text-lg font-semibold text-neutral-900">{isEditMode ? 'Edit Package' : 'New Package'}</h3>
               <button onClick={onClose} className="rounded-md p-1 text-neutral-500 hover:bg-neutral-100">
                 <X className="h-5 w-5" />
               </button>
@@ -130,14 +176,15 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
             {!isEditMode ? (
               <div className="mb-4 rounded-xl border border-neutral-200 bg-neutral-50 p-3">
                 <div className="flex items-center justify-between text-xs font-medium text-neutral-500">
-                  <span className={cn(createStep === 1 && 'text-neutral-900')}>Step 1: Details</span>
+                  <span className={cn(createStep === 1 && 'text-neutral-900')}>Step 1: Basics</span>
                   <span className={cn(createStep === 2 && 'text-neutral-900')}>Step 2: Items</span>
+                  <span className={cn(createStep === 3 && 'text-neutral-900')}>Step 3: Package</span>
                 </div>
                 <div className="mt-2 h-1.5 rounded-full bg-neutral-200">
                   <div
                     className={cn(
                       'h-1.5 rounded-full bg-brand-primary-500 transition-all',
-                      createStep === 1 ? 'w-1/2' : 'w-full',
+                      createStep === 1 ? 'w-1/3' : createStep === 2 ? 'w-2/3' : 'w-full',
                     )}
                   />
                 </div>
@@ -145,19 +192,6 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
             ) : null}
 
             <div className="space-y-4 max-h-[65vh] overflow-y-auto pr-1">
-              {(isEditMode || createStep === 1) ? (
-                <>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-neutral-700">Name</label>
-                    <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Happy Hour Menu" />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-neutral-700">Description</label>
-                    <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Special drinks and appetizers" />
-                  </div>
-                </>
-              ) : null}
-
               {isEditMode ? (
                 <div className="space-y-4 rounded-xl border border-neutral-200 p-4">
                   <div className="flex items-center justify-between">
@@ -245,6 +279,107 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
                 </div>
               ) : null}
 
+              {!isEditMode && createStep === 1 ? (
+                <>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-neutral-700">Name</label>
+                    <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Breakfast Box for the Team" />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-neutral-700">Description</label>
+                    <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Assorted bagels, pastries, fruit, and coffee." />
+                  </div>
+                </>
+              ) : null}
+
+              {(isEditMode || createStep === 3) ? (
+                <>
+                  {!isEditMode ? null : (
+                    <>
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-neutral-700">Name</label>
+                        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Breakfast Box for the Team" />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-neutral-700">Description</label>
+                        <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Assorted bagels, pastries, fruit, and coffee." />
+                      </div>
+                    </>
+                  )}
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-neutral-700">Serves</label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={servesCount}
+                        onChange={(e) => setServesCount(e.target.value)}
+                        placeholder="12"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-neutral-700">Package Price</label>
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={packagePrice}
+                        onChange={(e) => setPackagePrice(e.target.value)}
+                        placeholder="79.99"
+                      />
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-neutral-200 p-4">
+                    <div className="flex flex-col gap-4 md:flex-row">
+                      <div className="h-36 w-full overflow-hidden rounded-xl bg-neutral-100 md:w-48">
+                        {effectiveCoverImage ? (
+                          <img src={effectiveCoverImage} alt={name || 'Package cover'} className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-neutral-400">
+                            <ImageIcon className="h-8 w-8" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 space-y-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-semibold text-neutral-900">Cover Image</p>
+                            <p className="text-xs text-neutral-500">Shown on the public package card when available.</p>
+                          </div>
+                          <Button type="button" variant="secondary" size="sm" onClick={() => setShowImageUpload(true)}>
+                            <Upload className="mr-2 h-4 w-4" />
+                            Upload
+                          </Button>
+                        </div>
+                        <div className="grid gap-3 sm:grid-cols-3">
+                          <div className="rounded-lg bg-neutral-50 px-3 py-2">
+                            <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">Suggested Cost</p>
+                            <p className="mt-1 text-sm font-semibold text-neutral-900">${suggestedSubtotal.toFixed(2)}</p>
+                          </div>
+                          <div className="rounded-lg bg-neutral-50 px-3 py-2">
+                            <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">Items</p>
+                            <p className="mt-1 text-sm font-semibold text-neutral-900">{pricingItems.length}</p>
+                          </div>
+                          <div className="rounded-lg bg-neutral-50 px-3 py-2">
+                            <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">Pricing Hint</p>
+                            <p className={cn(
+                              'mt-1 text-sm font-semibold',
+                              packageSavings != null && packageSavings >= 0 ? 'text-emerald-600' : 'text-neutral-900',
+                            )}>
+                              {packageSavings == null
+                                ? 'Add a package price'
+                                : packageSavings >= 0
+                                ? `${packageSavings.toFixed(2)} below item total`
+                                : `${Math.abs(packageSavings).toFixed(2)} above item total`}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : null}
+
               {!isEditMode && createStep === 2 ? (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -305,7 +440,7 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
               ) : null}
             </div>
 
-            <div className="mt-6 flex items-center justify-end gap-3">
+            <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
               <Button variant="secondary" onClick={onClose}>Cancel</Button>
               {!isEditMode && createStep === 1 ? (
                 <Button onClick={() => setCreateStep(2)} disabled={!name.trim()}>
@@ -313,16 +448,30 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
                 </Button>
               ) : null}
               {!isEditMode && createStep === 2 ? (
-                <Button variant="secondary" onClick={() => setCreateStep(1)}>
+                <>
+                  <Button variant="secondary" onClick={() => setCreateStep(1)}>
+                    Back
+                  </Button>
+                  <Button onClick={() => setCreateStep(3)}>Next: Package and pricing</Button>
+                </>
+              ) : null}
+              {!isEditMode && createStep === 3 ? (
+                <Button variant="secondary" onClick={() => setCreateStep(2)}>
                   Back
                 </Button>
               ) : null}
-              {(isEditMode || createStep === 2) ? (
+              {(isEditMode || createStep === 3) ? (
                 <Button
                   onClick={async () => {
                     await onSubmit({
                       name: name.trim(),
                       description: description.trim() || undefined,
+                      coverImageUrl: coverImageUrl.trim() || undefined,
+                      servesCount: servesCount.trim().length > 0 ? Number(servesCount) : null,
+                      packagePrice: packagePrice.trim().length > 0 ? Number(packagePrice) : null,
+                      displayOrder: isEditMode
+                        ? (editingCollectionData?.collection?.displayOrder ?? initial?.displayOrder ?? 0)
+                        : 0,
                       menuItems: !isEditMode
                         ? Array.from(selectedItems).map((id, index) => ({
                             id,
@@ -342,6 +491,18 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
           </motion.div>
         </motion.div>
       )}
+      <ImageUploadModal
+        open={showImageUpload}
+        onOpenChange={setShowImageUpload}
+        maxFiles={1}
+        title="Upload package cover"
+        context="menu_collection_cover"
+        onUploadComplete={(urls) => {
+          if (urls[0]) {
+            setCoverImageUrl(urls[0]);
+          }
+        }}
+      />
     </AnimatePresence>
   );
 };
@@ -636,8 +797,14 @@ const CollectionDetailModal = ({ open, onClose, collectionId }: CollectionDetail
                 {collection.description && (
                   <p className="text-sm text-neutral-600 mt-1">{collection.description}</p>
                 )}
-                <div className="mt-2 flex items-center gap-4 text-sm text-neutral-500">
+                <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-neutral-500">
                   <span>{collectionItems.length} items</span>
+                  {collection.servesCount ? <span>{formatServesLabel(collection.servesCount)}</span> : null}
+                  {collection.packagePrice != null ? (
+                    <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-semibold text-neutral-700">
+                      Package ${Number(collection.packagePrice).toFixed(2)}
+                    </span>
+                  ) : null}
                   <span className={cn(
                     'rounded-full px-2 py-0.5 text-xs font-medium',
                     collection.isActive ? 'bg-green-100 text-green-700' : 'bg-neutral-100 text-neutral-700'
@@ -957,7 +1124,7 @@ export const MenuCollectionsPage = () => {
           <h3 className="mb-1 text-lg font-semibold text-neutral-900">No packages found</h3>
           <p className="mb-4 text-neutral-600">Create your first package to get started.</p>
           <Button onClick={() => setIsCreateOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" /> Create Collection
+            <Plus className="mr-2 h-4 w-4" /> Create Package
           </Button>
         </div>
       ) : (
@@ -967,127 +1134,176 @@ export const MenuCollectionsPage = () => {
             const previewItems = items.slice(0, 4);
             const remainingCount = items.length - 4;
             const totalItems = c._count?.items || items.length || 0;
+            const coverImage = getCollectionCoverImage(c);
+            const servesLabel = formatServesLabel(c.servesCount);
+            const suggestedSubtotal = getCollectionSuggestedSubtotal(c);
+            const packagePrice = c.packagePrice != null ? Number(c.packagePrice) : null;
 
             return (
               <motion.div
                 key={c.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-lg border border-neutral-200 bg-white p-4 hover:shadow-md transition-shadow cursor-pointer"
+                className="overflow-hidden rounded-2xl border border-neutral-200 bg-white transition-shadow hover:shadow-md cursor-pointer"
                 onClick={() => setViewingCollection(c.id)}
               >
-                {/* Header */}
-                <div className="mb-3 flex items-start justify-between gap-3">
-                  <div className="flex min-w-0 items-start gap-3 flex-1">
-                    <div className="rounded-lg bg-neutral-100 p-2 flex-shrink-0">
-                      <Package className="h-5 w-5 text-neutral-600" />
+                <div className="relative h-44 w-full overflow-hidden bg-neutral-100">
+                  {coverImage ? (
+                    <img src={coverImage} alt={c.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-neutral-400">
+                      <Package className="h-8 w-8" />
                     </div>
+                  )}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent p-4">
+                    <div className="flex items-center gap-2 text-white">
+                      <span className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide">
+                        Package
+                      </span>
+                      {servesLabel ? (
+                        <span className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold">
+                          {servesLabel}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4">
+                  <div className="mb-3 flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="truncate font-semibold text-neutral-900">{c.name}</div>
                       {c.description && (
                         <div className="mt-0.5 line-clamp-2 text-sm text-neutral-600">{c.description}</div>
                       )}
-                      <div className="mt-2 text-xs text-neutral-500">{totalItems} item{totalItems !== 1 ? 's' : ''}</div>
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-neutral-500">
+                        <span>{totalItems} item{totalItems !== 1 ? 's' : ''}</span>
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setAddingItemsTo(c);
+                        }}
+                        className="h-8 w-8 p-0"
+                        title="Add Items"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditing(c);
+                        }}
+                        className="h-8 w-8 p-0"
+                        title="Edit"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          setDeletingCollection(c);
+                        }}
+                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        title="Delete"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setAddingItemsTo(c);
-                      }}
-                      className="h-8 w-8 p-0"
-                      title="Add Items"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditing(c);
-                      }}
-                      className="h-8 w-8 p-0"
-                      title="Edit"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        setDeletingCollection(c);
-                      }}
-                      className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                      title="Delete"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+
+                  <div className="mb-4 grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-xl bg-neutral-50 px-3 py-2">
+                      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
+                        <DollarSign className="h-3.5 w-3.5" />
+                        Package Price
+                      </div>
+                      <p className="mt-1 text-sm font-semibold text-neutral-900">
+                        {packagePrice != null ? `$${packagePrice.toFixed(2)}` : 'Not set'}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-neutral-50 px-3 py-2">
+                      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        Suggested Total
+                      </div>
+                      <p className="mt-1 text-sm font-semibold text-neutral-900">${suggestedSubtotal.toFixed(2)}</p>
+                    </div>
+                    <div className="rounded-xl bg-neutral-50 px-3 py-2">
+                      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
+                        <Users className="h-3.5 w-3.5" />
+                        Serving
+                      </div>
+                      <p className="mt-1 text-sm font-semibold text-neutral-900">{servesLabel || 'Not set'}</p>
+                    </div>
                   </div>
-                </div>
 
-                {/* Item Preview */}
-                {items.length > 0 ? (
-                  <div className="mb-3">
-                    <div className="flex items-center gap-2 -space-x-2">
-                      {previewItems.map((collectionItem, index) => {
-                        const item = collectionItem.menuItem;
-                        const displayImages = item.images && item.images.length > 0 
-                          ? item.images 
-                          : item.imageUrl 
-                            ? [{ id: 'legacy', url: item.imageUrl, publicId: 'legacy', name: 'Image' }]
-                            : [];
+                  {items.length > 0 ? (
+                    <div className="mb-3">
+                      <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">Included items</div>
+                      <div className="flex items-center gap-2 -space-x-2">
+                        {previewItems.map((collectionItem, index) => {
+                          const item = collectionItem.menuItem;
+                          const displayImages = item.images && item.images.length > 0 
+                            ? item.images 
+                            : item.imageUrl 
+                              ? [{ id: 'legacy', url: item.imageUrl, publicId: 'legacy', name: 'Image' }]
+                              : [];
 
-                        return (
-                          <div
-                            key={collectionItem.menuItemId}
-                            className="relative h-12 w-12 rounded-lg border-2 border-white overflow-hidden bg-neutral-100 flex-shrink-0"
-                            style={{ zIndex: previewItems.length - index }}
+                          return (
+                            <div
+                              key={collectionItem.menuItemId}
+                              className="relative h-12 w-12 rounded-lg border-2 border-white overflow-hidden bg-neutral-100 flex-shrink-0"
+                              style={{ zIndex: previewItems.length - index }}
+                            >
+                              {displayImages.length > 0 ? (
+                                <img
+                                  src={displayImages[0].url}
+                                  alt={item.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <Utensils className="h-5 w-5 text-neutral-400" />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                        {remainingCount > 0 && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setViewingCollection(c.id);
+                            }}
+                            className="h-12 w-12 rounded-lg border-2 border-white bg-brand-primary-500 text-white flex items-center justify-center font-semibold text-sm hover:bg-brand-primary-600 transition-colors flex-shrink-0"
+                            style={{ zIndex: 0 }}
                           >
-                            {displayImages.length > 0 ? (
-                              <img
-                                src={displayImages[0].url}
-                                alt={item.name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <Utensils className="h-5 w-5 text-neutral-400" />
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                      {remainingCount > 0 && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setViewingCollection(c.id);
-                          }}
-                          className="h-12 w-12 rounded-lg border-2 border-white bg-brand-primary-500 text-white flex items-center justify-center font-semibold text-sm hover:bg-brand-primary-600 transition-colors flex-shrink-0"
-                          style={{ zIndex: 0 }}
-                        >
-                          +{remainingCount}
-                        </button>
-                      )}
+                            +{remainingCount}
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="mb-3 rounded-lg border-2 border-dashed border-neutral-200 p-4 text-center">
-                    <Utensils className="mx-auto h-6 w-6 text-neutral-300 mb-2" />
-                    <p className="text-xs text-neutral-500">No items yet</p>
-                  </div>
-                )}
+                  ) : (
+                    <div className="mb-3 rounded-lg border-2 border-dashed border-neutral-200 p-4 text-center">
+                      <Utensils className="mx-auto h-6 w-6 text-neutral-300 mb-2" />
+                      <p className="text-xs text-neutral-500">No items yet</p>
+                    </div>
+                  )}
 
-                {/* Footer */}
-                <div className="flex items-center justify-between text-sm pt-3 border-t border-neutral-100">
-                  <div className="text-neutral-600">Status</div>
-                  <div className={cn('rounded-full px-2 py-0.5 text-xs font-medium', c.isActive ? 'bg-green-100 text-green-700' : 'bg-neutral-100 text-neutral-700')}>
-                    {c.isActive ? 'Active' : 'Inactive'}
+                  <div className="flex items-center justify-between border-t border-neutral-100 pt-3 text-sm">
+                    <div className="flex items-center gap-2 text-neutral-600">Shown on public deal pages</div>
+                    <div className={cn('rounded-full px-2 py-0.5 text-xs font-medium', c.isActive ? 'bg-green-100 text-green-700' : 'bg-neutral-100 text-neutral-700')}>
+                      {c.isActive ? 'Active' : 'Inactive'}
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -1176,5 +1392,3 @@ export const MenuCollectionsPage = () => {
 };
 
 export default MenuCollectionsPage;
-
-

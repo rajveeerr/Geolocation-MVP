@@ -170,6 +170,10 @@ export interface PublicMenuCollection {
   merchantId: number;
   name: string;
   description: string | null;
+  coverImageUrl?: string | null;
+  servesCount?: number | null;
+  packagePrice?: number | null;
+  displayOrder?: number;
   isActive: boolean;
   menuType?: string | null;
   subType?: string | null;

@@ -375,7 +375,7 @@ export const DealDailyDealConfigStep = () => {
       onNext={() => navigate('/merchant/deals/create/daily-deal/review')}
       onBack={() => navigate('/merchant/deals/create/daily-deal/weekdays')}
       isNextDisabled={!canProceed}
-      progress={50}
+      wizardStep={{ current: 2, total: 3 }}
     >
       <div className="space-y-6 max-w-4xl mx-auto">
         {/* Deal Name & Description */}

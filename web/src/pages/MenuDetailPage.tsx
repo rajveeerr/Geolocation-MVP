@@ -8,8 +8,15 @@ import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { cn } from '@/lib/utils';
 import {
   X, Share2, ChevronLeft, ChevronRight, Star, ThumbsUp,
-  Minus, Plus, ShoppingCart,
+  Minus, Plus, ShoppingCart, Users, Package,
 } from 'lucide-react';
+import {
+  formatServesLabel,
+  getCollectionSuggestedSubtotal,
+  getEffectiveServesCount,
+  getPlaceholderBundlePriceBelowSum,
+} from '@/lib/menuCollectionPackages';
+import type { PublicMenuCollection } from '@/hooks/useDealDetail';
 
 /* ------------------------------------------------------------------ */
 /*  Placeholder data (backend doesn't support these yet)               */
@@ -97,6 +104,18 @@ export const MenuDetailPage = () => {
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
   const [addOns, setAddOns] = useState(placeholderAddOns);
 
+  /** Merchant menu collection that contains this item (if any). */
+  const containingCollection = useMemo((): PublicMenuCollection | null => {
+    if (!itemId || !collectionsData?.collections?.length) return null;
+    const id = String(itemId);
+    for (const col of collectionsData.collections) {
+      for (const entry of col.items || []) {
+        if (String(entry.menuItem.id) === id) return col;
+      }
+    }
+    return null;
+  }, [collectionsData, itemId]);
+
   /* Find the specific menu item */
   const menuItem = useMemo(() => {
     if (!itemId) return null;
@@ -119,7 +138,7 @@ export const MenuDetailPage = () => {
               entry.customPrice !== null && entry.customPrice !== undefined
                 ? Number(entry.customPrice)
                 : entry.customDiscount !== null && entry.customDiscount !== undefined
-                ? Math.max(0, Number(source.price) - Number(entry.customDiscount))
+                ? Math.max(0, Number(source.price) * (1 - Number(entry.customDiscount) / 100))
                 : source.isHappyHour && source.happyHourPrice != null
                 ? Number(source.happyHourPrice)
                 : Number(source.price),
@@ -157,6 +176,31 @@ export const MenuDetailPage = () => {
   const price = menuItem?.discountedPrice || menuItem?.originalPrice || 0;
   const originalPrice = menuItem?.originalPrice || 0;
   const hasDiscount = menuItem?.discountedPrice && menuItem.discountedPrice < originalPrice;
+
+  const displayCollectionServes = containingCollection
+    ? getEffectiveServesCount(containingCollection.servesCount, containingCollection.id)
+    : null;
+  const collectionServesLabel =
+    containingCollection && displayCollectionServes != null
+      ? formatServesLabel(displayCollectionServes)
+      : null;
+  const collectionSuggested =
+    containingCollection != null ? getCollectionSuggestedSubtotal(containingCollection) : null;
+  const hasListedPackagePrice =
+    containingCollection?.packagePrice != null &&
+    Number.isFinite(Number(containingCollection.packagePrice));
+  const estimatedPackagePrice =
+    containingCollection &&
+    !hasListedPackagePrice &&
+    collectionSuggested > 0 &&
+    Number.isFinite(collectionSuggested)
+      ? getPlaceholderBundlePriceBelowSum(collectionSuggested, containingCollection.id)
+      : null;
+  const displayPackagePrice =
+    hasListedPackagePrice && containingCollection
+      ? Number(containingCollection.packagePrice)
+      : estimatedPackagePrice;
+  const packagePriceIsEstimate = estimatedPackagePrice != null;
   const selectedVariant = useMemo(
     () => menuItem?.variants?.find((variant: any) => variant.id === selectedVariantId) ?? null,
     [menuItem, selectedVariantId],
@@ -335,7 +379,54 @@ export const MenuDetailPage = () => {
             {/* Title + Price */}
             <div>
               <h1 className="text-2xl font-black text-neutral-900">{menuItem.name}</h1>
-              <div className="flex items-baseline gap-2 mt-1">
+              {containingCollection ? (
+                <div className="mt-3 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide text-neutral-500">
+                    <Package className="h-3.5 w-3.5" />
+                    Part of this package
+                  </div>
+                  <p className="mt-1 text-sm font-bold text-neutral-900">{containingCollection.name}</p>
+                  {containingCollection.description ? (
+                    <p className="mt-1 text-xs text-neutral-600 leading-snug">{containingCollection.description}</p>
+                  ) : null}
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {collectionServesLabel ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-neutral-800 ring-1 ring-neutral-200">
+                        <Users className="h-3.5 w-3.5 text-neutral-500" />
+                        {collectionServesLabel}
+                      </span>
+                    ) : null}
+                    {displayPackagePrice != null ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[#8B1A1A] px-2.5 py-1 text-xs font-bold text-white">
+                        Bundle ${displayPackagePrice.toFixed(2)}
+                        {packagePriceIsEstimate ? (
+                          <span className="text-[10px] font-semibold opacity-90">est.</span>
+                        ) : null}
+                      </span>
+                    ) : null}
+                    {collectionSuggested > 0 ? (
+                      <span className="text-xs font-medium text-neutral-600">
+                        Dishes total ~${collectionSuggested.toFixed(2)}
+                      </span>
+                    ) : null}
+                  </div>
+                  {dealId && containingCollection ? (
+                    <button
+                      type="button"
+                      className="mt-3 inline-flex w-full items-center justify-center gap-1 rounded-xl border border-neutral-200 bg-white py-2.5 text-xs font-bold text-neutral-800 shadow-sm transition-colors hover:border-[#8B1A1A]/40 hover:bg-red-50/60 sm:w-auto sm:px-4"
+                      onClick={() =>
+                        navigate(`/deals/${dealId}?bundle=${containingCollection.id}`, {
+                          state: { fromMenuItem: true },
+                        })
+                      }
+                    >
+                      View full package on deal
+                      <ChevronRight className="h-4 w-4 text-neutral-500" />
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
+              <div className={cn('flex items-baseline gap-2', containingCollection ? 'mt-4' : 'mt-1')}>
                 <span className="text-2xl font-bold text-neutral-900">
                   ${price.toFixed(2)}
                 </span>

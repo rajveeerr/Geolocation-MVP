@@ -56,7 +56,7 @@ export const DealHiddenStep = () => {
       onNext={() => navigate('/merchant/deals/create/hidden/visibility')}
       onBack={() => navigate('/merchant/deals/create/type')}
       isNextDisabled={false}
-      progress={20}
+      wizardStep={{ current: 1, total: 6 }}
     >
       <div className="space-y-8 max-w-3xl mx-auto">
         {/* Access Code Input */}

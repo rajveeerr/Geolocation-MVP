@@ -1,5 +1,5 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useMemo, useEffect } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { Button } from '@/components/common/Button';
 import { useNavigationHistory } from '@/hooks/useNavigationHistory';
@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import {
   Heart, ChevronLeft, ChevronRight, Share2, Phone, MapPin, Star,
   ShoppingCart, ExternalLink, Play, Lock, AlertCircle, Pencil,
-  ThumbsUp, Check, Search, SlidersHorizontal, Zap, ChevronDown,
+  ThumbsUp, Check, Search, SlidersHorizontal, Zap, ChevronDown, Users, Package, DollarSign,
 } from 'lucide-react';
 import { useCheckIn } from '@/hooks/useCheckIn';
 import { PostCheckInGameModal } from '@/components/gamification/PostCheckInGameModal';
@@ -23,6 +23,13 @@ import {
   placeholderReviews, placeholderRatingsSummary, placeholderArticles,
   placeholderVibeTags, placeholderHours, placeholderThingsToKnow,
 } from '@/data/detail-page-placeholders';
+import {
+  formatServesLabel,
+  getCollectionCoverImage,
+  getCollectionSuggestedSubtotal,
+  getEffectiveServesCount,
+  getPlaceholderBundlePriceBelowSum,
+} from '@/lib/menuCollectionPackages';
 
 /* ------------------------------------------------------------------ */
 /*  Types & constants                                                  */
@@ -452,11 +459,17 @@ const MenuCardFigma = ({
   item,
   onClick,
   onAddToOrder,
+  isPackageItem,
+  servesCount,
 }: {
   item: any;
   deal?: any;
   onClick?: () => void;
   onAddToOrder?: () => void;
+  /** True when this card sits under a merchant bundle / menu collection. */
+  isPackageItem?: boolean;
+  /** Shown under the description (bundle serves). */
+  servesCount?: number | null;
 }) => {
   const discountAmount = item.originalPrice - item.discountedPrice;
   const discountPercent = item.originalPrice > 0
@@ -481,9 +494,14 @@ const MenuCardFigma = ({
     return item.category?.toUpperCase() || 'MENU ITEM';
   };
 
+  const showServes = servesCount != null && servesCount >= 1;
+
   return (
     <div
-      className="relative rounded-2xl overflow-hidden shadow-lg cursor-pointer group flex-shrink-0"
+      className={cn(
+        'relative rounded-2xl overflow-hidden shadow-lg cursor-pointer group flex-shrink-0 transition-shadow',
+        isPackageItem && 'ring-2 ring-amber-400/45 shadow-md shadow-amber-900/10',
+      )}
       style={{ width: '204.75px', height: '364px' }}
       onClick={onClick}
     >
@@ -516,14 +534,18 @@ const MenuCardFigma = ({
       </div>
 
       {/* Price badge – top right */}
-      <div className="absolute top-3 right-3 z-10">
+      <div className="absolute top-3 right-3 z-10 max-w-[46%]">
         {discountPercent > 0 && item.originalPrice ? (
-          <div className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white">
-            <div className="text-[9px] line-through opacity-70">${item.originalPrice.toFixed(2)}</div>
-            <div className="text-sm font-bold text-brand-primary-600 leading-tight">${(item.discountedPrice ?? 0).toFixed(2)}</div>
+          <div className="flex flex-col items-end gap-0.5 rounded-full bg-black/65 px-2.5 py-1.5 text-right shadow-sm backdrop-blur-md">
+            <span className="text-[9px] font-medium tabular-nums text-white/75 line-through decoration-white/50">
+              ${item.originalPrice.toFixed(2)}
+            </span>
+            <span className="text-sm font-bold tabular-nums leading-none text-brand-primary-500">
+              ${(item.discountedPrice ?? 0).toFixed(2)}
+            </span>
           </div>
         ) : (
-          <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white font-bold text-xs">
+          <span className="inline-block rounded-full bg-black/65 px-2.5 py-1.5 text-xs font-bold tabular-nums text-white shadow-sm backdrop-blur-md">
             ${(item.discountedPrice ?? item.originalPrice ?? 0).toFixed(2)}
           </span>
         )}
@@ -532,7 +554,7 @@ const MenuCardFigma = ({
       {/* Discount ribbon */}
       {discountPercent > 0 && (
         <div className="absolute top-12 left-3 z-10">
-          <span className="px-2 py-0.5 rounded bg-brand-primary-600 text-white text-[9px] font-bold">
+          <span className="inline-flex items-center rounded-full bg-brand-primary-600 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shadow-sm">
             {discountPercent}% OFF
           </span>
         </div>
@@ -542,12 +564,16 @@ const MenuCardFigma = ({
       <div className="absolute inset-x-0 bottom-0 h-3/5 pointer-events-none bg-gradient-to-t from-black via-black/70 to-transparent" />
 
       {/* Bottom content */}
-      <div className="absolute inset-x-0 bottom-0 z-10 p-4 flex flex-col">
-        {/* Best deal tag */}
+      <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col px-3 pb-3 pt-2">
+        {/* Best deal tag — single line on narrow cards */}
         {discountPercent > 15 && (
-          <div className="mb-2">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-primary-600 text-white text-[9px] font-bold uppercase">
-              <Zap className="w-2.5 h-2.5" /> Best Deal Within 5 Miles
+          <div className="mb-1.5 flex justify-center">
+            <span
+              className="inline-flex max-w-full items-center gap-0.5 whitespace-nowrap rounded-full bg-brand-primary-600 px-2 py-1 text-[7px] font-bold uppercase leading-none tracking-tight text-white shadow-sm sm:text-[8px]"
+              title="Best deal within 5 miles"
+            >
+              <Zap className="h-2.5 w-2.5 shrink-0" />
+              <span className="truncate">Best in 5 mi</span>
             </span>
           </div>
         )}
@@ -560,26 +586,43 @@ const MenuCardFigma = ({
             {item.description}
           </p>
         )}
+        {showServes ? (
+          <p className="mt-1.5 inline-flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-white/75">
+            <Users className="h-3 w-3 text-white/80" />
+            Serves {servesCount}
+          </p>
+        ) : null}
 
-        {/* Action row */}
-        <div className="flex items-center gap-2 mt-3">
+        {/* Action row — centered group, primary capped so heart isn’t on the rim */}
+        <div className="mt-2.5 flex w-full items-center justify-center gap-2">
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               onAddToOrder?.();
             }}
-            className="flex-1 flex items-center justify-between pl-3 pr-1 py-1 rounded-full bg-white hover:bg-neutral-100 transition-colors"
-            title="Add item to bulk order planner"
+            className={cn(
+              'flex max-w-[72%] min-w-0 items-center justify-center gap-1.5 rounded-full py-2 pl-2 pr-2.5 transition-colors',
+              isPackageItem ? 'bg-amber-50 hover:bg-amber-100' : 'bg-white hover:bg-neutral-100',
+            )}
+            title={
+              isPackageItem
+                ? 'Add this dish from the bundle to your bulk order planner'
+                : 'Add item to bulk order planner'
+            }
           >
-            <span className="text-[11px] font-semibold text-[#1a1a2e] whitespace-nowrap">Add to order</span>
-            <span className="w-8 h-8 rounded-full bg-[#1a1a2e] flex items-center justify-center flex-shrink-0">
-              <ShoppingCart className="h-3.5 w-3.5 text-white" />
+            <span className="w-7 h-7 shrink-0 rounded-full bg-[#1a1a2e] flex items-center justify-center">
+              <ShoppingCart className="h-3 w-3 text-white" />
+            </span>
+            <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-[#1a1a2e]">
+              {isPackageItem ? 'Add to planner' : 'Add to order'}
             </span>
           </button>
           <button
+            type="button"
             disabled
             onClick={(e) => e.stopPropagation()}
-            className="w-9 h-9 rounded-full bg-white flex items-center justify-center cursor-not-allowed flex-shrink-0"
+            className="h-9 w-9 shrink-0 rounded-full bg-white shadow-sm flex items-center justify-center cursor-not-allowed ring-1 ring-black/5"
             title="Save item coming soon"
           >
             <Heart className="h-3.5 w-3.5 text-[#1a1a2e]" />
@@ -596,6 +639,7 @@ const MenuCardFigma = ({
 export const DealDetailPage = () => {
   const { dealId } = useParams<{ dealId: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { canGoBack, goBack } = useNavigationHistory();
   const [leftTab, setLeftTab] = useState<LeftTab>('info');
   const [rightTab, setRightTab] = useState<RightTab>('menu');
@@ -653,7 +697,7 @@ export const DealDetailPage = () => {
     typeof deal?.merchant?.id === 'number' ? deal.merchant.id : null,
   );
 
-  const stores = deal?.merchant?.stores ?? [];
+  const stores = useMemo(() => deal?.merchant?.stores ?? [], [deal?.merchant?.stores]);
   const selectedStore = useMemo(
     () => (selectedStoreId ? stores.find((s: any) => s.id === selectedStoreId) : stores[0]),
     [stores, selectedStoreId],
@@ -716,7 +760,7 @@ export const DealDetailPage = () => {
     return `$${Math.round(avg)}+`;
   }, [deal]);
 
-  const menuCollections = useMemo(() => {
+  const packageCollections = useMemo(() => {
     const rawCollections = collectionsData?.collections ?? [];
 
     if (rawCollections.length > 0) {
@@ -726,6 +770,11 @@ export const DealDetailPage = () => {
           id: collection.id,
           title: collection.name,
           description: collection.description || null,
+          coverImageUrl: collection.coverImageUrl || getCollectionCoverImage(collection),
+          servesCount: collection.servesCount ?? null,
+          displayServesCount: getEffectiveServesCount(collection.servesCount, collection.id),
+          packagePrice: collection.packagePrice ?? null,
+          suggestedSubtotal: getCollectionSuggestedSubtotal(collection),
           items: (collection.items || []).map((entry: any) => {
             const menuItem = entry.menuItem;
             const originalPrice = menuItem.price;
@@ -733,7 +782,7 @@ export const DealDetailPage = () => {
               entry.customPrice !== null && entry.customPrice !== undefined
                 ? Number(entry.customPrice)
                 : entry.customDiscount !== null && entry.customDiscount !== undefined
-                ? Math.max(0, Number(originalPrice) - Number(entry.customDiscount))
+                ? Math.max(0, Number(originalPrice) * (1 - Number(entry.customDiscount) / 100))
                 : deal?.discountPercentage
                 ? Number(originalPrice) * (1 - Number(deal.discountPercentage) / 100)
                 : deal?.discountAmount
@@ -765,13 +814,69 @@ export const DealDetailPage = () => {
       return acc;
     }, {});
 
-    return Object.entries(grouped).map(([category, items], index) => ({
-      id: `fallback-${index}`,
-      title: prettyCat(category),
-      description: null,
-      items,
-    }));
+    return Object.entries(grouped).map(([category, items], index) => {
+      const list = items as any[];
+      const suggestedSubtotal = list.reduce(
+        (sum, item) => sum + Number(item.discountedPrice ?? item.originalPrice ?? 0),
+        0,
+      );
+      return {
+        id: `fallback-${index}`,
+        title: prettyCat(category),
+        description: null,
+        items: list,
+        servesCount: null,
+        displayServesCount: getEffectiveServesCount(null, `fallback-${index}-${category}`),
+        packagePrice: null,
+        suggestedSubtotal,
+        coverImageUrl: null as string | null,
+      };
+    });
   }, [collectionsData, deal]);
+
+  const bundleScrollTarget = searchParams.get('bundle');
+  useEffect(() => {
+    if (!bundleScrollTarget || !dealId || isLoading || !deal) return;
+    setRightTab('menu');
+
+    let cancelled = false;
+    let attempts = 0;
+    let highlightClear: number | undefined;
+    let paramClear: number | undefined;
+
+    const iv = window.setInterval(() => {
+      if (cancelled) return;
+      attempts += 1;
+      const el = document.getElementById(`bundle-${bundleScrollTarget}`);
+      if (el) {
+        window.clearInterval(iv);
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ring-2', 'ring-brand-primary-500', 'ring-offset-2', 'rounded-2xl', 'transition-shadow');
+        highlightClear = window.setTimeout(() => {
+          el.classList.remove('ring-2', 'ring-brand-primary-500', 'ring-offset-2', 'rounded-2xl', 'transition-shadow');
+        }, 2400);
+        paramClear = window.setTimeout(() => {
+          setSearchParams(
+            (prev) => {
+              const next = new URLSearchParams(prev);
+              next.delete('bundle');
+              return next;
+            },
+            { replace: true },
+          );
+        }, 600);
+      } else if (attempts > 40) {
+        window.clearInterval(iv);
+      }
+    }, 100);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(iv);
+      if (highlightClear) window.clearTimeout(highlightClear);
+      if (paramClear) window.clearTimeout(paramClear);
+    };
+  }, [bundleScrollTarget, dealId, deal, isLoading, packageCollections.length, setSearchParams]);
 
   /* ---------- Loading / Error ---------- */
   if (isLoading) return <LoadingOverlay message="Loading deal details\u2026" />;
@@ -851,6 +956,39 @@ export const DealDetailPage = () => {
       description: `${menuItem.name} added to planner.`,
     });
   };
+
+  const handleAddPackageToPlanner = useCallback(
+    (collection: any) => {
+      if (!deal?.merchant?.id) return;
+      const list = collection.items || [];
+      let added = 0;
+      for (const menuItem of list) {
+        const unitPrice = Number(menuItem.discountedPrice ?? menuItem.originalPrice ?? 0);
+        if (!Number.isFinite(unitPrice) || unitPrice <= 0) continue;
+        addItem({
+          menuItemId: Number(menuItem.id),
+          merchantId: Number(deal.merchant.id),
+          name: menuItem.name,
+          unitPrice,
+          quantity: 1,
+        });
+        added += 1;
+      }
+      if (added === 0) {
+        toast({
+          title: 'Nothing added',
+          description: 'No priced dishes were found in this package.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      toast({
+        title: 'Full package added',
+        description: `${added} dish(es) from “${collection.title}” are in your planner. Adjust quantities in the cart above.`,
+      });
+    },
+    [deal, addItem, toast],
+  );
 
   const handlePlaceBulkOrder = async () => {
     if (merchantCartItems.length === 0) {
@@ -1390,7 +1528,11 @@ export const DealDetailPage = () => {
                     <div>
                       <h3 className="text-lg font-bold text-neutral-900">Bulk order planner</h3>
                       <p className="text-sm text-neutral-500">
-                        Set people count, add menu items, then place one combined order.
+                        Set party size, then build your order: use{' '}
+                        <span className="font-semibold text-neutral-700">Add full package</span> on a bundle for every
+                        dish at once, <span className="font-semibold text-neutral-700">Add dish to planner</span> on gold
+                        cards for one piece of a bundle, or <span className="font-semibold text-neutral-700">Add to order</span>{' '}
+                        on standard cards for à la carte items.
                       </p>
                     </div>
                     <div className="w-full sm:w-44">
@@ -1450,22 +1592,135 @@ export const DealDetailPage = () => {
                   </div>
                 </section>
 
-                {menuCollections.length > 0 ? (
+                {packageCollections.length > 0 ? (
                   <>
                     <div className="space-y-8">
-                      {menuCollections.map((collection: any) => (
-                        <section key={collection.id} className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="text-2xl font-black text-neutral-900 uppercase tracking-tight">
-                                {collection.title}
-                              </h3>
-                              <p className="text-xs text-neutral-400 mt-0.5">
-                                {collection.description || `${collection.items.length} items in this collection`}
+                      {packageCollections.map((collection: any) => {
+                        const displayServes =
+                          collection.displayServesCount ??
+                          getEffectiveServesCount(collection.servesCount, collection.id);
+                        const servesLabel = formatServesLabel(displayServes);
+                        const isMerchantPackage = typeof collection.id === 'number';
+                        const showPackageStrip =
+                          Boolean(servesLabel) ||
+                          (isMerchantPackage &&
+                            (collection.packagePrice != null ||
+                              (collection.suggestedSubtotal != null &&
+                                Number.isFinite(Number(collection.suggestedSubtotal)))));
+                        const dishesTotal =
+                          collection.suggestedSubtotal != null &&
+                          Number.isFinite(Number(collection.suggestedSubtotal))
+                            ? Number(collection.suggestedSubtotal)
+                            : NaN;
+                        const hasListedBundlePrice =
+                          collection.packagePrice != null && Number.isFinite(Number(collection.packagePrice));
+                        const estimatedBundlePrice =
+                          isMerchantPackage &&
+                          !hasListedBundlePrice &&
+                          Number.isFinite(dishesTotal) &&
+                          dishesTotal > 0
+                            ? getPlaceholderBundlePriceBelowSum(dishesTotal, collection.id)
+                            : null;
+                        const effectiveBundlePrice = hasListedBundlePrice
+                          ? Number(collection.packagePrice)
+                          : estimatedBundlePrice;
+                        const bundlePriceIsEstimated = estimatedBundlePrice != null;
+                        return (
+                        <section
+                          key={collection.id}
+                          id={isMerchantPackage ? `bundle-${collection.id}` : undefined}
+                          className="space-y-4"
+                        >
+                          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <h3 className="text-2xl font-black text-neutral-900 uppercase tracking-tight">
+                                  {collection.title}
+                                </h3>
+                                {isMerchantPackage ? (
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-950 ring-1 ring-amber-300/80">
+                                    <Package className="h-3 w-3" />
+                                    Bundle
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex rounded-full bg-neutral-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-neutral-600 ring-1 ring-neutral-200">
+                                    À la carte
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-neutral-500 mt-1 max-w-2xl leading-relaxed">
+                                {collection.description || `${collection.items.length} items in this menu`}
                               </p>
+                              {showPackageStrip ? (
+                                <div className="mt-3 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
+                                  <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500 mb-2">
+                                    {isMerchantPackage ? 'Bundle details' : 'Section'}
+                                  </div>
+                                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                    {servesLabel ? (
+                                      <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-semibold text-neutral-800 ring-1 ring-neutral-200">
+                                        <Users className="h-3.5 w-3.5 text-neutral-500" />
+                                        {servesLabel}
+                                      </span>
+                                    ) : null}
+                                    {isMerchantPackage ? (
+                                      <>
+                                        <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-2 text-xs">
+                                          <span className="font-semibold uppercase tracking-wide text-neutral-500">
+                                            Bundle price
+                                          </span>
+                                          {effectiveBundlePrice != null ? (
+                                            <span className="inline-flex flex-wrap items-center gap-1.5">
+                                              <span className="inline-flex items-center gap-1 rounded-full bg-brand-primary-600 px-3 py-1 text-sm font-bold text-white">
+                                                <DollarSign className="h-3.5 w-3.5 opacity-90" />
+                                                {effectiveBundlePrice.toFixed(2)}
+                                              </span>
+                                              {bundlePriceIsEstimated ? (
+                                                <span className="text-[10px] font-medium normal-case text-neutral-500">
+                                                  Typical bundle (est.) — venue may set final price
+                                                </span>
+                                              ) : null}
+                                            </span>
+                                          ) : (
+                                            <span className="rounded-full border border-dashed border-neutral-300 bg-white px-3 py-1 text-xs font-medium text-neutral-500">
+                                              Add dishes to estimate
+                                            </span>
+                                          )}
+                                        </div>
+                                        {collection.suggestedSubtotal != null &&
+                                        Number.isFinite(Number(collection.suggestedSubtotal)) ? (
+                                          <div className="flex flex-wrap items-baseline gap-2 text-xs">
+                                            <span className="font-semibold uppercase tracking-wide text-neutral-500">
+                                              Dishes total
+                                            </span>
+                                            <span className="font-semibold text-neutral-800">
+                                              ~${Number(collection.suggestedSubtotal).toFixed(2)}
+                                            </span>
+                                            {effectiveBundlePrice != null &&
+                                            Number(collection.suggestedSubtotal) > effectiveBundlePrice ? (
+                                              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800 ring-1 ring-emerald-200">
+                                                Save ~$
+                                                {(
+                                                  Number(collection.suggestedSubtotal) - effectiveBundlePrice
+                                                ).toFixed(2)}{' '}
+                                                vs à la carte
+                                              </span>
+                                            ) : null}
+                                          </div>
+                                        ) : null}
+                                      </>
+                                    ) : collection.suggestedSubtotal != null ? (
+                                      <span className="text-xs font-medium text-neutral-600">
+                                        Sum of dishes ~${Number(collection.suggestedSubtotal).toFixed(2)}
+                                      </span>
+                                    ) : null}
+                                  </div>
+                                </div>
+                              ) : null}
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex shrink-0 items-center gap-2 self-start">
                               <button
+                                type="button"
                                 disabled
                                 className="w-10 h-10 rounded-xl bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-not-allowed opacity-50"
                                 title="Filter coming soon"
@@ -1473,6 +1728,7 @@ export const DealDetailPage = () => {
                                 <SlidersHorizontal className="h-[18px] w-[18px] text-neutral-600" />
                               </button>
                               <button
+                                type="button"
                                 disabled
                                 className="w-10 h-10 rounded-xl bg-[#1a1a2e] flex items-center justify-center cursor-not-allowed opacity-70"
                                 title="Search coming soon"
@@ -1482,24 +1738,55 @@ export const DealDetailPage = () => {
                             </div>
                           </div>
 
+                          {isMerchantPackage ? (
+                            <div className="rounded-2xl border border-amber-200/90 bg-gradient-to-br from-amber-50 via-white to-white p-4 shadow-sm">
+                              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="min-w-0">
+                                  <p className="text-sm font-bold text-neutral-900">Order the whole bundle</p>
+                                  <p className="mt-1 text-xs text-neutral-600 max-w-xl leading-relaxed">
+                                    Adds every dish in this bundle to your planner in one step. You can remove lines or
+                                    tweak quantities in the bulk order box above before checkout.
+                                  </p>
+                                </div>
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="primary"
+                                  className="shrink-0"
+                                  onClick={() => handleAddPackageToPlanner(collection)}
+                                >
+                                  <Package className="mr-2 h-4 w-4" />
+                                  Add full package
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-xs text-neutral-500 rounded-lg border border-dashed border-neutral-200 bg-neutral-50/80 px-3 py-2">
+                              À la carte section — add individual dishes with <span className="font-semibold">Add to order</span>.
+                            </p>
+                          )}
+
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {collection.items.map((item: any) => (
                               <MenuCardFigma
                                 key={`${collection.id}-${item.id}`}
                                 item={item}
                                 deal={deal}
+                                isPackageItem={isMerchantPackage}
+                                servesCount={displayServes}
                                 onClick={() => navigate(`/deals/${dealId}/menu/${item.id}`)}
                                 onAddToOrder={() => handleAddCardItemToBulkOrder(item)}
                               />
                             ))}
                           </div>
                         </section>
-                      ))}
+                        );
+                      })}
                     </div>
                   </>
                 ) : (
                   <div className="text-center py-16 text-neutral-400 text-sm">
-                    No packages available for this deal.
+                    No menu items available for this deal.
                   </div>
                 )}
               </div>

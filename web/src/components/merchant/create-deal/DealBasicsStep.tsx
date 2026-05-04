@@ -139,7 +139,11 @@ export const DealBasicsStep = () => {
         }
       }}
       isNextDisabled={!isFormValid}
-      progress={25}
+      wizardStep={
+        state.dealType === 'HIDDEN'
+          ? { current: 3, total: 6 }
+          : { current: 1, total: 9 }
+      }
     >
       <div className="space-y-6">
         {/* Deal Title Section */}

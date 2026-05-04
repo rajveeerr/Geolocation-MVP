@@ -49,7 +49,7 @@ export const DealDailyDealWeekdayStep = () => {
       onNext={() => navigate('/merchant/deals/create/daily-deal/config')}
       onBack={() => navigate('/merchant/deals/create')}
       isNextDisabled={!canProceed}
-      progress={20}
+      wizardStep={{ current: 1, total: 3 }}
     >
       <div className="space-y-6 max-w-4xl mx-auto">
         {/* Hero Message */}

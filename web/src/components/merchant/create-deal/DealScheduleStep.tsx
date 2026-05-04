@@ -291,7 +291,15 @@ export const DealScheduleStep = () => {
       onNext={handleNext}
       onBack={handleBack}
       isNextDisabled={!isDateValid() || exceeds24Hours}
-      progress={state.dealType === 'REDEEM_NOW' ? 80 : 65}
+      wizardStep={
+        state.dealType === 'BOUNTY'
+          ? { current: 4, total: 6 }
+          : state.dealType === 'HIDDEN'
+            ? { current: 5, total: 6 }
+            : state.dealType === 'REDEEM_NOW'
+              ? { current: 3, total: 4 }
+              : { current: 5, total: 9 }
+      }
     >
       <div className="space-y-8">
         {/* Quick Options */}

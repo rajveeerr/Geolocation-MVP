@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useDealCreation } from '@/context/DealCreationContext';
+import { useDealCreation, type SelectedMenuItem } from '@/context/DealCreationContext';
 import { useMenuCollections, useMenuCollection } from '@/hooks/useMenuCollections';
 import { Button } from '@/components/common/Button';
 import { 
   Package, 
   Plus, 
   ChevronDown, 
-  ChevronUp,
   Loader2,
   Search,
   FolderOpen
@@ -16,9 +15,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { PATHS } from '@/routing/paths';
+import {
+  formatServesLabel,
+  getCollectionCoverImage,
+  getCollectionItemCount,
+  getCollectionSuggestedSubtotal,
+} from '@/lib/menuCollectionPackages';
 
 interface MenuCollectionSelectorProps {
-  onCollectionSelect?: (collectionId: number | null, items?: any[]) => void;
+  onCollectionSelect?: (collectionId: number | null, items?: SelectedMenuItem[]) => void;
 }
 
 export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSelectorProps) => {
@@ -76,6 +81,10 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
     // Items will be cleared via useEffect
   };
 
+  const selectedCollectionCover = getCollectionCoverImage(selectedCollection);
+  const selectedCollectionServes = formatServesLabel(selectedCollection?.servesCount);
+  const selectedCollectionSuggestedTotal = getCollectionSuggestedSubtotal(selectedCollection);
+
   if (isLoading) {
     return (
       <div className="rounded-lg border border-neutral-200 bg-white p-6">
@@ -121,10 +130,16 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
           animate={{ opacity: 1, y: 0 }}
           className="rounded-lg border-2 border-brand-primary-200 bg-brand-primary-50 p-4"
         >
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-3 flex-1">
-              <div className="rounded-lg bg-brand-primary-100 p-2">
-                <Package className="h-5 w-5 text-brand-primary-600" />
+              <div className="h-20 w-20 overflow-hidden rounded-xl bg-brand-primary-100">
+                {selectedCollectionCover ? (
+                  <img src={selectedCollectionCover} alt={selectedCollection.name} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center">
+                    <Package className="h-5 w-5 text-brand-primary-600" />
+                  </div>
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="font-semibold text-brand-primary-900 truncate">
@@ -135,10 +150,15 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
                     {selectedCollection.description}
                   </p>
                 )}
-                <div className="mt-2 flex items-center gap-4 text-xs text-brand-primary-600">
-                  <span>
-                    {selectedCollection._count?.items || selectedCollection.items?.length || 0} items
-                  </span>
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-brand-primary-700">
+                  <span>{getCollectionItemCount(selectedCollection)} items</span>
+                  {selectedCollectionServes ? <span>&bull; {selectedCollectionServes}</span> : null}
+                  <span>&bull; Suggested ${selectedCollectionSuggestedTotal.toFixed(2)}</span>
+                  {selectedCollection.packagePrice != null ? (
+                    <span className="rounded-full bg-white/80 px-2 py-0.5 font-semibold text-brand-primary-800">
+                      Package ${Number(selectedCollection.packagePrice).toFixed(2)}
+                    </span>
+                  ) : null}
                   {selectedCollection.isActive && (
                     <span className="rounded-full bg-green-100 px-2 py-0.5 text-green-700 font-medium">
                       Active
@@ -238,6 +258,11 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
                   ) : (
                     <div className="p-2">
                       {filteredCollections.map((collection) => (
+                        (() => {
+                          const coverImage = getCollectionCoverImage(collection);
+                          const servesLabel = formatServesLabel(collection.servesCount);
+                          const suggestedTotal = getCollectionSuggestedSubtotal(collection);
+                          return (
                         <button
                           key={collection.id}
                           onClick={() => handleSelectCollection(collection.id)}
@@ -248,18 +273,22 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex items-start gap-3 flex-1">
-                              <div className={cn(
-                                'rounded-lg p-1.5 mt-0.5',
-                                selectedCollectionId === collection.id
-                                  ? 'bg-brand-primary-100'
-                                  : 'bg-neutral-100'
-                              )}>
-                                <Package className={cn(
-                                  'h-4 w-4',
-                                  selectedCollectionId === collection.id
-                                    ? 'text-brand-primary-600'
-                                    : 'text-neutral-600'
-                                )} />
+                              <div className="h-14 w-14 overflow-hidden rounded-lg bg-neutral-100">
+                                {coverImage ? (
+                                  <img src={coverImage} alt={collection.name} className="h-full w-full object-cover" />
+                                ) : (
+                                  <div className={cn(
+                                    'flex h-full w-full items-center justify-center',
+                                    selectedCollectionId === collection.id ? 'bg-brand-primary-100' : 'bg-neutral-100'
+                                  )}>
+                                    <Package className={cn(
+                                      'h-4 w-4',
+                                      selectedCollectionId === collection.id
+                                        ? 'text-brand-primary-600'
+                                        : 'text-neutral-600'
+                                    )} />
+                                  </div>
+                                )}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="font-medium text-neutral-900 truncate">
@@ -270,10 +299,15 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
                                     {collection.description}
                                   </p>
                                 )}
-                                <div className="mt-1.5 flex items-center gap-3 text-xs text-neutral-500">
-                                  <span>
-                                    {collection._count?.items || collection.items?.length || 0} items
-                                  </span>
+                                <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-neutral-500">
+                                  <span>{getCollectionItemCount(collection)} items</span>
+                                  {servesLabel ? <span>&bull; {servesLabel}</span> : null}
+                                  <span>&bull; Suggested ${suggestedTotal.toFixed(2)}</span>
+                                  {collection.packagePrice != null ? (
+                                    <span className="rounded-full bg-neutral-100 px-2 py-0.5 font-medium text-neutral-700">
+                                      ${Number(collection.packagePrice).toFixed(2)}
+                                    </span>
+                                  ) : null}
                                   {collection.isActive && (
                                     <span className="rounded-full bg-green-100 px-2 py-0.5 text-green-700 font-medium">
                                       Active
@@ -289,6 +323,8 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
                             )}
                           </div>
                         </button>
+                          );
+                        })()
                       ))}
                     </div>
                   )}
@@ -331,4 +367,3 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
     </div>
   );
 };
-

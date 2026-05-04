@@ -79,7 +79,7 @@ export const DealBountyBasicsStep = () => {
       onNext={() => navigate('/merchant/deals/create/bounty/menu')}
       onBack={() => navigate('/merchant/deals/create/bounty')}
       isNextDisabled={!isFormValid}
-      progress={33}
+      wizardStep={{ current: 2, total: 6 }}
     >
       <div className="space-y-8">
         {/* Bounty Context Banner */}

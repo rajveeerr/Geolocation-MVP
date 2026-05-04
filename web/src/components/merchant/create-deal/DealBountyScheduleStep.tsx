@@ -194,7 +194,7 @@ export const DealBountyScheduleStep = () => {
       onNext={() => navigate('/merchant/deals/create/bounty/images')}
       onBack={() => navigate('/merchant/deals/create/bounty/menu')}
       isNextDisabled={!canProceed}
-      progress={50}
+      wizardStep={{ current: 4, total: 6 }}
     >
       <div className="space-y-8 max-w-3xl mx-auto">
         {/* Quick Options */}

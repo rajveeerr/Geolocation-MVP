@@ -1,16 +1,14 @@
 import { useMenuCollection } from '@/hooks/useMenuCollections';
-import { useDealCreation } from '@/context/DealCreationContext';
 import { 
   Package, 
   Loader2, 
   DollarSign,
-  Eye,
-  EyeOff,
   Tag,
   AlertCircle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { formatServesLabel, getCollectionCoverImage } from '@/lib/menuCollectionPackages';
 
 interface CollectionPreviewProps {
   collectionId: number;
@@ -24,7 +22,6 @@ export const CollectionPreview = ({
   globalDiscountAmount
 }: CollectionPreviewProps) => {
   const { data: collectionData, isLoading, error } = useMenuCollection(collectionId);
-  const { state } = useDealCreation();
 
   if (isLoading) {
     return (
@@ -55,6 +52,8 @@ export const CollectionPreview = ({
 
   const collection = collectionData.collection;
   const items = collection.items || [];
+  const servesLabel = formatServesLabel(collection.servesCount);
+  const coverImage = getCollectionCoverImage(collection);
 
   // Calculate final price for each item
   const calculateItemPrice = (item: typeof items[0]) => {
@@ -122,14 +121,26 @@ export const CollectionPreview = ({
       <div className="border-b border-neutral-200 bg-neutral-50 px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-brand-primary-100 p-2">
-              <Package className="h-5 w-5 text-brand-primary-600" />
+            <div className="h-14 w-14 overflow-hidden rounded-lg bg-brand-primary-100">
+              {coverImage ? (
+                <img src={coverImage} alt={collection.name} className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                  <Package className="h-5 w-5 text-brand-primary-600" />
+                </div>
+              )}
             </div>
             <div>
               <h4 className="font-semibold text-neutral-900">{collection.name}</h4>
-              <p className="text-xs text-neutral-600 mt-0.5">
-                {totalItems} item{totalItems !== 1 ? 's' : ''} will be added to this deal
-              </p>
+              <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-neutral-600">
+                <span>{totalItems} item{totalItems !== 1 ? 's' : ''} will be added to this deal</span>
+                {servesLabel ? <span>&bull; {servesLabel}</span> : null}
+                {collection.packagePrice != null ? (
+                  <span className="rounded-full bg-brand-primary-100 px-2 py-0.5 font-semibold text-brand-primary-700">
+                    Package ${Number(collection.packagePrice).toFixed(2)}
+                  </span>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
@@ -255,9 +266,16 @@ export const CollectionPreview = ({
               </div>
             )}
           </div>
+          {collection.packagePrice != null ? (
+            <div className="mt-3 rounded-lg border border-brand-primary-200 bg-white px-3 py-2 text-sm">
+              <span className="text-neutral-600">Package price: </span>
+              <span className="font-semibold text-brand-primary-700">
+                ${Number(collection.packagePrice).toFixed(2)}
+              </span>
+            </div>
+          ) : null}
         </div>
       )}
     </motion.div>
   );
 };
-

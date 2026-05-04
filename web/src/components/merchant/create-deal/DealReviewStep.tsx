@@ -620,7 +620,7 @@ export const DealReviewStep = () => {
           tapInMenuCollectionId: state.hiddenDealVisibility.tapInMenuCollectionId,
         } : undefined,
         // Menu items if any - format for API
-        menuItems: state.selectedMenuItems?.length > 0 
+        menuItems: !state.useMenuCollection && state.selectedMenuItems?.length > 0 
           ? state.selectedMenuItems.map(item => ({
               id: item.id,
               isHidden: item.isHidden || false,
@@ -809,7 +809,17 @@ export const DealReviewStep = () => {
           }
         }
       }}
-      progress={100}
+      wizardStep={
+        state.dealType === 'BOUNTY'
+          ? { current: 6, total: 6 }
+          : state.dealType === 'HIDDEN'
+            ? { current: 6, total: 6 }
+            : state.dealType === 'RECURRING'
+              ? { current: 3, total: 3 }
+              : state.dealType === 'REDEEM_NOW'
+                ? { current: 4, total: 4 }
+                : { current: 9, total: 9 }
+      }
       nextButtonText="Publish Deal"
       isNextDisabled={isPublishing}
     >

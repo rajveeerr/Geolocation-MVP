@@ -333,6 +333,15 @@ export const DealMenuStep = () => {
     setEditingDiscountItem(item);
   };
 
+  const menuWizardStep =
+    state.dealType === 'BOUNTY'
+      ? { current: 3, total: 6 }
+      : state.dealType === 'HIDDEN'
+        ? { current: 4, total: 6 }
+        : state.dealType === 'REDEEM_NOW'
+          ? { current: 2, total: 4 }
+          : { current: 2, total: 9 };
+
   const handleNext = () => {
     // Check deal type and navigate accordingly
     if (state.dealType === 'BOUNTY') {
@@ -368,7 +377,7 @@ export const DealMenuStep = () => {
         onNext={handleNext}
         onBack={handleBack}
         isNextDisabled={false}
-        progress={state.dealType === 'BOUNTY' ? 40 : 35}
+        wizardStep={menuWizardStep}
       >
         <div className="space-y-4">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -387,7 +396,7 @@ export const DealMenuStep = () => {
         onNext={handleNext}
         onBack={handleBack}
         isNextDisabled={false}
-        progress={state.dealType === 'BOUNTY' ? 40 : 35}
+        wizardStep={menuWizardStep}
       >
         <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
           <Utensils className="mx-auto mb-4 h-12 w-12 text-red-500" />
@@ -423,7 +432,7 @@ export const DealMenuStep = () => {
           ? selectedMenuItems.length === 0 
           : !selectedCollectionId
       }
-      progress={state.dealType === 'BOUNTY' ? 40 : 40}
+      wizardStep={menuWizardStep}
     >
       <div className="space-y-6">
         {/* Hidden Deal Warning */}

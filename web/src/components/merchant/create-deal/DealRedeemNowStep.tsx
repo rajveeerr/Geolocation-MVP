@@ -88,7 +88,7 @@ export const DealRedeemNowStep = () => {
       }}
       onBack={() => navigate('/merchant/deals/create/type')}
       isNextDisabled={!canProceed}
-      progress={20}
+      wizardStep={{ current: 1, total: 4 }}
     >
       <div className="space-y-8 max-w-3xl mx-auto">
         {/* Hero Message */}

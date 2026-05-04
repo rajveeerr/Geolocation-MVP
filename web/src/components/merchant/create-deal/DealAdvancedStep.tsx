@@ -38,7 +38,7 @@ export const DealAdvancedStep = () => {
       onNext={() => navigate('/merchant/deals/create/review')}
       onBack={() => navigate('/merchant/deals/create/instructions')}
       isNextDisabled={false} // All fields are optional
-      progress={85}
+      wizardStep={{ current: 8, total: 9 }}
     >
       <div className="space-y-8">
         {/* Basic Advanced Settings */}

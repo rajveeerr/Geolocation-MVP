@@ -72,7 +72,7 @@ export const DealLocationStep = () => {
       onNext={() => navigate('/merchant/deals/create/instructions')}
       onBack={() => navigate('/merchant/deals/create/schedule')}
       isNextDisabled={false}
-      progress={70}
+      wizardStep={{ current: 6, total: 9 }}
     >
       <div className="space-y-8 max-w-4xl mx-auto">
         {/* Stores Section */}

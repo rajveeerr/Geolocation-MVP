@@ -147,7 +147,7 @@ export const DealOfferStep = () => {
         onNext={() => navigate('/merchant/deals/create/images')}
         onBack={() => navigate('/merchant/deals/create/menu')}
         isNextDisabled={false}
-        progress={45}
+        wizardStep={{ current: 3, total: 4 }}
       >
         <div className="space-y-8 max-w-3xl mx-auto">
           <motion.div
@@ -194,7 +194,7 @@ export const DealOfferStep = () => {
       onNext={() => navigate('/merchant/deals/create/images')}
       onBack={() => navigate('/merchant/deals/create/menu')}
       isNextDisabled={isNextDisabledSimple}
-      progress={45}
+      wizardStep={{ current: 3, total: 9 }}
     >
       <div className="space-y-10 max-w-5xl mx-auto">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 max-w-4xl mx-auto">

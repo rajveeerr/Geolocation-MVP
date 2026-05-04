@@ -91,7 +91,7 @@ export const DealHiddenVisibilityStep = () => {
       onNext={() => navigate('/merchant/deals/create/hidden/basics')}
       onBack={() => navigate('/merchant/deals/create/hidden')}
       isNextDisabled={!canProceed}
-      progress={40}
+      wizardStep={{ current: 2, total: 6 }}
     >
       <div className="space-y-8 max-w-4xl mx-auto">
         {/* Visibility Options */}

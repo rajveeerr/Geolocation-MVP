@@ -36,7 +36,9 @@ export const DealImagesStep = () => {
         }
       }}
       isNextDisabled={false} // Images are optional
-      progress={state.dealType === 'BOUNTY' ? 67 : 55}
+      wizardStep={
+        state.dealType === 'BOUNTY' ? { current: 5, total: 6 } : { current: 4, total: 9 }
+      }
     >
       <DealImageUpload
         images={state.imageUrls || []}

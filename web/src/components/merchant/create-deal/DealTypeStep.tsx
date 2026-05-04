@@ -228,7 +228,6 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
       onNext={handleNext}
       onBack={() => navigate(PATHS.MERCHANT_DASHBOARD)}
       isNextDisabled={!state.dealType}
-      progress={15}
       nextButtonText={selectedType ? 'Build this deal' : 'Select a deal type'}
       contentClassName="w-full max-w-7xl"
     >

@@ -22,6 +22,10 @@ export interface MenuCollection {
   storeId?: number | null;
   name: string;
   description: string | null;
+  coverImageUrl?: string | null;
+  servesCount?: number | null;
+  packagePrice?: number | null;
+  displayOrder?: number;
   isActive: boolean;
   menuType: MenuCollectionType;
   subType: string | null;
@@ -41,6 +45,10 @@ export interface MenuCollection {
 export interface CreateCollectionData {
   name: string;
   description?: string;
+  coverImageUrl?: string;
+  servesCount?: number | null;
+  packagePrice?: number | null;
+  displayOrder?: number | null;
   menuType?: MenuCollectionType;
   subType?: string;
   startTime?: string;
@@ -61,6 +69,10 @@ export interface CreateCollectionData {
 export interface UpdateCollectionData {
   name?: string;
   description?: string;
+  coverImageUrl?: string | null;
+  servesCount?: number | null;
+  packagePrice?: number | null;
+  displayOrder?: number | null;
   isActive?: boolean;
   menuType?: MenuCollectionType;
   subType?: string;
@@ -505,4 +517,3 @@ export const useBulkUpdateCollectionItems = () => {
     },
   });
 };
-
