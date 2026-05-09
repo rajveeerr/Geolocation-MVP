@@ -1,4 +1,5 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { Slot } from '@radix-ui/react-slot';
 import { cn } from '@/lib/utils';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -15,6 +16,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       className,
       variant = 'primary',
       size = 'md',
+      asChild = false,
       icon,
       iconPosition = 'left',
       children,
@@ -75,9 +77,25 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const iconElement = renderIcon();
+    const Comp: any = asChild ? Slot : 'button';
+
+    // When asChild is true the consumer passes a single child element (e.g. <Link/>)
+    // which Slot renders. Wrap children in a fragment so icons + content travel together.
+    const content =
+      iconPosition === 'left' ? (
+        <>
+          {iconElement}
+          {children}
+        </>
+      ) : (
+        <>
+          {children}
+          {iconElement}
+        </>
+      );
 
     return (
-      <button
+      <Comp
         className={cn(
           baseClasses,
           variantClasses[variant],
@@ -87,10 +105,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         {...props}
       >
-        {iconPosition === 'left' && iconElement}
-        {children}
-        {iconPosition === 'right' && iconElement}
-      </button>
+        {asChild ? children : content}
+      </Comp>
     );
   },
 );
