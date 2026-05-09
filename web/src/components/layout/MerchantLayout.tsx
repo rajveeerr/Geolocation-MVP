@@ -16,6 +16,7 @@ import {
   ScanSearch,
   Search,
   Settings,
+  ShoppingBag,
   Sparkles,
   Store,
   Ticket,
@@ -110,6 +111,20 @@ const navSections: MerchantNavSection[] = [
         to: PATHS.MERCHANT_MENU_COLLECTIONS,
         icon: UtensilsCrossed,
         match: (pathname) => pathname.startsWith(PATHS.MERCHANT_MENU_COLLECTIONS),
+      },
+      {
+        label: 'Catering Menu',
+        to: PATHS.MERCHANT_CATERING,
+        icon: UtensilsCrossed,
+        match: (pathname) =>
+          pathname.startsWith(PATHS.MERCHANT_CATERING) &&
+          !pathname.startsWith(PATHS.MERCHANT_CATERING_ORDERS),
+      },
+      {
+        label: 'Catering Orders',
+        to: PATHS.MERCHANT_CATERING_ORDERS,
+        icon: ShoppingBag,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_CATERING_ORDERS),
       },
       {
         label: 'Inventory',
@@ -288,6 +303,16 @@ const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; s
     match: (pathname) => pathname.startsWith('/merchant/trucks'),
     title: 'Food trucks',
     subtitle: 'Post upcoming stops so customers know where you\'ll be.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_CATERING_ORDERS),
+    title: 'Catering orders',
+    subtitle: 'Review, confirm, and track catering requests from your customers.',
+  },
+  {
+    match: (pathname) => pathname.startsWith('/merchant/catering'),
+    title: 'Catering menu',
+    subtitle: 'Build a separate catering menu with per-person pricing and customization options.',
   },
   {
     match: (pathname) => pathname.startsWith('/merchant/stores'),

@@ -200,11 +200,32 @@ const MerchantTrucksPage = React.lazy(() =>
 const MerchantTruckCreatePage = React.lazy(() =>
   import('./pages/merchant/MerchantTruckCreatePage').then((m) => ({ default: m.MerchantTruckCreatePage })),
 );
+const MerchantCateringPage = React.lazy(() =>
+  import('./pages/merchant/MerchantCateringPage').then((m) => ({ default: m.MerchantCateringPage })),
+);
+const MerchantCateringFormPage = React.lazy(() =>
+  import('./pages/merchant/MerchantCateringFormPage').then((m) => ({ default: m.MerchantCateringFormPage })),
+);
+const MerchantCateringOrdersPage = React.lazy(() =>
+  import('./pages/merchant/MerchantCateringOrdersPage').then((m) => ({ default: m.MerchantCateringOrdersPage })),
+);
+const MerchantCateringOrderDetailPage = React.lazy(() =>
+  import('./pages/merchant/MerchantCateringOrderDetailPage').then((m) => ({ default: m.MerchantCateringOrderDetailPage })),
+);
 const MerchantTruckSchedulePage = React.lazy(() =>
   import('./pages/merchant/MerchantTruckSchedulePage').then((m) => ({ default: m.MerchantTruckSchedulePage })),
 );
 const FoodTrucksPage = React.lazy(() =>
   import('./pages/FoodTrucksPage').then((m) => ({ default: m.FoodTrucksPage })),
+);
+const CateringMenuPage = React.lazy(() =>
+  import('./pages/CateringMenuPage').then((m) => ({ default: m.CateringMenuPage })),
+);
+const CateringOrderConfirmationPage = React.lazy(() =>
+  import('./pages/CateringOrderConfirmationPage').then((m) => ({ default: m.CateringOrderConfirmationPage })),
+);
+const MyCateringOrdersPage = React.lazy(() =>
+  import('./pages/MyCateringOrdersPage').then((m) => ({ default: m.MyCateringOrdersPage })),
 );
 const MerchantMyServicesPage = React.lazy(() =>
   import('./pages/merchant/MerchantMyServicesPage').then((m) => ({ default: m.MerchantMyServicesPage })),
@@ -435,6 +456,32 @@ function App() {
                     element={
                       <Suspense fallback={<LoadingOverlay />}>
                         <FoodTrucksPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={PATHS.CATERING_MENU}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <CateringMenuPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={PATHS.CATERING_ORDER_CONFIRMATION}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <CateringOrderConfirmationPage />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path={PATHS.MY_CATERING_ORDERS}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <MyCateringOrdersPage />
                       </Suspense>
                     }
                   />
@@ -723,6 +770,68 @@ function App() {
                       <MerchantLayout>
                         <Suspense fallback={<LoadingOverlay />}>
                           <MerchantTruckSchedulePage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Merchant Catering */}
+                <Route
+                  path={PATHS.MERCHANT_CATERING}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantCateringPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_CATERING_CREATE}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantCateringFormPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_CATERING_ORDERS}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantCateringOrdersPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_CATERING_ORDER_DETAIL}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantCateringOrderDetailPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_CATERING_EDIT}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantCateringFormPage />
                         </Suspense>
                       </MerchantLayout>
                     </ProtectedRoute>

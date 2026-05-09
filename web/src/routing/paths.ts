@@ -29,6 +29,11 @@ export const PATHS = {
   MERCHANT_MENU_EDIT: '/merchant/menu/:itemId/edit',
   MERCHANT_MENU_DETAIL: '/merchant/menu/:itemId',
   MERCHANT_MENU_COLLECTIONS: '/merchant/menu/collections',
+  MERCHANT_CATERING: '/merchant/catering',
+  MERCHANT_CATERING_CREATE: '/merchant/catering/create',
+  MERCHANT_CATERING_EDIT: '/merchant/catering/:itemId/edit',
+  MERCHANT_CATERING_ORDERS: '/merchant/catering/orders',
+  MERCHANT_CATERING_ORDER_DETAIL: '/merchant/catering/orders/:orderId',
   MERCHANT_INVENTORY: '/merchant/inventory',
   MERCHANT_ANALYTICS: '/merchant/analytics',
   MERCHANT_CHECKIN_GAMES: '/merchant/check-in-games',
@@ -109,6 +114,11 @@ export const PATHS = {
 
   // Food trucks (consumer)
   FOOD_TRUCKS: '/food-trucks',
+
+  // Catering (consumer)
+  CATERING_MENU: '/catering/:merchantId',
+  CATERING_ORDER_CONFIRMATION: '/catering/orders/:orderId',
+  MY_CATERING_ORDERS: '/my-activity/catering',
 
   // Events
   EVENT_DETAIL: '/events/:eventId',
