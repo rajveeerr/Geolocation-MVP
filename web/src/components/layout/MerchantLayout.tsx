@@ -278,36 +278,49 @@ const navSections: MerchantNavSection[] = [
   },
 ];
 
+// pageTitles is matched in order — keep more-specific entries above their parents.
 const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; subtitle: string }> = [
   {
-    match: (pathname) => pathname.startsWith('/merchant/blog'),
-    title: 'Blog',
-    subtitle: 'Write and publish content for your customers.',
-  },
-  {
-    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_BUSINESS),
-    title: 'My Business',
-    subtitle: 'Review the identity, status, and core details behind your merchant account.',
-  },
-  {
     match: (pathname) => pathname === PATHS.MERCHANT_DASHBOARD,
-    title: 'Merchant Dashboard',
-    subtitle: 'A cleaner control center for your storefront, campaigns, and customer activity.',
+    title: 'Dashboard',
+    subtitle: 'Your control center for storefront, campaigns, and customer activity.',
   },
   {
-    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN),
-    title: 'Hidden deals',
-    subtitle: 'Deals locked behind an access code — share with select customers only.',
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_ANALYTICS),
+    title: 'Analytics',
+    subtitle: 'Track performance with a focused operating view.',
+  },
+  // ─── Deals
+  {
+    match: (pathname) => pathname === PATHS.MERCHANT_DEALS_CREATE,
+    title: 'Create deal',
+    subtitle: 'Set up a new promotion, recurring deal, happy hour, or hidden offer.',
   },
   {
-    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_MEMBERSHIP_TIERS),
-    title: 'Membership tiers',
-    subtitle: 'Subscription perks like discounts, free delivery, and priority access. (Preview — not live yet.)',
+    match: (pathname) => /^\/merchant\/deals\/\d+\/edit$/.test(pathname),
+    title: 'Edit deal',
+    subtitle: 'Tune an existing promotion.',
   },
   {
-    match: (pathname) => pathname.startsWith('/merchant/deals'),
+    match: (pathname) => pathname.startsWith('/merchant/deals') && !pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN),
     title: 'Deals',
     subtitle: 'Create, tune, and monitor promotions from one place.',
+  },
+  // ─── Menu
+  {
+    match: (pathname) => pathname === PATHS.MERCHANT_MENU_CREATE,
+    title: 'Add menu item',
+    subtitle: 'Add a new dish, drink, or product to your menu.',
+  },
+  {
+    match: (pathname) => /^\/merchant\/menu\/\d+\/edit$/.test(pathname),
+    title: 'Edit menu item',
+    subtitle: 'Update pricing, availability, or details.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_MENU_COLLECTIONS),
+    title: 'Packages',
+    subtitle: 'Group menu items into themed sets.',
   },
   {
     match: (pathname) => pathname.startsWith('/merchant/menu'),
@@ -319,20 +332,21 @@ const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; s
     title: 'Inventory',
     subtitle: 'Track stock levels, restock items, and prevent overselling.',
   },
+  // ─── Locations
   {
-    match: (pathname) => pathname.startsWith('/merchant/trucks'),
-    title: 'Food trucks',
-    subtitle: 'Post upcoming stops so customers know where you\'ll be.',
+    match: (pathname) => pathname === PATHS.MERCHANT_STORES_CREATE,
+    title: 'Add store',
+    subtitle: 'Add a new physical location to your business.',
   },
   {
-    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_CATERING_ORDERS),
-    title: 'Catering orders',
-    subtitle: 'Review, confirm, and track catering requests from your customers.',
+    match: (pathname) => /^\/merchant\/stores\/\d+\/edit$/.test(pathname),
+    title: 'Edit store',
+    subtitle: 'Update store details, hours, or features.',
   },
   {
-    match: (pathname) => pathname.startsWith('/merchant/catering'),
-    title: 'Catering menu',
-    subtitle: 'Build a separate catering menu with per-person pricing and customization options.',
+    match: (pathname) => /^\/merchant\/stores\/\d+$/.test(pathname),
+    title: 'Store details',
+    subtitle: 'Manage this location\'s settings and content.',
   },
   {
     match: (pathname) => pathname.startsWith('/merchant/stores'),
@@ -340,34 +354,144 @@ const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; s
     subtitle: 'Manage locations, visibility, and store-level performance.',
   },
   {
+    match: (pathname) => pathname === PATHS.MERCHANT_TRUCKS_CREATE,
+    title: 'Add a food truck',
+    subtitle: 'Set up a mobile venue and optionally post your first stop.',
+  },
+  {
+    match: (pathname) => /^\/merchant\/trucks\/\d+$/.test(pathname),
+    title: 'Truck schedule',
+    subtitle: 'Post upcoming stops for this truck.',
+  },
+  {
+    match: (pathname) => pathname.startsWith('/merchant/trucks'),
+    title: 'Food trucks',
+    subtitle: 'Post upcoming stops so customers know where you\'ll be.',
+  },
+  // ─── Catering
+  {
+    match: (pathname) => /^\/merchant\/catering\/orders\/\d+$/.test(pathname),
+    title: 'Order details',
+    subtitle: 'Review and progress this catering order.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_CATERING_ORDERS),
+    title: 'Catering orders',
+    subtitle: 'Review, confirm, and track catering requests from your customers.',
+  },
+  {
+    match: (pathname) => pathname === PATHS.MERCHANT_CATERING_CREATE,
+    title: 'New catering item',
+    subtitle: 'Build a per-person package, platter, or boxed lunch.',
+  },
+  {
+    match: (pathname) => /^\/merchant\/catering\/\d+\/edit$/.test(pathname),
+    title: 'Edit catering item',
+    subtitle: 'Tweak pricing, options, or visibility.',
+  },
+  {
+    match: (pathname) => pathname.startsWith('/merchant/catering'),
+    title: 'Catering menu',
+    subtitle: 'Build a separate catering menu with per-person pricing and customization options.',
+  },
+  // ─── Incentives
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN),
+    title: 'Hidden deals',
+    subtitle: 'Deals locked behind an access code — share with select customers only.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_CHECKIN_GAMES),
+    title: 'Check-in rewards',
+    subtitle: 'Configure games and rewards customers earn for checking in.',
+  },
+  {
+    match: (pathname) => pathname.startsWith('/merchant/surprises'),
+    title: 'Surprise rewards',
+    subtitle: 'Reveal-based offers that surprise customers near you.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_KICKBACKS),
+    title: 'Cashback rewards',
+    subtitle: 'Track how referrals convert into spend and kickback distributed.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_MEMBERSHIP_TIERS),
+    title: 'Membership tiers',
+    subtitle: 'Subscription perks like discounts, free delivery, and priority access. (Preview — not live yet.)',
+  },
+  // ─── Experiences
+  {
+    match: (pathname) => pathname === PATHS.MERCHANT_EVENTS_CREATE,
+    title: 'Create event',
+    subtitle: 'Schedule a live experience for your customers.',
+  },
+  {
     match: (pathname) => pathname.startsWith('/merchant/events'),
     title: 'Events',
     subtitle: 'Coordinate live experiences and attendance operations.',
+  },
+  {
+    match: (pathname) => pathname === PATHS.MERCHANT_SERVICES_CREATE,
+    title: 'Create service',
+    subtitle: 'Add a new bookable service.',
   },
   {
     match: (pathname) => pathname.startsWith('/merchant/services'),
     title: 'Services',
     subtitle: 'Organize bookable services with a calmer workflow.',
   },
+  // ─── Loyalty
   {
-    match: (pathname) => pathname.startsWith('/merchant/surprises'),
-    title: 'Surprises',
-    subtitle: 'Launch reveal-based offers with stronger visual control.',
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_LOYALTY_PROGRAM),
+    title: 'Loyalty program',
+    subtitle: 'Configure points, rewards, and how customers progress.',
   },
   {
-    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_CHECKIN_GAMES),
-    title: 'Check-in Games',
-    subtitle: 'Shape a polished post check-in reward experience.',
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_LOYALTY_CUSTOMERS),
+    title: 'Loyalty customers',
+    subtitle: 'See member balances, recent activity, and segments.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_LOYALTY_TRANSACTIONS),
+    title: 'Loyalty transactions',
+    subtitle: 'Audit every points event across your customers.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_LOYALTY_SETUP),
+    title: 'Loyalty setup',
+    subtitle: 'Initial configuration for your loyalty program.',
   },
   {
     match: (pathname) => pathname.startsWith('/merchant/loyalty'),
-    title: 'Loyalty',
+    title: 'Loyalty analytics',
     subtitle: 'Review customer retention and refine your program.',
   },
+  // ─── Content + business
   {
-    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_ANALYTICS),
-    title: 'Analytics',
-    subtitle: 'Track performance with a more focused operating view.',
+    match: (pathname) => pathname === PATHS.MERCHANT_BLOG_CREATE,
+    title: 'Create post',
+    subtitle: 'Write content to publish on your storefront.',
+  },
+  {
+    match: (pathname) => /^\/merchant\/blog\/\d+\/edit$/.test(pathname),
+    title: 'Edit post',
+    subtitle: 'Update an existing blog post.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_BLOG_CATEGORIES),
+    title: 'Blog categories',
+    subtitle: 'Organize your blog by topic.',
+  },
+  {
+    match: (pathname) => pathname.startsWith('/merchant/blog'),
+    title: 'Blog',
+    subtitle: 'Write and publish content for your customers.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_BUSINESS),
+    title: 'My Business',
+    subtitle: 'Review the identity, status, and core details behind your merchant account.',
   },
 ];
 
@@ -953,22 +1077,23 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
             </div>
 
             <div className="bg-[#f5f5f7] px-4 py-4 sm:px-6 lg:px-8">
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-neutral-400">
+              <div className="min-w-0">
+                <nav aria-label="Breadcrumb" className="flex items-center gap-1.5">
+                  <Link
+                    to={activeSection.items[0]?.to ?? PATHS.MERCHANT_DASHBOARD}
+                    className="text-[10px] font-semibold uppercase tracking-[0.22em] text-neutral-500 transition-colors hover:text-neutral-900"
+                  >
                     {activeSection.label}
-                  </p>
-                  <h1 className="truncate text-[1.55rem] font-semibold tracking-tight text-neutral-950 sm:text-[1.75rem]">
+                  </Link>
+                  <ChevronRight className="h-3 w-3 shrink-0 text-neutral-400" aria-hidden />
+                  <span className="truncate text-[10px] font-semibold uppercase tracking-[0.22em] text-neutral-900">
                     {pageMeta.title}
-                  </h1>
-                  <p className="mt-1 max-w-3xl text-[13px] text-neutral-500 sm:text-sm">{pageMeta.subtitle}</p>
-                </div>
-
-                <div className="hidden min-w-[220px] rounded-[1.15rem] border border-neutral-200/80 bg-white/90 px-4 py-3 shadow-sm lg:block">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Active section</div>
-                  <div className="mt-1 text-[13px] font-semibold text-neutral-900">{activeSection.label}</div>
-                  <div className="mt-1 text-[13px] text-neutral-500">{activeSection.items.length} integrated destinations ready.</div>
-                </div>
+                  </span>
+                </nav>
+                <h1 className="mt-1.5 truncate text-[1.55rem] font-semibold tracking-tight text-neutral-950 sm:text-[1.75rem]">
+                  {pageMeta.title}
+                </h1>
+                <p className="mt-1 max-w-3xl text-[13px] text-neutral-500 sm:text-sm">{pageMeta.subtitle}</p>
               </div>
             </div>
           </header>
