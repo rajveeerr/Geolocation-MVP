@@ -197,6 +197,12 @@ const MyServiceBookingsPage = React.lazy(() =>
 const MerchantTrucksPage = React.lazy(() =>
   import('./pages/merchant/MerchantTrucksPage').then((m) => ({ default: m.MerchantTrucksPage })),
 );
+const MerchantHiddenDealsPage = React.lazy(() =>
+  import('./pages/merchant/MerchantHiddenDealsPage').then((m) => ({ default: m.MerchantHiddenDealsPage })),
+);
+const MerchantMembershipTiersPage = React.lazy(() =>
+  import('./pages/merchant/MerchantMembershipTiersPage').then((m) => ({ default: m.MerchantMembershipTiersPage })),
+);
 const MerchantTruckCreatePage = React.lazy(() =>
   import('./pages/merchant/MerchantTruckCreatePage').then((m) => ({ default: m.MerchantTruckCreatePage })),
 );
@@ -598,6 +604,30 @@ function App() {
                       <MerchantLayout>
                         <Suspense fallback={<LoadingOverlay />}>
                           <MerchantMyDealsPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_DEALS_HIDDEN}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantHiddenDealsPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_MEMBERSHIP_TIERS}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantMembershipTiersPage />
                         </Suspense>
                       </MerchantLayout>
                     </ProtectedRoute>

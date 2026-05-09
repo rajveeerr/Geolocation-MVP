@@ -136,7 +136,7 @@ function MerchantCateringOrdersInner() {
   return (
     <div className="mx-auto max-w-screen-xl space-y-6 px-4 py-3 sm:px-1 sm:py-4">
       <div>
-        <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Commerce</div>
+        <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Catering</div>
         <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-neutral-900">Catering orders</h1>
         <p className="mt-2 text-[13px] text-neutral-500 sm:text-sm">{subtitle}</p>
       </div>

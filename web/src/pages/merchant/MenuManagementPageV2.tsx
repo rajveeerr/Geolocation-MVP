@@ -283,7 +283,7 @@ const MenuManagementPageV2: React.FC = () => {
       <section className={cn(panelClass, 'overflow-hidden bg-gradient-to-br from-white via-white to-[#f6f7f9] p-5 sm:p-6')}>
         <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
           <div className="max-w-3xl">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Commerce</div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Menu</div>
             <div className="mt-3 flex items-start gap-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[1rem] bg-brand/10">
                 <LayoutGrid className="h-6 w-6 text-brand" />

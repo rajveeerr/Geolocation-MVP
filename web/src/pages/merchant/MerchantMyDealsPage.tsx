@@ -345,7 +345,7 @@ const MerchantMyDealsContent = () => {
       <div className="mb-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Commerce</div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Deals</div>
             <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-neutral-900">My Deals</h1>
             <p className="mt-2 max-w-2xl text-[13px] text-neutral-600 sm:text-sm">
               Manage active, scheduled, and expired promotions with a cleaner operating view.

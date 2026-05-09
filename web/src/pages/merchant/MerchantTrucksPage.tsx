@@ -92,7 +92,7 @@ function MerchantTrucksContent() {
     <div className="mx-auto max-w-screen-xl space-y-6 px-4 py-3 sm:px-1 sm:py-4">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Commerce</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Locations</div>
           <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-neutral-900">Food trucks</h1>
           <p className="mt-2 max-w-xl text-[13px] text-neutral-500 sm:text-sm">
             Post upcoming stops so customers can see where you'll be. Each stop appears on the food trucks page and on any deals for this truck.

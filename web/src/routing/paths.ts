@@ -17,6 +17,8 @@ export const PATHS = {
   MERCHANT_ONBOARDING: '/merchant/onboarding',
   MERCHANT_DEALS_CREATE: '/merchant/deals/create',
   MERCHANT_DEALS: '/merchant/deals',
+  MERCHANT_DEALS_HIDDEN: '/merchant/deals/hidden',
+  MERCHANT_MEMBERSHIP_TIERS: '/merchant/membership-tiers',
   MERCHANT_STORES: '/merchant/stores',
   MERCHANT_STORES_CREATE: '/merchant/stores/create',
   MERCHANT_STORES_EDIT: '/merchant/stores/:storeId/edit',
