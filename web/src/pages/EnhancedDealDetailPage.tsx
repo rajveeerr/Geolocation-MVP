@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { MerchantLogo } from '@/components/common/MerchantLogo';
 import { useLoyaltyBalance, useLoyaltyProgram } from '@/hooks/useLoyalty';
 import { formatDealTypeForDisplay } from '@/utils/dealTypeUtils';
+import { DealLocationLine } from '@/components/deals/DealLocationLine';
 
 // Icons
 import {
@@ -261,11 +262,8 @@ const MerchantInfoSection = ({ merchant }: { merchant: DetailedDeal['merchant'] 
           )}
           
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-neutral-500" />
-              <span className="text-sm text-neutral-700">{merchant.address}</span>
-            </div>
-            
+            <DealLocationLine merchant={merchant} variant="detail" />
+
             <div className="flex items-center gap-2">
               <Building className="h-4 w-4 text-neutral-500" />
               <span className="text-sm text-neutral-700">
@@ -796,20 +794,31 @@ export const EnhancedDealDetailPage = () => {
               {/* Quick Actions: Check-in, Directions */}
               <div className="p-6 lg:p-8 border-t border-neutral-200 bg-gradient-to-br from-white to-neutral-50 space-y-4">
                 {/* Check In Button */}
-                <Button
-                  variant="primary"
-                  size="lg"
-                  className="w-full rounded-full h-14 text-base font-semibold shadow-lg"
-                  onClick={handleCheckIn}
-                  disabled={isCheckingIn || !deal.status.isActive}
-                >
-                  {isCheckingIn ? (
-                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  ) : (
-                    <CheckCircle className="h-5 w-5 mr-2" />
-                  )}
-                  {deal.status.isActive ? "Check In" : "Deal Not Active"}
-                </Button>
+                {(() => {
+                  const truckStore = deal.merchant.stores?.find((s) => s.isFoodTruck);
+                  const truckHasNoStop = !!truckStore && !truckStore.currentStop;
+                  const disabled = isCheckingIn || !deal.status.isActive || truckHasNoStop;
+                  let label = 'Check In';
+                  if (!deal.status.isActive) label = 'Deal Not Active';
+                  else if (truckHasNoStop) label = 'Truck not at a stop right now';
+                  return (
+                    <Button
+                      variant="primary"
+                      size="lg"
+                      className="w-full rounded-full h-14 text-base font-semibold shadow-lg"
+                      onClick={handleCheckIn}
+                      disabled={disabled}
+                      title={truckHasNoStop ? `${deal.merchant.businessName} hasn't posted today's location yet.` : undefined}
+                    >
+                      {isCheckingIn ? (
+                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                      ) : (
+                        <CheckCircle className="h-5 w-5 mr-2" />
+                      )}
+                      {label}
+                    </Button>
+                  );
+                })()}
                 
                 {/* Get Directions Button */}
                 {deal.merchant.latitude && deal.merchant.longitude && (

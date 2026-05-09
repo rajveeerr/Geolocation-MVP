@@ -19,6 +19,7 @@ import {
   Sparkles,
   Store,
   Ticket,
+  Truck,
   UserCircle2,
   UtensilsCrossed,
   WandSparkles,
@@ -127,6 +128,12 @@ const navSections: MerchantNavSection[] = [
         to: PATHS.MERCHANT_STORES_CREATE,
         icon: Store,
         match: (pathname) => pathname === PATHS.MERCHANT_STORES_CREATE,
+      },
+      {
+        label: 'Food trucks',
+        to: PATHS.MERCHANT_TRUCKS,
+        icon: Truck,
+        match: (pathname) => pathname.startsWith('/merchant/trucks'),
       },
     ],
   },
@@ -276,6 +283,11 @@ const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; s
     match: (pathname) => pathname.startsWith(PATHS.MERCHANT_INVENTORY),
     title: 'Inventory',
     subtitle: 'Track stock levels, restock items, and prevent overselling.',
+  },
+  {
+    match: (pathname) => pathname.startsWith('/merchant/trucks'),
+    title: 'Food trucks',
+    subtitle: 'Post upcoming stops so customers know where you\'ll be.',
   },
   {
     match: (pathname) => pathname.startsWith('/merchant/stores'),

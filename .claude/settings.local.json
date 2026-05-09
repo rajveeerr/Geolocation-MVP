@@ -1,7 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Read(//c/Geolocation-MVP/**)"
+      "Read(//c/Geolocation-MVP/**)",
+      "Bash(git *)",
+      "Bash(npx --no-install tsc --noEmit)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(./node_modules/.bin/prisma format *)",
+      "Bash(./node_modules/.bin/prisma migrate *)",
+      "Bash(./node_modules/.bin/prisma db *)",
+      "Bash(./node_modules/.bin/prisma generate *)",
+      "Bash(npm run *)",
+      "Bash(tail -25 \"C:\\\\\\\\Users\\\\\\\\divya\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\claude\\\\\\\\C--Geolocation-MVP\\\\\\\\57ed68c5-822c-4d1b-a170-b5b44b6f1b50\\\\\\\\tasks\\\\\\\\bod352cj5.output\")",
+      "Bash(tail -25 \"C:\\\\\\\\Users\\\\\\\\divya\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\claude\\\\\\\\C--Geolocation-MVP\\\\\\\\57ed68c5-822c-4d1b-a170-b5b44b6f1b50\\\\\\\\tasks\\\\\\\\bbir8uknc.output\")"
     ]
   }
 }

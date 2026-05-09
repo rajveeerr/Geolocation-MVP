@@ -4,6 +4,7 @@ import type { DetailedDeal } from '@/hooks/useDealDetail';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { cn } from '@/lib/utils';
+import { DealLocationLine } from '@/components/deals/DealLocationLine';
 
 interface OverviewTabProps {
   deal: DetailedDeal;
@@ -204,8 +205,8 @@ export const OverviewTab = ({ deal }: OverviewTabProps) => {
           <h2 className="text-2xl font-bold mb-4">Where you'll dine</h2>
           <div className="bg-white rounded-xl overflow-hidden border border-neutral-200">
             <div className="p-4 border-b border-neutral-200">
-              <p className="font-semibold text-neutral-900">{merchant.address}</p>
-              <p className="text-sm text-neutral-600">
+              <DealLocationLine merchant={merchant} variant="detail" />
+              <p className="mt-1 text-sm text-neutral-600">
                 {merchant.stores?.[0]?.city?.name}, {merchant.stores?.[0]?.city?.state}
               </p>
             </div>

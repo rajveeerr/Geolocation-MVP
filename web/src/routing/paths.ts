@@ -21,6 +21,9 @@ export const PATHS = {
   MERCHANT_STORES_CREATE: '/merchant/stores/create',
   MERCHANT_STORES_EDIT: '/merchant/stores/:storeId/edit',
   MERCHANT_STORES_DETAIL: '/merchant/stores/:storeId',
+  MERCHANT_TRUCKS: '/merchant/trucks',
+  MERCHANT_TRUCKS_CREATE: '/merchant/trucks/create',
+  MERCHANT_TRUCK_SCHEDULE: '/merchant/trucks/:storeId',
   MERCHANT_MENU: '/merchant/menu',
   MERCHANT_MENU_CREATE: '/merchant/menu/create',
   MERCHANT_MENU_EDIT: '/merchant/menu/:itemId/edit',
@@ -103,6 +106,9 @@ export const PATHS = {
   // Consumer Surprises
   SURPRISES: '/surprises',
   MY_REVEAL_HISTORY: '/surprises/history',
+
+  // Food trucks (consumer)
+  FOOD_TRUCKS: '/food-trucks',
 
   // Events
   EVENT_DETAIL: '/events/:eventId',

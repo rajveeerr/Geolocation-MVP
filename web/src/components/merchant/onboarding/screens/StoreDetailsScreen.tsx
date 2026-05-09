@@ -18,8 +18,9 @@ import {
   Utensils, ShoppingBag, Briefcase, Music2, Heart, MoreHorizontal,
   Phone, Mail, Copy, Check, Plus, X,
   Wifi, Car, CreditCard, Users, ExternalLink,
-  CheckCircle2, Sparkles,
+  CheckCircle2, Sparkles, Truck,
 } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 
 // Phone formatting utilities
 const formatPhoneDisplay = (value: string) => {
@@ -68,7 +69,6 @@ export const StoreDetailsScreen = () => {
           ...getDefaultFirstStore(),
           businessName: state.businessName,
           phoneNumber: state.phoneNumber,
-          isFoodTruck: state.isFoodTruck,
         },
       });
     }
@@ -147,6 +147,28 @@ export const StoreDetailsScreen = () => {
               cities={cities}
               attempted={attempted}
             />
+          </section>
+
+          {/* ====== MOBILE / FOOD TRUCK ====== */}
+          <section className="rounded-xl border border-neutral-200 bg-white p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100">
+                  <Truck className="h-5 w-5 text-amber-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-neutral-900">Food truck or mobile venue</p>
+                  <p className="text-xs text-neutral-500">
+                    Does this location move? You'll post stops on a schedule instead of fixed hours.
+                  </p>
+                </div>
+              </div>
+              <Switch
+                checked={store.isFoodTruck ?? false}
+                onCheckedChange={(checked) => updateStore({ isFoodTruck: checked })}
+                aria-label="Food truck or mobile venue"
+              />
+            </div>
           </section>
 
           {/* ====== STORE INFO ====== */}

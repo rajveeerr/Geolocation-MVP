@@ -28,7 +28,6 @@ export interface OnboardingState {
   vibeTags: string[];
   amenities: string[];
   thingsToNote: string;
-  isFoodTruck: boolean;
   /** First store (location) - used when store flow is part of onboarding */
   firstStore: StoreWizardData | null;
 }
@@ -56,7 +55,6 @@ export type OnboardingAction =
   | { type: 'TOGGLE_VIBE_TAG'; payload: string }
   | { type: 'TOGGLE_AMENITY'; payload: string }
   | { type: 'SET_CONTACT_EMAIL'; payload: string }
-  | { type: 'SET_IS_FOOD_TRUCK'; payload: boolean }
   | { type: 'SET_TIKTOK_URL'; payload: string }
   | { type: 'SET_YOUTUBE_URL'; payload: string }
   | { type: 'SET_OWNER_NAME'; payload: string }
@@ -91,7 +89,6 @@ const initialState: OnboardingState = {
   vibeTags: [],
   amenities: [],
   thingsToNote: '',
-  isFoodTruck: false,
   firstStore: null,
 };
 
@@ -153,8 +150,6 @@ function reducer(state: OnboardingState, action: OnboardingAction): OnboardingSt
       };
     case 'SET_CONTACT_EMAIL':
       return { ...state, contactEmail: action.payload };
-    case 'SET_IS_FOOD_TRUCK':
-      return { ...state, isFoodTruck: action.payload };
     case 'SET_TIKTOK_URL':
       return { ...state, tiktokUrl: action.payload };
     case 'SET_YOUTUBE_URL':

@@ -194,6 +194,18 @@ const ServiceDetailPage = React.lazy(() =>
 const MyServiceBookingsPage = React.lazy(() =>
   import('./pages/MyServiceBookingsPage').then((m) => ({ default: m.MyServiceBookingsPage })),
 );
+const MerchantTrucksPage = React.lazy(() =>
+  import('./pages/merchant/MerchantTrucksPage').then((m) => ({ default: m.MerchantTrucksPage })),
+);
+const MerchantTruckCreatePage = React.lazy(() =>
+  import('./pages/merchant/MerchantTruckCreatePage').then((m) => ({ default: m.MerchantTruckCreatePage })),
+);
+const MerchantTruckSchedulePage = React.lazy(() =>
+  import('./pages/merchant/MerchantTruckSchedulePage').then((m) => ({ default: m.MerchantTruckSchedulePage })),
+);
+const FoodTrucksPage = React.lazy(() =>
+  import('./pages/FoodTrucksPage').then((m) => ({ default: m.FoodTrucksPage })),
+);
 const MerchantMyServicesPage = React.lazy(() =>
   import('./pages/merchant/MerchantMyServicesPage').then((m) => ({ default: m.MerchantMyServicesPage })),
 );
@@ -416,6 +428,14 @@ function App() {
                           <CityGuidePage />
                         </Suspense>
                       </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path={PATHS.FOOD_TRUCKS}
+                    element={
+                      <Suspense fallback={<LoadingOverlay />}>
+                        <FoodTrucksPage />
+                      </Suspense>
                     }
                   />
                   <Route
@@ -665,6 +685,44 @@ function App() {
                       <MerchantLayout>
                         <Suspense fallback={<LoadingOverlay />}>
                           <MerchantOnboardingPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Merchant Food Trucks */}
+                <Route
+                  path={PATHS.MERCHANT_TRUCKS}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantTrucksPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_TRUCKS_CREATE}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantTruckCreatePage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_TRUCK_SCHEDULE}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantTruckSchedulePage />
                         </Suspense>
                       </MerchantLayout>
                     </ProtectedRoute>

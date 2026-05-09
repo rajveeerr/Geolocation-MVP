@@ -9,6 +9,7 @@ import {
   Loader2,
   X,
   ChevronDown,
+  Truck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DealResultCard } from './DealResultCard';
@@ -50,6 +51,10 @@ interface DealsSidebarProps {
   setSortBy?: (sort: string) => void;
   // --- NEW: Error handling ---
   error?: string | null;
+  // --- NEW: Food truck filter (additive) ---
+  includeTrucks?: boolean;
+  setIncludeTrucks?: (v: boolean) => void;
+  liveTrucksCount?: number;
 }
 
 // Deal type options
@@ -88,6 +93,9 @@ export const DealsSidebar = ({
   sortBy = 'newest',
   setSortBy = () => {},
   error = null,
+  includeTrucks = true,
+  setIncludeTrucks = () => {},
+  liveTrucksCount = 0,
 }: DealsSidebarProps) => {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   
@@ -235,6 +243,34 @@ export const DealsSidebar = ({
                 </>
               )}
             </div>
+          </div>
+
+          {/* Food trucks chip (additive) */}
+          <div className="mb-4">
+            <button
+              type="button"
+              onClick={() => setIncludeTrucks(!includeTrucks)}
+              aria-pressed={includeTrucks}
+              className={cn(
+                'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition',
+                includeTrucks
+                  ? 'border-amber-500 bg-amber-500 text-white shadow-sm'
+                  : 'border-neutral-200 bg-white text-neutral-700 hover:border-amber-400',
+              )}
+            >
+              <Truck className="h-3.5 w-3.5" />
+              Food trucks
+              {liveTrucksCount > 0 && (
+                <span
+                  className={cn(
+                    'rounded-full px-1.5 py-0.5 text-[10px]',
+                    includeTrucks ? 'bg-white/25 text-white' : 'bg-amber-100 text-amber-800',
+                  )}
+                >
+                  {liveTrucksCount} live
+                </span>
+              )}
+            </button>
           </div>
 
           {/* Radius Filter */}
