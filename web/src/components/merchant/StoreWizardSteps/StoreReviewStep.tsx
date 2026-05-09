@@ -38,8 +38,27 @@ const FEATURE_ICONS = {
   group_friendly: Users,
 };
 
+const DEFAULT_DAY_HOURS = { open: '09:00', close: '17:00', closed: true };
+
+const DEFAULT_BUSINESS_HOURS: Record<string, { open: string; close: string; closed: boolean }> = {
+  monday: { ...DEFAULT_DAY_HOURS },
+  tuesday: { ...DEFAULT_DAY_HOURS },
+  wednesday: { ...DEFAULT_DAY_HOURS },
+  thursday: { ...DEFAULT_DAY_HOURS },
+  friday: { ...DEFAULT_DAY_HOURS },
+  saturday: { ...DEFAULT_DAY_HOURS },
+  sunday: { ...DEFAULT_DAY_HOURS },
+};
+
 export const StoreReviewStep = ({ data, cities }: StoreReviewStepProps) => {
   const selectedCity = cities.find(city => city.id === data.cityId);
+
+  // Existing stores may come in with businessHours = null/undefined (legacy rows
+  // before hours were captured). Normalize so review-screen reads never crash.
+  const businessHours: Record<string, { open: string; close: string; closed: boolean }> =
+    data.businessHours && typeof data.businessHours === 'object'
+      ? { ...DEFAULT_BUSINESS_HOURS, ...data.businessHours }
+      : DEFAULT_BUSINESS_HOURS;
 
   const formatTime = (time: string) => {
     const [hours, minutes] = time.split(':');
@@ -50,7 +69,7 @@ export const StoreReviewStep = ({ data, cities }: StoreReviewStepProps) => {
   };
 
   const getDayStatus = (day: string) => {
-    const dayHours = data.businessHours[day];
+    const dayHours = businessHours[day] ?? DEFAULT_DAY_HOURS;
     if (dayHours.closed) {
       return 'Closed';
     }
@@ -143,7 +162,7 @@ export const StoreReviewStep = ({ data, cities }: StoreReviewStepProps) => {
           <div>
             <h4 className="text-sm font-semibold text-neutral-700 mb-3">Business Hours</h4>
             <div className="space-y-2">
-              {Object.entries(data.businessHours).map(([day, hours]) => (
+              {Object.entries(businessHours).map(([day, hours]) => (
                 <div key={day} className="flex items-center justify-between py-1">
                   <span className="text-sm font-medium text-neutral-700 capitalize">{day}</span>
                   <span className="text-sm text-neutral-600">{getDayStatus(day)}</span>
@@ -197,7 +216,7 @@ export const StoreReviewStep = ({ data, cities }: StoreReviewStepProps) => {
                 <div className="flex items-center gap-1">
                   <Clock className="h-3 w-3 text-neutral-500" />
                   <span className="text-xs text-neutral-500">
-                    {data.businessHours.monday.closed ? 'Closed' : `${formatTime(data.businessHours.monday.open)} - ${formatTime(data.businessHours.monday.close)}`}
+                    {businessHours.monday.closed ? 'Closed' : `${formatTime(businessHours.monday.open)} - ${formatTime(businessHours.monday.close)}`}
                   </span>
                 </div>
                 <div className="flex items-center gap-1">

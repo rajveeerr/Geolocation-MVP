@@ -19,6 +19,7 @@ import { PostCheckInGameModal } from '@/components/gamification/PostCheckInGameM
 import { TableBookingModal } from '@/components/table-booking/TableBookingModal';
 import { LeaderboardTab } from '@/components/deals/detail-tabs/LeaderboardTab';
 import { EventsTab } from '@/components/deals/detail-tabs/EventsTab';
+import { CateringTab } from '@/components/deals/detail-tabs/CateringTab';
 import {
   placeholderReviews, placeholderRatingsSummary, placeholderArticles,
   placeholderVibeTags, placeholderHours, placeholderThingsToKnow,
@@ -45,7 +46,7 @@ const LEFT_TABS: { id: LeftTab; label: string; enabled: boolean }[] = [
 const RIGHT_TABS: { id: RightTab; label: string; enabled: boolean; comingSoon?: boolean }[] = [
   { id: 'menu', label: 'MENU', enabled: true },
   { id: 'events', label: 'EVENTS', enabled: true },
-  { id: 'catering', label: 'CATERING', enabled: false, comingSoon: true },
+  { id: 'catering', label: 'CATERING', enabled: true },
   { id: 'merch', label: 'MERCH', enabled: false, comingSoon: true },
   { id: 'rides', label: 'RIDES', enabled: false, comingSoon: true },
   { id: 'leaders', label: 'LEADERS', enabled: true },
@@ -1796,8 +1797,14 @@ export const DealDetailPage = () => {
             {rightTab === 'events' && <EventsTab deal={deal} />}
             {/* ---------- LEADERS ---------- */}
             {rightTab === 'leaders' && <LeaderboardTab deal={deal} />}
+            {/* ---------- CATERING ---------- */}
+            {rightTab === 'catering' && (
+              <CateringTab
+                merchantId={deal.merchant.id}
+                merchantName={deal.merchant.businessName}
+              />
+            )}
             {/* ---------- Coming Soon tabs ---------- */}
-            {rightTab === 'catering' && <ComingSoonOverlay feature="Catering" />}
             {rightTab === 'merch' && <ComingSoonOverlay feature="Merchandise" />}
             {rightTab === 'rides' && <ComingSoonOverlay feature="Rides" />}
             {rightTab === 'games' && <ComingSoonOverlay feature="Games" />}

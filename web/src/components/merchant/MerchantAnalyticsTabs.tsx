@@ -202,11 +202,14 @@ const DealPerformanceContent = ({ period }: { period: string }) => {
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-4 xl:grid-cols-5">
-        <AnalyticsStatCard label="Total deals" value={formatCompactNumber(data.summary.totalDeals)} />
-        <AnalyticsStatCard label="Active deals" value={formatCompactNumber(data.summary.activeDeals)} />
-        <AnalyticsStatCard label="Check-ins" value={formatCompactNumber(data.summary.totalCheckIns)} />
-        <AnalyticsStatCard label="Saves" value={formatCompactNumber(data.summary.totalSaves)} />
-        <AnalyticsStatCard label="Conversion" value={`${data.summary.averageConversionRate.toFixed(1)}%`} />
+        <AnalyticsStatCard label="Total deals" value={formatCompactNumber(data.summary.totalDeals ?? 0)} />
+        <AnalyticsStatCard label="Active deals" value={formatCompactNumber(data.summary.activeDeals ?? 0)} />
+        <AnalyticsStatCard label="Check-ins" value={formatCompactNumber(data.summary.totalCheckIns ?? 0)} />
+        <AnalyticsStatCard label="Saves" value={formatCompactNumber(data.summary.totalSaves ?? 0)} />
+        <AnalyticsStatCard
+          label="Conversion"
+          value={`${(data.summary.averageConversionRate ?? 0).toFixed(1)}%`}
+        />
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.95fr)]">
