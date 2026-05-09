@@ -210,11 +210,10 @@ export const useDealDetail = (dealId: string) => {
       throw new Error(response.error || 'Deal not found');
     },
     enabled: !!dealId,
-    // Truck-bound deals carry a moving currentStop — keep their cache short so
-    // "Live now @ X" doesn't drift. Static-store deals can afford the longer cache.
+    // Short cache keeps truck-bound deals fresh ("Live now @ X" doesn't drift).
+    // For non-truck deals it's a small over-fetch; not worth a dynamic refetch
+    // function which destabilizes React Query's internal hook count.
     staleTime: 60 * 1000,
-    refetchInterval: (query) =>
-      query.state.data?.merchant?.stores?.some((s) => s.isFoodTruck) ? 60_000 : false,
     retry: (failureCount, error) => {
       // Don't retry if it's a 404 (deal not found)
       if (error.message.includes('404') || error.message.includes('not found')) {
