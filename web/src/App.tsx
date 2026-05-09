@@ -200,6 +200,15 @@ const MerchantTrucksPage = React.lazy(() =>
 const MerchantHiddenDealsPage = React.lazy(() =>
   import('./pages/merchant/MerchantHiddenDealsPage').then((m) => ({ default: m.MerchantHiddenDealsPage })),
 );
+const MerchantBountyDealsPage = React.lazy(() =>
+  import('./pages/merchant/MerchantBountyDealsPage').then((m) => ({ default: m.MerchantBountyDealsPage })),
+);
+const MerchantReferralsPage = React.lazy(() =>
+  import('./pages/merchant/MerchantReferralsPage').then((m) => ({ default: m.MerchantReferralsPage })),
+);
+const MerchantReferralDealsPage = React.lazy(() =>
+  import('./pages/merchant/MerchantReferralDealsPage').then((m) => ({ default: m.MerchantReferralDealsPage })),
+);
 const MerchantMembershipTiersPage = React.lazy(() =>
   import('./pages/merchant/MerchantMembershipTiersPage').then((m) => ({ default: m.MerchantMembershipTiersPage })),
 );
@@ -616,6 +625,42 @@ function App() {
                       <MerchantLayout>
                         <Suspense fallback={<LoadingOverlay />}>
                           <MerchantHiddenDealsPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_DEALS_BOUNTIES}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantBountyDealsPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_REFERRALS}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantReferralsPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_REFERRAL_DEALS}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantReferralDealsPage />
                         </Suspense>
                       </MerchantLayout>
                     </ProtectedRoute>

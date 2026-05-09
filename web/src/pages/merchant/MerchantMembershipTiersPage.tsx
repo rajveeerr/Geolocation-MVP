@@ -1,15 +1,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Award,
   CheckCircle2,
   Clock3,
-  Crown,
-  Edit3,
-  Gem,
+  CreditCard,
   Plus,
   Sparkles,
-  Trash2,
   Users,
   Wand2,
   Zap,
@@ -25,77 +21,44 @@ const panelClass =
 interface MockTier {
   id: string;
   name: string;
-  icon: typeof Crown;
-  accent: string;
   monthlyPrice: number;
-  description: string;
   perks: string[];
   members: number;
 }
 
 const DEFAULT_TIERS: MockTier[] = [
   {
-    id: 'bronze',
-    name: 'Bronze',
-    icon: Award,
-    accent: 'from-amber-100 to-amber-50 text-amber-700 ring-amber-200',
-    monthlyPrice: 4.99,
-    description: 'Light perks for occasional customers.',
-    perks: [
-      '5% off any order',
-      'Member-only weekly deal',
-      'Standard delivery (no priority)',
-    ],
-    members: 124,
-  },
-  {
-    id: 'silver',
-    name: 'Silver',
-    icon: Gem,
-    accent: 'from-slate-100 to-slate-50 text-slate-700 ring-slate-300',
-    monthlyPrice: 9.99,
-    description: 'Better discounts and free standard delivery.',
-    perks: [
-      '10% off any order',
-      'Free standard delivery',
-      'Early access to new deals (24h)',
-      '2× loyalty points on every visit',
-    ],
-    members: 58,
-  },
-  {
     id: 'gold',
-    name: 'Gold',
-    icon: Crown,
-    accent: 'from-yellow-200 to-yellow-50 text-yellow-800 ring-yellow-300',
-    monthlyPrice: 19.99,
-    description: 'Best for regulars — biggest discounts and priority everything.',
-    perks: [
-      '15% off any order',
-      'Free priority delivery',
-      'Skip-the-line at pickup',
-      '3× loyalty points',
-      'Birthday gift voucher',
-      'Exclusive monthly chef event',
-    ],
-    members: 19,
+    name: 'Gold Member',
+    monthlyPrice: 29.99,
+    perks: ['10% OFF all orders', 'Free delivery', 'Early access'],
+    members: 156,
+  },
+  {
+    id: 'platinum',
+    name: 'Platinum VIP',
+    monthlyPrice: 49.99,
+    perks: ['20% OFF all orders', 'Free delivery', 'Priority seating', 'Birthday gift'],
+    members: 47,
   },
 ];
 
 const ALL_PERKS = [
-  '5% off any order',
-  '10% off any order',
-  '15% off any order',
-  'Free standard delivery',
+  '5% OFF all orders',
+  '10% OFF all orders',
+  '15% OFF all orders',
+  '20% OFF all orders',
+  'Free delivery',
   'Free priority delivery',
+  'Priority seating',
   'Skip-the-line at pickup',
-  'Early access to new deals (24h)',
-  'Early access to new deals (48h)',
+  'Early access',
+  'Early access (24h)',
+  'Early access (48h)',
   '2× loyalty points',
   '3× loyalty points',
+  'Birthday gift',
   'Member-only weekly deal',
-  'Birthday gift voucher',
-  'Exclusive monthly chef event',
   'Free dessert with any meal',
   'Reservation priority',
 ];
@@ -103,94 +66,66 @@ const ALL_PERKS = [
 function PerkRow({ text }: { text: string }) {
   return (
     <li className="flex items-start gap-2 text-sm text-neutral-700">
-      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" aria-hidden />
+      <span className="mt-2 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500" aria-hidden />
       <span>{text}</span>
     </li>
   );
 }
 
-function TierCard({
-  tier,
-  onEdit,
-  onDelete,
-}: {
-  tier: MockTier;
-  onEdit: (tier: MockTier) => void;
-  onDelete: (tier: MockTier) => void;
-}) {
-  const Icon = tier.icon;
+function TierCard({ tier, onManageMembers }: { tier: MockTier; onManageMembers: (tier: MockTier) => void }) {
   return (
     <motion.article
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(panelClass, 'flex flex-col p-5')}
     >
-      <header
-        className={cn(
-          'mb-4 inline-flex items-center gap-2 self-start rounded-full bg-gradient-to-r px-3 py-1 text-xs font-semibold ring-1 ring-inset',
-          tier.accent,
-        )}
-      >
-        <Icon className="h-3.5 w-3.5" />
-        {tier.name}
+      <header className="flex items-start justify-between gap-2">
+        <h3 className="text-lg font-bold tracking-tight text-neutral-900">{tier.name}</h3>
+        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-violet-100 px-2.5 py-1 text-[11px] font-semibold text-violet-700 ring-1 ring-inset ring-violet-200">
+          <Users className="h-3 w-3" aria-hidden />
+          {tier.members} members
+        </span>
       </header>
 
-      <div className="flex items-baseline gap-1">
-        <span className="text-3xl font-bold tracking-tight text-neutral-900">${tier.monthlyPrice.toFixed(2)}</span>
+      <div className="mt-3 flex items-baseline gap-1">
+        <span className="text-3xl font-bold tracking-tight text-violet-600">
+          ${tier.monthlyPrice.toFixed(2)}
+        </span>
         <span className="text-xs text-neutral-500">/ month</span>
       </div>
-      <p className="mt-1 text-xs text-neutral-500">{tier.description}</p>
 
-      <div className="mt-4 inline-flex items-center gap-1.5 text-xs text-neutral-500">
-        <Users className="h-3.5 w-3.5" aria-hidden />
-        {tier.members} active member{tier.members === 1 ? '' : 's'}
-      </div>
-
-      <ul className="mt-4 space-y-1.5">
+      <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">
+        Perks:
+      </p>
+      <ul className="mt-2 space-y-2">
         {tier.perks.map((p) => (
           <PerkRow key={p} text={p} />
         ))}
       </ul>
 
-      <footer className="mt-5 flex items-center gap-2 border-t border-neutral-100 pt-4">
-        <Button
-          type="button"
-          size="sm"
-          variant="secondary"
-          onClick={() => onEdit(tier)}
-          className="flex-1 rounded-full"
-        >
-          <Edit3 className="mr-1.5 h-3.5 w-3.5" />
-          Edit perks
-        </Button>
-        <button
-          type="button"
-          onClick={() => onDelete(tier)}
-          className="rounded-full border border-neutral-200 p-2 text-neutral-400 transition hover:bg-rose-50 hover:text-rose-600"
-          aria-label={`Remove ${tier.name} tier`}
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
-      </footer>
+      <div className="mt-6 flex-1" />
+
+      <Button
+        type="button"
+        variant="secondary"
+        onClick={() => onManageMembers(tier)}
+        className="w-full rounded-2xl bg-white py-3 text-sm font-semibold text-neutral-900 shadow-sm ring-1 ring-inset ring-neutral-200 hover:bg-neutral-50"
+      >
+        Manage Members
+      </Button>
     </motion.article>
   );
 }
 
 function MerchantMembershipTiersInner() {
   const { toast } = useToast();
-  const [tiers, setTiers] = useState<MockTier[]>(DEFAULT_TIERS);
+  const [tiers] = useState<MockTier[]>(DEFAULT_TIERS);
 
   const showPreviewToast = (action: string) =>
     toast({
       title: 'Preview only',
       description: `${action} will be wired up once membership billing is built. For now this page is a UI sketch.`,
     });
-
-  const handleEdit = (tier: MockTier) => showPreviewToast(`Editing "${tier.name}"`);
-  const handleDelete = (tier: MockTier) => showPreviewToast(`Removing "${tier.name}"`);
-
-  const totalMembers = tiers.reduce((sum, t) => sum + t.members, 0);
-  const monthlyRevenue = tiers.reduce((sum, t) => sum + t.members * t.monthlyPrice, 0);
 
   return (
     <div className="mx-auto max-w-screen-xl space-y-6 px-4 py-3 sm:px-1 sm:py-4">
@@ -207,79 +142,62 @@ function MerchantMembershipTiersInner() {
         </div>
       </div>
 
-      {/* Header */}
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Incentives</div>
-          <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-neutral-900">Membership tiers</h1>
-          <p className="mt-2 max-w-xl text-[13px] text-neutral-500 sm:text-sm">
-            Offer customers ongoing perks for a monthly subscription — discounts, free delivery, priority access. Each tier defines its own perks and price.
-          </p>
+      {/* Title banner — content from the reference, our theme */}
+      <div className={cn(panelClass, 'flex flex-wrap items-center justify-between gap-4 border-violet-200/70 bg-gradient-to-r from-violet-50 via-white to-white p-5')}>
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-md">
+            <CreditCard className="h-5 w-5" aria-hidden />
+          </div>
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold tracking-tight text-neutral-900 sm:text-xl">
+              Membership Tiers
+            </h2>
+            <p className="text-sm text-neutral-600">
+              Monthly subscription programs with exclusive perks
+            </p>
+          </div>
         </div>
         <Button
           size="md"
           onClick={() => showPreviewToast('Adding a new tier')}
-          className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800"
+          className="rounded-full bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-md hover:from-violet-600 hover:to-purple-700"
         >
           <Plus className="mr-2 h-4 w-4" />
-          Add tier
+          Create Tier
         </Button>
       </div>
 
-      {/* Stats */}
-      <div className="grid gap-3 sm:grid-cols-3">
-        <div className={cn(panelClass, 'p-4')}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Active members</div>
-          <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-[1.6rem] font-semibold tracking-tight text-neutral-950">{totalMembers}</span>
-            <span className="text-xs text-neutral-500">across all tiers</span>
-          </div>
-        </div>
-        <div className={cn(panelClass, 'p-4')}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Monthly revenue</div>
-          <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-[1.6rem] font-semibold tracking-tight text-neutral-950">
-              ${monthlyRevenue.toFixed(0)}
-            </span>
-            <span className="text-xs text-neutral-500">recurring (mock)</span>
-          </div>
-        </div>
-        <div className={cn(panelClass, 'p-4')}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Tiers</div>
-          <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-[1.6rem] font-semibold tracking-tight text-neutral-950">{tiers.length}</span>
-            <span className="text-xs text-neutral-500">configured</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Tiers grid */}
+      {/* Tier grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {tiers.map((t) => (
-          <TierCard key={t.id} tier={t} onEdit={handleEdit} onDelete={handleDelete} />
+          <TierCard
+            key={t.id}
+            tier={t}
+            onManageMembers={(tier) => showPreviewToast(`Managing members for "${tier.name}"`)}
+          />
         ))}
 
         <button
           type="button"
           onClick={() => showPreviewToast('Adding a new tier')}
-          className="flex min-h-[280px] flex-col items-center justify-center rounded-[1.45rem] border-2 border-dashed border-neutral-300 bg-neutral-50/50 text-neutral-400 transition hover:border-neutral-400 hover:bg-neutral-50 hover:text-neutral-600"
+          className="flex min-h-[280px] flex-col items-center justify-center rounded-[1.45rem] border-2 border-dashed border-neutral-300 bg-neutral-50/50 text-neutral-400 transition hover:border-violet-300 hover:bg-violet-50/40 hover:text-violet-700"
         >
           <Plus className="h-8 w-8" />
-          <span className="mt-2 text-sm font-medium">Add another tier</span>
+          <span className="mt-2 text-sm font-medium">Create another tier</span>
           <span className="mt-1 px-6 text-center text-xs text-neutral-400">
-            Most merchants use 2–3 tiers. Bronze / Silver / Gold is a good default.
+            Most merchants use 2–3 tiers. Gold + Platinum is a good start.
           </span>
         </button>
       </div>
 
-      {/* Perks library preview */}
+      {/* Perk library */}
       <section className={cn(panelClass, 'p-5')}>
         <header className="flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-amber-500" aria-hidden />
+          <Sparkles className="h-4 w-4 text-violet-500" aria-hidden />
           <h2 className="text-sm font-semibold text-neutral-900">Perk library</h2>
         </header>
         <p className="mt-1 text-xs text-neutral-500">
-          When you create a tier, you'll mix and match perks from this library. Custom perks coming later.
+          When you create a tier, mix and match perks from this library. Custom perks coming later.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {ALL_PERKS.map((p) => (
@@ -287,7 +205,7 @@ function MerchantMembershipTiersInner() {
               key={p}
               className="inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-700"
             >
-              <Zap className="h-3 w-3 text-amber-500" />
+              <Zap className="h-3 w-3 text-violet-500" />
               {p}
             </span>
           ))}
@@ -302,20 +220,20 @@ function MerchantMembershipTiersInner() {
         </header>
         <ul className="mt-3 space-y-2 text-sm text-neutral-700">
           <li className="flex items-start gap-2">
-            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400" />
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" aria-hidden />
             Schema for tiers, perks, member subscriptions, billing periods
           </li>
           <li className="flex items-start gap-2">
-            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400" />
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" aria-hidden />
             Recurring billing via PayPal SDK (already in BE deps) — webhooks for renewals, dunning, cancellation
           </li>
           <li className="flex items-start gap-2">
-            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400" />
-            Perk enforcement at the right call sites — discount % at deal redemption, delivery flag in checkout, "early access" gate on deal listings, etc.
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" aria-hidden />
+            Perk enforcement at the right call sites — discount % at deal redemption, delivery flag in checkout, "early access" gate on deal listings
           </li>
           <li className="flex items-start gap-2">
-            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400" />
-            Customer-facing subscribe/manage screens
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" aria-hidden />
+            Customer-facing subscribe / manage screens
           </li>
         </ul>
       </section>

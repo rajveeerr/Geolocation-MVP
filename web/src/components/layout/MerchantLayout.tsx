@@ -12,6 +12,9 @@ import {
   Gift,
   Grid2x2,
   KeyRound,
+  Share2,
+  Target,
+  UserPlus,
   LogOut,
   Menu,
   Plus,
@@ -84,7 +87,8 @@ const navSections: MerchantNavSection[] = [
         icon: Ticket,
         match: (pathname) =>
           pathname.startsWith('/merchant/deals') &&
-          !pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN),
+          !pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN) &&
+          !pathname.startsWith(PATHS.MERCHANT_DEALS_BOUNTIES),
       },
     ],
   },
@@ -155,16 +159,34 @@ const navSections: MerchantNavSection[] = [
     label: 'Incentives',
     items: [
       {
-        label: 'Hidden deals',
-        to: PATHS.MERCHANT_DEALS_HIDDEN,
-        icon: KeyRound,
-        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN),
+        label: 'Bounties',
+        to: PATHS.MERCHANT_DEALS_BOUNTIES,
+        icon: Target,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_BOUNTIES),
       },
       {
         label: 'Check-in rewards',
         to: PATHS.MERCHANT_CHECKIN_GAMES,
         icon: ScanSearch,
         match: (pathname) => pathname.startsWith(PATHS.MERCHANT_CHECKIN_GAMES),
+      },
+      {
+        label: 'Referrals',
+        to: PATHS.MERCHANT_REFERRALS,
+        icon: UserPlus,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_REFERRALS),
+      },
+      {
+        label: 'Referral deals',
+        to: PATHS.MERCHANT_REFERRAL_DEALS,
+        icon: Share2,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_REFERRAL_DEALS),
+      },
+      {
+        label: 'Hidden deals',
+        to: PATHS.MERCHANT_DEALS_HIDDEN,
+        icon: KeyRound,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN),
       },
       {
         label: 'Surprise rewards',
@@ -395,6 +417,21 @@ const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; s
     subtitle: 'Build a separate catering menu with per-person pricing and customization options.',
   },
   // ─── Incentives
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_BOUNTIES),
+    title: 'Bounties',
+    subtitle: 'Reward customers for bringing friends in.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_REFERRAL_DEALS),
+    title: 'Referral deals',
+    subtitle: 'Per-deal share mechanics — both the referrer and the friend get something. (Preview — not live yet.)',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_REFERRALS),
+    title: 'Referral programs',
+    subtitle: 'Reward customers for bringing in new people. (Preview — not live yet.)',
+  },
   {
     match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN),
     title: 'Hidden deals',
