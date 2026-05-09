@@ -22,6 +22,7 @@ import {
   Search,
   Settings,
   ShoppingBag,
+  ShoppingCart,
   Sparkles,
   Store,
   Ticket,
@@ -88,7 +89,14 @@ const navSections: MerchantNavSection[] = [
         match: (pathname) =>
           pathname.startsWith('/merchant/deals') &&
           !pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN) &&
-          !pathname.startsWith(PATHS.MERCHANT_DEALS_BOUNTIES),
+          !pathname.startsWith(PATHS.MERCHANT_DEALS_BOUNTIES) &&
+          !pathname.startsWith(PATHS.MERCHANT_DEALS_BOGO),
+      },
+      {
+        label: 'BOGO deals',
+        to: PATHS.MERCHANT_DEALS_BOGO,
+        icon: ShoppingCart,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_BOGO),
       },
     ],
   },
@@ -415,6 +423,12 @@ const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; s
     match: (pathname) => pathname.startsWith('/merchant/catering'),
     title: 'Catering menu',
     subtitle: 'Build a separate catering menu with per-person pricing and customization options.',
+  },
+  // ─── Deals (sub-views)
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_BOGO),
+    title: 'BOGO deals',
+    subtitle: '"Buy N Get M" deals — drive larger ticket sizes with volume incentives.',
   },
   // ─── Incentives
   {

@@ -22,6 +22,7 @@ import { DealBountyScheduleStep } from '@/components/merchant/create-deal/DealBo
 import { DealHiddenStep } from '@/components/merchant/create-deal/DealHiddenStep';
 import { DealHiddenVisibilityStep } from '@/components/merchant/create-deal/DealHiddenVisibilityStep';
 import { DealRedeemNowStep } from '@/components/merchant/create-deal/DealRedeemNowStep';
+import { DealBogoStep } from '@/components/merchant/create-deal/DealBogoStep';
 import { DealLocationStep } from '@/components/merchant/create-deal/DealLocationStep';
 import { DealDailyDealWeekdayStep } from '@/components/merchant/create-deal/DealDailyDealWeekdayStep';
 import { DealDailyDealConfigStep } from '@/components/merchant/create-deal/DealDailyDealConfigStep';
@@ -51,6 +52,8 @@ const InitialStepHandler = () => {
         } else if (state.dealType === 'RECURRING') {
             // Daily Deal goes directly to weekday selection
             navigate('/merchant/deals/create/daily-deal/weekdays');
+        } else if (state.dealType === 'BOGO') {
+            navigate('/merchant/deals/create/bogo');
         } else {
             // For 'STANDARD', start the simple multi-step flow
             navigate('/merchant/deals/create/basics');
@@ -93,7 +96,14 @@ export const CreateDealPage = () => {
           <Route path="hidden/schedule" element={<DealScheduleStep />} />
           <Route path="hidden/review" element={<DealReviewStep />} />
           <Route path="redeem-now" element={<DealRedeemNowStep />} />
-          
+
+          {/* BOGO routes */}
+          <Route path="bogo" element={<DealBogoStep />} />
+          <Route path="bogo/menu" element={<DealMenuStep />} />
+          <Route path="bogo/schedule" element={<DealScheduleStep />} />
+          <Route path="bogo/images" element={<DealImagesStep />} />
+          <Route path="bogo/review" element={<DealReviewStep />} />
+
           {/* Daily Deal routes */}
           <Route path="daily-deal/weekdays" element={<DealDailyDealWeekdayStep />} />
           <Route path="daily-deal/config" element={<DealDailyDealConfigStep />} />

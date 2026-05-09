@@ -19,6 +19,7 @@ export const PATHS = {
   MERCHANT_DEALS: '/merchant/deals',
   MERCHANT_DEALS_HIDDEN: '/merchant/deals/hidden',
   MERCHANT_DEALS_BOUNTIES: '/merchant/deals/bounties',
+  MERCHANT_DEALS_BOGO: '/merchant/deals/bogo',
   MERCHANT_REFERRALS: '/merchant/referrals',
   MERCHANT_REFERRAL_DEALS: '/merchant/referral-deals',
   MERCHANT_MEMBERSHIP_TIERS: '/merchant/membership-tiers',

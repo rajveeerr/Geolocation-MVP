@@ -203,6 +203,9 @@ const MerchantHiddenDealsPage = React.lazy(() =>
 const MerchantBountyDealsPage = React.lazy(() =>
   import('./pages/merchant/MerchantBountyDealsPage').then((m) => ({ default: m.MerchantBountyDealsPage })),
 );
+const MerchantBogoDealsPage = React.lazy(() =>
+  import('./pages/merchant/MerchantBogoDealsPage').then((m) => ({ default: m.MerchantBogoDealsPage })),
+);
 const MerchantReferralsPage = React.lazy(() =>
   import('./pages/merchant/MerchantReferralsPage').then((m) => ({ default: m.MerchantReferralsPage })),
 );
@@ -637,6 +640,18 @@ function App() {
                       <MerchantLayout>
                         <Suspense fallback={<LoadingOverlay />}>
                           <MerchantBountyDealsPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={PATHS.MERCHANT_DEALS_BOGO}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MerchantBogoDealsPage />
                         </Suspense>
                       </MerchantLayout>
                     </ProtectedRoute>

@@ -6,6 +6,7 @@ import {
   EyeOff,
   Gift,
   Repeat,
+  ShoppingBag,
   Tag,
   Trophy,
   Zap,
@@ -15,7 +16,7 @@ import { PATHS } from '@/routing/paths';
 import { useDealCreation } from '@/context/DealCreationContext';
 import { OnboardingStepLayout } from '../onboarding/OnboardingStepLayout';
 
-type DealTypeValue = 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' | 'REDEEM_NOW' | 'HIDDEN' | 'BOUNTY';
+type DealTypeValue = 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' | 'REDEEM_NOW' | 'HIDDEN' | 'BOUNTY' | 'BOGO';
 
 const dealTypes: Array<{
   value: DealTypeValue;
@@ -87,6 +88,16 @@ const dealTypes: Array<{
     iconWrap: 'bg-[#e9fff1] text-[#15803d]',
     icon: Trophy,
   },
+  {
+    value: 'BOGO',
+    title: 'BOGO Deal',
+    eyebrow: 'Volume incentive',
+    summary: 'Buy N items, get M at a discount (or free). Classic "Buy 1 Get 1" mechanics.',
+    bestFor: 'Driving larger ticket sizes',
+    selectedAccent: 'bg-[#7c2d12]',
+    iconWrap: 'bg-[#fff7ed] text-[#c2410c]',
+    icon: ShoppingBag,
+  },
 ];
 
 const dealTypeDescriptions: Record<DealTypeValue, string> = {
@@ -96,6 +107,7 @@ const dealTypeDescriptions: Record<DealTypeValue, string> = {
   REDEEM_NOW: 'A spend-threshold offer that gives guests an immediate incentive to convert right now.',
   HIDDEN: 'A gated offer that feels private, surprising, or earned through special access.',
   BOUNTY: 'A performance-style offer that rewards actions like referrals, attendance, or check-ins.',
+  BOGO: 'A volume offer where buying N items unlocks M items at a discount — "Buy 2 Get 1 Free" and similar.',
 };
 
 function DealTypeCard({
@@ -205,6 +217,8 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
       navigate('/merchant/deals/create/redeem-now');
     } else if (dealType === 'RECURRING') {
       navigate('/merchant/deals/create/daily-deal/weekdays');
+    } else if (dealType === 'BOGO') {
+      navigate('/merchant/deals/create/bogo');
     } else {
       onNext();
     }

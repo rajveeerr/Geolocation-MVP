@@ -609,6 +609,10 @@ export const DealReviewStep = () => {
           : undefined,
         // Hidden Deal fields
         accessCode: state.dealType === 'HIDDEN' ? (finalAccessCode || undefined) : undefined,
+        // BOGO Deal fields
+        bogoBuyQuantity: state.dealType === 'BOGO' ? (state.bogoBuyQuantity ?? undefined) : undefined,
+        bogoGetQuantity: state.dealType === 'BOGO' ? (state.bogoGetQuantity ?? undefined) : undefined,
+        bogoGetDiscountPercent: state.dealType === 'BOGO' ? (state.bogoGetDiscountPercent ?? undefined) : undefined,
         // Hidden Deal Visibility Configuration
         hiddenDealVisibility: state.dealType === 'HIDDEN' && state.hiddenDealVisibility ? {
           accessCode: state.hiddenDealVisibility.accessCode,
