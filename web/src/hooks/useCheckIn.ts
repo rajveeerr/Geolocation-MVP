@@ -12,10 +12,27 @@ interface CheckInPayload {
   longitude: number;
 }
 
+/**
+ * Reason a check-in failed at the proximity step.
+ * - OUT_OF_RANGE: customer is not within radius of the merchant location.
+ * - TRUCK_NOT_LIVE: merchant is a food truck but their current scheduled stop has ended.
+ * - TRUCK_NO_STOP_TODAY: merchant is a food truck and no stop covers right now.
+ */
+export type CheckInFailureReason =
+  | 'OUT_OF_RANGE'
+  | 'TRUCK_NOT_LIVE'
+  | 'TRUCK_NO_STOP_TODAY';
+
 interface CheckInResponse {
   pointsAwarded: number;
   firstCheckIn: boolean;
   withinRange: boolean;
+  /** Populated by BE when withinRange is false to drive a more specific message. */
+  failureReason?: CheckInFailureReason;
+  /** Optional merchant business name surfaced by BE for friendlier copy. */
+  merchantBusinessName?: string;
+  /** Optional current truck stop address surfaced by BE when relevant. */
+  currentStopAddress?: string;
   eligibleRewards?: Array<{
     id: number;
     title: string;
@@ -93,11 +110,34 @@ export const useCheckIn = (options?: UseCheckInOptions) => {
 
       // Check if user is within range
       if (!response.data.withinRange) {
-        toast({
+        const reason = response.data.failureReason as CheckInFailureReason | undefined;
+        const name = response.data.merchantBusinessName ?? 'This truck';
+        const stopAddr = response.data.currentStopAddress;
+        const messages: Record<CheckInFailureReason, { title: string; description: string }> = {
+          OUT_OF_RANGE: {
+            title: 'Too far away',
+            description: stopAddr
+              ? `You're not close enough — ${name} is at ${stopAddr}.`
+              : "You're not close enough to the merchant to check in.",
+          },
+          TRUCK_NOT_LIVE: {
+            title: `${name} isn't at a stop right now`,
+            description: 'Check back when they go live again.',
+          },
+          TRUCK_NO_STOP_TODAY: {
+            title: `${name} hasn't posted today's location yet`,
+            description: 'Try again once they share where they will be.',
+          },
+        };
+        const fallback = {
           title: 'Too Far Away',
           description: "You're not close enough to the merchant to check in.",
-          variant: 'destructive',
-        });
+        };
+        const { title, description } = reason ? messages[reason] : fallback;
+        toast({ title, description, variant: 'destructive' });
+
+        // Refresh the deal so the UI re-renders to "no current stop" if applicable.
+        queryClient.invalidateQueries({ queryKey: ['deal-detail'] });
         return;
       }
 

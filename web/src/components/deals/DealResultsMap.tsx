@@ -135,6 +135,10 @@ import L from 'leaflet';
 import { cn } from '@/lib/utils';
 import type { DealWithLocation } from '@/data/deals';
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { PATHS } from '@/routing/paths';
+import { createTruckIcon } from '@/components/food-trucks/mapIcons';
+import type { TruckSummary } from '@/types/truckSchedule';
 
 const createCustomIcon = (isHovered: boolean) => {
   const iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-utensils"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3z"/></svg>`;
@@ -160,6 +164,7 @@ interface DealResultsMapProps {
   deals: DealWithLocation[];
   hoveredDealId: string | null;
   userLocation?: { lat: number; lng: number } | null;
+  trucks?: TruckSummary[];
 }
 // --- NEW: Helper component to change the map's view smoothly ---
 const ChangeView = ({
@@ -203,9 +208,11 @@ const EnsureMapVisible = ({ deps }: { deps?: any[] }) => {
 const FitBoundsToFeatures = ({
   deals,
   userLocation,
+  trucks = [],
 }: {
   deals: DealWithLocation[];
   userLocation?: { lat: number; lng: number } | null;
+  trucks?: TruckSummary[];
 }) => {
   const map = useMap();
   useEffect(() => {
@@ -217,6 +224,12 @@ const FitBoundsToFeatures = ({
           const [lat, lng] = d.position as [number, number];
           if (Number.isFinite(lat) && Number.isFinite(lng))
             points.push(d.position as L.LatLngExpression);
+        }
+      }
+      for (const t of trucks) {
+        const stop = t.currentStop ?? t.nextStop;
+        if (stop && Number.isFinite(stop.latitude) && Number.isFinite(stop.longitude)) {
+          points.push([stop.latitude, stop.longitude]);
         }
       }
       if (
@@ -231,7 +244,7 @@ const FitBoundsToFeatures = ({
     } catch (err) {
       // ignore
     }
-  }, [map, deals, userLocation]);
+  }, [map, deals, userLocation, trucks]);
   return null;
 };
 
@@ -239,6 +252,7 @@ export const DealResultsMap = ({
   deals,
   hoveredDealId,
   userLocation,
+  trucks = [],
 }: DealResultsMapProps) => {
   // Center the map on the first deal, or a default location if empty
   const mapCenter: L.LatLngExpression =
@@ -264,11 +278,11 @@ export const DealResultsMap = ({
       >
         {/* Ensure map paints correctly when visible */}
         <EnsureMapVisible
-          deps={[deals.length, !!userLocation, hoveredDealId]}
+          deps={[deals.length, trucks.length, !!userLocation, hoveredDealId]}
         />
 
         {/* Fit bounds to include features (will be overridden by ChangeView on hover) */}
-        <FitBoundsToFeatures deals={deals} userLocation={userLocation} />
+        <FitBoundsToFeatures deals={deals} userLocation={userLocation} trucks={trucks} />
 
         {/* Pan/zoom when a deal is hovered */}
         {hoveredDeal && <ChangeView center={hoveredDeal.position} zoom={15} />}
@@ -293,6 +307,45 @@ export const DealResultsMap = ({
             </Popup>
           </Marker>
         ))}
+
+        {/* Food truck markers */}
+        {trucks.map((t) => {
+          const stop = t.currentStop ?? t.nextStop;
+          if (!stop) return null;
+          const live = !!t.currentStop;
+          return (
+            <Marker
+              key={`truck-${t.storeId}`}
+              position={[stop.latitude, stop.longitude]}
+              icon={createTruckIcon(live)}
+            >
+              <Popup>
+                <div className="font-sans">
+                  <b className="text-sm">{t.merchant.businessName}</b>
+                  <br />
+                  <span className="text-xs text-neutral-600">{stop.address}</span>
+                  <br />
+                  {live ? (
+                    <span className="text-xs font-medium text-emerald-700">
+                      Live now until {new Date(stop.endsAt).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-neutral-500">
+                      Next: {new Date(stop.startsAt).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                    </span>
+                  )}
+                  <br />
+                  <Link
+                    to={`${PATHS.FOOD_TRUCKS}#truck-${t.storeId}`}
+                    className="mt-1 inline-block text-xs font-medium text-amber-700 hover:underline"
+                  >
+                    View truck →
+                  </Link>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
 
         {/* User location marker */}
         {userLocation && (

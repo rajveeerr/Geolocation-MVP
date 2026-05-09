@@ -23,7 +23,7 @@ export interface SelectedMenuItem extends MenuItem {
 }
 
 export interface DealCreationState {
-  dealType: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' | 'REDEEM_NOW' | 'HIDDEN' | 'BOUNTY' | null;
+  dealType: 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' | 'REDEEM_NOW' | 'HIDDEN' | 'BOUNTY' | 'BOGO' | null;
   happyHourPeriod: 'Mornings' | 'Midday' | 'Late night';
   timeRanges: TimeRange[];
   activeStartDate: string;
@@ -63,6 +63,11 @@ export interface DealCreationState {
   bountyRewardAmount: number | null;
   minReferralsRequired: number | null;
   accessCode: string | null;
+  // BOGO config (Buy N Get M [free | X% off])
+  bogoBuyQuantity: number | null;
+  bogoGetQuantity: number | null;
+  /** 100 = free, 50 = half off. */
+  bogoGetDiscountPercent: number | null;
   // Menu collection fields
   useMenuCollection: boolean;
   menuCollectionId: number | null;
@@ -144,6 +149,9 @@ const initialState: DealCreationState = {
   bountyRewardAmount: null,
   minReferralsRequired: null,
   accessCode: null,
+  bogoBuyQuantity: null,
+  bogoGetQuantity: null,
+  bogoGetDiscountPercent: null,
   // Menu collection fields
   useMenuCollection: false,
   menuCollectionId: null,

@@ -37,6 +37,7 @@ import type { ApiDeal as PlaceholderApiDeal } from '@/data/deals-placeholder';
 import { apiGet } from '@/services/api';
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { useToast } from '@/hooks/use-toast';
+import { useNearbyTrucks } from '@/hooks/useTruckSchedule';
 
 // Define the shape of a deal object as it comes from your backend API
 type ApiDeal = {
@@ -79,6 +80,7 @@ export const AllDealsPage = () => {
     useState<string>(''); // Start with "All Categories"
   const [searchRadius, setSearchRadius] = useState<number>(10); // Default radius in miles
   const [showAllDeals, setShowAllDeals] = useState<boolean>(false);
+  const [includeTrucks, setIncludeTrucks] = useState<boolean>(true);
   
   // --- NEW: Additional filter states ---
   const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
@@ -217,6 +219,14 @@ export const AllDealsPage = () => {
     sortBy,
   ]); // Re-run when location, filters, debounced search, or toggle change
 
+  const { data: nearbyTrucksData } = useNearbyTrucks(
+    includeTrucks ? userLocation?.lat ?? null : null,
+    includeTrucks ? userLocation?.lng ?? null : null,
+    searchRadius,
+    { liveOnly: true },
+  );
+  const trucksOnMap = includeTrucks ? nearbyTrucksData?.liveNow ?? [] : [];
+
   // --- NEW: Debouncing effect for the search term ---
   useEffect(() => {
     const timerId = setTimeout(() => setDebouncedSearchTerm(searchTerm), 500);
@@ -267,6 +277,9 @@ export const AllDealsPage = () => {
                 sortBy={sortBy}
                 setSortBy={setSortBy}
                 error={error} // Pass error state for graceful error handling
+                includeTrucks={includeTrucks}
+                setIncludeTrucks={setIncludeTrucks}
+                liveTrucksCount={nearbyTrucksData?.liveNow.length ?? 0}
               />
             </div>
           </div>
@@ -277,6 +290,7 @@ export const AllDealsPage = () => {
               deals={deals}
               hoveredDealId={hoveredDealId}
               userLocation={userLocation}
+              trucks={trucksOnMap}
             />
           </div>
         </div>

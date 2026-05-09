@@ -8,17 +8,25 @@ import {
   ChevronLeft,
   ChevronRight,
   CircleDollarSign,
+  Crown,
   Gift,
   Grid2x2,
+  KeyRound,
+  Share2,
+  Target,
+  UserPlus,
   LogOut,
   Menu,
   Plus,
   ScanSearch,
   Search,
   Settings,
+  ShoppingBag,
+  ShoppingCart,
   Sparkles,
   Store,
   Ticket,
+  Truck,
   UserCircle2,
   UtensilsCrossed,
   WandSparkles,
@@ -68,41 +76,39 @@ const navSections: MerchantNavSection[] = [
         icon: BarChart3,
         match: (pathname) => pathname.startsWith(PATHS.MERCHANT_ANALYTICS),
       },
-      {
-        label: 'Kickbacks',
-        to: PATHS.MERCHANT_KICKBACKS,
-        icon: CircleDollarSign,
-        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_KICKBACKS),
-      },
     ],
   },
   {
-    id: 'commerce',
-    label: 'Commerce',
+    id: 'deals',
+    label: 'Deals',
     items: [
       {
         label: 'Deals',
         to: PATHS.MERCHANT_DEALS,
         icon: Ticket,
-        match: (pathname) => pathname.startsWith('/merchant/deals'),
+        match: (pathname) =>
+          pathname.startsWith('/merchant/deals') &&
+          !pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN) &&
+          !pathname.startsWith(PATHS.MERCHANT_DEALS_BOUNTIES) &&
+          !pathname.startsWith(PATHS.MERCHANT_DEALS_BOGO),
       },
       {
-        label: 'Create Deal',
-        to: PATHS.MERCHANT_DEALS_CREATE,
-        icon: Ticket,
-        match: (pathname) => pathname === PATHS.MERCHANT_DEALS_CREATE,
+        label: 'BOGO deals',
+        to: PATHS.MERCHANT_DEALS_BOGO,
+        icon: ShoppingCart,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_BOGO),
       },
+    ],
+  },
+  {
+    id: 'menu',
+    label: 'Menu',
+    items: [
       {
         label: 'Menu',
         to: PATHS.MERCHANT_MENU,
         icon: UtensilsCrossed,
         match: (pathname) => pathname.startsWith('/merchant/menu'),
-      },
-      {
-        label: 'Add Menu Item',
-        to: PATHS.MERCHANT_MENU_CREATE,
-        icon: UtensilsCrossed,
-        match: (pathname) => pathname === PATHS.MERCHANT_MENU_CREATE,
       },
       {
         label: 'Packages',
@@ -116,6 +122,12 @@ const navSections: MerchantNavSection[] = [
         icon: Boxes,
         match: (pathname) => pathname.startsWith(PATHS.MERCHANT_INVENTORY),
       },
+    ],
+  },
+  {
+    id: 'locations',
+    label: 'Locations',
+    items: [
       {
         label: 'Stores',
         to: PATHS.MERCHANT_STORES,
@@ -123,10 +135,84 @@ const navSections: MerchantNavSection[] = [
         match: (pathname) => pathname.startsWith('/merchant/stores'),
       },
       {
-        label: 'Add Store',
-        to: PATHS.MERCHANT_STORES_CREATE,
-        icon: Store,
-        match: (pathname) => pathname === PATHS.MERCHANT_STORES_CREATE,
+        label: 'Food trucks',
+        to: PATHS.MERCHANT_TRUCKS,
+        icon: Truck,
+        match: (pathname) => pathname.startsWith('/merchant/trucks'),
+      },
+    ],
+  },
+  {
+    id: 'catering',
+    label: 'Catering',
+    items: [
+      {
+        label: 'Catering Menu',
+        to: PATHS.MERCHANT_CATERING,
+        icon: UtensilsCrossed,
+        match: (pathname) =>
+          pathname.startsWith(PATHS.MERCHANT_CATERING) &&
+          !pathname.startsWith(PATHS.MERCHANT_CATERING_ORDERS),
+      },
+      {
+        label: 'Catering Orders',
+        to: PATHS.MERCHANT_CATERING_ORDERS,
+        icon: ShoppingBag,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_CATERING_ORDERS),
+      },
+    ],
+  },
+  {
+    id: 'incentives',
+    label: 'Incentives',
+    items: [
+      {
+        label: 'Bounties',
+        to: PATHS.MERCHANT_DEALS_BOUNTIES,
+        icon: Target,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_BOUNTIES),
+      },
+      {
+        label: 'Check-in rewards',
+        to: PATHS.MERCHANT_CHECKIN_GAMES,
+        icon: ScanSearch,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_CHECKIN_GAMES),
+      },
+      {
+        label: 'Referrals',
+        to: PATHS.MERCHANT_REFERRALS,
+        icon: UserPlus,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_REFERRALS),
+      },
+      {
+        label: 'Referral deals',
+        to: PATHS.MERCHANT_REFERRAL_DEALS,
+        icon: Share2,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_REFERRAL_DEALS),
+      },
+      {
+        label: 'Hidden deals',
+        to: PATHS.MERCHANT_DEALS_HIDDEN,
+        icon: KeyRound,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN),
+      },
+      {
+        label: 'Surprise rewards',
+        to: PATHS.MERCHANT_SURPRISES,
+        icon: WandSparkles,
+        match: (pathname) => pathname.startsWith('/merchant/surprises'),
+      },
+      {
+        label: 'Cashback rewards',
+        to: PATHS.MERCHANT_KICKBACKS,
+        icon: CircleDollarSign,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_KICKBACKS),
+      },
+      {
+        label: 'Membership tiers',
+        to: PATHS.MERCHANT_MEMBERSHIP_TIERS,
+        icon: Crown,
+        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_MEMBERSHIP_TIERS),
       },
     ],
   },
@@ -141,67 +227,43 @@ const navSections: MerchantNavSection[] = [
         match: (pathname) => pathname.startsWith('/merchant/events'),
       },
       {
-        label: 'Create Event',
-        to: PATHS.MERCHANT_EVENTS_CREATE,
-        icon: Building2,
-        match: (pathname) => pathname === PATHS.MERCHANT_EVENTS_CREATE,
-      },
-      {
         label: 'Services',
         to: PATHS.MERCHANT_SERVICES,
         icon: Sparkles,
         match: (pathname) => pathname.startsWith('/merchant/services'),
       },
+    ],
+  },
+  {
+    id: 'loyalty',
+    label: 'Loyalty',
+    items: [
       {
-        label: 'Create Service',
-        to: PATHS.MERCHANT_SERVICES_CREATE,
-        icon: Sparkles,
-        match: (pathname) => pathname === PATHS.MERCHANT_SERVICES_CREATE,
-      },
-      {
-        label: 'Surprises',
-        to: PATHS.MERCHANT_SURPRISES,
-        icon: WandSparkles,
-        match: (pathname) => pathname.startsWith('/merchant/surprises'),
-      },
-      {
-        label: 'Create Surprise',
-        to: PATHS.MERCHANT_SURPRISES_CREATE,
-        icon: WandSparkles,
-        match: (pathname) => pathname === PATHS.MERCHANT_SURPRISES_CREATE,
-      },
-      {
-        label: 'Check-in Games',
-        to: PATHS.MERCHANT_CHECKIN_GAMES,
-        icon: ScanSearch,
-        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_CHECKIN_GAMES),
-      },
-      {
-        label: 'Loyalty',
+        label: 'Analytics',
         to: PATHS.MERCHANT_LOYALTY_ANALYTICS,
         icon: Gift,
-        match: (pathname) => pathname.startsWith('/merchant/loyalty'),
+        match: (pathname) => pathname === PATHS.MERCHANT_LOYALTY_ANALYTICS,
       },
       {
-        label: 'Loyalty Program',
+        label: 'Program',
         to: PATHS.MERCHANT_LOYALTY_PROGRAM,
         icon: Gift,
         match: (pathname) => pathname.startsWith(PATHS.MERCHANT_LOYALTY_PROGRAM),
       },
       {
-        label: 'Loyalty Customers',
+        label: 'Customers',
         to: PATHS.MERCHANT_LOYALTY_CUSTOMERS,
         icon: Gift,
         match: (pathname) => pathname.startsWith(PATHS.MERCHANT_LOYALTY_CUSTOMERS),
       },
       {
-        label: 'Loyalty Transactions',
+        label: 'Transactions',
         to: PATHS.MERCHANT_LOYALTY_TRANSACTIONS,
         icon: Gift,
         match: (pathname) => pathname.startsWith(PATHS.MERCHANT_LOYALTY_TRANSACTIONS),
       },
       {
-        label: 'Loyalty Setup',
+        label: 'Setup',
         to: PATHS.MERCHANT_LOYALTY_SETUP,
         icon: Gift,
         match: (pathname) => pathname.startsWith(PATHS.MERCHANT_LOYALTY_SETUP),
@@ -246,26 +308,49 @@ const navSections: MerchantNavSection[] = [
   },
 ];
 
+// pageTitles is matched in order — keep more-specific entries above their parents.
 const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; subtitle: string }> = [
   {
-    match: (pathname) => pathname.startsWith('/merchant/blog'),
-    title: 'Blog',
-    subtitle: 'Write and publish content for your customers.',
-  },
-  {
-    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_BUSINESS),
-    title: 'My Business',
-    subtitle: 'Review the identity, status, and core details behind your merchant account.',
-  },
-  {
     match: (pathname) => pathname === PATHS.MERCHANT_DASHBOARD,
-    title: 'Merchant Dashboard',
-    subtitle: 'A cleaner control center for your storefront, campaigns, and customer activity.',
+    title: 'Dashboard',
+    subtitle: 'Your control center for storefront, campaigns, and customer activity.',
   },
   {
-    match: (pathname) => pathname.startsWith('/merchant/deals'),
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_ANALYTICS),
+    title: 'Analytics',
+    subtitle: 'Track performance with a focused operating view.',
+  },
+  // ─── Deals
+  {
+    match: (pathname) => pathname === PATHS.MERCHANT_DEALS_CREATE,
+    title: 'Create deal',
+    subtitle: 'Set up a new promotion, recurring deal, happy hour, or hidden offer.',
+  },
+  {
+    match: (pathname) => /^\/merchant\/deals\/\d+\/edit$/.test(pathname),
+    title: 'Edit deal',
+    subtitle: 'Tune an existing promotion.',
+  },
+  {
+    match: (pathname) => pathname.startsWith('/merchant/deals') && !pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN),
     title: 'Deals',
     subtitle: 'Create, tune, and monitor promotions from one place.',
+  },
+  // ─── Menu
+  {
+    match: (pathname) => pathname === PATHS.MERCHANT_MENU_CREATE,
+    title: 'Add menu item',
+    subtitle: 'Add a new dish, drink, or product to your menu.',
+  },
+  {
+    match: (pathname) => /^\/merchant\/menu\/\d+\/edit$/.test(pathname),
+    title: 'Edit menu item',
+    subtitle: 'Update pricing, availability, or details.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_MENU_COLLECTIONS),
+    title: 'Packages',
+    subtitle: 'Group menu items into themed sets.',
   },
   {
     match: (pathname) => pathname.startsWith('/merchant/menu'),
@@ -277,10 +362,120 @@ const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; s
     title: 'Inventory',
     subtitle: 'Track stock levels, restock items, and prevent overselling.',
   },
+  // ─── Locations
+  {
+    match: (pathname) => pathname === PATHS.MERCHANT_STORES_CREATE,
+    title: 'Add store',
+    subtitle: 'Add a new physical location to your business.',
+  },
+  {
+    match: (pathname) => /^\/merchant\/stores\/\d+\/edit$/.test(pathname),
+    title: 'Edit store',
+    subtitle: 'Update store details, hours, or features.',
+  },
+  {
+    match: (pathname) => /^\/merchant\/stores\/\d+$/.test(pathname),
+    title: 'Store details',
+    subtitle: 'Manage this location\'s settings and content.',
+  },
   {
     match: (pathname) => pathname.startsWith('/merchant/stores'),
     title: 'Stores',
     subtitle: 'Manage locations, visibility, and store-level performance.',
+  },
+  {
+    match: (pathname) => pathname === PATHS.MERCHANT_TRUCKS_CREATE,
+    title: 'Add a food truck',
+    subtitle: 'Set up a mobile venue and optionally post your first stop.',
+  },
+  {
+    match: (pathname) => /^\/merchant\/trucks\/\d+$/.test(pathname),
+    title: 'Truck schedule',
+    subtitle: 'Post upcoming stops for this truck.',
+  },
+  {
+    match: (pathname) => pathname.startsWith('/merchant/trucks'),
+    title: 'Food trucks',
+    subtitle: 'Post upcoming stops so customers know where you\'ll be.',
+  },
+  // ─── Catering
+  {
+    match: (pathname) => /^\/merchant\/catering\/orders\/\d+$/.test(pathname),
+    title: 'Order details',
+    subtitle: 'Review and progress this catering order.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_CATERING_ORDERS),
+    title: 'Catering orders',
+    subtitle: 'Review, confirm, and track catering requests from your customers.',
+  },
+  {
+    match: (pathname) => pathname === PATHS.MERCHANT_CATERING_CREATE,
+    title: 'New catering item',
+    subtitle: 'Build a per-person package, platter, or boxed lunch.',
+  },
+  {
+    match: (pathname) => /^\/merchant\/catering\/\d+\/edit$/.test(pathname),
+    title: 'Edit catering item',
+    subtitle: 'Tweak pricing, options, or visibility.',
+  },
+  {
+    match: (pathname) => pathname.startsWith('/merchant/catering'),
+    title: 'Catering menu',
+    subtitle: 'Build a separate catering menu with per-person pricing and customization options.',
+  },
+  // ─── Deals (sub-views)
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_BOGO),
+    title: 'BOGO deals',
+    subtitle: '"Buy N Get M" deals — drive larger ticket sizes with volume incentives.',
+  },
+  // ─── Incentives
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_BOUNTIES),
+    title: 'Bounties',
+    subtitle: 'Reward customers for bringing friends in.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_REFERRAL_DEALS),
+    title: 'Referral deals',
+    subtitle: 'Per-deal share mechanics — both the referrer and the friend get something. (Preview — not live yet.)',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_REFERRALS),
+    title: 'Referral programs',
+    subtitle: 'Reward customers for bringing in new people. (Preview — not live yet.)',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN),
+    title: 'Hidden deals',
+    subtitle: 'Deals locked behind an access code — share with select customers only.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_CHECKIN_GAMES),
+    title: 'Check-in rewards',
+    subtitle: 'Configure games and rewards customers earn for checking in.',
+  },
+  {
+    match: (pathname) => pathname.startsWith('/merchant/surprises'),
+    title: 'Surprise rewards',
+    subtitle: 'Reveal-based offers that surprise customers near you.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_KICKBACKS),
+    title: 'Cashback rewards',
+    subtitle: 'Track how referrals convert into spend and kickback distributed.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_MEMBERSHIP_TIERS),
+    title: 'Membership tiers',
+    subtitle: 'Subscription perks like discounts, free delivery, and priority access. (Preview — not live yet.)',
+  },
+  // ─── Experiences
+  {
+    match: (pathname) => pathname === PATHS.MERCHANT_EVENTS_CREATE,
+    title: 'Create event',
+    subtitle: 'Schedule a live experience for your customers.',
   },
   {
     match: (pathname) => pathname.startsWith('/merchant/events'),
@@ -288,29 +483,66 @@ const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; s
     subtitle: 'Coordinate live experiences and attendance operations.',
   },
   {
+    match: (pathname) => pathname === PATHS.MERCHANT_SERVICES_CREATE,
+    title: 'Create service',
+    subtitle: 'Add a new bookable service.',
+  },
+  {
     match: (pathname) => pathname.startsWith('/merchant/services'),
     title: 'Services',
     subtitle: 'Organize bookable services with a calmer workflow.',
   },
+  // ─── Loyalty
   {
-    match: (pathname) => pathname.startsWith('/merchant/surprises'),
-    title: 'Surprises',
-    subtitle: 'Launch reveal-based offers with stronger visual control.',
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_LOYALTY_PROGRAM),
+    title: 'Loyalty program',
+    subtitle: 'Configure points, rewards, and how customers progress.',
   },
   {
-    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_CHECKIN_GAMES),
-    title: 'Check-in Games',
-    subtitle: 'Shape a polished post check-in reward experience.',
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_LOYALTY_CUSTOMERS),
+    title: 'Loyalty customers',
+    subtitle: 'See member balances, recent activity, and segments.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_LOYALTY_TRANSACTIONS),
+    title: 'Loyalty transactions',
+    subtitle: 'Audit every points event across your customers.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_LOYALTY_SETUP),
+    title: 'Loyalty setup',
+    subtitle: 'Initial configuration for your loyalty program.',
   },
   {
     match: (pathname) => pathname.startsWith('/merchant/loyalty'),
-    title: 'Loyalty',
+    title: 'Loyalty analytics',
     subtitle: 'Review customer retention and refine your program.',
   },
+  // ─── Content + business
   {
-    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_ANALYTICS),
-    title: 'Analytics',
-    subtitle: 'Track performance with a more focused operating view.',
+    match: (pathname) => pathname === PATHS.MERCHANT_BLOG_CREATE,
+    title: 'Create post',
+    subtitle: 'Write content to publish on your storefront.',
+  },
+  {
+    match: (pathname) => /^\/merchant\/blog\/\d+\/edit$/.test(pathname),
+    title: 'Edit post',
+    subtitle: 'Update an existing blog post.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_BLOG_CATEGORIES),
+    title: 'Blog categories',
+    subtitle: 'Organize your blog by topic.',
+  },
+  {
+    match: (pathname) => pathname.startsWith('/merchant/blog'),
+    title: 'Blog',
+    subtitle: 'Write and publish content for your customers.',
+  },
+  {
+    match: (pathname) => pathname.startsWith(PATHS.MERCHANT_BUSINESS),
+    title: 'My Business',
+    subtitle: 'Review the identity, status, and core details behind your merchant account.',
   },
 ];
 
@@ -896,22 +1128,23 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
             </div>
 
             <div className="bg-[#f5f5f7] px-4 py-4 sm:px-6 lg:px-8">
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-neutral-400">
+              <div className="min-w-0">
+                <nav aria-label="Breadcrumb" className="flex items-center gap-1.5">
+                  <Link
+                    to={activeSection.items[0]?.to ?? PATHS.MERCHANT_DASHBOARD}
+                    className="text-[10px] font-semibold uppercase tracking-[0.22em] text-neutral-500 transition-colors hover:text-neutral-900"
+                  >
                     {activeSection.label}
-                  </p>
-                  <h1 className="truncate text-[1.55rem] font-semibold tracking-tight text-neutral-950 sm:text-[1.75rem]">
+                  </Link>
+                  <ChevronRight className="h-3 w-3 shrink-0 text-neutral-400" aria-hidden />
+                  <span className="truncate text-[10px] font-semibold uppercase tracking-[0.22em] text-neutral-900">
                     {pageMeta.title}
-                  </h1>
-                  <p className="mt-1 max-w-3xl text-[13px] text-neutral-500 sm:text-sm">{pageMeta.subtitle}</p>
-                </div>
-
-                <div className="hidden min-w-[220px] rounded-[1.15rem] border border-neutral-200/80 bg-white/90 px-4 py-3 shadow-sm lg:block">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Active section</div>
-                  <div className="mt-1 text-[13px] font-semibold text-neutral-900">{activeSection.label}</div>
-                  <div className="mt-1 text-[13px] text-neutral-500">{activeSection.items.length} integrated destinations ready.</div>
-                </div>
+                  </span>
+                </nav>
+                <h1 className="mt-1.5 truncate text-[1.55rem] font-semibold tracking-tight text-neutral-950 sm:text-[1.75rem]">
+                  {pageMeta.title}
+                </h1>
+                <p className="mt-1 max-w-3xl text-[13px] text-neutral-500 sm:text-sm">{pageMeta.subtitle}</p>
               </div>
             </div>
           </header>

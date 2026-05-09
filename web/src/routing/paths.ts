@@ -17,15 +17,29 @@ export const PATHS = {
   MERCHANT_ONBOARDING: '/merchant/onboarding',
   MERCHANT_DEALS_CREATE: '/merchant/deals/create',
   MERCHANT_DEALS: '/merchant/deals',
+  MERCHANT_DEALS_HIDDEN: '/merchant/deals/hidden',
+  MERCHANT_DEALS_BOUNTIES: '/merchant/deals/bounties',
+  MERCHANT_DEALS_BOGO: '/merchant/deals/bogo',
+  MERCHANT_REFERRALS: '/merchant/referrals',
+  MERCHANT_REFERRAL_DEALS: '/merchant/referral-deals',
+  MERCHANT_MEMBERSHIP_TIERS: '/merchant/membership-tiers',
   MERCHANT_STORES: '/merchant/stores',
   MERCHANT_STORES_CREATE: '/merchant/stores/create',
   MERCHANT_STORES_EDIT: '/merchant/stores/:storeId/edit',
   MERCHANT_STORES_DETAIL: '/merchant/stores/:storeId',
+  MERCHANT_TRUCKS: '/merchant/trucks',
+  MERCHANT_TRUCKS_CREATE: '/merchant/trucks/create',
+  MERCHANT_TRUCK_SCHEDULE: '/merchant/trucks/:storeId',
   MERCHANT_MENU: '/merchant/menu',
   MERCHANT_MENU_CREATE: '/merchant/menu/create',
   MERCHANT_MENU_EDIT: '/merchant/menu/:itemId/edit',
   MERCHANT_MENU_DETAIL: '/merchant/menu/:itemId',
   MERCHANT_MENU_COLLECTIONS: '/merchant/menu/collections',
+  MERCHANT_CATERING: '/merchant/catering',
+  MERCHANT_CATERING_CREATE: '/merchant/catering/create',
+  MERCHANT_CATERING_EDIT: '/merchant/catering/:itemId/edit',
+  MERCHANT_CATERING_ORDERS: '/merchant/catering/orders',
+  MERCHANT_CATERING_ORDER_DETAIL: '/merchant/catering/orders/:orderId',
   MERCHANT_INVENTORY: '/merchant/inventory',
   MERCHANT_ANALYTICS: '/merchant/analytics',
   MERCHANT_CHECKIN_GAMES: '/merchant/check-in-games',
@@ -103,6 +117,14 @@ export const PATHS = {
   // Consumer Surprises
   SURPRISES: '/surprises',
   MY_REVEAL_HISTORY: '/surprises/history',
+
+  // Food trucks (consumer)
+  FOOD_TRUCKS: '/food-trucks',
+
+  // Catering (consumer)
+  CATERING_MENU: '/catering/:merchantId',
+  CATERING_ORDER_CONFIRMATION: '/catering/orders/:orderId',
+  MY_CATERING_ORDERS: '/my-activity/catering',
 
   // Events
   EVENT_DETAIL: '/events/:eventId',

@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiPost, apiPut, apiDelete } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
+import type { ScheduledStop } from '@/types/truckSchedule';
 
 export interface Store {
   id: number;
@@ -27,6 +28,10 @@ export interface Store {
   operatingHours?: Record<string, { open: string; close: string; closed: boolean }> | null;
   galleryUrls?: string[];
   isFoodTruck?: boolean;
+  /** Server-resolved current stop for food trucks; populated when isFoodTruck === true. */
+  currentStop?: ScheduledStop | null;
+  /** Soonest upcoming stop for food trucks. */
+  nextStop?: ScheduledStop | null;
   createdAt?: string;
   updatedAt?: string;
 }

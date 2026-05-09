@@ -16,7 +16,6 @@ import {
   Plus,
   X,
   ImageIcon,
-  Truck,
   Home,
   Coffee,
   ShoppingBag,
@@ -239,27 +238,6 @@ export const BusinessProfileScreen = () => {
         <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-12">
           {/* Left column — main form */}
           <div className="space-y-10 md:col-span-8">
-
-            {/* Food truck toggle */}
-            <div className="flex items-center gap-3 rounded-xl border border-neutral-200 px-4 py-3">
-              <Truck className="h-5 w-5 text-neutral-500" />
-              <div className="flex-1">
-                <span className="text-sm font-medium text-neutral-900">Is this a mobile / food truck?</span>
-                <p className="text-xs text-neutral-500">Different hour and location controls will apply</p>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={state.isFoodTruck}
-                onClick={() => dispatch({ type: 'SET_IS_FOOD_TRUCK', payload: !state.isFoodTruck })}
-                className={cn(
-                  'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-                  state.isFoodTruck ? 'bg-brand-primary-600' : 'bg-neutral-300'
-                )}
-              >
-                <span className={cn('inline-block h-4 w-4 rounded-full bg-white transition-transform', state.isFoodTruck ? 'translate-x-6' : 'translate-x-1')} />
-              </button>
-            </div>
 
             {/* ====== BUSINESS INFO SECTION ====== */}
             <section>

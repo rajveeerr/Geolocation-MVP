@@ -6,7 +6,11 @@
       "Bash(find /c/Geolocation-MVP -name migrations -o -name schema -o -name *.sql)",
       "Bash(find /c/Geolocation-MVP/backend/GeoLocationMVP-BE/src -type f -name \"*.ts\" -exec wc -l {} +)",
       "Bash(find /c/Geolocation-MVP/backend/GeoLocationMVP-BE -type f \\\\\\(-name *.test.ts -o -name *.spec.ts -o -name __tests__ \\\\\\))",
-      "Bash(find /c/Geolocation-MVP -maxdepth 1 -name \"*.md\" -type f -exec basename {})"
+      "Bash(find /c/Geolocation-MVP -maxdepth 1 -name \"*.md\" -type f -exec basename {})",
+      "Read(//c//**)",
+      "Read(//c/GeoLocationMVP-BE/prisma/**)",
+      "Read(//c/GeoLocationMVP-BE/**)",
+      "Read(//c/GeolocationMVPBackend/**)"
     ],
     "additionalDirectories": [
       "C:\\Geolocation-MVP\\web\\src\\pages"

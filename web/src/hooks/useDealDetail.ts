@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
 import { getLandingDealById } from '@/data/landing-deals';
 import { dealToDetailedDeal } from '@/lib/dealToDetailedDeal';
+import type { ScheduledStop } from '@/types/truckSchedule';
 
 // Types (id can be string for landing/hardcoded deals)
 export interface DetailedDeal {
@@ -26,6 +27,10 @@ export interface DetailedDeal {
     description: string;
   };
   bountyQRCode?: string | null;
+  /** BOGO config — when bogoBuyQuantity is set, treat this deal as BOGO. */
+  bogoBuyQuantity?: number | null;
+  bogoGetQuantity?: number | null;
+  bogoGetDiscountPercent?: number | null;
   startTime: string;
   endTime: string;
   recurringDays: string[];
@@ -85,6 +90,10 @@ export interface DetailedDeal {
       operatingHours?: Record<string, { open: string; close: string; closed: boolean }> | null;
       galleryUrls?: string[];
       isFoodTruck?: boolean;
+      /** Server-resolved current stop; populated when isFoodTruck === true. */
+      currentStop?: ScheduledStop | null;
+      /** Soonest upcoming stop for food trucks. */
+      nextStop?: ScheduledStop | null;
       city: {
         id: number;
         name: string;
@@ -205,7 +214,11 @@ export const useDealDetail = (dealId: string) => {
       throw new Error(response.error || 'Deal not found');
     },
     enabled: !!dealId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    // Truck-bound deals carry a moving currentStop — keep their cache short so
+    // "Live now @ X" doesn't drift. Static-store deals can afford the longer cache.
+    staleTime: 60 * 1000,
+    refetchInterval: (query) =>
+      query.state.data?.merchant?.stores?.some((s) => s.isFoodTruck) ? 60_000 : false,
     retry: (failureCount, error) => {
       // Don't retry if it's a 404 (deal not found)
       if (error.message.includes('404') || error.message.includes('not found')) {

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Menu, X, BookOpen, Compass, Coins, Briefcase, Shield, User, Settings, LogOut, Gift, Trophy, Flame, Users, CalendarDays, Ticket, Bell, Wrench } from 'lucide-react';
+import { Menu, X, BookOpen, Compass, Coins, Briefcase, Shield, User, Settings, LogOut, Gift, Trophy, Flame, Users, CalendarDays, Ticket, Bell, Wrench, Truck } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { PATHS } from '@/routing/paths';
 import { Logo } from '../common/Logo';
@@ -18,6 +18,7 @@ const menuNavItems = [
   { id: 'deals', label: 'Hot Deals', path: PATHS.ALL_DEALS, icon: Flame },
   { id: 'events', label: 'Discover Events', path: PATHS.DISCOVER_EVENTS, icon: CalendarDays },
   { id: 'services', label: 'Discover Services', path: PATHS.DISCOVER_SERVICES, icon: Wrench },
+  { id: 'foodtrucks', label: 'Food Trucks', path: PATHS.FOOD_TRUCKS, icon: Truck },
   { id: 'leaderboard', label: 'Leaderboard', path: PATHS.LEADERBOARD, icon: Trophy },
   { id: 'referral', label: 'Referrals', path: PATHS.REFERRALS, icon: Users },
   { id: 'gamification', label: 'Coins & Rewards', path: PATHS.GAMIFICATION, icon: Coins },

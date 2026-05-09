@@ -196,7 +196,7 @@ export const StoreManagementPage = () => {
     <div className="mx-auto max-w-7xl px-4 py-3 sm:px-1 sm:py-4">
       <div className="mb-6 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Commerce</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Locations</div>
           <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-neutral-900">Store Management</h1>
           <p className="mt-2 text-[13px] text-neutral-600 sm:text-sm">
             Manage your store locations and settings
