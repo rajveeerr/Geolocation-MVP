@@ -27,6 +27,10 @@ export interface DetailedDeal {
     description: string;
   };
   bountyQRCode?: string | null;
+  /** BOGO config — when bogoBuyQuantity is set, treat this deal as BOGO. */
+  bogoBuyQuantity?: number | null;
+  bogoGetQuantity?: number | null;
+  bogoGetDiscountPercent?: number | null;
   startTime: string;
   endTime: string;
   recurringDays: string[];

@@ -13,6 +13,9 @@ import { MerchantLogo } from '@/components/common/MerchantLogo';
 import { useLoyaltyBalance, useLoyaltyProgram } from '@/hooks/useLoyalty';
 import { formatDealTypeForDisplay } from '@/utils/dealTypeUtils';
 import { DealLocationLine } from '@/components/deals/DealLocationLine';
+import { BogoBadge, formatBogoLabel } from '@/components/deals/BogoBadge';
+import { Link as RouterLink } from 'react-router-dom';
+import { usePublicCateringCategories } from '@/hooks/useCatering';
 
 // Icons
 import {
@@ -32,6 +35,9 @@ import {
   Building,
   TrendingUp,
   Zap,
+  ShoppingBag,
+  Utensils,
+  Users2,
 } from 'lucide-react';
 
 // Types are now imported from the hook
@@ -245,22 +251,28 @@ const SocialProofSection = ({ socialProof }: { socialProof: DetailedDeal['social
 };
 
 const MerchantInfoSection = ({ merchant }: { merchant: DetailedDeal['merchant'] }) => {
+  const merchantId = typeof merchant.id === 'number' ? merchant.id : Number(merchant.id);
+  const { data: cateringCategories } = usePublicCateringCategories(
+    Number.isFinite(merchantId) ? merchantId : null,
+  );
+  const hasCatering = Array.isArray(cateringCategories) && cateringCategories.length > 0;
+
   return (
     <div className="space-y-4">
       <div className="flex items-start gap-4">
-        <MerchantLogo 
-          src={merchant.logoUrl} 
-          name={merchant.businessName} 
-          size="lg" 
+        <MerchantLogo
+          src={merchant.logoUrl}
+          name={merchant.businessName}
+          size="lg"
           className="flex-shrink-0"
         />
-        
+
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-neutral-900 mb-2">{merchant.businessName}</h3>
           {merchant.description && (
             <p className="text-sm text-neutral-600 mb-3">{merchant.description}</p>
           )}
-          
+
           <div className="space-y-2">
             <DealLocationLine merchant={merchant} variant="detail" />
 
@@ -273,6 +285,42 @@ const MerchantInfoSection = ({ merchant }: { merchant: DetailedDeal['merchant'] 
           </div>
         </div>
       </div>
+
+      {/* Catering + group ordering discovery */}
+      {(hasCatering || true) && (
+        <div className="grid gap-2 sm:grid-cols-2">
+          {hasCatering && (
+            <RouterLink
+              to={`/catering/${merchantId}`}
+              className="group flex items-center gap-3 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 via-white to-white p-3 transition hover:border-amber-300 hover:shadow-sm"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-md">
+                <Utensils className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-700">Catering</div>
+                <div className="text-sm font-semibold text-neutral-900">View catering menu</div>
+                <div className="text-[11px] text-neutral-500">{cateringCategories!.length} categor{cateringCategories!.length === 1 ? 'y' : 'ies'}</div>
+              </div>
+              <Navigation className="h-4 w-4 shrink-0 text-amber-600 transition group-hover:translate-x-0.5" />
+            </RouterLink>
+          )}
+          <RouterLink
+            to={hasCatering ? `/catering/${merchantId}` : `/catering/${merchantId}`}
+            className="group flex items-center gap-3 rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 via-white to-white p-3 transition hover:border-emerald-300 hover:shadow-sm"
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md">
+              <Users2 className="h-5 w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Group ordering</div>
+              <div className="text-sm font-semibold text-neutral-900">Bulk orders & events</div>
+              <div className="text-[11px] text-neutral-500">For 10+ people</div>
+            </div>
+            <Navigation className="h-4 w-4 shrink-0 text-emerald-600 transition group-hover:translate-x-0.5" />
+          </RouterLink>
+        </div>
+      )}
       
       {merchant.stores.length > 1 && (
         <div>
@@ -471,7 +519,22 @@ export const EnhancedDealDetailPage = () => {
                 )}
                 <span className="text-sm font-medium text-neutral-600">{deal.category.label}</span>
               </div>
-              <h1 className="text-4xl lg:text-5xl font-bold text-neutral-900 mb-8 leading-tight">{deal.title}</h1>
+              <h1 className="text-4xl lg:text-5xl font-bold text-neutral-900 mb-4 leading-tight">{deal.title}</h1>
+
+              {/* BOGO callout — only when this deal has BOGO config */}
+              {formatBogoLabel(deal) && (
+                <div className="mb-8 inline-flex items-center gap-3 rounded-2xl border border-orange-200 bg-gradient-to-r from-orange-50 via-amber-50 to-white px-4 py-3 shadow-sm">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-md">
+                    <ShoppingBag className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-orange-700">BOGO Offer</div>
+                    <div className="mt-0.5 text-xl font-bold tracking-tight text-neutral-900">
+                      {formatBogoLabel(deal)}
+                    </div>
+                  </div>
+                </div>
+              )}
               
               <div className="flex flex-wrap items-center gap-3 mb-8">
                 {deal.socialProof.totalSaves > 0 && (
@@ -554,6 +617,7 @@ export const EnhancedDealDetailPage = () => {
                     Kickback Enabled
                   </div>
                 )}
+                {formatBogoLabel(deal) && <BogoBadge config={deal} size="md" />}
               </div>
 
               {/* Price and Offer - Prominent Display */}
