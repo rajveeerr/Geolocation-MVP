@@ -319,7 +319,7 @@ function SurpriseCreateInner() {
             <Field label="Start Time" required>
               <input
                 className={inputCls}
-                type="datetime-local"
+                type="datetime-local" lang="en-US"
                 value={form.startTime}
                 onChange={(e) => set('startTime', e.target.value)}
               />
@@ -327,7 +327,7 @@ function SurpriseCreateInner() {
             <Field label="End Time" required>
               <input
                 className={inputCls}
-                type="datetime-local"
+                type="datetime-local" lang="en-US"
                 value={form.endTime}
                 onChange={(e) => set('endTime', e.target.value)}
               />
@@ -353,7 +353,7 @@ function SurpriseCreateInner() {
             <Field label="Reveal At" required hint="Deal becomes unlockable at this exact time">
               <input
                 className={inputCls}
-                type="datetime-local"
+                type="datetime-local" lang="en-US"
                 value={form.revealAt}
                 onChange={(e) => set('revealAt', e.target.value)}
               />

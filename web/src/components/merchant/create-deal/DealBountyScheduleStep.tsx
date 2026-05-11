@@ -266,7 +266,7 @@ export const DealBountyScheduleStep = () => {
               <div className="relative">
                 <Input
                   id="startTime"
-                  type="datetime-local"
+                  type="datetime-local" lang="en-US"
                   value={formatDateTimeForInput(state.startTime)}
                   onChange={(e) => {
                     const value = e.target.value;
@@ -320,7 +320,7 @@ export const DealBountyScheduleStep = () => {
               <div className="relative">
                 <Input
                   id="endTime"
-                  type="datetime-local"
+                  type="datetime-local" lang="en-US"
                   value={formatDateTimeForInput(state.endTime)}
                   onChange={(e) => {
                     const value = e.target.value;

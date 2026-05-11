@@ -102,13 +102,13 @@ export function AdminGamesPage() {
           <input className="rounded-lg border border-neutral-300 px-3 py-2 text-sm" type="number" min={1} placeholder="Reward value" value={rewardValue} onChange={(e) => setRewardValue(Number(e.target.value) || 0)} />
           <input className="rounded-lg border border-neutral-300 px-3 py-2 text-sm" placeholder="Reward label (optional)" value={rewardLabel} onChange={(e) => setRewardLabel(e.target.value)} />
           <label className="text-sm text-neutral-700">Start at
-            <input className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" type="datetime-local" value={startAt} onChange={(e) => setStartAt(e.target.value)} />
+            <input className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" type="datetime-local" lang="en-US" value={startAt} onChange={(e) => setStartAt(e.target.value)} />
           </label>
           <label className="text-sm text-neutral-700">Cutoff at
-            <input className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" type="datetime-local" value={cutoffAt} onChange={(e) => setCutoffAt(e.target.value)} />
+            <input className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" type="datetime-local" lang="en-US" value={cutoffAt} onChange={(e) => setCutoffAt(e.target.value)} />
           </label>
           <label className="text-sm text-neutral-700 md:col-span-2">Draw at
-            <input className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" type="datetime-local" value={drawAt} onChange={(e) => setDrawAt(e.target.value)} />
+            <input className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" type="datetime-local" lang="en-US" value={drawAt} onChange={(e) => setDrawAt(e.target.value)} />
           </label>
         </div>
         <button

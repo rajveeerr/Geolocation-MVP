@@ -881,7 +881,7 @@ export const MerchantTableBookingDashboard = () => {
                 <Label htmlFor="startTime">Start Time</Label>
                 <Input
                   id="startTime"
-                  type="time"
+                  type="time" lang="en-US"
                   value={timeSlotForm.startTime}
                   onChange={(e) => setTimeSlotForm({ ...timeSlotForm, startTime: e.target.value })}
                 />
@@ -890,7 +890,7 @@ export const MerchantTableBookingDashboard = () => {
                 <Label htmlFor="endTime">End Time</Label>
                 <Input
                   id="endTime"
-                  type="time"
+                  type="time" lang="en-US"
                   value={timeSlotForm.endTime}
                   onChange={(e) => setTimeSlotForm({ ...timeSlotForm, endTime: e.target.value })}
                 />

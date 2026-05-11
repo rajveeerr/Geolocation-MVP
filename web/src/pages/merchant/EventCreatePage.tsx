@@ -255,7 +255,7 @@ function DateLocationStep() {
             Start Date & Time <span className="text-red-500">*</span>
           </label>
           <input
-            type="datetime-local"
+            type="datetime-local" lang="en-US"
             value={state.startDate}
             onChange={(e) => setField('startDate', e.target.value)}
             className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
@@ -266,7 +266,7 @@ function DateLocationStep() {
             End Date & Time <span className="text-red-500">*</span>
           </label>
           <input
-            type="datetime-local"
+            type="datetime-local" lang="en-US"
             value={state.endDate}
             onChange={(e) => setField('endDate', e.target.value)}
             className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"

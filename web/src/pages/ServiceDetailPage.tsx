@@ -177,7 +177,7 @@ export function ServiceDetailPage() {
               </div>
               <div>
                 <label className="mb-1 block text-sm font-semibold text-neutral-700">Start time</label>
-                <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm" />
+                <input type="time" lang="en-US" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm" />
               </div>
             </div>
 

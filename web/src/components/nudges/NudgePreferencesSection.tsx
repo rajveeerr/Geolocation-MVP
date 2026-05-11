@@ -221,7 +221,7 @@ export function NudgePreferencesSection() {
                         <div>
                             <label className="mb-1 block text-xs text-neutral-500">From</label>
                             <input
-                                type="time"
+                                type="time" lang="en-US"
                                 value={form.quietHoursStart}
                                 onChange={(e) => setField('quietHoursStart', e.target.value)}
                                 className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
@@ -230,7 +230,7 @@ export function NudgePreferencesSection() {
                         <div>
                             <label className="mb-1 block text-xs text-neutral-500">Until</label>
                             <input
-                                type="time"
+                                type="time" lang="en-US"
                                 value={form.quietHoursEnd}
                                 onChange={(e) => setField('quietHoursEnd', e.target.value)}
                                 className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"

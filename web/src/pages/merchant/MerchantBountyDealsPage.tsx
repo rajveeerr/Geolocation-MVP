@@ -11,6 +11,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useToast } from '@/hooks/use-toast';
 import { useRefreshBountyQR } from '@/hooks/useKitty';
+import { TwelveHourDateTimeField } from '@/components/common/TwelveHourDateTimeField';
+import { CategorySelector } from '@/components/common/CategorySelector';
 import { apiGet, apiPost } from '@/services/api';
 import { PATHS } from '@/routing/paths';
 import { cn } from '@/lib/utils';
@@ -62,12 +64,16 @@ const timeRemaining = (deal: MerchantBountyDeal) => {
 interface BountyFormState {
   title: string;
   description: string;
+  category: string;
   startDate: string; // local datetime, e.g. "2026-05-11T14:30"
   endDate: string;
   potAmount: string;
   perPerson: string;
   maxInvites: string;
   minSpend: string;
+  minReferralsRequired: string;
+  offerHeadline: string;
+  kickbackEnabled: boolean;
 }
 
 const toLocalDateTimeInput = (d: Date) => {
@@ -81,12 +87,16 @@ const blankForm = (): BountyFormState => {
   return {
     title: '',
     description: '',
+    category: 'FOOD_AND_BEVERAGE',
     startDate: toLocalDateTimeInput(now),
     endDate: toLocalDateTimeInput(end),
     potAmount: '',
     perPerson: '',
     maxInvites: '',
     minSpend: '',
+    minReferralsRequired: '1',
+    offerHeadline: '',
+    kickbackEnabled: true,
   };
 };
 
@@ -95,7 +105,7 @@ function CreateBountyForm({ onClose }: { onClose: () => void }) {
   const queryClient = useQueryClient();
   const [form, setForm] = useState<BountyFormState>(() => blankForm());
 
-  const set = <K extends keyof BountyFormState>(key: K, value: string) =>
+  const set = <K extends keyof BountyFormState>(key: K, value: BountyFormState[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
   const createBounty = useMutation({
@@ -104,8 +114,10 @@ function CreateBountyForm({ onClose }: { onClose: () => void }) {
       const potAmount = parseFloat(form.potAmount);
       const maxInvites = parseInt(form.maxInvites, 10);
       const minSpend = parseFloat(form.minSpend);
+      const minReferrals = parseInt(form.minReferralsRequired, 10);
 
       if (!form.title.trim()) throw new Error('Title is required');
+      if (!form.category) throw new Error('Category is required');
       if (!form.startDate) throw new Error('Start date is required');
       if (!form.endDate) throw new Error('End date is required');
 
@@ -119,24 +131,27 @@ function CreateBountyForm({ onClose }: { onClose: () => void }) {
       if (!Number.isFinite(perPerson) || perPerson <= 0) throw new Error('Per Person must be positive');
       if (!Number.isFinite(maxInvites) || maxInvites < 1) throw new Error('Max Invites must be ≥ 1');
       if (!Number.isFinite(minSpend) || minSpend < 0) throw new Error('Min Spend must be ≥ 0');
+      if (!Number.isFinite(minReferrals) || minReferrals < 1)
+        throw new Error('Min Referrals Required must be ≥ 1');
+
+      const customOfferDisplay = form.offerHeadline.trim() || `Earn $${perPerson} per friend`;
 
       const payload = {
         title: form.title.trim(),
         description: form.description.trim() || undefined,
         dealType: 'Bounty Deal',
-        category: 'FOOD_AND_BEVERAGE',
+        category: form.category,
         activeDateRange: {
           startDate: startTime.toISOString(),
           endDate: endTime.toISOString(),
         },
-        // Existing bounty mechanic fields (required by BE validation)
+        customOfferDisplay,
         bountyRewardAmount: perPerson,
-        minReferralsRequired: 1,
-        // New flash group bounty fields
+        minReferralsRequired: minReferrals,
         bountyPotAmount: potAmount,
         bountyMaxInvites: maxInvites,
         bountyMinSpend: minSpend,
-        kickbackEnabled: true,
+        kickbackEnabled: form.kickbackEnabled,
       };
 
       const res = await apiPost<{ deal: any; message?: string }, typeof payload>('/deals', payload);
@@ -194,30 +209,26 @@ function CreateBountyForm({ onClose }: { onClose: () => void }) {
           />
         </div>
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
           <div>
-            <Label htmlFor="bounty-start" className="text-xs font-semibold text-neutral-700">
-              Starts at
-            </Label>
-            <Input
-              id="bounty-start"
-              type="datetime-local"
-              value={form.startDate}
-              onChange={(e) => set('startDate', e.target.value)}
-              className="mt-1.5 h-11"
-            />
+            <Label className="text-xs font-semibold text-neutral-700">Starts at</Label>
+            <div className="mt-1.5">
+              <TwelveHourDateTimeField
+                id="bounty-start"
+                value={form.startDate}
+                onChange={(v) => set('startDate', v)}
+              />
+            </div>
           </div>
           <div>
-            <Label htmlFor="bounty-end" className="text-xs font-semibold text-neutral-700">
-              Ends at
-            </Label>
-            <Input
-              id="bounty-end"
-              type="datetime-local"
-              value={form.endDate}
-              onChange={(e) => set('endDate', e.target.value)}
-              className="mt-1.5 h-11"
-            />
+            <Label className="text-xs font-semibold text-neutral-700">Ends at</Label>
+            <div className="mt-1.5">
+              <TwelveHourDateTimeField
+                id="bounty-end"
+                value={form.endDate}
+                onChange={(v) => set('endDate', v)}
+              />
+            </div>
           </div>
         </div>
 
@@ -234,6 +245,36 @@ function CreateBountyForm({ onClose }: { onClose: () => void }) {
             maxLength={500}
             className="mt-1.5 resize-none"
           />
+        </div>
+
+        <div className="mt-4">
+          <Label className="text-xs font-semibold text-neutral-700">Category</Label>
+          <div className="mt-1.5">
+            <CategorySelector
+              value={form.category}
+              onChange={(v) => set('category', v)}
+              required
+            />
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <Label htmlFor="bounty-offer" className="text-xs font-semibold text-neutral-700">
+            Offer headline
+          </Label>
+          <Input
+            id="bounty-offer"
+            value={form.offerHeadline}
+            onChange={(e) => set('offerHeadline', e.target.value)}
+            placeholder={
+              form.perPerson ? `Earn $${form.perPerson} per friend` : 'Earn $X per friend'
+            }
+            className="mt-1.5 h-11"
+            maxLength={100}
+          />
+          <p className="mt-1 text-[11px] text-neutral-500">
+            Shown on the deal card. Leave empty to auto-generate from the per-person reward.
+          </p>
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -295,6 +336,40 @@ function CreateBountyForm({ onClose }: { onClose: () => void }) {
               placeholder="20"
               className="mt-1.5 h-11"
             />
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="bounty-minrefs" className="text-xs font-semibold text-neutral-700">
+              Min referrals required
+            </Label>
+            <Input
+              id="bounty-minrefs"
+              type="number"
+              min={1}
+              value={form.minReferralsRequired}
+              onChange={(e) => set('minReferralsRequired', e.target.value)}
+              placeholder="1"
+              className="mt-1.5 h-11"
+            />
+            <p className="mt-1 text-[11px] text-neutral-500">
+              Minimum friends a customer must invite for the bounty to count.
+            </p>
+          </div>
+          <div className="flex flex-col">
+            <Label className="text-xs font-semibold text-neutral-700">Kickback</Label>
+            <label className="mt-1.5 flex h-11 cursor-pointer items-center gap-2 rounded-md border border-neutral-200 bg-white px-3">
+              <input
+                type="checkbox"
+                checked={form.kickbackEnabled}
+                onChange={(e) => set('kickbackEnabled', e.target.checked)}
+                className="h-4 w-4 accent-emerald-600"
+              />
+              <span className="text-sm text-neutral-800">
+                Enable kickbacks for this bounty
+              </span>
+            </label>
           </div>
         </div>
 

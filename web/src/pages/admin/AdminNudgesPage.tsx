@@ -461,7 +461,7 @@ function NudgeForm({ initial, onClose }: NudgeFormProps) {
                             Active Start Date
                         </label>
                         <input
-                            type="datetime-local"
+                            type="datetime-local" lang="en-US"
                             value={form.activeStartTime}
                             onChange={(e) => setField('activeStartTime', e.target.value)}
                             className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
@@ -473,7 +473,7 @@ function NudgeForm({ initial, onClose }: NudgeFormProps) {
                             Active End Date
                         </label>
                         <input
-                            type="datetime-local"
+                            type="datetime-local" lang="en-US"
                             value={form.activeEndTime}
                             onChange={(e) => setField('activeEndTime', e.target.value)}
                             className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
@@ -490,7 +490,7 @@ function NudgeForm({ initial, onClose }: NudgeFormProps) {
                             Time Window Start
                         </label>
                         <input
-                            type="time"
+                            type="time" lang="en-US"
                             value={form.timeWindowStart}
                             onChange={(e) => setField('timeWindowStart', e.target.value)}
                             className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
@@ -502,7 +502,7 @@ function NudgeForm({ initial, onClose }: NudgeFormProps) {
                             Time Window End
                         </label>
                         <input
-                            type="time"
+                            type="time" lang="en-US"
                             value={form.timeWindowEnd}
                             onChange={(e) => setField('timeWindowEnd', e.target.value)}
                             className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"

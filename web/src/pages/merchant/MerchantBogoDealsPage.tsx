@@ -10,6 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useToast } from '@/hooks/use-toast';
+import { TwelveHourDateTimeField } from '@/components/common/TwelveHourDateTimeField';
+import { CategorySelector } from '@/components/common/CategorySelector';
 import { apiGet, apiPost } from '@/services/api';
 import { PATHS } from '@/routing/paths';
 import { cn } from '@/lib/utils';
@@ -53,6 +55,8 @@ const PRESETS: Array<{ id: string; label: string; sub: string; buy: number; get:
 interface BogoFormState {
   title: string;
   description: string;
+  category: string;
+  offerHeadline: string;
   buy: number;
   get: number;
   discount: number;
@@ -72,6 +76,8 @@ const blankForm = (): BogoFormState => {
   return {
     title: '',
     description: '',
+    category: 'FOOD_AND_BEVERAGE',
+    offerHeadline: '',
     buy: 1,
     get: 1,
     discount: 100,
@@ -119,15 +125,22 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
         throw new Error('Max redemptions must be a non-negative number');
       }
 
+      if (!form.category) throw new Error('Category is required');
+
+      const verb = form.discount === 100 ? 'Free' : `${form.discount}% Off`;
+      const autoOfferLabel = `Buy ${form.buy}, Get ${form.get} ${verb}`;
+      const customOfferDisplay = form.offerHeadline.trim() || autoOfferLabel;
+
       const payload = {
         title: form.title.trim(),
         description: form.description.trim() || undefined,
         dealType: 'BOGO',
-        category: 'FOOD_AND_BEVERAGE',
+        category: form.category,
         activeDateRange: {
           startDate: startTime.toISOString(),
           endDate: endTime.toISOString(),
         },
+        customOfferDisplay,
         bogoBuyQuantity: form.buy,
         bogoGetQuantity: form.get,
         bogoGetDiscountPercent: form.discount,
@@ -290,31 +303,55 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
           />
         </div>
 
-        {/* Active date range */}
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="bogo-start" className="text-xs font-semibold text-neutral-700">
-              Starts at
-            </Label>
-            <Input
-              id="bogo-start"
-              type="datetime-local"
-              value={form.startDate}
-              onChange={(e) => set('startDate', e.target.value)}
-              className="mt-1.5 h-11"
+        <div className="mt-4">
+          <Label className="text-xs font-semibold text-neutral-700">Category</Label>
+          <div className="mt-1.5">
+            <CategorySelector
+              value={form.category}
+              onChange={(v) => set('category', v)}
+              required
             />
           </div>
+        </div>
+
+        <div className="mt-4">
+          <Label htmlFor="bogo-offer" className="text-xs font-semibold text-neutral-700">
+            Offer headline
+          </Label>
+          <Input
+            id="bogo-offer"
+            value={form.offerHeadline}
+            onChange={(e) => set('offerHeadline', e.target.value.slice(0, 100))}
+            placeholder={previewLabel}
+            className="mt-1.5 h-11"
+            maxLength={100}
+          />
+          <p className="mt-1 text-[11px] text-neutral-500">
+            Shown on the deal card. Leave empty to auto-generate from the buy/get setup.
+          </p>
+        </div>
+
+        {/* Active date range */}
+        <div className="mt-4 grid gap-3 lg:grid-cols-2">
           <div>
-            <Label htmlFor="bogo-end" className="text-xs font-semibold text-neutral-700">
-              Ends at
-            </Label>
-            <Input
-              id="bogo-end"
-              type="datetime-local"
-              value={form.endDate}
-              onChange={(e) => set('endDate', e.target.value)}
-              className="mt-1.5 h-11"
-            />
+            <Label className="text-xs font-semibold text-neutral-700">Starts at</Label>
+            <div className="mt-1.5">
+              <TwelveHourDateTimeField
+                id="bogo-start"
+                value={form.startDate}
+                onChange={(v) => set('startDate', v)}
+              />
+            </div>
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-neutral-700">Ends at</Label>
+            <div className="mt-1.5">
+              <TwelveHourDateTimeField
+                id="bogo-end"
+                value={form.endDate}
+                onChange={(v) => set('endDate', v)}
+              />
+            </div>
           </div>
         </div>
 
