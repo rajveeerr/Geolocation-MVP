@@ -100,19 +100,59 @@ export function useBountyDashboard() {
   });
 }
 
+export interface StartBountyResult {
+  progress: { id: number; referralCount: number; isCompleted: boolean };
+  deal: {
+    id: number;
+    title: string;
+    bountyRewardAmount: number | null;
+    minReferralsRequired: number | null;
+    maxRedemptions: number | null;
+    currentRedemptions: number;
+    merchantName: string;
+  };
+}
+
 export function useStartBounty() {
   const queryClient = useQueryClient();
 
-  return useMutation<unknown, Error, { dealId: number }>({
+  return useMutation<StartBountyResult, Error, { dealId: number }>({
     mutationFn: async ({ dealId }) => {
-      const response = await apiPost<unknown, { dealId: number }>('/kitty/bounty/start', { dealId });
-      if (!response.success) {
+      const response = await apiPost<StartBountyResult, { dealId: number }>(
+        '/kitty/bounty/start',
+        { dealId },
+      );
+      if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to join bounty');
       }
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['kittyBountyDashboard'] });
+    },
+  });
+}
+
+export function useRefreshBountyQR() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    { qrCode: string; dealId: number; merchantId: number },
+    Error,
+    { dealId: number }
+  >({
+    mutationFn: async ({ dealId }) => {
+      const response = await apiPost<
+        { qrCode: string; dealId: number; merchantId: number },
+        { dealId: number }
+      >('/admin/games/bounty/refresh-qr', { dealId });
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to refresh QR code');
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['merchant-deals'] });
     },
   });
 }

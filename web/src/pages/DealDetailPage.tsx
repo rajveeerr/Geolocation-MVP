@@ -15,6 +15,9 @@ import {
   ThumbsUp, Check, Search, SlidersHorizontal, Zap, ChevronDown, Users, Package, DollarSign,
 } from 'lucide-react';
 import { useCheckIn } from '@/hooks/useCheckIn';
+import { useStartBounty } from '@/hooks/useKitty';
+import { useReferrals } from '@/hooks/useReferrals';
+import { useAuth } from '@/context/useAuth';
 import { PostCheckInGameModal } from '@/components/gamification/PostCheckInGameModal';
 import { TableBookingModal } from '@/components/table-booking/TableBookingModal';
 import { LeaderboardTab } from '@/components/deals/detail-tabs/LeaderboardTab';
@@ -163,10 +166,14 @@ const BountyEarnCard = ({
   deal,
   onCheckIn,
   isCheckingIn,
+  onStartBounty,
+  isStartingBounty,
 }: {
   deal: any;
   onCheckIn: () => void;
   isCheckingIn: boolean;
+  onStartBounty?: () => void;
+  isStartingBounty?: boolean;
 }) => {
   const bountyAmount = deal.bountyRewardAmount ?? deal.bounty?.rewardAmount ?? null;
   const minReferrals = deal.minReferralsRequired ?? deal.bounty?.minReferrals ?? null;
@@ -292,7 +299,7 @@ const BountyEarnCard = ({
           </div>
 
           {/* CTA button + avatars */}
-          <div className="flex items-center gap-3 sm:gap-4 mt-4 sm:mt-6">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-4 sm:mt-6">
             <button
               onClick={onCheckIn}
               disabled={isCheckingIn || !deal.status?.isActive}
@@ -305,6 +312,20 @@ const BountyEarnCard = ({
             >
               {isCheckingIn ? 'CHECKING IN\u2026' : 'CHECK IN NOW'}
             </button>
+
+            {isBounty && onStartBounty && (
+              <button
+                onClick={onStartBounty}
+                disabled={isStartingBounty}
+                className={cn(
+                  'px-5 sm:px-7 py-3 sm:py-4 rounded-2xl font-bold text-sm sm:text-base uppercase tracking-wide transition-all',
+                  'border-2 border-white/25 bg-white/10 text-white hover:bg-white/15 active:scale-[0.98]',
+                  isStartingBounty && 'opacity-60 cursor-not-allowed',
+                )}
+              >
+                {isStartingBounty ? 'PREPARING\u2026' : 'GET MY SHARE LINK'}
+              </button>
+            )}
 
             {/* Avatar strip – inline with CTA */}
             <div className="flex items-center gap-1.5 sm:gap-2">
@@ -912,6 +933,51 @@ export const DealDetailPage = () => {
     [deal, addItem, toast],
   );
 
+  /* ---------- Bounty: start sharing ---------- */
+  const { user } = useAuth();
+  const { data: referralData } = useReferrals();
+  const startBounty = useStartBounty();
+
+  const handleStartBounty = useCallback(() => {
+    if (!user) {
+      toast({
+        title: 'Sign in to share',
+        description: 'You need an account so we can attribute friend redemptions to you.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    const numericDealId = Number(dealId);
+    if (!Number.isFinite(numericDealId)) return;
+
+    startBounty.mutate(
+      { dealId: numericDealId },
+      {
+        onSuccess: () => {
+          const code = referralData?.referralCode;
+          const origin = typeof window !== 'undefined' ? window.location.origin : '';
+          const link = code
+            ? `${origin}/deals/${dealId}?ref=${code}`
+            : `${origin}/deals/${dealId}`;
+          navigator.clipboard?.writeText(link).catch(() => undefined);
+          toast({
+            title: code ? 'Share link copied' : 'You are in!',
+            description: code
+              ? link
+              : 'Bring friends to this deal — they need to redeem before the deadline.',
+          });
+        },
+        onError: (err) => {
+          toast({
+            title: 'Could not start bounty',
+            description: err.message,
+            variant: 'destructive',
+          });
+        },
+      },
+    );
+  }, [user, dealId, startBounty, referralData, toast]);
+
   /* ---------- Loading / Error ---------- */
   if (isLoading) return <LoadingOverlay message="Loading deal details\u2026" />;
   if (error || !deal) {
@@ -1517,6 +1583,8 @@ export const DealDetailPage = () => {
               deal={deal}
               onCheckIn={handleCheckIn}
               isCheckingIn={isCheckingIn}
+              onStartBounty={handleStartBounty}
+              isStartingBounty={startBounty.isPending}
             />
 
             <TabBar tabs={RIGHT_TABS} active={rightTab} onChange={setRightTab} />

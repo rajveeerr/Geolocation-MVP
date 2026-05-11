@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Plus, Target, Users, X } from 'lucide-react';
+import { ArrowRight, Loader2, Plus, QrCode, RefreshCw, Target, Users, X } from 'lucide-react';
 import { MerchantProtectedRoute } from '@/components/auth/MerchantProtectedRoute';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/ui/input';
@@ -10,9 +10,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useToast } from '@/hooks/use-toast';
+import { useRefreshBountyQR } from '@/hooks/useKitty';
 import { apiGet, apiPost } from '@/services/api';
 import { PATHS } from '@/routing/paths';
 import { cn } from '@/lib/utils';
+
+const QR_IMAGE_BASE = 'https://api.qrserver.com/v1/create-qr-code/';
+const qrImageUrl = (data: string, size = 96) =>
+  `${QR_IMAGE_BASE}?size=${size}x${size}&data=${encodeURIComponent(data)}`;
 
 interface MerchantBountyDeal {
   id: number | string;
@@ -290,6 +295,32 @@ function BountyDealCard({ deal }: { deal: MerchantBountyDeal }) {
   const minSpend = deal.bountyMinSpend;
   const claimed = deal.currentRedemptions ?? 0;
   const remaining = timeRemaining(deal);
+  const { toast } = useToast();
+  const refreshQR = useRefreshBountyQR();
+  const dealIdNum = Number(deal.id);
+  const qrSrc = deal.bountyQRCode ? qrImageUrl(deal.bountyQRCode, 96) : null;
+
+  const handleRefreshQR = () => {
+    if (!Number.isFinite(dealIdNum)) return;
+    refreshQR.mutate(
+      { dealId: dealIdNum },
+      {
+        onSuccess: () => {
+          toast({
+            title: 'QR code refreshed',
+            description: 'A new bounty QR code has been generated for this deal.',
+          });
+        },
+        onError: (err) => {
+          toast({
+            title: 'Could not refresh QR',
+            description: err.message,
+            variant: 'destructive',
+          });
+        },
+      },
+    );
+  };
 
   return (
     <motion.div
@@ -342,6 +373,42 @@ function BountyDealCard({ deal }: { deal: MerchantBountyDeal }) {
             {minSpend != null ? `$${minSpend.toFixed(0)}` : '—'}
           </div>
         </div>
+      </div>
+
+      {/* Bounty QR code + refresh */}
+      <div className="mt-4 flex items-center gap-3 rounded-xl border border-neutral-200 bg-white p-3">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-neutral-200 bg-white">
+          {qrSrc ? (
+            <img src={qrSrc} alt="Bounty QR" className="h-full w-full object-contain" />
+          ) : (
+            <QrCode className="h-7 w-7 text-neutral-300" aria-hidden />
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
+            Verification QR
+          </div>
+          <p className="mt-0.5 text-xs text-neutral-600">
+            {qrSrc
+              ? 'Friends scan this at check-in to credit the referrer.'
+              : 'No QR yet — generate one to start crediting referrals.'}
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={handleRefreshQR}
+          disabled={refreshQR.isPending}
+          className="shrink-0 rounded-full"
+        >
+          {refreshQR.isPending ? (
+            <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+          )}
+          {qrSrc ? 'Refresh' : 'Generate'}
+        </Button>
       </div>
     </motion.div>
   );
