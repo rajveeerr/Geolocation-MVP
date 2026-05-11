@@ -1,84 +1,86 @@
 // src/components/ui/LoadingOverlay.tsx
 import { motion } from 'framer-motion';
-import { Logo } from '../common/Logo';
 
 interface LoadingOverlayProps {
+  /** Optional context line shown subtly below the wordmark (e.g. "Loading deal details…"). */
   message?: string;
 }
 
-export const LoadingOverlay = ({
-  message = 'Loading...',
-}: LoadingOverlayProps) => {
+export const LoadingOverlay = ({ message }: LoadingOverlayProps) => {
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white"
     >
-      {/* Blurred Background */}
-      <div className="absolute inset-0 bg-white/80 backdrop-blur-md" />
-
-      {/* Loading Content */}
+      {/* Breathing mark */}
       <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        className="relative z-10 flex flex-col items-center justify-center rounded-2xl border border-neutral-200/50 bg-white p-8 shadow-2xl"
+        animate={{ scale: [1, 1.08, 1] }}
+        transition={{
+          duration: 1.8,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+        className="relative"
       >
-        {/* Animated Logo */}
-        <div className="mb-6">
-          <Logo />
+        {/* Soft red glow that pulses with the mark */}
+        <motion.div
+          aria-hidden
+          animate={{ opacity: [0.25, 0.55, 0.25] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute inset-0 h-14 w-14 rounded-2xl bg-brand-primary-500 blur-2xl"
+        />
+        <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-primary-600 shadow-[0_10px_30px_rgba(232,2,3,0.25)]">
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 18 18"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M3 8L8 3L13 8L8 13L3 8Z" fill="white" />
+            <circle cx="14" cy="4" r="2" fill="white" />
+          </svg>
         </div>
+      </motion.div>
 
-        {/* Loading Spinner */}
-        <div className="relative mb-4">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-            className="border-3 h-8 w-8 rounded-full border-gray-200 border-t-brand-primary-500"
-          />
+      {/* Wordmark */}
+      <motion.span
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.4 }}
+        className="mt-5 text-[1.35rem] font-semibold tracking-tight text-neutral-900"
+      >
+        Yohop
+      </motion.span>
 
-          {/* Pulsing dots */}
-          <div className="mt-4 flex justify-center space-x-1">
-            {[0, 1, 2].map((index) => (
-              <motion.div
-                key={index}
-                animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.5, 1, 0.5],
-                }}
-                transition={{
-                  duration: 1,
-                  repeat: Infinity,
-                  delay: index * 0.2,
-                }}
-                className="h-2 w-2 rounded-full bg-brand-primary-500"
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Loading Message */}
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="text-center font-medium text-neutral-600"
-        >
-          {message}
-        </motion.p>
-
-        {/* Subtitle */}
-        <motion.p
+      {/* Optional context line */}
+      {message ? (
+        <motion.span
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-2 text-center text-sm text-neutral-400"
+          transition={{ delay: 0.3, duration: 0.4 }}
+          className="mt-2 text-xs font-medium text-neutral-400"
         >
-          Preparing your experience...
-        </motion.p>
-      </motion.div>
+          {message}
+        </motion.span>
+      ) : null}
+
+      {/* Hairline indeterminate progress bar at the bottom of the viewport */}
+      <div className="absolute inset-x-0 bottom-0 h-[2px] overflow-hidden bg-neutral-100">
+        <motion.div
+          initial={{ x: '-40%' }}
+          animate={{ x: '140%' }}
+          transition={{
+            duration: 1.2,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+          className="h-full w-2/5 rounded-full bg-gradient-to-r from-transparent via-brand-primary-500 to-transparent"
+        />
+      </div>
     </motion.div>
   );
 };
