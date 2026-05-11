@@ -200,22 +200,12 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
 // backwards compatibility.
 export const adaptApiDealToFrontend = adaptApiDealToUi;
 
-// Merge backend data into placeholders: replace existing ids, otherwise append.
+// Adapt backend deals to UI shape. Sample/placeholder deals are no longer
+// surfaced on the discovery page — an empty backend response yields an empty
+// list, and the page renders its own "No Deals Found" state.
 export const mergeBackendDeals = (
   apiDeals: ApiDeal[] | undefined,
 ): DealWithLocation[] => {
-  // If no backend deals provided, just return placeholders
-  if (!Array.isArray(apiDeals) || apiDeals.length === 0)
-    return placeholderDeals;
-
-  const adapted = apiDeals.map(adaptApiDealToFrontend);
-
-  // We want backend deals to render on top, so put adapted backend deals first
-  // and then append placeholders that weren't replaced by backend entries.
-  const backendIds = new Set(adapted.map((d) => d.id));
-  const remainingPlaceholders = placeholderDeals.filter(
-    (p) => !backendIds.has(p.id),
-  );
-
-  return [...adapted, ...remainingPlaceholders];
+  if (!Array.isArray(apiDeals) || apiDeals.length === 0) return [];
+  return apiDeals.map(adaptApiDealToFrontend);
 };

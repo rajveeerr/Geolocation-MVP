@@ -255,8 +255,8 @@ export const AllDealsPage = () => {
       <div className="w-full">
         <div className="grid min-h-[calc(100vh-5rem)] grid-cols-1 lg:grid-cols-12">
           {/* Left Column: Pass filter state and setters to the Sidebar */}
-          <div className="border-r border-neutral-200/80 bg-white/80 shadow-sm backdrop-blur-sm lg:col-span-5 xl:col-span-4 2xl:col-span-3">
-            <div className="h-max overflow-hidden lg:h-screen">
+          <div className="border-r border-neutral-200/80 bg-white/80 shadow-sm backdrop-blur-sm lg:col-span-9 xl:col-span-9 2xl:col-span-10">
+            <div className="h-max overflow-hidden lg:h-[calc(100vh-5rem)]">
               <DealsSidebar
                 deals={deals}
                 hoveredDealId={hoveredDealId}
@@ -285,7 +285,7 @@ export const AllDealsPage = () => {
           </div>
 
           {/* Right Column: Map */}
-          <div className="relative hidden h-[calc(100vh-5rem)] bg-neutral-100/30 lg:col-span-7 lg:block xl:col-span-8 2xl:col-span-9">
+          <div className="relative hidden h-[calc(100vh-5rem)] bg-neutral-100/30 lg:col-span-3 lg:block xl:col-span-3 2xl:col-span-2">
             <DealResultsMap
               deals={deals}
               hoveredDealId={hoveredDealId}

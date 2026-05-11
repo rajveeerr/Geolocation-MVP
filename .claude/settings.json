@@ -13,7 +13,9 @@
       "Read(//c/GeolocationMVPBackend/**)",
       "Bash(Get-ChildItem -Path \"C:\\\\Geolocation-MVP\" -Directory)",
       "Bash(Select-Object Name)",
-      "Bash(del \"c:\\\\Geolocation-MVP\\\\web\\\\src\\\\components\\\\merchant\\\\create-deal\\\\DealBogoStep.tsx\")"
+      "Bash(del \"c:\\\\Geolocation-MVP\\\\web\\\\src\\\\components\\\\merchant\\\\create-deal\\\\DealBogoStep.tsx\")",
+      "Bash(ls ecosystem*)",
+      "Bash(ls *.sh)"
     ],
     "additionalDirectories": [
       "C:\\Geolocation-MVP\\web\\src\\pages"

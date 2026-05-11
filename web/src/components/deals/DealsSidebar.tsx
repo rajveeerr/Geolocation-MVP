@@ -371,7 +371,7 @@ export const DealsSidebar = ({
 
       {/* --- MODIFIED: Content List with Error and Empty State --- */}
       <div className="flex-grow overflow-y-auto">
-        <div className="space-y-4 p-3 sm:space-y-6 sm:p-4 lg:space-y-8 lg:p-6 xl:p-8">
+        <div className="p-3 sm:p-4 lg:p-6 xl:p-8">
           {/* Error State */}
           {error ? (
             <div className="py-12 text-center">
@@ -422,24 +422,25 @@ export const DealsSidebar = ({
               </p>
             </div>
           ) : (
-            /* Deals List */
-            deals.map((deal) => (
-              <div
-                key={deal.id}
-                className={cn(
-                  // allow the card to take full available width and give a little horizontal padding
-                  'w-full px-2 transition-all duration-200',
-                  hoveredDealId === deal.id && 'rounded-2xl ring-2 ring-primary/20',
-                )}
-              >
-                <DealResultCard
-                  deal={deal}
-                  isHovered={hoveredDealId === deal.id}
-                  onMouseEnter={(id: string) => setHoveredDealId(id)}
-                  onMouseLeave={() => setHoveredDealId(null)}
-                />
-              </div>
-            ))
+            /* Deals Grid */
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+              {deals.map((deal) => (
+                <div
+                  key={deal.id}
+                  className={cn(
+                    'w-full transition-all duration-200',
+                    hoveredDealId === deal.id && 'rounded-2xl ring-2 ring-primary/20',
+                  )}
+                >
+                  <DealResultCard
+                    deal={deal}
+                    isHovered={hoveredDealId === deal.id}
+                    onMouseEnter={(id: string) => setHoveredDealId(id)}
+                    onMouseLeave={() => setHoveredDealId(null)}
+                  />
+                </div>
+              ))}
+            </div>
           )}
         </div>
 
