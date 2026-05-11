@@ -57,17 +57,21 @@ export const TwelveHourDateTimeField = ({
   return (
     <div className={className ?? 'space-y-2'}>
       {label && <Label htmlFor={id}>{label}</Label>}
-      <div className="grid gap-2 sm:grid-cols-[minmax(0,11rem)_minmax(0,1fr)]">
+      <div className="grid min-w-0 gap-2 sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)]">
         <Input
           id={id}
           type="date"
           value={date}
           min={min}
           onChange={(e) => handleDateChange(e.target.value)}
-          className="h-11"
+          className="h-11 w-full min-w-0"
           lang="en-US"
         />
-        <TwelveHourTimeField value={time} onChange={handleTimeChange} className="" />
+        <TwelveHourTimeField
+          value={time}
+          onChange={handleTimeChange}
+          className="min-w-0 space-y-0"
+        />
       </div>
     </div>
   );

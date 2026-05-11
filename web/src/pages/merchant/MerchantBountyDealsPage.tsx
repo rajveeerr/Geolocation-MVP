@@ -494,8 +494,8 @@ function BountyDealCard({ deal }: { deal: MerchantBountyDeal }) {
         </div>
       </div>
 
-      {/* Bounty QR code + refresh */}
-      <div className="mt-4 flex items-center gap-3 rounded-xl border border-neutral-200 bg-white p-3">
+      {/* Bounty QR code + refresh — wraps cleanly on narrow screens */}
+      <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-neutral-200 bg-white p-3 sm:flex-nowrap">
         <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-neutral-200 bg-white">
           {qrSrc ? (
             <img src={qrSrc} alt="Bounty QR" className="h-full w-full object-contain" />
@@ -519,7 +519,7 @@ function BountyDealCard({ deal }: { deal: MerchantBountyDeal }) {
           size="sm"
           onClick={handleRefreshQR}
           disabled={refreshQR.isPending}
-          className="shrink-0 rounded-full"
+          className="w-full shrink-0 rounded-full sm:w-auto"
         >
           {refreshQR.isPending ? (
             <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
