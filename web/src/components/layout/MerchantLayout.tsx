@@ -14,7 +14,6 @@ import {
   KeyRound,
   Share2,
   Target,
-  UserPlus,
   LogOut,
   Menu,
   Plus,
@@ -169,12 +168,6 @@ const navSections: MerchantNavSection[] = [
         to: PATHS.MERCHANT_CHECKIN_GAMES,
         icon: ScanSearch,
         match: (pathname) => pathname.startsWith(PATHS.MERCHANT_CHECKIN_GAMES),
-      },
-      {
-        label: 'Referrals',
-        to: PATHS.MERCHANT_REFERRALS,
-        icon: UserPlus,
-        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_REFERRALS),
       },
       {
         label: 'Referral deals',

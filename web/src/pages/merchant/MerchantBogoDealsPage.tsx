@@ -119,7 +119,7 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
         maxRedemptions,
       };
 
-      const res = await apiPost<{ deal: any; message?: string }, typeof payload>('/merchants/deals', payload);
+      const res = await apiPost<{ deal: any; message?: string }, typeof payload>('/deals', payload);
       if (!res.success) throw new Error(res.error ?? 'Failed to create BOGO deal');
       return res.data;
     },

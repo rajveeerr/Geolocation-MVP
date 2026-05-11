@@ -124,7 +124,7 @@ function CreateBountyForm({ onClose }: { onClose: () => void }) {
         kickbackEnabled: true,
       };
 
-      const res = await apiPost<{ deal: any; message?: string }, typeof payload>('/merchants/deals', payload);
+      const res = await apiPost<{ deal: any; message?: string }, typeof payload>('/deals', payload);
       if (!res.success) throw new Error(res.error ?? 'Failed to launch bounty');
       return res.data;
     },
