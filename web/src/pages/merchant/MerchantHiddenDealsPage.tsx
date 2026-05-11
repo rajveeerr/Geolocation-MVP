@@ -161,10 +161,10 @@ function MerchantHiddenDealsContent() {
             Deals locked behind an access code. Share the code or link with select customers — only people with the code can see and redeem.
           </p>
         </div>
-        <Link to={PATHS.MERCHANT_DEALS_CREATE}>
+        <Link to="/merchant/deals/create/hidden">
           <Button size="md" className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800">
             <Plus className="mr-2 h-4 w-4" />
-            Create deal
+            Create hidden deal
           </Button>
         </Link>
       </div>
@@ -177,7 +177,7 @@ function MerchantHiddenDealsContent() {
             Create a deal and turn on "Hidden" to give it an access code. Hidden deals don't appear in normal discovery — share the code with the customers you want to reach.
           </p>
           <div className="mt-5 flex justify-center gap-2">
-            <Link to={PATHS.MERCHANT_DEALS_CREATE}>
+            <Link to="/merchant/deals/create/hidden">
               <Button size="md" className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800">
                 <Plus className="mr-2 h-4 w-4" />
                 Create a hidden deal

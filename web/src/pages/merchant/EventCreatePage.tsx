@@ -1099,6 +1099,23 @@ function CreateEventWizard() {
 
   return (
     <div className="flex min-h-[calc(100vh-5rem)] flex-col">
+      {/* Top progress bar */}
+      <div className="sticky top-0 z-10 border-b border-neutral-200 bg-white shadow-sm">
+        <div className="h-1.5 bg-neutral-200">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.5 }}
+            className="h-1.5 bg-gradient-to-r from-brand-primary-400 to-brand-primary-600"
+          />
+        </div>
+        <div className="container mx-auto flex h-10 max-w-screen-xl items-center justify-end px-6">
+          <span className="text-xs font-medium text-neutral-500">
+            Step {currentStep + 1} of {STEPS.length}
+          </span>
+        </div>
+      </div>
+
       <div className="flex-1 px-4 py-8">
         <div className="mx-auto max-w-2xl">
           {/* Title */}
@@ -1137,14 +1154,6 @@ function CreateEventWizard() {
 
       {/* Footer */}
       <footer className="sticky bottom-0 border-t border-neutral-200 bg-white shadow-lg">
-        <div className="h-1.5 bg-neutral-200">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.5 }}
-            className="h-1.5 bg-gradient-to-r from-brand-primary-400 to-brand-primary-600"
-          />
-        </div>
         <div className="container mx-auto flex h-16 max-w-screen-xl items-center justify-between px-6">
           <Button
             variant="secondary"
@@ -1155,9 +1164,6 @@ function CreateEventWizard() {
             <ChevronLeft className="mr-1 h-4 w-4" />
             {currentStep === 0 ? 'Cancel' : 'Back'}
           </Button>
-          <span className="text-sm font-medium text-neutral-500">
-            Step {currentStep + 1} of {STEPS.length}
-          </span>
           {currentStep < STEPS.length - 1 ? (
             <Button
               onClick={handleNext}

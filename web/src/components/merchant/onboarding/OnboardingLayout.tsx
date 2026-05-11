@@ -60,38 +60,42 @@ export const OnboardingLayout = ({
   return (
     <div className="flex min-h-screen flex-col bg-white">
       {/* Minimal navbar */}
-      <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-neutral-200 bg-white px-4 md:px-6">
-        <Logo />
+      <header className="sticky top-0 z-10 bg-white">
+        <div className="flex h-16 items-center justify-between border-b border-neutral-200 px-4 md:px-6">
+          <Logo />
 
-        {/* Centered Step Indicator */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-base sm:text-lg text-neutral-900 tracking-tight whitespace-nowrap">
-          Step {currentStep + 1} of {TOTAL_STEPS} <span className="text-neutral-400 mx-1 font-normal">—</span> {getStepLabel(currentStep)}
+          {/* Centered Step Indicator */}
+          <div className="absolute left-1/2 top-8 -translate-x-1/2 -translate-y-1/2 font-bold text-base sm:text-lg text-neutral-900 tracking-tight whitespace-nowrap">
+            Step {currentStep + 1} of {TOTAL_STEPS} <span className="text-neutral-400 mx-1 font-normal">—</span> {getStepLabel(currentStep)}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Link
+              to={PATHS.MERCHANT_DASHBOARD}
+              className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+            >
+              Save & exit
+            </Link>
+          </div>
         </div>
-
-        <div className="flex items-center gap-3">
-          <Link
-            to={PATHS.MERCHANT_DASHBOARD}
-            className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
-          >
-            Save & exit
-          </Link>
-        </div>
-      </header>
-
-      {/* Main content */}
-      <main className="flex-1 min-h-0 overflow-y-auto">{children}</main>
-
-      {/* Footer with progress bar */}
-      {showFooter && (
-        <footer className="sticky bottom-0 bg-white">
-          <div className="flex h-2 w-full overflow-hidden rounded-sm bg-neutral-200">
+        {showFooter && (
+          <div className="flex h-2 w-full overflow-hidden bg-neutral-200">
             <motion.div
-              className="h-full rounded-l-sm bg-neutral-900"
+              className="h-full bg-neutral-900"
               initial={false}
               animate={{ width: `${progressPercent}%` }}
               transition={{ duration: 0.35, ease: 'easeOut' }}
             />
           </div>
+        )}
+      </header>
+
+      {/* Main content */}
+      <main className="flex-1 min-h-0 overflow-y-auto">{children}</main>
+
+      {/* Footer with navigation buttons */}
+      {showFooter && (
+        <footer className="sticky bottom-0 bg-white border-t border-neutral-200">
           <div className="flex items-center justify-between px-4 py-4 md:px-6">
             <button
               type="button"

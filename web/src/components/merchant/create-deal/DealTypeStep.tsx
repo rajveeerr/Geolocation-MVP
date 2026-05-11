@@ -218,7 +218,7 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
     } else if (dealType === 'RECURRING') {
       navigate('/merchant/deals/create/daily-deal/weekdays');
     } else if (dealType === 'BOGO') {
-      navigate('/merchant/deals/create/bogo');
+      navigate(PATHS.MERCHANT_DEALS_BOGO);
     } else {
       onNext();
     }
