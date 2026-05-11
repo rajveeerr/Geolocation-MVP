@@ -74,7 +74,7 @@ function CateringMenuContent({
   }, [activeCategory]);
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-neutral-50 pt-20">
       {/* Restaurant header */}
       <section className="border-b border-neutral-200 bg-white">
         <div className="mx-auto max-w-screen-xl px-4 py-8 sm:px-6">

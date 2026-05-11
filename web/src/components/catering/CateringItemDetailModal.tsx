@@ -190,9 +190,8 @@ export const CateringItemDetailModal = ({
     performAdd();
   };
 
-  if (!item) return null;
-  const open = !!item;
   const quantityOptions = useMemo(() => {
+    if (!item) return [];
     const cap = item.maxPeople ?? item.minPeople + 200;
     const out: number[] = [];
     for (let n = item.minPeople; n <= cap; n++) {
@@ -200,7 +199,10 @@ export const CateringItemDetailModal = ({
       if (out.length >= 250) break;
     }
     return out;
-  }, [item.minPeople, item.maxPeople]);
+  }, [item]);
+
+  if (!item) return null;
+  const open = !!item;
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>

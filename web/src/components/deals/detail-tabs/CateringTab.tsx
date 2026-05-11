@@ -137,7 +137,7 @@ function CateringTabInner({ merchantId, merchantName }: { merchantId: number; me
         {visibleSections.map(([cat, list]) => (
           <section key={cat} className="space-y-3">
             <h4 className="text-sm font-semibold text-neutral-700">{cat}</h4>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {list.map((it) => (
                 <CateringItemCard key={it.id} item={it} onClick={setOpenItem} />
               ))}

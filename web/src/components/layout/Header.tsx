@@ -80,6 +80,15 @@ export const Header = () => {
 
           {/* Right section: Blog, City Guide, City Selector, Points, Profile, Hamburger */}
           <div className="flex items-center gap-1 lg:gap-2">
+            {/* Food Trucks link */}
+            <Link
+              to={PATHS.FOOD_TRUCKS}
+              className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50 hover:text-neutral-900"
+            >
+              <Truck className="h-4 w-4" />
+              <span className="hidden lg:inline">Food Trucks</span>
+            </Link>
+
             {/* Blog link */}
             <Link
               to={PATHS.BLOG}

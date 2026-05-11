@@ -74,7 +74,7 @@ export const FoodTrucksPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-neutral-50 pt-20">
       {/* Hero */}
       <section className="border-b border-neutral-200 bg-gradient-to-br from-amber-50 via-white to-white">
         <div className="mx-auto max-w-screen-xl px-4 py-10 sm:px-6 sm:py-12">

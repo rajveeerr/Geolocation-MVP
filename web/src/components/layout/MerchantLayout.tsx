@@ -22,7 +22,6 @@ import {
   Search,
   Settings,
   ShoppingBag,
-  ShoppingCart,
   Sparkles,
   Store,
   Ticket,
@@ -89,14 +88,7 @@ const navSections: MerchantNavSection[] = [
         match: (pathname) =>
           pathname.startsWith('/merchant/deals') &&
           !pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN) &&
-          !pathname.startsWith(PATHS.MERCHANT_DEALS_BOUNTIES) &&
-          !pathname.startsWith(PATHS.MERCHANT_DEALS_BOGO),
-      },
-      {
-        label: 'BOGO deals',
-        to: PATHS.MERCHANT_DEALS_BOGO,
-        icon: ShoppingCart,
-        match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_BOGO),
+          !pathname.startsWith(PATHS.MERCHANT_DEALS_BOUNTIES),
       },
     ],
   },
