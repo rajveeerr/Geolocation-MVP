@@ -845,11 +845,15 @@ function MerchantWorkspaceSearch({
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2 text-[13px] text-neutral-500 shadow-sm transition hover:border-neutral-300 hover:text-neutral-700"
+        title="Search workspace (Ctrl K)"
+        aria-label="Search workspace"
+        className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-2 text-[13px] text-neutral-500 shadow-sm transition hover:border-neutral-300 hover:text-neutral-700 2xl:px-4"
       >
         <Search className="h-4 w-4" />
-        <span>Search workspace</span>
-        <span className="rounded-md bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-400">Ctrl K</span>
+        <span className="hidden 2xl:inline">Search workspace</span>
+        <span className="hidden rounded-md bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-400 2xl:inline">
+          Ctrl K
+        </span>
       </button>
 
       {isOpen ? (
@@ -1016,27 +1020,68 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
                   </Link>
                 </div>
 
-                <nav className="hidden items-center gap-2 xl:flex">
-                  {navSections.map((section) => {
-                    const isActive = section.id === activeSection.id;
+                {(() => {
+                  // Show the first N sections inline; fold the rest behind a "More" dropdown.
+                  // Always keep the *active* section visible so the user can see where they are.
+                  const VISIBLE_COUNT = 6;
+                  let visibleSections = navSections.slice(0, VISIBLE_COUNT);
+                  let overflowSections = navSections.slice(VISIBLE_COUNT);
+                  if (
+                    !visibleSections.some((s) => s.id === activeSection.id) &&
+                    overflowSections.some((s) => s.id === activeSection.id)
+                  ) {
+                    const activeFromOverflow = overflowSections.find((s) => s.id === activeSection.id)!;
+                    visibleSections = [...visibleSections.slice(0, VISIBLE_COUNT - 1), activeFromOverflow];
+                    overflowSections = navSections.filter((s) => !visibleSections.includes(s));
+                  }
 
-                    return (
-                      <button
-                        key={section.id}
-                        type="button"
-                        onClick={() => navigate(section.items[0].to)}
-                        className={cn(
-                          'rounded-full px-4 py-2 text-[13px] font-medium transition',
-                          isActive
-                            ? 'bg-neutral-100 text-neutral-950 shadow-sm ring-1 ring-neutral-200/80'
-                            : 'text-neutral-500 hover:bg-neutral-100/80 hover:text-neutral-950',
-                        )}
-                      >
-                        {section.label}
-                      </button>
-                    );
-                  })}
-                </nav>
+                  return (
+                    <nav className="hidden items-center gap-1.5 xl:flex">
+                      {visibleSections.map((section) => {
+                        const isActive = section.id === activeSection.id;
+                        return (
+                          <button
+                            key={section.id}
+                            type="button"
+                            onClick={() => navigate(section.items[0].to)}
+                            className={cn(
+                              'rounded-full px-3.5 py-2 text-[13px] font-medium transition',
+                              isActive
+                                ? 'bg-neutral-100 text-neutral-950 shadow-sm ring-1 ring-neutral-200/80'
+                                : 'text-neutral-500 hover:bg-neutral-100/80 hover:text-neutral-950',
+                            )}
+                          >
+                            {section.label}
+                          </button>
+                        );
+                      })}
+                      {overflowSections.length > 0 ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              type="button"
+                              className="inline-flex items-center gap-1 rounded-full px-3.5 py-2 text-[13px] font-medium text-neutral-500 transition hover:bg-neutral-100/80 hover:text-neutral-950"
+                            >
+                              More
+                              <ChevronDown className="h-3.5 w-3.5" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-56">
+                            {overflowSections.map((section) => (
+                              <DropdownMenuItem
+                                key={section.id}
+                                onClick={() => navigate(section.items[0].to)}
+                                className="cursor-pointer"
+                              >
+                                {section.label}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : null}
+                    </nav>
+                  );
+                })()}
 
                 <div className="flex items-center gap-2 sm:gap-3">
                   <MerchantWorkspaceSearch onNavigateTo={(to) => navigate(to)} />
