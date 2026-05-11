@@ -10,7 +10,10 @@
       "Read(//c//**)",
       "Read(//c/GeoLocationMVP-BE/prisma/**)",
       "Read(//c/GeoLocationMVP-BE/**)",
-      "Read(//c/GeolocationMVPBackend/**)"
+      "Read(//c/GeolocationMVPBackend/**)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Geolocation-MVP\" -Directory)",
+      "Bash(Select-Object Name)",
+      "Bash(del \"c:\\\\Geolocation-MVP\\\\web\\\\src\\\\components\\\\merchant\\\\create-deal\\\\DealBogoStep.tsx\")"
     ],
     "additionalDirectories": [
       "C:\\Geolocation-MVP\\web\\src\\pages"

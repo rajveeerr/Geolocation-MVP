@@ -879,6 +879,39 @@ export const DealDetailPage = () => {
     };
   }, [bundleScrollTarget, dealId, deal, isLoading, packageCollections.length, setSearchParams]);
 
+  const handleAddPackageToPlanner = useCallback(
+    (collection: any) => {
+      if (!deal?.merchant?.id) return;
+      const list = collection.items || [];
+      let added = 0;
+      for (const menuItem of list) {
+        const unitPrice = Number(menuItem.discountedPrice ?? menuItem.originalPrice ?? 0);
+        if (!Number.isFinite(unitPrice) || unitPrice <= 0) continue;
+        addItem({
+          menuItemId: Number(menuItem.id),
+          merchantId: Number(deal.merchant.id),
+          name: menuItem.name,
+          unitPrice,
+          quantity: 1,
+        });
+        added += 1;
+      }
+      if (added === 0) {
+        toast({
+          title: 'Nothing added',
+          description: 'No priced dishes were found in this package.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      toast({
+        title: 'Full package added',
+        description: `${added} dish(es) from \u201c${collection.title}\u201d are in your planner. Adjust quantities in the cart above.`,
+      });
+    },
+    [deal, addItem, toast],
+  );
+
   /* ---------- Loading / Error ---------- */
   if (isLoading) return <LoadingOverlay message="Loading deal details\u2026" />;
   if (error || !deal) {
@@ -957,39 +990,6 @@ export const DealDetailPage = () => {
       description: `${menuItem.name} added to planner.`,
     });
   };
-
-  const handleAddPackageToPlanner = useCallback(
-    (collection: any) => {
-      if (!deal?.merchant?.id) return;
-      const list = collection.items || [];
-      let added = 0;
-      for (const menuItem of list) {
-        const unitPrice = Number(menuItem.discountedPrice ?? menuItem.originalPrice ?? 0);
-        if (!Number.isFinite(unitPrice) || unitPrice <= 0) continue;
-        addItem({
-          menuItemId: Number(menuItem.id),
-          merchantId: Number(deal.merchant.id),
-          name: menuItem.name,
-          unitPrice,
-          quantity: 1,
-        });
-        added += 1;
-      }
-      if (added === 0) {
-        toast({
-          title: 'Nothing added',
-          description: 'No priced dishes were found in this package.',
-          variant: 'destructive',
-        });
-        return;
-      }
-      toast({
-        title: 'Full package added',
-        description: `${added} dish(es) from “${collection.title}” are in your planner. Adjust quantities in the cart above.`,
-      });
-    },
-    [deal, addItem, toast],
-  );
 
   const handlePlaceBulkOrder = async () => {
     if (merchantCartItems.length === 0) {
