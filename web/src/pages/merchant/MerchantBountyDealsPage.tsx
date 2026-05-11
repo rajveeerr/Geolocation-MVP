@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRefreshBountyQR } from '@/hooks/useKitty';
 import { TwelveHourDateTimeField } from '@/components/common/TwelveHourDateTimeField';
 import { CategorySelector } from '@/components/common/CategorySelector';
+import { MenuItemPicker } from '@/components/merchant/MenuItemPicker';
 import { apiGet, apiPost } from '@/services/api';
 import { PATHS } from '@/routing/paths';
 import { cn } from '@/lib/utils';
@@ -74,6 +75,7 @@ interface BountyFormState {
   minReferralsRequired: string;
   offerHeadline: string;
   kickbackEnabled: boolean;
+  menuItemIds: number[];
 }
 
 const toLocalDateTimeInput = (d: Date) => {
@@ -97,6 +99,7 @@ const blankForm = (): BountyFormState => {
     minReferralsRequired: '1',
     offerHeadline: '',
     kickbackEnabled: true,
+    menuItemIds: [],
   };
 };
 
@@ -152,6 +155,7 @@ function CreateBountyForm({ onClose }: { onClose: () => void }) {
         bountyMaxInvites: maxInvites,
         bountyMinSpend: minSpend,
         kickbackEnabled: form.kickbackEnabled,
+        menuItems: form.menuItemIds.map((id) => ({ id })),
       };
 
       const res = await apiPost<{ deal: any; message?: string }, typeof payload>('/deals', payload);
@@ -370,6 +374,21 @@ function CreateBountyForm({ onClose }: { onClose: () => void }) {
                 Enable kickbacks for this bounty
               </span>
             </label>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <Label className="text-xs font-semibold text-neutral-700">
+            Apply to menu items (optional)
+          </Label>
+          <p className="mt-0.5 text-[11px] text-neutral-500">
+            Pick the items this bounty unlocks. Leave empty to apply broadly to the merchant.
+          </p>
+          <div className="mt-1.5">
+            <MenuItemPicker
+              value={form.menuItemIds}
+              onChange={(ids) => set('menuItemIds', ids)}
+            />
           </div>
         </div>
 

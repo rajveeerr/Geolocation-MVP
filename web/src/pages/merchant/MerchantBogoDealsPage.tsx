@@ -12,6 +12,7 @@ import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useToast } from '@/hooks/use-toast';
 import { TwelveHourDateTimeField } from '@/components/common/TwelveHourDateTimeField';
 import { CategorySelector } from '@/components/common/CategorySelector';
+import { MenuItemPicker } from '@/components/merchant/MenuItemPicker';
 import { apiGet, apiPost } from '@/services/api';
 import { PATHS } from '@/routing/paths';
 import { cn } from '@/lib/utils';
@@ -63,6 +64,7 @@ interface BogoFormState {
   startDate: string; // local datetime, e.g. "2026-05-11T14:30"
   endDate: string;
   maxRedemptions: string;
+  menuItemIds: number[];
 }
 
 const toLocalDateTimeInput = (d: Date) => {
@@ -84,6 +86,7 @@ const blankForm = (): BogoFormState => {
     startDate: toLocalDateTimeInput(now),
     endDate: toLocalDateTimeInput(end),
     maxRedemptions: '',
+    menuItemIds: [],
   };
 };
 
@@ -145,6 +148,7 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
         bogoGetQuantity: form.get,
         bogoGetDiscountPercent: form.discount,
         maxRedemptions,
+        menuItems: form.menuItemIds.map((id) => ({ id })),
       };
 
       const res = await apiPost<{ deal: any; message?: string }, typeof payload>('/deals', payload);
@@ -369,6 +373,21 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
             placeholder="Unlimited"
             className="mt-1.5 h-11"
           />
+        </div>
+
+        <div className="mt-4">
+          <Label className="text-xs font-semibold text-neutral-700">
+            Apply to menu items (optional)
+          </Label>
+          <p className="mt-0.5 text-[11px] text-neutral-500">
+            Pick the items that count toward the buy / get. Leave empty for the offer to apply broadly.
+          </p>
+          <div className="mt-1.5">
+            <MenuItemPicker
+              value={form.menuItemIds}
+              onChange={(ids) => set('menuItemIds', ids)}
+            />
+          </div>
         </div>
 
         <Button
