@@ -62,22 +62,33 @@ const timeRemaining = (deal: MerchantBountyDeal) => {
 interface BountyFormState {
   title: string;
   description: string;
-  expiresInHours: string;
+  startDate: string; // local datetime, e.g. "2026-05-11T14:30"
+  endDate: string;
   potAmount: string;
   perPerson: string;
   maxInvites: string;
   minSpend: string;
 }
 
-const blankForm = (): BountyFormState => ({
-  title: '',
-  description: '',
-  expiresInHours: '2',
-  potAmount: '',
-  perPerson: '',
-  maxInvites: '',
-  minSpend: '',
-});
+const toLocalDateTimeInput = (d: Date) => {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
+const blankForm = (): BountyFormState => {
+  const now = new Date();
+  const end = new Date(now.getTime() + 2 * 60 * 60 * 1000); // +2h default
+  return {
+    title: '',
+    description: '',
+    startDate: toLocalDateTimeInput(now),
+    endDate: toLocalDateTimeInput(end),
+    potAmount: '',
+    perPerson: '',
+    maxInvites: '',
+    minSpend: '',
+  };
+};
 
 function CreateBountyForm({ onClose }: { onClose: () => void }) {
   const { toast } = useToast();
@@ -89,31 +100,35 @@ function CreateBountyForm({ onClose }: { onClose: () => void }) {
 
   const createBounty = useMutation({
     mutationFn: async () => {
-      const expiresHours = parseFloat(form.expiresInHours);
-      if (!Number.isFinite(expiresHours) || expiresHours <= 0) {
-        throw new Error('Expires In must be a positive number');
-      }
       const perPerson = parseFloat(form.perPerson);
       const potAmount = parseFloat(form.potAmount);
       const maxInvites = parseInt(form.maxInvites, 10);
       const minSpend = parseFloat(form.minSpend);
 
       if (!form.title.trim()) throw new Error('Title is required');
+      if (!form.startDate) throw new Error('Start date is required');
+      if (!form.endDate) throw new Error('End date is required');
+
+      const startTime = new Date(form.startDate);
+      const endTime = new Date(form.endDate);
+      if (isNaN(startTime.getTime())) throw new Error('Invalid start date');
+      if (isNaN(endTime.getTime())) throw new Error('Invalid end date');
+      if (startTime >= endTime) throw new Error('End date must be after start date');
+
       if (!Number.isFinite(potAmount) || potAmount <= 0) throw new Error('Pot Amount must be positive');
       if (!Number.isFinite(perPerson) || perPerson <= 0) throw new Error('Per Person must be positive');
       if (!Number.isFinite(maxInvites) || maxInvites < 1) throw new Error('Max Invites must be ≥ 1');
       if (!Number.isFinite(minSpend) || minSpend < 0) throw new Error('Min Spend must be ≥ 0');
-
-      const now = new Date();
-      const endTime = new Date(now.getTime() + expiresHours * 60 * 60 * 1000);
 
       const payload = {
         title: form.title.trim(),
         description: form.description.trim() || undefined,
         dealType: 'Bounty Deal',
         category: 'FOOD_AND_BEVERAGE',
-        startTime: now.toISOString(),
-        endTime: endTime.toISOString(),
+        activeDateRange: {
+          startDate: startTime.toISOString(),
+          endDate: endTime.toISOString(),
+        },
         // Existing bounty mechanic fields (required by BE validation)
         bountyRewardAmount: perPerson,
         minReferralsRequired: 1,
@@ -165,32 +180,42 @@ function CreateBountyForm({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <div className="mt-5">
+          <Label htmlFor="bounty-title" className="text-xs font-semibold text-neutral-700">
+            Title
+          </Label>
+          <Input
+            id="bounty-title"
+            value={form.title}
+            onChange={(e) => set('title', e.target.value)}
+            placeholder="Taco Tuesday Happy Hour"
+            className="mt-1.5 h-11"
+            maxLength={100}
+          />
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
-            <Label htmlFor="bounty-title" className="text-xs font-semibold text-neutral-700">
-              Title
+            <Label htmlFor="bounty-start" className="text-xs font-semibold text-neutral-700">
+              Starts at
             </Label>
             <Input
-              id="bounty-title"
-              value={form.title}
-              onChange={(e) => set('title', e.target.value)}
-              placeholder="Taco Tuesday Happy Hour"
+              id="bounty-start"
+              type="datetime-local"
+              value={form.startDate}
+              onChange={(e) => set('startDate', e.target.value)}
               className="mt-1.5 h-11"
-              maxLength={100}
             />
           </div>
           <div>
-            <Label htmlFor="bounty-expires" className="text-xs font-semibold text-neutral-700">
-              Expires In (hours)
+            <Label htmlFor="bounty-end" className="text-xs font-semibold text-neutral-700">
+              Ends at
             </Label>
             <Input
-              id="bounty-expires"
-              type="number"
-              min={1}
-              step={0.5}
-              value={form.expiresInHours}
-              onChange={(e) => set('expiresInHours', e.target.value)}
-              placeholder="2"
+              id="bounty-end"
+              type="datetime-local"
+              value={form.endDate}
+              onChange={(e) => set('endDate', e.target.value)}
               className="mt-1.5 h-11"
             />
           </div>

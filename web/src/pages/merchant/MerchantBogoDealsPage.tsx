@@ -56,19 +56,30 @@ interface BogoFormState {
   buy: number;
   get: number;
   discount: number;
-  durationDays: string;
+  startDate: string; // local datetime, e.g. "2026-05-11T14:30"
+  endDate: string;
   maxRedemptions: string;
 }
 
-const blankForm = (): BogoFormState => ({
-  title: '',
-  description: '',
-  buy: 1,
-  get: 1,
-  discount: 100,
-  durationDays: '14',
-  maxRedemptions: '',
-});
+const toLocalDateTimeInput = (d: Date) => {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
+const blankForm = (): BogoFormState => {
+  const now = new Date();
+  const end = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000); // +14 days
+  return {
+    title: '',
+    description: '',
+    buy: 1,
+    get: 1,
+    discount: 100,
+    startDate: toLocalDateTimeInput(now),
+    endDate: toLocalDateTimeInput(end),
+    maxRedemptions: '',
+  };
+};
 
 function CreateBogoForm({ onClose }: { onClose: () => void }) {
   const { toast } = useToast();
@@ -94,25 +105,29 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
       if (form.get < 1) throw new Error('Customer gets must be at least 1');
       if (form.discount < 0 || form.discount > 100)
         throw new Error('Discount must be between 0 and 100');
-      const durationDays = parseFloat(form.durationDays);
-      if (!Number.isFinite(durationDays) || durationDays <= 0)
-        throw new Error('Duration must be a positive number of days');
+      if (!form.startDate) throw new Error('Start date is required');
+      if (!form.endDate) throw new Error('End date is required');
+
+      const startTime = new Date(form.startDate);
+      const endTime = new Date(form.endDate);
+      if (isNaN(startTime.getTime())) throw new Error('Invalid start date');
+      if (isNaN(endTime.getTime())) throw new Error('Invalid end date');
+      if (startTime >= endTime) throw new Error('End date must be after start date');
 
       const maxRedemptions = form.maxRedemptions === '' ? undefined : parseInt(form.maxRedemptions, 10);
       if (maxRedemptions !== undefined && (!Number.isFinite(maxRedemptions) || maxRedemptions < 0)) {
         throw new Error('Max redemptions must be a non-negative number');
       }
 
-      const now = new Date();
-      const endTime = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000);
-
       const payload = {
         title: form.title.trim(),
         description: form.description.trim() || undefined,
         dealType: 'BOGO',
         category: 'FOOD_AND_BEVERAGE',
-        startTime: now.toISOString(),
-        endTime: endTime.toISOString(),
+        activeDateRange: {
+          startDate: startTime.toISOString(),
+          endDate: endTime.toISOString(),
+        },
         bogoBuyQuantity: form.buy,
         bogoGetQuantity: form.get,
         bogoGetDiscountPercent: form.discount,
@@ -275,37 +290,48 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
           />
         </div>
 
-        {/* Duration + max redemptions */}
+        {/* Active date range */}
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <div>
-            <Label htmlFor="bogo-duration" className="text-xs font-semibold text-neutral-700">
-              Runs for (days)
+            <Label htmlFor="bogo-start" className="text-xs font-semibold text-neutral-700">
+              Starts at
             </Label>
             <Input
-              id="bogo-duration"
-              type="number"
-              min={1}
-              step="0.5"
-              value={form.durationDays}
-              onChange={(e) => set('durationDays', e.target.value)}
-              placeholder="14"
+              id="bogo-start"
+              type="datetime-local"
+              value={form.startDate}
+              onChange={(e) => set('startDate', e.target.value)}
               className="mt-1.5 h-11"
             />
           </div>
           <div>
-            <Label htmlFor="bogo-max" className="text-xs font-semibold text-neutral-700">
-              Max redemptions (optional)
+            <Label htmlFor="bogo-end" className="text-xs font-semibold text-neutral-700">
+              Ends at
             </Label>
             <Input
-              id="bogo-max"
-              type="number"
-              min={0}
-              value={form.maxRedemptions}
-              onChange={(e) => set('maxRedemptions', e.target.value)}
-              placeholder="Unlimited"
+              id="bogo-end"
+              type="datetime-local"
+              value={form.endDate}
+              onChange={(e) => set('endDate', e.target.value)}
               className="mt-1.5 h-11"
             />
           </div>
+        </div>
+
+        {/* Max redemptions */}
+        <div className="mt-4">
+          <Label htmlFor="bogo-max" className="text-xs font-semibold text-neutral-700">
+            Max redemptions (optional)
+          </Label>
+          <Input
+            id="bogo-max"
+            type="number"
+            min={0}
+            value={form.maxRedemptions}
+            onChange={(e) => set('maxRedemptions', e.target.value)}
+            placeholder="Unlimited"
+            className="mt-1.5 h-11"
+          />
         </div>
 
         <Button
