@@ -43,6 +43,7 @@ import { PATHS } from '@/routing/paths';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/useAuth';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
+import { dealCreationSidebarItems } from '@/config/dealCreation';
 
 type MerchantNavItem = {
   label: string;
@@ -89,6 +90,7 @@ const navSections: MerchantNavSection[] = [
           !pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN) &&
           !pathname.startsWith(PATHS.MERCHANT_DEALS_BOUNTIES),
       },
+      ...dealCreationSidebarItems,
     ],
   },
   {
@@ -155,7 +157,7 @@ const navSections: MerchantNavSection[] = [
   },
   {
     id: 'incentives',
-    label: 'Incentives',
+    label: 'Rewards',
     items: [
       {
         label: 'Bounties',
@@ -317,6 +319,11 @@ const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; s
     subtitle: 'Tune an existing promotion.',
   },
   {
+    match: (pathname) => pathname === PATHS.MERCHANT_DEALS_CREATE || pathname.startsWith('/merchant/deals/create/'),
+    title: 'Create deal',
+    subtitle: 'Set up a new promotion from the deal types in the sidebar.',
+  },
+  {
     match: (pathname) => pathname.startsWith('/merchant/deals') && !pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN),
     title: 'Deals',
     subtitle: 'Create, tune, and monitor promotions from one place.',
@@ -415,7 +422,7 @@ const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; s
     title: 'BOGO deals',
     subtitle: '"Buy N Get M" deals — drive larger ticket sizes with volume incentives.',
   },
-  // ─── Incentives
+  // ─── Rewards
   {
     match: (pathname) => pathname.startsWith(PATHS.MERCHANT_DEALS_BOUNTIES),
     title: 'Bounties',

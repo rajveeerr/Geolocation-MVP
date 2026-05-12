@@ -1,12 +1,9 @@
 // src/components/ui/LoadingOverlay.tsx
 import { motion } from 'framer-motion';
 
-interface LoadingOverlayProps {
-  /** Optional context line shown subtly below the wordmark (e.g. "Loading deal details…"). */
-  message?: string;
-}
+interface LoadingOverlayProps {}
 
-export const LoadingOverlay = ({ message }: LoadingOverlayProps) => {
+export const LoadingOverlay = () => {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -56,31 +53,7 @@ export const LoadingOverlay = ({ message }: LoadingOverlayProps) => {
         Yohop
       </motion.span>
 
-      {/* Optional context line */}
-      {message ? (
-        <motion.span
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
-          className="mt-2 text-xs font-medium text-neutral-400"
-        >
-          {message}
-        </motion.span>
-      ) : null}
 
-      {/* Hairline indeterminate progress bar at the bottom of the viewport */}
-      <div className="absolute inset-x-0 bottom-0 h-[2px] overflow-hidden bg-neutral-100">
-        <motion.div
-          initial={{ x: '-40%' }}
-          animate={{ x: '140%' }}
-          transition={{
-            duration: 1.2,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-          className="h-full w-2/5 rounded-full bg-gradient-to-r from-transparent via-brand-primary-500 to-transparent"
-        />
-      </div>
     </motion.div>
   );
 };

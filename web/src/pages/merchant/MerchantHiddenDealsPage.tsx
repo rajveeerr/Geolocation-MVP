@@ -155,7 +155,7 @@ function MerchantHiddenDealsContent() {
     <div className="mx-auto max-w-screen-xl space-y-6 px-4 py-3 sm:px-1 sm:py-4">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Incentives</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Rewards</div>
           <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-neutral-900">Hidden deals</h1>
           <p className="mt-2 max-w-xl text-[13px] text-neutral-500 sm:text-sm">
             Deals locked behind an access code. Share the code or link with select customers — only people with the code can see and redeem.

@@ -1,114 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  ArrowRight,
-  Clock,
-  EyeOff,
-  Gift,
-  Repeat,
-  ShoppingBag,
-  Tag,
-  Trophy,
-  Zap,
-} from 'lucide-react';
+import { ArrowRight, Gift } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PATHS } from '@/routing/paths';
 import { useDealCreation } from '@/context/DealCreationContext';
+import { dealCreationTypes, type DealTypeValue } from '@/config/dealCreation';
 import { OnboardingStepLayout } from '../onboarding/OnboardingStepLayout';
-
-type DealTypeValue = 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' | 'REDEEM_NOW' | 'HIDDEN' | 'BOUNTY' | 'BOGO';
-
-const dealTypes: Array<{
-  value: DealTypeValue;
-  title: string;
-  eyebrow: string;
-  summary: string;
-  bestFor: string;
-  selectedAccent: string;
-  iconWrap: string;
-  icon: typeof Tag;
-}> = [
-  {
-    value: 'STANDARD',
-    title: 'Item Deal',
-    eyebrow: 'Core offer',
-    summary: 'Promote a single menu item, combo, or short campaign with flexible pricing.',
-    bestFor: 'Flash promos and product pushes',
-    selectedAccent: 'bg-[#111827]',
-    iconWrap: 'bg-[#fff0e8] text-[#ff5a36]',
-    icon: Tag,
-  },
-  {
-    value: 'HAPPY_HOUR',
-    title: 'Happy Hour',
-    eyebrow: 'Traffic builder',
-    summary: 'Use short windows and curated pricing to fill slower hours with urgency.',
-    bestFor: 'Afternoon and late-night traffic',
-    selectedAccent: 'bg-[#1f2937]',
-    iconWrap: 'bg-[#e6fffb] text-[#0f766e]',
-    icon: Clock,
-  },
-  {
-    value: 'RECURRING',
-    title: 'Daily Deal',
-    eyebrow: 'Habit loop',
-    summary: 'Create repeatable weekly moments like Taco Tuesday or Wine Wednesday.',
-    bestFor: 'Recurring weekly rituals',
-    selectedAccent: 'bg-[#0f172a]',
-    iconWrap: 'bg-[#eef2ff] text-[#4338ca]',
-    icon: Repeat,
-  },
-  {
-    value: 'REDEEM_NOW',
-    title: 'Redeem Now',
-    eyebrow: 'Instant unlock',
-    summary: 'Drive immediate action with a spend threshold and a fixed reward.',
-    bestFor: 'Fast conversion and same-day visits',
-    selectedAccent: 'bg-[#292524]',
-    iconWrap: 'bg-[#fff1e6] text-[#f97316]',
-    icon: Zap,
-  },
-  {
-    value: 'HIDDEN',
-    title: 'Hidden Deal',
-    eyebrow: 'Exclusive access',
-    summary: 'Unlock members-only or code-based offers that feel secret and premium.',
-    bestFor: 'VIP moments and discovery-based offers',
-    selectedAccent: 'bg-[#18181b]',
-    iconWrap: 'bg-[#f3e8ff] text-[#7c3aed]',
-    icon: EyeOff,
-  },
-  {
-    value: 'BOUNTY',
-    title: 'Bounty Deal',
-    eyebrow: 'Reward loop',
-    summary: 'Incentivize guests with referrals, check-ins, or outcome-based rewards.',
-    bestFor: 'Growth campaigns and social reach',
-    selectedAccent: 'bg-[#172554]',
-    iconWrap: 'bg-[#e9fff1] text-[#15803d]',
-    icon: Trophy,
-  },
-  {
-    value: 'BOGO',
-    title: 'BOGO Deal',
-    eyebrow: 'Volume incentive',
-    summary: 'Buy N items, get M at a discount (or free). Classic "Buy 1 Get 1" mechanics.',
-    bestFor: 'Driving larger ticket sizes',
-    selectedAccent: 'bg-[#7c2d12]',
-    iconWrap: 'bg-[#fff7ed] text-[#c2410c]',
-    icon: ShoppingBag,
-  },
-];
-
-const dealTypeDescriptions: Record<DealTypeValue, string> = {
-  STANDARD: 'A flexible format for one-time promotions, featured items, and seasonal offers.',
-  HAPPY_HOUR: 'Short, high-intent offer windows designed to increase traffic during quieter times.',
-  RECURRING: 'A repeating schedule that turns a promotion into something customers remember every week.',
-  REDEEM_NOW: 'A spend-threshold offer that gives guests an immediate incentive to convert right now.',
-  HIDDEN: 'A gated offer that feels private, surprising, or earned through special access.',
-  BOUNTY: 'A performance-style offer that rewards actions like referrals, attendance, or check-ins.',
-  BOGO: 'A volume offer where buying N items unlocks M items at a discount — "Buy 2 Get 1 Free" and similar.',
-};
 
 function DealTypeCard({
   title,
@@ -247,7 +144,7 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
     >
       <div className="mx-auto w-full max-w-6xl space-y-8 pb-2">
         <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {dealTypes.map((dealType, index) => (
+          {dealCreationTypes.map((dealType, index) => (
             <DealTypeCard
               key={dealType.value}
               title={dealType.title}
@@ -276,11 +173,11 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
             </div>
             <div>
               <div className="text-[15px] font-semibold text-neutral-900">
-                {selectedType ? dealTypes.find((item) => item.value === selectedType)?.title : 'Choose a deal type'}
+                {selectedType ? dealCreationTypes.find((item) => item.value === selectedType)?.title : 'Choose a deal type'}
               </div>
               <p className="mt-1 text-[13px] leading-6 text-neutral-600">
                 {selectedType
-                  ? dealTypeDescriptions[selectedType]
+                  ? dealCreationTypes.find((item) => item.value === selectedType)?.detailDescription
                   : 'Select a format above to preview the strategy, then continue with a focused creation flow.'}
               </p>
             </div>
