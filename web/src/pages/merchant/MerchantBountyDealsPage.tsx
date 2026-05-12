@@ -1,20 +1,16 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Plus, QrCode, RefreshCw, Target, Users, X } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowRight, Loader2, QrCode, RefreshCw, Target, Users } from 'lucide-react';
 import { MerchantProtectedRoute } from '@/components/auth/MerchantProtectedRoute';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useToast } from '@/hooks/use-toast';
 import { useRefreshBountyQR } from '@/hooks/useKitty';
-import { TwelveHourDateTimeField } from '@/components/common/TwelveHourDateTimeField';
-import { CategorySelector } from '@/components/common/CategorySelector';
-import { MenuItemPicker } from '@/components/merchant/MenuItemPicker';
-import { apiGet, apiPost } from '@/services/api';
+import { apiGet, apiPatch } from '@/services/api';
 import { PATHS } from '@/routing/paths';
 import { cn } from '@/lib/utils';
 
@@ -23,11 +19,14 @@ const qrImageUrl = (data: string, size = 96) =>
   `${QR_IMAGE_BASE}?size=${size}x${size}&data=${encodeURIComponent(data)}`;
 
 interface MerchantBountyDeal {
-  id: number | string;
+  id: number;
   title: string;
   description?: string | null;
   startTime: string;
   endTime: string;
+  dealType?: { name?: string | null } | null;
+  isExpired?: boolean;
+  isUpcoming?: boolean;
   bountyRewardAmount?: number | null;
   minReferralsRequired?: number | null;
   bountyQRCode?: string | null;
@@ -37,416 +36,235 @@ interface MerchantBountyDeal {
   currentRedemptions?: number;
 }
 
+interface BountyFormState {
+  rewardAmount: string;
+  minReferralsRequired: string;
+  potAmount: string;
+  maxInvites: string;
+  minSpend: string;
+  kickbackEnabled: boolean;
+}
+
+interface ConfigureBountyResponse {
+  deal: MerchantBountyDeal;
+  bounty: {
+    rewardAmount: number;
+    minReferrals: number;
+    qrCode: string | null;
+  };
+}
+
 const panelClass =
   'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 
-const dealStatus = (deal: MerchantBountyDeal) => {
-  const now = new Date();
-  const start = new Date(deal.startTime);
-  const end = new Date(deal.endTime);
-  if (now < start) return { label: 'Scheduled', tone: 'bg-sky-100 text-sky-700 ring-sky-600/20' };
-  if (now > end) return { label: 'Expired', tone: 'bg-neutral-100 text-neutral-600 ring-neutral-400/20' };
+const dealState = (deal: MerchantBountyDeal) => {
+  if (deal.isExpired) return { label: 'Expired', tone: 'bg-neutral-100 text-neutral-600 ring-neutral-400/20' };
+  if (deal.isUpcoming) return { label: 'Scheduled', tone: 'bg-sky-100 text-sky-700 ring-sky-600/20' };
   return { label: 'Active', tone: 'bg-emerald-100 text-emerald-700 ring-emerald-600/20' };
 };
 
-const timeRemaining = (deal: MerchantBountyDeal) => {
-  const ms = new Date(deal.endTime).getTime() - Date.now();
-  if (ms <= 0) return null;
-  const hours = Math.floor(ms / (1000 * 60 * 60));
-  const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-  if (hours >= 24) return `${Math.floor(hours / 24)}d`;
-  if (hours >= 1) return `${hours}h`;
-  return `${minutes} min`;
-};
+const createBlankForm = (): BountyFormState => ({
+  rewardAmount: '',
+  minReferralsRequired: '1',
+  potAmount: '',
+  maxInvites: '',
+  minSpend: '',
+  kickbackEnabled: true,
+});
 
-interface BountyFormState {
-  title: string;
-  description: string;
-  category: string;
-  startDate: string; // local datetime, e.g. "2026-05-11T14:30"
-  endDate: string;
-  potAmount: string;
-  perPerson: string;
-  maxInvites: string;
-  minSpend: string;
-  minReferralsRequired: string;
-  offerHeadline: string;
-  kickbackEnabled: boolean;
-  menuItemIds: number[];
-}
+const formFromDeal = (deal: MerchantBountyDeal): BountyFormState => ({
+  rewardAmount: deal.bountyRewardAmount != null ? String(deal.bountyRewardAmount) : '',
+  minReferralsRequired: deal.minReferralsRequired != null ? String(deal.minReferralsRequired) : '1',
+  potAmount: deal.bountyPotAmount != null ? String(deal.bountyPotAmount) : '',
+  maxInvites: deal.bountyMaxInvites != null ? String(deal.bountyMaxInvites) : '',
+  minSpend: deal.bountyMinSpend != null ? String(deal.bountyMinSpend) : '',
+  kickbackEnabled: true,
+});
 
-const toLocalDateTimeInput = (d: Date) => {
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-};
-
-const blankForm = (): BountyFormState => {
-  const now = new Date();
-  const end = new Date(now.getTime() + 2 * 60 * 60 * 1000); // +2h default
-  return {
-    title: '',
-    description: '',
-    category: 'FOOD_AND_BEVERAGE',
-    startDate: toLocalDateTimeInput(now),
-    endDate: toLocalDateTimeInput(end),
-    potAmount: '',
-    perPerson: '',
-    maxInvites: '',
-    minSpend: '',
-    minReferralsRequired: '1',
-    offerHeadline: '',
-    kickbackEnabled: true,
-    menuItemIds: [],
-  };
-};
-
-function CreateBountyForm({ onClose }: { onClose: () => void }) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [form, setForm] = useState<BountyFormState>(() => blankForm());
-
-  const set = <K extends keyof BountyFormState>(key: K, value: BountyFormState[K]) =>
-    setForm((prev) => ({ ...prev, [key]: value }));
-
-  const createBounty = useMutation({
-    mutationFn: async () => {
-      const perPerson = parseFloat(form.perPerson);
-      const potAmount = parseFloat(form.potAmount);
-      const maxInvites = parseInt(form.maxInvites, 10);
-      const minSpend = parseFloat(form.minSpend);
-      const minReferrals = parseInt(form.minReferralsRequired, 10);
-
-      if (!form.title.trim()) throw new Error('Title is required');
-      if (!form.category) throw new Error('Category is required');
-      if (!form.startDate) throw new Error('Start date is required');
-      if (!form.endDate) throw new Error('End date is required');
-
-      const startTime = new Date(form.startDate);
-      const endTime = new Date(form.endDate);
-      if (isNaN(startTime.getTime())) throw new Error('Invalid start date');
-      if (isNaN(endTime.getTime())) throw new Error('Invalid end date');
-      if (startTime >= endTime) throw new Error('End date must be after start date');
-
-      if (!Number.isFinite(potAmount) || potAmount <= 0) throw new Error('Pot Amount must be positive');
-      if (!Number.isFinite(perPerson) || perPerson <= 0) throw new Error('Per Person must be positive');
-      if (!Number.isFinite(maxInvites) || maxInvites < 1) throw new Error('Max Invites must be ≥ 1');
-      if (!Number.isFinite(minSpend) || minSpend < 0) throw new Error('Min Spend must be ≥ 0');
-      if (!Number.isFinite(minReferrals) || minReferrals < 1)
-        throw new Error('Min Referrals Required must be ≥ 1');
-
-      const customOfferDisplay = form.offerHeadline.trim() || `Earn $${perPerson} per friend`;
-
-      const payload = {
-        title: form.title.trim(),
-        description: form.description.trim() || undefined,
-        dealType: 'Bounty Deal',
-        category: form.category,
-        activeDateRange: {
-          startDate: startTime.toISOString(),
-          endDate: endTime.toISOString(),
-        },
-        customOfferDisplay,
-        bountyRewardAmount: perPerson,
-        minReferralsRequired: minReferrals,
-        bountyPotAmount: potAmount,
-        bountyMaxInvites: maxInvites,
-        bountyMinSpend: minSpend,
-        kickbackEnabled: form.kickbackEnabled,
-        menuItems: form.menuItemIds.map((id) => ({ id })),
-      };
-
-      const res = await apiPost<{ deal: any; message?: string }, typeof payload>('/deals', payload);
-      if (!res.success) throw new Error(res.error ?? 'Failed to launch bounty');
-      return res.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['merchant-deals'] });
-      toast({ title: 'Bounty launched', description: 'Customers can start sharing it now.' });
-      setForm(blankForm());
-      onClose();
-    },
-    onError: (err: Error) => {
-      toast({ title: 'Could not launch bounty', description: err.message, variant: 'destructive' });
-    },
-  });
+const BountySelectionCard = ({
+  deal,
+  selected,
+  onSelect,
+}: {
+  deal: MerchantBountyDeal;
+  selected: boolean;
+  onSelect: (deal: MerchantBountyDeal) => void;
+}) => {
+  const state = dealState(deal);
+  const bountySet = (deal.bountyRewardAmount ?? 0) > 0;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: 'auto' }}
-      exit={{ opacity: 0, height: 0 }}
-      transition={{ duration: 0.2 }}
-      className="overflow-hidden"
+    <button
+      type="button"
+      onClick={() => onSelect(deal)}
+      disabled={deal.isExpired}
+      className={cn(
+        panelClass,
+        'w-full border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-[0_10px_26px_rgba(15,23,42,0.08)] disabled:cursor-not-allowed disabled:opacity-60',
+        selected && 'border-orange-300 ring-2 ring-orange-200',
+      )}
     >
-      <div className={cn(panelClass, 'p-5')}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-rose-500 text-white">
-              <Target className="h-3.5 w-3.5" />
-            </div>
-            <h3 className="text-base font-bold text-neutral-900">Create New Bounty</h3>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-full p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700"
-            aria-label="Close form"
-          >
-            <X className="h-4 w-4" />
-          </button>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h4 className="truncate text-base font-semibold text-neutral-900">{deal.title}</h4>
+          {deal.description && <p className="mt-1 line-clamp-2 text-sm text-neutral-500">{deal.description}</p>}
         </div>
-
-        <div className="mt-5">
-          <Label htmlFor="bounty-title" className="text-xs font-semibold text-neutral-700">
-            Title
-          </Label>
-          <Input
-            id="bounty-title"
-            value={form.title}
-            onChange={(e) => set('title', e.target.value)}
-            placeholder="Taco Tuesday Happy Hour"
-            className="mt-1.5 h-11"
-            maxLength={100}
-          />
-        </div>
-
-        <div className="mt-4 grid gap-4 lg:grid-cols-2">
-          <div>
-            <Label className="text-xs font-semibold text-neutral-700">Starts at</Label>
-            <div className="mt-1.5">
-              <TwelveHourDateTimeField
-                id="bounty-start"
-                value={form.startDate}
-                onChange={(v) => set('startDate', v)}
-              />
-            </div>
-          </div>
-          <div>
-            <Label className="text-xs font-semibold text-neutral-700">Ends at</Label>
-            <div className="mt-1.5">
-              <TwelveHourDateTimeField
-                id="bounty-end"
-                value={form.endDate}
-                onChange={(v) => set('endDate', v)}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <Label htmlFor="bounty-desc" className="text-xs font-semibold text-neutral-700">
-            Description
-          </Label>
-          <Textarea
-            id="bounty-desc"
-            value={form.description}
-            onChange={(e) => set('description', e.target.value)}
-            placeholder="Bring your friends and save!"
-            rows={2}
-            maxLength={500}
-            className="mt-1.5 resize-none"
-          />
-        </div>
-
-        <div className="mt-4">
-          <Label className="text-xs font-semibold text-neutral-700">Category</Label>
-          <div className="mt-1.5">
-            <CategorySelector
-              value={form.category}
-              onChange={(v) => set('category', v)}
-              required
-            />
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <Label htmlFor="bounty-offer" className="text-xs font-semibold text-neutral-700">
-            Offer headline
-          </Label>
-          <Input
-            id="bounty-offer"
-            value={form.offerHeadline}
-            onChange={(e) => set('offerHeadline', e.target.value)}
-            placeholder={
-              form.perPerson ? `Earn $${form.perPerson} per friend` : 'Earn $X per friend'
-            }
-            className="mt-1.5 h-11"
-            maxLength={100}
-          />
-          <p className="mt-1 text-[11px] text-neutral-500">
-            Shown on the deal card. Leave empty to auto-generate from the per-person reward.
-          </p>
-        </div>
-
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <Label htmlFor="bounty-pot" className="text-xs font-semibold text-neutral-700">
-              Pot Amount ($)
-            </Label>
-            <Input
-              id="bounty-pot"
-              type="number"
-              min={0}
-              step="0.01"
-              value={form.potAmount}
-              onChange={(e) => set('potAmount', e.target.value)}
-              placeholder="100"
-              className="mt-1.5 h-11"
-            />
-          </div>
-          <div>
-            <Label htmlFor="bounty-perperson" className="text-xs font-semibold text-neutral-700">
-              Per Person ($)
-            </Label>
-            <Input
-              id="bounty-perperson"
-              type="number"
-              min={0}
-              step="0.01"
-              value={form.perPerson}
-              onChange={(e) => set('perPerson', e.target.value)}
-              placeholder="5"
-              className="mt-1.5 h-11"
-            />
-          </div>
-          <div>
-            <Label htmlFor="bounty-max" className="text-xs font-semibold text-neutral-700">
-              Max Invites
-            </Label>
-            <Input
-              id="bounty-max"
-              type="number"
-              min={1}
-              value={form.maxInvites}
-              onChange={(e) => set('maxInvites', e.target.value)}
-              placeholder="6"
-              className="mt-1.5 h-11"
-            />
-          </div>
-          <div>
-            <Label htmlFor="bounty-minspend" className="text-xs font-semibold text-neutral-700">
-              Min Spend ($)
-            </Label>
-            <Input
-              id="bounty-minspend"
-              type="number"
-              min={0}
-              step="0.01"
-              value={form.minSpend}
-              onChange={(e) => set('minSpend', e.target.value)}
-              placeholder="20"
-              className="mt-1.5 h-11"
-            />
-          </div>
-        </div>
-
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="bounty-minrefs" className="text-xs font-semibold text-neutral-700">
-              Min referrals required
-            </Label>
-            <Input
-              id="bounty-minrefs"
-              type="number"
-              min={1}
-              value={form.minReferralsRequired}
-              onChange={(e) => set('minReferralsRequired', e.target.value)}
-              placeholder="1"
-              className="mt-1.5 h-11"
-            />
-            <p className="mt-1 text-[11px] text-neutral-500">
-              Minimum friends a customer must invite for the bounty to count.
-            </p>
-          </div>
-          <div className="flex flex-col">
-            <Label className="text-xs font-semibold text-neutral-700">Kickback</Label>
-            <label className="mt-1.5 flex h-11 cursor-pointer items-center gap-2 rounded-md border border-neutral-200 bg-white px-3">
-              <input
-                type="checkbox"
-                checked={form.kickbackEnabled}
-                onChange={(e) => set('kickbackEnabled', e.target.checked)}
-                className="h-4 w-4 accent-emerald-600"
-              />
-              <span className="text-sm text-neutral-800">
-                Enable kickbacks for this bounty
-              </span>
-            </label>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <Label className="text-xs font-semibold text-neutral-700">
-            Apply to menu items (optional)
-          </Label>
-          <p className="mt-0.5 text-[11px] text-neutral-500">
-            Pick the items this bounty unlocks. Leave empty to apply broadly to the merchant.
-          </p>
-          <div className="mt-1.5">
-            <MenuItemPicker
-              value={form.menuItemIds}
-              onChange={(ids) => set('menuItemIds', ids)}
-            />
-          </div>
-        </div>
-
-        <Button
-          type="button"
-          onClick={() => createBounty.mutate()}
-          disabled={createBounty.isPending}
-          className="mt-5 w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 py-3 text-base font-semibold text-white shadow-md hover:from-emerald-600 hover:to-emerald-700"
-        >
-          {createBounty.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-          Launch Bounty
-        </Button>
+        <span className={cn('inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset', state.tone)}>
+          {state.label}
+        </span>
       </div>
-    </motion.div>
+
+      <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold">
+        <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 ring-1 ring-inset', bountySet ? 'bg-orange-100 text-orange-700 ring-orange-600/20' : 'bg-neutral-100 text-neutral-500 ring-neutral-400/20')}>
+          {bountySet ? `$${deal.bountyRewardAmount?.toFixed(0)} reward` : 'No bounty yet'}
+        </span>
+        <span className="inline-flex items-center rounded-full bg-neutral-100 px-2 py-0.5 text-neutral-600 ring-1 ring-inset ring-neutral-200">
+          {deal.dealType?.name ?? 'Deal'}
+        </span>
+        {selected && (
+          <span className="inline-flex items-center rounded-full bg-orange-50 px-2 py-0.5 text-orange-700 ring-1 ring-inset ring-orange-200">
+            Selected
+          </span>
+        )}
+      </div>
+
+      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-neutral-600">
+        <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-2.5">
+          <div className="font-semibold uppercase tracking-wider text-neutral-400">Starts</div>
+          <div className="mt-0.5">{formatDate(deal.startTime)}</div>
+        </div>
+        <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-2.5">
+          <div className="font-semibold uppercase tracking-wider text-neutral-400">Ends</div>
+          <div className="mt-0.5">{formatDate(deal.endTime)}</div>
+        </div>
+      </div>
+
+      <div className="mt-3 text-xs text-neutral-500">
+        {deal.isExpired ? 'Expired deals cannot be configured.' : 'Choose this deal to attach bounty conditions.'}
+      </div>
+    </button>
   );
-}
+};
+
+const ConfigureBountyForm = ({
+  deal,
+  form,
+  setForm,
+  onSave,
+  isSaving,
+}: {
+  deal: MerchantBountyDeal;
+  form: BountyFormState;
+  setForm: React.Dispatch<React.SetStateAction<BountyFormState>>;
+  onSave: () => void;
+  isSaving: boolean;
+}) => {
+  const bountySet = (deal.bountyRewardAmount ?? 0) > 0;
+
+  return (
+    <div className={cn(panelClass, 'p-5')}>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-500">Configure bounty</div>
+          <h3 className="mt-1 text-lg font-bold text-neutral-900">{deal.title}</h3>
+          <p className="mt-1 text-sm text-neutral-500">
+            {bountySet ? 'Update the current bounty settings for this deal.' : 'Attach a bounty to this deal and set the conditions customers must meet.'}
+          </p>
+        </div>
+        <div className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-semibold text-neutral-600 ring-1 ring-inset ring-neutral-200">
+          {bountySet ? 'Bounty active' : 'Not yet configured'}
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <div>
+          <Label htmlFor="bounty-reward" className="text-xs font-semibold text-neutral-700">Reward per friend ($)</Label>
+          <Input id="bounty-reward" type="number" min={0} step="0.01" value={form.rewardAmount} onChange={(e) => setForm((prev) => ({ ...prev, rewardAmount: e.target.value }))} placeholder="5" className="mt-1.5 h-11" />
+        </div>
+        <div>
+          <Label htmlFor="bounty-minrefs" className="text-xs font-semibold text-neutral-700">Min referrals required</Label>
+          <Input id="bounty-minrefs" type="number" min={1} value={form.minReferralsRequired} onChange={(e) => setForm((prev) => ({ ...prev, minReferralsRequired: e.target.value }))} placeholder="1" className="mt-1.5 h-11" />
+        </div>
+        <div>
+          <Label htmlFor="bounty-pot" className="text-xs font-semibold text-neutral-700">Pot amount ($)</Label>
+          <Input id="bounty-pot" type="number" min={0} step="0.01" value={form.potAmount} onChange={(e) => setForm((prev) => ({ ...prev, potAmount: e.target.value }))} placeholder="100" className="mt-1.5 h-11" />
+        </div>
+        <div>
+          <Label htmlFor="bounty-max" className="text-xs font-semibold text-neutral-700">Max invites</Label>
+          <Input id="bounty-max" type="number" min={1} value={form.maxInvites} onChange={(e) => setForm((prev) => ({ ...prev, maxInvites: e.target.value }))} placeholder="6" className="mt-1.5 h-11" />
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <Label htmlFor="bounty-minspend" className="text-xs font-semibold text-neutral-700">Minimum spend to qualify ($)</Label>
+        <Input id="bounty-minspend" type="number" min={0} step="0.01" value={form.minSpend} onChange={(e) => setForm((prev) => ({ ...prev, minSpend: e.target.value }))} placeholder="20" className="mt-1.5 h-11" />
+      </div>
+
+      <div className="mt-4 flex items-center gap-2 rounded-2xl border border-neutral-200 bg-white px-3 py-3">
+        <input type="checkbox" checked={form.kickbackEnabled} onChange={(e) => setForm((prev) => ({ ...prev, kickbackEnabled: e.target.checked }))} className="h-4 w-4 accent-orange-600" />
+        <div>
+          <div className="text-sm font-medium text-neutral-900">Enable kickbacks</div>
+          <p className="text-xs text-neutral-500">Keeps the referral reward active for this bounty.</p>
+        </div>
+      </div>
+
+      <div className="mt-5 rounded-2xl border border-neutral-200 bg-neutral-50 p-4 text-sm text-neutral-600">
+        <div className="font-semibold text-neutral-900">Current deal snapshot</div>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          <div>Starts {formatDate(deal.startTime)}</div>
+          <div>Ends {formatDate(deal.endTime)}</div>
+          <div>Existing redemptions {deal.currentRedemptions ?? 0}</div>
+          <div>Type {deal.dealType?.name ?? 'Deal'}</div>
+        </div>
+      </div>
+
+      <Button type="button" onClick={onSave} disabled={isSaving} className="mt-5 w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 py-3 text-base font-semibold text-white shadow-md hover:from-emerald-600 hover:to-emerald-700">
+        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+        {bountySet ? 'Update bounty' : 'Launch bounty'}
+      </Button>
+    </div>
+  );
+};
 
 function BountyDealCard({ deal }: { deal: MerchantBountyDeal }) {
-  const status = dealStatus(deal);
+  const status = dealState(deal);
   const reward = deal.bountyRewardAmount ?? 0;
   const pot = deal.bountyPotAmount;
   const maxInvites = deal.bountyMaxInvites;
   const minSpend = deal.bountyMinSpend;
   const claimed = deal.currentRedemptions ?? 0;
-  const remaining = timeRemaining(deal);
+  const remaining = (() => {
+    const ms = new Date(deal.endTime).getTime() - Date.now();
+    if (ms <= 0) return null;
+    const hours = Math.floor(ms / (1000 * 60 * 60));
+    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+    if (hours >= 24) return `${Math.floor(hours / 24)}d`;
+    if (hours >= 1) return `${hours}h`;
+    return `${minutes} min`;
+  })();
   const { toast } = useToast();
   const refreshQR = useRefreshBountyQR();
-  const dealIdNum = Number(deal.id);
   const qrSrc = deal.bountyQRCode ? qrImageUrl(deal.bountyQRCode, 96) : null;
 
   const handleRefreshQR = () => {
-    if (!Number.isFinite(dealIdNum)) return;
     refreshQR.mutate(
-      { dealId: dealIdNum },
+      { dealId: deal.id },
       {
         onSuccess: () => {
-          toast({
-            title: 'QR code refreshed',
-            description: 'A new bounty QR code has been generated for this deal.',
-          });
+          toast({ title: 'QR code refreshed', description: 'A new bounty QR code has been generated for this deal.' });
         },
         onError: (err) => {
-          toast({
-            title: 'Could not refresh QR',
-            description: err.message,
-            variant: 'destructive',
-          });
+          toast({ title: 'Could not refresh QR', description: err.message, variant: 'destructive' });
         },
       },
     );
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={cn(panelClass, 'p-5')}
-    >
+    <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className={cn(panelClass, 'p-5')}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600 ring-1 ring-inset ring-orange-200">
           <Target className="h-5 w-5" />
@@ -465,16 +283,12 @@ function BountyDealCard({ deal }: { deal: MerchantBountyDeal }) {
         </span>
       </div>
 
-      {deal.description && (
-        <p className="mt-2 text-sm text-neutral-500">{deal.description}</p>
-      )}
+      {deal.description && <p className="mt-2 text-sm text-neutral-500">{deal.description}</p>}
 
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3">
           <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Pot Amount</div>
-          <div className="mt-0.5 text-base font-bold text-emerald-600">
-            {pot != null ? `$${pot.toFixed(0)}` : '—'}
-          </div>
+          <div className="mt-0.5 text-base font-bold text-emerald-600">{pot != null ? `$${pot.toFixed(0)}` : '—'}</div>
         </div>
         <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3">
           <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Per Person</div>
@@ -482,35 +296,22 @@ function BountyDealCard({ deal }: { deal: MerchantBountyDeal }) {
         </div>
         <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3">
           <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Claimed</div>
-          <div className="mt-0.5 text-base font-bold text-neutral-900">
-            {maxInvites != null ? `${claimed}/${maxInvites}` : claimed}
-          </div>
+          <div className="mt-0.5 text-base font-bold text-neutral-900">{maxInvites != null ? `${claimed}/${maxInvites}` : claimed}</div>
         </div>
         <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3">
           <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Min Spend</div>
-          <div className="mt-0.5 text-base font-bold text-neutral-900">
-            {minSpend != null ? `$${minSpend.toFixed(0)}` : '—'}
-          </div>
+          <div className="mt-0.5 text-base font-bold text-neutral-900">{minSpend != null ? `$${minSpend.toFixed(0)}` : '—'}</div>
         </div>
       </div>
 
-      {/* Bounty QR code + refresh — wraps cleanly on narrow screens */}
       <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-neutral-200 bg-white p-3 sm:flex-nowrap">
         <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-neutral-200 bg-white">
-          {qrSrc ? (
-            <img src={qrSrc} alt="Bounty QR" className="h-full w-full object-contain" />
-          ) : (
-            <QrCode className="h-7 w-7 text-neutral-300" aria-hidden />
-          )}
+          {qrSrc ? <img src={qrSrc} alt="Bounty QR" className="h-full w-full object-contain" /> : <QrCode className="h-7 w-7 text-neutral-300" aria-hidden />}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
-            Verification QR
-          </div>
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Verification QR</div>
           <p className="mt-0.5 text-xs text-neutral-600">
-            {qrSrc
-              ? 'Friends scan this at check-in to credit the referrer.'
-              : 'No QR yet — generate one to start crediting referrals.'}
+            {qrSrc ? 'Friends scan this at check-in to credit the referrer.' : 'No QR yet — generate one to start crediting referrals.'}
           </p>
         </div>
         <Button
@@ -521,11 +322,7 @@ function BountyDealCard({ deal }: { deal: MerchantBountyDeal }) {
           disabled={refreshQR.isPending}
           className="w-full shrink-0 rounded-full sm:w-auto"
         >
-          {refreshQR.isPending ? (
-            <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
-          )}
+          {refreshQR.isPending ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="mr-1.5 h-3.5 w-3.5" />}
           {qrSrc ? 'Refresh' : 'Generate'}
         </Button>
       </div>
@@ -534,9 +331,10 @@ function BountyDealCard({ deal }: { deal: MerchantBountyDeal }) {
 }
 
 function MerchantBountyDealsContent() {
-  const [showForm, setShowForm] = useState(false);
   const { data: merchantData } = useMerchantStatus();
   const merchantStatus = merchantData?.data?.merchant?.status;
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['merchant-deals'],
@@ -544,10 +342,73 @@ function MerchantBountyDealsContent() {
     enabled: !!merchantStatus && merchantStatus === 'APPROVED',
   });
 
-  const bountyDeals = useMemo(
-    () => (data?.data?.deals ?? []).filter((d) => (d.bountyRewardAmount ?? 0) > 0),
-    [data],
+  const deals = useMemo(() => data?.data?.deals ?? [], [data]);
+  const availableDeals = useMemo(() => deals.filter((deal) => !deal.isExpired), [deals]);
+  const bountyDeals = useMemo(() => deals.filter((deal) => (deal.bountyRewardAmount ?? 0) > 0), [deals]);
+
+  const [selectedDealId, setSelectedDealId] = useState<number | null>(null);
+  const [form, setForm] = useState<BountyFormState>(() => createBlankForm());
+
+  useEffect(() => {
+    if (selectedDealId == null && availableDeals.length > 0) {
+      setSelectedDealId(availableDeals[0].id);
+    }
+  }, [availableDeals, selectedDealId]);
+
+  const selectedDeal = useMemo(
+    () => availableDeals.find((deal) => deal.id === selectedDealId) ?? null,
+    [availableDeals, selectedDealId],
   );
+
+  useEffect(() => {
+    if (!selectedDeal) {
+      setForm(createBlankForm());
+      return;
+    }
+    setForm(formFromDeal(selectedDeal));
+  }, [selectedDeal]);
+
+  const configureBounty = useMutation<ConfigureBountyResponse, Error, void>({
+    mutationFn: async () => {
+      if (!selectedDeal) {
+        throw new Error('Select a deal first');
+      }
+
+      const rewardAmount = parseFloat(form.rewardAmount);
+      const minReferrals = parseInt(form.minReferralsRequired, 10);
+      const potAmount = form.potAmount.trim() ? parseFloat(form.potAmount) : undefined;
+      const maxInvites = form.maxInvites.trim() ? parseInt(form.maxInvites, 10) : undefined;
+      const minSpend = form.minSpend.trim() ? parseFloat(form.minSpend) : undefined;
+
+      if (!Number.isFinite(rewardAmount) || rewardAmount <= 0) throw new Error('Reward amount must be positive');
+      if (!Number.isInteger(minReferrals) || minReferrals < 1) throw new Error('Minimum referrals must be at least 1');
+      if (potAmount !== undefined && (!Number.isFinite(potAmount) || potAmount < 0)) throw new Error('Pot amount must be zero or greater');
+      if (maxInvites !== undefined && (!Number.isInteger(maxInvites) || maxInvites < 1)) throw new Error('Max invites must be at least 1');
+      if (minSpend !== undefined && (!Number.isFinite(minSpend) || minSpend < 0)) throw new Error('Minimum spend must be zero or greater');
+
+      const payload = {
+        bountyRewardAmount: rewardAmount,
+        minReferralsRequired: minReferrals,
+        bountyPotAmount: potAmount,
+        bountyMaxInvites: maxInvites,
+        bountyMinSpend: minSpend,
+        kickbackEnabled: form.kickbackEnabled,
+      };
+
+      const response = await apiPatch<ConfigureBountyResponse, typeof payload>(`/merchants/deals/${selectedDeal.id}/bounty`, payload);
+      if (!response.success || !response.data) {
+        throw new Error(response.error ?? 'Failed to save bounty');
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['merchant-deals'] });
+      toast({ title: 'Bounty saved', description: 'The selected deal is now configured for sharing.' });
+    },
+    onError: (err: Error) => {
+      toast({ title: 'Could not save bounty', description: err.message, variant: 'destructive' });
+    },
+  });
 
   if (isLoading) {
     return (
@@ -558,79 +419,126 @@ function MerchantBountyDealsContent() {
   }
 
   if (error) {
+    return <div className={cn(panelClass, 'border-rose-200 bg-rose-50 p-4 text-sm text-rose-700')}>{(error as Error).message}</div>;
+  }
+
+  if (!merchantStatus) {
     return (
-      <div className={cn(panelClass, 'border-rose-200 bg-rose-50 p-4 text-sm text-rose-700')}>
-        {(error as Error).message}
+      <div className="mx-auto max-w-4xl px-4 py-12">
+        <div className="text-center">
+          <h1 className="mb-4 text-4xl font-bold">Join as a Merchant</h1>
+          <p className="mb-8 text-neutral-600">Start creating deals and reach new customers</p>
+          <Link to={PATHS.MERCHANT_ONBOARDING}>
+            <Button size="lg">Become a Merchant</Button>
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-screen-xl space-y-6 px-4 py-3 sm:px-1 sm:py-4">
-      {/* Title banner */}
       <div className={cn(panelClass, 'flex flex-wrap items-center justify-between gap-4 border-orange-200/70 bg-gradient-to-r from-orange-50 via-white to-white p-5')}>
         <div className="flex min-w-0 items-start gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-md">
             <Target className="h-5 w-5" aria-hidden />
           </div>
           <div className="min-w-0">
-            <h2 className="text-lg font-bold tracking-tight text-neutral-900 sm:text-xl">
-              Customer Bounties
-            </h2>
-            <p className="text-sm text-neutral-600">
-              Time-limited group deals that customers can share.
-            </p>
+            <h2 className="text-lg font-bold tracking-tight text-neutral-900 sm:text-xl">Customer Bounties</h2>
+            <p className="text-sm text-neutral-600">Pick one of your deals, then attach a referral bounty and conditions to it.</p>
           </div>
         </div>
-        <Button
-          size="md"
-          onClick={() => setShowForm((s) => !s)}
-          className="rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md hover:from-orange-600 hover:to-orange-700"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          {showForm ? 'Hide form' : 'Create Bounty'}
-        </Button>
+        <Link to={PATHS.MERCHANT_DEALS}>
+          <Button size="md" variant="secondary" className="rounded-full border-neutral-200 bg-white text-neutral-700 shadow-sm hover:bg-neutral-50">
+            <ArrowRight className="mr-2 h-4 w-4 rotate-180" />
+            View all deals
+          </Button>
+        </Link>
       </div>
 
-      <AnimatePresence initial={false}>
-        {showForm && <CreateBountyForm key="bounty-form" onClose={() => setShowForm(false)} />}
-      </AnimatePresence>
-
-      {bountyDeals.length === 0 ? (
-        <div className={cn(panelClass, 'border-dashed py-16 text-center')}>
-          <Target className="mx-auto mb-3 h-10 w-10 text-neutral-300" aria-hidden />
-          <h3 className="text-[1.4rem] font-semibold tracking-tight text-neutral-900">No bounty deals yet</h3>
-          <p className="mt-1 text-[13px] text-neutral-500 sm:text-sm">
-            Launch a bounty — set a pot, per-person payout, and a slot cap. Customers share the link to fill it.
-          </p>
-          <div className="mt-5 flex justify-center gap-2">
-            <Button
-              onClick={() => setShowForm(true)}
-              className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Create your first bounty
-            </Button>
-            <Link to={PATHS.MERCHANT_DEALS}>
-              <Button variant="secondary" className="rounded-full">
-                All deals
-                <ArrowRight className="ml-1.5 h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className={cn(panelClass, 'p-4')}>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Available deals</div>
+          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-neutral-950">{availableDeals.length}</div>
         </div>
-      ) : (
-        <>
-          <div className="flex items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-xs text-neutral-600">
-            <Users className="h-3.5 w-3.5 text-neutral-400" />
-            {bountyDeals.length} active bounty deal{bountyDeals.length === 1 ? '' : 's'}.
+        <div className={cn(panelClass, 'p-4')}>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Configured bounties</div>
+          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-neutral-950">{bountyDeals.length}</div>
+        </div>
+        <div className={cn(panelClass, 'p-4')}>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Selected deal</div>
+          <div className="mt-1 truncate text-[1.1rem] font-semibold tracking-tight text-orange-700">{selectedDeal?.title ?? 'None'}</div>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="space-y-4">
+          <div className={cn(panelClass, 'flex items-center justify-between gap-3 p-4')}>
+            <div>
+              <h3 className="text-base font-bold text-neutral-900">Choose a deal</h3>
+              <p className="text-sm text-neutral-500">Expired deals are read-only. Active and upcoming deals can be configured.</p>
+            </div>
+            <div className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-semibold text-neutral-600 ring-1 ring-inset ring-neutral-200">{availableDeals.length} available</div>
+          </div>
+
+          {availableDeals.length === 0 ? (
+            <div className={cn(panelClass, 'border-dashed p-8 text-center')}>
+              <Target className="mx-auto mb-3 h-10 w-10 text-neutral-300" aria-hidden />
+              <h3 className="text-[1.4rem] font-semibold tracking-tight text-neutral-900">No deals yet</h3>
+              <p className="mt-1 text-[13px] text-neutral-500 sm:text-sm">Create a deal first, then come back here to attach bounty conditions.</p>
+              <div className="mt-5 flex justify-center gap-2">
+                <Link to={PATHS.MERCHANT_DEALS_CREATE}>
+                  <Button className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800">Create a deal</Button>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="grid gap-3 md:grid-cols-2">
+              {availableDeals.map((deal) => (
+                <BountySelectionCard
+                  key={deal.id}
+                  deal={deal}
+                  selected={deal.id === selectedDeal?.id}
+                  onSelect={(picked) => setSelectedDealId(picked.id)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="lg:sticky lg:top-4 lg:self-start">
+          {selectedDeal ? (
+            <ConfigureBountyForm
+              deal={selectedDeal}
+              form={form}
+              setForm={setForm}
+              onSave={() => configureBounty.mutate()}
+              isSaving={configureBounty.isPending}
+            />
+          ) : (
+            <div className={cn(panelClass, 'p-5 text-sm text-neutral-500')}>Select a deal to configure its bounty.</div>
+          )}
+        </div>
+      </div>
+
+      {bountyDeals.length > 0 && (
+        <div className="space-y-4">
+          <div className={cn(panelClass, 'flex items-center justify-between gap-3 p-4')}>
+            <div>
+              <h3 className="text-base font-bold text-neutral-900">Configured bounties</h3>
+              <p className="text-sm text-neutral-500">Deals with active bounty settings and QR codes.</p>
+            </div>
+            <div className="flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700 ring-1 ring-inset ring-orange-200">
+              <Users className="h-3.5 w-3.5" />
+              {bountyDeals.length}
+            </div>
           </div>
           <div className="grid gap-3 lg:grid-cols-2">
             {bountyDeals.map((deal) => (
               <BountyDealCard key={deal.id} deal={deal} />
             ))}
           </div>
-        </>
+        </div>
       )}
     </div>
   );

@@ -221,13 +221,13 @@ function MerchantReferralDealsInner() {
             </p>
           </div>
         </div>
-        <Link to="/merchant/deals/create/bounty">
+        <Link to="/merchant/deals/bounties">
           <Button
             size="md"
             className="rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md hover:from-emerald-600 hover:to-teal-700"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Create Referral Deal
+            Configure Bounty
           </Button>
         </Link>
       </div>
