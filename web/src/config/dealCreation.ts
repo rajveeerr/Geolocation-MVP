@@ -27,7 +27,7 @@ export const dealCreationTypes: DealCreationType[] = [
     detailDescription:
       'A flexible format for one-time promotions, featured items, and seasonal offers.',
     bestFor: 'Flash promos and product pushes',
-    route: PATHS.MERCHANT_DEALS_CREATE,
+    route: '/merchant/deals/create/basics',
     selectedAccent: 'bg-[#111827]',
     iconWrap: 'bg-[#fff0e8] text-[#ff5a36]',
     icon: Tag,

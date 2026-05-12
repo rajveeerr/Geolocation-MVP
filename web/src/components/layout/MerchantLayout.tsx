@@ -40,6 +40,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { PATHS } from '@/routing/paths';
+import { dealCreationTypes } from '@/config/dealCreation';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/useAuth';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
@@ -947,6 +948,25 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
     [location.pathname],
   );
 
+  // If we're in the create-deal flow, prefer the specific deal type title/subtitle
+  const enrichedPageMeta = useMemo(() => {
+    if (!location.pathname.startsWith('/merchant/deals/create')) return pageMeta;
+
+    const match = dealCreationTypes.find((d) =>
+      location.pathname === d.route || location.pathname.startsWith(d.route + '/') || location.pathname.startsWith(d.route),
+    );
+
+    if (match) {
+      return { title: match.title, subtitle: match.summary };
+    }
+
+    return pageMeta;
+  }, [location.pathname, pageMeta]);
+
+  const showPageHeader = useMemo(() => !location.pathname.startsWith(PATHS.MERCHANT_DEALS_CREATE), [
+    location.pathname,
+  ]);
+
   const activeSection = useMemo(() => getActiveSection(location.pathname), [location.pathname]);
   const merchantName = merchantData?.data?.merchant?.businessName?.trim() || user?.name?.trim() || 'Merchant Business';
   const profileAvatarUrl = user?.avatarUrl || null;
@@ -1175,13 +1195,17 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
                   </Link>
                   <ChevronRight className="h-3 w-3 shrink-0 text-neutral-400" aria-hidden />
                   <span className="truncate text-[10px] font-semibold uppercase tracking-[0.22em] text-neutral-900">
-                    {pageMeta.title}
-                  </span>
+                      {enrichedPageMeta.title}
+                    </span>
                 </nav>
-                <h1 className="mt-1.5 truncate text-[1.55rem] font-semibold tracking-tight text-neutral-950 sm:text-[1.75rem]">
-                  {pageMeta.title}
-                </h1>
-                <p className="mt-1 max-w-3xl text-[13px] text-neutral-500 sm:text-sm">{pageMeta.subtitle}</p>
+                {showPageHeader ? (
+                  <>
+                    <h1 className="mt-1.5 truncate text-[1.55rem] font-semibold tracking-tight text-neutral-950 sm:text-[1.75rem]">
+                      {enrichedPageMeta.title}
+                    </h1>
+                    <p className="mt-1 max-w-3xl text-[13px] text-neutral-500 sm:text-sm">{enrichedPageMeta.subtitle}</p>
+                  </>
+                ) : null}
               </div>
             </div>
           </header>

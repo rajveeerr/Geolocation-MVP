@@ -284,7 +284,7 @@ export const DealMenuStep = () => {
   // Get unique categories
   const categories = ['all', ...new Set(menuItems.map(item => item.category))];
   const filterChipClass =
-    'inline-flex items-center rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200';
+    'inline-flex items-center justify-center rounded-full border px-3 py-1.5 text-[13px] font-medium leading-none transition-all duration-200';
 
   const handleToggleMenuItem = (item: MenuItem) => {
     const isSelected = selectedMenuItems.some(selected => selected.id === item.id);
@@ -617,47 +617,8 @@ export const DealMenuStep = () => {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-4"
           >
-            <div className="rounded-[1.8rem] border border-[#eaded2] bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(255,248,242,0.92))] p-5 shadow-[0_18px_50px_rgba(82,58,40,0.08)]">
-              <div className="grid gap-5">
-                <div className="grid gap-3 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start">
-                  <div>
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#97a2b1]">
-                      Deal Type
-                    </div>
-                    <p className="mt-2 text-sm leading-6 text-[#607084]">
-                      Narrow the menu to items that match a specific deal format.
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => setSelectedDealType('ALL')}
-                      className={cn(
-                        filterChipClass,
-                        selectedDealType === 'ALL'
-                          ? 'border-[#ff7a59] bg-[#ff6f61] text-white shadow-[0_10px_24px_rgba(255,111,97,0.26)]'
-                          : 'border-[#eaded2] bg-white text-[#4e5d6f] hover:border-[#ffb08a] hover:bg-[#fff1e8] hover:text-[#bf6545]'
-                      )}
-                    >
-                      All
-                    </button>
-                    {dealTypes.map((dt) => (
-                      <button
-                        key={dt.value}
-                        onClick={() => setSelectedDealType(dt.value)}
-                        className={cn(
-                          filterChipClass,
-                          selectedDealType === dt.value
-                            ? 'border-[#ff7a59] bg-[#ff6f61] text-white shadow-[0_10px_24px_rgba(255,111,97,0.26)]'
-                            : 'border-[#eaded2] bg-white text-[#4e5d6f] hover:border-[#ffb08a] hover:bg-[#fff1e8] hover:text-[#bf6545]'
-                        )}
-                        title={dt.description || dt.label}
-                      >
-                        {dt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
+            <div className="rounded-[1.8rem] border border-[#eaded2] bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(255,248,242,0.92))] p-4 shadow-[0_18px_50px_rgba(82,58,40,0.08)] sm:p-[18px]">
+              <div className="grid gap-4">
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#97a2b1]" />
                   <Input
@@ -668,35 +629,93 @@ export const DealMenuStep = () => {
                   />
                 </div>
 
-                <div className="grid gap-3 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start">
+                <div className="grid gap-2.5 rounded-[1.45rem] border border-[#f0e2d2] bg-white/55 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
                   <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#fff2ea] text-[#ff7a59]">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl bg-[#fff2ea] text-[#ff7a59]">
                       <Filter className="h-4 w-4" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#97a2b1]">
                         Categories
                       </div>
-                      <p className="mt-2 text-sm leading-6 text-[#607084]">
+                      <p className="mt-1 text-[13px] leading-5 text-[#607084]">
                         Filter by menu section to find items faster.
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((category) => (
+                  <div className="flex items-center justify-end gap-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#97a2b1]">
+                    <span>Slide to scroll</span>
+                    <span aria-hidden className="text-[#ff7a59]">→</span>
+                  </div>
+                  <div className="relative overflow-x-auto overflow-y-hidden pb-1 pr-8 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    <div className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-[#fffaf6] via-[#fffaf6]/85 to-transparent" />
+                    <div className="flex w-max flex-nowrap gap-1.5 pr-2">
+                      {categories.map((category) => (
+                        <button
+                          key={category}
+                          onClick={() => setSelectedCategory(category)}
+                          className={cn(
+                            filterChipClass,
+                            selectedCategory === category
+                              ? 'border-[#203247] bg-[#203247] text-white shadow-[0_10px_24px_rgba(32,50,71,0.18)]'
+                              : 'border-[#eaded2] bg-[#fffdfa] text-[#4e5d6f] hover:border-[#cfd9e5] hover:bg-[#eef5fb] hover:text-[#305f89]'
+                          )}
+                        >
+                          {category === 'all' ? 'All Items' : category.replace(/_/g, ' ')}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid gap-2.5 rounded-[1.45rem] border border-[#f0e2d2] bg-white/55 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl bg-[#fff2ea] text-[#ff7a59]">
+                      <Filter className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#97a2b1]">
+                        Deal Type
+                      </div>
+                      <p className="mt-1 text-[13px] leading-5 text-[#607084]">
+                        Narrow the menu to items that match a specific deal format.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-end gap-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#97a2b1]">
+                    <span>Slide to scroll</span>
+                    <span aria-hidden className="text-[#ff7a59]">→</span>
+                  </div>
+                  <div className="relative overflow-x-auto overflow-y-hidden pb-1 pr-8 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    <div className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-[#fffaf6] via-[#fffaf6]/85 to-transparent" />
+                    <div className="flex w-max flex-nowrap gap-1.5 pr-2">
                       <button
-                        key={category}
-                        onClick={() => setSelectedCategory(category)}
+                        onClick={() => setSelectedDealType('ALL')}
                         className={cn(
                           filterChipClass,
-                          selectedCategory === category
-                            ? 'border-[#203247] bg-[#203247] text-white shadow-[0_10px_24px_rgba(32,50,71,0.18)]'
-                            : 'border-[#eaded2] bg-[#fffdfa] text-[#4e5d6f] hover:border-[#cfd9e5] hover:bg-[#eef5fb] hover:text-[#305f89]'
+                          selectedDealType === 'ALL'
+                            ? 'border-[#ff7a59] bg-[#ff6f61] text-white shadow-[0_10px_24px_rgba(255,111,97,0.26)]'
+                            : 'border-[#eaded2] bg-white text-[#4e5d6f] hover:border-[#ffb08a] hover:bg-[#fff1e8] hover:text-[#bf6545]'
                         )}
                       >
-                        {category === 'all' ? 'All Items' : category.replace(/_/g, ' ')}
+                        All
                       </button>
-                    ))}
+                      {dealTypes.map((dt) => (
+                        <button
+                          key={dt.value}
+                          onClick={() => setSelectedDealType(dt.value)}
+                          className={cn(
+                            filterChipClass,
+                            selectedDealType === dt.value
+                              ? 'border-[#ff7a59] bg-[#ff6f61] text-white shadow-[0_10px_24px_rgba(255,111,97,0.26)]'
+                              : 'border-[#eaded2] bg-white text-[#4e5d6f] hover:border-[#ffb08a] hover:bg-[#fff1e8] hover:text-[#bf6545]'
+                          )}
+                          title={dt.description || dt.label}
+                        >
+                          {dt.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
