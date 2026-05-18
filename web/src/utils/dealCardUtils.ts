@@ -81,10 +81,10 @@ export const formatDealValue = (
   dealType?: DealType | string
 ): string => {
   if (discountPercentage !== null && discountPercentage > 0) {
-    return `${discountPercentage}% OFF`;
+    return `UP TO ${discountPercentage}% OFF`;
   }
   if (discountAmount !== null && discountAmount > 0) {
-    return `$${discountAmount} OFF`;
+    return `UP TO $${discountAmount} OFF`;
   }
   if (dealType === 'BOUNTY') {
     return 'Bounty Deal';

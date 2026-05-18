@@ -93,7 +93,7 @@ function SurpriseDealCard({
         </div>
 
         <p className="mt-2 text-xs text-neutral-400">
-          {new Date(deal.startTime).toLocaleDateString()} — {new Date(deal.endTime).toLocaleDateString()}
+          {new Date(deal.startTime).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })} — {new Date(deal.endTime).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
         </p>
 
         <div className="mt-4 flex items-center gap-2 border-t border-neutral-100 pt-4">

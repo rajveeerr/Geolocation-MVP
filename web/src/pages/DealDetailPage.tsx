@@ -242,7 +242,7 @@ const BountyEarnCard = ({
           ) : (
             <>
               <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-[1.1] mb-1.5 sm:mb-2">
-                {deal.offerDisplay || `${deal.discountPercentage ?? 0}% OFF`}
+                {deal.offerDisplay || `UP TO ${deal.discountPercentage ?? 0}% OFF`}
               </h3>
               <p className="text-xs sm:text-sm md:text-base text-white/50">{deal.title}</p>
             </>
@@ -580,7 +580,7 @@ const MenuCardFigma = ({
       {discountPercent > 0 && (
         <div className="absolute top-12 left-3 z-10">
           <span className="inline-flex items-center rounded-full bg-brand-primary-600 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shadow-sm">
-            {discountPercent}% OFF
+            UP TO {discountPercent}% OFF
           </span>
         </div>
       )}
@@ -694,6 +694,16 @@ export const DealDetailPage = () => {
       subtitle?: string | null;
       expiresAt: string;
     } | null;
+    checkInReward?: {
+      id: number;
+      rewardType: string;
+      rewardValue: number;
+      rewardLabel?: string | null;
+      imageUrl?: string | null;
+      claimCode: string;
+      expiresAt?: string | null;
+      createdAt: string;
+    } | null;
   } | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showHoursDropdown, setShowHoursDropdown] = useState(false);
@@ -711,6 +721,7 @@ export const DealDetailPage = () => {
           eligibleRewards: data.eligibleRewards,
           lotteryEntry: data.lotteryEntry,
           gameSession: data.gameSession,
+          checkInReward: data.checkInReward,
         });
         setShowCheckInModal(true);
       }
@@ -1923,6 +1934,7 @@ export const DealDetailPage = () => {
           eligibleRewards={checkInResult?.eligibleRewards || []}
           lotteryEntry={checkInResult?.lotteryEntry || null}
           gameSession={checkInResult?.gameSession || null}
+          checkInReward={checkInResult?.checkInReward || null}
           onCheckOut={() => {
             setShowCheckInModal(false);
             setCheckInResult(null);

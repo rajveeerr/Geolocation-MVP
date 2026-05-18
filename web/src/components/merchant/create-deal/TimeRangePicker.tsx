@@ -1,11 +1,9 @@
 import { DealCreationContext } from '@/context/DealCreationContext';
 import { HappyHourContext } from '@/context/HappyHourContext';
 import { useContext, useState } from 'react';
-import { Button } from '@/components/common/Button';
-import { Plus, X, Clock, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, X, Calendar } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Label } from '@/components/ui/label';
 import { TwelveHourTimeField } from '@/components/common/TwelveHourTimeField';
 
 type TimeRangePreset = 'everyday' | 'mon-fri' | 'weekends' | 'days';
@@ -14,7 +12,6 @@ export const TimeRangePicker = () => {
   // Prefer the DealCreationContext; fall back to HappyHourContext if present
   const dealCtx = useContext(DealCreationContext as any);
   const hhCtx = useContext(HappyHourContext as any);
-  const [expandedRanges, setExpandedRanges] = useState<Set<number>>(new Set());
   const [preset, setPreset] = useState<TimeRangePreset | null>(null);
 
   const context = dealCtx ?? hhCtx;
@@ -163,238 +160,168 @@ export const TimeRangePicker = () => {
 
   const currentPreset = preset || detectPreset();
 
+  const PRESETS: { value: TimeRangePreset; label: string }[] = [
+    { value: 'everyday', label: 'Everyday' },
+    { value: 'mon-fri', label: 'Mon-Fri' },
+    { value: 'weekends', label: 'Weekends' },
+    { value: 'days', label: 'Custom days' },
+  ];
+
+  const single = currentPreset !== 'days' ? state.timeRanges[0] : null;
+  const singleValidation = single ? validateTimeRange(single.start, single.end) : null;
+
   return (
-    <div className="space-y-4">
-      {/* Preset Selection */}
-      <div>
-        <Label className="text-sm font-medium text-neutral-700 mb-3 block">Select Schedule Type</Label>
-        <div className="grid grid-cols-2 gap-2">
-          {[
-            { value: 'everyday' as TimeRangePreset, label: 'Everyday', icon: Calendar },
-            { value: 'mon-fri' as TimeRangePreset, label: 'Mon-Fri', icon: Calendar },
-            { value: 'weekends' as TimeRangePreset, label: 'Weekends', icon: Calendar },
-            { value: 'days' as TimeRangePreset, label: 'Days', icon: Calendar },
-          ].map(({ value, label, icon: Icon }) => (
-            <button
-              key={value}
-              onClick={() => applyPreset(value)}
-              className={cn(
-                'flex items-center justify-center gap-2 rounded-lg border-2 p-3 text-sm font-medium transition-all',
-                currentPreset === value
-                  ? 'border-brand-primary-500 bg-brand-primary-50 text-brand-primary-700'
-                  : 'border-neutral-200 bg-white text-neutral-600 hover:border-brand-primary-300'
-              )}
-            >
-              <Icon className="h-4 w-4" />
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Time Range Configuration */}
-      {currentPreset && (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Clock className="h-5 w-5 text-brand-primary-600" />
-          <h3 className="text-lg font-semibold text-neutral-900">Time Ranges</h3>
-          <span className="text-sm text-neutral-500">({state.timeRanges.length} range{state.timeRanges.length !== 1 ? 's' : ''})</span>
-        </div>
-        {state.timeRanges.length === 0 && (
-          <span className="text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded-full">
-            ⚠️ Add at least one time range
-          </span>
-        )}
-      </div>
-      
-          {/* For preset options (everyday, mon-fri, weekends), show single time input */}
-          {currentPreset !== 'days' && state.timeRanges.length > 0 && (
-            <div className="rounded-xl border border-neutral-200 bg-white p-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-neutral-700 mb-2 block">Day</label>
-                  <div className="rounded-lg border border-neutral-300 bg-neutral-50 px-3 py-2 text-sm text-neutral-600">
-                    {getDayLabel(state.timeRanges[0]?.day)}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-neutral-700 mb-2 block">Start Time</label>
-                  <TwelveHourTimeField
-                    value={state.timeRanges[0]?.start || '17:00'}
-                    onChange={(value) => {
-                      const updatedRanges = [...state.timeRanges];
-                      if (updatedRanges[0]) {
-                        updatedRanges[0] = { ...updatedRanges[0], start: value };
-                      }
-                      dispatch({ type: 'SET_FIELD', field: 'timeRanges', value: updatedRanges });
-                    }}
-                    className="space-y-0"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-neutral-700 mb-2 block">End Time</label>
-                  <TwelveHourTimeField
-                    value={state.timeRanges[0]?.end || '19:00'}
-                    onChange={(value) => {
-                      const updatedRanges = [...state.timeRanges];
-                      if (updatedRanges[0]) {
-                        updatedRanges[0] = { ...updatedRanges[0], end: value };
-                      }
-                      dispatch({ type: 'SET_FIELD', field: 'timeRanges', value: updatedRanges });
-                    }}
-                    className="space-y-0"
-                  />
-                </div>
-              </div>
-              {state.timeRanges[0] && (
-                <div className="mt-4 pt-4 border-t border-neutral-200">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-neutral-600">
-                      {formatTime(state.timeRanges[0].start)} - {formatTime(state.timeRanges[0].end)}
-                    </span>
-                    <span className="text-neutral-500">
-                      Duration: {getDuration(state.timeRanges[0].start, state.timeRanges[0].end)}
-                    </span>
-                  </div>
-                </div>
-              )}
-        </div>
-      )}
-
-          {/* For "Days" preset, show multiple day/time selectors */}
-          {currentPreset === 'days' && (
     <div className="space-y-3">
-              {state.timeRanges.map((range) => {
-          const isExpanded = expandedRanges.has(range.id);
-          const validation = validateTimeRange(range.start, range.end);
-          const duration = getDuration(range.start, range.end);
-          
-          return (
-            <motion.div
-              key={range.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-                    className={cn(
-                      'rounded-xl border p-4 shadow-sm transition-all hover:shadow-md',
-                validation.isValid 
-                  ? 'border-neutral-200 bg-white' 
-                  : 'border-red-200 bg-red-50'
-                    )}
-            >
-              {/* Compact View */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-neutral-400" />
-                    <span className="text-sm font-medium text-neutral-700">
-                            {getDayLabel(range.day)}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                          <Clock className={cn('h-4 w-4', validation.isValid ? 'text-neutral-500' : 'text-red-500')} />
-                          <span className={cn('text-sm', validation.isValid ? 'text-neutral-600' : 'text-red-600')}>
-                      {formatTime(range.start)} - {formatTime(range.end)}
-                    </span>
-                          <span className={cn('text-xs', validation.isValid ? 'text-neutral-500' : 'text-red-500')}>
-                      ({duration})
-                    </span>
-                    {!validation.isValid && (
-                      <span className="text-xs text-red-500 font-medium">
-                        ⚠️ {validation.message}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => toggleRangeExpansion(range.id)}
-                    className="text-neutral-500 hover:text-neutral-700"
-                  >
-                    {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                  </Button>
-                    <Button
-                          onClick={() => {
-                            const newRanges = state.timeRanges.filter(r => r.id !== range.id);
-                            dispatch({ type: 'SET_FIELD', field: 'timeRanges', value: newRanges });
-                          }}
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    >
-              <X className="h-4 w-4" />
-            </Button>
-        </div>
-              </div>
-
-              {/* Expanded View */}
-              <AnimatePresence>
-                {isExpanded && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="mt-4 space-y-4 border-t border-neutral-100 pt-4"
-                  >
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                      {/* Day Selection */}
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-neutral-700">Day</label>
-                        <select
-                                value={range.day ?? 'Mon'}
-                          onChange={(e) => dispatch({ type: 'UPDATE_TIME_RANGE', payload: { id: range.id, field: 'day', value: e.target.value }})}
-                          className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-brand-primary-500 focus:ring-1 focus:ring-brand-primary-500"
-                        >
-                          {days.map((day) => (
-                            <option key={day.value} value={day.value}>
-                              {day.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/* Start Time */}
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-neutral-700">Start Time</label>
-                        <TwelveHourTimeField
-                          value={range.start}
-                          onChange={(value) => dispatch({ type: 'UPDATE_TIME_RANGE', payload: { id: range.id, field: 'start', value }})}
-                          className="space-y-0"
-                        />
-                      </div>
-
-                      {/* End Time */}
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-neutral-700">End Time</label>
-                        <TwelveHourTimeField
-                          value={range.end}
-                          onChange={(value) => dispatch({ type: 'UPDATE_TIME_RANGE', payload: { id: range.id, field: 'end', value }})}
-                          className="space-y-0"
-                        />
-                      </div>
-                    </div>
-                  </motion.div>
+      {/* Preset pills + duration hint + start/end time, all inline. Wraps
+          on narrow screens but stays compact on wide ones. */}
+      <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {PRESETS.map(({ value, label }) => {
+            const selected = currentPreset === value;
+            return (
+              <button
+                key={value}
+                type="button"
+                onClick={() => applyPreset(value)}
+                className={cn(
+                  'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-semibold transition',
+                  selected
+                    ? 'border-neutral-900 bg-neutral-900 text-white shadow-[0_4px_12px_rgba(15,23,42,0.16)]'
+                    : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50',
                 )}
-              </AnimatePresence>
-            </motion.div>
-          );
-        })}
-
-      <Button
-                onClick={addCustomDayRange}
-        variant="secondary"
-        className="w-full rounded-lg border-2 border-dashed border-neutral-300 bg-neutral-50 py-3 text-neutral-600 hover:border-brand-primary-300 hover:bg-brand-primary-25 hover:text-brand-primary-700"
-      >
-        <Plus className="mr-2 h-4 w-4" />
-                Add Day & Time
-      </Button>
-            </div>
-          )}
+              >
+                <Calendar className="h-3 w-3" />
+                {label}
+              </button>
+            );
+          })}
         </div>
-      )}
+
+        {currentPreset && currentPreset !== 'days' && single ? (
+          <>
+            <div className="flex items-end gap-2">
+              <TwelveHourTimeField
+                value={single.start || '17:00'}
+                onChange={(value) => {
+                  const updated = [...state.timeRanges];
+                  if (updated[0]) updated[0] = { ...updated[0], start: value };
+                  dispatch({ type: 'SET_FIELD', field: 'timeRanges', value: updated });
+                }}
+                className="space-y-0"
+              />
+              <span className="pb-1.5 text-neutral-400">→</span>
+              <TwelveHourTimeField
+                value={single.end || '19:00'}
+                onChange={(value) => {
+                  const updated = [...state.timeRanges];
+                  if (updated[0]) updated[0] = { ...updated[0], end: value };
+                  dispatch({ type: 'SET_FIELD', field: 'timeRanges', value: updated });
+                }}
+                className="space-y-0"
+              />
+            </div>
+            {singleValidation ? (
+              <span
+                className={cn(
+                  'pb-2 text-[11px] font-semibold',
+                  singleValidation.isValid ? 'text-emerald-600' : 'text-rose-600',
+                )}
+              >
+                {singleValidation.isValid
+                  ? `· ${getDuration(single.start, single.end)}`
+                  : `· ${singleValidation.message}`}
+              </span>
+            ) : null}
+          </>
+        ) : null}
+      </div>
+
+      {/* Custom-days list */}
+      {currentPreset === 'days' ? (
+        <div className="space-y-2">
+          {state.timeRanges.map((range) => {
+            const validation = validateTimeRange(range.start, range.end);
+            return (
+              <motion.div
+                key={range.id}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={cn(
+                  'flex flex-wrap items-center gap-2 rounded-xl border bg-white px-3 py-2',
+                  validation.isValid ? 'border-neutral-200' : 'border-rose-200 bg-rose-50/40',
+                )}
+              >
+                <select
+                  value={range.day ?? 'Mon'}
+                  onChange={(e) =>
+                    dispatch({
+                      type: 'UPDATE_TIME_RANGE',
+                      payload: { id: range.id, field: 'day', value: e.target.value },
+                    })
+                  }
+                  className="h-9 rounded-lg border border-neutral-200 bg-white px-2 text-[13px] outline-none focus:border-brand-primary-400"
+                >
+                  {days.map((day) => (
+                    <option key={day.value} value={day.value}>
+                      {day.short}
+                    </option>
+                  ))}
+                </select>
+                <TwelveHourTimeField
+                  value={range.start}
+                  onChange={(value) =>
+                    dispatch({
+                      type: 'UPDATE_TIME_RANGE',
+                      payload: { id: range.id, field: 'start', value },
+                    })
+                  }
+                  className="space-y-0"
+                />
+                <span className="text-neutral-400">→</span>
+                <TwelveHourTimeField
+                  value={range.end}
+                  onChange={(value) =>
+                    dispatch({
+                      type: 'UPDATE_TIME_RANGE',
+                      payload: { id: range.id, field: 'end', value },
+                    })
+                  }
+                  className="space-y-0"
+                />
+                <span
+                  className={cn(
+                    'ml-1 text-[11px] font-medium',
+                    validation.isValid ? 'text-emerald-600' : 'text-rose-600',
+                  )}
+                >
+                  {validation.isValid
+                    ? getDuration(range.start, range.end)
+                    : validation.message}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newRanges = state.timeRanges.filter((r) => r.id !== range.id);
+                    dispatch({ type: 'SET_FIELD', field: 'timeRanges', value: newRanges });
+                  }}
+                  className="ml-auto inline-flex h-7 w-7 items-center justify-center rounded-full text-neutral-400 transition hover:bg-rose-50 hover:text-rose-600"
+                  aria-label="Remove time range"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </motion.div>
+            );
+          })}
+          <button
+            type="button"
+            onClick={addCustomDayRange}
+            className="inline-flex h-8 items-center gap-1.5 rounded-full border border-dashed border-neutral-300 bg-white px-3 text-[12px] font-semibold text-neutral-600 transition hover:border-neutral-400 hover:bg-neutral-50"
+          >
+            <Plus className="h-3 w-3" />
+            Add day & time
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 };

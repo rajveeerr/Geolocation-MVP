@@ -15,10 +15,15 @@
       "Bash(Select-Object Name)",
       "Bash(del \"c:\\\\Geolocation-MVP\\\\web\\\\src\\\\components\\\\merchant\\\\create-deal\\\\DealBogoStep.tsx\")",
       "Bash(ls ecosystem*)",
-      "Bash(ls *.sh)"
+      "Bash(ls *.sh)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Geolocation-MVP\" -Directory)",
+      "Bash(node ./node_modules/typescript/bin/tsc --noEmit)",
+      "Read(//tmp/**)",
+      "Bash(node ./node_modules/typescript/bin/tsc --noEmit > /tmp/tsc-out.txt 2>&1; echo \"EXIT=$?\"; head -30 /tmp/tsc-out.txt)"
     ],
     "additionalDirectories": [
-      "C:\\Geolocation-MVP\\web\\src\\pages"
+      "C:\\Geolocation-MVP\\web\\src\\pages",
+      "\\tmp"
     ]
   }
 }

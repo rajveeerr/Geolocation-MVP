@@ -1,11 +1,11 @@
 // web/src/components/merchant/create-deal/HappyHourItemDiscountEditor.tsx
 import { useState } from 'react';
 import { useHappyHour, type SelectedMenuItem } from '@/context/HappyHourContext';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/common/Button';
+import { AmountSlider } from '@/components/ui/AmountSlider';
 import { X, Percent, Tag, RotateCcw } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface HappyHourItemDiscountEditorProps {
@@ -72,28 +72,21 @@ export const HappyHourItemDiscountEditor = ({
   globalDiscountAmount,
   onClose
 }: HappyHourItemDiscountEditorProps) => {
-  const { state, dispatch } = useHappyHour();
-  
+  const { dispatch } = useHappyHour();
+
   // Determine current discount type
   const getCurrentDiscountType = (): DiscountType => {
-    // Check for customDiscount first (now represents "Percentage Off" using customPrice type)
     if (item.customDiscount !== null && item.customDiscount !== undefined) return 'customPrice';
-    // Legacy: check for customPrice (fixed price) - but we're not using this anymore
     if (item.customPrice !== null && item.customPrice !== undefined) return 'customPrice';
-    // Legacy: check for discountAmount - but we're not using this anymore
     if (item.discountAmount !== null && item.discountAmount !== undefined) return 'customPrice';
     return 'global';
   };
 
   const [discountType, setDiscountType] = useState<DiscountType>(getCurrentDiscountType());
-  const [customPrice, setCustomPrice] = useState<string>(
-    item.customPrice !== null && item.customPrice !== undefined ? item.customPrice.toFixed(2) : ''
-  );
-  const [customDiscount, setCustomDiscount] = useState<string>(
-    item.customDiscount !== null && item.customDiscount !== undefined ? item.customDiscount.toString() : ''
-  );
-  const [discountAmount, setDiscountAmount] = useState<string>(
-    item.discountAmount !== null && item.discountAmount !== undefined ? item.discountAmount.toFixed(2) : ''
+  const [customDiscount, setCustomDiscount] = useState<number>(
+    item.customDiscount !== null && item.customDiscount !== undefined
+      ? item.customDiscount
+      : globalDiscountPercentage ?? 20,
   );
 
   const priceCalculation = calculateFinalPrice(
@@ -102,12 +95,17 @@ export const HappyHourItemDiscountEditor = ({
     globalDiscountPercentage,
     globalDiscountAmount,
     null,
-    discountType === 'customPrice' ? parseFloat(customDiscount) : null,
-    null
+    discountType === 'customPrice' ? customDiscount : null,
+    null,
   );
 
   const handleSave = () => {
-    const discountData: any = {
+    const discountData: {
+      customPrice: number | null;
+      customDiscount: number | null;
+      discountAmount: number | null;
+      useGlobalDiscount: boolean;
+    } = {
       customPrice: null,
       customDiscount: null,
       discountAmount: null,
@@ -115,8 +113,7 @@ export const HappyHourItemDiscountEditor = ({
     };
 
     if (discountType === 'customPrice') {
-      // When "Percentage Off" is selected, use customDiscount
-      discountData.customDiscount = customDiscount ? parseFloat(customDiscount) : null;
+      discountData.customDiscount = customDiscount;
     }
 
     dispatch({
@@ -136,9 +133,7 @@ export const HappyHourItemDiscountEditor = ({
       payload: { itemId: item.id },
     });
     setDiscountType('global');
-    setCustomPrice('');
-    setCustomDiscount('');
-    setDiscountAmount('');
+    setCustomDiscount(globalDiscountPercentage ?? 20);
   };
 
   return (
@@ -192,26 +187,29 @@ export const HappyHourItemDiscountEditor = ({
             </div>
           </div>
 
-          {/* Percentage Off Input */}
+          {/* Percentage Off Slider */}
           {discountType === 'customPrice' && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
             >
-              <Label htmlFor="custom-discount">Percentage Off</Label>
-              <div className="relative mt-1">
-                <Input
-                  id="custom-discount"
-                  type="number"
-                  min="0"
-                  max="100"
+              <div className="flex items-baseline justify-between">
+                <Label htmlFor="custom-discount">Percentage off</Label>
+                <span className="text-[12px] font-semibold text-emerald-600">
+                  {customDiscount}% off · save ${(item.price - priceCalculation.finalPrice).toFixed(2)}
+                </span>
+              </div>
+              <div className="mt-2 rounded-xl border border-neutral-200 bg-white p-3">
+                <AmountSlider
                   value={customDiscount}
-                  onChange={(e) => setCustomDiscount(e.target.value)}
-                  placeholder="0"
-                  className="pr-12"
+                  onChange={setCustomDiscount}
+                  min={5}
+                  max={90}
+                  step={5}
+                  suffix="%"
+                  showEditButton={false}
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500">%</span>
               </div>
             </motion.div>
           )}

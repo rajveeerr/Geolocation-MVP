@@ -67,7 +67,7 @@ const MenuItemListRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
         console.warn('Invalid date string:', dateString);
         return 'Recently';
       }
-      return date.toLocaleDateString();
+      return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
     } catch (error) {
       console.warn('Error formatting date:', dateString, error);
       return 'Recently';
@@ -195,7 +195,7 @@ const MenuItemTableRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: 
         console.warn('Invalid date string:', dateString);
         return 'Recently';
       }
-      return date.toLocaleDateString();
+      return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
     } catch (error) {
       console.warn('Error formatting date:', dateString, error);
       return 'Recently';
@@ -313,7 +313,7 @@ const MenuItemCard = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
         console.warn('Invalid date string:', dateString);
         return 'Recently';
       }
-      return date.toLocaleDateString();
+      return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
     } catch (error) {
       console.warn('Error formatting date:', dateString, error);
       return 'Recently';

@@ -56,6 +56,16 @@ interface CheckInResponse {
     subtitle?: string | null;
     expiresAt: string;
   } | null;
+  checkInReward?: {
+    id: number;
+    rewardType: string;
+    rewardValue: number;
+    rewardLabel?: string | null;
+    imageUrl?: string | null;
+    claimCode: string;
+    expiresAt?: string | null;
+    createdAt: string;
+  } | null;
   streak?: {
     currentStreak: number;
     currentDiscountPercent: number;
@@ -73,6 +83,7 @@ interface UseCheckInOptions {
     eligibleRewards?: CheckInResponse['eligibleRewards'];
     lotteryEntry?: CheckInResponse['lotteryEntry'];
     gameSession?: CheckInResponse['gameSession'];
+    checkInReward?: CheckInResponse['checkInReward'];
   }) => void;
 }
 
@@ -151,6 +162,7 @@ export const useCheckIn = (options?: UseCheckInOptions) => {
         eligibleRewards: response.data.eligibleRewards,
         lotteryEntry: response.data.lotteryEntry,
         gameSession: response.data.gameSession,
+        checkInReward: response.data.checkInReward,
       });
       
       // Don't show toast if callback is provided (modal will handle it)

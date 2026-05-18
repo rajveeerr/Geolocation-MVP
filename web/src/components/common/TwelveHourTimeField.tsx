@@ -66,12 +66,12 @@ export const TwelveHourTimeField = ({
 }: TwelveHourTimeFieldProps) => {
   const parts = to12HourParts(value);
   const baseSelectClassName =
-    'h-10 w-full appearance-none rounded-lg border border-neutral-200 bg-neutral-50 px-3 pr-8 text-base font-semibold text-neutral-900 outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100';
+    'h-9 w-full appearance-none rounded-md border border-neutral-200 bg-neutral-50 pl-2 pr-5 text-[13px] font-semibold text-neutral-900 outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100';
 
   return (
     <div className={className ?? 'space-y-2'}>
       {label && <Label htmlFor={id}>{label}</Label>}
-      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_minmax(72px,0.9fr)] items-center gap-2 rounded-xl border border-neutral-200 bg-white p-2">
+      <div className="inline-grid min-w-0 grid-cols-[3.5rem_auto_3.5rem_3.75rem] items-center gap-1 rounded-lg border border-neutral-200 bg-white p-1">
         <div className="relative">
           <select
             id={id}
@@ -79,16 +79,16 @@ export const TwelveHourTimeField = ({
             onChange={(e) => onChange(from12HourParts(e.target.value, parts.minute, parts.period))}
             className={baseSelectClassName}
           >
-            <option value="">Hour</option>
+            <option value="">Hr</option>
             {hourOptions.map((option) => (
               <option key={option} value={option}>
                 {option}
               </option>
             ))}
           </select>
-          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+          <ChevronDown className="pointer-events-none absolute right-1 top-1/2 h-3 w-3 -translate-y-1/2 text-neutral-400" />
         </div>
-        <span className="px-0.5 text-center text-xl font-semibold text-neutral-400">:</span>
+        <span className="px-0 text-center text-base font-semibold text-neutral-400">:</span>
         <div className="relative">
           <select
             value={parts.minute}
@@ -101,18 +101,18 @@ export const TwelveHourTimeField = ({
               </option>
             ))}
           </select>
-          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+          <ChevronDown className="pointer-events-none absolute right-1 top-1/2 h-3 w-3 -translate-y-1/2 text-neutral-400" />
         </div>
         <div className="relative">
           <select
             value={parts.period}
             onChange={(e) => onChange(from12HourParts(parts.hour, parts.minute, e.target.value as 'AM' | 'PM'))}
-            className="h-10 w-full appearance-none rounded-lg border border-neutral-200 bg-neutral-50 px-3 pr-7 text-base font-semibold text-neutral-900 outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100"
+            className={baseSelectClassName}
           >
             <option value="AM">AM</option>
             <option value="PM">PM</option>
           </select>
-          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+          <ChevronDown className="pointer-events-none absolute right-1 top-1/2 h-3 w-3 -translate-y-1/2 text-neutral-400" />
         </div>
       </div>
     </div>

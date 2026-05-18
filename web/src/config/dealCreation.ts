@@ -1,5 +1,4 @@
-import { Clock, EyeOff, ShoppingBag, Tag, Trophy, Zap, Repeat, type LucideIcon } from 'lucide-react';
-import { PATHS } from '@/routing/paths';
+import { Clock, EyeOff, ShoppingBag, Tag, Zap, Repeat, type LucideIcon } from 'lucide-react';
 
 export type DealTypeValue = 'STANDARD' | 'HAPPY_HOUR' | 'RECURRING' | 'REDEEM_NOW' | 'HIDDEN' | 'BOUNTY' | 'BOGO';
 
@@ -27,7 +26,7 @@ export const dealCreationTypes: DealCreationType[] = [
     detailDescription:
       'A flexible format for one-time promotions, featured items, and seasonal offers.',
     bestFor: 'Flash promos and product pushes',
-    route: '/merchant/deals/create/basics',
+    route: '/merchant/deals/create/standard',
     selectedAccent: 'bg-[#111827]',
     iconWrap: 'bg-[#fff0e8] text-[#ff5a36]',
     icon: Tag,
@@ -55,7 +54,7 @@ export const dealCreationTypes: DealCreationType[] = [
     detailDescription:
       'A repeating schedule that turns a promotion into something customers remember every week.',
     bestFor: 'Recurring weekly rituals',
-    route: '/merchant/deals/create/daily-deal/weekdays',
+    route: '/merchant/deals/create/daily-deal',
     selectedAccent: 'bg-[#0f172a]',
     iconWrap: 'bg-[#eef2ff] text-[#4338ca]',
     icon: Repeat,
@@ -88,19 +87,6 @@ export const dealCreationTypes: DealCreationType[] = [
     icon: EyeOff,
   },
   {
-    value: 'BOUNTY',
-    title: 'Bounty Deal',
-    eyebrow: 'Reward loop',
-    sidebarLabel: 'Bounty Deal',
-    summary: 'Incentivize guests with referrals, check-ins, or outcome-based rewards.',
-    detailDescription: 'A performance-style offer that rewards actions like referrals, attendance, or check-ins.',
-    bestFor: 'Growth campaigns and social reach',
-    route: '/merchant/deals/create/bounty',
-    selectedAccent: 'bg-[#172554]',
-    iconWrap: 'bg-[#e9fff1] text-[#15803d]',
-    icon: Trophy,
-  },
-  {
     value: 'BOGO',
     title: 'BOGO Deal',
     eyebrow: 'Volume incentive',
@@ -109,7 +95,7 @@ export const dealCreationTypes: DealCreationType[] = [
     detailDescription:
       'A volume offer where buying N items unlocks M items at a discount - "Buy 2 Get 1 Free" and similar.',
     bestFor: 'Driving larger ticket sizes',
-    route: PATHS.MERCHANT_DEALS_BOGO,
+    route: '/merchant/deals/create/bogo',
     selectedAccent: 'bg-[#7c2d12]',
     iconWrap: 'bg-[#fff7ed] text-[#c2410c]',
     icon: ShoppingBag,

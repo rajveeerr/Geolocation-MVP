@@ -173,7 +173,7 @@ export function ServiceDetailPage() {
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-sm font-semibold text-neutral-700">Date</label>
-                <input type="date" value={bookingDate} onChange={(e) => setBookingDate(e.target.value)} className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm" />
+                <input type="date" lang="en-US" value={bookingDate} onChange={(e) => setBookingDate(e.target.value)} className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm" />
               </div>
               <div>
                 <label className="mb-1 block text-sm font-semibold text-neutral-700">Start time</label>

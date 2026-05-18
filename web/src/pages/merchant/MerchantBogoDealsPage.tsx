@@ -35,7 +35,7 @@ const panelClass =
   'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  new Date(iso).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
 
 const dealStatus = (deal: MerchantBogoDeal) => {
   const now = new Date();
@@ -511,19 +511,16 @@ function MerchantBogoDealsContent() {
             </p>
           </div>
         </div>
-        <Button
-          size="md"
-          onClick={() => setShowForm((v) => !v)}
-          className="rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md hover:from-orange-600 hover:to-orange-700"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          {showForm ? 'Hide form' : 'Create BOGO'}
-        </Button>
+        <Link to="/merchant/deals/create/bogo">
+          <Button
+            size="md"
+            className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Create BOGO
+          </Button>
+        </Link>
       </div>
-
-      <AnimatePresence initial={false}>
-        {showForm && <CreateBogoForm key="bogo-form" onClose={() => setShowForm(false)} />}
-      </AnimatePresence>
 
       {bogoDeals.length === 0 ? (
         <div className={cn(panelClass, 'border-dashed py-16 text-center')}>
@@ -533,14 +530,15 @@ function MerchantBogoDealsContent() {
             Create a BOGO deal — pick a preset like "Buy 1 Get 1 Free" or dial in your own buy/get quantities.
           </p>
           <div className="mt-5 flex justify-center gap-2">
-            <Button
-              size="md"
-              onClick={() => setShowForm(true)}
-              className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Create your first BOGO
-            </Button>
+            <Link to="/merchant/deals/create/bogo">
+              <Button
+                size="md"
+                className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Create your first BOGO
+              </Button>
+            </Link>
             <Link to={PATHS.MERCHANT_DEALS}>
               <Button size="md" variant="secondary" className="rounded-full">
                 All deals

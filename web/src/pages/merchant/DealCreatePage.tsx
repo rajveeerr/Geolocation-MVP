@@ -5,106 +5,87 @@ import {
 } from '@/context/DealCreationContext';
 import { HappyHourProvider } from '@/context/HappyHourContext';
 import { MerchantProtectedRoute } from '@/components/auth/MerchantProtectedRoute';
+import { PATHS } from '@/routing/paths';
 
-// Import all necessary step and page components
+// Entry-point: keep the existing rich deal type picker as step 1.
 import { DealTypeStep } from '@/components/merchant/create-deal/DealTypeStep';
-import { DealBasicsStep } from '@/components/merchant/create-deal/DealBasicsStep';
-import { DealMenuStep } from '@/components/merchant/create-deal/DealMenuStep';
-import { DealOfferStep } from '@/components/merchant/create-deal/DealOfferStep';
-import { DealImagesStep } from '@/components/merchant/create-deal/DealImagesStep';
-import { DealScheduleStep } from '@/components/merchant/create-deal/DealScheduleStep';
-import { DealInstructionsStep } from '@/components/merchant/create-deal/DealInstructionsStep';
-import { DealAdvancedStep } from '@/components/merchant/create-deal/DealAdvancedStep';
-import { DealReviewStep } from '@/components/merchant/create-deal/DealReviewStep';
-import { DealBountyStep } from '@/components/merchant/create-deal/DealBountyStep';
-import { DealBountyBasicsStep } from '@/components/merchant/create-deal/DealBountyBasicsStep';
-import { DealBountyScheduleStep } from '@/components/merchant/create-deal/DealBountyScheduleStep';
-import { DealHiddenStep } from '@/components/merchant/create-deal/DealHiddenStep';
-import { DealHiddenVisibilityStep } from '@/components/merchant/create-deal/DealHiddenVisibilityStep';
-import { DealRedeemNowStep } from '@/components/merchant/create-deal/DealRedeemNowStep';
-import { DealLocationStep } from '@/components/merchant/create-deal/DealLocationStep';
-import { DealDailyDealWeekdayStep } from '@/components/merchant/create-deal/DealDailyDealWeekdayStep';
-import { DealDailyDealConfigStep } from '@/components/merchant/create-deal/DealDailyDealConfigStep';
+
+// New 2- and 3-step "quick form" deal creation flows.
+import { StandardDealQuickForm } from '@/components/merchant/create-deal/quick-form/StandardDealQuickForm';
+import { RecurringDealQuickForm } from '@/components/merchant/create-deal/quick-form/RecurringDealQuickForm';
+import { RedeemNowDealQuickForm } from '@/components/merchant/create-deal/quick-form/RedeemNowDealQuickForm';
+import { BountyConfigStep } from '@/components/merchant/create-deal/quick-form/BountyConfigStep';
+import { BountyDetailsStep } from '@/components/merchant/create-deal/quick-form/BountyDetailsStep';
+import { HiddenConfigStep } from '@/components/merchant/create-deal/quick-form/HiddenConfigStep';
+import { HiddenDetailsStep } from '@/components/merchant/create-deal/quick-form/HiddenDetailsStep';
+import { BogoDealQuickForm } from '@/components/merchant/create-deal/quick-form/BogoDealQuickForm';
+import { DealFinishStep } from '@/components/merchant/create-deal/quick-form/DealFinishStep';
+
+// Happy Hour keeps its dedicated single-page editor (untouched).
 import { HappyHourEditorPage } from './HappyHourEditorPage';
 import { AddMenuItemPage } from './AddMenuItemPage';
 
-// --- THIS COMPONENT IS THE FIX ---
-// It wraps the initial step and handles the navigation logic
-// after a user makes their first choice.
 const InitialStepHandler = () => {
-    const navigate = useNavigate();
-    const { state } = useDealCreation();
+  const navigate = useNavigate();
+  const { state } = useDealCreation();
 
-    const handleNext = () => {
-        // Based on the deal type chosen, navigate to the correct flow's first step
-        if (state.dealType === 'HAPPY_HOUR') {
-            navigate('/merchant/deals/create/happy-hour/edit');
-        } else if (state.dealType === 'BOUNTY') {
-            // Bounty deals go to bounty step first
-            navigate('/merchant/deals/create/bounty');
-        } else if (state.dealType === 'HIDDEN') {
-            // Hidden deals go to hidden step first
-            navigate('/merchant/deals/create/hidden');
-        } else if (state.dealType === 'REDEEM_NOW') {
-            // Redeem Now goes to dedicated redeem-now step
-            navigate('/merchant/deals/create/redeem-now');
-        } else if (state.dealType === 'RECURRING') {
-            // Daily Deal goes directly to weekday selection
-            navigate('/merchant/deals/create/daily-deal/weekdays');
-        } else if (state.dealType === 'BOGO') {
-            navigate('/merchant/deals/bogo');
-        } else {
-            // For 'STANDARD', start the simple multi-step flow
-            navigate('/merchant/deals/create/basics');
-        }
-    };
-    
-    return <DealTypeStep onNext={handleNext} />;
+  const handleNext = () => {
+    switch (state.dealType) {
+      case 'HAPPY_HOUR':
+        navigate('/merchant/deals/create/happy-hour/edit');
+        return;
+      case 'BOUNTY':
+        navigate('/merchant/deals/create/bounty');
+        return;
+      case 'HIDDEN':
+        navigate('/merchant/deals/create/hidden');
+        return;
+      case 'REDEEM_NOW':
+        navigate('/merchant/deals/create/redeem-now');
+        return;
+      case 'RECURRING':
+        navigate('/merchant/deals/create/daily-deal');
+        return;
+      case 'BOGO':
+        navigate('/merchant/deals/create/bogo');
+        return;
+      default:
+        navigate('/merchant/deals/create/standard');
+    }
+  };
+
+  return <DealTypeStep onNext={handleNext} />;
 };
 
 export const CreateDealPage = () => {
   return (
     <MerchantProtectedRoute fallbackMessage="Only merchants can create deals. Please sign up as a merchant to access this feature.">
-      <DealCreationProvider> {/* Wrap the entire page in the main context */}
+      <DealCreationProvider>
         <Routes>
-          {/* The initial route always shows the type selector */}
           <Route index element={<InitialStepHandler />} />
-          
-          {/* --- MODIFIED: Explicit routes for the Standard/Recurring flow --- */}
-          <Route path="basics" element={<DealBasicsStep />} />
-          <Route path="menu" element={<DealMenuStep />} />
-          <Route path="offer" element={<DealOfferStep />} />
-          <Route path="images" element={<DealImagesStep />} />
-          <Route path="schedule" element={<DealScheduleStep />} />
-          <Route path="location" element={<DealLocationStep />} />
-          <Route path="instructions" element={<DealInstructionsStep />} />
-          <Route path="advanced" element={<DealAdvancedStep />} />
-          <Route path="review" element={<DealReviewStep />} />
-          
-          {/* Deal type specific routes */}
-          <Route path="bounty" element={<DealBountyStep />} />
-          <Route path="bounty/basics" element={<DealBountyBasicsStep />} />
-          <Route path="bounty/menu" element={<DealMenuStep />} />
-          <Route path="bounty/schedule" element={<DealBountyScheduleStep />} />
-          <Route path="bounty/images" element={<DealImagesStep />} />
-          <Route path="bounty/review" element={<DealReviewStep />} />
-          <Route path="hidden" element={<DealHiddenStep />} />
-          <Route path="hidden/visibility" element={<DealHiddenVisibilityStep />} />
-          <Route path="hidden/basics" element={<DealBasicsStep />} />
-          <Route path="hidden/menu" element={<DealMenuStep />} />
-          <Route path="hidden/schedule" element={<DealScheduleStep />} />
-          <Route path="hidden/review" element={<DealReviewStep />} />
-          <Route path="redeem-now" element={<DealRedeemNowStep />} />
 
-          {/* BOGO uses the inline-form pattern on the BOGO deals page; no multistep route. */}
+          {/* New quick-form flows (Core fields → DealFinishStep with More options + Preview + Publish). */}
+          <Route path="standard" element={<StandardDealQuickForm />} />
+          <Route path="standard/review" element={<DealFinishStep />} />
 
-          {/* Daily Deal routes */}
-          <Route path="daily-deal/weekdays" element={<DealDailyDealWeekdayStep />} />
-          <Route path="daily-deal/config" element={<DealDailyDealConfigStep />} />
-          <Route path="daily-deal/review" element={<DealReviewStep />} />
+          <Route path="daily-deal" element={<RecurringDealQuickForm />} />
+          <Route path="daily-deal/review" element={<DealFinishStep />} />
 
-          {/* --- Route group for the happy hour flow --- */}
-          {/* This requires its own provider for its more complex state */}
+          <Route path="redeem-now" element={<RedeemNowDealQuickForm />} />
+          <Route path="redeem-now/review" element={<DealFinishStep />} />
+
+          <Route path="bogo" element={<BogoDealQuickForm />} />
+          <Route path="bogo/review" element={<DealFinishStep />} />
+
+          <Route path="bounty" element={<BountyConfigStep />} />
+          <Route path="bounty/details" element={<BountyDetailsStep />} />
+          <Route path="bounty/review" element={<DealFinishStep />} />
+
+          <Route path="hidden" element={<HiddenConfigStep />} />
+          <Route path="hidden/details" element={<HiddenDetailsStep />} />
+          <Route path="hidden/review" element={<DealFinishStep />} />
+
+          {/* Happy Hour keeps its dedicated single-page editor. */}
           <Route
             path="happy-hour/*"
             element={

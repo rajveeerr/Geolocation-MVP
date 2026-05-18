@@ -170,8 +170,8 @@ const BlogListPage: React.FC = () => {
                   </td>
                   <td className="px-4 py-3 text-neutral-500 text-xs">
                     {post.publishedAt
-                      ? new Date(post.publishedAt).toLocaleDateString()
-                      : new Date(post.createdAt).toLocaleDateString()}
+                      ? new Date(post.publishedAt).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })
+                      : new Date(post.createdAt).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">

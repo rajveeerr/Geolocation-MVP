@@ -204,6 +204,7 @@ export const HoursSection = ({ hours, onChange, isFoodTruck, holidayHours = [], 
                 <div key={i} className="flex flex-wrap items-center gap-2 rounded-lg border border-neutral-200 bg-white p-3">
                   <Input
                     type="date"
+                    lang="en-US"
                     value={entry.date}
                     onChange={(e) => updateHolidayEntry(i, { date: e.target.value })}
                     className="h-9 w-36 text-xs"

@@ -544,18 +544,21 @@ function RewardBadge({
       ) : dtype === 'redeem' && deal.discountPercentage ? (
         <div className="flex items-center gap-1.5">
           <Sparkles className="w-4 h-4 text-gray-600" />
+          <span className="text-[10px] text-gray-400">up to</span>
           <span className="text-lg font-bold text-gray-900">{deal.discountPercentage}%</span>
           <span className="text-[10px] text-gray-400">off</span>
         </div>
       ) : deal.discountPercentage ? (
         <div className="flex items-center gap-1.5">
           <Tag className="w-4 h-4 text-gray-600" />
+          <span className="text-[10px] text-gray-400">up to</span>
           <span className="text-lg font-bold text-gray-900">{deal.discountPercentage}%</span>
           <span className="text-[10px] text-gray-400">off</span>
         </div>
       ) : deal.discountAmount ? (
         <div className="flex items-center gap-1.5">
           <Tag className="w-4 h-4 text-gray-600" />
+          <span className="text-[10px] text-gray-400">up to</span>
           <span className="text-lg font-bold text-gray-900">${deal.discountAmount}</span>
           <span className="text-[10px] text-gray-400">off</span>
         </div>
@@ -664,7 +667,7 @@ function MenuItemRow({ item, deal }: { item: any; deal: Deal }) {
         <div className="flex items-center gap-1.5">
           <span className="text-emerald-600 font-semibold text-xs">${item.price}</span>
           {deal.discountPercentage != null && deal.discountPercentage > 0 && (
-            <Badge className="bg-brand-primary-600 text-white text-[9px] px-1.5 py-0">{deal.discountPercentage}% OFF</Badge>
+            <Badge className="bg-brand-primary-600 text-white text-[9px] px-1.5 py-0">UP TO {deal.discountPercentage}% OFF</Badge>
           )}
         </div>
       </div>
@@ -707,6 +710,7 @@ function IncentiveOverlay({
                 </div>
               ) : dtype === 'redeem' ? (
                 <div className="text-center space-y-2">
+                  <p className="text-white/60 text-xs font-semibold uppercase tracking-[0.2em]">Up to</p>
                   <span className="text-5xl font-bold text-emerald-400">{deal.discountPercentage || 50}%</span>
                   <p className="text-white/80 text-base">OFF YOUR BILL</p>
                   {deal.discountAmount != null && <p className="text-white/50 text-[11px]">Up to ${deal.discountAmount} discount</p>}
@@ -723,6 +727,7 @@ function IncentiveOverlay({
                 <div className="text-center space-y-2">
                   {deal.discountPercentage ? (
                     <>
+                      <p className="text-white/60 text-xs font-semibold uppercase tracking-[0.2em]">Up to</p>
                       <span className="text-5xl font-bold text-white">{deal.discountPercentage}%</span>
                       <p className="text-white/60 text-xs">Discount on this deal</p>
                     </>

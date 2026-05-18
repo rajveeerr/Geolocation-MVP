@@ -170,7 +170,7 @@ const MenuItemsSection = ({ menuItems }: { menuItems: DetailedDeal['menuItems'] 
                     <h4 className="font-semibold text-neutral-900">{item.name}</h4>
                     {hasDiscount && (
                       <span className="flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
-                        {discountPercent}% OFF
+                        UP TO {discountPercent}% OFF
                       </span>
                     )}
                   </div>
@@ -378,14 +378,25 @@ export const EnhancedDealDetailPage = () => {
       subtitle?: string | null;
       expiresAt: string;
     } | null;
+    checkInReward?: {
+      id: number;
+      rewardType: string;
+      rewardValue: number;
+      rewardLabel?: string | null;
+      imageUrl?: string | null;
+      claimCode: string;
+      expiresAt?: string | null;
+      createdAt: string;
+    } | null;
   } | null>(null);
   const { isCheckingIn, checkIn } = useCheckIn({
-    onSuccess: ({ pointsEarned, eligibleRewards, lotteryEntry, gameSession }) => {
+    onSuccess: ({ pointsEarned, eligibleRewards, lotteryEntry, gameSession, checkInReward }) => {
       setCheckInResult({
         pointsEarned,
         eligibleRewards,
         lotteryEntry,
         gameSession,
+        checkInReward,
       });
       setShowCheckInModal(true);
     },
@@ -629,12 +640,12 @@ export const EnhancedDealDetailPage = () => {
                   )}
                   {deal.discountPercentage && (
                     <span className="text-lg font-semibold text-green-600">
-                      {deal.discountPercentage}% OFF
+                      UP TO {deal.discountPercentage}% OFF
                     </span>
                   )}
                   {deal.discountAmount && !deal.discountPercentage && (
                     <span className="text-lg font-semibold text-green-600">
-                      ${deal.discountAmount} OFF
+                      UP TO ${deal.discountAmount} OFF
                     </span>
                   )}
                 </div>
@@ -917,6 +928,7 @@ export const EnhancedDealDetailPage = () => {
           eligibleRewards={checkInResult?.eligibleRewards || []}
           lotteryEntry={checkInResult?.lotteryEntry || null}
           gameSession={checkInResult?.gameSession || null}
+          checkInReward={checkInResult?.checkInReward || null}
           onCheckOut={() => {
             setShowCheckInModal(false);
             setCheckInResult(null);

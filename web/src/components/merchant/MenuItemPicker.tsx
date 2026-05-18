@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Check, Loader2, Search } from 'lucide-react';
+import { Check, CircleDot, Loader2, Search } from 'lucide-react';
 import { useMerchantMenu, type MenuItem } from '@/hooks/useMerchantMenu';
 import { cn } from '@/lib/utils';
 
@@ -8,14 +8,24 @@ interface MenuItemPickerProps {
   value: number[];
   onChange: (next: number[]) => void;
   emptyHint?: string;
+  /** 'multi' (default) lets the merchant select many; 'single' enforces at most one. */
+  mode?: 'multi' | 'single';
+  /** Optional max-height override for the scrolling list. */
+  maxHeightClass?: string;
 }
 
 /**
- * Compact multi-select for the merchant's own menu items. Lets the merchant
- * scope a deal (bounty / BOGO / etc.) to specific items inline, without
- * navigating through the multi-step deal creation flow.
+ * Compact picker for the merchant's own menu items. Multi-select by default
+ * (used in the deal creation flow); switch to single-select via mode='single'
+ * for cases like the check-in reward configurator where only one item is picked.
  */
-export const MenuItemPicker = ({ value, onChange, emptyHint }: MenuItemPickerProps) => {
+export const MenuItemPicker = ({
+  value,
+  onChange,
+  emptyHint,
+  mode = 'multi',
+  maxHeightClass = 'max-h-56',
+}: MenuItemPickerProps) => {
   const { data, isLoading, error } = useMerchantMenu();
   const [query, setQuery] = useState('');
 
@@ -32,6 +42,10 @@ export const MenuItemPicker = ({ value, onChange, emptyHint }: MenuItemPickerPro
 
   const selected = new Set(value);
   const toggle = (id: number) => {
+    if (mode === 'single') {
+      onChange(selected.has(id) ? [] : [id]);
+      return;
+    }
     if (selected.has(id)) {
       onChange(value.filter((v) => v !== id));
     } else {
@@ -76,7 +90,7 @@ export const MenuItemPicker = ({ value, onChange, emptyHint }: MenuItemPickerPro
           className="h-8 w-full bg-transparent pl-7 text-sm outline-none placeholder:text-neutral-400"
         />
       </div>
-      <div className="max-h-56 overflow-y-auto p-1">
+      <div className={cn('overflow-y-auto p-1', maxHeightClass)}>
         {filtered.length === 0 ? (
           <div className="px-3 py-4 text-center text-xs text-neutral-500">
             No items match “{query}”.
@@ -91,19 +105,41 @@ export const MenuItemPicker = ({ value, onChange, emptyHint }: MenuItemPickerPro
                 onClick={() => toggle(item.id)}
                 className={cn(
                   'flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left transition',
-                  isSelected ? 'bg-orange-50' : 'hover:bg-neutral-50',
+                  isSelected
+                    ? mode === 'single'
+                      ? 'bg-emerald-50'
+                      : 'bg-orange-50'
+                    : 'hover:bg-neutral-50',
                 )}
               >
-                <span
-                  className={cn(
-                    'flex h-5 w-5 shrink-0 items-center justify-center rounded border',
-                    isSelected
-                      ? 'border-orange-500 bg-orange-500 text-white'
-                      : 'border-neutral-300 bg-white',
-                  )}
-                >
-                  {isSelected ? <Check className="h-3.5 w-3.5" /> : null}
-                </span>
+                {mode === 'single' ? (
+                  <span
+                    className={cn(
+                      'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border',
+                      isSelected
+                        ? 'border-emerald-500 bg-emerald-500 text-white'
+                        : 'border-neutral-300 bg-white',
+                    )}
+                  >
+                    {isSelected ? <CircleDot className="h-3.5 w-3.5" /> : null}
+                  </span>
+                ) : (
+                  <span
+                    className={cn(
+                      'flex h-5 w-5 shrink-0 items-center justify-center rounded border',
+                      isSelected
+                        ? 'border-orange-500 bg-orange-500 text-white'
+                        : 'border-neutral-300 bg-white',
+                    )}
+                  >
+                    {isSelected ? <Check className="h-3.5 w-3.5" /> : null}
+                  </span>
+                )}
+                {item.imageUrl ? (
+                  <span className="h-8 w-8 shrink-0 overflow-hidden rounded-md bg-neutral-100">
+                    <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
+                  </span>
+                ) : null}
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span className="truncate text-sm font-medium text-neutral-900">
                     {item.name}
@@ -121,9 +157,13 @@ export const MenuItemPicker = ({ value, onChange, emptyHint }: MenuItemPickerPro
         )}
       </div>
       <div className="border-t border-neutral-200 px-3 py-2 text-[11px] text-neutral-500">
-        {value.length === 0
-          ? 'No items selected — deal will apply broadly.'
-          : `${value.length} item${value.length === 1 ? '' : 's'} selected`}
+        {mode === 'single'
+          ? value.length === 0
+            ? 'Pick the item the discount will apply to.'
+            : '1 item selected.'
+          : value.length === 0
+            ? 'No items selected — deal will apply broadly.'
+            : `${value.length} item${value.length === 1 ? '' : 's'} selected`}
       </div>
     </div>
   );

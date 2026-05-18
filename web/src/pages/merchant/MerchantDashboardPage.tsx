@@ -84,15 +84,15 @@ const DealCard = ({ deal }: { deal: Deal }) => {
         <div className="flex items-center gap-2">
           <CalendarIcon className="h-4 w-4 text-neutral-500" />
           <span className="text-xs text-neutral-600">
-            {new Date(deal.startTime).toLocaleDateString()} -{' '}
-            {new Date(deal.endTime).toLocaleDateString()}
+            {new Date(deal.startTime).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })} -{' '}
+            {new Date(deal.endTime).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
           </span>
         </div>
 
         <div className="flex items-center gap-2">
           <ClockIcon className="h-4 w-4 text-neutral-500" />
           <span className="text-xs text-neutral-600">
-            Created {new Date(deal.createdAt).toLocaleDateString()}
+            Created {new Date(deal.createdAt).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
           </span>
         </div>
       </div>

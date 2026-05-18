@@ -93,7 +93,7 @@ function OrderRow({ order }: { order: MerchantCateringOrder }) {
             )}
             {meta.eventDate && (
               <span className="inline-flex items-center gap-1">
-                <Calendar className="h-3 w-3" /> Event {new Date(meta.eventDate).toLocaleDateString()}
+                <Calendar className="h-3 w-3" /> Event {new Date(meta.eventDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
               </span>
             )}
             {fulfillmentType === 'DELIVERY' && meta.deliveryAddress && (

@@ -3,7 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/services/api';
 import { useAuth } from '@/context/useAuth';
 
-interface MerchantStatus {
+export type MerchantTier = 'FREE' | 'PRO' | 'ENTERPRISE';
+
+export interface MerchantStatus {
   id: number;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   businessName: string;
@@ -13,6 +15,7 @@ interface MerchantStatus {
   logoUrl?: string;
   phoneNumber?: string;
   city?: string;
+  tier?: MerchantTier;
   createdAt: string;
   updatedAt: string;
 }

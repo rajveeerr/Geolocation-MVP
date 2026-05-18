@@ -58,7 +58,7 @@ export function dealToDetailedDeal(d: Deal): DetailedDeal {
     },
     imageUrl: images[0] || null,
     images,
-    offerDisplay: d.dealValue || `${d.discountPercentage ?? 0}% OFF`,
+    offerDisplay: d.dealValue || `UP TO ${d.discountPercentage ?? 0}% OFF`,
     discountPercentage: d.discountPercentage ?? null,
     discountAmount: d.discountAmount ?? null,
     offerTerms: d.offerTerms ?? null,

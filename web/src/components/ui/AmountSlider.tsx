@@ -215,10 +215,16 @@ export const AmountSlider: React.FC<AmountSliderProps> = ({
         {/* Slider Handle */}
         <motion.div
           className={cn(
-            'absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full shadow-lg border-2 border-brand-primary-500 cursor-grab active:cursor-grabbing flex items-center justify-center',
+            'absolute w-6 h-6 bg-white rounded-full shadow-lg border-2 border-brand-primary-500 cursor-grab active:cursor-grabbing flex items-center justify-center',
             disabled && 'opacity-50 cursor-not-allowed'
           )}
-          style={{ left: `calc(${percentage}% - 12px)` }}
+          // Centre vertically via geometry (top instead of translateY) so
+          // framer-motion can manage transforms (whileHover scale, etc.)
+          // without overwriting the centering.
+          style={{
+            top: 'calc(50% - 12px)',
+            left: `calc(${percentage}% - 12px)`,
+          }}
           initial={false}
           animate={{ left: `calc(${percentage}% - 12px)` }}
           transition={{ duration: isDragging ? 0 : 0.2 }}

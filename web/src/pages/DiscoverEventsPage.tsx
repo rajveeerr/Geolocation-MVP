@@ -576,6 +576,7 @@ export function DiscoverEventsPage() {
                     </label>
                     <input
                       type="date"
+                      lang="en-US"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
                       className="px-3 py-2 bg-white border border-neutral-200 rounded-lg text-sm text-[#1a1a2e] focus:outline-none focus:border-[#B91C1C]"
@@ -587,6 +588,7 @@ export function DiscoverEventsPage() {
                     </label>
                     <input
                       type="date"
+                      lang="en-US"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
                       className="px-3 py-2 bg-white border border-neutral-200 rounded-lg text-sm text-[#1a1a2e] focus:outline-none focus:border-[#B91C1C]"

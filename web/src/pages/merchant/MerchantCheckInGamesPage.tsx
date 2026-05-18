@@ -1,974 +1,1035 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  ArrowLeft,
+  ArrowRight,
+  Ban,
   CheckCircle2,
-  CircleDot,
   Coins,
-  Eye,
   Gift,
-  Image as ImageIcon,
-  Plus,
+  Globe,
+  Loader2,
+  Percent,
+  Pencil,
   Sparkles,
-  Ticket,
+  Target,
   Trash2,
-  X,
+  Utensils,
 } from 'lucide-react';
 import { Button } from '@/components/common/Button';
-import { ImageUploadModal } from '@/components/common/ImageUploadModal';
-import {
-  useMerchantCheckInGameAnalytics,
-  useMerchantCheckInGameConfig,
-  useSaveMerchantCheckInGameConfig,
-  type MerchantCheckInGameConfig,
-  type MerchantCheckInGameReward,
-} from '@/hooks/useCheckInGames';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { MenuItemPicker } from '@/components/merchant/MenuItemPicker';
+import { useMerchantStatus } from '@/hooks/useMerchantStatus';
+import { useMerchantMenu, type MenuItem } from '@/hooks/useMerchantMenu';
 import { useToast } from '@/hooks/use-toast';
+import { apiDelete, apiGet, apiPatch } from '@/services/api';
+import { PATHS } from '@/routing/paths';
 import { cn } from '@/lib/utils';
 
-const GAME_TYPES: MerchantCheckInGameConfig['gameType'][] = ['SCRATCH_CARD', 'SPIN_WHEEL', 'PICK_A_CARD'];
-const REWARD_TYPES: MerchantCheckInGameReward['rewardType'][] = [
+type CheckInRewardType =
+  | 'DISCOUNT_PERCENTAGE'
+  | 'DISCOUNT_FIXED'
+  | 'FREE_ITEM'
+  | 'BONUS_POINTS';
+
+// Wizard-only sentinel. Saved to the backend as isEnabled: false (no rewardType used).
+type WizardRewardChoice = CheckInRewardType | 'NONE';
+
+const ITEM_BASED_TYPES: WizardRewardChoice[] = ['DISCOUNT_PERCENTAGE', 'DISCOUNT_FIXED', 'FREE_ITEM'];
+const POINT_PRESETS = [50, 100, 200, 500] as const;
+
+type Scope = 'default' | 'deal';
+
+interface MerchantDeal {
+  id: number;
+  title: string;
+  description?: string | null;
+  startTime: string;
+  endTime: string;
+  dealType?: { name?: string | null } | null;
+  isExpired?: boolean;
+  isUpcoming?: boolean;
+  currentRedemptions?: number;
+}
+
+interface ConfiguredReward {
+  id: number;
+  label: string;
+  imageUrl: string | null;
+  rewardType: CheckInRewardType;
+  rewardValue: number;
+  rewardLabel: string | null;
+  isActive: boolean;
+  maxWins: number | null;
+  currentWins: number;
+  dealId: number | null;
+  menuItemId: number | null;
+  menuItem: { id: number; name: string; imageUrl: string | null; price: number; category: string | null } | null;
+}
+
+interface RewardsConfigResponse {
+  rewards: ConfiguredReward[];
+}
+
+const panelClass =
+  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
+
+const REWARD_CHOICE_LABEL: Record<WizardRewardChoice, string> = {
+  DISCOUNT_PERCENTAGE: 'Percent off',
+  DISCOUNT_FIXED: 'Fixed amount off',
+  FREE_ITEM: 'Free item',
+  BONUS_POINTS: 'Bonus points',
+  NONE: 'No reward',
+};
+
+const REWARD_CHOICE_HINT: Record<WizardRewardChoice, string> = {
+  DISCOUNT_PERCENTAGE: 'A percentage off the menu item you pick.',
+  DISCOUNT_FIXED: 'A flat dollar amount off the menu item you pick.',
+  FREE_ITEM: 'Give the item away for free.',
+  BONUS_POINTS: 'Credit the customer with loyalty points. Comes in 50 / 100 / 200 / 500 packs.',
+  NONE: "Customers checking in to this deal get no automatic reward — and it won't fall back to the default.",
+};
+
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+
+const dealState = (deal: MerchantDeal) => {
+  if (deal.isExpired) return { label: 'Expired', tone: 'bg-neutral-100 text-neutral-600 ring-neutral-400/20' };
+  if (deal.isUpcoming) return { label: 'Scheduled', tone: 'bg-sky-100 text-sky-700 ring-sky-600/20' };
+  return { label: 'Active', tone: 'bg-emerald-100 text-emerald-700 ring-emerald-600/20' };
+};
+
+const describeReward = (reward: ConfiguredReward) => {
+  if (!reward.isActive) return 'No reward';
+  if (reward.rewardLabel) return reward.rewardLabel;
+  const name = reward.menuItem?.name ?? reward.label;
+  if (reward.rewardType === 'DISCOUNT_PERCENTAGE') return `${Math.round(reward.rewardValue)}% off ${name}`;
+  if (reward.rewardType === 'DISCOUNT_FIXED') return `$${Math.round(reward.rewardValue)} off ${name}`;
+  if (reward.rewardType === 'BONUS_POINTS') return `${Math.round(reward.rewardValue)} bonus points`;
+  return `Free ${name}`;
+};
+
+interface WizardState {
+  scope: Scope;
+  dealId: number | null;
+  menuItemId: number | null;
+  rewardChoice: WizardRewardChoice;
+  rewardValue: string;
+  rewardExpiryHours: string;
+  maxWins: string;
+  editingRewardId: number | null;
+}
+
+const emptyWizard: WizardState = {
+  scope: 'default',
+  dealId: null,
+  menuItemId: null,
+  rewardChoice: 'DISCOUNT_PERCENTAGE',
+  rewardValue: '20',
+  rewardExpiryHours: '24',
+  maxWins: '',
+  editingRewardId: null,
+};
+
+const wizardFromReward = (reward: ConfiguredReward): WizardState => ({
+  scope: reward.dealId == null ? 'default' : 'deal',
+  dealId: reward.dealId,
+  menuItemId: reward.menuItemId,
+  rewardChoice: reward.isActive ? reward.rewardType : 'NONE',
+  rewardValue:
+    !reward.isActive || reward.rewardType === 'FREE_ITEM' ? '0' : String(reward.rewardValue ?? ''),
+  rewardExpiryHours: '24',
+  maxWins: reward.maxWins != null ? String(reward.maxWins) : '',
+  editingRewardId: reward.id,
+});
+
+const requiresItem = (choice: WizardRewardChoice) => ITEM_BASED_TYPES.includes(choice);
+const requiresValueInput = (choice: WizardRewardChoice) =>
+  choice === 'DISCOUNT_PERCENTAGE' || choice === 'DISCOUNT_FIXED' || choice === 'BONUS_POINTS';
+
+const STEP_LABELS = ['Scope', 'Reward', 'Details'] as const;
+
+function StepIndicator({ step }: { step: 1 | 2 | 3 }) {
+  return (
+    <div className="flex items-center gap-2">
+      {STEP_LABELS.map((label, index) => {
+        const n = (index + 1) as 1 | 2 | 3;
+        const state = n < step ? 'done' : n === step ? 'current' : 'upcoming';
+        return (
+          <div key={label} className="flex items-center gap-2">
+            <div
+              className={cn(
+                'flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ring-1 ring-inset transition',
+                state === 'done' && 'bg-emerald-600 text-white ring-emerald-600',
+                state === 'current' && 'bg-emerald-50 text-emerald-700 ring-emerald-300',
+                state === 'upcoming' && 'bg-neutral-100 text-neutral-500 ring-neutral-200',
+              )}
+            >
+              {state === 'done' ? <CheckCircle2 className="h-4 w-4" /> : n}
+            </div>
+            <div
+              className={cn(
+                'text-xs font-semibold uppercase tracking-[0.18em]',
+                state === 'upcoming' ? 'text-neutral-400' : 'text-neutral-700',
+              )}
+            >
+              {label}
+            </div>
+            {n < 3 && <div className="h-px w-6 bg-neutral-200" aria-hidden />}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ScopeStep({
+  scope,
+  dealId,
+  deals,
+  alreadyConfiguredDealIds,
+  onScopeChange,
+  onDealChange,
+}: {
+  scope: Scope;
+  dealId: number | null;
+  deals: MerchantDeal[];
+  alreadyConfiguredDealIds: Set<number>;
+  onScopeChange: (next: Scope) => void;
+  onDealChange: (next: number | null) => void;
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <button
+          type="button"
+          onClick={() => onScopeChange('default')}
+          className={cn(
+            'flex items-start gap-3 rounded-2xl border bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.06)]',
+            scope === 'default' ? 'border-emerald-300 ring-2 ring-emerald-200' : 'border-neutral-200',
+          )}
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 ring-1 ring-inset ring-emerald-200">
+            <Globe className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="text-sm font-bold text-neutral-900">Default for all deals</div>
+            <p className="mt-1 text-xs text-neutral-500">
+              Applies to every deal where you haven’t set up a specific check-in reward.
+            </p>
+          </div>
+        </button>
+        <button
+          type="button"
+          onClick={() => onScopeChange('deal')}
+          className={cn(
+            'flex items-start gap-3 rounded-2xl border bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.06)]',
+            scope === 'deal' ? 'border-emerald-300 ring-2 ring-emerald-200' : 'border-neutral-200',
+          )}
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-100 text-sky-700 ring-1 ring-inset ring-sky-200">
+            <Target className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="text-sm font-bold text-neutral-900">Specific deal</div>
+            <p className="mt-1 text-xs text-neutral-500">
+              Override the default with a unique check-in reward for one of your deals.
+            </p>
+          </div>
+        </button>
+      </div>
+
+      {scope === 'deal' && (
+        <div className={cn(panelClass, 'p-4')}>
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-sm font-semibold text-neutral-900">Pick a deal</div>
+              <p className="text-xs text-neutral-500">Expired deals can’t receive new rewards.</p>
+            </div>
+            <div className="rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-neutral-600 ring-1 ring-inset ring-neutral-200">
+              {deals.filter((d) => !d.isExpired).length} available
+            </div>
+          </div>
+          <div className="mt-3 grid gap-2 max-h-[320px] overflow-y-auto pr-1 sm:grid-cols-2">
+            {deals
+              .filter((deal) => !deal.isExpired)
+              .map((deal) => {
+                const selected = deal.id === dealId;
+                const status = dealState(deal);
+                const alreadyConfigured = alreadyConfiguredDealIds.has(deal.id);
+                return (
+                  <button
+                    key={deal.id}
+                    type="button"
+                    onClick={() => onDealChange(deal.id)}
+                    className={cn(
+                      'flex flex-col gap-2 rounded-2xl border bg-white p-3 text-left transition hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.06)]',
+                      selected ? 'border-emerald-300 ring-2 ring-emerald-200' : 'border-neutral-200',
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-semibold text-neutral-900">{deal.title}</div>
+                        <div className="mt-0.5 text-[11px] text-neutral-500">
+                          {formatDate(deal.startTime)} → {formatDate(deal.endTime)}
+                        </div>
+                      </div>
+                      <span
+                        className={cn(
+                          'inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset',
+                          status.tone,
+                        )}
+                      >
+                        {status.label}
+                      </span>
+                    </div>
+                    {alreadyConfigured && (
+                      <div className="inline-flex items-center gap-1 self-start rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-200">
+                        <CheckCircle2 className="h-3 w-3" /> Has reward
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            {deals.filter((deal) => !deal.isExpired).length === 0 && (
+              <div className="col-span-full rounded-2xl border border-dashed border-neutral-200 p-6 text-center text-sm text-neutral-500">
+                You have no active or upcoming deals.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const CHOICE_ICON: Record<WizardRewardChoice, typeof Percent> = {
+  DISCOUNT_PERCENTAGE: Percent,
+  DISCOUNT_FIXED: Gift,
+  FREE_ITEM: Sparkles,
+  BONUS_POINTS: Coins,
+  NONE: Ban,
+};
+
+const REWARD_CHOICE_ORDER: WizardRewardChoice[] = [
   'DISCOUNT_PERCENTAGE',
   'DISCOUNT_FIXED',
   'FREE_ITEM',
-  'COINS',
   'BONUS_POINTS',
-];
-const ALLOWED_PERCENTAGE_REWARD_VALUES = [50, 60] as const;
-
-const formatPercentageRewardLabel = (value: number) => `UP TO ${value}% OFF`;
-const formatPercentageRewardTitle = (value: number) => `Up to ${value}% Off`;
-
-type CheckInGamePreset = {
-  id: string;
-  name: string;
-  description: string;
-  badge: string;
-  config: Pick<
-    MerchantCheckInGameConfig,
-    'gameType' | 'title' | 'subtitle' | 'cooldownMinutes' | 'rewardExpiryHours'
-  > & {
-    rewards: MerchantCheckInGameReward[];
-  };
-};
-
-const createEmptyReward = (): MerchantCheckInGameReward => ({
-  label: '',
-  imageUrl: '',
-  rewardType: 'DISCOUNT_PERCENTAGE',
-  rewardValue: 50,
-  rewardLabel: '',
-  probabilityWeight: 1,
-  isActive: true,
-});
-
-const CHECK_IN_GAME_PRESETS: CheckInGamePreset[] = [
-  {
-    id: 'daily-delight',
-    name: 'Daily delight',
-    badge: 'Balanced',
-    description: 'A dependable everyday setup with a mix of small wins and one standout reward.',
-    config: {
-      gameType: 'SPIN_WHEEL',
-      title: "Spin for today's surprise",
-      subtitle: 'Every check-in could unlock a fresh perk before you leave.',
-      cooldownMinutes: 0,
-      rewardExpiryHours: 24,
-      rewards: [
-        { label: 'Up to $10 Off', rewardType: 'DISCOUNT_FIXED', rewardValue: 10, rewardLabel: 'UP TO $10 OFF', probabilityWeight: 5, isActive: true },
-        { label: '10 Coins', rewardType: 'COINS', rewardValue: 10, rewardLabel: '10 Bonus Coins', probabilityWeight: 4, isActive: true },
-        { label: formatPercentageRewardTitle(50), rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 50, rewardLabel: formatPercentageRewardLabel(50), probabilityWeight: 2, isActive: true },
-        { label: 'Free Drink', rewardType: 'FREE_ITEM', rewardValue: 1, rewardLabel: 'Free Drink', probabilityWeight: 1, isActive: true },
-      ],
-    },
-  },
-  {
-    id: 'vip-burst',
-    name: 'VIP burst',
-    badge: 'Premium',
-    description: 'A higher-impact reveal meant for premium brands and special customer moments.',
-    config: {
-      gameType: 'PICK_A_CARD',
-      title: 'Pick your VIP reward',
-      subtitle: 'Choose a card and unlock an elevated check-in bonus.',
-      cooldownMinutes: 60,
-      rewardExpiryHours: 48,
-      rewards: [
-        { label: 'Up to $20 Off', rewardType: 'DISCOUNT_FIXED', rewardValue: 20, rewardLabel: 'UP TO $20 OFF', probabilityWeight: 4, isActive: true },
-        { label: formatPercentageRewardTitle(60), rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 60, rewardLabel: formatPercentageRewardLabel(60), probabilityWeight: 2, isActive: true },
-        { label: '25 Coins', rewardType: 'COINS', rewardValue: 25, rewardLabel: '25 Bonus Coins', probabilityWeight: 2, isActive: true },
-        { label: 'Free Dessert', rewardType: 'FREE_ITEM', rewardValue: 1, rewardLabel: 'Free Dessert', probabilityWeight: 1, isActive: true },
-      ],
-    },
-  },
-  {
-    id: 'quick-scratch',
-    name: 'Quick scratch',
-    badge: 'Fast',
-    description: 'A lightweight scratch-card flow for fast-moving queues and instant gratification.',
-    config: {
-      gameType: 'SCRATCH_CARD',
-      title: 'Scratch to reveal your reward',
-      subtitle: 'A quick post check-in surprise with fast wins.',
-      cooldownMinutes: 15,
-      rewardExpiryHours: 12,
-      rewards: [
-        { label: '5 Coins', rewardType: 'COINS', rewardValue: 5, rewardLabel: '5 Bonus Coins', probabilityWeight: 5, isActive: true },
-        { label: formatPercentageRewardTitle(50), rewardType: 'DISCOUNT_PERCENTAGE', rewardValue: 50, rewardLabel: formatPercentageRewardLabel(50), probabilityWeight: 4, isActive: true },
-        { label: 'Up to $8 Off', rewardType: 'DISCOUNT_FIXED', rewardValue: 8, rewardLabel: 'UP TO $8 OFF', probabilityWeight: 2, isActive: true },
-        { label: 'Free Add-on', rewardType: 'FREE_ITEM', rewardValue: 1, rewardLabel: 'Free Add-on', probabilityWeight: 1, isActive: true },
-      ],
-    },
-  },
+  'NONE',
 ];
 
-const cloneReward = (reward: MerchantCheckInGameReward): MerchantCheckInGameReward => ({ ...reward });
-
-const sanitizePercentageRewardValue = (value: number) =>
-  ALLOWED_PERCENTAGE_REWARD_VALUES.includes(value as (typeof ALLOWED_PERCENTAGE_REWARD_VALUES)[number])
-    ? value
-    : ALLOWED_PERCENTAGE_REWARD_VALUES[0];
-
-const sanitizeReward = (reward: MerchantCheckInGameReward): MerchantCheckInGameReward =>
-  reward.rewardType === 'DISCOUNT_PERCENTAGE'
-    ? { ...reward, rewardValue: sanitizePercentageRewardValue(Number(reward.rewardValue) || 0) }
-    : reward;
-
-const normalizeReward = (reward: MerchantCheckInGameReward) => ({
-  label: reward.label.trim(),
-  rewardType: reward.rewardType,
-  rewardValue:
-    reward.rewardType === 'DISCOUNT_PERCENTAGE'
-      ? sanitizePercentageRewardValue(Number(reward.rewardValue) || 0)
-      : Number(reward.rewardValue) || 0,
-  rewardLabel: reward.rewardLabel?.trim() || '',
-  probabilityWeight: Number(reward.probabilityWeight) || 0,
-  isActive: reward.isActive,
-  imageUrl: reward.imageUrl?.trim() || '',
-});
-
-const getMatchingPresetId = (config: MerchantCheckInGameConfig | null) => {
-  if (!config) return 'custom';
-
-  const normalizedRewards = config.rewards.map(normalizeReward);
-
-  const matchedPreset = CHECK_IN_GAME_PRESETS.find((preset) => {
-    if (
-      preset.config.gameType !== config.gameType ||
-      preset.config.title !== config.title ||
-      (preset.config.subtitle || '') !== (config.subtitle || '') ||
-      preset.config.cooldownMinutes !== config.cooldownMinutes ||
-      preset.config.rewardExpiryHours !== config.rewardExpiryHours ||
-      preset.config.rewards.length !== normalizedRewards.length
-    ) {
-      return false;
-    }
-
-    return preset.config.rewards.every((reward, index) => {
-      const currentReward = normalizedRewards[index];
-      const presetReward = normalizeReward(reward);
-
-      return JSON.stringify(currentReward) === JSON.stringify(presetReward);
-    });
-  });
-
-  return matchedPreset?.id || 'custom';
-};
-
-const gameTypeCopy: Record<
-  MerchantCheckInGameConfig['gameType'],
-  { title: string; description: string; previewTitle: string }
-> = {
-  SCRATCH_CARD: {
-    title: 'Scratch card',
-    description: 'Best for fast reveal moments and strong reward anticipation.',
-    previewTitle: 'Swipe-to-reveal reward',
-  },
-  SPIN_WHEEL: {
-    title: 'Spin wheel',
-    description: 'Best for visual excitement and larger promo-style campaigns.',
-    previewTitle: 'Big reveal wheel',
-  },
-  PICK_A_CARD: {
-    title: 'Pick a card',
-    description: 'Best for a simple and premium-feeling choose-your-luck flow.',
-    previewTitle: 'Choose-your-luck reveal',
-  },
-};
-
-const rewardTypeLabels: Record<MerchantCheckInGameReward['rewardType'], string> = {
-  DISCOUNT_PERCENTAGE: 'Percent off',
-  DISCOUNT_FIXED: 'Fixed discount',
-  FREE_ITEM: 'Free item',
-  COINS: 'Coins',
-  BONUS_POINTS: 'Bonus points',
-};
-
-const editorInputClass =
-  'w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100';
-
-const editorFieldLabelClass =
-  'mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-500';
-
-const StatCard = ({
-  label,
-  value,
-  tone = 'neutral',
+function RewardTypeStep({
+  rewardChoice,
+  menuItemId,
+  onChoiceChange,
+  onMenuItemChange,
 }: {
-  label: string;
-  value: string;
-  tone?: 'neutral' | 'brand' | 'green';
-}) => {
-  const toneClasses =
-    tone === 'brand'
-      ? 'bg-brand-primary-50 text-brand-primary-700 border-brand-primary-100'
-      : tone === 'green'
-        ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-        : 'bg-white text-neutral-900 border-neutral-200';
-
+  rewardChoice: WizardRewardChoice;
+  menuItemId: number | null;
+  onChoiceChange: (next: WizardRewardChoice) => void;
+  onMenuItemChange: (next: number | null) => void;
+}) {
   return (
-    <div className={cn('rounded-2xl border p-5 shadow-sm', toneClasses)}>
-      <div className="text-sm font-medium text-neutral-500">{label}</div>
-      <div className="mt-2 text-3xl font-black tracking-tight">{value}</div>
+    <div className="space-y-5">
+      <div>
+        <Label className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">Reward type</Label>
+        <div className="mt-2 grid gap-2 sm:grid-cols-3 lg:grid-cols-5">
+          {REWARD_CHOICE_ORDER.map((choice) => {
+            const isActive = choice === rewardChoice;
+            const Icon = CHOICE_ICON[choice];
+            return (
+              <button
+                key={choice}
+                type="button"
+                onClick={() => onChoiceChange(choice)}
+                className={cn(
+                  'flex flex-col items-start gap-1.5 rounded-2xl border bg-white p-3 text-left transition hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.06)]',
+                  isActive ? 'border-emerald-300 ring-2 ring-emerald-200' : 'border-neutral-200',
+                  choice === 'NONE' && isActive && 'border-neutral-400 ring-neutral-300',
+                )}
+              >
+                <Icon
+                  className={cn('h-5 w-5', isActive ? (choice === 'NONE' ? 'text-neutral-700' : 'text-emerald-600') : 'text-neutral-500')}
+                  aria-hidden
+                />
+                <div className="text-sm font-semibold text-neutral-900">{REWARD_CHOICE_LABEL[choice]}</div>
+                <div className="text-[11px] leading-snug text-neutral-500">{REWARD_CHOICE_HINT[choice]}</div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {requiresItem(rewardChoice) && (
+        <div>
+          <Label className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">Menu item</Label>
+          <div className="mt-2">
+            <MenuItemPicker
+              mode="single"
+              value={menuItemId == null ? [] : [menuItemId]}
+              onChange={(ids) => onMenuItemChange(ids[0] ?? null)}
+              maxHeightClass="max-h-[320px]"
+              emptyHint="Add an item to your menu first — discount and free-item rewards always apply to a specific menu item."
+            />
+          </div>
+        </div>
+      )}
+
+      {rewardChoice === 'BONUS_POINTS' && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-3 text-xs text-amber-800">
+          Customers receive these as loyalty points credited to their account at check-in — no claim code or staff handoff needed.
+        </div>
+      )}
+
+      {rewardChoice === 'NONE' && (
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-600">
+          Customers checking in to this deal will get no automatic reward. The merchant default (if any) will NOT apply for this deal.
+        </div>
+      )}
     </div>
   );
-};
+}
 
-const previewRewardLabel = (reward: MerchantCheckInGameReward) => {
-  if (reward.rewardLabel?.trim()) return reward.rewardLabel.trim();
-
-  switch (reward.rewardType) {
-    case 'DISCOUNT_PERCENTAGE':
-      return formatPercentageRewardLabel(reward.rewardValue);
-    case 'DISCOUNT_FIXED':
-      return `$${reward.rewardValue.toFixed(0)} OFF`;
-    case 'COINS':
-      return `${reward.rewardValue.toFixed(0)} Coins`;
-    case 'BONUS_POINTS':
-      return `${reward.rewardValue.toFixed(0)} Points`;
-    case 'FREE_ITEM':
-      return reward.label || 'Free item';
-    default:
-      return reward.label || 'Reward';
-  }
-};
-
-export function MerchantCheckInGamesPage() {
-  const { toast } = useToast();
-  const { data, isLoading } = useMerchantCheckInGameConfig();
-  const { data: analytics } = useMerchantCheckInGameAnalytics();
-  const saveMutation = useSaveMerchantCheckInGameConfig();
-  const [form, setForm] = useState<MerchantCheckInGameConfig | null>(null);
-  const [builderMode, setBuilderMode] = useState<'preset' | 'manual'>('preset');
-  const [selectedPresetId, setSelectedPresetId] = useState<string>('custom');
-  const [uploadRewardIndex, setUploadRewardIndex] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (data) {
-      setForm(data);
-      const matchedPresetId = getMatchingPresetId(data);
-      setSelectedPresetId(matchedPresetId);
-      setBuilderMode(matchedPresetId === 'custom' ? 'manual' : 'preset');
-    }
-  }, [data]);
-
-  const applyPreset = (presetId: string) => {
-    const preset = CHECK_IN_GAME_PRESETS.find((item) => item.id === presetId);
-    if (!preset) return;
-
-    setSelectedPresetId(presetId);
-    setBuilderMode('preset');
-    setForm((current) =>
-      current
-        ? {
-            ...current,
-            gameType: preset.config.gameType,
-            title: preset.config.title,
-            subtitle: preset.config.subtitle,
-            cooldownMinutes: preset.config.cooldownMinutes,
-            rewardExpiryHours: preset.config.rewardExpiryHours,
-            rewards: preset.config.rewards.map(cloneReward),
-          }
-        : current,
-    );
-  };
-
-  const updateReward = (index: number, patch: Partial<MerchantCheckInGameReward>) => {
-    setForm((current) => {
-      if (!current) return current;
-      const rewards = [...current.rewards];
-      rewards[index] = sanitizeReward({ ...rewards[index], ...patch });
-      setSelectedPresetId('custom');
-      setBuilderMode('manual');
-      return { ...current, rewards };
-    });
-  };
-
-  const addReward = () => {
-    setSelectedPresetId('custom');
-    setBuilderMode('manual');
-    setForm((current) => (current ? { ...current, rewards: [...current.rewards, createEmptyReward()] } : current));
-  };
-
-  const removeReward = (index: number) => {
-    setSelectedPresetId('custom');
-    setBuilderMode('manual');
-    setForm((current) => {
-      if (!current) return current;
-      return { ...current, rewards: current.rewards.filter((_, rewardIndex) => rewardIndex !== index) };
-    });
-  };
-
-  const handleRewardImageUpload = (urls: string[]) => {
-    const imageUrl = urls[0];
-    if (uploadRewardIndex === null || !imageUrl) return;
-
-    updateReward(uploadRewardIndex, { imageUrl });
-    setUploadRewardIndex(null);
-  };
-
-  const clearRewardImage = (index: number) => {
-    updateReward(index, { imageUrl: '' });
-  };
-
-  const activeRewards = useMemo(
-    () => (form?.rewards ?? []).filter((reward) => reward.label.trim().length > 0),
-    [form?.rewards],
-  );
-
-  const totalWeight = useMemo(
-    () => activeRewards.reduce((sum, reward) => sum + Math.max(1, Number(reward.probabilityWeight) || 1), 0),
-    [activeRewards],
-  );
-
-  const topRewards = useMemo(
-    () =>
-      [...activeRewards]
-        .sort((a, b) => (Number(b.probabilityWeight) || 1) - (Number(a.probabilityWeight) || 1))
-        .slice(0, 3),
-    [activeRewards],
-  );
-
-  const handleSave = async () => {
-    if (!form) return;
-
-    try {
-      await saveMutation.mutateAsync({
-        ...form,
-        rewards: form.rewards.filter((reward) => reward.label.trim().length > 0).map(sanitizeReward),
-      });
-      toast({ title: 'Saved', description: 'Check-in game settings updated.' });
-    } catch (error: any) {
-      toast({
-        title: 'Save failed',
-        description: error.message || 'Could not update check-in game settings.',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  if (isLoading || !form) {
+function DetailsStep({
+  rewardChoice,
+  rewardValue,
+  rewardExpiryHours,
+  maxWins,
+  onChange,
+}: {
+  rewardChoice: WizardRewardChoice;
+  rewardValue: string;
+  rewardExpiryHours: string;
+  maxWins: string;
+  onChange: (patch: Partial<WizardState>) => void;
+}) {
+  if (rewardChoice === 'NONE') {
     return (
-      <div className="rounded-3xl border border-neutral-200 bg-white p-8 text-sm text-neutral-500 shadow-sm">
-        Loading merchant game settings...
+      <div className={cn(panelClass, 'p-5')}>
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-neutral-700">
+            <Ban className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="text-sm font-bold text-neutral-900">No reward configured</div>
+            <p className="mt-1 text-xs text-neutral-500">
+              Nothing else to set. Click Save and check-ins to this deal won't issue a reward.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
 
-  const selectedGame = gameTypeCopy[form.gameType];
-  const status = !form.isEnabled ? 'draft' : activeRewards.length === 0 ? 'needs_rewards' : 'live';
-  const statusLabel =
-    status === 'live' ? 'Live' : status === 'needs_rewards' ? 'Needs rewards' : 'Draft';
-  const statusClasses =
-    status === 'live'
-      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-      : status === 'needs_rewards'
-        ? 'bg-amber-50 text-amber-700 border-amber-200'
-        : 'bg-neutral-100 text-neutral-700 border-neutral-200';
+  if (rewardChoice === 'FREE_ITEM') {
+    return (
+      <div className="space-y-5">
+        <div className={cn(panelClass, 'p-4 text-sm text-neutral-600')}>
+          <div className="font-semibold text-neutral-900">Free item — no value needed</div>
+          <p className="mt-1 text-xs text-neutral-500">
+            The customer gets the selected menu item free. Set the redemption window below.
+          </p>
+        </div>
+        <ExpiryAndCapInputs
+          rewardExpiryHours={rewardExpiryHours}
+          maxWins={maxWins}
+          onChange={onChange}
+        />
+      </div>
+    );
+  }
+
+  if (rewardChoice === 'BONUS_POINTS') {
+    return (
+      <div className="space-y-5">
+        <div>
+          <Label className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">Quick presets</Label>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {POINT_PRESETS.map((preset) => (
+              <button
+                key={preset}
+                type="button"
+                onClick={() => onChange({ rewardValue: String(preset) })}
+                className={cn(
+                  'rounded-full px-4 py-1.5 text-sm font-semibold ring-1 ring-inset transition',
+                  Number(rewardValue) === preset
+                    ? 'bg-emerald-600 text-white ring-emerald-600'
+                    : 'bg-white text-neutral-700 ring-neutral-200 hover:bg-neutral-50',
+                )}
+              >
+                {preset} pts
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <Label htmlFor="reward-value" className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
+            Custom amount (points)
+          </Label>
+          <div className="mt-2 flex items-center gap-2">
+            <Input
+              id="reward-value"
+              type="number"
+              min={1}
+              step={1}
+              value={rewardValue}
+              onChange={(event) => onChange({ rewardValue: event.target.value })}
+              className="h-11 max-w-[160px]"
+            />
+            <span className="text-sm font-semibold text-neutral-500">pts</span>
+          </div>
+        </div>
+        <ExpiryAndCapInputs
+          rewardExpiryHours={rewardExpiryHours}
+          maxWins={maxWins}
+          onChange={onChange}
+          expiryHidden
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6 pb-8">
-      <section className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm">
-        <div className="bg-gradient-to-r from-[#f6efe6] via-white to-[#eef4ff] px-5 py-6 sm:px-6 sm:py-7">
-          <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-            <div className="max-w-2xl">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-brand-primary-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-brand-primary-700">
-                <Sparkles className="h-3.5 w-3.5" />
-                Check-in Games
-              </div>
-              <h1 className="text-3xl font-black tracking-tight text-neutral-900 sm:text-[2.15rem]">
-                Design your post check-in reward moment
-              </h1>
-              <p className="mt-3 max-w-xl text-sm leading-6 text-neutral-600">
-                Keep the experience playful, on-brand, and easy to redeem. Merchants choose the game type, reward mix,
-                and how often customers can play.
-              </p>
-            </div>
+    <div className="space-y-5">
+      <div>
+        <Label htmlFor="reward-value" className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
+          {rewardChoice === 'DISCOUNT_PERCENTAGE' ? 'Percent off' : 'Dollar amount off'}
+        </Label>
+        <div className="mt-2 flex items-center gap-2">
+          {rewardChoice === 'DISCOUNT_FIXED' && <span className="text-sm font-semibold text-neutral-500">$</span>}
+          <Input
+            id="reward-value"
+            type="number"
+            min={rewardChoice === 'DISCOUNT_PERCENTAGE' ? 1 : 0.5}
+            max={rewardChoice === 'DISCOUNT_PERCENTAGE' ? 100 : undefined}
+            step={rewardChoice === 'DISCOUNT_PERCENTAGE' ? 1 : 0.5}
+            value={rewardValue}
+            onChange={(event) => onChange({ rewardValue: event.target.value })}
+            className="h-11 max-w-[160px]"
+          />
+          {rewardChoice === 'DISCOUNT_PERCENTAGE' && <span className="text-sm font-semibold text-neutral-500">%</span>}
+        </div>
+      </div>
+      <ExpiryAndCapInputs
+        rewardExpiryHours={rewardExpiryHours}
+        maxWins={maxWins}
+        onChange={onChange}
+      />
+    </div>
+  );
+}
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-white/70 bg-white/90 p-4 shadow-sm backdrop-blur">
-                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">Current mode</div>
-                <div className="mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-neutral-800">
-                  <span className={cn('rounded-full border px-3 py-1', statusClasses)}>{statusLabel}</span>
+function ExpiryAndCapInputs({
+  rewardExpiryHours,
+  maxWins,
+  onChange,
+  expiryHidden = false,
+}: {
+  rewardExpiryHours: string;
+  maxWins: string;
+  onChange: (patch: Partial<WizardState>) => void;
+  expiryHidden?: boolean;
+}) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {!expiryHidden && (
+        <div>
+          <Label htmlFor="expiry-hours" className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
+            Expires after (hours)
+          </Label>
+          <Input
+            id="expiry-hours"
+            type="number"
+            min={1}
+            value={rewardExpiryHours}
+            onChange={(event) => onChange({ rewardExpiryHours: event.target.value })}
+            placeholder="24"
+            className="mt-2 h-11"
+          />
+        </div>
+      )}
+      <div>
+        <Label htmlFor="max-wins" className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
+          Total claim cap
+        </Label>
+        <Input
+          id="max-wins"
+          type="number"
+          min={1}
+          value={maxWins}
+          onChange={(event) => onChange({ maxWins: event.target.value })}
+          placeholder="Unlimited"
+          className="mt-2 h-11"
+        />
+      </div>
+    </div>
+  );
+}
+
+function ConfiguredRewardsList({
+  rewards,
+  dealsById,
+  onEdit,
+  onRemove,
+  removingId,
+}: {
+  rewards: ConfiguredReward[];
+  dealsById: Map<number, MerchantDeal>;
+  onEdit: (reward: ConfiguredReward) => void;
+  onRemove: (reward: ConfiguredReward) => void;
+  removingId: number | null;
+}) {
+  if (rewards.length === 0) return null;
+  return (
+    <div className="space-y-3">
+      <div className={cn(panelClass, 'flex items-center justify-between gap-3 p-4')}>
+        <div>
+          <h3 className="text-base font-bold text-neutral-900">Configured rewards</h3>
+          <p className="text-sm text-neutral-500">Customers get one of these on check-in based on which deal they’re at.</p>
+        </div>
+        <div className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-200">
+          {rewards.length}
+        </div>
+      </div>
+      <div className="grid gap-3 lg:grid-cols-2">
+        {rewards.map((reward) => {
+          const isDefault = reward.dealId == null;
+          const deal = !isDefault && reward.dealId != null ? dealsById.get(reward.dealId) : null;
+          return (
+            <div
+              key={reward.id}
+              className={cn(
+                panelClass,
+                'flex items-start gap-3 p-4',
+                !reward.isActive && 'opacity-70',
+              )}
+            >
+              <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
+                {reward.menuItem?.imageUrl || reward.imageUrl ? (
+                  <img
+                    src={reward.menuItem?.imageUrl ?? reward.imageUrl ?? undefined}
+                    alt={reward.menuItem?.name ?? reward.label}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-neutral-400">
+                    <Utensils className="h-5 w-5" />
+                  </div>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span
+                    className={cn(
+                      'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset',
+                      isDefault
+                        ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
+                        : 'bg-sky-50 text-sky-700 ring-sky-200',
+                    )}
+                  >
+                    {isDefault ? <Globe className="h-3 w-3" /> : <Target className="h-3 w-3" />}
+                    {isDefault ? 'Default' : deal?.title ?? `Deal #${reward.dealId}`}
+                  </span>
                 </div>
-                <p className="mt-3 text-sm text-neutral-600">
-                  {status === 'live'
-                    ? 'Customers can immediately play after check-in.'
-                    : status === 'needs_rewards'
-                      ? 'Turn this live by adding at least one named reward.'
-                      : 'This setup is saved, but hidden from customers.'}
-                </p>
+                <div className="mt-1 truncate text-sm font-bold text-neutral-900">
+                  {describeReward(reward)}
+                </div>
+                <div className="mt-0.5 text-[11px] text-neutral-500">
+                  {reward.menuItem?.category ? `${reward.menuItem.category} · ` : ''}
+                  {reward.maxWins != null ? `${reward.currentWins}/${reward.maxWins} claimed` : `${reward.currentWins} claimed`}
+                </div>
               </div>
-              <div className="rounded-2xl border border-white/70 bg-white/90 p-4 shadow-sm backdrop-blur">
-                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">Live setup</div>
-                <div className="mt-2 text-lg font-bold text-neutral-900">{selectedGame.title}</div>
-                <p className="mt-1 max-w-xs text-sm text-neutral-600">{selectedGame.description}</p>
+              <div className="flex flex-col gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => onEdit(reward)}
+                  className="rounded-full p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800"
+                  title="Edit"
+                >
+                  <Pencil className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onRemove(reward)}
+                  disabled={removingId === reward.id}
+                  className="rounded-full p-1.5 text-rose-500 hover:bg-rose-50 hover:text-rose-700 disabled:opacity-60"
+                  title="Remove"
+                >
+                  {removingId === reward.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                </button>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="rounded-2xl bg-brand-primary-50 p-2.5 text-brand-primary-700">
-              <CircleDot className="h-4 w-4" />
-            </div>
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">Status</div>
-              <div className="mt-1 text-base font-bold text-neutral-900">{statusLabel}</div>
-            </div>
-          </div>
-        </div>
-        <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="rounded-2xl bg-neutral-100 p-2.5 text-neutral-700">
-              <Gift className="h-4 w-4" />
-            </div>
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">Reward mix</div>
-              <div className="mt-1 text-base font-bold text-neutral-900">{activeRewards.length} active rewards</div>
-            </div>
-          </div>
-        </div>
-        <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="rounded-2xl bg-neutral-100 p-2.5 text-neutral-700">
-              <Ticket className="h-4 w-4" />
-            </div>
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">Game style</div>
-              <div className="mt-1 text-base font-bold text-neutral-900">{selectedGame.previewTitle}</div>
-            </div>
-          </div>
-        </div>
-        <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="rounded-2xl bg-neutral-100 p-2.5 text-neutral-700">
-              <Eye className="h-4 w-4" />
-            </div>
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">Player promise</div>
-              <div className="mt-1 text-base font-bold text-neutral-900">
-                {form.cooldownMinutes > 0 ? `Replay in ${form.cooldownMinutes} min` : 'Playable every check-in'}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+export function MerchantCheckInGamesPage() {
+  const { data: merchantData } = useMerchantStatus();
+  const merchantStatus = merchantData?.data?.merchant?.status;
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Sessions created" value={`${analytics?.sessions ?? 0}`} />
-        <StatCard label="Games played" value={`${analytics?.playedSessions ?? 0}`} tone="brand" />
-        <StatCard label="Play-through rate" value={`${analytics?.conversionRate ?? 0}%`} tone="green" />
+  const dealsQuery = useQuery({
+    queryKey: ['merchant-deals'],
+    queryFn: () => apiGet<{ deals: MerchantDeal[] }>('/merchants/deals'),
+    enabled: !!merchantStatus && merchantStatus === 'APPROVED',
+  });
+
+  const rewardsQuery = useQuery({
+    queryKey: ['merchant-check-in-rewards-config'],
+    queryFn: () => apiGet<{ success: boolean; data: RewardsConfigResponse }>('/merchants/check-in-rewards/config'),
+    enabled: !!merchantStatus && merchantStatus === 'APPROVED',
+  });
+
+  const menuQuery = useMerchantMenu();
+
+  const deals = useMemo<MerchantDeal[]>(() => dealsQuery.data?.data?.deals ?? [], [dealsQuery.data]);
+  const rewards = useMemo<ConfiguredReward[]>(
+    () => rewardsQuery.data?.data?.data?.rewards ?? [],
+    [rewardsQuery.data],
+  );
+  const menuItems = useMemo<MenuItem[]>(() => menuQuery.data?.menuItems ?? [], [menuQuery.data]);
+  const menuItemById = useMemo(() => new Map(menuItems.map((item) => [item.id, item])), [menuItems]);
+  const dealsById = useMemo(() => new Map(deals.map((deal) => [deal.id, deal])), [deals]);
+
+  const defaultReward = useMemo(() => rewards.find((reward) => reward.dealId == null) ?? null, [rewards]);
+  const dealRewards = useMemo(() => rewards.filter((reward) => reward.dealId != null), [rewards]);
+  const dealRewardsByDealId = useMemo(
+    () => new Set(dealRewards.map((reward) => reward.dealId!)),
+    [dealRewards],
+  );
+
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [wizard, setWizard] = useState<WizardState>(emptyWizard);
+
+  const updateWizard = (patch: Partial<WizardState>) => setWizard((prev) => ({ ...prev, ...patch }));
+
+  const resetWizard = () => {
+    setStep(1);
+    setWizard(emptyWizard);
+  };
+
+  const beginEdit = (reward: ConfiguredReward) => {
+    setStep(1);
+    setWizard(wizardFromReward(reward));
+  };
+
+  const saveReward = useMutation({
+    mutationFn: async () => {
+      if (wizard.scope === 'deal' && wizard.dealId == null) {
+        throw new Error('Pick a deal first');
+      }
+
+      const endpoint =
+        wizard.scope === 'default'
+          ? '/merchants/check-in-rewards/default'
+          : `/merchants/deals/${wizard.dealId}/check-in-reward`;
+
+      // "No reward" path: just save with isEnabled=false. Backend ignores other
+      // fields in this case.
+      if (wizard.rewardChoice === 'NONE') {
+        const response = await apiPatch(endpoint, { isEnabled: false });
+        if (!response.success) {
+          throw new Error(response.error ?? 'Failed to save');
+        }
+        return response.data;
+      }
+
+      if (requiresItem(wizard.rewardChoice) && wizard.menuItemId == null) {
+        throw new Error('Pick a menu item first');
+      }
+
+      const rewardExpiryHours = wizard.rewardExpiryHours.trim() ? Number(wizard.rewardExpiryHours) : 24;
+      if (!Number.isFinite(rewardExpiryHours) || rewardExpiryHours < 0) {
+        throw new Error('Expiry must be zero or greater');
+      }
+      const maxWins = wizard.maxWins.trim() ? Number(wizard.maxWins) : null;
+      if (maxWins != null && (!Number.isInteger(maxWins) || maxWins < 1)) {
+        throw new Error('Total claim cap must be at least 1');
+      }
+
+      const rewardValue =
+        wizard.rewardChoice === 'FREE_ITEM' ? 0 : Number(wizard.rewardValue);
+      if (wizard.rewardChoice !== 'FREE_ITEM') {
+        if (!Number.isFinite(rewardValue) || rewardValue <= 0) {
+          throw new Error('Reward value must be a positive number');
+        }
+        if (wizard.rewardChoice === 'DISCOUNT_PERCENTAGE' && rewardValue > 100) {
+          throw new Error('Percent off cannot exceed 100');
+        }
+        if (wizard.rewardChoice === 'BONUS_POINTS' && !Number.isInteger(rewardValue)) {
+          throw new Error('Points must be a whole number');
+        }
+      }
+
+      const payload = {
+        isEnabled: true,
+        menuItemId: requiresItem(wizard.rewardChoice) ? wizard.menuItemId : null,
+        rewardType: wizard.rewardChoice,
+        rewardValue,
+        rewardExpiryHours,
+        maxWins,
+      };
+
+      const response = await apiPatch(endpoint, payload);
+      if (!response.success) {
+        throw new Error(response.error ?? 'Failed to save check-in reward');
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['merchant-check-in-rewards-config'] });
+      toast({
+        title: 'Check-in reward saved',
+        description:
+          wizard.scope === 'default'
+            ? 'Will apply to every deal without its own reward.'
+            : 'Will apply when customers check in to this deal.',
+      });
+      resetWizard();
+    },
+    onError: (error: Error) => {
+      toast({ title: 'Could not save reward', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  const removeReward = useMutation({
+    mutationFn: async (reward: ConfiguredReward) => {
+      const endpoint =
+        reward.dealId == null
+          ? '/merchants/check-in-rewards/default'
+          : `/merchants/deals/${reward.dealId}/check-in-reward`;
+      const response = await apiDelete(endpoint);
+      if (!response.success) throw new Error(response.error ?? 'Failed to remove');
+      return reward.id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['merchant-check-in-rewards-config'] });
+      toast({ title: 'Reward removed' });
+    },
+    onError: (error: Error) => {
+      toast({ title: 'Could not remove reward', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  // If the merchant edits a reward whose item disappeared from the menu, surface
+  // a helpful default so the picker doesn't show a stale ID.
+  useEffect(() => {
+    if (wizard.menuItemId != null && menuItems.length > 0 && !menuItemById.has(wizard.menuItemId)) {
+      updateWizard({ menuItemId: null });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menuItems]);
+
+  const selectedItem = wizard.menuItemId != null ? menuItemById.get(wizard.menuItemId) ?? null : null;
+  const selectedDeal = wizard.dealId != null ? dealsById.get(wizard.dealId) ?? null : null;
+
+  const canAdvanceFromScope = wizard.scope === 'default' || wizard.dealId != null;
+  const canAdvanceFromReward =
+    wizard.rewardChoice === 'NONE' ||
+    wizard.rewardChoice === 'BONUS_POINTS' ||
+    (requiresItem(wizard.rewardChoice) && wizard.menuItemId != null);
+  const valueValid = (() => {
+    if (!requiresValueInput(wizard.rewardChoice)) return true;
+    const n = Number(wizard.rewardValue);
+    if (!Number.isFinite(n) || n <= 0) return false;
+    if (wizard.rewardChoice === 'DISCOUNT_PERCENTAGE' && n > 100) return false;
+    if (wizard.rewardChoice === 'BONUS_POINTS' && !Number.isInteger(n)) return false;
+    return true;
+  })();
+  const canSave = canAdvanceFromScope && canAdvanceFromReward && valueValid;
+
+  if (dealsQuery.isLoading || rewardsQuery.isLoading) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
+      </div>
+    );
+  }
+
+  if (dealsQuery.error || rewardsQuery.error) {
+    return (
+      <div className={cn(panelClass, 'border-rose-200 bg-rose-50 p-4 text-sm text-rose-700')}>
+        {(dealsQuery.error as Error)?.message || (rewardsQuery.error as Error)?.message}
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto max-w-screen-xl space-y-6 px-4 py-3 sm:px-1 sm:py-4">
+      <div
+        className={cn(
+          panelClass,
+          'flex flex-wrap items-center justify-between gap-4 border-emerald-200/70 bg-gradient-to-r from-emerald-50 via-white to-white p-5',
+        )}
+      >
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-md">
+            <Gift className="h-5 w-5" aria-hidden />
+          </div>
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold tracking-tight text-neutral-900 sm:text-xl">Check-in Rewards</h2>
+            <p className="text-sm text-neutral-600">
+              Set a default or per-deal reward. Customers get a discount on one specific menu item when they check in.
+            </p>
+          </div>
+        </div>
+        <Link to={PATHS.MERCHANT_DEALS}>
+          <Button size="md" variant="secondary" className="rounded-full border-neutral-200 bg-white text-neutral-700 shadow-sm hover:bg-neutral-50">
+            <ArrowRight className="mr-2 h-4 w-4 rotate-180" />
+            View all deals
+          </Button>
+        </Link>
       </div>
 
-      <div className="grid gap-6 2xl:grid-cols-[minmax(0,1.25fr)_minmax(360px,0.95fr)]">
-        <div className="space-y-6">
-          <section className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-6">
-            <div className="mb-5">
-              <h2 className="text-lg font-bold text-neutral-900">Experience settings</h2>
-              <p className="mt-1 text-sm text-neutral-600">Define which game appears and how the reward moment is presented.</p>
-            </div>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className={cn(panelClass, 'p-4')}>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Default set?</div>
+          <div className="mt-1 truncate text-[1.1rem] font-semibold tracking-tight text-emerald-700">
+            {defaultReward ? describeReward(defaultReward) : 'Not yet'}
+          </div>
+        </div>
+        <div className={cn(panelClass, 'p-4')}>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Deal-specific overrides</div>
+          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-neutral-950">{dealRewards.length}</div>
+        </div>
+        <div className={cn(panelClass, 'p-4')}>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Editing</div>
+          <div className="mt-1 truncate text-[1.1rem] font-semibold tracking-tight text-neutral-900">
+            {wizard.editingRewardId ? 'Existing reward' : 'New reward'}
+          </div>
+        </div>
+      </div>
 
-            <div className="mb-6 grid grid-cols-1 gap-2 rounded-2xl border border-neutral-200 bg-neutral-100/80 p-1.5 sm:grid-cols-2">
-              <button
+      <div className={cn(panelClass, 'p-5')}>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <StepIndicator step={step} />
+          {wizard.editingRewardId != null && (
+            <button
+              type="button"
+              onClick={resetWizard}
+              className="text-xs font-semibold text-neutral-500 underline-offset-4 hover:underline"
+            >
+              Cancel edit
+            </button>
+          )}
+        </div>
+
+        <div className="mt-5">
+          {step === 1 && (
+            <ScopeStep
+              scope={wizard.scope}
+              dealId={wizard.dealId}
+              deals={deals}
+              alreadyConfiguredDealIds={dealRewardsByDealId}
+              onScopeChange={(scope) =>
+                updateWizard({ scope, dealId: scope === 'default' ? null : wizard.dealId })
+              }
+              onDealChange={(dealId) => updateWizard({ dealId })}
+            />
+          )}
+          {step === 2 && (
+            <RewardTypeStep
+              rewardChoice={wizard.rewardChoice}
+              menuItemId={wizard.menuItemId}
+              onChoiceChange={(choice) => updateWizard({
+                rewardChoice: choice,
+                menuItemId: requiresItem(choice) ? wizard.menuItemId : null,
+                rewardValue:
+                  choice === 'BONUS_POINTS'
+                    ? '100'
+                    : choice === 'DISCOUNT_PERCENTAGE'
+                      ? '20'
+                      : choice === 'DISCOUNT_FIXED'
+                        ? '5'
+                        : '0',
+              })}
+              onMenuItemChange={(id) => updateWizard({ menuItemId: id })}
+            />
+          )}
+          {step === 3 && (
+            <DetailsStep
+              rewardChoice={wizard.rewardChoice}
+              rewardValue={wizard.rewardValue}
+              rewardExpiryHours={wizard.rewardExpiryHours}
+              maxWins={wizard.maxWins}
+              onChange={updateWizard}
+            />
+          )}
+        </div>
+
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-2">
+          <div className="text-xs text-neutral-500">
+            {step === 1 && (wizard.scope === 'default'
+              ? 'This reward will apply to every deal where you haven’t set a specific reward.'
+              : selectedDeal
+                ? `Reward will trigger when customers check in to “${selectedDeal.title}”.`
+                : 'Pick a deal to continue.')}
+            {step === 2 && (() => {
+              if (wizard.rewardChoice === 'NONE') return "Explicit opt-out — this deal won't issue any reward.";
+              if (wizard.rewardChoice === 'BONUS_POINTS') return 'Bonus points credit the customer\'s loyalty balance — no menu item needed.';
+              if (requiresItem(wizard.rewardChoice)) {
+                return selectedItem ? `Selected: ${selectedItem.name}` : 'Pick the menu item the reward applies to.';
+              }
+              return 'Pick a reward type to continue.';
+            })()}
+            {step === 3 && (canSave
+              ? 'Click Save to apply.'
+              : wizard.rewardChoice === 'NONE'
+                ? 'Click Save to record the no-reward opt-out.'
+                : 'Set a reward value to continue.')}
+          </div>
+          <div className="flex items-center gap-2">
+            {step > 1 && (
+              <Button
                 type="button"
-                className={cn(
-                  'rounded-xl px-4 py-3 text-sm font-semibold transition',
-                  builderMode === 'preset'
-                    ? 'bg-white text-neutral-900 shadow-sm ring-1 ring-neutral-200'
-                    : 'text-neutral-600 hover:bg-white/80 hover:text-neutral-900',
-                )}
-                onClick={() => setBuilderMode('preset')}
+                variant="secondary"
+                onClick={() => setStep((prev) => (prev === 3 ? 2 : 1))}
+                className="rounded-full"
               >
-                Choose preset
-              </button>
-              <button
-                type="button"
-                className={cn(
-                  'rounded-xl px-4 py-3 text-sm font-semibold transition',
-                  builderMode === 'manual'
-                    ? 'bg-white text-neutral-900 shadow-sm ring-1 ring-neutral-200'
-                    : 'text-neutral-600 hover:bg-white/80 hover:text-neutral-900',
-                )}
-                onClick={() => {
-                  setBuilderMode('manual');
-                  setSelectedPresetId('custom');
-                }}
-              >
-                Manual creation
-              </button>
-            </div>
-
-            {builderMode === 'preset' && (
-              <div className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {CHECK_IN_GAME_PRESETS.map((preset) => {
-                  const isSelected = selectedPresetId === preset.id;
-
-                  return (
-                    <button
-                      key={preset.id}
-                      type="button"
-                      className={cn(
-                        'group flex h-full flex-col rounded-[1.4rem] border p-5 text-left transition focus:outline-none focus:ring-2 focus:ring-brand-primary-100',
-                        isSelected
-                          ? 'border-brand-primary-300 bg-brand-primary-50/80 shadow-sm shadow-brand-primary-100/50'
-                          : 'border-neutral-200 bg-neutral-50/70 hover:-translate-y-0.5 hover:border-neutral-300 hover:bg-white hover:shadow-sm',
-                      )}
-                      onClick={() => applyPreset(preset.id)}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="text-xl font-black tracking-tight text-neutral-900">{preset.name}</div>
-                          <div className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
-                            {gameTypeCopy[preset.config.gameType].title}
-                          </div>
-                        </div>
-                        <div className="shrink-0 rounded-full border border-neutral-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-600">
-                          {preset.badge}
-                        </div>
-                      </div>
-                      <p className="mt-4 flex-1 text-sm leading-6 text-neutral-600">{preset.description}</p>
-                      <div className="mt-5 flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
-                        {gameTypeCopy[preset.config.gameType].title} • {preset.config.rewards.length} rewards
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <label className="space-y-2 text-sm text-neutral-700">
-                <span className="font-semibold">Enable post check-in game</span>
-                <select
-                  className={editorInputClass}
-                  value={form.isEnabled ? 'enabled' : 'disabled'}
-                  onChange={(event) => setForm({ ...form, isEnabled: event.target.value === 'enabled' })}
-                >
-                  <option value="disabled">Disabled</option>
-                  <option value="enabled">Enabled</option>
-                </select>
-              </label>
-
-              <label className="space-y-2 text-sm text-neutral-700">
-                <span className="font-semibold">Game type</span>
-                <select
-                  className={editorInputClass}
-                  value={form.gameType}
-                  onChange={(event) => {
-                    setSelectedPresetId('custom');
-                    setBuilderMode('manual');
-                    setForm({ ...form, gameType: event.target.value as MerchantCheckInGameConfig['gameType'] });
-                  }}
-                >
-                  {GAME_TYPES.map((gameType) => (
-                    <option key={gameType} value={gameType}>
-                      {gameType.replaceAll('_', ' ')}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="space-y-2 text-sm text-neutral-700">
-                <span className="font-semibold">Headline</span>
-                <input
-                  className={editorInputClass}
-                  value={form.title}
-                  onChange={(event) => {
-                    setSelectedPresetId('custom');
-                    setBuilderMode('manual');
-                    setForm({ ...form, title: event.target.value });
-                  }}
-                />
-              </label>
-
-              <label className="space-y-2 text-sm text-neutral-700">
-                <span className="font-semibold">Subheadline</span>
-                <input
-                  className={editorInputClass}
-                  value={form.subtitle || ''}
-                  onChange={(event) => {
-                    setSelectedPresetId('custom');
-                    setBuilderMode('manual');
-                    setForm({ ...form, subtitle: event.target.value });
-                  }}
-                />
-              </label>
-
-              <label className="space-y-2 text-sm text-neutral-700">
-                <span className="font-semibold">Cooldown minutes</span>
-                <input
-                  className={editorInputClass}
-                  type="number"
-                  min={0}
-                  value={form.cooldownMinutes}
-                  onChange={(event) => {
-                    setSelectedPresetId('custom');
-                    setBuilderMode('manual');
-                    setForm({ ...form, cooldownMinutes: Number(event.target.value) || 0 });
-                  }}
-                />
-              </label>
-
-              <label className="space-y-2 text-sm text-neutral-700">
-                <span className="font-semibold">Reward expires in hours</span>
-                <input
-                  className={editorInputClass}
-                  type="number"
-                  min={1}
-                  value={form.rewardExpiryHours}
-                  onChange={(event) => {
-                    setSelectedPresetId('custom');
-                    setBuilderMode('manual');
-                    setForm({ ...form, rewardExpiryHours: Number(event.target.value) || 24 });
-                  }}
-                />
-              </label>
-            </div>
-
-            {builderMode === 'manual' && (
-              <div className="mt-4 rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 px-4 py-3 text-sm text-neutral-600">
-                Manual mode keeps everything editable. You can build from scratch here or tweak a preset and it will automatically become custom.
-              </div>
-            )}
-          </section>
-
-          <section className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-6">
-            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 className="text-lg font-bold text-neutral-900">Reward pool</h2>
-                <p className="mt-1 text-sm text-neutral-600">Set how common each reward should be and balance it against prize value.</p>
-              </div>
-              <Button variant="secondary" size="sm" className="rounded-xl" onClick={addReward}>
-                <Plus className="mr-1 h-4 w-4" />
-                Add reward
+                <ArrowLeft className="mr-2 h-4 w-4" /> Back
               </Button>
-            </div>
-
-            <div className="space-y-4">
-              {form.rewards.map((reward, index) => (
-                <div
-                  key={`${reward.id ?? 'new'}-${index}`}
-                  className="rounded-[1.6rem] border border-neutral-200 bg-gradient-to-br from-white to-neutral-50/70 p-4 shadow-sm sm:p-5"
-                >
-                  <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex min-w-0 items-center gap-3">
-                      <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-white">
-                        {reward.imageUrl ? (
-                          <img src={reward.imageUrl} alt={reward.label || `Reward ${index + 1}`} className="h-full w-full object-cover" />
-                        ) : (
-                          <ImageIcon className="h-5 w-5 text-neutral-300" />
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-base font-bold text-neutral-900">
-                        Reward {index + 1}
-                        {reward.label.trim() ? ` · ${reward.label}` : ''}
-                        </div>
-                        <div className="mt-1 text-xs uppercase tracking-[0.2em] text-neutral-500">
-                          {rewardTypeLabels[reward.rewardType]}
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      className="rounded-xl border border-red-200 bg-white p-2 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
-                      onClick={() => removeReward(index)}
-                      disabled={form.rewards.length <= 1}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-
-                  <div className="grid gap-4 xl:grid-cols-[minmax(140px,0.9fr)_minmax(0,1.5fr)_minmax(160px,0.85fr)_minmax(130px,0.65fr)]">
-                    <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-3">
-                      {reward.imageUrl ? (
-                        <div className="space-y-3">
-                          <div className="aspect-square overflow-hidden rounded-xl bg-neutral-100">
-                            <img src={reward.imageUrl} alt={reward.label || `Reward ${index + 1}`} className="h-full w-full object-cover" />
-                          </div>
-                          <div className="flex gap-2">
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              className="flex-1 rounded-xl"
-                              onClick={() => setUploadRewardIndex(index)}
-                            >
-                              Replace
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="rounded-xl text-red-600 hover:text-red-700"
-                              onClick={() => clearRewardImage(index)}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <button
-                          type="button"
-                          className="flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 px-3 py-6 text-center text-sm text-neutral-500 transition hover:border-brand-primary-300 hover:bg-brand-primary-50/40 hover:text-brand-primary-700"
-                          onClick={() => setUploadRewardIndex(index)}
-                        >
-                          <ImageIcon className="h-5 w-5" />
-                          <span className="font-medium">Upload reward image</span>
-                          <span className="text-xs text-neutral-400">Optional artwork for this reward</span>
-                        </button>
-                      )}
-                    </div>
-                    <div className="space-y-4 xl:col-span-2">
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <label>
-                          <span className={editorFieldLabelClass}>Reward title</span>
-                        <input
-                          className={editorInputClass}
-                          placeholder={
-                            reward.rewardType === 'DISCOUNT_PERCENTAGE'
-                              ? formatPercentageRewardTitle(sanitizePercentageRewardValue(Number(reward.rewardValue) || 0))
-                              : 'Reward title'
-                          }
-                          value={reward.label}
-                          onChange={(event) => updateReward(index, { label: event.target.value })}
-                        />
-                        </label>
-                        <label>
-                          <span className={editorFieldLabelClass}>Reward type</span>
-                          <select
-                            className={editorInputClass}
-                            value={reward.rewardType}
-                            onChange={(event) =>
-                              updateReward(index, { rewardType: event.target.value as MerchantCheckInGameReward['rewardType'] })
-                            }
-                          >
-                            {REWARD_TYPES.map((rewardType) => (
-                              <option key={rewardType} value={rewardType}>
-                                {rewardTypeLabels[rewardType]}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                      </div>
-                      <label>
-                        <span className={editorFieldLabelClass}>Customer-facing label</span>
-                        <input
-                          className={editorInputClass}
-                          placeholder={
-                            reward.rewardType === 'DISCOUNT_PERCENTAGE'
-                              ? formatPercentageRewardLabel(sanitizePercentageRewardValue(Number(reward.rewardValue) || 0))
-                              : 'What the customer sees after winning'
-                          }
-                          value={reward.rewardLabel || ''}
-                          onChange={(event) => updateReward(index, { rewardLabel: event.target.value })}
-                        />
-                      </label>
-                    </div>
-                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-                      <label>
-                        <span className={editorFieldLabelClass}>Reward value</span>
-                        {reward.rewardType === 'DISCOUNT_PERCENTAGE' ? (
-                          <select
-                            className={editorInputClass}
-                            value={sanitizePercentageRewardValue(Number(reward.rewardValue) || 0)}
-                            onChange={(event) => updateReward(index, { rewardValue: Number(event.target.value) || 50 })}
-                          >
-                            {ALLOWED_PERCENTAGE_REWARD_VALUES.map((value) => (
-                              <option key={value} value={value}>
-                                {formatPercentageRewardTitle(value)}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          <input
-                            className={editorInputClass}
-                            type="number"
-                            min={0}
-                            step="0.01"
-                            placeholder="0"
-                            value={reward.rewardValue}
-                            onChange={(event) => updateReward(index, { rewardValue: Number(event.target.value) || 0 })}
-                          />
-                        )}
-                      </label>
-                      <label>
-                        <span className={editorFieldLabelClass}>Chance level</span>
-                        <input
-                          className={editorInputClass}
-                          type="number"
-                          min={1}
-                          placeholder="1"
-                          value={reward.probabilityWeight}
-                          onChange={(event) => updateReward(index, { probabilityWeight: Number(event.target.value) || 1 })}
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+            )}
+            {step < 3 ? (
+              <Button
+                type="button"
+                onClick={() => {
+                  if (step === 1 && !canAdvanceFromScope) return;
+                  if (step === 2 && !canAdvanceFromReward) return;
+                  setStep((prev) => (prev === 1 ? 2 : 3));
+                }}
+                disabled={(step === 1 && !canAdvanceFromScope) || (step === 2 && !canAdvanceFromReward)}
+                className="rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700"
+              >
+                Next <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={() => saveReward.mutate()}
+                disabled={!canSave || saveReward.isPending}
+                className="rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700"
+              >
+                {saveReward.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {wizard.editingRewardId ? 'Update reward' : 'Save reward'}
+              </Button>
+            )}
+          </div>
         </div>
-
-        <aside className="space-y-6">
-          <section className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-6">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-primary-100 text-brand-primary-700">
-                <Sparkles className="h-5 w-5" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-neutral-900">Player preview</h2>
-                <p className="text-sm text-neutral-600">How the experience feels after check-in.</p>
-              </div>
-            </div>
-
-            <div className="mt-5 overflow-hidden rounded-[28px] border border-neutral-200 bg-neutral-900 text-white">
-              <div className="bg-gradient-to-br from-brand-primary-700 via-brand-primary-600 to-neutral-900 px-5 py-5">
-                <div className="inline-flex rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em]">
-                  Bonus game
-                </div>
-                <div className="mt-4 text-2xl font-black tracking-tight">{form.title || 'Tap to win'}</div>
-                <p className="mt-2 text-sm text-white/80">
-                  {form.subtitle?.trim() || 'Reward your guests with a polished post check-in surprise.'}
-                </p>
-              </div>
-
-              <div className="space-y-4 px-5 py-5">
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <div className="text-xs uppercase tracking-[0.18em] text-white/55">Customer sees</div>
-                      <div className="mt-2 text-base font-bold text-white">{selectedGame.previewTitle}</div>
-                    </div>
-                    <div className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">
-                      {statusLabel}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid gap-3">
-                  {topRewards.map((reward, index) => (
-                    <div key={`${reward.id ?? 'preview'}-${index}`} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex min-w-0 items-center gap-3">
-                          {reward.imageUrl ? (
-                            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/5">
-                              <img src={reward.imageUrl} alt={previewRewardLabel(reward)} className="h-full w-full object-cover" />
-                            </div>
-                          ) : null}
-                          <div className="min-w-0">
-                          <div className="text-sm font-semibold text-white">{previewRewardLabel(reward)}</div>
-                          <div className="mt-1 text-xs uppercase tracking-[0.18em] text-white/45">
-                            {rewardTypeLabels[reward.rewardType]}
-                          </div>
-                        </div>
-                        </div>
-                        <div className="text-xs uppercase tracking-[0.18em] text-white/60">
-                          {totalWeight > 0 ? Math.round((Math.max(1, reward.probabilityWeight) / totalWeight) * 100) : 0}%
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  {activeRewards.length === 0 && (
-                    <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 p-4 text-sm text-white/60">
-                      Add rewards to preview the customer experience.
-                    </div>
-                  )}
-                </div>
-
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <div className="text-xs uppercase tracking-[0.18em] text-white/50">Cooldown</div>
-                    <div className="mt-2 text-sm font-semibold text-white">
-                      {form.cooldownMinutes > 0 ? `${form.cooldownMinutes} min between plays` : 'No extra wait'}
-                    </div>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <div className="text-xs uppercase tracking-[0.18em] text-white/50">Expiry</div>
-                    <div className="mt-2 text-sm font-semibold text-white">{form.rewardExpiryHours} hrs after unlock</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-6">
-            <h2 className="text-lg font-bold text-neutral-900">Campaign summary</h2>
-            <div className="mt-4 space-y-3">
-              <div className="flex items-start gap-3 rounded-2xl bg-neutral-50 p-4">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 text-brand-primary-600" />
-                <div>
-                  <div className="text-sm font-semibold text-neutral-900">{statusLabel}</div>
-                  <div className="text-sm text-neutral-600">
-                    {form.isEnabled ? 'Customers can play after a successful check-in.' : 'The game is hidden until you enable it.'}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 rounded-2xl bg-neutral-50 p-4">
-                <Ticket className="mt-0.5 h-4 w-4 text-brand-primary-600" />
-                <div>
-                  <div className="text-sm font-semibold text-neutral-900">{selectedGame.title}</div>
-                  <div className="text-sm text-neutral-600">{selectedGame.description}</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 rounded-2xl bg-neutral-50 p-4">
-                <Coins className="mt-0.5 h-4 w-4 text-brand-primary-600" />
-                <div>
-                  <div className="text-sm font-semibold text-neutral-900">{activeRewards.length} configured rewards</div>
-                  <div className="text-sm text-neutral-600">
-                    Cooldown: {form.cooldownMinutes} min · Expires: {form.rewardExpiryHours} hrs
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        </aside>
       </div>
 
-      <div className="flex justify-stretch sm:justify-end">
-        <Button
-          variant="primary"
-          size="md"
-          className="w-full rounded-xl px-6 sm:w-auto"
-          onClick={handleSave}
-          disabled={saveMutation.isPending}
-        >
-          {saveMutation.isPending ? 'Saving...' : 'Save Check-in Game'}
-        </Button>
-      </div>
-
-      <ImageUploadModal
-        open={uploadRewardIndex !== null}
-        onOpenChange={(open) => {
-          if (!open) setUploadRewardIndex(null);
-        }}
-        onUploadComplete={handleRewardImageUpload}
-        context="checkin_game_reward"
-        maxFiles={1}
-        title="Upload reward image"
+      <ConfiguredRewardsList
+        rewards={rewards}
+        dealsById={dealsById}
+        onEdit={beginEdit}
+        onRemove={(reward) => removeReward.mutate(reward)}
+        removingId={removeReward.isPending ? (removeReward.variables as ConfiguredReward | undefined)?.id ?? null : null}
       />
     </div>
   );

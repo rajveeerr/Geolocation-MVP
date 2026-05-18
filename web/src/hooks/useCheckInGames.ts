@@ -57,6 +57,10 @@ export interface CheckInGameIssuedReward {
   status: 'AVAILABLE' | 'REDEEMED' | 'EXPIRED';
   expiresAt?: string | null;
   createdAt: string;
+  /// Populated by /check-in-games/my-rewards so the user-facing list can
+  /// surface where each reward came from.
+  deal?: { id: number; title: string } | null;
+  merchant?: { id: number; businessName: string } | null;
 }
 
 export interface MerchantCheckInGameAnalytics {

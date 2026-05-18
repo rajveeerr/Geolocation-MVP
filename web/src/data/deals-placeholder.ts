@@ -108,9 +108,9 @@ export const adaptApiDealToUi = (apiDeal: ApiDeal): DealWithLocation => {
   if (apiDeal.offerDisplay) {
     dealValue = apiDeal.offerDisplay;
   } else if (apiDeal.discountPercentage) {
-    dealValue = `${apiDeal.discountPercentage}% OFF`;
+    dealValue = `UP TO ${apiDeal.discountPercentage}% OFF`;
   } else if (apiDeal.discountAmount) {
-    dealValue = `$${apiDeal.discountAmount} OFF`;
+    dealValue = `UP TO $${apiDeal.discountAmount} OFF`;
   }
 
   // Handle category - can be string or object

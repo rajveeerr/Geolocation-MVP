@@ -136,6 +136,7 @@ function ProgramForm({
           <Input
             id="ref-expires"
             type="date"
+            lang="en-US"
             value={form.expiresAt}
             onChange={(e) => set('expiresAt', e.target.value)}
             className="mt-1.5 h-11"
@@ -268,7 +269,7 @@ function ProgramCard({
             )}
             {program.expiresAt && (
               <span className="inline-flex items-center gap-1">
-                <Calendar className="h-3 w-3" /> Expires {new Date(program.expiresAt).toLocaleDateString()}
+                <Calendar className="h-3 w-3" /> Expires {new Date(program.expiresAt).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
               </span>
             )}
           </div>
@@ -538,7 +539,7 @@ function MerchantReferralsInner() {
                     </div>
                   </div>
                   <span className="text-[11px] text-neutral-500">
-                    {new Date(a.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    {new Date(a.createdAt).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
                   </span>
                 </li>
               ))}

@@ -76,7 +76,27 @@ export interface DealCreationState {
   streakMinVisits: number | null;
   streakRewardType: 'percentage' | 'amount' | null;
   streakRewardValue: number | null;
+  /** Max times a user can claim the streak reward. null = unlimited. */
+  streakMaxClaims: number | null;
+  /** How long the streak reward is redeemable for, in hours. */
+  streakExpiryHours: number;
   recurringFrequency: 'week' | 'month' | 'year' | null;
+  // ── Unified Rewards section (Check-in / Referral) ──
+  // Check-in reward (configured inline; attached via PATCH /merchants/deals/:id/check-in-reward after publish)
+  checkInRewardEnabled: boolean;
+  checkInRewardKind: 'FREE_ITEM' | 'BONUS_POINTS' | 'DISCOUNT_PERCENTAGE' | 'DISCOUNT_FIXED';
+  /** Value in $/points/% depending on kind. Ignored for FREE_ITEM. */
+  checkInRewardValue: number;
+  checkInRewardMaxClaims: number | null;
+  checkInRewardExpiryHours: number;
+  // Referral reward (configured inline; attached via POST /merchants/me/referral-programs after publish)
+  referralRewardEnabled: boolean;
+  referralRewardName: string;
+  referralRewardForReferrer: string;
+  referralRewardForReferred: string;
+  referralMaxPerUser: number | null;
+  /** ISO date string; null = no expiry. */
+  referralExpiresAt: string | null;
   // Hidden deal visibility configuration
   hiddenDealVisibility: {
     accessCode: boolean; // always true
@@ -160,7 +180,21 @@ const initialState: DealCreationState = {
   streakMinVisits: null,
   streakRewardType: null,
   streakRewardValue: null,
+  streakMaxClaims: null,
+  streakExpiryHours: 24,
   recurringFrequency: null,
+  // ── Unified Rewards defaults ──
+  checkInRewardEnabled: false,
+  checkInRewardKind: 'BONUS_POINTS',
+  checkInRewardValue: 50,
+  checkInRewardMaxClaims: null,
+  checkInRewardExpiryHours: 24,
+  referralRewardEnabled: false,
+  referralRewardName: '',
+  referralRewardForReferrer: '',
+  referralRewardForReferred: '',
+  referralMaxPerUser: null,
+  referralExpiresAt: null,
   // Hidden deal visibility configuration
   hiddenDealVisibility: {
     accessCode: true, // always true

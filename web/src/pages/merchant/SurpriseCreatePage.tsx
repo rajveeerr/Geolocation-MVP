@@ -1,34 +1,45 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkles, Loader2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Sparkles, Loader2, MapPin, Clock, CheckCircle2, Dices } from 'lucide-react';
 import { MerchantProtectedRoute } from '@/components/auth/MerchantProtectedRoute';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/common/Button';
 import { PATHS } from '@/routing/paths';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateSurpriseDeal, useGenerateSurpriseAI } from '@/hooks/useSurprises';
 import type { CreateSurpriseDealPayload, SurpriseType } from '@/types/surprises';
 import { cn } from '@/lib/utils';
+import { QuickFormLayout } from '@/components/merchant/create-deal/quick-form/QuickFormLayout';
+import {
+  SectionCard,
+  FieldLabel,
+} from '@/components/merchant/create-deal/quick-form/SectionCard';
 
-const SURPRISE_TYPES: { value: SurpriseType; label: string; description: string }[] = [
+const SURPRISE_TYPES: { value: SurpriseType; label: string; description: string; icon: typeof MapPin }[] = [
   {
     value: 'LOCATION_BASED',
     label: 'Location',
     description: 'Reveal when user is within a set radius',
+    icon: MapPin,
   },
   {
     value: 'TIME_BASED',
     label: 'Time',
     description: 'Reveal automatically at a specific date & time',
+    icon: Clock,
   },
   {
     value: 'ENGAGEMENT_BASED',
     label: 'Check-in',
     description: 'Reveal after user checks in at your location',
+    icon: CheckCircle2,
   },
   {
     value: 'RANDOM_DROP',
     label: 'Random Drop',
     description: 'First-come-first-served from a limited slot pool',
+    icon: Dices,
   },
 ];
 
@@ -57,42 +68,18 @@ const EMPTY_FORM: FormState = {
   dealTypeId: '',
   startTime: '',
   endTime: '',
-  redemptionInstructions: '',
+  redemptionInstructions: 'Show this screen to redeem.',
   surpriseType: 'LOCATION_BASED',
   surpriseHint: '',
   discountPercentage: '',
   discountAmount: '',
-  revealRadiusMeters: '',
+  revealRadiusMeters: '100',
   revealAt: '',
   revealDurationMinutes: '60',
   surpriseTotalSlots: '',
 };
 
-function Field({
-  label,
-  required,
-  children,
-  hint,
-}: {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-  hint?: string;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-semibold text-neutral-700">
-        {label}
-        {required && <span className="ml-0.5 text-red-500">*</span>}
-      </label>
-      {children}
-      {hint && <p className="text-xs text-neutral-400">{hint}</p>}
-    </div>
-  );
-}
-
-const inputCls =
-  'w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-brand-primary-500 focus:ring-2 focus:ring-brand-primary-500/20 disabled:bg-neutral-50';
+const inputClassName = 'mt-1.5 h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]';
 
 function SurpriseCreateInner() {
   const navigate = useNavigate();
@@ -103,7 +90,7 @@ function SurpriseCreateInner() {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [aiIntent, setAiIntent] = useState('');
 
-  const set = (field: keyof FormState, value: string) =>
+  const set = <K extends keyof FormState>(field: K, value: FormState[K]) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleGenerateAI = () => {
@@ -129,31 +116,27 @@ function SurpriseCreateInner() {
             discountPercentage: s.discountPercentage !== null ? String(s.discountPercentage) : '',
             discountAmount: s.discountAmount !== null ? String(s.discountAmount) : '',
             surpriseType: s.suggestedRevealType,
-            revealRadiusMeters: s.suggestedRevealRadiusMeters !== null
-              ? String(s.suggestedRevealRadiusMeters)
-              : '',
+            revealRadiusMeters:
+              s.suggestedRevealRadiusMeters !== null ? String(s.suggestedRevealRadiusMeters) : '',
           }));
           toast({ title: 'AI suggestion applied', description: 'Review and edit before saving.' });
         },
-        onError: (e) =>
-          toast({ title: 'AI failed', description: e.message, variant: 'destructive' }),
+        onError: (e) => toast({ title: 'AI failed', description: e.message, variant: 'destructive' }),
       },
     );
   };
 
+  const canPublish = useMemo(() => {
+    if (!form.title.trim() || !form.description.trim()) return false;
+    if (!form.startTime || !form.endTime) return false;
+    if (!form.redemptionInstructions.trim()) return false;
+    if (form.surpriseType === 'LOCATION_BASED' && !form.revealRadiusMeters) return false;
+    if (form.surpriseType === 'TIME_BASED' && !form.revealAt) return false;
+    return true;
+  }, [form]);
+
   const handleSubmit = () => {
-    if (!form.title.trim() || !form.description.trim() || !form.startTime || !form.endTime || !form.redemptionInstructions.trim()) {
-      toast({ title: 'Missing required fields', variant: 'destructive' });
-      return;
-    }
-    if (form.surpriseType === 'LOCATION_BASED' && !form.revealRadiusMeters) {
-      toast({ title: 'Reveal radius required for Location-based surprise', variant: 'destructive' });
-      return;
-    }
-    if (form.surpriseType === 'TIME_BASED' && !form.revealAt) {
-      toast({ title: 'Reveal time required for Time-based surprise', variant: 'destructive' });
-      return;
-    }
+    if (!canPublish) return;
 
     const payload: CreateSurpriseDealPayload = {
       title: form.title.trim(),
@@ -175,233 +158,277 @@ function SurpriseCreateInner() {
 
     create.mutate(payload, {
       onSuccess: () => {
-        toast({ title: 'Surprise deal created!' });
-        navigate(PATHS.MERCHANT_SURPRISES);
+        toast({ title: 'Surprise deal published', description: 'Your surprise deal is now live.' });
+        setTimeout(() => navigate(PATHS.MERCHANT_SURPRISES), 600);
       },
-      onError: (e) =>
-        toast({ title: 'Create failed', description: e.message, variant: 'destructive' }),
+      onError: (e) => toast({ title: 'Could not publish', description: e.message, variant: 'destructive' }),
     });
   };
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <Link
-        to={PATHS.MERCHANT_SURPRISES}
-        className="inline-flex items-center gap-2 whitespace-nowrap text-sm font-medium text-brand-primary-600 hover:underline"
-      >
-        <ArrowLeft className="h-4 w-4 shrink-0" />
-        Back to My Surprises
-      </Link>
-
-      <h1 className="mt-4 text-2xl font-bold text-neutral-900">Create Surprise Deal</h1>
-      <p className="mt-1 text-sm text-neutral-500">
-        A mystery deal that users reveal by meeting a trigger condition.
-      </p>
-
-      {/* AI Generate section */}
-      <div className="mt-6 rounded-xl border border-brand-primary-200 bg-brand-primary-50 p-4">
-        <p className="text-sm font-semibold text-brand-primary-800">Generate with AI ✨</p>
-        <p className="mt-0.5 text-xs text-brand-primary-600">
-          Describe your offer and we'll fill in the form for you.
-        </p>
-        <div className="mt-3 flex gap-2">
-          <input
-            className={cn(inputCls, 'flex-1 border-brand-primary-200 bg-white')}
-            placeholder="e.g. 20% off all cocktails after 8pm on weekends"
-            value={aiIntent}
-            onChange={(e) => setAiIntent(e.target.value)}
-          />
-          <Button
-            size="sm"
-            className="flex-shrink-0 rounded-full"
-            onClick={handleGenerateAI}
-            disabled={generateAI.isPending}
-          >
-            {generateAI.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
+    <QuickFormLayout
+      title="Create a Surprise Deal"
+      subtitle="A mystery deal that customers reveal when they meet a trigger condition."
+      onBack={() => navigate(PATHS.MERCHANT_SURPRISES)}
+      primary={{
+        label: 'Publish surprise',
+        onClick: handleSubmit,
+        disabled: !canPublish,
+        isLoading: create.isPending,
+      }}
+    >
+      <div className="space-y-3">
+        {/* AI generator */}
+        <SectionCard className="bg-gradient-to-br from-violet-50/50 to-white">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-600">
               <Sparkles className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
-      </div>
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[13px] font-semibold text-neutral-900">Generate with AI</div>
+              <p className="text-[12px] text-neutral-500">
+                Describe your offer in one line — we'll fill in the form.
+              </p>
+              <div className="mt-3 flex gap-2">
+                <Input
+                  value={aiIntent}
+                  onChange={(e) => setAiIntent(e.target.value)}
+                  placeholder="e.g. 20% off all cocktails after 8pm on weekends"
+                  className="h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                />
+                <Button
+                  variant="ghost"
+                  onClick={handleGenerateAI}
+                  disabled={generateAI.isPending}
+                  className="h-10 shrink-0 rounded-lg border border-violet-200 bg-violet-600 px-3 text-white hover:bg-violet-700 hover:text-white disabled:opacity-70"
+                >
+                  {generateAI.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Generate'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </SectionCard>
 
-      <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-        <div className="grid gap-5">
-          {/* Surprise type selector */}
-          <Field label="Surprise Type" required>
-            <div className="grid grid-cols-2 gap-2">
-              {SURPRISE_TYPES.map((t) => (
+        {/* Surprise type */}
+        <SectionCard>
+          <FieldLabel label="Surprise type" required />
+          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {SURPRISE_TYPES.map((t) => {
+              const Icon = t.icon;
+              const selected = form.surpriseType === t.value;
+              return (
                 <button
                   key={t.value}
                   type="button"
                   onClick={() => set('surpriseType', t.value)}
                   className={cn(
-                    'rounded-xl border p-3 text-left transition-all',
-                    form.surpriseType === t.value
-                      ? 'border-brand-primary-500 bg-brand-primary-50 ring-1 ring-brand-primary-300'
-                      : 'border-neutral-200 hover:border-neutral-300',
+                    'flex items-start gap-3 rounded-xl border p-3 text-left transition',
+                    selected
+                      ? 'border-neutral-900 bg-neutral-50 shadow-[0_4px_12px_rgba(15,23,42,0.06)]'
+                      : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50',
                   )}
                 >
-                  <p className="text-sm font-semibold text-neutral-900">{t.label}</p>
-                  <p className="mt-0.5 text-xs text-neutral-500">{t.description}</p>
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-100 text-violet-700">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-semibold text-neutral-900">{t.label}</div>
+                    <div className="text-[11px] text-neutral-500">{t.description}</div>
+                  </div>
+                  {selected ? (
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-neutral-900" />
+                  ) : null}
                 </button>
-              ))}
-            </div>
-          </Field>
+              );
+            })}
+          </div>
+        </SectionCard>
 
-          {/* Basic info */}
-          <Field label="Title" required>
-            <input
-              className={inputCls}
-              placeholder="e.g. Mystery Happy Hour"
-              value={form.title}
-              onChange={(e) => set('title', e.target.value)}
-            />
-          </Field>
+        {/* Basics */}
+        <SectionCard>
+          <FieldLabel label="Title" required htmlFor="surprise-title" />
+          <Input
+            id="surprise-title"
+            value={form.title}
+            onChange={(e) => set('title', e.target.value)}
+            placeholder="Mystery Happy Hour"
+            className={inputClassName}
+            maxLength={100}
+          />
 
-          <Field label="Description" required>
-            <textarea
-              className={cn(inputCls, 'resize-none')}
-              rows={3}
-              placeholder="Full deal description (shown after reveal)"
+          <div className="mt-4">
+            <FieldLabel label="Description" required hint="Shown after the customer reveals the deal" htmlFor="surprise-desc" />
+            <Textarea
+              id="surprise-desc"
               value={form.description}
               onChange={(e) => set('description', e.target.value)}
+              rows={3}
+              placeholder="Full deal description (shown after reveal)"
+              className="mt-1.5 resize-none rounded-lg border-neutral-200 bg-white text-[13.5px]"
             />
-          </Field>
+          </div>
 
-          <Field label="Hint" hint="Teaser shown to users before they reveal the deal">
-            <input
-              className={inputCls}
-              placeholder="e.g. Something bubbly awaits after sundown… 🍾"
+          <div className="mt-4">
+            <FieldLabel label="Hint" hint="Teaser shown before the reveal" htmlFor="surprise-hint" />
+            <Input
+              id="surprise-hint"
               value={form.surpriseHint}
               onChange={(e) => set('surpriseHint', e.target.value)}
+              placeholder="Something bubbly awaits after sundown… 🍾"
+              className={inputClassName}
+              maxLength={150}
             />
-          </Field>
+          </div>
 
-          <Field label="Redemption Instructions" required>
-            <textarea
-              className={cn(inputCls, 'resize-none')}
-              rows={2}
-              placeholder="e.g. Show this screen to your server before ordering."
+          <div className="mt-4">
+            <FieldLabel label="Redemption instructions" required htmlFor="surprise-redeem" />
+            <Textarea
+              id="surprise-redeem"
               value={form.redemptionInstructions}
               onChange={(e) => set('redemptionInstructions', e.target.value)}
+              rows={2}
+              placeholder="Show this screen to your server before ordering."
+              className="mt-1.5 resize-none rounded-lg border-neutral-200 bg-white text-[13.5px]"
             />
-          </Field>
+          </div>
+        </SectionCard>
 
-          {/* Discount */}
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Discount %" hint="Leave blank if not applicable">
-              <input
-                className={inputCls}
+        {/* Discount */}
+        <SectionCard>
+          <FieldLabel label="Discount" hint="At least one of these or a custom offer" />
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+                Percent off
+              </label>
+              <Input
                 type="number"
                 min={0}
                 max={100}
-                placeholder="e.g. 30"
                 value={form.discountPercentage}
                 onChange={(e) => set('discountPercentage', e.target.value)}
+                placeholder="30"
+                className="h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
               />
-            </Field>
-            <Field label="Discount Amount ($)" hint="Leave blank if not applicable">
-              <input
-                className={inputCls}
+            </div>
+            <div>
+              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+                Dollar amount off
+              </label>
+              <Input
                 type="number"
                 min={0}
-                placeholder="e.g. 5"
                 value={form.discountAmount}
                 onChange={(e) => set('discountAmount', e.target.value)}
+                placeholder="5"
+                className="h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
               />
-            </Field>
+            </div>
           </div>
+        </SectionCard>
 
-          {/* Schedule */}
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Start Time" required>
-              <input
-                className={inputCls}
-                type="datetime-local" lang="en-US"
+        {/* Schedule */}
+        <SectionCard>
+          <FieldLabel label="Schedule" required />
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+                Start time
+              </label>
+              <Input
+                type="datetime-local"
+                lang="en-US"
                 value={form.startTime}
                 onChange={(e) => set('startTime', e.target.value)}
+                className="h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
               />
-            </Field>
-            <Field label="End Time" required>
-              <input
-                className={inputCls}
-                type="datetime-local" lang="en-US"
+            </div>
+            <div>
+              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+                End time
+              </label>
+              <Input
+                type="datetime-local"
+                lang="en-US"
                 value={form.endTime}
                 onChange={(e) => set('endTime', e.target.value)}
+                className="h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
               />
-            </Field>
+            </div>
           </div>
+        </SectionCard>
 
-          {/* Conditional: Location-based */}
-          {form.surpriseType === 'LOCATION_BASED' && (
-            <Field label="Reveal Radius (meters)" required hint="How close the user must be to unlock">
-              <input
-                className={inputCls}
-                type="number"
-                min={10}
-                placeholder="e.g. 100"
-                value={form.revealRadiusMeters}
-                onChange={(e) => set('revealRadiusMeters', e.target.value)}
-              />
-            </Field>
-          )}
+        {/* Reveal config — varies by type */}
+        {form.surpriseType === 'LOCATION_BASED' ? (
+          <SectionCard>
+            <FieldLabel
+              label="Reveal radius (meters)"
+              required
+              hint="Customers within this distance can reveal the deal"
+              htmlFor="surprise-radius"
+            />
+            <Input
+              id="surprise-radius"
+              type="number"
+              min={10}
+              value={form.revealRadiusMeters}
+              onChange={(e) => set('revealRadiusMeters', e.target.value)}
+              placeholder="100"
+              className={cn(inputClassName, 'w-[180px]')}
+            />
+          </SectionCard>
+        ) : null}
 
-          {/* Conditional: Time-based */}
-          {form.surpriseType === 'TIME_BASED' && (
-            <Field label="Reveal At" required hint="Deal becomes unlockable at this exact time">
-              <input
-                className={inputCls}
-                type="datetime-local" lang="en-US"
-                value={form.revealAt}
-                onChange={(e) => set('revealAt', e.target.value)}
-              />
-            </Field>
-          )}
+        {form.surpriseType === 'TIME_BASED' ? (
+          <SectionCard>
+            <FieldLabel label="Reveal at" required hint="Customers can reveal at this exact moment" htmlFor="surprise-reveal-at" />
+            <Input
+              id="surprise-reveal-at"
+              type="datetime-local"
+              lang="en-US"
+              value={form.revealAt}
+              onChange={(e) => set('revealAt', e.target.value)}
+              className={inputClassName}
+            />
+          </SectionCard>
+        ) : null}
 
-          {/* Advanced */}
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Reveal Window (minutes)" hint="How long after reveal user has to redeem (default 60)">
-              <input
-                className={inputCls}
+        {/* Advanced */}
+        <SectionCard>
+          <FieldLabel label="Advanced" />
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+                Reveal window (minutes)
+              </label>
+              <Input
                 type="number"
                 min={1}
-                placeholder="60"
                 value={form.revealDurationMinutes}
                 onChange={(e) => set('revealDurationMinutes', e.target.value)}
+                placeholder="60"
+                className="h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
               />
-            </Field>
-            <Field label="Total Slots" hint="Leave blank for unlimited">
-              <input
-                className={inputCls}
+              <p className="mt-1 text-[11px] text-neutral-400">How long after reveal users have to redeem.</p>
+            </div>
+            <div>
+              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+                Total slots
+              </label>
+              <Input
                 type="number"
                 min={1}
-                placeholder="e.g. 50"
                 value={form.surpriseTotalSlots}
                 onChange={(e) => set('surpriseTotalSlots', e.target.value)}
+                placeholder="50"
+                className="h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
               />
-            </Field>
+              <p className="mt-1 text-[11px] text-neutral-400">Leave blank for unlimited reveals.</p>
+            </div>
           </div>
-        </div>
-
-        <div className="mt-6 flex gap-3">
-          <Button
-            size="md"
-            className="flex-1 rounded-full"
-            onClick={handleSubmit}
-            disabled={create.isPending}
-          >
-            {create.isPending ? 'Creating…' : 'Create Surprise Deal'}
-          </Button>
-          <Link to={PATHS.MERCHANT_SURPRISES}>
-            <Button variant="secondary" size="md" className="rounded-full">
-              Cancel
-            </Button>
-          </Link>
-        </div>
+        </SectionCard>
       </div>
-    </div>
+    </QuickFormLayout>
   );
 }
 

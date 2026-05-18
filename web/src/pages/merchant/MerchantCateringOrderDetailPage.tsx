@@ -269,7 +269,7 @@ function MerchantCateringOrderDetailInner() {
             {meta.eventDate && (
               <p className="flex items-start gap-2">
                 <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-neutral-400" />
-                Event: {new Date(meta.eventDate).toLocaleDateString()}
+                Event: {new Date(meta.eventDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
               </p>
             )}
             {fulfillmentType === 'PICKUP' && (

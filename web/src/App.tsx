@@ -272,6 +272,9 @@ const SurprisesPage = React.lazy(() =>
 const MyRevealHistoryPage = React.lazy(() =>
   import('./pages/MyRevealHistoryPage').then((m) => ({ default: m.MyRevealHistoryPage })),
 );
+const MyCheckInRewardsPage = React.lazy(() =>
+  import('./pages/MyCheckInRewardsPage').then((m) => ({ default: m.MyCheckInRewardsPage })),
+);
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
 import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
@@ -1333,6 +1336,16 @@ function App() {
                       <ProtectedRoute>
                         <Suspense fallback={<LoadingOverlay />}>
                           <MyRevealHistoryPage />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path={PATHS.MY_CHECKIN_REWARDS}
+                    element={
+                      <ProtectedRoute>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <MyCheckInRewardsPage />
                         </Suspense>
                       </ProtectedRoute>
                     }

@@ -30,6 +30,16 @@ type CheckInGameSessionSummary = {
   expiresAt: string;
 };
 
+type IssuedCheckInReward = {
+  id: number;
+  rewardType: string;
+  rewardValue: number;
+  rewardLabel?: string | null;
+  imageUrl?: string | null;
+  claimCode: string;
+  expiresAt?: string | null;
+};
+
 interface PostCheckInGameModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -38,6 +48,7 @@ interface PostCheckInGameModalProps {
   eligibleRewards?: EligibleReward[];
   lotteryEntry?: LotteryEntry | null;
   gameSession?: CheckInGameSessionSummary | null;
+  checkInReward?: IssuedCheckInReward | null;
   onCheckOut?: () => void;
 }
 
@@ -210,6 +221,7 @@ export function PostCheckInGameModal({
   eligibleRewards = [],
   lotteryEntry = null,
   gameSession = null,
+  checkInReward = null,
   onCheckOut,
 }: PostCheckInGameModalProps) {
   const { data: session } = useCheckInGameSession(gameSession?.sessionToken ?? null, isOpen && !!gameSession);
@@ -248,7 +260,7 @@ export function PostCheckInGameModal({
   if (!isOpen) return null;
 
   const resultSlot = playResult?.resultSlot ?? session?.resultSlot ?? null;
-  const reward = playResult?.reward ?? session?.reward ?? null;
+  const reward = checkInReward ?? playResult?.reward ?? session?.reward ?? null;
   const rewardLabel = reward ? rewardValueLabel(reward.rewardType, reward.rewardValue, reward.rewardLabel) : null;
 
   return (
@@ -272,7 +284,7 @@ export function PostCheckInGameModal({
             <h2 className="text-3xl font-black tracking-tight">You&apos;re checked in at {deal.merchant.businessName}</h2>
             <p className="mt-2 text-xl font-semibold text-emerald-300">+{pointsEarned} coins earned</p>
             <p className="mt-3 text-sm text-white/80">
-              {gameSession ? 'Your merchant has a bonus game ready below.' : 'Your rewards are ready below.'}
+              {checkInReward ? 'Your check-in reward is ready below.' : gameSession ? 'Your merchant has a bonus game ready below.' : 'Your rewards are ready below.'}
             </p>
           </div>
         </div>
@@ -323,18 +335,25 @@ export function PostCheckInGameModal({
 
           {reward && (
             <section className="rounded-3xl border border-emerald-500/30 bg-emerald-900/30 p-5">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 {reward.imageUrl ? (
-                  <div className="h-14 w-14 overflow-hidden rounded-2xl border border-emerald-500/20 bg-emerald-950/40">
+                  <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-emerald-500/20 bg-emerald-950/40">
                     <img src={reward.imageUrl} alt={rewardLabel || 'Reward'} className="h-full w-full object-cover" />
                   </div>
-                ) : null}
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-300">
-                  {reward.rewardType.includes('DISCOUNT') ? <Percent className="h-6 w-6" /> : reward.rewardType === 'COINS' ? <Coins className="h-6 w-6" /> : <Trophy className="h-6 w-6" />}
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-emerald-100">Bonus reward unlocked</h3>
-                  <p className="text-sm text-emerald-200">{rewardLabel}</p>
+                ) : (
+                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-300">
+                    {reward.rewardType.includes('DISCOUNT')
+                      ? <Percent className="h-7 w-7" />
+                      : (reward.rewardType === 'COINS' || reward.rewardType === 'BONUS_POINTS')
+                        ? <Coins className="h-7 w-7" />
+                        : <Trophy className="h-7 w-7" />}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300/80">
+                    {checkInReward ? 'Check-in reward' : 'Bonus reward unlocked'}
+                  </div>
+                  <h3 className="mt-1 truncate text-xl font-bold text-emerald-50">{rewardLabel}</h3>
                 </div>
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">

@@ -772,7 +772,7 @@ function EventManageContent() {
             <p className="text-sm text-neutral-500">
               {EVENT_TYPES.find((t) => t.value === event.eventType)?.label ?? event.eventType}
               {' · '}
-              Created {new Date(event.createdAt).toLocaleDateString()}
+              Created {new Date(event.createdAt).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
             </p>
           </div>
 

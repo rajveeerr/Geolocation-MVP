@@ -1,15 +1,23 @@
 import { Button } from '@/components/common/Button';
-import { Plus, Tag, CalendarIcon, ClockIcon, DollarSign, Percent, Edit, Trash2 } from 'lucide-react';
+import { Plus, CalendarIcon, ClockIcon, Edit, Trash2, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PATHS } from '@/routing/paths';
-import { useQuery } from '@tanstack/react-query';
-import { apiGet } from '@/services/api';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { apiDelete, apiGet } from '@/services/api';
 import { MerchantProtectedRoute } from '@/components/auth/MerchantProtectedRoute';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { useModal } from '@/context/ModalContext';
+import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface Deal {
   id: string;
@@ -45,8 +53,8 @@ const DealCard = ({ deal, onEdit, onDelete }: {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
       year: 'numeric',
     });
   };
@@ -59,76 +67,77 @@ const DealCard = ({ deal, onEdit, onDelete }: {
     });
   };
 
+  const dealTypeLabel = deal.dealType?.name ?? 'Item Deal';
+  const statusLabel = isActive ? 'Active' : isExpired ? 'Expired' : 'Scheduled';
+  const statusDot = isActive ? 'bg-emerald-500' : isExpired ? 'bg-rose-500' : 'bg-amber-500';
+  const statusText = isActive ? 'text-emerald-700' : isExpired ? 'text-rose-700' : 'text-amber-700';
+
+  const discountLabel = deal.discountPercentage
+    ? `${deal.discountPercentage}% off`
+    : deal.discountAmount
+      ? `$${deal.discountAmount} off`
+      : null;
+
   return (
-    <div className="rounded-[1.45rem] border border-neutral-200/80 bg-white/95 p-6 shadow-[0_8px_22px_rgba(15,23,42,0.045)] transition hover:shadow-[0_12px_28px_rgba(15,23,42,0.06)]">
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <h3 className="max-w-[80%] text-[1.05rem] font-semibold tracking-tight text-neutral-900">{deal.title}</h3>
-        <span
-          className={`rounded-full px-3 py-1 text-[13px] font-medium ${
-            isActive
-              ? 'bg-emerald-100 text-emerald-800'
-              : isExpired
-                ? 'bg-rose-100 text-rose-700'
-                : 'bg-amber-100 text-amber-800'
-          }`}
-        >
-          {isActive ? 'Active' : isExpired ? 'Expired' : 'Scheduled'}
+    <div className="flex h-full flex-col rounded-[1.45rem] border border-neutral-200/80 bg-white/95 p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)] transition hover:shadow-[0_12px_28px_rgba(15,23,42,0.07)]">
+      {/* Eyebrow row: deal type + status dot */}
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">
+          {dealTypeLabel}
+        </span>
+        <span className={cn('inline-flex items-center gap-1.5 text-[11px] font-semibold', statusText)}>
+          <span className={cn('h-1.5 w-1.5 rounded-full', statusDot)} />
+          {statusLabel}
         </span>
       </div>
 
-      <p className="mb-4 line-clamp-3 text-[13px] leading-6 text-neutral-600">{deal.description}</p>
+      {/* Title */}
+      <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug tracking-tight text-neutral-900">
+        {deal.title}
+      </h3>
 
-      <div className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] text-neutral-500">
-        <div className="flex items-center gap-1">
-          <CalendarIcon className="h-4 w-4" />
-          <span>{formatDate(deal.startTime)}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <ClockIcon className="h-4 w-4" />
-          <span>{formatTime(deal.startTime)} - {formatTime(deal.endTime)}</span>
-        </div>
-      </div>
+      {/* Description */}
+      {deal.description ? (
+        <p className="mt-1.5 line-clamp-2 text-[13px] leading-5 text-neutral-600">{deal.description}</p>
+      ) : null}
 
-      <div className="mb-4 flex items-center gap-2">
-        {deal.discountPercentage ? (
-          <div className="flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1">
-            <Percent className="h-4 w-4 text-emerald-600" />
-            <span className="text-[13px] font-semibold text-emerald-700">
-              {deal.discountPercentage}% OFF
-            </span>
-          </div>
-        ) : deal.discountAmount ? (
-          <div className="flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1">
-            <DollarSign className="h-4 w-4 text-emerald-600" />
-            <span className="text-[13px] font-semibold text-emerald-700">
-              ${deal.discountAmount} OFF
-            </span>
-          </div>
+      {/* Discount + schedule */}
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        {discountLabel ? (
+          <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-[12px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/15">
+            {discountLabel}
+          </span>
         ) : null}
+        <span className="inline-flex items-center gap-1 text-[12px] text-neutral-500">
+          <CalendarIcon className="h-3.5 w-3.5" />
+          {formatDate(deal.startTime)}
+        </span>
+        <span className="inline-flex items-center gap-1 text-[12px] text-neutral-500">
+          <ClockIcon className="h-3.5 w-3.5" />
+          {formatTime(deal.startTime)} – {formatTime(deal.endTime)}
+        </span>
       </div>
 
-      <div className="flex items-center justify-between gap-3 border-t border-neutral-100 pt-4">
-        <div className="text-xs text-neutral-500">
-          Created {formatDate(deal.createdAt)}
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            className="rounded-full border-neutral-200 bg-white px-4 text-[13px] text-neutral-700 hover:bg-neutral-50"
+      {/* Footer */}
+      <div className="mt-auto flex items-center justify-between gap-2 border-t border-neutral-100 pt-3 mt-4">
+        <span className="text-[11px] text-neutral-400">Created {formatDate(deal.createdAt)}</span>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
             onClick={() => onEdit(deal)}
+            className="inline-flex h-8 items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 text-[12px] font-semibold text-neutral-700 transition hover:border-neutral-300 hover:bg-neutral-50"
           >
-            <Edit className="mr-1 h-3 w-3" />
+            <Edit className="h-3 w-3" />
             Edit
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="rounded-full px-3 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800"
+          </button>
+          <button
+            type="button"
             onClick={() => onDelete(deal)}
+            aria-label="Delete deal"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-neutral-400 transition hover:bg-rose-50 hover:text-rose-600"
           >
-            <Trash2 className="h-3 w-3" />
-          </Button>
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
         </div>
       </div>
     </div>
@@ -159,9 +168,18 @@ const DealsSkeleton = () => (
 
 const MerchantMyDealsContent = () => {
   const navigate = useNavigate();
-  const { openModal } = useModal();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   type DealStatusFilter = 'all' | 'active' | 'scheduled' | 'expired';
-  type DealTypeFilter = 'all' | 'happy_hour' | 'standard' | 'recurring';
+  type DealTypeFilter =
+    | 'all'
+    | 'standard'
+    | 'happy_hour'
+    | 'recurring'
+    | 'redeem_now'
+    | 'hidden'
+    | 'bounty'
+    | 'bogo';
   type CategoryFilter = 'all' | 'food_beverage' | 'retail' | 'entertainment' | 'health_fitness' | 'beauty_wellness' | 'other';
   const panelClass =
     'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
@@ -210,17 +228,36 @@ const MerchantMyDealsContent = () => {
       });
     }
 
-    // Filter by deal type
+    // Filter by deal type — matches the backend dealType.name (case-insensitive
+    // substring match) against the merchant's filter selection.
     if (activeDealType !== 'all') {
       filtered = filtered.filter((deal) => {
-        const dealType = deal.dealType?.name?.toLowerCase() || 'standard';
+        const dealType = deal.dealType?.name?.toLowerCase() ?? 'standard';
         switch (activeDealType) {
+          case 'standard': {
+            // Standard / Item Deal — also matches when name is missing.
+            const isSpecial =
+              dealType.includes('happy') ||
+              dealType.includes('recurring') ||
+              dealType.includes('daily') ||
+              dealType.includes('redeem') ||
+              dealType.includes('hidden') ||
+              dealType.includes('bounty') ||
+              dealType.includes('bogo');
+            return !isSpecial;
+          }
           case 'happy_hour':
-            return dealType.includes('happy') || dealType.includes('hour');
-          case 'standard':
-            return dealType.includes('standard') || dealType.includes('regular');
+            return dealType.includes('happy');
           case 'recurring':
-            return dealType.includes('recurring');
+            return dealType.includes('recurring') || dealType.includes('daily');
+          case 'redeem_now':
+            return dealType.includes('redeem');
+          case 'hidden':
+            return dealType.includes('hidden');
+          case 'bounty':
+            return dealType.includes('bounty');
+          case 'bogo':
+            return dealType.includes('bogo');
           default:
             return true;
         }
@@ -258,18 +295,32 @@ const MerchantMyDealsContent = () => {
     navigate(`/merchant/deals/${deal.id}/edit`);
   };
 
+  const [dealToDelete, setDealToDelete] = useState<Deal | null>(null);
+
+  const deleteMutation = useMutation({
+    mutationFn: async (dealId: string | number) => {
+      const response = await apiDelete<{ message?: string }>(`/merchants/me/deals/${dealId}`);
+      if (!response.success) {
+        throw new Error(response.error ?? 'Failed to delete deal');
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['merchant-deals'] });
+      toast({ title: 'Deal deleted', description: 'The deal has been removed.' });
+      setDealToDelete(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Could not delete deal',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
   const handleDelete = (deal: Deal) => {
-    openModal({
-      title: 'Delete Deal',
-      content: `Are you sure you want to delete "${deal.title}"? This action cannot be undone.`,
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
-      onConfirm: () => {
-        // Implement delete functionality
-        console.log('Delete deal:', deal.id);
-      },
-      variant: 'destructive'
-    });
+    setDealToDelete(deal);
   };
 
   if (merchantLoading) {
@@ -363,78 +414,73 @@ const MerchantMyDealsContent = () => {
         </div>
       </div>
 
-      <div className={cn(panelClass, 'mb-8 p-5 sm:p-6')}>
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h3 className="text-[15px] font-semibold text-neutral-900">Filters</h3>
-            <p className="mt-1 text-[13px] text-neutral-500">Refine by status, deal type, or category.</p>
-          </div>
-          <div className="flex items-center gap-2 text-[13px] text-neutral-500">
-            <span>Showing {filteredDeals.length} deals</span>
-            {(activeFilter !== 'all' || activeDealType !== 'all' || activeCategory !== 'all') && (
-              <button
-                onClick={() => {
-                  setActiveFilter('all');
-                  setActiveDealType('all');
-                  setActiveCategory('all');
-                }}
-                className="font-medium text-neutral-700 transition hover:text-neutral-950"
-              >
-                Clear all
-              </button>
-            )}
-          </div>
-        </div>
+      <div className={cn(panelClass, 'mb-6 flex flex-wrap items-center gap-2 px-3 py-2 sm:px-4')}>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">
+          Filters
+        </span>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="space-y-2">
-            <label className="text-[13px] font-medium text-neutral-700">Status</label>
-            <Select value={activeFilter} onValueChange={(value) => setActiveFilter(value as DealStatusFilter)}>
-              <SelectTrigger className="h-11 w-full rounded-[1rem] border-neutral-200 bg-white text-[13px] shadow-sm">
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="scheduled">Scheduled</SelectItem>
-                <SelectItem value="expired">Expired</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <Select value={activeFilter} onValueChange={(value) => setActiveFilter(value as DealStatusFilter)}>
+          <SelectTrigger className="h-8 w-auto min-w-[120px] gap-1.5 rounded-full border-neutral-200 bg-white px-3 text-[12px] font-medium shadow-none">
+            <span className="text-neutral-500">Status:</span>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="scheduled">Scheduled</SelectItem>
+            <SelectItem value="expired">Expired</SelectItem>
+          </SelectContent>
+        </Select>
 
-          <div className="space-y-2">
-            <label className="text-[13px] font-medium text-neutral-700">Deal Type</label>
-            <Select value={activeDealType} onValueChange={(value) => setActiveDealType(value as DealTypeFilter)}>
-              <SelectTrigger className="h-11 w-full rounded-[1rem] border-neutral-200 bg-white text-[13px] shadow-sm">
-                <SelectValue placeholder="Select deal type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="happy_hour">Happy Hour</SelectItem>
-                <SelectItem value="standard">Item Deal</SelectItem>
-                <SelectItem value="recurring">Recurring</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <Select value={activeDealType} onValueChange={(value) => setActiveDealType(value as DealTypeFilter)}>
+          <SelectTrigger className="h-8 w-auto min-w-[140px] gap-1.5 rounded-full border-neutral-200 bg-white px-3 text-[12px] font-medium shadow-none">
+            <span className="text-neutral-500">Type:</span>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="standard">Item Deal</SelectItem>
+            <SelectItem value="happy_hour">Happy Hour</SelectItem>
+            <SelectItem value="recurring">Daily Deal</SelectItem>
+            <SelectItem value="redeem_now">Redeem Now</SelectItem>
+            <SelectItem value="hidden">Hidden Deal</SelectItem>
+            <SelectItem value="bounty">Bounty Deal</SelectItem>
+            <SelectItem value="bogo">BOGO Deal</SelectItem>
+          </SelectContent>
+        </Select>
 
-          <div className="space-y-2">
-            <label className="text-[13px] font-medium text-neutral-700">Category</label>
-            <Select value={activeCategory} onValueChange={(value) => setActiveCategory(value as CategoryFilter)}>
-              <SelectTrigger className="h-11 w-full rounded-[1rem] border-neutral-200 bg-white text-[13px] shadow-sm">
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="food_beverage">Food & Beverage</SelectItem>
-                <SelectItem value="retail">Retail</SelectItem>
-                <SelectItem value="entertainment">Entertainment</SelectItem>
-                <SelectItem value="health_fitness">Health & Fitness</SelectItem>
-                <SelectItem value="beauty_wellness">Beauty & Wellness</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <Select value={activeCategory} onValueChange={(value) => setActiveCategory(value as CategoryFilter)}>
+          <SelectTrigger className="h-8 w-auto min-w-[160px] gap-1.5 rounded-full border-neutral-200 bg-white px-3 text-[12px] font-medium shadow-none">
+            <span className="text-neutral-500">Category:</span>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            <SelectItem value="food_beverage">Food & Beverage</SelectItem>
+            <SelectItem value="retail">Retail</SelectItem>
+            <SelectItem value="entertainment">Entertainment</SelectItem>
+            <SelectItem value="health_fitness">Health & Fitness</SelectItem>
+            <SelectItem value="beauty_wellness">Beauty & Wellness</SelectItem>
+            <SelectItem value="other">Other</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {(activeFilter !== 'all' || activeDealType !== 'all' || activeCategory !== 'all') && (
+          <button
+            onClick={() => {
+              setActiveFilter('all');
+              setActiveDealType('all');
+              setActiveCategory('all');
+            }}
+            className="rounded-full px-2 py-1 text-[12px] font-semibold text-neutral-700 transition hover:text-neutral-950"
+          >
+            Clear
+          </button>
+        )}
+
+        <span className="ml-auto text-[12px] text-neutral-500">
+          {filteredDeals.length} {filteredDeals.length === 1 ? 'deal' : 'deals'}
+        </span>
       </div>
 
       {/* Deals Content */}
@@ -517,10 +563,16 @@ const MerchantMyDealsContent = () => {
               <p className="text-[13px] text-neutral-500">Create different offer types to keep your storefront fresh.</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
-              <Link to={PATHS.MERCHANT_DEALS_CREATE}>
+              <Link to={PATHS.MERCHANT_DEALS_CREATE_STANDARD}>
                 <Button size="sm" className="rounded-full bg-neutral-950 px-4 text-white hover:bg-neutral-800">
                   <Plus className="mr-1 h-3 w-3" />
                   Item Deal
+                </Button>
+              </Link>
+              <Link to={PATHS.MERCHANT_DEALS_CREATE_DAILY}>
+                <Button size="sm" variant="outline" className="rounded-full border-neutral-200 bg-white px-4 text-neutral-700 hover:bg-neutral-50">
+                  <Plus className="mr-1 h-3 w-3" />
+                  Daily Deal
                 </Button>
               </Link>
               <Link to={PATHS.MERCHANT_HAPPY_HOUR_CREATE}>
@@ -537,14 +589,61 @@ const MerchantMyDealsContent = () => {
       {/* Floating Action Button for Mobile */}
       <div className="fixed bottom-6 right-6 z-50 sm:hidden">
         <Link to={PATHS.MERCHANT_DEALS_CREATE}>
-          <Button 
-            size="lg" 
+          <Button
+            size="lg"
             className="h-14 w-14 rounded-full bg-neutral-950 shadow-lg transition-all duration-200 hover:bg-neutral-800 hover:shadow-xl"
           >
             <Plus className="h-6 w-6" />
           </Button>
         </Link>
       </div>
+
+      {/* Delete confirmation dialog */}
+      <Dialog
+        open={!!dealToDelete}
+        onOpenChange={(open) => {
+          if (!open && !deleteMutation.isPending) setDealToDelete(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-md border-neutral-200 bg-white text-neutral-800 p-0 overflow-hidden">
+          <DialogHeader className="p-6 pb-4 border-b border-neutral-100">
+            <DialogTitle className="text-lg font-bold text-neutral-900">Delete this deal?</DialogTitle>
+            <DialogDescription className="mt-1 text-sm text-neutral-500">
+              {dealToDelete ? (
+                <>
+                  <span className="font-semibold text-neutral-900">"{dealToDelete.title}"</span> will be
+                  permanently removed. This can't be undone.
+                </>
+              ) : null}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center justify-end gap-2 px-6 py-4">
+            <button
+              type="button"
+              onClick={() => setDealToDelete(null)}
+              disabled={deleteMutation.isPending}
+              className="inline-flex h-9 items-center justify-center rounded-full border border-neutral-200 bg-white px-4 text-[13px] font-semibold text-neutral-700 transition hover:border-neutral-300 hover:bg-neutral-50 disabled:opacity-60"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => dealToDelete && deleteMutation.mutate(dealToDelete.id)}
+              disabled={deleteMutation.isPending}
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-neutral-900 px-4 text-[13px] font-semibold text-white transition hover:bg-neutral-800 disabled:opacity-70"
+            >
+              {deleteMutation.isPending ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Deleting…
+                </>
+              ) : (
+                'Delete deal'
+              )}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

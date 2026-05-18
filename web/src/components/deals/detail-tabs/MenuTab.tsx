@@ -82,10 +82,10 @@ export const MenuTab = ({ deal, onNavigateToTab }: MenuTabProps) => {
   const recurringDaysText = formatRecurringDays();
   
   // Get discount information
-  const discountText = deal.discountPercentage 
-    ? `${deal.discountPercentage}% OFF`
-    : deal.discountAmount 
-    ? `$${deal.discountAmount} OFF`
+  const discountText = deal.discountPercentage
+    ? `UP TO ${deal.discountPercentage}% OFF`
+    : deal.discountAmount
+    ? `UP TO $${deal.discountAmount} OFF`
     : deal.offerDisplay || 'Special Offer';
   
   // Get menu items count
@@ -285,7 +285,7 @@ export const MenuTab = ({ deal, onNavigateToTab }: MenuTabProps) => {
             />
             {discountPercent > 0 && (
               <div className="absolute top-3 right-3 bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-lg">
-                {discountPercent}% OFF
+                UP TO {discountPercent}% OFF
               </div>
             )}
           </div>

@@ -396,6 +396,7 @@ export const CateringCartDrawer = ({ open, onClose }: CateringCartDrawerProps) =
                       <Input
                         id="cust-date"
                         type="date"
+                        lang="en-US"
                         value={form.eventDate}
                         onChange={(e) => setForm((p) => ({ ...p, eventDate: e.target.value }))}
                         className="mt-1.5 h-10 sm:max-w-xs"

@@ -106,14 +106,14 @@ function EventCard({
             <Clock className="h-3.5 w-3.5" />
             <span>
               {startDate.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
                 year: 'numeric',
               })}
               {' - '}
               {endDate.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
                 year: 'numeric',
               })}
             </span>

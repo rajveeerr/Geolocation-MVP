@@ -113,9 +113,9 @@ export const PremiumDealCard = ({ deal }: PremiumDealCardProps) => {
               </p>
             </div>
             <div className="px-2">
-              <p className="text-xs text-neutral-500">DISCOUNT</p>
+              <p className="text-xs text-neutral-500">MAX DISCOUNT</p>
               <p className="text-sm font-bold sm:text-base">
-                {Math.round((deal.discountValue / deal.originalValue) * 100)}%
+                Up to {Math.round((deal.discountValue / deal.originalValue) * 100)}%
               </p>
             </div>
             <div className="pl-2">

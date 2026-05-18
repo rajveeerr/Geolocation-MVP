@@ -83,13 +83,18 @@ const navSections: MerchantNavSection[] = [
     label: 'Deals',
     items: [
       {
-        label: 'Deals',
+        label: 'Create Deal',
+        to: PATHS.MERCHANT_DEALS_CREATE,
+        icon: Ticket,
+        match: (pathname) => pathname === PATHS.MERCHANT_DEALS_CREATE,
+      },
+      {
+        label: 'My Deals',
         to: PATHS.MERCHANT_DEALS,
         icon: Ticket,
         match: (pathname) =>
-          pathname.startsWith('/merchant/deals') &&
-          !pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN) &&
-          !pathname.startsWith(PATHS.MERCHANT_DEALS_BOUNTIES),
+          pathname === PATHS.MERCHANT_DEALS ||
+          /^\/merchant\/deals\/\d+\/edit$/.test(pathname),
       },
       ...dealCreationSidebarItems,
     ],
@@ -325,6 +330,11 @@ const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; s
     subtitle: 'Set up a new promotion from the deal types in the sidebar.',
   },
   {
+    match: (pathname) => pathname === PATHS.MERCHANT_DEALS,
+    title: 'My Deals',
+    subtitle: 'All deals you\'ve created, across types.',
+  },
+  {
     match: (pathname) => pathname.startsWith('/merchant/deals') && !pathname.startsWith(PATHS.MERCHANT_DEALS_HIDDEN),
     title: 'Deals',
     subtitle: 'Create, tune, and monitor promotions from one place.',
@@ -447,7 +457,7 @@ const pageTitles: Array<{ match: (pathname: string) => boolean; title: string; s
   {
     match: (pathname) => pathname.startsWith(PATHS.MERCHANT_CHECKIN_GAMES),
     title: 'Check-in rewards',
-    subtitle: 'Configure games and rewards customers earn for checking in.',
+    subtitle: 'Configure rewards customers earn for checking in.',
   },
   {
     match: (pathname) => pathname.startsWith('/merchant/surprises'),
@@ -963,10 +973,6 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
     return pageMeta;
   }, [location.pathname, pageMeta]);
 
-  const showPageHeader = useMemo(() => !location.pathname.startsWith(PATHS.MERCHANT_DEALS_CREATE), [
-    location.pathname,
-  ]);
-
   const activeSection = useMemo(() => getActiveSection(location.pathname), [location.pathname]);
   const merchantName = merchantData?.data?.merchant?.businessName?.trim() || user?.name?.trim() || 'Merchant Business';
   const profileAvatarUrl = user?.avatarUrl || null;
@@ -1198,14 +1204,6 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
                       {enrichedPageMeta.title}
                     </span>
                 </nav>
-                {showPageHeader ? (
-                  <>
-                    <h1 className="mt-1.5 truncate text-[1.55rem] font-semibold tracking-tight text-neutral-950 sm:text-[1.75rem]">
-                      {enrichedPageMeta.title}
-                    </h1>
-                    <p className="mt-1 max-w-3xl text-[13px] text-neutral-500 sm:text-sm">{enrichedPageMeta.subtitle}</p>
-                  </>
-                ) : null}
               </div>
             </div>
           </header>

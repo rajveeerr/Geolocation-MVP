@@ -2,11 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ArrowRight, Loader2, QrCode, RefreshCw, Target, Users } from 'lucide-react';
+import { ArrowRight, Loader2, QrCode, RefreshCw, Search, Target, Users } from 'lucide-react';
 import { MerchantProtectedRoute } from '@/components/auth/MerchantProtectedRoute';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { useToast } from '@/hooks/use-toast';
 import { useRefreshBountyQR } from '@/hooks/useKitty';
@@ -58,7 +59,7 @@ const panelClass =
   'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  new Date(iso).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
 
 const dealState = (deal: MerchantBountyDeal) => {
   if (deal.isExpired) return { label: 'Expired', tone: 'bg-neutral-100 text-neutral-600 ring-neutral-400/20' };
@@ -346,6 +347,59 @@ function MerchantBountyDealsContent() {
   const availableDeals = useMemo(() => deals.filter((deal) => !deal.isExpired), [deals]);
   const bountyDeals = useMemo(() => deals.filter((deal) => (deal.bountyRewardAmount ?? 0) > 0), [deals]);
 
+  type BountyStatusFilter = 'all' | 'active' | 'scheduled' | 'expired';
+  type BountySort = 'recent' | 'reward_desc' | 'redemptions_desc';
+  type AvailableStatusFilter = 'all' | 'active' | 'scheduled';
+  type AvailableBountyFilter = 'all' | 'configured' | 'unconfigured';
+
+  const [bountyStatusFilter, setBountyStatusFilter] = useState<BountyStatusFilter>('all');
+  const [bountySort, setBountySort] = useState<BountySort>('recent');
+  const [bountySearch, setBountySearch] = useState('');
+
+  // Filters for the "Choose a deal" picker (attach-bounty list)
+  const [pickerSearch, setPickerSearch] = useState('');
+  const [pickerStatus, setPickerStatus] = useState<AvailableStatusFilter>('all');
+  const [pickerBounty, setPickerBounty] = useState<AvailableBountyFilter>('all');
+
+  const filteredAvailableDeals = useMemo(() => {
+    const term = pickerSearch.trim().toLowerCase();
+    return availableDeals.filter((deal) => {
+      if (pickerStatus === 'active' && deal.isUpcoming) return false;
+      if (pickerStatus === 'scheduled' && !deal.isUpcoming) return false;
+      const hasBounty = (deal.bountyRewardAmount ?? 0) > 0;
+      if (pickerBounty === 'configured' && !hasBounty) return false;
+      if (pickerBounty === 'unconfigured' && hasBounty) return false;
+      if (term && !deal.title.toLowerCase().includes(term)) return false;
+      return true;
+    });
+  }, [availableDeals, pickerSearch, pickerStatus, pickerBounty]);
+
+  const hasActivePickerFilter =
+    pickerStatus !== 'all' || pickerBounty !== 'all' || pickerSearch.trim().length > 0;
+
+  const filteredBountyDeals = useMemo(() => {
+    const term = bountySearch.trim().toLowerCase();
+    const filtered = bountyDeals.filter((deal) => {
+      if (bountyStatusFilter === 'active' && (deal.isExpired || deal.isUpcoming)) return false;
+      if (bountyStatusFilter === 'scheduled' && !deal.isUpcoming) return false;
+      if (bountyStatusFilter === 'expired' && !deal.isExpired) return false;
+      if (term && !deal.title.toLowerCase().includes(term)) return false;
+      return true;
+    });
+    const sorted = [...filtered];
+    if (bountySort === 'reward_desc') {
+      sorted.sort((a, b) => (b.bountyRewardAmount ?? 0) - (a.bountyRewardAmount ?? 0));
+    } else if (bountySort === 'redemptions_desc') {
+      sorted.sort((a, b) => (b.currentRedemptions ?? 0) - (a.currentRedemptions ?? 0));
+    } else {
+      // 'recent' — keep API order (already sorted desc by createdAt server-side)
+    }
+    return sorted;
+  }, [bountyDeals, bountyStatusFilter, bountySort, bountySearch]);
+
+  const hasActiveBountyFilter =
+    bountyStatusFilter !== 'all' || bountySort !== 'recent' || bountySearch.trim().length > 0;
+
   const [selectedDealId, setSelectedDealId] = useState<number | null>(null);
   const [form, setForm] = useState<BountyFormState>(() => createBlankForm());
 
@@ -493,16 +547,99 @@ function MerchantBountyDealsContent() {
               </div>
             </div>
           ) : (
-            <div className="grid gap-3 md:grid-cols-2">
-              {availableDeals.map((deal) => (
-                <BountySelectionCard
-                  key={deal.id}
-                  deal={deal}
-                  selected={deal.id === selectedDeal?.id}
-                  onSelect={(picked) => setSelectedDealId(picked.id)}
-                />
-              ))}
-            </div>
+            <>
+              {/* Filter bar */}
+              <div className={cn(panelClass, 'flex flex-wrap items-center gap-2 px-3 py-2 sm:px-4')}>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">
+                  Filters
+                </span>
+
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-400" />
+                  <Input
+                    type="text"
+                    placeholder="Search title"
+                    value={pickerSearch}
+                    onChange={(e) => setPickerSearch(e.target.value)}
+                    className="h-8 w-[160px] rounded-full border-neutral-200 bg-white pl-7 pr-3 text-[12px] shadow-none"
+                  />
+                </div>
+
+                <Select
+                  value={pickerStatus}
+                  onValueChange={(value) => setPickerStatus(value as AvailableStatusFilter)}
+                >
+                  <SelectTrigger className="h-8 w-auto min-w-[120px] gap-1.5 rounded-full border-neutral-200 bg-white px-3 text-[12px] font-medium shadow-none">
+                    <span className="text-neutral-500">Status:</span>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="scheduled">Scheduled</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  value={pickerBounty}
+                  onValueChange={(value) => setPickerBounty(value as AvailableBountyFilter)}
+                >
+                  <SelectTrigger className="h-8 w-auto min-w-[140px] gap-1.5 rounded-full border-neutral-200 bg-white px-3 text-[12px] font-medium shadow-none">
+                    <span className="text-neutral-500">Bounty:</span>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="unconfigured">No bounty yet</SelectItem>
+                    <SelectItem value="configured">Configured</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {hasActivePickerFilter ? (
+                  <button
+                    onClick={() => {
+                      setPickerSearch('');
+                      setPickerStatus('all');
+                      setPickerBounty('all');
+                    }}
+                    className="rounded-full px-2 py-1 text-[12px] font-semibold text-neutral-700 transition hover:text-neutral-950"
+                  >
+                    Clear
+                  </button>
+                ) : null}
+
+                <span className="ml-auto text-[12px] text-neutral-500">
+                  {filteredAvailableDeals.length} of {availableDeals.length}
+                </span>
+              </div>
+
+              {filteredAvailableDeals.length === 0 ? (
+                <div className={cn(panelClass, 'px-4 py-10 text-center')}>
+                  <p className="text-[13px] text-neutral-500">No deals match these filters.</p>
+                  <button
+                    onClick={() => {
+                      setPickerSearch('');
+                      setPickerStatus('all');
+                      setPickerBounty('all');
+                    }}
+                    className="mt-2 inline-flex h-8 items-center rounded-full border border-neutral-200 bg-white px-3 text-[12px] font-semibold text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50"
+                  >
+                    Clear filters
+                  </button>
+                </div>
+              ) : (
+                <div className="grid gap-3 md:grid-cols-2">
+                  {filteredAvailableDeals.map((deal) => (
+                    <BountySelectionCard
+                      key={deal.id}
+                      deal={deal}
+                      selected={deal.id === selectedDeal?.id}
+                      onSelect={(picked) => setSelectedDealId(picked.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -522,7 +659,7 @@ function MerchantBountyDealsContent() {
       </div>
 
       {bountyDeals.length > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div className={cn(panelClass, 'flex items-center justify-between gap-3 p-4')}>
             <div>
               <h3 className="text-base font-bold text-neutral-900">Configured bounties</h3>
@@ -533,11 +670,92 @@ function MerchantBountyDealsContent() {
               {bountyDeals.length}
             </div>
           </div>
-          <div className="grid gap-3 lg:grid-cols-2">
-            {bountyDeals.map((deal) => (
-              <BountyDealCard key={deal.id} deal={deal} />
-            ))}
+
+          {/* Filter bar */}
+          <div className={cn(panelClass, 'flex flex-wrap items-center gap-2 px-3 py-2 sm:px-4')}>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">
+              Filters
+            </span>
+
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-400" />
+              <Input
+                type="text"
+                placeholder="Search title"
+                value={bountySearch}
+                onChange={(e) => setBountySearch(e.target.value)}
+                className="h-8 w-[160px] rounded-full border-neutral-200 bg-white pl-7 pr-3 text-[12px] shadow-none"
+              />
+            </div>
+
+            <Select
+              value={bountyStatusFilter}
+              onValueChange={(value) => setBountyStatusFilter(value as BountyStatusFilter)}
+            >
+              <SelectTrigger className="h-8 w-auto min-w-[120px] gap-1.5 rounded-full border-neutral-200 bg-white px-3 text-[12px] font-medium shadow-none">
+                <span className="text-neutral-500">Status:</span>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="scheduled">Scheduled</SelectItem>
+                <SelectItem value="expired">Expired</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={bountySort} onValueChange={(value) => setBountySort(value as BountySort)}>
+              <SelectTrigger className="h-8 w-auto min-w-[150px] gap-1.5 rounded-full border-neutral-200 bg-white px-3 text-[12px] font-medium shadow-none">
+                <span className="text-neutral-500">Sort:</span>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="recent">Most recent</SelectItem>
+                <SelectItem value="reward_desc">Highest reward</SelectItem>
+                <SelectItem value="redemptions_desc">Most redemptions</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {hasActiveBountyFilter ? (
+              <button
+                onClick={() => {
+                  setBountyStatusFilter('all');
+                  setBountySort('recent');
+                  setBountySearch('');
+                }}
+                className="rounded-full px-2 py-1 text-[12px] font-semibold text-neutral-700 transition hover:text-neutral-950"
+              >
+                Clear
+              </button>
+            ) : null}
+
+            <span className="ml-auto text-[12px] text-neutral-500">
+              {filteredBountyDeals.length} of {bountyDeals.length}{' '}
+              {bountyDeals.length === 1 ? 'bounty' : 'bounties'}
+            </span>
           </div>
+
+          {filteredBountyDeals.length === 0 ? (
+            <div className={cn(panelClass, 'px-4 py-10 text-center')}>
+              <p className="text-[13px] text-neutral-500">No bounties match these filters.</p>
+              <button
+                onClick={() => {
+                  setBountyStatusFilter('all');
+                  setBountySort('recent');
+                  setBountySearch('');
+                }}
+                className="mt-2 inline-flex h-8 items-center rounded-full border border-neutral-200 bg-white px-3 text-[12px] font-semibold text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50"
+              >
+                Clear filters
+              </button>
+            </div>
+          ) : (
+            <div className="grid gap-3 lg:grid-cols-2">
+              {filteredBountyDeals.map((deal) => (
+                <BountyDealCard key={deal.id} deal={deal} />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

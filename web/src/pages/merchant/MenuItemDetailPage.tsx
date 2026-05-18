@@ -100,9 +100,9 @@ const MenuItemDetailCard = ({ item, onEdit, onDelete }: {
         return 'Recently';
       }
       return date.toLocaleDateString('en-US', {
+        month: '2-digit',
+        day: '2-digit',
         year: 'numeric',
-        month: 'long',
-        day: 'numeric'
       });
     } catch {
       return 'Recently';

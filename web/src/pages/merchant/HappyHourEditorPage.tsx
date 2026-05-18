@@ -406,58 +406,70 @@ const HappyHourEditorContent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <div className="max-w-7xl mx-auto px-4 pt-8 py-36">
-        <div className="flex items-center gap-4">
+    <div className="min-h-screen">
+      <div className="mx-auto max-w-6xl px-3 py-4 pb-36 sm:px-4">
+        <div className="mb-5 flex items-start gap-3">
           <Button onClick={() => navigate('/merchant/deals/create')} variant="ghost" size="sm" className="rounded-full">
             <ArrowLeft />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">Create Happy Hour Deal</h1>
-            <p className="text-sm text-neutral-500">Create a limited-time happy hour to drive visits.</p>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Deals</div>
+            <h1 className="mt-1.5 text-[1.65rem] font-semibold tracking-tight text-neutral-900 sm:text-[1.85rem]">
+              Create Happy Hour Deal
+            </h1>
+            <p className="mt-1.5 max-w-2xl text-[13px] leading-6 text-neutral-600 sm:text-sm">
+              Create a limited-time happy hour to drive visits.
+            </p>
           </div>
         </div>
 
-        <div className="mt-6 max-w-4xl mx-auto">
-          <div className="space-y-6">
+        <div className="space-y-5">
               {/* STEP 1: Menu Items - FIRST AND MOST PROMINENT */}
-              <div className="bg-gradient-to-br from-brand-primary-50 to-blue-50 rounded-xl border-2 border-brand-primary-200 p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 rounded-full bg-brand-primary-500 text-white flex items-center justify-center font-bold text-sm">1</div>
+              <div className="rounded-[1.45rem] border border-neutral-200/80 bg-white/95 p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)]">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <h2 className="text-xl font-bold text-neutral-900">Select Happy Hour Menu Items</h2>
-                    <p className="text-sm text-neutral-600">Choose which items from your happy hour menu will be included in this deal</p>
-                  </div>
-                </div>
-                
-                {state.selectedMenuItems.length === 0 ? (
-                  <div className="bg-white rounded-lg border-2 border-dashed border-neutral-300 p-8 text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-neutral-100 flex items-center justify-center">
-                      <UtensilsCrossed className="h-8 w-8 text-neutral-400" />
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+                      Menu items
                     </div>
-                    <h3 className="font-semibold text-neutral-900 mb-2">No items selected yet</h3>
-                    <p className="text-sm text-neutral-500 mb-4">Start by adding items from your happy hour menu</p>
-                    <Button 
-                      onClick={() => navigate('/merchant/deals/create/happy-hour/add-menu')} 
-                      className="bg-brand-primary-500 hover:bg-brand-primary-600 text-white"
+                    <p className="mt-0.5 text-[12px] text-neutral-500">
+                      Choose which items from your menu are in this happy hour.
+                    </p>
+                  </div>
+                  {state.selectedMenuItems.length > 0 ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/15">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                      {state.selectedMenuItems.length} item{state.selectedMenuItems.length !== 1 ? 's' : ''} selected
+                    </span>
+                  ) : null}
+                </div>
+
+                {state.selectedMenuItems.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-neutral-300 bg-neutral-50/60 px-4 py-8 text-center">
+                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
+                      <UtensilsCrossed className="h-5 w-5 text-neutral-400" />
+                    </div>
+                    <h3 className="text-[14px] font-semibold text-neutral-900">No items selected yet</h3>
+                    <p className="mb-4 mt-1 text-[12px] text-neutral-500">
+                      Add items to include in this happy hour deal.
+                    </p>
+                    <Button
+                      variant="ghost"
+                      onClick={() => navigate('/merchant/deals/create/happy-hour/add-menu')}
+                      className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[hsl(var(--brand-primary))] px-4 text-[13px] font-semibold text-white shadow-[0_6px_18px_hsl(var(--brand-primary)/0.28)] hover:bg-[hsl(var(--brand-primary-hover))] hover:text-white"
                     >
-                      <ShoppingBag className="mr-2 h-4 w-4" /> Add Menu Items
+                      <ShoppingBag className="h-3.5 w-3.5" /> Add menu items
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-neutral-900">{state.selectedMenuItems.length} Item{state.selectedMenuItems.length !== 1 ? 's' : ''} Selected</h3>
-                        <p className="text-sm text-neutral-600">You can add more items or edit pricing for each item</p>
-                      </div>
-                      <Button 
-                        onClick={() => navigate('/merchant/deals/create/happy-hour/add-menu')} 
-                        variant="secondary"
-                        size="sm"
+                    <div className="flex items-center justify-end">
+                      <button
+                        type="button"
+                        onClick={() => navigate('/merchant/deals/create/happy-hour/add-menu')}
+                        className="inline-flex h-8 items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 text-[12px] font-semibold text-neutral-700 transition hover:border-neutral-300 hover:bg-neutral-50"
                       >
-                        <ShoppingBag className="mr-2 h-4 w-4" /> Add More
-                      </Button>
+                        <ShoppingBag className="h-3 w-3" /> Add more
+                      </button>
                     </div>
                     
                     <div className="grid grid-cols-1 gap-3">
@@ -547,28 +559,37 @@ const HappyHourEditorContent = () => {
               </div>
 
               {/* STEP 2: Schedule */}
-              <FormSection title="Schedule" subtitle="Configure when your happy hour is active">
-                <div className="space-y-6">
-                  {/* Active Dates */}
-                  <div>
-                    <Label className="text-sm font-medium text-neutral-700 mb-2 block">Active Dates</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="hh-start-date" className="text-xs text-neutral-500">Start Date</Label>
-                        <Input id="hh-start-date" type="date" value={state.activeStartDate} onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'activeStartDate', value: e.target.value })} />
-                      </div>
-                      <div>
-                        <Label htmlFor="hh-end-date" className="text-xs text-neutral-500">End Date</Label>
-                        <Input id="hh-end-date" type="date" value={state.activeEndDate} onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'activeEndDate', value: e.target.value })} />
-                      </div>
-                    </div>
+              <FormSection title="Schedule" subtitle="When your happy hour is active">
+                <div className="flex flex-wrap items-end gap-3">
+                  <div className="shrink-0">
+                    <label htmlFor="hh-start-date" className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+                      Start date
+                    </label>
+                    <Input
+                      id="hh-start-date"
+                      type="date"
+                      lang="en-US"
+                      value={state.activeStartDate}
+                      onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'activeStartDate', value: e.target.value })}
+                      className="h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                    />
                   </div>
-
-                  {/* Time Ranges */}
-                  <div>
-                    <Label className="text-sm font-medium text-neutral-700 mb-2 block">Time Ranges</Label>
-                    <TimeRangePicker />
+                  <div className="shrink-0">
+                    <label htmlFor="hh-end-date" className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+                      End date
+                    </label>
+                    <Input
+                      id="hh-end-date"
+                      type="date"
+                      lang="en-US"
+                      value={state.activeEndDate}
+                      onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'activeEndDate', value: e.target.value })}
+                      className="h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                    />
                   </div>
+                </div>
+                <div className="mt-4">
+                  <TimeRangePicker />
                 </div>
               </FormSection>
 
@@ -777,7 +798,6 @@ const HappyHourEditorContent = () => {
                   </div>
                 )}
               </FormSection>
-          </div>
 
           {/* Item Discount Editor Modal */}
           <AnimatePresence>
@@ -796,13 +816,33 @@ const HappyHourEditorContent = () => {
           </AnimatePresence>
         </div>
 
-        <div className="fixed bottom-6 left-0 right-0 px-4 lg:left-[320px] lg:px-8">
-          <div className="max-w-4xl mx-auto">
-            <Button onClick={handleSubmit} disabled={isSubmitting} size="lg" className="w-full rounded-lg">
-              {isSubmitting ? <Loader2 className="animate-spin" /> : 'Save Happy Hour Deal'}
+        <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-neutral-200/80 bg-white/95 backdrop-blur-xl shadow-[0_-6px_20px_rgba(15,23,42,0.06)] lg:left-[320px] lg:w-[calc(100%-320px)]">
+          <div className="mx-auto flex min-h-[3.75rem] w-full max-w-screen-xl items-center justify-between gap-2 px-3 py-2.5 sm:px-5">
+            <Button
+              variant="secondary"
+              onClick={() => navigate('/merchant/deals/create')}
+              className="h-9 rounded-xl border-neutral-300 bg-white px-4 text-[13px] text-neutral-700 shadow-none hover:border-neutral-400 hover:bg-neutral-50"
+              disabled={isSubmitting}
+            >
+              Back
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={handleSubmit}
+              disabled={isSubmitting || state.selectedMenuItems.length === 0 || !state.title?.trim()}
+              className="flex h-9 min-w-[160px] items-center justify-center gap-1.5 rounded-xl bg-[hsl(var(--brand-primary))] px-4 text-[13px] font-semibold text-white shadow-[0_6px_18px_hsl(var(--brand-primary)/0.28)] hover:bg-[hsl(var(--brand-primary-hover))] hover:text-white disabled:opacity-100 disabled:bg-neutral-200 disabled:text-neutral-700 disabled:shadow-none disabled:hover:bg-neutral-200"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Publishing…</span>
+                </>
+              ) : (
+                'Publish Deal'
+              )}
             </Button>
           </div>
-        </div>
+        </footer>
       </div>
     </div>
   );

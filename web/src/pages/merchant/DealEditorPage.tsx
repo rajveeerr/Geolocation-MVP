@@ -51,11 +51,11 @@ export const DealEditorPage = () => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="start-date">Start Date</Label>
-              <Input id="start-date" type="date" value={state.activeStartDate} onChange={e => dispatch({ type: 'SET_FIELD', field: 'activeStartDate', value: e.target.value })} />
+              <Input id="start-date" type="date" lang="en-US" value={state.activeStartDate} onChange={e => dispatch({ type: 'SET_FIELD', field: 'activeStartDate', value: e.target.value })} />
             </div>
             <div>
               <Label htmlFor="end-date">End Date</Label>
-              <Input id="end-date" type="date" value={state.activeEndDate} onChange={e => dispatch({ type: 'SET_FIELD', field: 'activeEndDate', value: e.target.value })} />
+              <Input id="end-date" type="date" lang="en-US" value={state.activeEndDate} onChange={e => dispatch({ type: 'SET_FIELD', field: 'activeEndDate', value: e.target.value })} />
             </div>
           </div>
         </FormSection>

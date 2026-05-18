@@ -236,6 +236,7 @@ export const TruckStopFields = ({ value, onChange, defaultCenter }: TruckStopFie
           <Input
             id="stop-date"
             type="date"
+            lang="en-US"
             value={value.date}
             min={todayIso()}
             onChange={(e) => onChange({ ...value, date: e.target.value })}

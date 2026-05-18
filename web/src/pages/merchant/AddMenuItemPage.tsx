@@ -96,103 +96,134 @@ export const AddMenuItemPage = () => {
 
   const handleDone = () => navigate(-1);
 
+  const TABS: Array<'All' | 'Bites' | 'Drinks'> = ['All', 'Bites', 'Drinks'];
+
   return (
-    <div className="min-h-screen bg-white">
-      <header className="sticky top-0 bg-white/80 backdrop-blur-sm border-b z-10 p-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Button onClick={() => navigate(-1)} variant="ghost" size="sm" className="rounded-full h-10 w-10">
+    <div className="relative flex min-h-[calc(100vh-5rem)] flex-col">
+      <div className="mx-auto w-full max-w-6xl px-3 py-4 pb-24 sm:px-4">
+        <div className="mb-5 flex items-start gap-3">
+          <Button onClick={() => navigate(-1)} variant="ghost" size="sm" className="rounded-full">
             <ArrowLeft />
           </Button>
-          <h2 className="font-bold text-lg">Add Menu Items</h2>
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">
+              Happy Hour
+            </div>
+            <h1 className="mt-1.5 text-[1.65rem] font-semibold tracking-tight text-neutral-900 sm:text-[1.85rem]">
+              Add menu items
+            </h1>
+            <p className="mt-1.5 max-w-2xl text-[13px] leading-6 text-neutral-600 sm:text-sm">
+              Pick the items to include in this happy hour deal.
+            </p>
+          </div>
         </div>
-      </header>
 
-      <div className="sticky top-[73px] bg-white z-10 border-b">
-        <div className="max-w-4xl mx-auto flex items-center">
-          <button onClick={() => setActiveTab('All')} className={cn('flex-1 py-3 text-center font-semibold border-b-2', activeTab === 'All' ? 'border-brand-primary-600 text-brand-primary-600' : 'border-transparent text-neutral-500')}>
-            All
-          </button>
-          <button onClick={() => setActiveTab('Bites')} className={cn('flex-1 py-3 text-center font-semibold border-b-2', activeTab === 'Bites' ? 'border-brand-primary-600 text-brand-primary-600' : 'border-transparent text-neutral-500')}>
-            Bites
-          </button>
-          <button onClick={() => setActiveTab('Drinks')} className={cn('flex-1 py-3 text-center font-semibold border-b-2', activeTab === 'Drinks' ? 'border-brand-primary-600 text-brand-primary-600' : 'border-transparent text-neutral-500')}>
-            Drinks
-          </button>
+        <div className="rounded-[1.45rem] border border-neutral-200/80 bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.045)] sm:p-5">
+          {/* Tab strip */}
+          <div className="mb-4 flex flex-wrap gap-1.5 rounded-2xl bg-neutral-100 p-1">
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab;
+              return (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setActiveTab(tab)}
+                  aria-pressed={isActive}
+                  className={cn(
+                    'inline-flex flex-1 items-center justify-center rounded-xl px-3 py-2 text-[12.5px] font-semibold transition',
+                    isActive
+                      ? 'bg-white text-neutral-900 shadow-[0_4px_12px_rgba(15,23,42,0.06)]'
+                      : 'text-neutral-600 hover:text-neutral-900',
+                  )}
+                >
+                  {tab}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Loading */}
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <Loader2 className="mb-3 h-6 w-6 animate-spin text-neutral-400" />
+              <p className="text-[13px] text-neutral-600">Loading menu items…</p>
+            </div>
+          ) : null}
+
+          {/* Error */}
+          {error ? (
+            <div className="rounded-xl border border-rose-200 bg-rose-50 p-4">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" />
+                <div>
+                  <h4 className="text-[13px] font-semibold text-rose-900">Couldn't load your menu</h4>
+                  <p className="mt-0.5 text-[12px] text-rose-700">
+                    {error instanceof Error ? error.message : 'Please try again in a moment.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          {/* Empty */}
+          {!isLoading && !error && filteredMenu.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-neutral-300 bg-neutral-50/60 px-4 py-8 text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
+                <Info className="h-5 w-5 text-neutral-400" />
+              </div>
+              <h3 className="text-[14px] font-semibold text-neutral-900">No happy hour items yet</h3>
+              <p className="mb-4 mt-1 text-[12px] text-neutral-500">
+                Mark items as "Happy Hour" on your menu first.
+              </p>
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/merchant/menu')}
+                className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-neutral-300 bg-white px-4 text-[13px] font-semibold text-neutral-700 hover:border-neutral-400 hover:bg-neutral-50"
+              >
+                Go to Menu Management
+              </Button>
+            </div>
+          ) : null}
+
+          {/* Grid */}
+          {!isLoading && !error && filteredMenu.length > 0 ? (
+            <>
+              <div className="mb-3 inline-flex items-center gap-1.5 text-[11px] text-neutral-500">
+                <Info className="h-3 w-3" />
+                {filteredMenu.length} happy hour item{filteredMenu.length !== 1 ? 's' : ''} available
+              </div>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                {filteredMenu.map((item) => {
+                  const isSelected = state.selectedMenuItems.some((s) => s.id === item.id);
+                  return (
+                    <div key={item.id}>
+                      <MenuItemCard item={item} isSelected={isSelected} onToggle={() => toggleSelectItem(item)} />
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          ) : null}
         </div>
       </div>
 
-      <main className="p-4 max-w-4xl mx-auto pb-24">
-        {/* Loading State */}
-        {isLoading && (
-          <div className="flex flex-col items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-brand-primary-600 mb-4" />
-            <p className="text-neutral-600">Loading menu items...</p>
-          </div>
-        )}
-
-        {/* Error State */}
-        {error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4 mb-4">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
-              <div>
-                <h4 className="font-semibold text-red-900">Error Loading Menu</h4>
-                <p className="text-sm text-red-700 mt-1">
-                  {error instanceof Error ? error.message : 'Failed to load menu items. Please try again.'}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Empty State - No Happy Hour Items */}
-        {!isLoading && !error && filteredMenu.length === 0 && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-8 text-center">
-            <Info className="h-12 w-12 mx-auto text-amber-600 mb-3" />
-            <h3 className="font-semibold text-amber-900 mb-2">No Happy Hour Items Found</h3>
-            <p className="text-sm text-amber-700 mb-4">
-              You need to mark menu items as "Happy Hour" before adding them to a Happy Hour deal.
-            </p>
-            <Button
-              onClick={() => navigate('/merchant/menu')}
-              variant="outline"
-              className="border-amber-300 text-amber-700 hover:bg-amber-100"
-            >
-              Go to Menu Management
-            </Button>
-          </div>
-        )}
-
-        {/* Menu Items Grid */}
-        {!isLoading && !error && filteredMenu.length > 0 && (
-          <>
-            <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
-              <div className="flex items-start gap-2">
-                <Info className="h-4 w-4 text-blue-600 mt-0.5" />
-                <p className="text-sm text-blue-700">
-                  Only items marked as "Happy Hour" in your menu are shown here. 
-                  {filteredMenu.length} Happy Hour item{filteredMenu.length !== 1 ? 's' : ''} available.
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredMenu.map((item) => {
-                const isSelected = state.selectedMenuItems.some((s) => s.id === item.id);
-                return (
-                  <div key={item.id}>
-                    <MenuItemCard item={item} isSelected={isSelected} onToggle={() => toggleSelectItem(item)} />
-                  </div>
-                );
-              })}
-            </div>
-          </>
-        )}
-      </main>
-
-      <footer className="fixed bottom-0 left-0 right-0 border-t p-4 bg-white/95 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto">
-          <Button onClick={handleDone} size="lg" className="w-full rounded-lg">
-            Confirm {state.selectedMenuItems.length} Selection(s)
+      <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-neutral-200/80 bg-white/95 backdrop-blur-xl shadow-[0_-6px_20px_rgba(15,23,42,0.06)] lg:left-[320px] lg:w-[calc(100%-320px)]">
+        <div className="mx-auto flex min-h-[3.75rem] w-full max-w-screen-xl items-center justify-between gap-2 px-3 py-2.5 sm:px-5">
+          <Button
+            variant="secondary"
+            onClick={() => navigate(-1)}
+            className="h-9 rounded-xl border-neutral-300 bg-white px-4 text-[13px] text-neutral-700 shadow-none hover:border-neutral-400 hover:bg-neutral-50"
+          >
+            Back
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={handleDone}
+            disabled={state.selectedMenuItems.length === 0}
+            className="flex h-9 min-w-[160px] items-center justify-center gap-1.5 rounded-xl bg-[hsl(var(--brand-primary))] px-4 text-[13px] font-semibold text-white shadow-[0_6px_18px_hsl(var(--brand-primary)/0.28)] hover:bg-[hsl(var(--brand-primary-hover))] hover:text-white disabled:opacity-100 disabled:bg-neutral-200 disabled:text-neutral-700 disabled:shadow-none disabled:hover:bg-neutral-200"
+          >
+            Confirm
+            {state.selectedMenuItems.length > 0 ? ` ${state.selectedMenuItems.length} item${state.selectedMenuItems.length === 1 ? '' : 's'}` : ''}
           </Button>
         </div>
       </footer>
