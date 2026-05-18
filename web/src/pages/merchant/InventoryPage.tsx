@@ -36,8 +36,10 @@ import {
   type AiBulkSetupSuggestion,
 } from '@/hooks/useAi';
 import { Button } from '@/components/common/Button';
+import IngredientsTab from '@/components/inventory/IngredientsTab';
 
 type StatusFilter = 'all' | 'low' | 'out' | 'tracked' | 'untracked';
+type InventoryTab = 'menu' | 'ingredients';
 
 const STATUS_TONES: Record<NonNullable<MenuItem['inventoryStatus']>, string> = {
   IN_STOCK: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
@@ -73,6 +75,9 @@ const InventoryPage: React.FC = () => {
   const [appliedBulkIds, setAppliedBulkIds] = useState<Set<number>>(new Set());
   const [appliedRestockNames, setAppliedRestockNames] = useState<Set<string>>(new Set());
   const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<InventoryTab>(
+    (searchParams.get('tab') === 'ingredients' ? 'ingredients' : 'menu') as InventoryTab,
+  );
 
   const aiEnabled = aiStatus?.aiEnabled ?? false;
 
@@ -203,10 +208,18 @@ const InventoryPage: React.FC = () => {
     });
   };
 
+  const switchTab = (tab: InventoryTab) => {
+    setActiveTab(tab);
+    const next = new URLSearchParams(searchParams);
+    if (tab === 'ingredients') next.set('tab', 'ingredients');
+    else next.delete('tab');
+    setSearchParams(next, { replace: true });
+  };
+
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold text-foreground flex items-center gap-2.5">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand/10">
@@ -218,26 +231,56 @@ const InventoryPage: React.FC = () => {
             Track stock levels, restock items, and prevent overselling.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            className="rounded-xl"
-            onClick={() => refetch()}
-            disabled={isRefetching}
-          >
-            <RefreshCcw className={cn('mr-2 h-4 w-4', isRefetching && 'animate-spin')} />
-            Refresh
-          </Button>
-          <Link to="/merchant/menu/create">
-            <Button size="sm" className="rounded-xl">
-              <Plus className="mr-2 h-4 w-4" />
-              New item
+        {activeTab === 'menu' && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              className="rounded-xl"
+              onClick={() => refetch()}
+              disabled={isRefetching}
+            >
+              <RefreshCcw className={cn('mr-2 h-4 w-4', isRefetching && 'animate-spin')} />
+              Refresh
             </Button>
-          </Link>
-        </div>
+            <Link to="/merchant/menu/create">
+              <Button size="sm" className="rounded-xl">
+                <Plus className="mr-2 h-4 w-4" />
+                New item
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
 
+      {/* Tabs */}
+      <div className="mb-6 inline-flex rounded-xl border border-neutral-200 bg-neutral-100 p-1">
+        <button
+          type="button"
+          onClick={() => switchTab('menu')}
+          className={cn(
+            'rounded-lg px-4 py-1.5 text-sm font-semibold transition',
+            activeTab === 'menu' ? 'bg-white text-neutral-900 shadow-sm' : 'text-neutral-600 hover:text-neutral-900',
+          )}
+        >
+          Menu Inventory
+        </button>
+        <button
+          type="button"
+          onClick={() => switchTab('ingredients')}
+          className={cn(
+            'rounded-lg px-4 py-1.5 text-sm font-semibold transition',
+            activeTab === 'ingredients' ? 'bg-white text-neutral-900 shadow-sm' : 'text-neutral-600 hover:text-neutral-900',
+          )}
+        >
+          Ingredients
+        </button>
+      </div>
+
+      {activeTab === 'ingredients' && <IngredientsTab />}
+
+      {activeTab === 'menu' && (
+        <>
       {/* Stats */}
       <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
         <div className={cardClass}>
@@ -891,6 +934,8 @@ const InventoryPage: React.FC = () => {
           </table>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 };

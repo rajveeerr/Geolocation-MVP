@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,8 @@ import { cn } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import MenuItemRecipeSection, { type MenuItemRecipeSectionHandle } from '@/components/inventory/MenuItemRecipeSection';
+import { useUpdateMenuItemRecipe } from '@/hooks/useIngredients';
 
 const menuItemFormSchema = z.object({
   name: z.string().min(1, 'Item name is required').max(100, 'Name is too long'),
@@ -163,6 +165,9 @@ export const MenuItemFormPage = () => {
     }
     return [];
   });
+
+  const recipeRef = useRef<MenuItemRecipeSectionHandle>(null);
+  const updateMenuItemRecipe = useUpdateMenuItemRecipe();
 
   const {
     register,
@@ -333,15 +338,39 @@ export const MenuItemFormPage = () => {
         variants: hasVariants ? variants : undefined,
       };
 
+      let savedMenuItemId: number | null = null;
       if (isEditing && itemId) {
-        await updateMenuItemMutation.mutateAsync({
+        const updated = await updateMenuItemMutation.mutateAsync({
           itemId: Number(itemId),
           data: itemData as UpdateMenuItemData
         });
+        savedMenuItemId = updated?.menuItem?.id ?? Number(itemId);
       } else {
-        await createMenuItemMutation.mutateAsync(itemData as CreateMenuItemData);
+        const created = await createMenuItemMutation.mutateAsync(itemData as CreateMenuItemData);
+        savedMenuItemId = created?.menuItem?.id ?? null;
       }
-      
+
+      // Persist recipe links if any were drafted
+      const drafts = recipeRef.current?.getDrafts() ?? [];
+      if (savedMenuItemId != null) {
+        try {
+          await updateMenuItemRecipe.mutateAsync({
+            menuItemId: savedMenuItemId,
+            links: drafts.map((d) => ({
+              ingredientId: d.ingredientId,
+              quantityPerUnit: d.quantityPerUnit,
+            })),
+          });
+        } catch (recipeError) {
+          // Non-fatal: the item is saved, only the recipe failed. Surface but don't block navigation.
+          toast({
+            title: 'Recipe could not be saved',
+            description: recipeError instanceof Error ? recipeError.message : 'Try again from Inventory → Ingredients.',
+            variant: 'destructive',
+          });
+        }
+      }
+
       navigate(PATHS.MERCHANT_MENU);
     } catch {
       // Error handling is done in the mutation hooks
@@ -622,6 +651,12 @@ export const MenuItemFormPage = () => {
                 Upload up to 5 images to showcase your menu item. Supported formats: JPG, PNG, WebP.
               </p>
             </div>
+
+            {/* Recipe / Ingredients Section */}
+            <MenuItemRecipeSection
+              ref={recipeRef}
+              menuItemId={isEditing && itemId ? Number(itemId) : null}
+            />
 
             {/* Variants Section */}
             <div className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
