@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Search, Plus, RefreshCcw, Loader2, AlertTriangle, Scan, TrendingUp, ArrowUpDown } from 'lucide-react';
+import { Search, Plus, RefreshCcw, Loader2, AlertTriangle, Scan, ArrowUpDown, SlidersHorizontal, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/common/Button';
 import {
@@ -250,65 +250,20 @@ const IngredientsTab: React.FC = () => {
         />
       </div>
 
-      {/* Search + filters + sort */}
-      <div className={cn(cardClass, 'mb-6 space-y-3')}>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search ingredients..."
-              className="w-full rounded-xl border border-neutral-200 bg-white py-2 pl-9 pr-3 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <ArrowUpDown className="h-4 w-4 text-neutral-400" />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortBy)}
-              className="rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
-            >
-              <option value="name">Sort: Name</option>
-              <option value="trend">Sort: Trend (highest %)</option>
-              <option value="cost">Sort: Cost (highest)</option>
-              <option value="days-left">Sort: Days left (lowest)</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Filter pill rows */}
-        <FilterRow
-          label="Category"
-          all={{ value: 'all', label: 'All' }}
-          value={categoryFilter}
-          options={categories.map((c) => ({ value: c, label: c }))}
-          onChange={setCategoryFilter}
-        />
-        <FilterRow
-          label="Stock"
-          all={{ value: 'all', label: 'Any' }}
-          value={statusFilter}
-          options={[
-            { value: 'healthy', label: 'Healthy', tone: 'emerald' },
-            { value: 'low', label: 'Low', tone: 'amber' },
-            { value: 'out', label: 'Out / Critical', tone: 'red' },
-          ]}
-          onChange={(v) => setStatusFilter(v as StatusFilter)}
-        />
-        <FilterRow
-          label="Trend"
-          all={{ value: 'all', label: 'Any' }}
-          value={trendFilter}
-          options={[
-            { value: 'rising', label: 'Rising', tone: 'red', Icon: TrendingUp },
-            { value: 'stable', label: 'Stable' },
-            { value: 'falling', label: 'Falling', tone: 'emerald' },
-          ]}
-          onChange={(v) => setTrendFilter(v as TrendFilter)}
-        />
-      </div>
+      {/* Search + dropdown filters + sort — all on one row */}
+      <FilterBar
+        search={search}
+        onSearchChange={setSearch}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        categoryFilter={categoryFilter}
+        onCategoryChange={setCategoryFilter}
+        categories={categories}
+        statusFilter={statusFilter}
+        onStatusChange={setStatusFilter}
+        trendFilter={trendFilter}
+        onTrendChange={setTrendFilter}
+      />
 
       {/* Table or loading */}
       {ingredientsQuery.isLoading ? (
@@ -349,65 +304,153 @@ const IngredientsTab: React.FC = () => {
 };
 
 // ────────────────────────────────────────────────
-// FilterRow — reusable pill bar for one filter dimension
+// FilterBar — search + 4 dropdowns on one row, with active-filter chips below
 // ────────────────────────────────────────────────
 
-interface FilterOption {
-  value: string;
-  label: string;
-  tone?: 'emerald' | 'amber' | 'red';
-  Icon?: React.ComponentType<{ className?: string }>;
+const selectClass =
+  'rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-700 shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20';
+
+interface FilterBarProps {
+  search: string;
+  onSearchChange: (s: string) => void;
+  sortBy: SortBy;
+  onSortChange: (s: SortBy) => void;
+  categoryFilter: string;
+  onCategoryChange: (c: string) => void;
+  categories: string[];
+  statusFilter: StatusFilter;
+  onStatusChange: (s: StatusFilter) => void;
+  trendFilter: TrendFilter;
+  onTrendChange: (t: TrendFilter) => void;
 }
 
-const TONE_ACTIVE: Record<NonNullable<FilterOption['tone']>, string> = {
-  emerald: 'bg-emerald-600 text-white',
-  amber: 'bg-amber-500 text-white',
-  red: 'bg-red-600 text-white',
-};
+const FilterBar: React.FC<FilterBarProps> = ({
+  search,
+  onSearchChange,
+  sortBy,
+  onSortChange,
+  categoryFilter,
+  onCategoryChange,
+  categories,
+  statusFilter,
+  onStatusChange,
+  trendFilter,
+  onTrendChange,
+}) => {
+  const activeChips: { label: string; onClear: () => void }[] = [];
+  if (categoryFilter !== 'all') activeChips.push({ label: `Category: ${categoryFilter}`, onClear: () => onCategoryChange('all') });
+  if (statusFilter !== 'all') activeChips.push({ label: `Stock: ${statusFilter}`, onClear: () => onStatusChange('all') });
+  if (trendFilter !== 'all') activeChips.push({ label: `Trend: ${trendFilter}`, onClear: () => onTrendChange('all') });
 
-const FilterRow: React.FC<{
-  label: string;
-  all: FilterOption;
-  value: string;
-  options: FilterOption[];
-  onChange: (v: string) => void;
-}> = ({ label, all, value, options, onChange }) => {
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="w-20 shrink-0 text-[11px] font-semibold uppercase tracking-widest text-neutral-400">
-        {label}
-      </span>
-      <button
-        type="button"
-        onClick={() => onChange(all.value)}
-        className={cn(
-          'rounded-full px-3 py-1.5 text-xs font-semibold transition',
-          value === all.value
-            ? 'bg-brand text-white shadow-sm'
-            : 'bg-white text-neutral-700 ring-1 ring-neutral-200 hover:bg-neutral-50 hover:text-brand',
-        )}
-      >
-        {all.label}
-      </button>
-      {options.map((o) => {
-        const active = value === o.value;
-        const activeClass = active
-          ? o.tone
-            ? TONE_ACTIVE[o.tone]
-            : 'bg-brand text-white shadow-sm'
-          : 'bg-white text-neutral-700 ring-1 ring-neutral-200 hover:bg-neutral-50 hover:text-brand';
-        return (
-          <button
-            key={o.value}
-            type="button"
-            onClick={() => onChange(o.value)}
-            className={cn('inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition', activeClass)}
+    <div className={cn(cardClass, 'mb-6 space-y-3')}>
+      <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
+        {/* Search */}
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Search ingredients..."
+            className="w-full rounded-xl border border-neutral-200 bg-white py-2 pl-9 pr-3 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+          />
+        </div>
+
+        {/* Category dropdown */}
+        <label className="flex items-center gap-1.5">
+          <SlidersHorizontal className="h-4 w-4 text-neutral-400" />
+          <select
+            value={categoryFilter}
+            onChange={(e) => onCategoryChange(e.target.value)}
+            className={selectClass}
+            title="Filter by category"
           >
-            {o.Icon && <o.Icon className="h-3 w-3" />}
-            {o.label}
+            <option value="all">All categories</option>
+            {categories.length === 0 ? (
+              <option value="" disabled>(no categories yet)</option>
+            ) : (
+              categories.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))
+            )}
+          </select>
+        </label>
+
+        {/* Status dropdown */}
+        <select
+          value={statusFilter}
+          onChange={(e) => onStatusChange(e.target.value as StatusFilter)}
+          className={selectClass}
+          title="Filter by stock status"
+        >
+          <option value="all">All stock</option>
+          <option value="healthy">🟢 Healthy</option>
+          <option value="low">🟡 Low</option>
+          <option value="out">🔴 Out / Critical</option>
+        </select>
+
+        {/* Trend dropdown */}
+        <select
+          value={trendFilter}
+          onChange={(e) => onTrendChange(e.target.value as TrendFilter)}
+          className={selectClass}
+          title="Filter by price trend"
+        >
+          <option value="all">All trends</option>
+          <option value="rising">↑ Rising</option>
+          <option value="stable">→ Stable</option>
+          <option value="falling">↓ Falling</option>
+        </select>
+
+        {/* Sort */}
+        <label className="flex items-center gap-1.5">
+          <ArrowUpDown className="h-4 w-4 text-neutral-400" />
+          <select
+            value={sortBy}
+            onChange={(e) => onSortChange(e.target.value as SortBy)}
+            className={selectClass}
+            title="Sort"
+          >
+            <option value="name">Name</option>
+            <option value="trend">Trend (highest %)</option>
+            <option value="cost">Cost (highest)</option>
+            <option value="days-left">Days left (lowest)</option>
+          </select>
+        </label>
+      </div>
+
+      {/* Active filter chips + clear-all */}
+      {activeChips.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400">
+            Active
+          </span>
+          {activeChips.map((c) => (
+            <button
+              key={c.label}
+              type="button"
+              onClick={c.onClear}
+              className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-1 text-xs font-semibold text-brand transition hover:bg-brand/20"
+              title="Clear this filter"
+            >
+              {c.label}
+              <X className="h-3 w-3" />
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => {
+              onCategoryChange('all');
+              onStatusChange('all');
+              onTrendChange('all');
+            }}
+            className="text-xs font-semibold text-neutral-500 underline-offset-2 hover:text-brand hover:underline"
+          >
+            Clear all
           </button>
-        );
-      })}
+        </div>
+      )}
     </div>
   );
 };
