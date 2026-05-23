@@ -12,7 +12,10 @@ import {
   Gift,
   Grid2x2,
   KeyRound,
+  Monitor,
+  Moon,
   Share2,
+  Sun,
   Target,
   LogOut,
   Menu,
@@ -43,6 +46,7 @@ import { PATHS } from '@/routing/paths';
 import { dealCreationTypes } from '@/config/dealCreation';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/useAuth';
+import { useTheme, type ThemeMode } from '@/context/ThemeContext';
 import { useMerchantStatus } from '@/hooks/useMerchantStatus';
 import { dealCreationSidebarItems } from '@/config/dealCreation';
 
@@ -617,10 +621,10 @@ function MerchantSidebar({
   if (collapsed) {
     return (
       <div className="flex h-full flex-col items-center">
-        <div className="border-b border-neutral-200/80 px-2 py-5 w-full flex flex-col items-center gap-3">
+        <div className="border-b border-border/80 px-2 py-5 w-full flex flex-col items-center gap-3">
           <Link to={PATHS.MERCHANT_DASHBOARD} onClick={onNavigate} title={merchantDisplayName}>
             {merchantLogoUrl && !logoLoadFailed ? (
-              <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-neutral-200 bg-white shadow-[0_8px_18px_rgba(17,17,17,0.18)]">
+              <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-border bg-card shadow-[0_8px_18px_rgba(17,17,17,0.18)] dark:shadow-none">
                 <img
                   src={merchantLogoUrl}
                   alt={merchantDisplayName}
@@ -629,7 +633,7 @@ function MerchantSidebar({
                 />
               </span>
             ) : (
-              <span className="flex h-10 w-10 items-center justify-center rounded-[0.85rem] bg-[#111111] text-sm font-semibold text-white shadow-[0_8px_18px_rgba(17,17,17,0.18)]">
+              <span className="flex h-10 w-10 items-center justify-center rounded-[0.85rem] bg-foreground text-sm font-semibold text-background shadow-[0_8px_18px_rgba(17,17,17,0.18)] dark:shadow-none">
                 {merchantInitials}
               </span>
             )}
@@ -639,7 +643,7 @@ function MerchantSidebar({
               type="button"
               onClick={onToggleCollapse}
               title="Expand sidebar"
-              className="flex h-8 w-8 items-center justify-center rounded-[0.6rem] border border-neutral-200 bg-white text-neutral-400 transition hover:bg-neutral-50 hover:text-neutral-700"
+              className="flex h-8 w-8 items-center justify-center rounded-[0.6rem] border border-border bg-card text-muted-foreground transition hover:bg-muted hover:text-foreground"
             >
               <ChevronRight className="h-3.5 w-3.5" />
             </button>
@@ -662,8 +666,8 @@ function MerchantSidebar({
                     className={cn(
                       'flex items-center justify-center rounded-[0.7rem] p-2.5 transition',
                       isActive
-                        ? 'bg-neutral-100 text-neutral-950'
-                        : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-950',
+                        ? 'bg-muted text-foreground'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                     )}
                   >
                     <Icon className="h-[18px] w-[18px]" />
@@ -674,12 +678,12 @@ function MerchantSidebar({
           </div>
         </div>
 
-        <div className="border-t border-neutral-200/80 px-2 py-3 w-full flex flex-col items-center">
+        <div className="border-t border-border/80 px-2 py-3 w-full flex flex-col items-center">
           <Link
             to={PATHS.MERCHANT_DEALS_CREATE}
             onClick={onNavigate}
             title="Create deal"
-            className="flex h-10 w-10 items-center justify-center rounded-[0.85rem] bg-neutral-950 text-white transition hover:bg-neutral-800"
+            className="flex h-10 w-10 items-center justify-center rounded-[0.85rem] bg-foreground text-background transition hover:bg-foreground/85"
           >
             <Plus className="h-4 w-4" />
           </Link>
@@ -690,11 +694,11 @@ function MerchantSidebar({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="border-b border-neutral-200/80 px-5 py-5">
+      <div className="border-b border-border/80 px-5 py-5">
         <div className="flex items-center justify-between gap-2">
           <Link to={PATHS.MERCHANT_DASHBOARD} onClick={onNavigate} className="inline-flex min-w-0 items-center gap-3">
             {merchantLogoUrl && !logoLoadFailed ? (
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-neutral-200 bg-white shadow-[0_8px_18px_rgba(17,17,17,0.18)]">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-border bg-card shadow-[0_8px_18px_rgba(17,17,17,0.18)] dark:shadow-none">
                 <img
                   src={merchantLogoUrl}
                   alt={merchantDisplayName}
@@ -703,13 +707,13 @@ function MerchantSidebar({
                 />
               </span>
             ) : (
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] bg-[#111111] text-sm font-semibold text-white shadow-[0_8px_18px_rgba(17,17,17,0.18)]">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] bg-foreground text-sm font-semibold text-background shadow-[0_8px_18px_rgba(17,17,17,0.18)] dark:shadow-none">
                 {merchantInitials}
               </span>
             )}
             <span className="min-w-0">
-              <span className="block truncate text-[1.05rem] font-semibold tracking-tight text-neutral-950">{merchantDisplayName}</span>
-              <span className="block truncate text-xs text-neutral-500">{merchantTagline}</span>
+              <span className="block truncate text-[1.05rem] font-semibold tracking-tight text-foreground">{merchantDisplayName}</span>
+              <span className="block truncate text-xs text-muted-foreground">{merchantTagline}</span>
             </span>
           </Link>
           {onToggleCollapse ? (
@@ -717,7 +721,7 @@ function MerchantSidebar({
               type="button"
               onClick={onToggleCollapse}
               title="Collapse sidebar"
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.6rem] border border-neutral-200 bg-white text-neutral-400 transition hover:bg-neutral-50 hover:text-neutral-700"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.6rem] border border-border bg-card text-muted-foreground transition hover:bg-muted hover:text-foreground"
             >
               <ChevronLeft className="h-3.5 w-3.5" />
             </button>
@@ -727,8 +731,8 @@ function MerchantSidebar({
 
       <div className="flex-1 overflow-y-auto px-5 py-6">
         <div className="pb-4">
-          <div className="text-[1.7rem] font-semibold tracking-tight text-neutral-950">Merchant</div>
-          <div className="mt-1 text-[13px] text-neutral-500">Business workspace</div>
+          <div className="text-[1.7rem] font-semibold tracking-tight text-foreground">Merchant</div>
+          <div className="mt-1 text-[13px] text-muted-foreground">Business workspace</div>
         </div>
 
         <div className="space-y-1">
@@ -746,14 +750,14 @@ function MerchantSidebar({
                   className={cn(
                     'flex w-full items-center justify-between rounded-[0.9rem] px-3 py-2 text-left text-[14px] font-medium transition',
                     sectionHasActiveItem
-                      ? 'text-neutral-950'
-                      : 'text-neutral-700 hover:bg-neutral-100/80 hover:text-neutral-950',
+                      ? 'text-foreground'
+                      : 'text-foreground hover:bg-muted/80 hover:text-foreground',
                   )}
                 >
                   <span>{section.label}</span>
                   <ChevronDown
                     className={cn(
-                      'h-4 w-4 text-neutral-500 transition-transform',
+                      'h-4 w-4 text-muted-foreground transition-transform',
                       isExpanded ? 'rotate-180' : 'rotate-0',
                     )}
                   />
@@ -772,8 +776,8 @@ function MerchantSidebar({
                           className={cn(
                             'block rounded-[0.7rem] px-4 py-2.5 text-[13px] transition',
                             isActive
-                              ? 'bg-neutral-100 font-semibold text-neutral-950'
-                              : 'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950',
+                              ? 'bg-muted font-semibold text-foreground'
+                              : 'text-foreground hover:bg-muted hover:text-foreground',
                           )}
                         >
                           {item.label}
@@ -788,24 +792,24 @@ function MerchantSidebar({
         </div>
       </div>
 
-      <div className="border-t border-neutral-200/80 px-4 py-4">
-        <div className="rounded-[1.2rem] border border-neutral-200/80 bg-white/90 p-4 shadow-[0_8px_24px_rgba(15,23,42,0.05)]">
-          <p className="text-[13px] font-semibold text-neutral-950">Quick actions</p>
-          <p className="mt-1 text-xs leading-5 text-neutral-500">
+      <div className="border-t border-border/80 px-4 py-4">
+        <div className="rounded-[1.2rem] border border-border/80 bg-card/90 dark:bg-card p-4 shadow-[0_8px_24px_rgba(15,23,42,0.05)]">
+          <p className="text-[13px] font-semibold text-foreground">Quick actions</p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
             Jump into publishing or switch back to the customer-facing app.
           </p>
           <div className="mt-4 grid gap-2">
             <Link
               to={PATHS.MERCHANT_DEALS_CREATE}
               onClick={onNavigate}
-              className="inline-flex items-center justify-center rounded-[1rem] bg-neutral-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800"
+              className="inline-flex items-center justify-center rounded-[1rem] bg-foreground px-4 py-3 text-sm font-semibold text-background transition hover:bg-foreground/85"
             >
               Create deal
             </Link>
             <Link
               to={PATHS.HOME}
               onClick={onNavigate}
-              className="inline-flex items-center justify-center rounded-[1rem] border border-neutral-200 bg-white px-4 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50"
+              className="inline-flex items-center justify-center rounded-[1rem] border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground transition hover:bg-muted"
             >
               Switch to browsing
             </Link>
@@ -865,26 +869,26 @@ function MerchantWorkspaceSearch({
         onClick={() => setIsOpen((current) => !current)}
         title="Search workspace (Ctrl K)"
         aria-label="Search workspace"
-        className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-2 text-[13px] text-neutral-500 shadow-sm transition hover:border-neutral-300 hover:text-neutral-700 2xl:px-4"
+        className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-2 text-[13px] text-muted-foreground shadow-sm transition hover:border-border hover:text-foreground 2xl:px-4"
       >
         <Search className="h-4 w-4" />
         <span className="hidden 2xl:inline">Search workspace</span>
-        <span className="hidden rounded-md bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-400 2xl:inline">
+        <span className="hidden rounded-md bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground 2xl:inline">
           Ctrl K
         </span>
       </button>
 
       {isOpen ? (
-        <div className="absolute right-0 top-[calc(100%+10px)] z-50 w-[340px] overflow-hidden rounded-[1.1rem] border border-neutral-200 bg-white shadow-[0_18px_40px_rgba(15,23,42,0.14)]">
-          <div className="border-b border-neutral-200 p-3">
-            <div className="flex items-center gap-2 rounded-[0.9rem] border border-neutral-200 bg-neutral-50 px-3 py-2">
-              <Search className="h-4 w-4 text-neutral-400" />
+        <div className="absolute right-0 top-[calc(100%+10px)] z-50 w-[340px] overflow-hidden rounded-[1.1rem] border border-border bg-card shadow-[0_18px_40px_rgba(15,23,42,0.14)]">
+          <div className="border-b border-border p-3">
+            <div className="flex items-center gap-2 rounded-[0.9rem] border border-border bg-muted px-3 py-2">
+              <Search className="h-4 w-4 text-muted-foreground" />
               <input
                 autoFocus
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search pages, tools, and create flows"
-                className="w-full bg-transparent text-[13px] text-neutral-800 outline-none placeholder:text-neutral-400"
+                className="w-full bg-transparent text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
               />
             </div>
           </div>
@@ -896,17 +900,17 @@ function MerchantWorkspaceSearch({
                   key={`${item.sectionLabel}-${item.to}`}
                   type="button"
                   onClick={() => handleNavigate(item.to)}
-                  className="flex w-full items-start justify-between rounded-[0.9rem] px-3 py-2.5 text-left transition hover:bg-neutral-50"
+                  className="flex w-full items-start justify-between rounded-[0.9rem] px-3 py-2.5 text-left transition hover:bg-muted"
                 >
                   <div>
-                    <div className="text-[13px] font-medium text-neutral-900">{item.label}</div>
-                    <div className="mt-0.5 text-xs text-neutral-500">{item.sectionLabel}</div>
+                    <div className="text-[13px] font-medium text-foreground">{item.label}</div>
+                    <div className="mt-0.5 text-xs text-muted-foreground">{item.sectionLabel}</div>
                   </div>
-                  <div className="ml-4 truncate text-xs text-neutral-400">{item.to}</div>
+                  <div className="ml-4 truncate text-xs text-muted-foreground">{item.to}</div>
                 </button>
               ))
             ) : (
-              <div className="px-3 py-5 text-center text-[13px] text-neutral-500">
+              <div className="px-3 py-5 text-center text-[13px] text-muted-foreground">
                 No workspace matches found.
               </div>
             )}
@@ -918,6 +922,28 @@ function MerchantWorkspaceSearch({
 }
 
 const SIDEBAR_COLLAPSED_KEY = 'merchant-sidebar-collapsed';
+
+const THEME_NEXT_LABEL: Record<ThemeMode, string> = {
+  light: 'Switch to dark mode',
+  dark: 'Switch to system theme',
+  system: 'Switch to light mode',
+};
+
+function ThemeToggleButton() {
+  const { theme, cycleTheme } = useTheme();
+  const Icon = theme === 'light' ? Sun : theme === 'dark' ? Moon : Monitor;
+  return (
+    <button
+      type="button"
+      onClick={cycleTheme}
+      title={THEME_NEXT_LABEL[theme]}
+      aria-label={THEME_NEXT_LABEL[theme]}
+      className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground/70 shadow-sm transition hover:border-border hover:bg-accent hover:text-foreground"
+    >
+      <Icon className="h-4 w-4" />
+    </button>
+  );
+}
 
 export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
   const location = useLocation();
@@ -996,11 +1022,11 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
   }, [merchantLogoUrl]);
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] text-neutral-900">
+    <div className="merchant-dashboard min-h-screen bg-background text-foreground">
       <div className="flex min-h-screen">
         <aside
           className={cn(
-            'hidden shrink-0 border-r border-neutral-200/70 bg-[#fbfbfc] lg:block transition-[width] duration-300 ease-in-out',
+            'hidden shrink-0 border-r border-border/70 bg-chrome lg:block transition-[width] duration-300 ease-in-out',
             sidebarCollapsed ? 'w-[72px]' : 'w-[320px]',
           )}
         >
@@ -1018,14 +1044,14 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
         </aside>
 
         <div className="flex min-h-screen min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-30 border-b border-neutral-200/80 bg-white/92 backdrop-blur-2xl">
-            <div className="border-b border-neutral-200/80 px-4 py-3 sm:px-6 lg:px-8">
+          <header className="sticky top-0 z-30 border-b border-border/80 bg-chrome/92 dark:bg-chrome backdrop-blur-2xl">
+            <div className="border-b border-border/80 px-4 py-3 sm:px-6 lg:px-8">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex min-w-0 items-center gap-3">
                   <button
                     type="button"
                     onClick={() => setMobileSidebarOpen(true)}
-                    className="flex h-11 w-11 items-center justify-center rounded-[1rem] border border-neutral-200 bg-white text-neutral-700 shadow-sm lg:hidden"
+                    className="flex h-11 w-11 items-center justify-center rounded-[1rem] border border-border bg-card text-foreground shadow-sm lg:hidden"
                     aria-label="Open merchant sidebar"
                   >
                     <Menu className="h-5 w-5" />
@@ -1033,7 +1059,7 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
 
                   <Link to={PATHS.MERCHANT_DASHBOARD} className="flex min-w-0 items-center gap-3 lg:hidden">
                     {merchantLogoUrl && !mobileLogoLoadFailed ? (
-                      <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-neutral-200 bg-white">
+                      <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-border bg-card">
                         <img
                           src={merchantLogoUrl}
                           alt={merchantName}
@@ -1042,13 +1068,13 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
                         />
                       </span>
                     ) : (
-                      <span className="flex h-10 w-10 items-center justify-center rounded-[1rem] bg-neutral-950 text-sm font-semibold text-white">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-[1rem] bg-foreground text-sm font-semibold text-background">
                         {merchantInitials}
                       </span>
                     )}
                     <div className="min-w-0">
-                      <div className="max-w-[280px] truncate text-[15px] font-semibold tracking-tight text-neutral-950">{merchantName}</div>
-                      <div className="max-w-[280px] truncate text-xs text-neutral-500">{merchantTagline}</div>
+                      <div className="max-w-[280px] truncate text-[15px] font-semibold tracking-tight text-foreground">{merchantName}</div>
+                      <div className="max-w-[280px] truncate text-xs text-muted-foreground">{merchantTagline}</div>
                     </div>
                   </Link>
                 </div>
@@ -1080,8 +1106,8 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
                             className={cn(
                               'rounded-full px-3.5 py-2 text-[13px] font-medium transition',
                               isActive
-                                ? 'bg-neutral-100 text-neutral-950 shadow-sm ring-1 ring-neutral-200/80'
-                                : 'text-neutral-500 hover:bg-neutral-100/80 hover:text-neutral-950',
+                                ? 'bg-muted text-foreground shadow-sm ring-1 ring-border/80'
+                                : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground',
                             )}
                           >
                             {section.label}
@@ -1093,7 +1119,7 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
                           <DropdownMenuTrigger asChild>
                             <button
                               type="button"
-                              className="inline-flex items-center gap-1 rounded-full px-3.5 py-2 text-[13px] font-medium text-neutral-500 transition hover:bg-neutral-100/80 hover:text-neutral-950"
+                              className="inline-flex items-center gap-1 rounded-full px-3.5 py-2 text-[13px] font-medium text-muted-foreground transition hover:bg-muted/80 hover:text-foreground"
                             >
                               More
                               <ChevronDown className="h-3.5 w-3.5" />
@@ -1119,14 +1145,16 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
                 <div className="flex items-center gap-2 sm:gap-3">
                   <MerchantWorkspaceSearch onNavigateTo={(to) => navigate(to)} />
 
+                  <ThemeToggleButton />
+
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
                         type="button"
-                        className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-2.5 py-1.5 text-[13px] text-neutral-700 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-50"
+                        className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-2.5 py-1.5 text-[13px] text-foreground shadow-sm transition hover:border-border hover:bg-muted"
                       >
                         <span className="hidden max-w-[120px] truncate font-medium sm:inline">{profileName}</span>
-                        <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-neutral-200 bg-white text-neutral-900">
+                        <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-border bg-card text-foreground">
                           {profileAvatarUrl ? (
                             <img
                               src={profileAvatarUrl}
@@ -1137,17 +1165,17 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
                             <UserCircle2 className="h-4 w-4" />
                           )}
                         </span>
-                        <ChevronDown className="hidden h-4 w-4 text-neutral-400 sm:block" />
+                        <ChevronDown className="hidden h-4 w-4 text-muted-foreground sm:block" />
                       </button>
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent
                       align="end"
-                      className="w-[240px] rounded-[1.15rem] border-neutral-200 p-2 shadow-[0_18px_40px_rgba(15,23,42,0.14)]"
+                      className="w-[240px] rounded-[1.15rem] border-border p-2 shadow-[0_18px_40px_rgba(15,23,42,0.14)]"
                     >
                       <DropdownMenuLabel className="px-3 py-2">
-                        <div className="truncate text-[13px] font-semibold text-neutral-950">{profileName}</div>
-                        <div className="truncate text-xs font-normal text-neutral-500">{merchantTagline}</div>
+                        <div className="truncate text-[13px] font-semibold text-foreground">{profileName}</div>
+                        <div className="truncate text-xs font-normal text-muted-foreground">{merchantTagline}</div>
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
 
@@ -1190,17 +1218,17 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
               </div>
             </div>
 
-            <div className="bg-[#f5f5f7] px-4 py-4 sm:px-6 lg:px-8">
+            <div className="bg-background px-4 py-4 sm:px-6 lg:px-8">
               <div className="min-w-0">
                 <nav aria-label="Breadcrumb" className="flex items-center gap-1.5">
                   <Link
                     to={activeSection.items[0]?.to ?? PATHS.MERCHANT_DASHBOARD}
-                    className="text-[10px] font-semibold uppercase tracking-[0.22em] text-neutral-500 transition-colors hover:text-neutral-900"
+                    className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground transition-colors hover:text-foreground"
                   >
                     {activeSection.label}
                   </Link>
-                  <ChevronRight className="h-3 w-3 shrink-0 text-neutral-400" aria-hidden />
-                  <span className="truncate text-[10px] font-semibold uppercase tracking-[0.22em] text-neutral-900">
+                  <ChevronRight className="h-3 w-3 shrink-0 text-muted-foreground" aria-hidden />
+                  <span className="truncate text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground">
                       {enrichedPageMeta.title}
                     </span>
                 </nav>
@@ -1218,16 +1246,16 @@ export const MerchantLayout = ({ children }: { children?: ReactNode }) => {
         <div className="fixed inset-0 z-50 lg:hidden">
           <button
             type="button"
-            className="absolute inset-0 bg-neutral-950/35 backdrop-blur-[2px]"
+            className="absolute inset-0 bg-foreground/35 backdrop-blur-[2px]"
             aria-label="Close merchant sidebar"
             onClick={() => setMobileSidebarOpen(false)}
           />
-          <div className="absolute inset-y-0 left-0 w-[88vw] max-w-[340px] border-r border-neutral-200/80 bg-[#fbfbfc] shadow-2xl">
+          <div className="absolute inset-y-0 left-0 w-[88vw] max-w-[340px] border-r border-border/80 bg-chrome shadow-2xl">
             <div className="flex items-center justify-end px-3 pt-3">
               <button
                 type="button"
                 onClick={() => setMobileSidebarOpen(false)}
-                className="flex h-10 w-10 items-center justify-center rounded-[1rem] border border-neutral-200 bg-white text-neutral-700 shadow-sm"
+                className="flex h-10 w-10 items-center justify-center rounded-[1rem] border border-border bg-card text-foreground shadow-sm"
                 aria-label="Close merchant sidebar"
               >
                 <X className="h-5 w-5" />

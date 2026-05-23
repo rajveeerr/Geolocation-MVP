@@ -12,7 +12,7 @@ export const ExploreDealsPreview = () => {
   const { data: featuredDeals, isLoading, error } = useFeaturedDeals();
 
   return (
-    <div className="mt-8 border-t border-amber-200/50 pt-8">
+    <div className="mt-8 border-t border-amber-200/50 dark:border-amber-900/50 dark:border-amber-900/50 dark:border-amber-900/50 pt-8">
       {/* --- This is now a self-contained component that uses the carousel --- */}
       
       {isLoading && (

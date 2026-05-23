@@ -12,7 +12,7 @@ import {
 } from '@/hooks/useTruckSchedule';
 
 const panelClass =
-  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
+  'rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 const formatDateTime = (iso: string) => {
   const d = new Date(iso);
@@ -32,14 +32,14 @@ function TruckRow({ truck }: { truck: MerchantTruckOverviewItem }) {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0 flex-1 space-y-3">
           <div className="flex items-center gap-2">
-            <h3 className="truncate text-base font-semibold text-neutral-900">
+            <h3 className="truncate text-base font-semibold text-foreground">
               {truck.businessName || truck.address}
             </h3>
             <TruckBadge size="xs" variant={truck.currentStop ? 'live' : 'default'} label={truck.currentStop ? 'Live now' : 'Food truck'} />
           </div>
 
           {truck.currentStop ? (
-            <div className="flex items-start gap-2 text-sm text-emerald-700">
+            <div className="flex items-start gap-2 text-sm text-emerald-700 dark:text-emerald-300">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
               <div className="min-w-0">
                 <p className="truncate font-medium">{truck.currentStop.address}</p>
@@ -49,23 +49,23 @@ function TruckRow({ truck }: { truck: MerchantTruckOverviewItem }) {
               </div>
             </div>
           ) : truck.nextStop ? (
-            <div className="flex items-start gap-2 text-sm text-neutral-600">
-              <Clock className="mt-0.5 h-4 w-4 shrink-0 text-neutral-400" aria-hidden />
+            <div className="flex items-start gap-2 text-sm text-muted-foreground">
+              <Clock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
               <div className="min-w-0">
-                <p className="text-xs uppercase tracking-wider text-neutral-400">Next stop</p>
-                <p className="truncate text-sm font-medium text-neutral-900">{truck.nextStop.address}</p>
-                <p className="text-xs text-neutral-500">{formatDateTime(truck.nextStop.startsAt)}</p>
+                <p className="text-xs uppercase tracking-wider text-muted-foreground">Next stop</p>
+                <p className="truncate text-sm font-medium text-foreground">{truck.nextStop.address}</p>
+                <p className="text-xs text-muted-foreground">{formatDateTime(truck.nextStop.startsAt)}</p>
               </div>
             </div>
           ) : (
-            <div className="flex items-start gap-2 text-sm text-neutral-500">
-              <Calendar className="mt-0.5 h-4 w-4 shrink-0 text-neutral-400" aria-hidden />
+            <div className="flex items-start gap-2 text-sm text-muted-foreground">
+              <Calendar className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
               <p>No stops scheduled. Add one so customers can find you.</p>
             </div>
           )}
 
           {truck.upcomingStopCount > 0 && (
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-muted-foreground">
               {truck.upcomingStopCount} upcoming {truck.upcomingStopCount === 1 ? 'stop' : 'stops'}
             </p>
           )}
@@ -92,9 +92,9 @@ function MerchantTrucksContent() {
     <div className="mx-auto max-w-screen-xl space-y-6 px-4 py-3 sm:px-1 sm:py-4">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Locations</div>
-          <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-neutral-900">Food trucks</h1>
-          <p className="mt-2 max-w-xl text-[13px] text-neutral-500 sm:text-sm">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Locations</div>
+          <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-foreground">Food trucks</h1>
+          <p className="mt-2 max-w-xl text-[13px] text-muted-foreground sm:text-sm">
             Post upcoming stops so customers can see where you'll be. Each stop appears on the food trucks page and on any deals for this truck.
           </p>
         </div>
@@ -111,19 +111,19 @@ function MerchantTrucksContent() {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-primary-500 border-t-transparent" />
         </div>
       ) : error ? (
-        <div className={cn(panelClass, 'border-rose-200 bg-rose-50 p-4 text-sm text-rose-700')}>
+        <div className={cn(panelClass, 'border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 p-4 text-sm text-rose-700 dark:text-rose-300')}>
           {(error as Error).message}
         </div>
       ) : trucks.length === 0 ? (
         <div className={cn(panelClass, 'border-dashed py-16 text-center')}>
-          <Truck className="mx-auto mb-3 h-10 w-10 text-neutral-300" aria-hidden />
-          <h3 className="text-[1.4rem] font-semibold tracking-tight text-neutral-900">No food trucks yet</h3>
-          <p className="mt-1 text-[13px] text-neutral-500 sm:text-sm">
+          <Truck className="mx-auto mb-3 h-10 w-10 text-muted-foreground" aria-hidden />
+          <h3 className="text-[1.4rem] font-semibold tracking-tight text-foreground">No food trucks yet</h3>
+          <p className="mt-1 text-[13px] text-muted-foreground sm:text-sm">
             Add your first truck — it takes about a minute, and you can post your opening stop in the same flow.
           </p>
           <div className="mt-5">
             <Link to={PATHS.MERCHANT_TRUCKS_CREATE}>
-              <Button size="md" className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800">
+              <Button size="md" className="rounded-full bg-foreground text-background hover:bg-foreground/85">
                 <Plus className="mr-2 h-4 w-4" />
                 Add a truck
               </Button>

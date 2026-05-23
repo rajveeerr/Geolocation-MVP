@@ -156,7 +156,7 @@ export const MerchantMenuManagement = () => {
   const getCategoryIcon = (category: string) => {
     const categoryLower = category.toLowerCase();
     if (categoryLower.includes('appetizer') || categoryLower.includes('starter')) {
-      return <Utensils className="h-4 w-4 text-red-800" />;
+      return <Utensils className="h-4 w-4 text-red-800 dark:text-red-300" />;
     }
     if (categoryLower.includes('main') || categoryLower.includes('entree')) {
       return <Utensils className="h-4 w-4 text-red-500" />;
@@ -167,7 +167,7 @@ export const MerchantMenuManagement = () => {
     if (categoryLower.includes('drink') || categoryLower.includes('beverage')) {
       return <Utensils className="h-4 w-4 text-blue-500" />;
     }
-    return <Utensils className="h-4 w-4 text-gray-500" />;
+    return <Utensils className="h-4 w-4 text-muted-foreground" />;
   };
 
   return (
@@ -269,7 +269,7 @@ export const MerchantMenuManagement = () => {
                     )}
                     {item.calories && (
                       <div className="flex items-center gap-1">
-                        <Zap className="h-4 w-4 text-red-800" />
+                        <Zap className="h-4 w-4 text-red-800 dark:text-red-300" />
                         <span className="text-sm">{item.calories} cal</span>
                       </div>
                     )}
@@ -327,7 +327,7 @@ export const MerchantMenuManagement = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleDeleteItem(item.id)}
-                    className="text-red-600 hover:text-red-700"
+                    className="text-red-600 hover:text-red-700 dark:text-red-300"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

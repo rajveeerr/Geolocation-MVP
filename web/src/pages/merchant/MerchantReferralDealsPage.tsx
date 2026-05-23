@@ -21,7 +21,7 @@ import { cn } from '@/lib/utils';
 import type { MerchantReferralProgram, ReferralProgramPayload } from '@/types/referral';
 
 const panelClass =
-  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
+  'rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 interface ReferralDeal {
   id: number;
@@ -48,9 +48,9 @@ const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
 
 const dealState = (deal: ReferralDeal) => {
-  if (deal.isExpired) return { label: 'Expired', tone: 'bg-neutral-100 text-neutral-600 ring-neutral-400/20' };
-  if (deal.isUpcoming) return { label: 'Scheduled', tone: 'bg-sky-100 text-sky-700 ring-sky-600/20' };
-  return { label: 'Active', tone: 'bg-emerald-100 text-emerald-700 ring-emerald-600/20' };
+  if (deal.isExpired) return { label: 'Expired', tone: 'bg-muted text-muted-foreground ring-neutral-400/20' };
+  if (deal.isUpcoming) return { label: 'Scheduled', tone: 'bg-sky-100 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-sky-600/20' };
+  return { label: 'Active', tone: 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 ring-emerald-600/20' };
 };
 
 const blankForm = (): ReferralFormState => ({
@@ -100,8 +100,8 @@ function DealSelectionCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h4 className="truncate text-base font-semibold text-neutral-900">{deal.title}</h4>
-          {deal.description && <p className="mt-1 line-clamp-2 text-sm text-neutral-500">{deal.description}</p>}
+          <h4 className="truncate text-base font-semibold text-foreground">{deal.title}</h4>
+          {deal.description && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{deal.description}</p>}
         </div>
         <span className={cn('inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset', state.tone)}>
           {state.label}
@@ -109,21 +109,21 @@ function DealSelectionCard({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold">
-        <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 ring-1 ring-inset', program ? 'bg-teal-100 text-teal-700 ring-teal-600/20' : 'bg-neutral-100 text-neutral-500 ring-neutral-400/20')}>
+        <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 ring-1 ring-inset', program ? 'bg-teal-100 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 ring-teal-600/20' : 'bg-muted text-muted-foreground ring-neutral-400/20')}>
           {program ? (program.isActive ? 'Referral enabled' : 'Referral paused') : 'No referral offer yet'}
         </span>
-        <span className="inline-flex items-center rounded-full bg-neutral-100 px-2 py-0.5 text-neutral-600 ring-1 ring-inset ring-neutral-200">
+        <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-muted-foreground ring-1 ring-inset ring-neutral-200">
           {deal.dealType?.name ?? 'Deal'}
         </span>
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-neutral-600">
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-2.5">
-          <div className="font-semibold uppercase tracking-wider text-neutral-400">Starts</div>
+      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+        <div className="rounded-xl border border-border bg-muted/60 p-2.5">
+          <div className="font-semibold uppercase tracking-wider text-muted-foreground">Starts</div>
           <div className="mt-0.5">{formatDate(deal.startTime)}</div>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-2.5">
-          <div className="font-semibold uppercase tracking-wider text-neutral-400">Ends</div>
+        <div className="rounded-xl border border-border bg-muted/60 p-2.5">
+          <div className="font-semibold uppercase tracking-wider text-muted-foreground">Ends</div>
           <div className="mt-0.5">{formatDate(deal.endTime)}</div>
         </div>
       </div>
@@ -151,19 +151,19 @@ function ConfigureReferralForm({
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-600">Configure referral offer</div>
-          <h3 className="mt-1 text-lg font-bold text-neutral-900">{deal.title}</h3>
-          <p className="mt-1 text-sm text-neutral-500">
+          <h3 className="mt-1 text-lg font-bold text-foreground">{deal.title}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
             {program ? 'Update the referral offer attached to this deal.' : 'Attach a referral offer to this deal.'}
           </p>
         </div>
-        <div className={cn('rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset', form.isActive ? 'bg-emerald-50 text-emerald-700 ring-emerald-200' : 'bg-neutral-100 text-neutral-600 ring-neutral-200')}>
+        <div className={cn('rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset', form.isActive ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 ring-emerald-200' : 'bg-muted text-muted-foreground ring-neutral-200')}>
           {form.isActive ? 'Enabled' : 'Paused'}
         </div>
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <div>
-          <Label htmlFor="referrer-offer" className="text-xs font-semibold text-neutral-700">Referrer earns</Label>
+          <Label htmlFor="referrer-offer" className="text-xs font-semibold text-foreground">Referrer earns</Label>
           <Input
             id="referrer-offer"
             value={form.rewardForReferrer}
@@ -174,7 +174,7 @@ function ConfigureReferralForm({
           />
         </div>
         <div>
-          <Label htmlFor="friend-offer" className="text-xs font-semibold text-neutral-700">Friend gets</Label>
+          <Label htmlFor="friend-offer" className="text-xs font-semibold text-foreground">Friend gets</Label>
           <Input
             id="friend-offer"
             value={form.rewardForReferred}
@@ -187,7 +187,7 @@ function ConfigureReferralForm({
       </div>
 
       <div className="mt-4">
-        <Label htmlFor="referral-desc" className="text-xs font-semibold text-neutral-700">Offer notes</Label>
+        <Label htmlFor="referral-desc" className="text-xs font-semibold text-foreground">Offer notes</Label>
         <Textarea
           id="referral-desc"
           value={form.description}
@@ -201,7 +201,7 @@ function ConfigureReferralForm({
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div>
-          <Label htmlFor="referral-max" className="text-xs font-semibold text-neutral-700">Max redemptions per referrer</Label>
+          <Label htmlFor="referral-max" className="text-xs font-semibold text-foreground">Max redemptions per referrer</Label>
           <Input
             id="referral-max"
             type="number"
@@ -213,7 +213,7 @@ function ConfigureReferralForm({
           />
         </div>
         <div>
-          <Label htmlFor="referral-expires" className="text-xs font-semibold text-neutral-700">Referral offer ends</Label>
+          <Label htmlFor="referral-expires" className="text-xs font-semibold text-foreground">Referral offer ends</Label>
           <Input
             id="referral-expires"
             type="date"
@@ -225,7 +225,7 @@ function ConfigureReferralForm({
         </div>
       </div>
 
-      <div className="mt-4 flex items-center gap-2 rounded-2xl border border-neutral-200 bg-white px-3 py-3">
+      <div className="mt-4 flex items-center gap-2 rounded-2xl border border-border bg-card px-3 py-3">
         <input
           type="checkbox"
           checked={form.isActive}
@@ -233,13 +233,13 @@ function ConfigureReferralForm({
           className="h-4 w-4 accent-teal-600"
         />
         <div>
-          <div className="text-sm font-medium text-neutral-900">Enable referral offer</div>
-          <p className="text-xs text-neutral-500">Attribution is recorded when a referred customer checks in to this deal.</p>
+          <div className="text-sm font-medium text-foreground">Enable referral offer</div>
+          <p className="text-xs text-muted-foreground">Attribution is recorded when a referred customer checks in to this deal.</p>
         </div>
       </div>
 
-      <div className="mt-5 rounded-2xl border border-neutral-200 bg-neutral-50 p-4 text-sm text-neutral-600">
-        <div className="font-semibold text-neutral-900">Current deal snapshot</div>
+      <div className="mt-5 rounded-2xl border border-border bg-muted p-4 text-sm text-muted-foreground">
+        <div className="font-semibold text-foreground">Current deal snapshot</div>
         <div className="mt-2 grid gap-2 sm:grid-cols-2">
           <div>Starts {formatDate(deal.startTime)}</div>
           <div>Ends {formatDate(deal.endTime)}</div>
@@ -277,7 +277,7 @@ function ConfiguredReferralCard({
   return (
     <div className={cn(panelClass, 'p-5', !program.isActive && 'opacity-70')}>
       <div className="flex items-start justify-between gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-100 text-teal-700 ring-1 ring-inset ring-teal-200">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-100 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 ring-1 ring-inset ring-teal-200">
           <Share2 className="h-5 w-5" />
         </div>
         <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset', state.tone)}>
@@ -286,31 +286,31 @@ function ConfiguredReferralCard({
       </div>
 
       <div className="mt-3">
-        <h3 className="text-base font-bold text-neutral-900">{deal.title}</h3>
-        {program.description && <p className="mt-1 text-sm text-neutral-500">{program.description}</p>}
+        <h3 className="text-base font-bold text-foreground">{deal.title}</h3>
+        {program.description && <p className="mt-1 text-sm text-muted-foreground">{program.description}</p>}
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Referrer earns</div>
-          <div className="mt-0.5 text-sm font-medium text-neutral-900">{program.rewardForReferrer}</div>
+        <div className="rounded-xl border border-border bg-muted/60 p-3">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Referrer earns</div>
+          <div className="mt-0.5 text-sm font-medium text-foreground">{program.rewardForReferrer}</div>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Friend gets</div>
-          <div className="mt-0.5 text-sm font-medium text-neutral-900">{program.rewardForReferred}</div>
+        <div className="rounded-xl border border-border bg-muted/60 p-3">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Friend gets</div>
+          <div className="mt-0.5 text-sm font-medium text-foreground">{program.rewardForReferred}</div>
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-teal-200 bg-teal-50/50 p-3 text-xs">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-teal-200 dark:border-teal-900/50 bg-teal-50/50 dark:bg-teal-950/30 p-3 text-xs">
         <div>
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-teal-700">Status</div>
-          <div className="mt-0.5 text-sm font-bold text-teal-800">{program.isActive ? 'Enabled' : 'Paused'}</div>
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-teal-700 dark:text-teal-300">Status</div>
+          <div className="mt-0.5 text-sm font-bold text-teal-800 dark:text-teal-300">{program.isActive ? 'Enabled' : 'Paused'}</div>
         </div>
         <button
           type="button"
           onClick={() => onCopyLink(deal)}
           disabled={!shareCode || !program.isActive}
-          className="inline-flex items-center gap-1.5 rounded-full border border-teal-300 bg-white px-3 py-1.5 text-xs font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-60"
+          className="inline-flex items-center gap-1.5 rounded-full border border-teal-300 bg-card px-3 py-1.5 text-xs font-medium text-teal-800 dark:text-teal-300 hover:bg-teal-50 dark:bg-teal-950/30 disabled:opacity-60"
         >
           <Share2 className="h-3.5 w-3.5" />
           Copy share link
@@ -433,29 +433,29 @@ function MerchantReferralDealsInner() {
   if (isLoading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (error) {
-    return <div className={cn(panelClass, 'border-rose-200 bg-rose-50 p-4 text-sm text-rose-700')}>{(error as Error).message}</div>;
+    return <div className={cn(panelClass, 'border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 p-4 text-sm text-rose-700 dark:text-rose-300')}>{(error as Error).message}</div>;
   }
 
   return (
     <div className="mx-auto max-w-screen-xl space-y-6 px-4 py-3 sm:px-1 sm:py-4">
-      <div className={cn(panelClass, 'flex flex-wrap items-center justify-between gap-4 border-teal-200/70 bg-gradient-to-r from-teal-50 via-white to-white p-5')}>
+      <div className={cn(panelClass, 'flex flex-wrap items-center justify-between gap-4 border-teal-200/70 dark:border-teal-900/50 bg-gradient-to-r from-teal-50 via-card to-card dark:bg-none dark:bg-card p-5')}>
         <div className="flex min-w-0 items-start gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md">
             <Share2 className="h-5 w-5" aria-hidden />
           </div>
           <div className="min-w-0">
-            <h2 className="text-lg font-bold tracking-tight text-neutral-900 sm:text-xl">Referral Deals</h2>
-            <p className="text-sm text-neutral-600">Pick one of your deals, then choose the referral offer attached to it.</p>
+            <h2 className="text-lg font-bold tracking-tight text-foreground sm:text-xl">Referral Deals</h2>
+            <p className="text-sm text-muted-foreground">Pick one of your deals, then choose the referral offer attached to it.</p>
           </div>
         </div>
         <Link to={PATHS.MERCHANT_DEALS}>
-          <Button size="md" variant="secondary" className="rounded-full border-neutral-200 bg-white text-neutral-700 shadow-sm hover:bg-neutral-50">
+          <Button size="md" variant="secondary" className="rounded-full border-border bg-card text-foreground shadow-sm hover:bg-muted">
             <ArrowRight className="mr-2 h-4 w-4 rotate-180" />
             View all deals
           </Button>
@@ -464,16 +464,16 @@ function MerchantReferralDealsInner() {
 
       <div className="grid gap-3 sm:grid-cols-3">
         <div className={cn(panelClass, 'p-4')}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Available deals</div>
-          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-neutral-950">{availableDeals.length}</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Available deals</div>
+          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-foreground">{availableDeals.length}</div>
         </div>
         <div className={cn(panelClass, 'p-4')}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Configured referral deals</div>
-          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-neutral-950">{configuredDeals.length}</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Configured referral deals</div>
+          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-foreground">{configuredDeals.length}</div>
         </div>
         <div className={cn(panelClass, 'p-4')}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Selected deal</div>
-          <div className="mt-1 truncate text-[1.1rem] font-semibold tracking-tight text-teal-700">{selectedDeal?.title ?? 'None'}</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Selected deal</div>
+          <div className="mt-1 truncate text-[1.1rem] font-semibold tracking-tight text-teal-700 dark:text-teal-300">{selectedDeal?.title ?? 'None'}</div>
         </div>
       </div>
 
@@ -481,20 +481,20 @@ function MerchantReferralDealsInner() {
         <div className="space-y-4">
           <div className={cn(panelClass, 'flex items-center justify-between gap-3 p-4')}>
             <div>
-              <h3 className="text-base font-bold text-neutral-900">Choose a deal</h3>
-              <p className="text-sm text-neutral-500">Expired deals are read-only. Active and upcoming deals can receive referral offers.</p>
+              <h3 className="text-base font-bold text-foreground">Choose a deal</h3>
+              <p className="text-sm text-muted-foreground">Expired deals are read-only. Active and upcoming deals can receive referral offers.</p>
             </div>
-            <div className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-semibold text-neutral-600 ring-1 ring-inset ring-neutral-200">{availableDeals.length} available</div>
+            <div className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground ring-1 ring-inset ring-neutral-200">{availableDeals.length} available</div>
           </div>
 
           {availableDeals.length === 0 ? (
             <div className={cn(panelClass, 'border-dashed p-8 text-center')}>
-              <Target className="mx-auto mb-3 h-10 w-10 text-neutral-300" aria-hidden />
-              <h3 className="text-[1.4rem] font-semibold tracking-tight text-neutral-900">No deals yet</h3>
-              <p className="mt-1 text-[13px] text-neutral-500 sm:text-sm">Create a deal first, then come back here to attach referral offers.</p>
+              <Target className="mx-auto mb-3 h-10 w-10 text-muted-foreground" aria-hidden />
+              <h3 className="text-[1.4rem] font-semibold tracking-tight text-foreground">No deals yet</h3>
+              <p className="mt-1 text-[13px] text-muted-foreground sm:text-sm">Create a deal first, then come back here to attach referral offers.</p>
               <div className="mt-5 flex justify-center">
                 <Link to={PATHS.MERCHANT_DEALS_CREATE}>
-                  <Button className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800">Create a deal</Button>
+                  <Button className="rounded-full bg-foreground text-background hover:bg-foreground/85">Create a deal</Button>
                 </Link>
               </div>
             </div>
@@ -524,7 +524,7 @@ function MerchantReferralDealsInner() {
               isSaving={isSaving}
             />
           ) : (
-            <div className={cn(panelClass, 'p-5 text-sm text-neutral-500')}>Select a deal to configure its referral offer.</div>
+            <div className={cn(panelClass, 'p-5 text-sm text-muted-foreground')}>Select a deal to configure its referral offer.</div>
           )}
         </div>
       </div>
@@ -533,10 +533,10 @@ function MerchantReferralDealsInner() {
         <div className="space-y-4">
           <div className={cn(panelClass, 'flex items-center justify-between gap-3 p-4')}>
             <div>
-              <h3 className="text-base font-bold text-neutral-900">Configured referral deals</h3>
-              <p className="text-sm text-neutral-500">Deals with active or paused referral offers attached.</p>
+              <h3 className="text-base font-bold text-foreground">Configured referral deals</h3>
+              <p className="text-sm text-muted-foreground">Deals with active or paused referral offers attached.</p>
             </div>
-            <div className="flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700 ring-1 ring-inset ring-teal-200">
+            <div className="flex items-center gap-2 rounded-full bg-teal-50 dark:bg-teal-950/30 px-3 py-1 text-xs font-semibold text-teal-700 dark:text-teal-300 ring-1 ring-inset ring-teal-200">
               <Users className="h-3.5 w-3.5" />
               {configuredDeals.length}
             </div>

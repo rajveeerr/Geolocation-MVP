@@ -79,7 +79,7 @@ const EMPTY_FORM: FormState = {
   surpriseTotalSlots: '',
 };
 
-const inputClassName = 'mt-1.5 h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]';
+const inputClassName = 'mt-1.5 h-10 rounded-lg border-border bg-card text-[13.5px]';
 
 function SurpriseCreateInner() {
   const navigate = useNavigate();
@@ -179,14 +179,14 @@ function SurpriseCreateInner() {
     >
       <div className="space-y-3">
         {/* AI generator */}
-        <SectionCard className="bg-gradient-to-br from-violet-50/50 to-white">
+        <SectionCard className="bg-gradient-to-br from-violet-50/50 to-card dark:bg-none dark:bg-card">
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-600">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-100 dark:bg-violet-950/40 text-violet-600">
               <Sparkles className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-[13px] font-semibold text-neutral-900">Generate with AI</div>
-              <p className="text-[12px] text-neutral-500">
+              <div className="text-[13px] font-semibold text-foreground">Generate with AI</div>
+              <p className="text-[12px] text-muted-foreground">
                 Describe your offer in one line — we'll fill in the form.
               </p>
               <div className="mt-3 flex gap-2">
@@ -194,13 +194,13 @@ function SurpriseCreateInner() {
                   value={aiIntent}
                   onChange={(e) => setAiIntent(e.target.value)}
                   placeholder="e.g. 20% off all cocktails after 8pm on weekends"
-                  className="h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                  className="h-10 rounded-lg border-border bg-card text-[13.5px]"
                 />
                 <Button
                   variant="ghost"
                   onClick={handleGenerateAI}
                   disabled={generateAI.isPending}
-                  className="h-10 shrink-0 rounded-lg border border-violet-200 bg-violet-600 px-3 text-white hover:bg-violet-700 hover:text-white disabled:opacity-70"
+                  className="h-10 shrink-0 rounded-lg border border-violet-200 dark:border-violet-900/50 bg-violet-600 px-3 text-white hover:bg-violet-700 hover:text-white disabled:opacity-70"
                 >
                   {generateAI.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Generate'}
                 </Button>
@@ -224,19 +224,19 @@ function SurpriseCreateInner() {
                   className={cn(
                     'flex items-start gap-3 rounded-xl border p-3 text-left transition',
                     selected
-                      ? 'border-neutral-900 bg-neutral-50 shadow-[0_4px_12px_rgba(15,23,42,0.06)]'
-                      : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50',
+                      ? 'border-foreground bg-muted shadow-[0_4px_12px_rgba(15,23,42,0.06)]'
+                      : 'border-border bg-card hover:border-border hover:bg-muted',
                   )}
                 >
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-100 text-violet-700">
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-100 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300">
                     <Icon className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-semibold text-neutral-900">{t.label}</div>
-                    <div className="text-[11px] text-neutral-500">{t.description}</div>
+                    <div className="text-[13px] font-semibold text-foreground">{t.label}</div>
+                    <div className="text-[11px] text-muted-foreground">{t.description}</div>
                   </div>
                   {selected ? (
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-neutral-900" />
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-foreground" />
                   ) : null}
                 </button>
               );
@@ -264,7 +264,7 @@ function SurpriseCreateInner() {
               onChange={(e) => set('description', e.target.value)}
               rows={3}
               placeholder="Full deal description (shown after reveal)"
-              className="mt-1.5 resize-none rounded-lg border-neutral-200 bg-white text-[13.5px]"
+              className="mt-1.5 resize-none rounded-lg border-border bg-card text-[13.5px]"
             />
           </div>
 
@@ -288,7 +288,7 @@ function SurpriseCreateInner() {
               onChange={(e) => set('redemptionInstructions', e.target.value)}
               rows={2}
               placeholder="Show this screen to your server before ordering."
-              className="mt-1.5 resize-none rounded-lg border-neutral-200 bg-white text-[13.5px]"
+              className="mt-1.5 resize-none rounded-lg border-border bg-card text-[13.5px]"
             />
           </div>
         </SectionCard>
@@ -298,7 +298,7 @@ function SurpriseCreateInner() {
           <FieldLabel label="Discount" hint="At least one of these or a custom offer" />
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 Percent off
               </label>
               <Input
@@ -308,11 +308,11 @@ function SurpriseCreateInner() {
                 value={form.discountPercentage}
                 onChange={(e) => set('discountPercentage', e.target.value)}
                 placeholder="30"
-                className="h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="h-10 w-[180px] rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
             <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 Dollar amount off
               </label>
               <Input
@@ -321,7 +321,7 @@ function SurpriseCreateInner() {
                 value={form.discountAmount}
                 onChange={(e) => set('discountAmount', e.target.value)}
                 placeholder="5"
-                className="h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="h-10 w-[180px] rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
           </div>
@@ -332,7 +332,7 @@ function SurpriseCreateInner() {
           <FieldLabel label="Schedule" required />
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 Start time
               </label>
               <Input
@@ -340,11 +340,11 @@ function SurpriseCreateInner() {
                 lang="en-US"
                 value={form.startTime}
                 onChange={(e) => set('startTime', e.target.value)}
-                className="h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="h-10 rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
             <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 End time
               </label>
               <Input
@@ -352,7 +352,7 @@ function SurpriseCreateInner() {
                 lang="en-US"
                 value={form.endTime}
                 onChange={(e) => set('endTime', e.target.value)}
-                className="h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="h-10 rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
           </div>
@@ -398,7 +398,7 @@ function SurpriseCreateInner() {
           <FieldLabel label="Advanced" />
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 Reveal window (minutes)
               </label>
               <Input
@@ -407,12 +407,12 @@ function SurpriseCreateInner() {
                 value={form.revealDurationMinutes}
                 onChange={(e) => set('revealDurationMinutes', e.target.value)}
                 placeholder="60"
-                className="h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="h-10 w-[180px] rounded-lg border-border bg-card text-[13.5px]"
               />
-              <p className="mt-1 text-[11px] text-neutral-400">How long after reveal users have to redeem.</p>
+              <p className="mt-1 text-[11px] text-muted-foreground">How long after reveal users have to redeem.</p>
             </div>
             <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 Total slots
               </label>
               <Input
@@ -421,9 +421,9 @@ function SurpriseCreateInner() {
                 value={form.surpriseTotalSlots}
                 onChange={(e) => set('surpriseTotalSlots', e.target.value)}
                 placeholder="50"
-                className="h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="h-10 w-[180px] rounded-lg border-border bg-card text-[13.5px]"
               />
-              <p className="mt-1 text-[11px] text-neutral-400">Leave blank for unlimited reveals.</p>
+              <p className="mt-1 text-[11px] text-muted-foreground">Leave blank for unlimited reveals.</p>
             </div>
           </div>
         </SectionCard>

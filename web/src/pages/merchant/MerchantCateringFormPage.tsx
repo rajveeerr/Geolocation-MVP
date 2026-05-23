@@ -34,7 +34,7 @@ import type {
 } from '@/types/catering';
 
 const panelClass =
-  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
+  'rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 interface ChoiceState {
   /** Stable id for React keys; persists across renders. */
@@ -179,18 +179,18 @@ function ChipInput({
   };
   return (
     <div className="space-y-2">
-      <Label className="text-sm font-medium text-neutral-700">{label}</Label>
+      <Label className="text-sm font-medium text-foreground">{label}</Label>
       <div className="flex flex-wrap gap-1.5">
         {values.map((v) => (
           <span
             key={v}
-            className="inline-flex items-center gap-1 rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-700"
+            className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-foreground"
           >
             {v}
             <button
               type="button"
               onClick={() => onChange(values.filter((x) => x !== v))}
-              className="text-neutral-400 hover:text-neutral-700"
+              className="text-muted-foreground hover:text-foreground"
               aria-label={`Remove ${v}`}
             >
               <X className="h-3 w-3" />
@@ -243,7 +243,7 @@ function MultiToggleChips({
               'rounded-full border px-3 py-1.5 text-xs font-medium transition',
               selected
                 ? 'border-brand-primary-500 bg-brand-primary-50 text-brand-primary-700'
-                : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300',
+                : 'border-border bg-card text-muted-foreground hover:border-border',
             )}
           >
             {opt}
@@ -279,11 +279,11 @@ function OptionEditor({
     );
 
   return (
-    <div className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-4">
+    <div className="space-y-4 rounded-2xl border border-border bg-card p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1 space-y-3">
           <div>
-            <Label className="text-sm font-medium text-neutral-700">Group name</Label>
+            <Label className="text-sm font-medium text-foreground">Group name</Label>
             <Input
               value={option.name}
               onChange={(e) => set('name', e.target.value)}
@@ -294,7 +294,7 @@ function OptionEditor({
 
           <div className="grid gap-3 sm:grid-cols-3">
             <div>
-              <Label className="text-sm font-medium text-neutral-700">Selection</Label>
+              <Label className="text-sm font-medium text-foreground">Selection</Label>
               <select
                 value={option.selectionType}
                 onChange={(e) => {
@@ -305,7 +305,7 @@ function OptionEditor({
                     maxSelections: next === 'SINGLE' ? 1 : Math.max(option.maxSelections, 2),
                   });
                 }}
-                className="mt-1 h-10 w-full rounded-lg border border-neutral-200 bg-white px-3 text-sm"
+                className="mt-1 h-10 w-full rounded-lg border border-border bg-card px-3 text-sm"
               >
                 <option value="SINGLE">Single (radio)</option>
                 <option value="MULTIPLE">Multiple (checkboxes)</option>
@@ -314,7 +314,7 @@ function OptionEditor({
 
             {option.selectionType === 'MULTIPLE' && (
               <div>
-                <Label className="text-sm font-medium text-neutral-700">Max selections</Label>
+                <Label className="text-sm font-medium text-foreground">Max selections</Label>
                 <Input
                   type="number"
                   min={2}
@@ -326,10 +326,10 @@ function OptionEditor({
             )}
 
             <div>
-              <Label className="text-sm font-medium text-neutral-700">Required</Label>
+              <Label className="text-sm font-medium text-foreground">Required</Label>
               <div className="mt-2 flex h-10 items-center gap-2">
                 <Switch checked={option.isRequired} onCheckedChange={(v) => set('isRequired', v)} />
-                <span className="text-xs text-neutral-500">{option.isRequired ? 'Customer must pick' : 'Optional'}</span>
+                <span className="text-xs text-muted-foreground">{option.isRequired ? 'Customer must pick' : 'Optional'}</span>
               </div>
             </div>
           </div>
@@ -338,21 +338,21 @@ function OptionEditor({
         <button
           type="button"
           onClick={onRemove}
-          className="rounded-full border border-neutral-200 p-1.5 text-neutral-400 transition hover:bg-rose-50 hover:text-rose-600"
+          className="rounded-full border border-border p-1.5 text-muted-foreground transition hover:bg-rose-50 dark:bg-rose-950/30 hover:text-rose-600"
           aria-label="Remove option group"
         >
           <Trash2 className="h-4 w-4" />
         </button>
       </div>
 
-      <div className="space-y-2 border-t border-neutral-100 pt-4">
-        <Label className="text-sm font-medium text-neutral-700">Choices</Label>
+      <div className="space-y-2 border-t border-border pt-4">
+        <Label className="text-sm font-medium text-foreground">Choices</Label>
         {option.choices.length === 0 ? (
-          <p className="text-xs text-neutral-500">No choices yet. Add at least one.</p>
+          <p className="text-xs text-muted-foreground">No choices yet. Add at least one.</p>
         ) : (
           <div className="space-y-2">
             {option.choices.map((choice) => (
-              <div key={choice.uid} className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-3">
+              <div key={choice.uid} className="rounded-xl border border-border bg-muted/50 p-3">
                 <div className="grid gap-2 sm:grid-cols-[1fr_120px_auto]">
                   <Input
                     value={choice.label}
@@ -361,7 +361,7 @@ function OptionEditor({
                     className="h-10"
                   />
                   <div className="relative">
-                    <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs text-neutral-400">+$</span>
+                    <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">+$</span>
                     <Input
                       type="number"
                       step="0.01"
@@ -374,13 +374,13 @@ function OptionEditor({
                   <button
                     type="button"
                     onClick={() => removeChoice(choice.uid)}
-                    className="rounded-full p-2 text-neutral-400 hover:bg-neutral-200 hover:text-neutral-700"
+                    className="rounded-full p-2 text-muted-foreground hover:bg-accent hover:text-foreground"
                     aria-label="Remove choice"
                   >
                     <X className="h-4 w-4" />
                   </button>
                 </div>
-                <div className="mt-2 flex flex-wrap gap-3 text-xs text-neutral-600">
+                <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted-foreground">
                   <label className="inline-flex items-center gap-1.5">
                     <input
                       type="checkbox"
@@ -551,7 +551,7 @@ function MerchantCateringFormInner() {
   if (isEditing && loadingExisting) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -568,14 +568,14 @@ function MerchantCateringFormInner() {
 
       <div className={`${panelClass} mt-4 p-6`}>
         <div className="flex items-start gap-3">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-100">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-950/40">
             <ChefHat className="h-6 w-6 text-amber-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-neutral-900">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
               {isEditing ? 'Edit catering item' : 'New catering item'}
             </h1>
-            <p className="mt-1 text-sm text-neutral-500">
+            <p className="mt-1 text-sm text-muted-foreground">
               Per-person packages, platters, sandwiches — anything you cater. Customize options to match how you actually serve it.
             </p>
           </div>
@@ -583,10 +583,10 @@ function MerchantCateringFormInner() {
 
         {/* Section: Basic info */}
         <section className="mt-8 space-y-4">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Basic info</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Basic info</h2>
 
           <div>
-            <Label htmlFor="cat-name" className="text-sm font-medium text-neutral-700">
+            <Label htmlFor="cat-name" className="text-sm font-medium text-foreground">
               Item name <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -600,10 +600,10 @@ function MerchantCateringFormInner() {
           </div>
 
           <div>
-            <Label htmlFor="cat-category" className="text-sm font-medium text-neutral-700">
+            <Label htmlFor="cat-category" className="text-sm font-medium text-foreground">
               Category <span className="text-red-500">*</span>
             </Label>
-            <p className="mt-0.5 text-xs text-neutral-500">Used to group items on your catering page.</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">Used to group items on your catering page.</p>
             <Input
               id="cat-category"
               value={form.category}
@@ -627,7 +627,7 @@ function MerchantCateringFormInner() {
                     key={c}
                     type="button"
                     onClick={() => set('category', c)}
-                    className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600 hover:bg-neutral-200"
+                    className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground hover:bg-accent"
                   >
                     {c}
                   </button>
@@ -637,7 +637,7 @@ function MerchantCateringFormInner() {
           </div>
 
           <div>
-            <Label htmlFor="cat-desc" className="text-sm font-medium text-neutral-700">
+            <Label htmlFor="cat-desc" className="text-sm font-medium text-foreground">
               Description
             </Label>
             <Textarea
@@ -652,18 +652,18 @@ function MerchantCateringFormInner() {
           </div>
 
           <div>
-            <Label className="text-sm font-medium text-neutral-700">Cover image</Label>
-            <p className="mt-0.5 text-xs text-neutral-500">Shown on the customer catering page.</p>
+            <Label className="text-sm font-medium text-foreground">Cover image</Label>
+            <p className="mt-0.5 text-xs text-muted-foreground">Shown on the customer catering page.</p>
             <div className="mt-2">
               {form.imageUrl ? (
                 <div className="space-y-2">
-                  <img src={form.imageUrl} alt="Cover" className="h-40 w-full rounded-xl border border-neutral-200 object-cover" />
+                  <img src={form.imageUrl} alt="Cover" className="h-40 w-full rounded-xl border border-border object-cover" />
                   <div className="flex gap-2">
                     <Button type="button" size="sm" variant="secondary" onClick={() => setImageModalOpen(true)} className="rounded-full">
                       <ImageIcon className="mr-1.5 h-3.5 w-3.5" />
                       Change
                     </Button>
-                    <Button type="button" size="sm" variant="ghost" onClick={() => set('imageUrl', '')} className="rounded-full text-rose-600 hover:bg-rose-50">
+                    <Button type="button" size="sm" variant="ghost" onClick={() => set('imageUrl', '')} className="rounded-full text-rose-600 hover:bg-rose-50 dark:bg-rose-950/30">
                       Remove
                     </Button>
                   </div>
@@ -672,7 +672,7 @@ function MerchantCateringFormInner() {
                 <button
                   type="button"
                   onClick={() => setImageModalOpen(true)}
-                  className="flex h-32 w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-neutral-300 text-neutral-400 hover:border-neutral-400 hover:bg-neutral-50"
+                  className="flex h-32 w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-border text-muted-foreground hover:border-border hover:bg-muted"
                 >
                   <Plus className="h-6 w-6" />
                   <span className="mt-1 text-xs font-medium">Add image</span>
@@ -684,10 +684,10 @@ function MerchantCateringFormInner() {
 
         {/* Section: Pricing & serving */}
         <section className="mt-8 space-y-4">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Pricing & serving</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Pricing & serving</h2>
 
           <div>
-            <Label className="text-sm font-medium text-neutral-700">Pricing type</Label>
+            <Label className="text-sm font-medium text-foreground">Pricing type</Label>
             <div className="mt-2 grid gap-2 sm:grid-cols-2">
               {(['PER_PERSON', 'FIXED'] as CateringPricingType[]).map((type) => (
                 <button
@@ -698,13 +698,13 @@ function MerchantCateringFormInner() {
                     'rounded-xl border-2 p-3 text-left text-sm transition',
                     form.pricingType === type
                       ? 'border-brand-primary-500 bg-brand-primary-50'
-                      : 'border-neutral-200 hover:border-neutral-300',
+                      : 'border-border hover:border-border',
                   )}
                 >
-                  <div className="font-semibold text-neutral-900">
+                  <div className="font-semibold text-foreground">
                     {type === 'PER_PERSON' ? 'Per person' : 'Flat / fixed'}
                   </div>
-                  <div className="mt-0.5 text-xs text-neutral-500">
+                  <div className="mt-0.5 text-xs text-muted-foreground">
                     {type === 'PER_PERSON' ? 'Customer picks # of people' : 'One total price (e.g. a tray)'}
                   </div>
                 </button>
@@ -714,7 +714,7 @@ function MerchantCateringFormInner() {
 
           {form.pricingType === 'PER_PERSON' ? (
             <div>
-              <Label htmlFor="cat-ppp" className="text-sm font-medium text-neutral-700">
+              <Label htmlFor="cat-ppp" className="text-sm font-medium text-foreground">
                 Price per person ($)
               </Label>
               <Input
@@ -729,7 +729,7 @@ function MerchantCateringFormInner() {
             </div>
           ) : (
             <div>
-              <Label htmlFor="cat-fp" className="text-sm font-medium text-neutral-700">
+              <Label htmlFor="cat-fp" className="text-sm font-medium text-foreground">
                 Fixed price ($)
               </Label>
               <Input
@@ -746,7 +746,7 @@ function MerchantCateringFormInner() {
 
           <div className="grid gap-3 sm:grid-cols-3">
             <div>
-              <Label htmlFor="cat-min" className="text-sm font-medium text-neutral-700">
+              <Label htmlFor="cat-min" className="text-sm font-medium text-foreground">
                 Min people <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -759,7 +759,7 @@ function MerchantCateringFormInner() {
               />
             </div>
             <div>
-              <Label htmlFor="cat-max" className="text-sm font-medium text-neutral-700">
+              <Label htmlFor="cat-max" className="text-sm font-medium text-foreground">
                 Max people
               </Label>
               <Input
@@ -773,7 +773,7 @@ function MerchantCateringFormInner() {
               />
             </div>
             <div>
-              <Label htmlFor="cat-serves" className="text-sm font-medium text-neutral-700">
+              <Label htmlFor="cat-serves" className="text-sm font-medium text-foreground">
                 Serves count
               </Label>
               <Input
@@ -792,8 +792,8 @@ function MerchantCateringFormInner() {
         {/* Section: Tags & metadata */}
         <section className="mt-8 space-y-4">
           <div className="flex items-center gap-2">
-            <Tags className="h-4 w-4 text-neutral-400" />
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Tags & metadata</h2>
+            <Tags className="h-4 w-4 text-muted-foreground" />
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tags & metadata</h2>
           </div>
 
           <ChipInput
@@ -804,7 +804,7 @@ function MerchantCateringFormInner() {
           />
 
           <div>
-            <Label className="text-sm font-medium text-neutral-700">Dietary info</Label>
+            <Label className="text-sm font-medium text-foreground">Dietary info</Label>
             <div className="mt-2">
               <MultiToggleChips
                 options={DIETARY_OPTIONS}
@@ -815,14 +815,14 @@ function MerchantCateringFormInner() {
           </div>
 
           <div>
-            <Label htmlFor="cat-pkg" className="text-sm font-medium text-neutral-700">
+            <Label htmlFor="cat-pkg" className="text-sm font-medium text-foreground">
               Packaging
             </Label>
             <select
               id="cat-pkg"
               value={form.packagingType}
               onChange={(e) => set('packagingType', e.target.value)}
-              className="mt-2 h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 text-sm sm:max-w-xs"
+              className="mt-2 h-11 w-full rounded-xl border border-border bg-card px-3 text-sm sm:max-w-xs"
             >
               <option value="">— Not specified —</option>
               {PACKAGING_OPTIONS.map((pkg) => (
@@ -832,17 +832,17 @@ function MerchantCateringFormInner() {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-3">
+            <div className="flex items-center justify-between rounded-xl border border-border bg-card p-3">
               <div>
-                <p className="text-sm font-medium text-neutral-900">Most ordered</p>
-                <p className="text-xs text-neutral-500">Show a "Most ordered" badge on this item</p>
+                <p className="text-sm font-medium text-foreground">Most ordered</p>
+                <p className="text-xs text-muted-foreground">Show a "Most ordered" badge on this item</p>
               </div>
               <Switch checked={form.isPopular} onCheckedChange={(v) => set('isPopular', v)} />
             </div>
-            <div className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-3">
+            <div className="flex items-center justify-between rounded-xl border border-border bg-card p-3">
               <div>
-                <p className="text-sm font-medium text-neutral-900">Allow special instructions</p>
-                <p className="text-xs text-neutral-500">Let customers add a note when ordering</p>
+                <p className="text-sm font-medium text-foreground">Allow special instructions</p>
+                <p className="text-xs text-muted-foreground">Let customers add a note when ordering</p>
               </div>
               <Switch
                 checked={form.specialInstructions}
@@ -856,8 +856,8 @@ function MerchantCateringFormInner() {
         <section className="mt-8 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Settings2 className="h-4 w-4 text-neutral-400" />
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Customization options</h2>
+              <Settings2 className="h-4 w-4 text-muted-foreground" />
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Customization options</h2>
             </div>
             <Button
               type="button"
@@ -872,7 +872,7 @@ function MerchantCateringFormInner() {
           </div>
 
           {form.options.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-neutral-300 bg-neutral-50/40 p-4 text-center text-xs text-neutral-500">
+            <p className="rounded-xl border border-dashed border-border bg-muted/40 p-4 text-center text-xs text-muted-foreground">
               No option groups yet. Add groups for things like "Select size", "Add sides", "Pick a salad".
             </p>
           ) : (
@@ -893,17 +893,17 @@ function MerchantCateringFormInner() {
 
         {/* Section: Visibility */}
         <section className="mt-8">
-          <div className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-4">
+          <div className="flex items-center justify-between rounded-xl border border-border bg-card p-4">
             <div>
-              <p className="text-sm font-semibold text-neutral-900">Active</p>
-              <p className="text-xs text-neutral-500">When off, customers don't see this item.</p>
+              <p className="text-sm font-semibold text-foreground">Active</p>
+              <p className="text-xs text-muted-foreground">When off, customers don't see this item.</p>
             </div>
             <Switch checked={form.isActive} onCheckedChange={(v) => set('isActive', v)} />
           </div>
         </section>
 
         {/* Footer */}
-        <div className="mt-8 flex flex-col gap-3 border-t border-neutral-200 pt-6 sm:flex-row sm:justify-end">
+        <div className="mt-8 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:justify-end">
           <Link to={PATHS.MERCHANT_CATERING} className="sm:order-1">
             <Button
               type="button"

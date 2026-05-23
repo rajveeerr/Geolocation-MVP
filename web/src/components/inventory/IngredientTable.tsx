@@ -21,13 +21,13 @@ interface Props {
 }
 
 function formatTrend(pct: number | null): { label: string; tone: string; Icon: typeof TrendingUp } {
-  if (pct == null) return { label: 'n/a', tone: 'text-neutral-500', Icon: Minus };
+  if (pct == null) return { label: 'n/a', tone: 'text-muted-foreground', Icon: Minus };
   const abs = Math.abs(pct);
-  if (abs < 1.5) return { label: 'STABLE', tone: 'text-neutral-600', Icon: Minus };
+  if (abs < 1.5) return { label: 'STABLE', tone: 'text-muted-foreground', Icon: Minus };
   if (pct > 0) {
     return {
       label: `↑ ${abs.toFixed(0)}%`,
-      tone: pct >= 15 ? 'text-red-600' : pct >= 5 ? 'text-amber-600' : 'text-neutral-700',
+      tone: pct >= 15 ? 'text-red-600' : pct >= 5 ? 'text-amber-600' : 'text-foreground',
       Icon: TrendingUp,
     };
   }
@@ -39,7 +39,7 @@ function formatTrend(pct: number | null): { label: string; tone: string; Icon: t
 }
 
 function stockBarTone(daysLeft: number | null): string {
-  if (daysLeft == null) return 'bg-neutral-400';
+  if (daysLeft == null) return 'bg-muted-foreground/40';
   if (daysLeft <= 14) return 'bg-red-500';
   if (daysLeft <= 30) return 'bg-amber-500';
   return 'bg-emerald-500';
@@ -79,7 +79,7 @@ const CostCell: React.FC<{
   if (editing) {
     return (
       <div className="flex items-center gap-1">
-        <span className="text-neutral-500">$</span>
+        <span className="text-muted-foreground">$</span>
         <input
           ref={inputRef}
           type="number"
@@ -95,9 +95,9 @@ const CostCell: React.FC<{
               setEditing(false);
             }
           }}
-          className="w-20 rounded-md border border-brand bg-white px-2 py-1 text-sm font-bold text-neutral-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand/30"
+          className="w-20 rounded-md border border-brand bg-card px-2 py-1 text-sm font-bold text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-brand/30"
         />
-        <span className="text-neutral-500">/ {ingredient.unitType}</span>
+        <span className="text-muted-foreground">/ {ingredient.unitType}</span>
       </div>
     );
   }
@@ -113,14 +113,14 @@ const CostCell: React.FC<{
       <span
         className={cn(
           'font-bold',
-          ingredient.trendPct != null && ingredient.trendPct >= 15 ? 'text-red-600' : 'text-neutral-900',
+          ingredient.trendPct != null && ingredient.trendPct >= 15 ? 'text-red-600' : 'text-foreground',
         )}
       >
         ${ingredient.currentCost.toFixed(2)}
       </span>
-      <span className="text-neutral-500">/ {ingredient.unitType}</span>
-      {saving && <Loader2 className="ml-1 h-3 w-3 animate-spin text-neutral-400" />}
-      <Pencil className="ml-1 h-3 w-3 text-neutral-300 opacity-0 transition group-hover:opacity-100" />
+      <span className="text-muted-foreground">/ {ingredient.unitType}</span>
+      {saving && <Loader2 className="ml-1 h-3 w-3 animate-spin text-muted-foreground" />}
+      <Pencil className="ml-1 h-3 w-3 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
     </button>
   );
 };
@@ -138,8 +138,8 @@ const IngredientTable: React.FC<Props> = ({
 }) => {
   if (ingredients.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-12 text-center">
-        <p className="text-sm text-neutral-600">
+      <div className="rounded-2xl border border-dashed border-border bg-card p-12 text-center">
+        <p className="text-sm text-muted-foreground">
           No ingredients match the current filters. Clear filters or click{' '}
           <span className="font-semibold">+ Add Item</span> to track a new one.
         </p>
@@ -148,11 +148,11 @@ const IngredientTable: React.FC<Props> = ({
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_4px_14px_rgba(15,23,42,0.04)]">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[0_4px_14px_rgba(15,23,42,0.04)]">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="border-b border-neutral-200 bg-neutral-50">
-            <tr className="text-left text-xs font-semibold uppercase tracking-wide text-neutral-500">
+          <thead className="border-b border-border bg-muted">
+            <tr className="text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <th className="px-5 py-3">Ingredient</th>
               <th className="px-5 py-3">Category</th>
               <th className="px-5 py-3">Cost per unit</th>
@@ -166,15 +166,15 @@ const IngredientTable: React.FC<Props> = ({
               const trend = formatTrend(ing.trendPct);
               const saving = updatingId === ing.id;
               return (
-                <tr key={ing.id} className="group hover:bg-neutral-50/60">
+                <tr key={ing.id} className="group hover:bg-muted/60">
                   <td className="px-5 py-4">
-                    <div className="font-semibold text-neutral-900">{ing.name}</div>
-                    <div className="mt-0.5 text-xs text-neutral-500">
+                    <div className="font-semibold text-foreground">{ing.name}</div>
+                    <div className="mt-0.5 text-xs text-muted-foreground">
                       ID: <code className="font-mono">{ing.slug}</code>
                     </div>
                   </td>
                   <td className="px-5 py-4">
-                    <span className="inline-flex items-center rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-700">
+                    <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-foreground">
                       {ing.category}
                     </span>
                   </td>
@@ -189,14 +189,14 @@ const IngredientTable: React.FC<Props> = ({
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <div className="min-w-0">
-                        <div className="text-xs uppercase tracking-wide text-neutral-500">
+                        <div className="text-xs uppercase tracking-wide text-muted-foreground">
                           LVL:{' '}
-                          <span className="font-semibold text-neutral-700">
+                          <span className="font-semibold text-foreground">
                             {Math.round(ing.stockLevel)}
                             {ing.unitType}
                           </span>
                         </div>
-                        <div className="mt-1 h-1.5 w-24 overflow-hidden rounded-full bg-neutral-100">
+                        <div className="mt-1 h-1.5 w-24 overflow-hidden rounded-full bg-muted">
                           <div
                             className={cn('h-full transition-all', stockBarTone(ing.daysLeft))}
                             style={{
@@ -209,13 +209,13 @@ const IngredientTable: React.FC<Props> = ({
                         <span
                           className={cn('inline-block h-2 w-2 rounded-full', stockBarTone(ing.daysLeft))}
                         />
-                        <span className="font-semibold text-neutral-700">
+                        <span className="font-semibold text-foreground">
                           {ing.daysLeft != null ? `~${ing.daysLeft} days` : '—'}
                         </span>
-                        <span className="text-neutral-500">left</span>
+                        <span className="text-muted-foreground">left</span>
                         {ing.usageSource === 'orders' && (
                           <span
-                            className="rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700 ring-1 ring-emerald-200"
+                            className="rounded-full bg-emerald-50 dark:bg-emerald-950/30 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-200"
                             title="Computed from real order sales over the last 30 days"
                           >
                             auto
@@ -229,7 +229,7 @@ const IngredientTable: React.FC<Props> = ({
                           type="button"
                           onClick={() => onAdjustStock(ing, -1)}
                           disabled={saving || ing.stockLevel <= 0}
-                          className="flex h-6 w-6 items-center justify-center rounded-md border border-neutral-200 bg-white text-neutral-500 transition hover:bg-red-50 hover:text-red-600 disabled:opacity-40"
+                          className="flex h-6 w-6 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition hover:bg-red-50 dark:bg-red-950/30 hover:text-red-600 disabled:opacity-40"
                           title="Decrement stock by 1"
                         >
                           <Minus className="h-3 w-3" />
@@ -238,7 +238,7 @@ const IngredientTable: React.FC<Props> = ({
                           type="button"
                           onClick={() => onAdjustStock(ing, 1)}
                           disabled={saving}
-                          className="flex h-6 w-6 items-center justify-center rounded-md border border-neutral-200 bg-white text-neutral-500 transition hover:bg-emerald-50 hover:text-emerald-600 disabled:opacity-40"
+                          className="flex h-6 w-6 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition hover:bg-emerald-50 dark:bg-emerald-950/30 hover:text-emerald-600 disabled:opacity-40"
                           title="Increment stock by 1"
                         >
                           <Plus className="h-3 w-3" />
@@ -247,7 +247,7 @@ const IngredientTable: React.FC<Props> = ({
                           type="button"
                           onClick={() => onAdjustStock(ing, 10)}
                           disabled={saving}
-                          className="flex h-6 items-center justify-center rounded-md border border-emerald-200 bg-emerald-50 px-1.5 text-[10px] font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:opacity-40"
+                          className="flex h-6 items-center justify-center rounded-md border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/30 px-1.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 transition hover:bg-emerald-100 dark:bg-emerald-950/40 disabled:opacity-40"
                           title="Increment stock by 10"
                         >
                           +10
@@ -262,7 +262,7 @@ const IngredientTable: React.FC<Props> = ({
                           href={ing.supplierUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex h-8 w-8 items-center justify-center rounded-full text-neutral-500 transition hover:bg-brand/10 hover:text-brand"
+                          className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-brand/10 hover:text-brand"
                           title={ing.supplierName ? `Visit ${ing.supplierName}` : 'Visit supplier'}
                           onClick={(e) => e.stopPropagation()}
                         >
@@ -274,7 +274,7 @@ const IngredientTable: React.FC<Props> = ({
                       <button
                         type="button"
                         onClick={() => onEdit(ing)}
-                        className="flex h-8 w-8 items-center justify-center rounded-full text-neutral-500 transition hover:bg-brand/10 hover:text-brand"
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-brand/10 hover:text-brand"
                         title="Edit ingredient"
                       >
                         <Pencil className="h-4 w-4" />
@@ -284,7 +284,7 @@ const IngredientTable: React.FC<Props> = ({
                           href={ing.supplierUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex h-8 w-8 items-center justify-center rounded-full text-neutral-500 transition hover:bg-brand/10 hover:text-brand"
+                          className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-brand/10 hover:text-brand"
                           title="Open in new tab"
                           onClick={(e) => e.stopPropagation()}
                         >

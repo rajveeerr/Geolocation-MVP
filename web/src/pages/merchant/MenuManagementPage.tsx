@@ -26,13 +26,13 @@ import { cn } from '@/lib/utils';
 const getInventoryTone = (item: MenuItem) => {
   switch (item.inventoryStatus) {
     case 'OUT_OF_STOCK':
-      return 'bg-red-100 text-red-700';
+      return 'bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-300';
     case 'LOW_STOCK':
-      return 'bg-amber-100 text-amber-700';
+      return 'bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300';
     case 'IN_STOCK':
-      return 'bg-emerald-100 text-emerald-700';
+      return 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300';
     default:
-      return 'bg-slate-100 text-slate-700';
+      return 'bg-muted text-foreground';
   }
 };
 
@@ -75,18 +75,18 @@ const MenuItemListRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
   };
 
   return (
-    <div className="flex items-center gap-4 rounded-lg border border-neutral-200 bg-white p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:border-neutral-300">
+    <div className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:border-border">
       {/* Image */}
       <div className="flex-shrink-0">
         {item.imageUrl ? (
           <img
             src={item.imageUrl}
             alt={item.name}
-            className="h-16 w-16 rounded-lg object-cover border border-neutral-200"
+            className="h-16 w-16 rounded-lg object-cover border border-border"
           />
         ) : (
-          <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-neutral-100 border border-neutral-200">
-            <ImageIcon className="h-6 w-6 text-neutral-400" />
+          <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-muted border border-border">
+            <ImageIcon className="h-6 w-6 text-muted-foreground" />
           </div>
         )}
       </div>
@@ -95,18 +95,18 @@ const MenuItemListRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold text-neutral-900 truncate">
+            <h3 className="text-lg font-semibold text-foreground truncate">
               {item.name}
             </h3>
-            <p className="mt-1 text-sm text-neutral-600 line-clamp-2">
+            <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
               {item.description}
             </p>
-            <div className="mt-2 flex items-center gap-4 text-sm text-neutral-500">
+            <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
               <span className="font-medium text-green-600">
                 {formatCurrency(item.price)}
               </span>
               <span>•</span>
-              <span className="px-2 py-1 bg-neutral-100 rounded-full text-xs font-medium">
+              <span className="px-2 py-1 bg-muted rounded-full text-xs font-medium">
                 {item.category}
               </span>
               <span className={cn('rounded-full px-2 py-1 text-xs font-medium', getInventoryTone(item))}>
@@ -125,7 +125,7 @@ const MenuItemListRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
           variant="secondary"
           size="sm"
           onClick={() => onQuickInventory(item, item.isAvailable ? 'soldout' : 'toggle-availability')}
-          className="flex items-center gap-1 hover:bg-neutral-100"
+          className="flex items-center gap-1 hover:bg-muted"
         >
           {item.isAvailable ? 'Sold Out' : 'Available'}
         </Button>
@@ -134,7 +134,7 @@ const MenuItemListRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
             variant="secondary"
             size="sm"
             onClick={() => onQuickInventory(item, 'restock')}
-            className="flex items-center gap-1 hover:bg-emerald-50 hover:text-emerald-700"
+            className="flex items-center gap-1 hover:bg-emerald-50 dark:bg-emerald-950/30 hover:text-emerald-700 dark:text-emerald-300"
           >
             +10
           </Button>
@@ -143,7 +143,7 @@ const MenuItemListRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
           variant="secondary"
           size="sm"
           onClick={() => onView(item)}
-          className="flex items-center gap-1 hover:bg-neutral-100"
+          className="flex items-center gap-1 hover:bg-muted"
         >
           <Eye className="h-4 w-4" />
           View
@@ -152,7 +152,7 @@ const MenuItemListRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
           variant="secondary"
           size="sm"
           onClick={() => onEdit(item)}
-          className="flex items-center gap-1 hover:bg-blue-50 hover:text-blue-600"
+          className="flex items-center gap-1 hover:bg-blue-50 dark:bg-blue-950/30 hover:text-blue-600"
         >
           <Edit className="h-4 w-4" />
           Edit
@@ -161,7 +161,7 @@ const MenuItemListRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
           variant="secondary"
           size="sm"
           onClick={() => onDelete(item)}
-          className="flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 hover:border-red-200"
+          className="flex items-center gap-1 text-red-600 hover:text-red-700 dark:text-red-300 hover:bg-red-50 dark:bg-red-950/30 hover:border-red-200 dark:border-red-900/50"
         >
           <Trash2 className="h-4 w-4" />
           Delete
@@ -203,7 +203,7 @@ const MenuItemTableRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: 
   };
 
   return (
-    <tr className="border-b border-neutral-200 hover:bg-neutral-50 transition-colors">
+    <tr className="border-b border-border hover:bg-muted transition-colors">
       {/* Image */}
       <td className="px-4 py-3">
         <div className="flex items-center">
@@ -211,11 +211,11 @@ const MenuItemTableRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: 
             <img
               src={item.imageUrl}
               alt={item.name}
-              className="h-12 w-12 rounded-lg object-cover border border-neutral-200"
+              className="h-12 w-12 rounded-lg object-cover border border-border"
             />
           ) : (
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-neutral-100 border border-neutral-200">
-              <ImageIcon className="h-4 w-4 text-neutral-400" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted border border-border">
+              <ImageIcon className="h-4 w-4 text-muted-foreground" />
             </div>
           )}
         </div>
@@ -224,14 +224,14 @@ const MenuItemTableRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: 
       {/* Name & Description */}
       <td className="px-4 py-3">
         <div>
-          <h3 className="font-semibold text-neutral-900">{item.name}</h3>
-          <p className="text-sm text-neutral-600 line-clamp-1">{item.description}</p>
+          <h3 className="font-semibold text-foreground">{item.name}</h3>
+          <p className="text-sm text-muted-foreground line-clamp-1">{item.description}</p>
         </div>
       </td>
 
       {/* Category */}
       <td className="px-4 py-3">
-        <span className="px-2 py-1 bg-neutral-100 rounded-full text-xs font-medium">
+        <span className="px-2 py-1 bg-muted rounded-full text-xs font-medium">
           {item.category}
         </span>
       </td>
@@ -250,7 +250,7 @@ const MenuItemTableRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: 
       </td>
 
       {/* Updated Date */}
-      <td className="px-4 py-3 text-sm text-neutral-500">
+      <td className="px-4 py-3 text-sm text-muted-foreground">
         {formatDate(item.updatedAt)}
       </td>
 
@@ -261,7 +261,7 @@ const MenuItemTableRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: 
             variant="secondary"
             size="sm"
             onClick={() => onQuickInventory(item, item.isAvailable ? 'soldout' : 'toggle-availability')}
-            className="flex items-center gap-1 hover:bg-neutral-100"
+            className="flex items-center gap-1 hover:bg-muted"
           >
             {item.isAvailable ? 'Sold Out' : 'Available'}
           </Button>
@@ -269,7 +269,7 @@ const MenuItemTableRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: 
             variant="secondary"
             size="sm"
             onClick={() => onView(item)}
-            className="flex items-center gap-1 hover:bg-neutral-100"
+            className="flex items-center gap-1 hover:bg-muted"
           >
             <Eye className="h-4 w-4" />
           </Button>
@@ -277,7 +277,7 @@ const MenuItemTableRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: 
             variant="secondary"
             size="sm"
             onClick={() => onEdit(item)}
-            className="flex items-center gap-1 hover:bg-blue-50 hover:text-blue-600"
+            className="flex items-center gap-1 hover:bg-blue-50 dark:bg-blue-950/30 hover:text-blue-600"
           >
             <Edit className="h-4 w-4" />
           </Button>
@@ -285,7 +285,7 @@ const MenuItemTableRow = ({ item, onEdit, onDelete, onView, onQuickInventory }: 
             variant="secondary"
             size="sm"
             onClick={() => onDelete(item)}
-            className="flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 hover:border-red-200"
+            className="flex items-center gap-1 text-red-600 hover:text-red-700 dark:text-red-300 hover:bg-red-50 dark:bg-red-950/30 hover:border-red-200 dark:border-red-900/50"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -328,7 +328,7 @@ const MenuItemCard = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
       : [];
 
   return (
-    <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+    <div className="rounded-lg border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
       <div className="mb-4 flex items-start justify-between">
         <div className="flex items-start gap-3">
           <div className="rounded-lg bg-brand-primary-100 p-2">
@@ -336,14 +336,14 @@ const MenuItemCard = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
           </div>
           <div className="flex-1">
             <h3 
-              className="text-lg font-semibold text-neutral-800 cursor-pointer hover:text-brand-primary-600 transition-colors"
+              className="text-lg font-semibold text-foreground cursor-pointer hover:text-brand-primary-600 transition-colors"
               onClick={() => onView(item)}
             >
               {item.name}
             </h3>
-            <p className="text-sm text-neutral-600">{item.description}</p>
+            <p className="text-sm text-muted-foreground">{item.description}</p>
             <div className="mt-1 flex items-center gap-2">
-              <span className="rounded-full bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-700">
+              <span className="rounded-full bg-muted px-2 py-1 text-xs font-medium text-foreground">
                 {item.category}
               </span>
               <span className={cn('rounded-full px-2 py-1 text-xs font-medium', getInventoryTone(item))}>
@@ -362,15 +362,15 @@ const MenuItemCard = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
       {displayImages.length > 0 && (
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-2">
-            <ImageIcon className="h-4 w-4 text-neutral-500" />
-            <span className="text-xs text-neutral-500">
+            <ImageIcon className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">
               {displayImages.length} image{displayImages.length !== 1 ? 's' : ''}
             </span>
           </div>
           <div className="flex gap-2 overflow-x-auto">
             {displayImages.slice(0, 3).map((image, index) => (
               <div key={image.id} className="flex-shrink-0">
-                <div className="w-16 h-16 rounded-lg overflow-hidden bg-neutral-100">
+                <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted">
                   <img
                     src={image.url}
                     alt={`${item.name} - Image ${index + 1}`}
@@ -380,8 +380,8 @@ const MenuItemCard = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
               </div>
             ))}
             {displayImages.length > 3 && (
-              <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-neutral-100 flex items-center justify-center">
-                <span className="text-xs text-neutral-500">+{displayImages.length - 3}</span>
+              <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-muted flex items-center justify-center">
+                <span className="text-xs text-muted-foreground">+{displayImages.length - 3}</span>
               </div>
             )}
           </div>
@@ -389,7 +389,7 @@ const MenuItemCard = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
       )}
 
       <div className="mb-4">
-        <div className="text-xs text-neutral-500">
+        <div className="text-xs text-muted-foreground">
           Added {formatDate(item.createdAt)}
         </div>
       </div>
@@ -408,7 +408,7 @@ const MenuItemCard = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
             variant="secondary"
             size="sm"
             onClick={() => onQuickInventory(item, 'restock')}
-            className="text-emerald-700 hover:text-emerald-800 hover:border-emerald-300"
+            className="text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 dark:text-emerald-300 hover:border-emerald-300"
           >
             +10
           </Button>
@@ -426,7 +426,7 @@ const MenuItemCard = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
           variant="secondary"
           size="sm"
           onClick={() => onDelete(item)}
-          className="text-red-600 hover:text-red-700 hover:border-red-300"
+          className="text-red-600 hover:text-red-700 dark:text-red-300 hover:border-red-300"
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -436,27 +436,27 @@ const MenuItemCard = ({ item, onEdit, onDelete, onView, onQuickInventory }: {
 };
 
 const MenuItemSkeleton = () => (
-  <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm">
+  <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
     <div className="animate-pulse">
       <div className="mb-4 flex items-start justify-between">
         <div className="flex items-start gap-3">
-          <div className="h-9 w-9 rounded-lg bg-neutral-200" />
+          <div className="h-9 w-9 rounded-lg bg-accent" />
           <div>
-            <div className="mb-2 h-5 w-32 rounded bg-neutral-200" />
-            <div className="mb-2 h-4 w-48 rounded bg-neutral-200" />
+            <div className="mb-2 h-5 w-32 rounded bg-accent" />
+            <div className="mb-2 h-4 w-48 rounded bg-accent" />
             <div className="flex gap-2">
-              <div className="h-5 w-16 rounded-full bg-neutral-200" />
-              <div className="h-5 w-12 rounded bg-neutral-200" />
+              <div className="h-5 w-16 rounded-full bg-accent" />
+              <div className="h-5 w-12 rounded bg-accent" />
             </div>
           </div>
         </div>
       </div>
       <div className="mb-4">
-        <div className="h-3 w-24 rounded bg-neutral-200" />
+        <div className="h-3 w-24 rounded bg-accent" />
       </div>
       <div className="flex gap-2">
-        <div className="h-8 flex-1 rounded bg-neutral-200" />
-        <div className="h-8 w-8 rounded bg-neutral-200" />
+        <div className="h-8 flex-1 rounded bg-accent" />
+        <div className="h-8 w-8 rounded bg-accent" />
       </div>
     </div>
   </div>
@@ -566,8 +566,8 @@ export const MenuManagementPage = () => {
     return (
       <div className="container mx-auto max-w-7xl px-4 py-12">
         <div className="mb-8">
-          <div className="mb-4 h-8 w-64 animate-pulse rounded bg-neutral-200" />
-          <div className="h-4 w-96 animate-pulse rounded bg-neutral-200" />
+          <div className="mb-4 h-8 w-64 animate-pulse rounded bg-accent" />
+          <div className="h-4 w-96 animate-pulse rounded bg-accent" />
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -581,9 +581,9 @@ export const MenuManagementPage = () => {
   if (error) {
     return (
       <div className="container mx-auto max-w-7xl px-4 py-12">
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
+        <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-6 text-center">
           <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
-          <h3 className="mb-2 text-lg font-semibold text-red-800">
+          <h3 className="mb-2 text-lg font-semibold text-red-800 dark:text-red-300">
             Error Loading Menu
           </h3>
           <p className="text-red-600">
@@ -598,21 +598,21 @@ export const MenuManagementPage = () => {
     <div className="container mx-auto max-w-7xl px-4 py-12">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-neutral-900">Menu Management</h1>
-          <p className="mt-2 text-neutral-600">
+          <h1 className="text-4xl font-bold text-foreground">Menu Management</h1>
+          <p className="mt-2 text-muted-foreground">
             Manage your menu items, pricing, and inventory
           </p>
         </div>
         <div className="flex items-center gap-3">
           {/* View Toggle */}
-          <div className="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white p-1">
+          <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-1">
             <button
               onClick={() => setViewMode('grid')}
               className={cn(
                 'flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
                 viewMode === 'grid'
-                  ? 'bg-neutral-900 text-white'
-                  : 'text-neutral-600 hover:bg-neutral-100'
+                  ? 'bg-foreground text-background'
+                  : 'text-muted-foreground hover:bg-muted'
               )}
             >
               <Grid3X3 className="h-4 w-4" />
@@ -623,8 +623,8 @@ export const MenuManagementPage = () => {
               className={cn(
                 'flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
                 viewMode === 'list'
-                  ? 'bg-neutral-900 text-white'
-                  : 'text-neutral-600 hover:bg-neutral-100'
+                  ? 'bg-foreground text-background'
+                  : 'text-muted-foreground hover:bg-muted'
               )}
             >
               <List className="h-4 w-4" />
@@ -659,12 +659,12 @@ export const MenuManagementPage = () => {
       </div>
 
       {menuItems.length === 0 ? (
-        <div className="rounded-lg border-2 border-dashed border-neutral-200 bg-white py-16 text-center">
-          <Utensils className="mx-auto mb-4 h-12 w-12 text-neutral-400" />
-          <h3 className="mb-2 text-xl font-semibold text-neutral-800">
+        <div className="rounded-lg border-2 border-dashed border-border bg-card py-16 text-center">
+          <Utensils className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+          <h3 className="mb-2 text-xl font-semibold text-foreground">
             No menu items yet
           </h3>
-          <p className="mb-6 text-neutral-600">
+          <p className="mb-6 text-muted-foreground">
             Add your first menu item to start building your menu.
           </p>
           <Link to={PATHS.MERCHANT_MENU_CREATE}>
@@ -678,11 +678,11 @@ export const MenuManagementPage = () => {
         <>
           {/* Stats Cards */}
           <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm text-neutral-500">Total Items</h4>
-                  <p className="mt-2 text-2xl font-extrabold text-neutral-900">
+                  <h4 className="text-sm text-muted-foreground">Total Items</h4>
+                  <p className="mt-2 text-2xl font-extrabold text-foreground">
                     {menuItems.length}
                   </p>
                 </div>
@@ -690,11 +690,11 @@ export const MenuManagementPage = () => {
               </div>
             </div>
 
-            <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm text-neutral-500">Categories</h4>
-                  <p className="mt-2 text-2xl font-extrabold text-neutral-900">
+                  <h4 className="text-sm text-muted-foreground">Categories</h4>
+                  <p className="mt-2 text-2xl font-extrabold text-foreground">
                     {categories.length}
                   </p>
                 </div>
@@ -702,11 +702,11 @@ export const MenuManagementPage = () => {
               </div>
             </div>
 
-            <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm text-neutral-500">Average Price</h4>
-                  <p className="mt-2 text-2xl font-extrabold text-neutral-900">
+                  <h4 className="text-sm text-muted-foreground">Average Price</h4>
+                  <p className="mt-2 text-2xl font-extrabold text-foreground">
                     ${(menuItems.reduce((sum, item) => sum + item.price, 0) / menuItems.length).toFixed(2)}
                   </p>
                 </div>
@@ -714,14 +714,14 @@ export const MenuManagementPage = () => {
               </div>
             </div>
 
-            <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm text-neutral-500">Inventory Alerts</h4>
-                  <p className="mt-2 text-2xl font-extrabold text-neutral-900">
+                  <h4 className="text-sm text-muted-foreground">Inventory Alerts</h4>
+                  <p className="mt-2 text-2xl font-extrabold text-foreground">
                     {inventoryStats.lowStock + inventoryStats.outOfStock}
                   </p>
-                  <p className="mt-1 text-xs text-neutral-500">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     {inventoryStats.tracked} tracked, {inventoryStats.outOfStock} out of stock
                   </p>
                 </div>
@@ -732,14 +732,14 @@ export const MenuManagementPage = () => {
 
           {/* Custom Tabs for Categories - matching kickback page style */}
           <div className="space-y-6">
-            <div className="flex items-center gap-2 rounded-full bg-neutral-100 p-1">
+            <div className="flex items-center gap-2 rounded-full bg-muted p-1">
               <button
                 onClick={() => setActiveTab('all')}
                 className={cn(
                   'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
                   activeTab === 'all'
-                    ? 'bg-black text-white shadow-sm'
-                    : 'text-neutral-600 hover:bg-neutral-200/50',
+                    ? 'bg-foreground text-background shadow-sm'
+                    : 'text-muted-foreground hover:bg-accent/50',
                 )}
               >
                 All Items ({menuItems.length})
@@ -751,8 +751,8 @@ export const MenuManagementPage = () => {
                   className={cn(
                     'rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200',
                     activeTab === category
-                      ? 'bg-black text-white shadow-sm'
-                      : 'text-neutral-600 hover:bg-neutral-200/50',
+                      ? 'bg-foreground text-background shadow-sm'
+                      : 'text-muted-foreground hover:bg-accent/50',
                   )}
                 >
                   {category} ({menuItemsByCategory[category]?.length || 0})

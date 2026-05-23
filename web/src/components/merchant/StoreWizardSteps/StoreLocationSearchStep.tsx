@@ -184,8 +184,8 @@ export const StoreLocationSearchStep = ({ data, onUpdate, cities }: StoreLocatio
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold text-neutral-900">Where is your store?</h2>
-        <p className="mt-1 text-neutral-600">
+        <h2 className="text-xl font-bold text-foreground">Where is your store?</h2>
+        <p className="mt-1 text-muted-foreground">
           Search for your address or use your current location. We only serve areas in our supported cities.
         </p>
       </div>
@@ -194,13 +194,13 @@ export const StoreLocationSearchStep = ({ data, onUpdate, cities }: StoreLocatio
       <div className="relative z-30">
         <div
           className={cn(
-            'flex items-center gap-3 rounded-xl border bg-white shadow-sm transition-all',
+            'flex items-center gap-3 rounded-xl border bg-card shadow-sm transition-all',
             inputFocused || showSuggestions
               ? 'border-brand-primary-400 ring-2 ring-brand-primary-100'
-              : 'border-neutral-200'
+              : 'border-border'
           )}
         >
-          <MapPin className="ml-4 h-5 w-5 flex-shrink-0 text-neutral-400" />
+          <MapPin className="ml-4 h-5 w-5 flex-shrink-0 text-muted-foreground" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -216,17 +216,17 @@ export const StoreLocationSearchStep = ({ data, onUpdate, cities }: StoreLocatio
             className="h-14 flex-1 border-0 bg-transparent text-base shadow-none focus-visible:ring-0"
           />
           {isSearching && (
-            <Loader2 className="mr-4 h-5 w-5 animate-spin text-neutral-400" />
+            <Loader2 className="mr-4 h-5 w-5 animate-spin text-muted-foreground" />
           )}
         </div>
 
         {/* Suggestions dropdown */}
         {showSuggestions && (suggestions.length > 0 || debouncedQuery.length >= 3) && (
-          <div className="absolute left-0 right-0 top-full z-[1100] mt-1 max-h-64 overflow-y-auto rounded-xl border border-neutral-200 bg-white shadow-lg">
+          <div className="absolute left-0 right-0 top-full z-[1100] mt-1 max-h-64 overflow-y-auto rounded-xl border border-border bg-card shadow-lg">
             {isSearching ? (
               <div className="flex items-center justify-center gap-2 py-8">
                 <Loader2 className="h-5 w-5 animate-spin text-brand-primary-600" />
-                <span className="text-sm text-neutral-500">Searching...</span>
+                <span className="text-sm text-muted-foreground">Searching...</span>
               </div>
             ) : suggestions.length > 0 ? (
               suggestions.map((s) => {
@@ -236,11 +236,11 @@ export const StoreLocationSearchStep = ({ data, onUpdate, cities }: StoreLocatio
                     key={s.place_id}
                     type="button"
                     onClick={() => handleSelect(s)}
-                    className="flex w-full items-start gap-3 p-3 text-left hover:bg-neutral-50"
+                    className="flex w-full items-start gap-3 p-3 text-left hover:bg-muted"
                   >
-                    <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-neutral-400" />
+                    <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-neutral-900 line-clamp-2">
+                      <p className="text-sm font-medium text-foreground line-clamp-2">
                         {s.display_name}
                       </p>
                       {mc ? (
@@ -253,7 +253,7 @@ export const StoreLocationSearchStep = ({ data, onUpdate, cities }: StoreLocatio
                 );
               })
             ) : (
-              <div className="p-4 text-center text-sm text-neutral-500">
+              <div className="p-4 text-center text-sm text-muted-foreground">
                 No results. Try a different search.
               </div>
             )}
@@ -266,7 +266,7 @@ export const StoreLocationSearchStep = ({ data, onUpdate, cities }: StoreLocatio
         type="button"
         onClick={useCurrentLocation}
         disabled={isLocating}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-card py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-60"
       >
         {isLocating ? (
           <Loader2 className="h-5 w-5 animate-spin" />
@@ -277,7 +277,7 @@ export const StoreLocationSearchStep = ({ data, onUpdate, cities }: StoreLocatio
       </button>
 
       {/* Map preview - constrained height, below search in stacking order */}
-      <div className="relative z-0 overflow-hidden rounded-xl border border-neutral-200">
+      <div className="relative z-0 overflow-hidden rounded-xl border border-border">
         <StoreLocationMap
           center={mapCenter}
           onLocationChange={(coords) => onUpdate({ latitude: coords.lat, longitude: coords.lng })}
@@ -287,11 +287,11 @@ export const StoreLocationSearchStep = ({ data, onUpdate, cities }: StoreLocatio
 
       {/* Coming soon - city not available */}
       {cityNotAvailable && (
-        <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
+        <div className="flex items-start gap-3 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/30 p-4">
           <AlertCircle className="h-5 w-5 flex-shrink-0 text-amber-600" />
           <div>
-            <p className="font-medium text-amber-900">Coming soon to your area</p>
-            <p className="mt-1 text-sm text-amber-800">
+            <p className="font-medium text-amber-900 dark:text-amber-200">Coming soon to your area</p>
+            <p className="mt-1 text-sm text-amber-800 dark:text-amber-300">
               We're not in this city yet. Search for an address in one of our supported cities to continue.
             </p>
           </div>
@@ -299,7 +299,7 @@ export const StoreLocationSearchStep = ({ data, onUpdate, cities }: StoreLocatio
       )}
 
       {data.address && data.cityId > 0 && (
-        <div className="rounded-lg bg-green-50 p-3 text-sm text-green-800">
+        <div className="rounded-lg bg-green-50 dark:bg-green-950/30 p-3 text-sm text-green-800 dark:text-green-300">
           <span className="font-medium">Selected:</span> {data.address}
         </div>
       )}

@@ -129,7 +129,7 @@ export const RecurringDealQuickForm = () => {
               dispatch({ type: 'UPDATE_FIELD', field: 'title', value: e.target.value.slice(0, 100) })
             }
             placeholder="Wine Wednesday — half-price bottles"
-            className="mt-1.5 h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+            className="mt-1.5 h-10 rounded-lg border-border bg-card text-[13.5px]"
             maxLength={100}
           />
         </SectionCard>
@@ -148,8 +148,8 @@ export const RecurringDealQuickForm = () => {
                   className={cn(
                     'h-10 min-w-[3rem] rounded-full border px-4 text-[13px] font-semibold transition',
                     selected
-                      ? 'border-neutral-900 bg-neutral-900 text-white shadow-[0_6px_18px_rgba(15,23,42,0.18)]'
-                      : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50',
+                      ? 'border-foreground bg-foreground text-background shadow-[0_6px_18px_rgba(15,23,42,0.18)]'
+                      : 'border-border bg-card text-foreground hover:border-border hover:bg-muted',
                   )}
                 >
                   {day.short}
@@ -162,7 +162,7 @@ export const RecurringDealQuickForm = () => {
         <SectionCard>
           <div className="grid gap-5 sm:grid-cols-3">
             <ProLockedField label="Discount" hint="Off total bill">
-              <div className="rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="rounded-xl border border-border bg-card p-3">
                 <AmountSlider
                   value={state.discountPercentage}
                   onChange={(v) => dispatch({ type: 'UPDATE_FIELD', field: 'discountPercentage', value: v })}
@@ -175,7 +175,7 @@ export const RecurringDealQuickForm = () => {
               </div>
             </ProLockedField>
             <ProLockedField label="Up to" hint="Max discount cap">
-              <div className="rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="rounded-xl border border-border bg-card p-3">
                 <AmountSlider
                   value={state.discountAmount}
                   onChange={(v) => dispatch({ type: 'UPDATE_FIELD', field: 'discountAmount', value: v })}
@@ -188,7 +188,7 @@ export const RecurringDealQuickForm = () => {
               </div>
             </ProLockedField>
             <ProLockedField label="Minimum spend">
-              <div className="rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="rounded-xl border border-border bg-card p-3">
                 <AmountSlider
                   value={state.minOrderAmount}
                   onChange={(v) => dispatch({ type: 'UPDATE_FIELD', field: 'minOrderAmount', value: v })}
@@ -216,7 +216,7 @@ export const RecurringDealQuickForm = () => {
                 onChange={(e) =>
                   dispatch({ type: 'UPDATE_FIELD', field: 'activeStartDate', value: e.target.value ? `${e.target.value}T00:00:00.000Z` : '' })
                 }
-                className="mt-1.5 h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="mt-1.5 h-10 w-[180px] rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
             <div className="shrink-0">
@@ -230,10 +230,10 @@ export const RecurringDealQuickForm = () => {
                 onChange={(e) =>
                   dispatch({ type: 'UPDATE_FIELD', field: 'activeEndDate', value: e.target.value ? `${e.target.value}T23:59:59.000Z` : '' })
                 }
-                className="mt-1.5 h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="mt-1.5 h-10 w-[180px] rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
-            <div className="hidden h-16 w-px shrink-0 bg-neutral-200 sm:block" aria-hidden />
+            <div className="hidden h-16 w-px shrink-0 bg-accent sm:block" aria-hidden />
             <div className="min-w-0 flex-1">
               <TimeWindowEditor value={window} onChange={setWindow} label="Time window (per day)" />
             </div>
@@ -252,7 +252,7 @@ export const RecurringDealQuickForm = () => {
               dispatch({ type: 'UPDATE_FIELD', field: 'maxRedemptions', value: v });
             }}
             placeholder="50 uses"
-            className="mt-1.5 h-10 w-[200px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+            className="mt-1.5 h-10 w-[200px] rounded-lg border-border bg-card text-[13.5px]"
           />
         </SectionCard>
 

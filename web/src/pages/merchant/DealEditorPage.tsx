@@ -22,8 +22,8 @@ export const DealEditorPage = () => {
   };
 
   return (
-    <div className="bg-white min-h-screen">
-      <header className="sticky top-0 bg-white/80 backdrop-blur-sm border-b z-10 p-4 flex items-center gap-4">
+    <div className="bg-card min-h-screen">
+      <header className="sticky top-0 bg-card/80 dark:bg-card backdrop-blur-sm border-b z-10 p-4 flex items-center gap-4">
         <Button onClick={() => navigate('/merchant/deals/create')} variant="ghost" size="sm" className="rounded-full">
           <ArrowLeft />
         </Button>
@@ -34,12 +34,12 @@ export const DealEditorPage = () => {
         {/* --- Happy Hour Specific Section --- */}
         {state.dealType === 'HAPPY_HOUR' && (
           <FormSection title="Happy Hour Type" subtitle="Select which type of happy hour">
-            <div className="flex items-center gap-2 rounded-lg bg-neutral-100 p-1">
+            <div className="flex items-center gap-2 rounded-lg bg-muted p-1">
               {['Mornings', 'Midday', 'Late night'].map((type: string) => (
                 <button 
                   key={type}
                   onClick={() => dispatch({ type: 'SET_FIELD', field: 'happyHourPeriod', value: type })}
-                  className={cn("flex-1 rounded-md py-2 text-sm font-semibold", state.happyHourPeriod === type ? "bg-black text-white shadow" : "text-neutral-600")}
+                  className={cn("flex-1 rounded-md py-2 text-sm font-semibold", state.happyHourPeriod === type ? "bg-foreground text-background shadow" : "text-muted-foreground")}
                 >{type}</button>
               ))}
             </div>
@@ -61,12 +61,12 @@ export const DealEditorPage = () => {
         </FormSection>
 
         <FormSection title="Deal Items" subtitle="Select or upload deal items for customers">
-          <div className="flex items-center justify-between rounded-lg bg-neutral-100 p-2 mb-4">
+          <div className="flex items-center justify-between rounded-lg bg-muted p-2 mb-4">
         {['Single day', 'Recurring'].map((type: string) => (
           <button 
             key={type}
             onClick={() => dispatch({ type: 'SET_FIELD', field: 'periodType', value: type })}
-            className={cn("flex-1 rounded-md py-2 text-sm font-semibold", state.periodType === type ? "bg-black text-white shadow" : "text-neutral-600")}
+            className={cn("flex-1 rounded-md py-2 text-sm font-semibold", state.periodType === type ? "bg-foreground text-background shadow" : "text-muted-foreground")}
           >{type}</button>
         ))}
           </div>
@@ -99,7 +99,7 @@ export const DealEditorPage = () => {
         </FormSection>
 
         <FormSection title="Kickback" subtitle="Enable a kickback offer">
-            <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                 <Label htmlFor="kickback-switch" className="font-semibold">Enable kickback</Label>
         <Switch 
           id="kickback-switch"
@@ -110,7 +110,7 @@ export const DealEditorPage = () => {
         </FormSection>
       </main>
 
-      <footer className="sticky bottom-0 bg-white border-t p-4">
+      <footer className="sticky bottom-0 bg-card border-t p-4">
         <Button onClick={handleSubmit} size="lg" className="w-full rounded-lg">
           Save Deal
         </Button>

@@ -15,28 +15,28 @@ interface KPICardProps {
 const KPICard = ({ title, value, icon, color, subtitle, isLoading }: KPICardProps) => {
   const colorClasses = {
     primary: 'bg-brand-primary-100 text-brand-primary-600',
-    green: 'bg-green-100 text-green-600',
-    amber: 'bg-amber-100 text-amber-600',
-    red: 'bg-red-100 text-red-600',
-    blue: 'bg-blue-100 text-blue-600',
+    green: 'bg-green-100 dark:bg-green-950/40 text-green-600',
+    amber: 'bg-amber-100 dark:bg-amber-950/40 text-amber-600',
+    red: 'bg-red-100 dark:bg-red-950/40 text-red-600',
+    blue: 'bg-blue-100 dark:bg-blue-950/40 text-blue-600',
   };
 
   return (
-    <div className="rounded-[1.2rem] border border-neutral-200/80 bg-white/95 p-4 shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
+    <div className="rounded-[1.2rem] border border-border/80 bg-card/95 dark:bg-card p-4 shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-[13px] font-medium text-neutral-600">{title}</p>
+          <p className="text-[13px] font-medium text-muted-foreground">{title}</p>
           <div className="mt-2">
             {isLoading ? (
-              <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             ) : (
-              <p className="text-[1.5rem] font-bold tracking-tight text-neutral-900">
+              <p className="text-[1.5rem] font-bold tracking-tight text-foreground">
                 {typeof value === 'number' ? value.toLocaleString() : value}
               </p>
             )}
           </div>
           {subtitle && (
-            <p className="mt-1 text-xs text-neutral-500">{subtitle}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>
           )}
         </div>
         <div className={`rounded-[0.95rem] p-3 ${colorClasses[color]}`}>
@@ -56,8 +56,8 @@ export const MerchantKPICards = ({ period = 'all_time' }: MerchantKPICardsProps)
 
   if (error) {
     return (
-      <div className="rounded-[1.2rem] border border-red-200 bg-red-50 p-4">
-        <p className="text-red-800 text-sm">Failed to load dashboard statistics</p>
+      <div className="rounded-[1.2rem] border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-4">
+        <p className="text-red-800 dark:text-red-300 text-sm">Failed to load dashboard statistics</p>
       </div>
     );
   }
@@ -65,8 +65,8 @@ export const MerchantKPICards = ({ period = 'all_time' }: MerchantKPICardsProps)
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-[15px] font-semibold text-neutral-900">Key performance indicators</h2>
-        <div className="text-[13px] text-neutral-600">
+        <h2 className="text-[15px] font-semibold text-foreground">Key performance indicators</h2>
+        <div className="text-[13px] text-muted-foreground">
           Period: {stats?.period?.replace('_', ' ') || period.replace('_', ' ')}
         </div>
       </div>
@@ -140,7 +140,7 @@ export const MerchantKPICards = ({ period = 'all_time' }: MerchantKPICardsProps)
 
       {stats?.dateRange && (
         <div className={merchantPanelClass}>
-          <p className="text-[13px] text-neutral-600">
+          <p className="text-[13px] text-muted-foreground">
             <span className="font-medium">Date Range:</span>{' '}
             {stats.dateRange.from 
               ? `${new Date(stats.dateRange.from).toLocaleDateString()} - ${new Date(stats.dateRange.to).toLocaleDateString()}`

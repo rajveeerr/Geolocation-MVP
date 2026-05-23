@@ -106,7 +106,7 @@ export const HiddenDetailsStep = () => {
               dispatch({ type: 'UPDATE_FIELD', field: 'title', value: e.target.value.slice(0, 100) })
             }
             placeholder="Members-only chef's tasting — 25% OFF"
-            className="mt-1.5 h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+            className="mt-1.5 h-10 rounded-lg border-border bg-card text-[13.5px]"
             maxLength={100}
           />
 
@@ -120,7 +120,7 @@ export const HiddenDetailsStep = () => {
               }
               rows={2}
               placeholder="Optional context for the redeeming guest."
-              className="mt-2 resize-none rounded-xl border-neutral-200 bg-white text-[14px]"
+              className="mt-2 resize-none rounded-xl border-border bg-card text-[14px]"
               maxLength={500}
             />
           </div>
@@ -129,7 +129,7 @@ export const HiddenDetailsStep = () => {
         <SectionCard>
           <div className="grid gap-5 sm:grid-cols-3">
             <ProLockedField label="Discount" hint="Off total bill">
-              <div className="rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="rounded-xl border border-border bg-card p-3">
                 <AmountSlider
                   value={state.discountPercentage}
                   onChange={(v) => dispatch({ type: 'UPDATE_FIELD', field: 'discountPercentage', value: v })}
@@ -142,7 +142,7 @@ export const HiddenDetailsStep = () => {
               </div>
             </ProLockedField>
             <ProLockedField label="Up to" hint="Max discount cap">
-              <div className="rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="rounded-xl border border-border bg-card p-3">
                 <AmountSlider
                   value={state.discountAmount}
                   onChange={(v) => dispatch({ type: 'UPDATE_FIELD', field: 'discountAmount', value: v })}
@@ -155,7 +155,7 @@ export const HiddenDetailsStep = () => {
               </div>
             </ProLockedField>
             <ProLockedField label="Minimum spend">
-              <div className="rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="rounded-xl border border-border bg-card p-3">
                 <AmountSlider
                   value={state.minOrderAmount}
                   onChange={(v) => dispatch({ type: 'UPDATE_FIELD', field: 'minOrderAmount', value: v })}
@@ -183,7 +183,7 @@ export const HiddenDetailsStep = () => {
                 onChange={(e) =>
                   dispatch({ type: 'UPDATE_FIELD', field: 'activeStartDate', value: e.target.value ? `${e.target.value}T00:00:00.000Z` : '' })
                 }
-                className="mt-1.5 h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="mt-1.5 h-10 w-[180px] rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
             <div className="shrink-0">
@@ -197,10 +197,10 @@ export const HiddenDetailsStep = () => {
                 onChange={(e) =>
                   dispatch({ type: 'UPDATE_FIELD', field: 'activeEndDate', value: e.target.value ? `${e.target.value}T23:59:59.000Z` : '' })
                 }
-                className="mt-1.5 h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="mt-1.5 h-10 w-[180px] rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
-            <div className="hidden h-16 w-px shrink-0 bg-neutral-200 sm:block" aria-hidden />
+            <div className="hidden h-16 w-px shrink-0 bg-accent sm:block" aria-hidden />
             <div className="min-w-0 flex-1">
               <TimeWindowEditor value={window} onChange={setWindow} label="Active window (per day)" />
             </div>

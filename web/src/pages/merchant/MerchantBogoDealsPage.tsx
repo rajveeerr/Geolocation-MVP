@@ -32,7 +32,7 @@ interface MerchantBogoDeal {
 }
 
 const panelClass =
-  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
+  'rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
@@ -41,9 +41,9 @@ const dealStatus = (deal: MerchantBogoDeal) => {
   const now = new Date();
   const start = new Date(deal.startTime);
   const end = new Date(deal.endTime);
-  if (now < start) return { label: 'Scheduled', tone: 'bg-sky-100 text-sky-700 ring-sky-600/20' };
-  if (now > end) return { label: 'Expired', tone: 'bg-neutral-100 text-neutral-600 ring-neutral-400/20' };
-  return { label: 'Active', tone: 'bg-emerald-100 text-emerald-700 ring-emerald-600/20' };
+  if (now < start) return { label: 'Scheduled', tone: 'bg-sky-100 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-sky-600/20' };
+  if (now > end) return { label: 'Expired', tone: 'bg-muted text-muted-foreground ring-neutral-400/20' };
+  return { label: 'Active', tone: 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 ring-emerald-600/20' };
 };
 
 const PRESETS: Array<{ id: string; label: string; sub: string; buy: number; get: number; discount: number }> = [
@@ -180,12 +180,12 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-orange-600 text-white">
               <ShoppingBag className="h-3.5 w-3.5" />
             </div>
-            <h3 className="text-base font-bold text-neutral-900">New BOGO Deal</h3>
+            <h3 className="text-base font-bold text-foreground">New BOGO Deal</h3>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700"
+            className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
             aria-label="Close form"
           >
             <X className="h-4 w-4" />
@@ -193,16 +193,16 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Live preview */}
-        <div className="mt-4 rounded-xl border border-orange-200 bg-gradient-to-r from-orange-50 via-amber-50 to-white p-4">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-orange-700">Live preview</div>
-          <div className="mt-0.5 text-xl font-bold tracking-tight text-neutral-900">{previewLabel}</div>
+        <div className="mt-4 rounded-xl border border-orange-200 dark:border-orange-900/50 bg-gradient-to-r from-orange-50 via-amber-50 to-card dark:bg-none dark:bg-card p-4">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-orange-700 dark:text-orange-300">Live preview</div>
+          <div className="mt-0.5 text-xl font-bold tracking-tight text-foreground">{previewLabel}</div>
         </div>
 
         {/* Presets */}
         <div className="mt-5">
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-amber-500" />
-            <Label className="text-xs font-semibold text-neutral-700">Quick presets</Label>
+            <Label className="text-xs font-semibold text-foreground">Quick presets</Label>
           </div>
           <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
             {PRESETS.map((preset) => {
@@ -215,16 +215,16 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
                   className={cn(
                     'flex items-start gap-3 rounded-xl border-2 p-3 text-left transition',
                     selected
-                      ? 'border-orange-500 bg-orange-50/60'
-                      : 'border-neutral-200 bg-white hover:border-neutral-300',
+                      ? 'border-orange-500 bg-orange-50/60 dark:bg-orange-950/30'
+                      : 'border-border bg-card hover:border-border',
                   )}
                 >
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-orange-700">
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300">
                     <ShoppingBag className="h-3.5 w-3.5" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-sm font-semibold text-neutral-900">{preset.label}</div>
-                    <div className="text-xs text-neutral-500">{preset.sub}</div>
+                    <div className="text-sm font-semibold text-foreground">{preset.label}</div>
+                    <div className="text-xs text-muted-foreground">{preset.sub}</div>
                   </div>
                   {selected && <CheckCircle2 className="h-5 w-5 shrink-0 text-orange-600" />}
                 </button>
@@ -236,7 +236,7 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
         {/* Manual config */}
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           <div>
-            <Label htmlFor="bogo-buy" className="text-xs font-semibold text-neutral-700">
+            <Label htmlFor="bogo-buy" className="text-xs font-semibold text-foreground">
               Customer buys
             </Label>
             <Input
@@ -249,7 +249,7 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
             />
           </div>
           <div>
-            <Label htmlFor="bogo-get" className="text-xs font-semibold text-neutral-700">
+            <Label htmlFor="bogo-get" className="text-xs font-semibold text-foreground">
               Customer gets
             </Label>
             <Input
@@ -262,7 +262,7 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
             />
           </div>
           <div>
-            <Label htmlFor="bogo-discount" className="text-xs font-semibold text-neutral-700">
+            <Label htmlFor="bogo-discount" className="text-xs font-semibold text-foreground">
               Discount on "get" (%)
             </Label>
             <Input
@@ -279,7 +279,7 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
 
         {/* Title + description */}
         <div className="mt-5">
-          <Label htmlFor="bogo-title" className="text-xs font-semibold text-neutral-700">
+          <Label htmlFor="bogo-title" className="text-xs font-semibold text-foreground">
             Deal title
           </Label>
           <Input
@@ -293,7 +293,7 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="mt-4">
-          <Label htmlFor="bogo-desc" className="text-xs font-semibold text-neutral-700">
+          <Label htmlFor="bogo-desc" className="text-xs font-semibold text-foreground">
             Description
           </Label>
           <Textarea
@@ -308,7 +308,7 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="mt-4">
-          <Label className="text-xs font-semibold text-neutral-700">Category</Label>
+          <Label className="text-xs font-semibold text-foreground">Category</Label>
           <div className="mt-1.5">
             <CategorySelector
               value={form.category}
@@ -319,7 +319,7 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="mt-4">
-          <Label htmlFor="bogo-offer" className="text-xs font-semibold text-neutral-700">
+          <Label htmlFor="bogo-offer" className="text-xs font-semibold text-foreground">
             Offer headline
           </Label>
           <Input
@@ -330,7 +330,7 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
             className="mt-1.5 h-11"
             maxLength={100}
           />
-          <p className="mt-1 text-[11px] text-neutral-500">
+          <p className="mt-1 text-[11px] text-muted-foreground">
             Shown on the deal card. Leave empty to auto-generate from the buy/get setup.
           </p>
         </div>
@@ -338,7 +338,7 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
         {/* Active date range */}
         <div className="mt-4 grid gap-3 lg:grid-cols-2">
           <div>
-            <Label className="text-xs font-semibold text-neutral-700">Starts at</Label>
+            <Label className="text-xs font-semibold text-foreground">Starts at</Label>
             <div className="mt-1.5">
               <TwelveHourDateTimeField
                 id="bogo-start"
@@ -348,7 +348,7 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
             </div>
           </div>
           <div>
-            <Label className="text-xs font-semibold text-neutral-700">Ends at</Label>
+            <Label className="text-xs font-semibold text-foreground">Ends at</Label>
             <div className="mt-1.5">
               <TwelveHourDateTimeField
                 id="bogo-end"
@@ -361,7 +361,7 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
 
         {/* Max redemptions */}
         <div className="mt-4">
-          <Label htmlFor="bogo-max" className="text-xs font-semibold text-neutral-700">
+          <Label htmlFor="bogo-max" className="text-xs font-semibold text-foreground">
             Max redemptions (optional)
           </Label>
           <Input
@@ -376,10 +376,10 @@ function CreateBogoForm({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="mt-4">
-          <Label className="text-xs font-semibold text-neutral-700">
+          <Label className="text-xs font-semibold text-foreground">
             Apply to menu items (optional)
           </Label>
-          <p className="mt-0.5 text-[11px] text-neutral-500">
+          <p className="mt-0.5 text-[11px] text-muted-foreground">
             Pick the items that count toward the buy / get. Leave empty for the offer to apply broadly.
           </p>
           <div className="mt-1.5">
@@ -414,21 +414,21 @@ function BogoDealCard({ deal }: { deal: MerchantBogoDeal }) {
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex min-w-0 flex-1 items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600 ring-1 ring-inset ring-orange-200">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 dark:bg-orange-950/40 text-orange-600 ring-1 ring-inset ring-orange-200">
             <ShoppingBag className="h-5 w-5" />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="truncate text-base font-semibold text-neutral-900">{deal.title}</h3>
+              <h3 className="truncate text-base font-semibold text-foreground">{deal.title}</h3>
               <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset', status.tone)}>
                 {status.label}
               </span>
               <BogoBadge config={deal} size="xs" />
             </div>
             {deal.description && (
-              <p className="mt-1 line-clamp-2 text-sm text-neutral-600">{deal.description}</p>
+              <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{deal.description}</p>
             )}
-            <p className="mt-1 text-xs text-neutral-500">
+            <p className="mt-1 text-xs text-muted-foreground">
               {formatDate(deal.startTime)} – {formatDate(deal.endTime)}
             </p>
           </div>
@@ -436,23 +436,23 @@ function BogoDealCard({ deal }: { deal: MerchantBogoDeal }) {
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Buy</div>
-          <div className="mt-0.5 text-base font-bold text-neutral-900">{deal.bogoBuyQuantity ?? '—'}</div>
+        <div className="rounded-xl border border-border bg-muted/60 p-3">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Buy</div>
+          <div className="mt-0.5 text-base font-bold text-foreground">{deal.bogoBuyQuantity ?? '—'}</div>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Get</div>
-          <div className="mt-0.5 text-base font-bold text-neutral-900">{deal.bogoGetQuantity ?? '—'}</div>
+        <div className="rounded-xl border border-border bg-muted/60 p-3">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Get</div>
+          <div className="mt-0.5 text-base font-bold text-foreground">{deal.bogoGetQuantity ?? '—'}</div>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Discount</div>
+        <div className="rounded-xl border border-border bg-muted/60 p-3">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Discount</div>
           <div className="mt-0.5 text-base font-bold text-orange-600">
             {deal.bogoGetDiscountPercent != null ? `${deal.bogoGetDiscountPercent}%` : '—'}
           </div>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Redemptions</div>
-          <div className="mt-0.5 text-base font-bold text-neutral-900">
+        <div className="rounded-xl border border-border bg-muted/60 p-3">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Redemptions</div>
+          <div className="mt-0.5 text-base font-bold text-foreground">
             {deal.currentRedemptions ?? 0}
             {deal.maxRedemptions ? ` / ${deal.maxRedemptions}` : ''}
           </div>
@@ -481,14 +481,14 @@ function MerchantBogoDealsContent() {
   if (isLoading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={cn(panelClass, 'border-rose-200 bg-rose-50 p-4 text-sm text-rose-700')}>
+      <div className={cn(panelClass, 'border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 p-4 text-sm text-rose-700 dark:text-rose-300')}>
         {(error as Error).message}
       </div>
     );
@@ -497,16 +497,16 @@ function MerchantBogoDealsContent() {
   return (
     <div className="mx-auto max-w-screen-xl space-y-6 px-4 py-3 sm:px-1 sm:py-4">
       {/* Title banner */}
-      <div className={cn(panelClass, 'flex flex-wrap items-center justify-between gap-4 border-orange-200/70 bg-gradient-to-r from-orange-50 via-white to-white p-5')}>
+      <div className={cn(panelClass, 'flex flex-wrap items-center justify-between gap-4 border-orange-200/70 dark:border-orange-900/50 bg-gradient-to-r from-orange-50 via-card to-card dark:bg-none dark:bg-card p-5')}>
         <div className="flex min-w-0 items-start gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-md">
             <ShoppingBag className="h-5 w-5" aria-hidden />
           </div>
           <div className="min-w-0">
-            <h2 className="text-lg font-bold tracking-tight text-neutral-900 sm:text-xl">
+            <h2 className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
               BOGO Deals
             </h2>
-            <p className="text-sm text-neutral-600">
+            <p className="text-sm text-muted-foreground">
               "Buy N Get M" deals — drive larger ticket sizes with volume incentives.
             </p>
           </div>
@@ -514,7 +514,7 @@ function MerchantBogoDealsContent() {
         <Link to="/merchant/deals/create/bogo">
           <Button
             size="md"
-            className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800"
+            className="rounded-full bg-foreground text-background hover:bg-foreground/85"
           >
             <Plus className="mr-2 h-4 w-4" />
             Create BOGO
@@ -524,16 +524,16 @@ function MerchantBogoDealsContent() {
 
       {bogoDeals.length === 0 ? (
         <div className={cn(panelClass, 'border-dashed py-16 text-center')}>
-          <ShoppingBag className="mx-auto mb-3 h-10 w-10 text-neutral-300" aria-hidden />
-          <h3 className="text-[1.4rem] font-semibold tracking-tight text-neutral-900">No BOGO deals yet</h3>
-          <p className="mt-1 text-[13px] text-neutral-500 sm:text-sm">
+          <ShoppingBag className="mx-auto mb-3 h-10 w-10 text-muted-foreground" aria-hidden />
+          <h3 className="text-[1.4rem] font-semibold tracking-tight text-foreground">No BOGO deals yet</h3>
+          <p className="mt-1 text-[13px] text-muted-foreground sm:text-sm">
             Create a BOGO deal — pick a preset like "Buy 1 Get 1 Free" or dial in your own buy/get quantities.
           </p>
           <div className="mt-5 flex justify-center gap-2">
             <Link to="/merchant/deals/create/bogo">
               <Button
                 size="md"
-                className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800"
+                className="rounded-full bg-foreground text-background hover:bg-foreground/85"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Create your first BOGO

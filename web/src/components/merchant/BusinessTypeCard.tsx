@@ -44,8 +44,8 @@ export const BusinessTypeCard = () => {
 
   const getBusinessTypeTone = (type: 'NATIONAL' | 'LOCAL') =>
     type === 'NATIONAL'
-      ? 'bg-blue-50 text-blue-700 border-blue-100'
-      : 'bg-green-50 text-green-700 border-green-100';
+      ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border-blue-100 dark:border-blue-900/40'
+      : 'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300 border-green-100 dark:border-green-900/40';
 
   const getBusinessTypeLabel = (type: 'NATIONAL' | 'LOCAL') =>
     type === 'NATIONAL' ? 'National chain' : 'Local business';
@@ -57,9 +57,9 @@ export const BusinessTypeCard = () => {
     return (
       <section className={merchantPanelClass}>
         <div className="animate-pulse space-y-4">
-          <div className="h-5 w-36 rounded bg-neutral-200" />
-          <div className="h-4 w-64 rounded bg-neutral-200" />
-          <div className="h-14 w-full rounded-[1rem] bg-neutral-100" />
+          <div className="h-5 w-36 rounded bg-accent" />
+          <div className="h-4 w-64 rounded bg-accent" />
+          <div className="h-14 w-full rounded-[1rem] bg-muted" />
         </div>
       </section>
     );
@@ -76,28 +76,28 @@ export const BusinessTypeCard = () => {
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-[0.95rem] bg-neutral-100 text-neutral-800">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[0.95rem] bg-muted text-foreground">
               <Building2 className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-[15px] font-semibold text-neutral-900">Business Type</h3>
-              <p className="mt-1 text-[13px] text-neutral-600">
+              <h3 className="text-[15px] font-semibold text-foreground">Business Type</h3>
+              <p className="mt-1 text-[13px] text-muted-foreground">
                 Your business classification for better targeting and analytics.
               </p>
             </div>
           </div>
 
           {!isEditing ? (
-            <div className="mt-5 flex flex-col gap-4 rounded-[1.1rem] border border-neutral-200/80 bg-neutral-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mt-5 flex flex-col gap-4 rounded-[1.1rem] border border-border/80 bg-muted/60 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex min-w-0 items-start gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[1rem] bg-white text-neutral-800 shadow-sm">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[1rem] bg-card text-foreground shadow-sm">
                   <BusinessTypeIcon className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
-                  <div className="truncate text-[15px] font-semibold text-neutral-900">{merchant.businessName}</div>
-                  <div className="mt-1 text-[13px] text-neutral-600">{getBusinessTypeLabel(merchant.businessType)}</div>
+                  <div className="truncate text-[15px] font-semibold text-foreground">{merchant.businessName}</div>
+                  <div className="mt-1 text-[13px] text-muted-foreground">{getBusinessTypeLabel(merchant.businessType)}</div>
                   {merchant.address ? (
-                    <div className="mt-3 flex items-start gap-2 text-[13px] text-neutral-500">
+                    <div className="mt-3 flex items-start gap-2 text-[13px] text-muted-foreground">
                       <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
                       <span>{merchant.address}</span>
                     </div>
@@ -115,13 +115,13 @@ export const BusinessTypeCard = () => {
               </div>
             </div>
           ) : (
-            <div className="mt-5 space-y-4 rounded-[1.1rem] border border-neutral-200/80 bg-neutral-50/60 p-4">
+            <div className="mt-5 space-y-4 rounded-[1.1rem] border border-border/80 bg-muted/60 p-4">
               <div>
-                <label className="mb-2 block text-[13px] font-medium text-neutral-700">
+                <label className="mb-2 block text-[13px] font-medium text-foreground">
                   Select business type
                 </label>
                 <Select value={selectedType} onValueChange={(value) => setSelectedType(value as 'NATIONAL' | 'LOCAL')}>
-                  <SelectTrigger className="rounded-[0.95rem] border-neutral-200 bg-white">
+                  <SelectTrigger className="rounded-[0.95rem] border-border bg-card">
                     <SelectValue placeholder="Choose business type" />
                   </SelectTrigger>
                   <SelectContent>

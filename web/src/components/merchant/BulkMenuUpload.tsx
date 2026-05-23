@@ -154,10 +154,10 @@ export const BulkMenuUpload: React.FC<BulkMenuUploadProps> = ({ isOpen, onClose 
                   ref={fileInputRef}
                   className="mt-1"
                 />
-                <p className="mt-1 text-sm text-neutral-500">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Supported formats: CSV, Excel (.xlsx, .xls)
                 </p>
-                <p className="mt-1 text-xs text-neutral-500">
+                <p className="mt-1 text-xs text-muted-foreground">
                   Inventory columns supported: <code>isAvailable</code>, <code>inventoryTrackingEnabled</code>, <code>inventoryQuantity</code>, <code>lowStockThreshold</code>, and <code>allowBackorder</code>.
                 </p>
               </div>
@@ -171,17 +171,17 @@ export const BulkMenuUpload: React.FC<BulkMenuUploadProps> = ({ isOpen, onClose 
                   <Download className="h-4 w-4" />
                   Download Template
                 </Button>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-muted-foreground">
                   Download our CSV template to get started
                 </span>
               </div>
 
               {/* Selected File Display */}
               {file && (
-                <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-3">
+                <div className="flex items-center gap-3 rounded-lg border border-green-200 dark:border-green-900/50 bg-green-50 dark:bg-green-950/30 p-3">
                   <CheckCircle className="h-5 w-5 text-green-500" />
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-green-800">{file.name}</p>
+                    <p className="text-sm font-medium text-green-800 dark:text-green-300">{file.name}</p>
                     <p className="text-xs text-green-600">
                       {(file.size / 1024).toFixed(1)} KB
                     </p>
@@ -219,9 +219,9 @@ export const BulkMenuUpload: React.FC<BulkMenuUploadProps> = ({ isOpen, onClose 
                   value={rawText}
                   onChange={(e) => setRawText(e.target.value)}
                   placeholder={'Margherita Pizza $12.99\nCaesar Salad $8.50\nGarlic Bread $5'}
-                  className="mt-1 h-32 w-full rounded-md border border-neutral-300 p-2 text-sm"
+                  className="mt-1 h-32 w-full rounded-md border border-border p-2 text-sm"
                 />
-                <p className="mt-1 text-sm text-neutral-500">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Paste plain text, a screenshot OCR result, or a copied PDF menu. AI will turn it into
                   structured items you can review.
                 </p>
@@ -236,7 +236,7 @@ export const BulkMenuUpload: React.FC<BulkMenuUploadProps> = ({ isOpen, onClose 
                 >
                   {aiMenuParse.isPending ? (
                     <>
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-neutral-900 border-t-transparent" />
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
                       Parsing with AI...
                     </>
                   ) : (
@@ -246,15 +246,15 @@ export const BulkMenuUpload: React.FC<BulkMenuUploadProps> = ({ isOpen, onClose 
                     </>
                   )}
                 </Button>
-                <span className="text-xs text-neutral-500">
+                <span className="text-xs text-muted-foreground">
                   We never save drafts until you confirm upload.
                 </span>
               </div>
 
               {parsedItems.length > 0 && (
-                <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+                <div className="rounded-lg border border-border bg-muted p-3">
                   <div className="mb-2 flex items-center justify-between">
-                    <p className="text-sm font-medium text-neutral-800">
+                    <p className="text-sm font-medium text-foreground">
                       Preview ({parsedItems.length} item{parsedItems.length === 1 ? '' : 's'})
                     </p>
                   </div>
@@ -262,28 +262,28 @@ export const BulkMenuUpload: React.FC<BulkMenuUploadProps> = ({ isOpen, onClose 
                     {parsedItems.map((item, idx) => (
                       <div
                         key={`${item.name}-${idx}`}
-                        className="flex items-start justify-between gap-2 rounded-md bg-white p-2"
+                        className="flex items-start justify-between gap-2 rounded-md bg-card p-2"
                       >
                         <div>
-                          <p className="font-semibold text-neutral-900">{item.name}</p>
+                          <p className="font-semibold text-foreground">{item.name}</p>
                           {item.description && (
-                            <p className="text-xs text-neutral-600 line-clamp-2">
+                            <p className="text-xs text-muted-foreground line-clamp-2">
                               {item.description}
                             </p>
                           )}
                           {item.category && (
-                            <p className="mt-0.5 text-[11px] text-neutral-500">
+                            <p className="mt-0.5 text-[11px] text-muted-foreground">
                               Category: {item.category}
                             </p>
                           )}
                         </div>
-                        <p className="whitespace-nowrap text-sm font-semibold text-green-700">
+                        <p className="whitespace-nowrap text-sm font-semibold text-green-700 dark:text-green-300">
                           ${item.price.toFixed(2)}
                         </p>
                       </div>
                     ))}
                   </div>
-                  <p className="mt-2 text-[11px] text-neutral-500">
+                  <p className="mt-2 text-[11px] text-muted-foreground">
                     To save these items permanently, download our CSV template above, paste this data
                     in, and upload — or quickly recreate key dishes using the form view.
                   </p>
@@ -294,12 +294,12 @@ export const BulkMenuUpload: React.FC<BulkMenuUploadProps> = ({ isOpen, onClose 
 
           {/* Errors */}
           {errors.length > 0 && (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+            <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-4">
               <div className="flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
                 <div className="space-y-1">
                   {errors.map((error, index) => (
-                    <div key={index} className="text-sm text-red-700">{error}</div>
+                    <div key={index} className="text-sm text-red-700 dark:text-red-300">{error}</div>
                   ))}
                 </div>
               </div>

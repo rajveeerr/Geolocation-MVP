@@ -74,7 +74,7 @@ interface RewardsConfigResponse {
 }
 
 const panelClass =
-  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
+  'rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 const REWARD_CHOICE_LABEL: Record<WizardRewardChoice, string> = {
   DISCOUNT_PERCENTAGE: 'Percent off',
@@ -96,9 +96,9 @@ const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
 
 const dealState = (deal: MerchantDeal) => {
-  if (deal.isExpired) return { label: 'Expired', tone: 'bg-neutral-100 text-neutral-600 ring-neutral-400/20' };
-  if (deal.isUpcoming) return { label: 'Scheduled', tone: 'bg-sky-100 text-sky-700 ring-sky-600/20' };
-  return { label: 'Active', tone: 'bg-emerald-100 text-emerald-700 ring-emerald-600/20' };
+  if (deal.isExpired) return { label: 'Expired', tone: 'bg-muted text-muted-foreground ring-neutral-400/20' };
+  if (deal.isUpcoming) return { label: 'Scheduled', tone: 'bg-sky-100 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-sky-600/20' };
+  return { label: 'Active', tone: 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 ring-emerald-600/20' };
 };
 
 const describeReward = (reward: ConfiguredReward) => {
@@ -163,8 +163,8 @@ function StepIndicator({ step }: { step: 1 | 2 | 3 }) {
               className={cn(
                 'flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ring-1 ring-inset transition',
                 state === 'done' && 'bg-emerald-600 text-white ring-emerald-600',
-                state === 'current' && 'bg-emerald-50 text-emerald-700 ring-emerald-300',
-                state === 'upcoming' && 'bg-neutral-100 text-neutral-500 ring-neutral-200',
+                state === 'current' && 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 ring-emerald-300',
+                state === 'upcoming' && 'bg-muted text-muted-foreground ring-neutral-200',
               )}
             >
               {state === 'done' ? <CheckCircle2 className="h-4 w-4" /> : n}
@@ -172,12 +172,12 @@ function StepIndicator({ step }: { step: 1 | 2 | 3 }) {
             <div
               className={cn(
                 'text-xs font-semibold uppercase tracking-[0.18em]',
-                state === 'upcoming' ? 'text-neutral-400' : 'text-neutral-700',
+                state === 'upcoming' ? 'text-muted-foreground' : 'text-foreground',
               )}
             >
               {label}
             </div>
-            {n < 3 && <div className="h-px w-6 bg-neutral-200" aria-hidden />}
+            {n < 3 && <div className="h-px w-6 bg-accent" aria-hidden />}
           </div>
         );
       })}
@@ -207,16 +207,16 @@ function ScopeStep({
           type="button"
           onClick={() => onScopeChange('default')}
           className={cn(
-            'flex items-start gap-3 rounded-2xl border bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.06)]',
-            scope === 'default' ? 'border-emerald-300 ring-2 ring-emerald-200' : 'border-neutral-200',
+            'flex items-start gap-3 rounded-2xl border bg-card p-4 text-left transition hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.06)]',
+            scope === 'default' ? 'border-emerald-300 ring-2 ring-emerald-200' : 'border-border',
           )}
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 ring-1 ring-inset ring-emerald-200">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-200">
             <Globe className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-sm font-bold text-neutral-900">Default for all deals</div>
-            <p className="mt-1 text-xs text-neutral-500">
+            <div className="text-sm font-bold text-foreground">Default for all deals</div>
+            <p className="mt-1 text-xs text-muted-foreground">
               Applies to every deal where you haven’t set up a specific check-in reward.
             </p>
           </div>
@@ -225,16 +225,16 @@ function ScopeStep({
           type="button"
           onClick={() => onScopeChange('deal')}
           className={cn(
-            'flex items-start gap-3 rounded-2xl border bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.06)]',
-            scope === 'deal' ? 'border-emerald-300 ring-2 ring-emerald-200' : 'border-neutral-200',
+            'flex items-start gap-3 rounded-2xl border bg-card p-4 text-left transition hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.06)]',
+            scope === 'deal' ? 'border-emerald-300 ring-2 ring-emerald-200' : 'border-border',
           )}
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-100 text-sky-700 ring-1 ring-inset ring-sky-200">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-100 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-inset ring-sky-200">
             <Target className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-sm font-bold text-neutral-900">Specific deal</div>
-            <p className="mt-1 text-xs text-neutral-500">
+            <div className="text-sm font-bold text-foreground">Specific deal</div>
+            <p className="mt-1 text-xs text-muted-foreground">
               Override the default with a unique check-in reward for one of your deals.
             </p>
           </div>
@@ -245,10 +245,10 @@ function ScopeStep({
         <div className={cn(panelClass, 'p-4')}>
           <div className="flex items-center justify-between gap-3">
             <div>
-              <div className="text-sm font-semibold text-neutral-900">Pick a deal</div>
-              <p className="text-xs text-neutral-500">Expired deals can’t receive new rewards.</p>
+              <div className="text-sm font-semibold text-foreground">Pick a deal</div>
+              <p className="text-xs text-muted-foreground">Expired deals can’t receive new rewards.</p>
             </div>
-            <div className="rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-neutral-600 ring-1 ring-inset ring-neutral-200">
+            <div className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground ring-1 ring-inset ring-neutral-200">
               {deals.filter((d) => !d.isExpired).length} available
             </div>
           </div>
@@ -265,14 +265,14 @@ function ScopeStep({
                     type="button"
                     onClick={() => onDealChange(deal.id)}
                     className={cn(
-                      'flex flex-col gap-2 rounded-2xl border bg-white p-3 text-left transition hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.06)]',
-                      selected ? 'border-emerald-300 ring-2 ring-emerald-200' : 'border-neutral-200',
+                      'flex flex-col gap-2 rounded-2xl border bg-card p-3 text-left transition hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.06)]',
+                      selected ? 'border-emerald-300 ring-2 ring-emerald-200' : 'border-border',
                     )}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <div className="truncate text-sm font-semibold text-neutral-900">{deal.title}</div>
-                        <div className="mt-0.5 text-[11px] text-neutral-500">
+                        <div className="truncate text-sm font-semibold text-foreground">{deal.title}</div>
+                        <div className="mt-0.5 text-[11px] text-muted-foreground">
                           {formatDate(deal.startTime)} → {formatDate(deal.endTime)}
                         </div>
                       </div>
@@ -286,7 +286,7 @@ function ScopeStep({
                       </span>
                     </div>
                     {alreadyConfigured && (
-                      <div className="inline-flex items-center gap-1 self-start rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-200">
+                      <div className="inline-flex items-center gap-1 self-start rounded-full bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-200">
                         <CheckCircle2 className="h-3 w-3" /> Has reward
                       </div>
                     )}
@@ -294,7 +294,7 @@ function ScopeStep({
                 );
               })}
             {deals.filter((deal) => !deal.isExpired).length === 0 && (
-              <div className="col-span-full rounded-2xl border border-dashed border-neutral-200 p-6 text-center text-sm text-neutral-500">
+              <div className="col-span-full rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
                 You have no active or upcoming deals.
               </div>
             )}
@@ -335,7 +335,7 @@ function RewardTypeStep({
   return (
     <div className="space-y-5">
       <div>
-        <Label className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">Reward type</Label>
+        <Label className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Reward type</Label>
         <div className="mt-2 grid gap-2 sm:grid-cols-3 lg:grid-cols-5">
           {REWARD_CHOICE_ORDER.map((choice) => {
             const isActive = choice === rewardChoice;
@@ -346,17 +346,17 @@ function RewardTypeStep({
                 type="button"
                 onClick={() => onChoiceChange(choice)}
                 className={cn(
-                  'flex flex-col items-start gap-1.5 rounded-2xl border bg-white p-3 text-left transition hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.06)]',
-                  isActive ? 'border-emerald-300 ring-2 ring-emerald-200' : 'border-neutral-200',
-                  choice === 'NONE' && isActive && 'border-neutral-400 ring-neutral-300',
+                  'flex flex-col items-start gap-1.5 rounded-2xl border bg-card p-3 text-left transition hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.06)]',
+                  isActive ? 'border-emerald-300 ring-2 ring-emerald-200' : 'border-border',
+                  choice === 'NONE' && isActive && 'border-border ring-neutral-300',
                 )}
               >
                 <Icon
-                  className={cn('h-5 w-5', isActive ? (choice === 'NONE' ? 'text-neutral-700' : 'text-emerald-600') : 'text-neutral-500')}
+                  className={cn('h-5 w-5', isActive ? (choice === 'NONE' ? 'text-foreground' : 'text-emerald-600') : 'text-muted-foreground')}
                   aria-hidden
                 />
-                <div className="text-sm font-semibold text-neutral-900">{REWARD_CHOICE_LABEL[choice]}</div>
-                <div className="text-[11px] leading-snug text-neutral-500">{REWARD_CHOICE_HINT[choice]}</div>
+                <div className="text-sm font-semibold text-foreground">{REWARD_CHOICE_LABEL[choice]}</div>
+                <div className="text-[11px] leading-snug text-muted-foreground">{REWARD_CHOICE_HINT[choice]}</div>
               </button>
             );
           })}
@@ -365,7 +365,7 @@ function RewardTypeStep({
 
       {requiresItem(rewardChoice) && (
         <div>
-          <Label className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">Menu item</Label>
+          <Label className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Menu item</Label>
           <div className="mt-2">
             <MenuItemPicker
               mode="single"
@@ -379,13 +379,13 @@ function RewardTypeStep({
       )}
 
       {rewardChoice === 'BONUS_POINTS' && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-3 text-xs text-amber-800">
+        <div className="rounded-2xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/60 dark:bg-amber-950/30 dark:bg-amber-950/30 dark:bg-amber-950/30 p-3 text-xs text-amber-800 dark:text-amber-300">
           Customers receive these as loyalty points credited to their account at check-in — no claim code or staff handoff needed.
         </div>
       )}
 
       {rewardChoice === 'NONE' && (
-        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-600">
+        <div className="rounded-2xl border border-border bg-muted p-3 text-xs text-muted-foreground">
           Customers checking in to this deal will get no automatic reward. The merchant default (if any) will NOT apply for this deal.
         </div>
       )}
@@ -410,12 +410,12 @@ function DetailsStep({
     return (
       <div className={cn(panelClass, 'p-5')}>
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-neutral-700">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted text-foreground">
             <Ban className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-sm font-bold text-neutral-900">No reward configured</div>
-            <p className="mt-1 text-xs text-neutral-500">
+            <div className="text-sm font-bold text-foreground">No reward configured</div>
+            <p className="mt-1 text-xs text-muted-foreground">
               Nothing else to set. Click Save and check-ins to this deal won't issue a reward.
             </p>
           </div>
@@ -427,9 +427,9 @@ function DetailsStep({
   if (rewardChoice === 'FREE_ITEM') {
     return (
       <div className="space-y-5">
-        <div className={cn(panelClass, 'p-4 text-sm text-neutral-600')}>
-          <div className="font-semibold text-neutral-900">Free item — no value needed</div>
-          <p className="mt-1 text-xs text-neutral-500">
+        <div className={cn(panelClass, 'p-4 text-sm text-muted-foreground')}>
+          <div className="font-semibold text-foreground">Free item — no value needed</div>
+          <p className="mt-1 text-xs text-muted-foreground">
             The customer gets the selected menu item free. Set the redemption window below.
           </p>
         </div>
@@ -446,7 +446,7 @@ function DetailsStep({
     return (
       <div className="space-y-5">
         <div>
-          <Label className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">Quick presets</Label>
+          <Label className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Quick presets</Label>
           <div className="mt-2 flex flex-wrap gap-2">
             {POINT_PRESETS.map((preset) => (
               <button
@@ -457,7 +457,7 @@ function DetailsStep({
                   'rounded-full px-4 py-1.5 text-sm font-semibold ring-1 ring-inset transition',
                   Number(rewardValue) === preset
                     ? 'bg-emerald-600 text-white ring-emerald-600'
-                    : 'bg-white text-neutral-700 ring-neutral-200 hover:bg-neutral-50',
+                    : 'bg-card text-foreground ring-neutral-200 hover:bg-muted',
                 )}
               >
                 {preset} pts
@@ -466,7 +466,7 @@ function DetailsStep({
           </div>
         </div>
         <div>
-          <Label htmlFor="reward-value" className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
+          <Label htmlFor="reward-value" className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Custom amount (points)
           </Label>
           <div className="mt-2 flex items-center gap-2">
@@ -479,7 +479,7 @@ function DetailsStep({
               onChange={(event) => onChange({ rewardValue: event.target.value })}
               className="h-11 max-w-[160px]"
             />
-            <span className="text-sm font-semibold text-neutral-500">pts</span>
+            <span className="text-sm font-semibold text-muted-foreground">pts</span>
           </div>
         </div>
         <ExpiryAndCapInputs
@@ -495,11 +495,11 @@ function DetailsStep({
   return (
     <div className="space-y-5">
       <div>
-        <Label htmlFor="reward-value" className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
+        <Label htmlFor="reward-value" className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           {rewardChoice === 'DISCOUNT_PERCENTAGE' ? 'Percent off' : 'Dollar amount off'}
         </Label>
         <div className="mt-2 flex items-center gap-2">
-          {rewardChoice === 'DISCOUNT_FIXED' && <span className="text-sm font-semibold text-neutral-500">$</span>}
+          {rewardChoice === 'DISCOUNT_FIXED' && <span className="text-sm font-semibold text-muted-foreground">$</span>}
           <Input
             id="reward-value"
             type="number"
@@ -510,7 +510,7 @@ function DetailsStep({
             onChange={(event) => onChange({ rewardValue: event.target.value })}
             className="h-11 max-w-[160px]"
           />
-          {rewardChoice === 'DISCOUNT_PERCENTAGE' && <span className="text-sm font-semibold text-neutral-500">%</span>}
+          {rewardChoice === 'DISCOUNT_PERCENTAGE' && <span className="text-sm font-semibold text-muted-foreground">%</span>}
         </div>
       </div>
       <ExpiryAndCapInputs
@@ -537,7 +537,7 @@ function ExpiryAndCapInputs({
     <div className="grid gap-3 sm:grid-cols-2">
       {!expiryHidden && (
         <div>
-          <Label htmlFor="expiry-hours" className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
+          <Label htmlFor="expiry-hours" className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Expires after (hours)
           </Label>
           <Input
@@ -552,7 +552,7 @@ function ExpiryAndCapInputs({
         </div>
       )}
       <div>
-        <Label htmlFor="max-wins" className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
+        <Label htmlFor="max-wins" className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           Total claim cap
         </Label>
         <Input
@@ -587,10 +587,10 @@ function ConfiguredRewardsList({
     <div className="space-y-3">
       <div className={cn(panelClass, 'flex items-center justify-between gap-3 p-4')}>
         <div>
-          <h3 className="text-base font-bold text-neutral-900">Configured rewards</h3>
-          <p className="text-sm text-neutral-500">Customers get one of these on check-in based on which deal they’re at.</p>
+          <h3 className="text-base font-bold text-foreground">Configured rewards</h3>
+          <p className="text-sm text-muted-foreground">Customers get one of these on check-in based on which deal they’re at.</p>
         </div>
-        <div className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-200">
+        <div className="rounded-full bg-emerald-50 dark:bg-emerald-950/30 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-200">
           {rewards.length}
         </div>
       </div>
@@ -607,7 +607,7 @@ function ConfiguredRewardsList({
                 !reward.isActive && 'opacity-70',
               )}
             >
-              <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
+              <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-muted">
                 {reward.menuItem?.imageUrl || reward.imageUrl ? (
                   <img
                     src={reward.menuItem?.imageUrl ?? reward.imageUrl ?? undefined}
@@ -615,7 +615,7 @@ function ConfiguredRewardsList({
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-neutral-400">
+                  <div className="flex h-full w-full items-center justify-center text-muted-foreground">
                     <Utensils className="h-5 w-5" />
                   </div>
                 )}
@@ -626,18 +626,18 @@ function ConfiguredRewardsList({
                     className={cn(
                       'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset',
                       isDefault
-                        ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
-                        : 'bg-sky-50 text-sky-700 ring-sky-200',
+                        ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 ring-emerald-200'
+                        : 'bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300 ring-sky-200',
                     )}
                   >
                     {isDefault ? <Globe className="h-3 w-3" /> : <Target className="h-3 w-3" />}
                     {isDefault ? 'Default' : deal?.title ?? `Deal #${reward.dealId}`}
                   </span>
                 </div>
-                <div className="mt-1 truncate text-sm font-bold text-neutral-900">
+                <div className="mt-1 truncate text-sm font-bold text-foreground">
                   {describeReward(reward)}
                 </div>
-                <div className="mt-0.5 text-[11px] text-neutral-500">
+                <div className="mt-0.5 text-[11px] text-muted-foreground">
                   {reward.menuItem?.category ? `${reward.menuItem.category} · ` : ''}
                   {reward.maxWins != null ? `${reward.currentWins}/${reward.maxWins} claimed` : `${reward.currentWins} claimed`}
                 </div>
@@ -646,7 +646,7 @@ function ConfiguredRewardsList({
                 <button
                   type="button"
                   onClick={() => onEdit(reward)}
-                  className="rounded-full p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800"
+                  className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
                   title="Edit"
                 >
                   <Pencil className="h-4 w-4" />
@@ -655,7 +655,7 @@ function ConfiguredRewardsList({
                   type="button"
                   onClick={() => onRemove(reward)}
                   disabled={removingId === reward.id}
-                  className="rounded-full p-1.5 text-rose-500 hover:bg-rose-50 hover:text-rose-700 disabled:opacity-60"
+                  className="rounded-full p-1.5 text-rose-500 hover:bg-rose-50 dark:bg-rose-950/30 hover:text-rose-700 dark:text-rose-300 disabled:opacity-60"
                   title="Remove"
                 >
                   {removingId === reward.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
@@ -848,14 +848,14 @@ export function MerchantCheckInGamesPage() {
   if (dealsQuery.isLoading || rewardsQuery.isLoading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (dealsQuery.error || rewardsQuery.error) {
     return (
-      <div className={cn(panelClass, 'border-rose-200 bg-rose-50 p-4 text-sm text-rose-700')}>
+      <div className={cn(panelClass, 'border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 p-4 text-sm text-rose-700 dark:text-rose-300')}>
         {(dealsQuery.error as Error)?.message || (rewardsQuery.error as Error)?.message}
       </div>
     );
@@ -866,7 +866,7 @@ export function MerchantCheckInGamesPage() {
       <div
         className={cn(
           panelClass,
-          'flex flex-wrap items-center justify-between gap-4 border-emerald-200/70 bg-gradient-to-r from-emerald-50 via-white to-white p-5',
+          'flex flex-wrap items-center justify-between gap-4 border-emerald-200/70 dark:border-emerald-900/50 bg-gradient-to-r from-emerald-50 via-card to-card dark:bg-none dark:bg-card p-5',
         )}
       >
         <div className="flex min-w-0 items-start gap-3">
@@ -874,14 +874,14 @@ export function MerchantCheckInGamesPage() {
             <Gift className="h-5 w-5" aria-hidden />
           </div>
           <div className="min-w-0">
-            <h2 className="text-lg font-bold tracking-tight text-neutral-900 sm:text-xl">Check-in Rewards</h2>
-            <p className="text-sm text-neutral-600">
+            <h2 className="text-lg font-bold tracking-tight text-foreground sm:text-xl">Check-in Rewards</h2>
+            <p className="text-sm text-muted-foreground">
               Set a default or per-deal reward. Customers get a discount on one specific menu item when they check in.
             </p>
           </div>
         </div>
         <Link to={PATHS.MERCHANT_DEALS}>
-          <Button size="md" variant="secondary" className="rounded-full border-neutral-200 bg-white text-neutral-700 shadow-sm hover:bg-neutral-50">
+          <Button size="md" variant="secondary" className="rounded-full border-border bg-card text-foreground shadow-sm hover:bg-muted">
             <ArrowRight className="mr-2 h-4 w-4 rotate-180" />
             View all deals
           </Button>
@@ -890,18 +890,18 @@ export function MerchantCheckInGamesPage() {
 
       <div className="grid gap-3 sm:grid-cols-3">
         <div className={cn(panelClass, 'p-4')}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Default set?</div>
-          <div className="mt-1 truncate text-[1.1rem] font-semibold tracking-tight text-emerald-700">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Default set?</div>
+          <div className="mt-1 truncate text-[1.1rem] font-semibold tracking-tight text-emerald-700 dark:text-emerald-300">
             {defaultReward ? describeReward(defaultReward) : 'Not yet'}
           </div>
         </div>
         <div className={cn(panelClass, 'p-4')}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Deal-specific overrides</div>
-          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-neutral-950">{dealRewards.length}</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Deal-specific overrides</div>
+          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-foreground">{dealRewards.length}</div>
         </div>
         <div className={cn(panelClass, 'p-4')}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Editing</div>
-          <div className="mt-1 truncate text-[1.1rem] font-semibold tracking-tight text-neutral-900">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Editing</div>
+          <div className="mt-1 truncate text-[1.1rem] font-semibold tracking-tight text-foreground">
             {wizard.editingRewardId ? 'Existing reward' : 'New reward'}
           </div>
         </div>
@@ -914,7 +914,7 @@ export function MerchantCheckInGamesPage() {
             <button
               type="button"
               onClick={resetWizard}
-              className="text-xs font-semibold text-neutral-500 underline-offset-4 hover:underline"
+              className="text-xs font-semibold text-muted-foreground underline-offset-4 hover:underline"
             >
               Cancel edit
             </button>
@@ -965,7 +965,7 @@ export function MerchantCheckInGamesPage() {
         </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-2">
-          <div className="text-xs text-neutral-500">
+          <div className="text-xs text-muted-foreground">
             {step === 1 && (wizard.scope === 'default'
               ? 'This reward will apply to every deal where you haven’t set a specific reward.'
               : selectedDeal

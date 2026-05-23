@@ -59,9 +59,9 @@ interface RecipeLinkDraft {
   quantityPerUnit: number;
 }
 
-const labelClass = 'mb-1 block text-xs font-semibold uppercase tracking-widest text-neutral-400';
+const labelClass = 'mb-1 block text-xs font-semibold uppercase tracking-widest text-muted-foreground';
 const inputClass =
-  'w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm text-foreground shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20';
+  'w-full rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20';
 
 const IngredientFormModal: React.FC<Props> = ({ open, ingredient, onClose }) => {
   const isEdit = !!ingredient;
@@ -208,13 +208,13 @@ const IngredientFormModal: React.FC<Props> = ({ open, ingredient, onClose }) => 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 p-4"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
     >
       <div
-        className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-neutral-200 bg-white p-6 shadow-[0_24px_48px_rgba(15,23,42,0.16)]"
+        className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-[0_24px_48px_rgba(15,23,42,0.16)]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
@@ -229,7 +229,7 @@ const IngredientFormModal: React.FC<Props> = ({ open, ingredient, onClose }) => 
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted"
           >
             <X className="h-4 w-4" />
           </button>
@@ -351,22 +351,22 @@ const IngredientFormModal: React.FC<Props> = ({ open, ingredient, onClose }) => 
           </div>
 
           {/* Recipe links */}
-          <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+          <div className="rounded-xl border border-border bg-muted p-4">
             <div className="flex items-center justify-between">
               <div className={labelClass + ' mb-0'}>Used in menu items (recipe)</div>
-              <div className="text-xs text-neutral-500">
+              <div className="text-xs text-muted-foreground">
                 Used to compute days-left from sales velocity
               </div>
             </div>
 
             {recipeLinks.length === 0 && (
-              <p className="mt-2 text-xs text-neutral-500">No menu items linked yet.</p>
+              <p className="mt-2 text-xs text-muted-foreground">No menu items linked yet.</p>
             )}
 
             <div className="mt-3 space-y-2">
               {recipeLinks.map((link) => (
-                <div key={link.menuItemId} className="flex items-center gap-2 rounded-lg bg-white px-3 py-2 ring-1 ring-neutral-200">
-                  <span className="flex-1 truncate text-sm font-medium text-neutral-800">
+                <div key={link.menuItemId} className="flex items-center gap-2 rounded-lg bg-card px-3 py-2 ring-1 ring-neutral-200">
+                  <span className="flex-1 truncate text-sm font-medium text-foreground">
                     {link.menuItemName}
                   </span>
                   <input
@@ -375,13 +375,13 @@ const IngredientFormModal: React.FC<Props> = ({ open, ingredient, onClose }) => 
                     min="0"
                     value={link.quantityPerUnit}
                     onChange={(e) => updateLinkQty(link.menuItemId, Number(e.target.value) || 0)}
-                    className="w-20 rounded-md border border-neutral-300 px-2 py-1 text-sm"
+                    className="w-20 rounded-md border border-border px-2 py-1 text-sm"
                   />
-                  <span className="text-xs text-neutral-500">{unitType}/unit</span>
+                  <span className="text-xs text-muted-foreground">{unitType}/unit</span>
                   <button
                     type="button"
                     onClick={() => removeLink(link.menuItemId)}
-                    className="rounded-full p-1 text-neutral-400 hover:bg-neutral-100 hover:text-red-500"
+                    className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-red-500"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -410,7 +410,7 @@ const IngredientFormModal: React.FC<Props> = ({ open, ingredient, onClose }) => 
           </div>
 
           {validationError && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 px-3 py-2 text-sm text-red-700 dark:text-red-300">
               {validationError}
             </div>
           )}
@@ -442,7 +442,7 @@ const IngredientFormModal: React.FC<Props> = ({ open, ingredient, onClose }) => 
               <button
                 type="button"
                 onClick={() => setConfirmingDelete(true)}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-red-50 text-red-600 hover:bg-red-100"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-red-50 dark:bg-red-950/30 text-red-600 hover:bg-red-100 dark:bg-red-950/40"
                 title="Delete ingredient"
               >
                 <Trash2 className="h-4 w-4" />

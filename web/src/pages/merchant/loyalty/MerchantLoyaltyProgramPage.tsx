@@ -63,39 +63,39 @@ export const MerchantLoyaltyProgramPage = () => {
       subtitle="Update how customers earn points and redeem value at checkout."
     >
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="rounded-xl border border-neutral-200 bg-white p-6 lg:col-span-2">
+        <div className="rounded-xl border border-border bg-card p-6 lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-neutral-900">Rules</h2>
-            <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${data.program.isActive ? 'bg-green-100 text-green-700' : 'bg-neutral-100 text-neutral-600'}`}>
+            <h2 className="text-lg font-semibold text-foreground">Rules</h2>
+            <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${data.program.isActive ? 'bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-300' : 'bg-muted text-muted-foreground'}`}>
               {data.program.isActive ? 'Active' : 'Inactive'}
             </span>
           </div>
 
           <form onSubmit={onSave} className="grid gap-4">
             <label className="grid gap-1">
-              <span className="text-sm font-medium text-neutral-700">Points per $1</span>
-              <input className="rounded-md border border-neutral-300 p-2" type="number" step="0.1" min="0.1" value={pointsPerDollar} onChange={(e) => setPointsPerDollar(e.target.value === '' ? '' : Number(e.target.value))} />
+              <span className="text-sm font-medium text-foreground">Points per $1</span>
+              <input className="rounded-md border border-border p-2" type="number" step="0.1" min="0.1" value={pointsPerDollar} onChange={(e) => setPointsPerDollar(e.target.value === '' ? '' : Number(e.target.value))} />
             </label>
             <label className="grid gap-1">
-              <span className="text-sm font-medium text-neutral-700">Minimum Redemption (points)</span>
-              <input className="rounded-md border border-neutral-300 p-2" type="number" min="1" value={minimumRedemption} onChange={(e) => setMinimumRedemption(e.target.value === '' ? '' : Number(e.target.value))} />
+              <span className="text-sm font-medium text-foreground">Minimum Redemption (points)</span>
+              <input className="rounded-md border border-border p-2" type="number" min="1" value={minimumRedemption} onChange={(e) => setMinimumRedemption(e.target.value === '' ? '' : Number(e.target.value))} />
             </label>
             <label className="grid gap-1">
-              <span className="text-sm font-medium text-neutral-700">Redemption Value ($)</span>
-              <input className="rounded-md border border-neutral-300 p-2" type="number" min="0.5" step="0.5" value={redemptionValue} onChange={(e) => setRedemptionValue(e.target.value === '' ? '' : Number(e.target.value))} />
+              <span className="text-sm font-medium text-foreground">Redemption Value ($)</span>
+              <input className="rounded-md border border-border p-2" type="number" min="0.5" step="0.5" value={redemptionValue} onChange={(e) => setRedemptionValue(e.target.value === '' ? '' : Number(e.target.value))} />
             </label>
-            <button className="rounded-md bg-neutral-900 px-4 py-2 text-white disabled:opacity-50" disabled={update.isPending}>
+            <button className="rounded-md bg-foreground px-4 py-2 text-background disabled:opacity-50" disabled={update.isPending}>
               {update.isPending ? 'Saving...' : 'Save Changes'}
             </button>
           </form>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-6">
-          <h3 className="text-sm font-semibold text-neutral-900">Program Control</h3>
-          <p className="mt-1 text-sm text-neutral-600">Pause earning and redemption at merchant level without losing customer balances.</p>
+        <div className="rounded-xl border border-border bg-muted p-6">
+          <h3 className="text-sm font-semibold text-foreground">Program Control</h3>
+          <p className="mt-1 text-sm text-muted-foreground">Pause earning and redemption at merchant level without losing customer balances.</p>
           <button
             type="button"
-            className="mt-4 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-semibold"
+            className="mt-4 w-full rounded-md border border-border bg-card px-3 py-2 text-sm font-semibold"
             onClick={() => {
               setStatus.mutate(
                 { isActive: !data.program.isActive },

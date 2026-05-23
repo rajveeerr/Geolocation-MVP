@@ -50,7 +50,7 @@ export const BountyConfigStep = () => {
         <SectionCard>
           <div className="grid gap-5 sm:grid-cols-2">
             <ProLockedField label="Reward per check-in" hint="Per friend brought">
-              <div className="rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="rounded-xl border border-border bg-card p-3">
                 <AmountSlider
                   value={state.bountyRewardAmount}
                   onChange={(v) => dispatch({ type: 'UPDATE_FIELD', field: 'bountyRewardAmount', value: v })}
@@ -76,22 +76,22 @@ export const BountyConfigStep = () => {
                   dispatch({ type: 'UPDATE_FIELD', field: 'minReferralsRequired', value: v });
                 }}
                 placeholder="2"
-                className="mt-1.5 h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="mt-1.5 h-10 rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
           </div>
         </SectionCard>
 
         <SectionCard>
-          <div className="flex items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50 p-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+          <div className="flex items-start gap-3 rounded-xl border border-border bg-muted p-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300">
               <Trophy className="h-5 w-5" />
             </div>
-            <div className="text-[13px] leading-6 text-neutral-700">
-              <div className="font-semibold text-neutral-900">
+            <div className="text-[13px] leading-6 text-foreground">
+              <div className="font-semibold text-foreground">
                 Bring {minRefs} friend{minRefs === 1 ? '' : 's'}, earn ${(reward * minRefs).toFixed(0)}
               </div>
-              <p className="mt-0.5 text-neutral-600">
+              <p className="mt-0.5 text-muted-foreground">
                 Each verified check-in unlocks <span className="font-semibold">${reward.toFixed(0)}</span> for the
                 referring guest. Customers see a QR after publishing.
               </p>
@@ -101,9 +101,9 @@ export const BountyConfigStep = () => {
 
         <SectionCard>
           <FieldLabel label="Coverage" />
-          <div className="mt-3 flex items-start gap-3 rounded-xl border border-neutral-200 bg-white p-4">
-            <Users className="mt-0.5 h-5 w-5 text-neutral-500" />
-            <p className="text-[13px] leading-6 text-neutral-700">
+          <div className="mt-3 flex items-start gap-3 rounded-xl border border-border bg-card p-4">
+            <Users className="mt-0.5 h-5 w-5 text-muted-foreground" />
+            <p className="text-[13px] leading-6 text-foreground">
               Bounty deals work best at peak hours. We recommend running them at the same windows as your
               busiest service — set those next.
             </p>

@@ -113,7 +113,7 @@ export const StandardDealQuickForm = () => {
               dispatch({ type: 'UPDATE_FIELD', field: 'title', value: e.target.value.slice(0, 100) })
             }
             placeholder="Taco Tuesday — 60% OFF"
-            className="mt-1.5 h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+            className="mt-1.5 h-10 rounded-lg border-border bg-card text-[13.5px]"
             maxLength={100}
           />
         </SectionCard>
@@ -135,7 +135,7 @@ export const StandardDealQuickForm = () => {
         <SectionCard>
           <div className="grid gap-5 sm:grid-cols-3">
             <ProLockedField label="Discount" hint="Off total bill">
-              <div className="rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="rounded-xl border border-border bg-card p-3">
                 <AmountSlider
                   value={state.discountPercentage}
                   onChange={(v) => dispatch({ type: 'UPDATE_FIELD', field: 'discountPercentage', value: v })}
@@ -148,7 +148,7 @@ export const StandardDealQuickForm = () => {
               </div>
             </ProLockedField>
             <ProLockedField label="Up to" hint="Max discount cap">
-              <div className="rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="rounded-xl border border-border bg-card p-3">
                 <AmountSlider
                   value={state.discountAmount}
                   onChange={(v) => dispatch({ type: 'UPDATE_FIELD', field: 'discountAmount', value: v })}
@@ -161,7 +161,7 @@ export const StandardDealQuickForm = () => {
               </div>
             </ProLockedField>
             <ProLockedField label="Minimum spend">
-              <div className="rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="rounded-xl border border-border bg-card p-3">
                 <AmountSlider
                   value={state.minOrderAmount}
                   onChange={(v) => dispatch({ type: 'UPDATE_FIELD', field: 'minOrderAmount', value: v })}
@@ -187,10 +187,10 @@ export const StandardDealQuickForm = () => {
                 min={todayIso}
                 value={dateValue}
                 onChange={(e) => handleDateChange(e.target.value)}
-                className="mt-1.5 h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="mt-1.5 h-10 w-[180px] rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
-            <div className="hidden h-16 w-px shrink-0 bg-neutral-200 sm:block" aria-hidden />
+            <div className="hidden h-16 w-px shrink-0 bg-accent sm:block" aria-hidden />
             <div className="min-w-0 flex-1">
               <TimeWindowEditor value={window} onChange={setWindow} label="Time window" />
             </div>
@@ -209,7 +209,7 @@ export const StandardDealQuickForm = () => {
               dispatch({ type: 'UPDATE_FIELD', field: 'maxRedemptions', value: v });
             }}
             placeholder="50 uses"
-            className="mt-1.5 h-10 w-[200px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+            className="mt-1.5 h-10 w-[200px] rounded-lg border-border bg-card text-[13.5px]"
           />
         </SectionCard>
 

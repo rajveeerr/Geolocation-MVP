@@ -25,10 +25,10 @@ export const CollectionPreview = ({
 
   if (isLoading) {
     return (
-      <div className="rounded-lg border border-neutral-200 bg-white p-6">
+      <div className="rounded-lg border border-border bg-card p-6">
         <div className="flex items-center justify-center gap-3">
           <Loader2 className="h-5 w-5 animate-spin text-brand-primary-600" />
-          <span className="text-sm text-neutral-600">Loading collection items...</span>
+          <span className="text-sm text-muted-foreground">Loading collection items...</span>
         </div>
       </div>
     );
@@ -36,12 +36,12 @@ export const CollectionPreview = ({
 
   if (error || !collectionData?.collection) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+      <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-4">
         <div className="flex items-start gap-3">
           <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
           <div>
-            <h4 className="font-semibold text-red-900 mb-1">Error Loading Collection</h4>
-            <p className="text-sm text-red-700">
+            <h4 className="font-semibold text-red-900 dark:text-red-200 mb-1">Error Loading Collection</h4>
+            <p className="text-sm text-red-700 dark:text-red-300">
               {error?.message || 'Failed to load collection items. Please try again.'}
             </p>
           </div>
@@ -115,10 +115,10 @@ export const CollectionPreview = ({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-lg border border-neutral-200 bg-white"
+      className="rounded-lg border border-border bg-card"
     >
       {/* Header */}
-      <div className="border-b border-neutral-200 bg-neutral-50 px-4 py-3">
+      <div className="border-b border-border bg-muted px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-14 w-14 overflow-hidden rounded-lg bg-brand-primary-100">
@@ -131,8 +131,8 @@ export const CollectionPreview = ({
               )}
             </div>
             <div>
-              <h4 className="font-semibold text-neutral-900">{collection.name}</h4>
-              <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-neutral-600">
+              <h4 className="font-semibold text-foreground">{collection.name}</h4>
+              <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span>{totalItems} item{totalItems !== 1 ? 's' : ''} will be added to this deal</span>
                 {servesLabel ? <span>&bull; {servesLabel}</span> : null}
                 {collection.packagePrice != null ? (
@@ -150,8 +150,8 @@ export const CollectionPreview = ({
       <div className="max-h-96 overflow-y-auto">
         {activeItems.length === 0 ? (
           <div className="p-8 text-center">
-            <Package className="mx-auto h-10 w-10 text-neutral-400 mb-3" />
-            <p className="text-sm text-neutral-600">No active items in this collection</p>
+            <Package className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
+            <p className="text-sm text-muted-foreground">No active items in this collection</p>
           </div>
         ) : (
           <div className="divide-y divide-neutral-100">
@@ -165,12 +165,12 @@ export const CollectionPreview = ({
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="p-4 hover:bg-neutral-50 transition-colors"
+                  className="p-4 hover:bg-muted transition-colors"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-neutral-100 flex items-center justify-center">
+                        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
                           {item.menuItem.imageUrl ? (
                             <img
                               src={item.menuItem.imageUrl}
@@ -178,32 +178,32 @@ export const CollectionPreview = ({
                               className="w-full h-full rounded-lg object-cover"
                             />
                           ) : (
-                            <DollarSign className="h-5 w-5 text-neutral-400" />
+                            <DollarSign className="h-5 w-5 text-muted-foreground" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <h5 className="font-medium text-neutral-900 truncate">
+                            <h5 className="font-medium text-foreground truncate">
                               {item.menuItem.name}
                             </h5>
                             {hasCustomPricing && (
-                              <span className="flex-shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                              <span className="flex-shrink-0 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">
                                 <Tag className="h-3 w-3 inline mr-1" />
                                 Custom
                               </span>
                             )}
                           </div>
                           {item.menuItem.description && (
-                            <p className="text-xs text-neutral-600 mt-1 line-clamp-2">
+                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                               {item.menuItem.description}
                             </p>
                           )}
                           <div className="mt-2 flex items-center gap-2 flex-wrap">
-                            <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700">
+                            <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
                               {item.menuItem.category}
                             </span>
                             {item.notes && (
-                              <span className="text-xs text-neutral-500 italic">
+                              <span className="text-xs text-muted-foreground italic">
                                 {item.notes}
                               </span>
                             )}
@@ -216,19 +216,19 @@ export const CollectionPreview = ({
                     <div className="flex-shrink-0 text-right">
                       <div className="flex items-center gap-2 justify-end">
                         {hasDiscount && (
-                          <span className="text-xs text-neutral-400 line-through">
+                          <span className="text-xs text-muted-foreground line-through">
                             ${item.menuItem.price.toFixed(2)}
                           </span>
                         )}
                         <div>
                           <div className={cn(
                             "font-semibold",
-                            hasDiscount ? "text-green-600" : "text-neutral-900"
+                            hasDiscount ? "text-green-600" : "text-foreground"
                           )}>
                             ${finalPrice.toFixed(2)}
                           </div>
                           {discountInfo && (
-                            <div className="text-xs text-neutral-500 mt-0.5">
+                            <div className="text-xs text-muted-foreground mt-0.5">
                               {discountInfo}
                             </div>
                           )}
@@ -245,21 +245,21 @@ export const CollectionPreview = ({
 
       {/* Summary Footer */}
       {activeItems.length > 0 && (
-        <div className="border-t border-neutral-200 bg-neutral-50 px-4 py-3">
+        <div className="border-t border-border bg-muted px-4 py-3">
           <div className="grid grid-cols-3 gap-4 text-sm">
             <div>
-              <div className="text-neutral-600 text-xs mb-1">Total Items</div>
-              <div className="font-semibold text-neutral-900">{totalItems}</div>
+              <div className="text-muted-foreground text-xs mb-1">Total Items</div>
+              <div className="font-semibold text-foreground">{totalItems}</div>
             </div>
             <div>
-              <div className="text-neutral-600 text-xs mb-1">Total Value</div>
+              <div className="text-muted-foreground text-xs mb-1">Total Value</div>
               <div className="font-semibold text-green-600">
                 ${totalFinalValue.toFixed(2)}
               </div>
             </div>
             {totalSavings > 0 && (
               <div>
-                <div className="text-neutral-600 text-xs mb-1">Total Savings</div>
+                <div className="text-muted-foreground text-xs mb-1">Total Savings</div>
                 <div className="font-semibold text-green-600">
                   ${totalSavings.toFixed(2)}
                 </div>
@@ -267,8 +267,8 @@ export const CollectionPreview = ({
             )}
           </div>
           {collection.packagePrice != null ? (
-            <div className="mt-3 rounded-lg border border-brand-primary-200 bg-white px-3 py-2 text-sm">
-              <span className="text-neutral-600">Package price: </span>
+            <div className="mt-3 rounded-lg border border-brand-primary-200 bg-card px-3 py-2 text-sm">
+              <span className="text-muted-foreground">Package price: </span>
               <span className="font-semibold text-brand-primary-700">
                 ${Number(collection.packagePrice).toFixed(2)}
               </span>

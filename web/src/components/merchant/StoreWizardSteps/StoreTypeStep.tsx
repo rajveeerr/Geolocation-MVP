@@ -18,8 +18,8 @@ interface StoreTypeStepProps {
 export const StoreTypeStep = ({ data, onUpdate }: StoreTypeStepProps) => (
   <div className="space-y-8">
     <div>
-      <h2 className="text-2xl font-bold text-neutral-900">Which best describes this place?</h2>
-      <p className="mt-2 text-neutral-600">This helps customers find you when they search for deals.</p>
+      <h2 className="text-2xl font-bold text-foreground">Which best describes this place?</h2>
+      <p className="mt-2 text-muted-foreground">This helps customers find you when they search for deals.</p>
     </div>
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {STORE_TYPES.map((type) => {
@@ -32,15 +32,15 @@ export const StoreTypeStep = ({ data, onUpdate }: StoreTypeStepProps) => (
             onClick={() => onUpdate({ storeType: type.value })}
             className={cn(
               'flex flex-col items-center gap-3 rounded-xl border p-6 text-center transition-all duration-200',
-              isSelected ? 'border-brand-primary-500 bg-brand-primary-50 ring-2 ring-brand-primary-500' : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50'
+              isSelected ? 'border-brand-primary-500 bg-brand-primary-50 ring-2 ring-brand-primary-500' : 'border-border bg-card hover:border-border hover:bg-muted'
             )}
           >
-            <div className={cn('flex h-12 w-12 items-center justify-center rounded-full', isSelected ? 'bg-brand-primary-500 text-white' : 'bg-neutral-100 text-neutral-600')}>
+            <div className={cn('flex h-12 w-12 items-center justify-center rounded-full', isSelected ? 'bg-brand-primary-500 text-white' : 'bg-muted text-muted-foreground')}>
               <Icon className="h-6 w-6" />
             </div>
             <div>
-              <p className="font-semibold text-neutral-900">{type.label}</p>
-              <p className="text-sm text-neutral-500">{type.description}</p>
+              <p className="font-semibold text-foreground">{type.label}</p>
+              <p className="text-sm text-muted-foreground">{type.description}</p>
             </div>
           </button>
         );

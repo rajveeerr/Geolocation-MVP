@@ -155,7 +155,7 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4"
           onClick={onClose}
         >
           <motion.div
@@ -163,24 +163,24 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ type: 'tween', duration: 0.2 }}
-            className="relative z-50 w-full max-w-3xl rounded-2xl bg-white p-6 shadow-2xl"
+            className="relative z-50 w-full max-w-3xl rounded-2xl bg-card p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-neutral-900">{isEditMode ? 'Edit Package' : 'New Package'}</h3>
-              <button onClick={onClose} className="rounded-md p-1 text-neutral-500 hover:bg-neutral-100">
+              <h3 className="text-lg font-semibold text-foreground">{isEditMode ? 'Edit Package' : 'New Package'}</h3>
+              <button onClick={onClose} className="rounded-md p-1 text-muted-foreground hover:bg-muted">
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             {!isEditMode ? (
-              <div className="mb-4 rounded-xl border border-neutral-200 bg-neutral-50 p-3">
-                <div className="flex items-center justify-between text-xs font-medium text-neutral-500">
-                  <span className={cn(createStep === 1 && 'text-neutral-900')}>Step 1: Basics</span>
-                  <span className={cn(createStep === 2 && 'text-neutral-900')}>Step 2: Items</span>
-                  <span className={cn(createStep === 3 && 'text-neutral-900')}>Step 3: Package</span>
+              <div className="mb-4 rounded-xl border border-border bg-muted p-3">
+                <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+                  <span className={cn(createStep === 1 && 'text-foreground')}>Step 1: Basics</span>
+                  <span className={cn(createStep === 2 && 'text-foreground')}>Step 2: Items</span>
+                  <span className={cn(createStep === 3 && 'text-foreground')}>Step 3: Package</span>
                 </div>
-                <div className="mt-2 h-1.5 rounded-full bg-neutral-200">
+                <div className="mt-2 h-1.5 rounded-full bg-accent">
                   <div
                     className={cn(
                       'h-1.5 rounded-full bg-brand-primary-500 transition-all',
@@ -193,21 +193,21 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
 
             <div className="space-y-4 max-h-[65vh] overflow-y-auto pr-1">
               {isEditMode ? (
-                <div className="space-y-4 rounded-xl border border-neutral-200 p-4">
+                <div className="space-y-4 rounded-xl border border-border p-4">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-neutral-900">Manage Items</p>
-                    <p className="text-xs text-neutral-500">{editingItems.length} in collection</p>
+                    <p className="text-sm font-semibold text-foreground">Manage Items</p>
+                    <p className="text-xs text-muted-foreground">{editingItems.length} in collection</p>
                   </div>
 
-                  <div className="space-y-2 rounded-lg border border-neutral-200 p-2">
+                  <div className="space-y-2 rounded-lg border border-border p-2">
                     {editingItems.length === 0 ? (
-                      <p className="py-4 text-center text-sm text-neutral-500">No items in this collection yet.</p>
+                      <p className="py-4 text-center text-sm text-muted-foreground">No items in this collection yet.</p>
                     ) : (
                       editingItems.map((collectionItem) => (
-                        <div key={collectionItem.menuItemId} className="flex items-center justify-between rounded-lg border border-neutral-100 bg-neutral-50 px-3 py-2">
+                        <div key={collectionItem.menuItemId} className="flex items-center justify-between rounded-lg border border-border bg-muted px-3 py-2">
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-medium text-neutral-900">{collectionItem.menuItem.name}</p>
-                            <p className="text-xs text-neutral-500">{collectionItem.menuItem.category}</p>
+                            <p className="truncate text-sm font-medium text-foreground">{collectionItem.menuItem.name}</p>
+                            <p className="text-xs text-muted-foreground">{collectionItem.menuItem.category}</p>
                           </div>
                           <Button
                             type="button"
@@ -215,7 +215,7 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
                             size="sm"
                             onClick={() => collectionId && removeItem.mutateAsync({ collectionId, itemId: collectionItem.menuItemId })}
                             disabled={removeItem.isPending}
-                            className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                            className="text-red-600 hover:bg-red-50 dark:bg-red-950/30 hover:text-red-700 dark:text-red-300"
                           >
                             Remove
                           </Button>
@@ -225,9 +225,9 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-neutral-700">Add More Items</label>
+                    <label className="text-sm font-medium text-foreground">Add More Items</label>
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input
                         value={editSearchTerm}
                         onChange={(e) => setEditSearchTerm(e.target.value)}
@@ -235,9 +235,9 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
                         className="pl-10"
                       />
                     </div>
-                    <div className="max-h-52 space-y-2 overflow-y-auto rounded-lg border border-neutral-200 p-2">
+                    <div className="max-h-52 space-y-2 overflow-y-auto rounded-lg border border-border p-2">
                       {filteredEditableItems.length === 0 ? (
-                        <p className="py-4 text-center text-sm text-neutral-500">No additional items available.</p>
+                        <p className="py-4 text-center text-sm text-muted-foreground">No additional items available.</p>
                       ) : (
                         filteredEditableItems.map((item) => {
                           const isSelected = editSelectedItems.has(item.id);
@@ -250,13 +250,13 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
                                 'w-full rounded-lg border px-3 py-2 text-left transition',
                                 isSelected
                                   ? 'border-brand-primary-500 bg-brand-primary-50'
-                                  : 'border-neutral-200 bg-white hover:border-neutral-300',
+                                  : 'border-border bg-card hover:border-border',
                               )}
                             >
                               <div className="flex items-center justify-between gap-2">
                                 <div className="min-w-0">
-                                  <p className="truncate text-sm font-medium text-neutral-900">{item.name}</p>
-                                  <p className="text-xs text-neutral-500">{item.category} • ${item.price.toFixed(2)}</p>
+                                  <p className="truncate text-sm font-medium text-foreground">{item.name}</p>
+                                  <p className="text-xs text-muted-foreground">{item.category} • ${item.price.toFixed(2)}</p>
                                 </div>
                                 {isSelected ? <Check className="h-4 w-4 text-brand-primary-600" /> : null}
                               </div>
@@ -282,11 +282,11 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
               {!isEditMode && createStep === 1 ? (
                 <>
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-neutral-700">Name</label>
+                    <label className="mb-1 block text-sm font-medium text-foreground">Name</label>
                     <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Breakfast Box for the Team" />
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-neutral-700">Description</label>
+                    <label className="mb-1 block text-sm font-medium text-foreground">Description</label>
                     <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Assorted bagels, pastries, fruit, and coffee." />
                   </div>
                 </>
@@ -297,18 +297,18 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
                   {!isEditMode ? null : (
                     <>
                       <div>
-                        <label className="mb-1 block text-sm font-medium text-neutral-700">Name</label>
+                        <label className="mb-1 block text-sm font-medium text-foreground">Name</label>
                         <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Breakfast Box for the Team" />
                       </div>
                       <div>
-                        <label className="mb-1 block text-sm font-medium text-neutral-700">Description</label>
+                        <label className="mb-1 block text-sm font-medium text-foreground">Description</label>
                         <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Assorted bagels, pastries, fruit, and coffee." />
                       </div>
                     </>
                   )}
                   <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                      <label className="mb-1 block text-sm font-medium text-neutral-700">Serves</label>
+                      <label className="mb-1 block text-sm font-medium text-foreground">Serves</label>
                       <Input
                         type="number"
                         min="1"
@@ -318,7 +318,7 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-sm font-medium text-neutral-700">Package Price</label>
+                      <label className="mb-1 block text-sm font-medium text-foreground">Package Price</label>
                       <Input
                         type="number"
                         min="0"
@@ -329,13 +329,13 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
                       />
                     </div>
                   </div>
-                  <div className="rounded-xl border border-neutral-200 p-4">
+                  <div className="rounded-xl border border-border p-4">
                     <div className="flex flex-col gap-4 md:flex-row">
-                      <div className="h-36 w-full overflow-hidden rounded-xl bg-neutral-100 md:w-48">
+                      <div className="h-36 w-full overflow-hidden rounded-xl bg-muted md:w-48">
                         {effectiveCoverImage ? (
                           <img src={effectiveCoverImage} alt={name || 'Package cover'} className="h-full w-full object-cover" />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center text-neutral-400">
+                          <div className="flex h-full w-full items-center justify-center text-muted-foreground">
                             <ImageIcon className="h-8 w-8" />
                           </div>
                         )}
@@ -343,8 +343,8 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
                       <div className="flex-1 space-y-3">
                         <div className="flex items-center justify-between gap-3">
                           <div>
-                            <p className="text-sm font-semibold text-neutral-900">Cover Image</p>
-                            <p className="text-xs text-neutral-500">Shown on the public package card when available.</p>
+                            <p className="text-sm font-semibold text-foreground">Cover Image</p>
+                            <p className="text-xs text-muted-foreground">Shown on the public package card when available.</p>
                           </div>
                           <Button type="button" variant="secondary" size="sm" onClick={() => setShowImageUpload(true)}>
                             <Upload className="mr-2 h-4 w-4" />
@@ -352,19 +352,19 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
                           </Button>
                         </div>
                         <div className="grid gap-3 sm:grid-cols-3">
-                          <div className="rounded-lg bg-neutral-50 px-3 py-2">
-                            <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">Suggested Cost</p>
-                            <p className="mt-1 text-sm font-semibold text-neutral-900">${suggestedSubtotal.toFixed(2)}</p>
+                          <div className="rounded-lg bg-muted px-3 py-2">
+                            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Suggested Cost</p>
+                            <p className="mt-1 text-sm font-semibold text-foreground">${suggestedSubtotal.toFixed(2)}</p>
                           </div>
-                          <div className="rounded-lg bg-neutral-50 px-3 py-2">
-                            <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">Items</p>
-                            <p className="mt-1 text-sm font-semibold text-neutral-900">{pricingItems.length}</p>
+                          <div className="rounded-lg bg-muted px-3 py-2">
+                            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Items</p>
+                            <p className="mt-1 text-sm font-semibold text-foreground">{pricingItems.length}</p>
                           </div>
-                          <div className="rounded-lg bg-neutral-50 px-3 py-2">
-                            <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">Pricing Hint</p>
+                          <div className="rounded-lg bg-muted px-3 py-2">
+                            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Pricing Hint</p>
                             <p className={cn(
                               'mt-1 text-sm font-semibold',
-                              packageSavings != null && packageSavings >= 0 ? 'text-emerald-600' : 'text-neutral-900',
+                              packageSavings != null && packageSavings >= 0 ? 'text-emerald-600' : 'text-foreground',
                             )}>
                               {packageSavings == null
                                 ? 'Add a package price'
@@ -383,13 +383,13 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
               {!isEditMode && createStep === 2 ? (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <label className="block text-sm font-medium text-neutral-700">Add Items (Optional)</label>
-                    <span className="text-xs text-neutral-500">
+                    <label className="block text-sm font-medium text-foreground">Add Items (Optional)</label>
+                    <span className="text-xs text-muted-foreground">
                       {selectedItems.size} selected
                     </span>
                   </div>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
@@ -397,9 +397,9 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
                       className="pl-10"
                     />
                   </div>
-                  <div className="max-h-60 space-y-2 overflow-y-auto rounded-lg border border-neutral-200 p-2">
+                  <div className="max-h-60 space-y-2 overflow-y-auto rounded-lg border border-border p-2">
                     {filteredItems.length === 0 ? (
-                      <div className="py-6 text-center text-sm text-neutral-500">
+                      <div className="py-6 text-center text-sm text-muted-foreground">
                         No menu items found.
                       </div>
                     ) : (
@@ -414,13 +414,13 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
                               'w-full rounded-lg border px-3 py-2 text-left transition',
                               isSelected
                                 ? 'border-brand-primary-500 bg-brand-primary-50'
-                                : 'border-neutral-200 bg-white hover:border-neutral-300',
+                                : 'border-border bg-card hover:border-border',
                             )}
                           >
                             <div className="flex items-center justify-between gap-3">
                               <div className="min-w-0">
-                                <div className="truncate text-sm font-semibold text-neutral-900">{item.name}</div>
-                                <div className="mt-0.5 text-xs text-neutral-500">
+                                <div className="truncate text-sm font-semibold text-foreground">{item.name}</div>
+                                <div className="mt-0.5 text-xs text-muted-foreground">
                                   {item.category} • ${item.price.toFixed(2)}
                                 </div>
                               </div>
@@ -433,7 +433,7 @@ const CollectionForm = ({ open, onClose, initial, onSubmit, isSubmitting }: Coll
                       })
                     )}
                   </div>
-                  <p className="text-xs text-neutral-500">
+                  <p className="text-xs text-muted-foreground">
                     You can create now and still add or remove items later from the collection card.
                   </p>
                 </div>
@@ -573,7 +573,7 @@ const AddItemsModal = ({ open, onClose, collection }: AddItemsModalProps) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4"
           onClick={onClose}
         >
           <motion.div
@@ -581,15 +581,15 @@ const AddItemsModal = ({ open, onClose, collection }: AddItemsModalProps) => {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ type: 'tween', duration: 0.2 }}
-            className="relative z-50 w-full max-w-2xl max-h-[90vh] rounded-2xl bg-white shadow-2xl flex flex-col"
+            className="relative z-50 w-full max-w-2xl max-h-[90vh] rounded-2xl bg-card shadow-2xl flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-neutral-200 p-6">
+            <div className="flex items-center justify-between border-b border-border p-6">
               <div>
-                <h3 className="text-lg font-semibold text-neutral-900">Add Items to {collection.name}</h3>
-                <p className="text-sm text-neutral-600 mt-1">Select menu items to add to this collection</p>
+                <h3 className="text-lg font-semibold text-foreground">Add Items to {collection.name}</h3>
+                <p className="text-sm text-muted-foreground mt-1">Select menu items to add to this collection</p>
               </div>
-              <button onClick={onClose} className="rounded-md p-1 text-neutral-500 hover:bg-neutral-100">
+              <button onClick={onClose} className="rounded-md p-1 text-muted-foreground hover:bg-muted">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -597,7 +597,7 @@ const AddItemsModal = ({ open, onClose, collection }: AddItemsModalProps) => {
             <div className="p-6 flex-1 overflow-hidden flex flex-col">
               <div className="mb-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -610,8 +610,8 @@ const AddItemsModal = ({ open, onClose, collection }: AddItemsModalProps) => {
               <div className="flex-1 overflow-y-auto space-y-2">
                 {filteredItems.length === 0 ? (
                   <div className="text-center py-12">
-                    <Utensils className="mx-auto h-12 w-12 text-neutral-300 mb-3" />
-                    <p className="text-neutral-600">
+                    <Utensils className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+                    <p className="text-muted-foreground">
                       {availableItems.length === 0
                         ? 'All menu items are already in this collection'
                         : 'No items found matching your search'}
@@ -634,12 +634,12 @@ const AddItemsModal = ({ open, onClose, collection }: AddItemsModalProps) => {
                           'w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-all text-left',
                           isSelected
                             ? 'border-brand-primary-500 bg-brand-primary-50'
-                            : 'border-neutral-200 bg-white hover:border-neutral-300'
+                            : 'border-border bg-card hover:border-border'
                         )}
                       >
                         <div className="flex-shrink-0">
                           {displayImages.length > 0 ? (
-                            <div className="h-12 w-12 rounded-lg overflow-hidden bg-neutral-100">
+                            <div className="h-12 w-12 rounded-lg overflow-hidden bg-muted">
                               <img
                                 src={displayImages[0].url}
                                 alt={item.name}
@@ -647,20 +647,20 @@ const AddItemsModal = ({ open, onClose, collection }: AddItemsModalProps) => {
                               />
                             </div>
                           ) : (
-                            <div className="h-12 w-12 rounded-lg bg-neutral-100 flex items-center justify-center">
-                              <ImageIcon className="h-6 w-6 text-neutral-400" />
+                            <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
+                              <ImageIcon className="h-6 w-6 text-muted-foreground" />
                             </div>
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-neutral-900">{item.name}</div>
+                          <div className="font-semibold text-foreground">{item.name}</div>
                           {item.description && (
-                            <div className="text-sm text-neutral-600 line-clamp-1 mt-0.5">{item.description}</div>
+                            <div className="text-sm text-muted-foreground line-clamp-1 mt-0.5">{item.description}</div>
                           )}
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-sm font-medium text-green-600">${item.price.toFixed(2)}</span>
-                            <span className="text-xs text-neutral-500">•</span>
-                            <span className="text-xs text-neutral-500">{item.category}</span>
+                            <span className="text-xs text-muted-foreground">•</span>
+                            <span className="text-xs text-muted-foreground">{item.category}</span>
                           </div>
                         </div>
                         <div className="flex-shrink-0">
@@ -677,8 +677,8 @@ const AddItemsModal = ({ open, onClose, collection }: AddItemsModalProps) => {
               </div>
 
               {selectedItems.size > 0 && (
-                <div className="mt-4 pt-4 border-t border-neutral-200 flex items-center justify-between">
-                  <span className="text-sm text-neutral-600">
+                <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
                     {selectedItems.size} item{selectedItems.size !== 1 ? 's' : ''} selected
                   </span>
                   <div className="flex gap-2">
@@ -779,7 +779,7 @@ const CollectionDetailModal = ({ open, onClose, collectionId }: CollectionDetail
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4"
           onClick={onClose}
         >
           <motion.div
@@ -787,33 +787,33 @@ const CollectionDetailModal = ({ open, onClose, collectionId }: CollectionDetail
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ type: 'tween', duration: 0.2 }}
-            className="relative z-50 w-full max-w-4xl max-h-[90vh] rounded-2xl bg-white shadow-2xl flex flex-col"
+            className="relative z-50 w-full max-w-4xl max-h-[90vh] rounded-2xl bg-card shadow-2xl flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-neutral-200 p-6">
+            <div className="flex items-center justify-between border-b border-border p-6">
               <div className="flex-1">
-                <h3 className="text-xl font-semibold text-neutral-900">{collection.name}</h3>
+                <h3 className="text-xl font-semibold text-foreground">{collection.name}</h3>
                 {collection.description && (
-                  <p className="text-sm text-neutral-600 mt-1">{collection.description}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{collection.description}</p>
                 )}
-                <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-neutral-500">
+                <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                   <span>{collectionItems.length} items</span>
                   {collection.servesCount ? <span>{formatServesLabel(collection.servesCount)}</span> : null}
                   {collection.packagePrice != null ? (
-                    <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-semibold text-neutral-700">
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-semibold text-foreground">
                       Package ${Number(collection.packagePrice).toFixed(2)}
                     </span>
                   ) : null}
                   <span className={cn(
                     'rounded-full px-2 py-0.5 text-xs font-medium',
-                    collection.isActive ? 'bg-green-100 text-green-700' : 'bg-neutral-100 text-neutral-700'
+                    collection.isActive ? 'bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-300' : 'bg-muted text-foreground'
                   )}>
                     {collection.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
               </div>
-              <button onClick={onClose} className="rounded-md p-1 text-neutral-500 hover:bg-neutral-100">
+              <button onClick={onClose} className="rounded-md p-1 text-muted-foreground hover:bg-muted">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -826,12 +826,12 @@ const CollectionDetailModal = ({ open, onClose, collectionId }: CollectionDetail
                   <div className="flex-1 overflow-y-auto p-6">
                     {isLoading ? (
                       <div className="flex items-center justify-center py-12">
-                        <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
+                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                       </div>
                     ) : collectionItems.length === 0 ? (
                       <div className="text-center py-12">
-                        <Package className="mx-auto h-12 w-12 text-neutral-300 mb-3" />
-                        <p className="text-neutral-600 mb-4">This collection is empty</p>
+                        <Package className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+                        <p className="text-muted-foreground mb-4">This collection is empty</p>
                         <Button onClick={() => setShowAddItems(true)}>
                           <Plus className="mr-2 h-4 w-4" /> Add Items
                         </Button>
@@ -855,11 +855,11 @@ const CollectionDetailModal = ({ open, onClose, collectionId }: CollectionDetail
                           return (
                             <div
                               key={collectionItem.menuItemId}
-                              className="flex items-center gap-3 rounded-lg border border-neutral-200 bg-white p-4 hover:shadow-sm transition-shadow"
+                              className="flex items-center gap-3 rounded-lg border border-border bg-card p-4 hover:shadow-sm transition-shadow"
                             >
                               <div className="flex-shrink-0">
                                 {displayImages.length > 0 ? (
-                                  <div className="h-16 w-16 rounded-lg overflow-hidden bg-neutral-100">
+                                  <div className="h-16 w-16 rounded-lg overflow-hidden bg-muted">
                                     <img
                                       src={displayImages[0].url}
                                       alt={item.name}
@@ -867,25 +867,25 @@ const CollectionDetailModal = ({ open, onClose, collectionId }: CollectionDetail
                                     />
                                   </div>
                                 ) : (
-                                  <div className="h-16 w-16 rounded-lg bg-neutral-100 flex items-center justify-center">
-                                    <ImageIcon className="h-6 w-6 text-neutral-400" />
+                                  <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center">
+                                    <ImageIcon className="h-6 w-6 text-muted-foreground" />
                                   </div>
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="font-semibold text-neutral-900">{item.name}</div>
+                                <div className="font-semibold text-foreground">{item.name}</div>
                                 {item.description && (
-                                  <div className="text-sm text-neutral-600 line-clamp-1 mt-0.5">{item.description}</div>
+                                  <div className="text-sm text-muted-foreground line-clamp-1 mt-0.5">{item.description}</div>
                                 )}
                                 <div className="flex items-center gap-2 mt-1">
                                   {finalPrice < item.price && (
-                                    <span className="text-xs text-neutral-400 line-through">${item.price.toFixed(2)}</span>
+                                    <span className="text-xs text-muted-foreground line-through">${item.price.toFixed(2)}</span>
                                   )}
                                   <span className="text-sm font-medium text-green-600">${finalPrice.toFixed(2)}</span>
-                                  <span className="text-xs text-neutral-500">•</span>
-                                  <span className="text-xs text-neutral-500">{item.category}</span>
+                                  <span className="text-xs text-muted-foreground">•</span>
+                                  <span className="text-xs text-muted-foreground">{item.category}</span>
                                   {(collectionItem.customPrice !== null || collectionItem.customDiscount !== null) && (
-                                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                                    <span className="rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">
                                       Custom Price
                                     </span>
                                   )}
@@ -896,7 +896,7 @@ const CollectionDetailModal = ({ open, onClose, collectionId }: CollectionDetail
                                 size="sm"
                                 onClick={() => handleRemoveItem(item.id)}
                                 disabled={removeItem.isPending}
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                className="text-red-600 hover:text-red-700 dark:text-red-300 hover:bg-red-50 dark:bg-red-950/30"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -908,7 +908,7 @@ const CollectionDetailModal = ({ open, onClose, collectionId }: CollectionDetail
                   </div>
 
                   {/* Actions */}
-                  <div className="border-t border-neutral-200 p-4 flex items-center justify-between">
+                  <div className="border-t border-border p-4 flex items-center justify-between">
                     <Button variant="secondary" onClick={onClose}>Close</Button>
                     <Button onClick={() => setShowAddItems(true)}>
                       <Plus className="mr-2 h-4 w-4" /> Add Items
@@ -920,14 +920,14 @@ const CollectionDetailModal = ({ open, onClose, collectionId }: CollectionDetail
                   {/* Add Items View */}
                   <div className="p-6 flex-1 overflow-hidden flex flex-col">
                     <div className="mb-4 flex items-center justify-between">
-                      <h4 className="font-semibold text-neutral-900">Add Items to Collection</h4>
+                      <h4 className="font-semibold text-foreground">Add Items to Collection</h4>
                       <button
                         onClick={() => {
                           setShowAddItems(false);
                           setSelectedItems(new Set());
                           setSearchTerm('');
                         }}
-                        className="text-sm text-neutral-600 hover:text-neutral-900"
+                        className="text-sm text-muted-foreground hover:text-foreground"
                       >
                         Back to Collection
                       </button>
@@ -935,7 +935,7 @@ const CollectionDetailModal = ({ open, onClose, collectionId }: CollectionDetail
 
                     <div className="mb-4">
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
@@ -948,8 +948,8 @@ const CollectionDetailModal = ({ open, onClose, collectionId }: CollectionDetail
                     <div className="flex-1 overflow-y-auto space-y-2">
                       {filteredAvailableItems.length === 0 ? (
                         <div className="text-center py-12">
-                          <Utensils className="mx-auto h-12 w-12 text-neutral-300 mb-3" />
-                          <p className="text-neutral-600">
+                          <Utensils className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+                          <p className="text-muted-foreground">
                             {availableItems.length === 0
                               ? 'All menu items are already in this collection'
                               : 'No items found matching your search'}
@@ -972,12 +972,12 @@ const CollectionDetailModal = ({ open, onClose, collectionId }: CollectionDetail
                                 'w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-all text-left',
                                 isSelected
                                   ? 'border-brand-primary-500 bg-brand-primary-50'
-                                  : 'border-neutral-200 bg-white hover:border-neutral-300'
+                                  : 'border-border bg-card hover:border-border'
                               )}
                             >
                               <div className="flex-shrink-0">
                                 {displayImages.length > 0 ? (
-                                  <div className="h-12 w-12 rounded-lg overflow-hidden bg-neutral-100">
+                                  <div className="h-12 w-12 rounded-lg overflow-hidden bg-muted">
                                     <img
                                       src={displayImages[0].url}
                                       alt={item.name}
@@ -985,20 +985,20 @@ const CollectionDetailModal = ({ open, onClose, collectionId }: CollectionDetail
                                     />
                                   </div>
                                 ) : (
-                                  <div className="h-12 w-12 rounded-lg bg-neutral-100 flex items-center justify-center">
-                                    <ImageIcon className="h-6 w-6 text-neutral-400" />
+                                  <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
+                                    <ImageIcon className="h-6 w-6 text-muted-foreground" />
                                   </div>
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="font-semibold text-neutral-900">{item.name}</div>
+                                <div className="font-semibold text-foreground">{item.name}</div>
                                 {item.description && (
-                                  <div className="text-sm text-neutral-600 line-clamp-1 mt-0.5">{item.description}</div>
+                                  <div className="text-sm text-muted-foreground line-clamp-1 mt-0.5">{item.description}</div>
                                 )}
                                 <div className="flex items-center gap-2 mt-1">
                                   <span className="text-sm font-medium text-green-600">${item.price.toFixed(2)}</span>
-                                  <span className="text-xs text-neutral-500">•</span>
-                                  <span className="text-xs text-neutral-500">{item.category}</span>
+                                  <span className="text-xs text-muted-foreground">•</span>
+                                  <span className="text-xs text-muted-foreground">{item.category}</span>
                                 </div>
                               </div>
                               <div className="flex-shrink-0">
@@ -1015,8 +1015,8 @@ const CollectionDetailModal = ({ open, onClose, collectionId }: CollectionDetail
                     </div>
 
                     {selectedItems.size > 0 && (
-                      <div className="mt-4 pt-4 border-t border-neutral-200 flex items-center justify-between">
-                        <span className="text-sm text-neutral-600">
+                      <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
                           {selectedItems.size} item{selectedItems.size !== 1 ? 's' : ''} selected
                         </span>
                         <div className="flex gap-2">
@@ -1090,8 +1090,8 @@ export const MenuCollectionsPage = () => {
       {/* Header */}
       <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Packages</h1>
-          <p className="text-sm text-neutral-600">Create, edit, and reuse packages for faster deal creation.</p>
+          <h1 className="text-2xl font-bold text-foreground">Packages</h1>
+          <p className="text-sm text-muted-foreground">Create, edit, and reuse packages for faster deal creation.</p>
         </div>
         <Button onClick={() => setIsCreateOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> New Package
@@ -1101,7 +1101,7 @@ export const MenuCollectionsPage = () => {
       {/* Search */}
       <div className="mb-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -1113,16 +1113,16 @@ export const MenuCollectionsPage = () => {
 
       {/* Content */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-24 text-neutral-600">
+        <div className="flex items-center justify-center py-24 text-muted-foreground">
           <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading packages...
         </div>
       ) : error ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">Failed to load packages.</div>
+        <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-4 text-red-700 dark:text-red-300">Failed to load packages.</div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-lg border-2 border-dashed border-neutral-200 p-10 text-center">
-          <Package className="mx-auto mb-3 h-10 w-10 text-neutral-400" />
-          <h3 className="mb-1 text-lg font-semibold text-neutral-900">No packages found</h3>
-          <p className="mb-4 text-neutral-600">Create your first package to get started.</p>
+        <div className="rounded-lg border-2 border-dashed border-border p-10 text-center">
+          <Package className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
+          <h3 className="mb-1 text-lg font-semibold text-foreground">No packages found</h3>
+          <p className="mb-4 text-muted-foreground">Create your first package to get started.</p>
           <Button onClick={() => setIsCreateOpen(true)}>
             <Plus className="mr-2 h-4 w-4" /> Create Package
           </Button>
@@ -1144,24 +1144,24 @@ export const MenuCollectionsPage = () => {
                 key={c.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="overflow-hidden rounded-2xl border border-neutral-200 bg-white transition-shadow hover:shadow-md cursor-pointer"
+                className="overflow-hidden rounded-2xl border border-border bg-card transition-shadow hover:shadow-md cursor-pointer"
                 onClick={() => setViewingCollection(c.id)}
               >
-                <div className="relative h-44 w-full overflow-hidden bg-neutral-100">
+                <div className="relative h-44 w-full overflow-hidden bg-muted">
                   {coverImage ? (
                     <img src={coverImage} alt={c.name} className="h-full w-full object-cover" />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-neutral-400">
+                    <div className="flex h-full w-full items-center justify-center text-muted-foreground">
                       <Package className="h-8 w-8" />
                     </div>
                   )}
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent p-4">
                     <div className="flex items-center gap-2 text-white">
-                      <span className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide">
+                      <span className="rounded-full bg-card/15 dark:bg-card px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide">
                         Package
                       </span>
                       {servesLabel ? (
-                        <span className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold">
+                        <span className="rounded-full bg-card/15 dark:bg-card px-2.5 py-1 text-[11px] font-semibold">
                           {servesLabel}
                         </span>
                       ) : null}
@@ -1172,11 +1172,11 @@ export const MenuCollectionsPage = () => {
                 <div className="p-4">
                   <div className="mb-3 flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <div className="truncate font-semibold text-neutral-900">{c.name}</div>
+                      <div className="truncate font-semibold text-foreground">{c.name}</div>
                       {c.description && (
-                        <div className="mt-0.5 line-clamp-2 text-sm text-neutral-600">{c.description}</div>
+                        <div className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">{c.description}</div>
                       )}
-                      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-neutral-500">
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                         <span>{totalItems} item{totalItems !== 1 ? 's' : ''}</span>
                       </div>
                     </div>
@@ -1212,7 +1212,7 @@ export const MenuCollectionsPage = () => {
                           e.stopPropagation();
                           setDeletingCollection(c);
                         }}
-                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 dark:text-red-300 hover:bg-red-50 dark:bg-red-950/30"
                         title="Delete"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -1221,34 +1221,34 @@ export const MenuCollectionsPage = () => {
                   </div>
 
                   <div className="mb-4 grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-xl bg-neutral-50 px-3 py-2">
-                      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
+                    <div className="rounded-xl bg-muted px-3 py-2">
+                      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                         <DollarSign className="h-3.5 w-3.5" />
                         Package Price
                       </div>
-                      <p className="mt-1 text-sm font-semibold text-neutral-900">
+                      <p className="mt-1 text-sm font-semibold text-foreground">
                         {packagePrice != null ? `$${packagePrice.toFixed(2)}` : 'Not set'}
                       </p>
                     </div>
-                    <div className="rounded-xl bg-neutral-50 px-3 py-2">
-                      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
+                    <div className="rounded-xl bg-muted px-3 py-2">
+                      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                         <Sparkles className="h-3.5 w-3.5" />
                         Suggested Total
                       </div>
-                      <p className="mt-1 text-sm font-semibold text-neutral-900">${suggestedSubtotal.toFixed(2)}</p>
+                      <p className="mt-1 text-sm font-semibold text-foreground">${suggestedSubtotal.toFixed(2)}</p>
                     </div>
-                    <div className="rounded-xl bg-neutral-50 px-3 py-2">
-                      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
+                    <div className="rounded-xl bg-muted px-3 py-2">
+                      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                         <Users className="h-3.5 w-3.5" />
                         Serving
                       </div>
-                      <p className="mt-1 text-sm font-semibold text-neutral-900">{servesLabel || 'Not set'}</p>
+                      <p className="mt-1 text-sm font-semibold text-foreground">{servesLabel || 'Not set'}</p>
                     </div>
                   </div>
 
                   {items.length > 0 ? (
                     <div className="mb-3">
-                      <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">Included items</div>
+                      <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Included items</div>
                       <div className="flex items-center gap-2 -space-x-2">
                         {previewItems.map((collectionItem, index) => {
                           const item = collectionItem.menuItem;
@@ -1261,7 +1261,7 @@ export const MenuCollectionsPage = () => {
                           return (
                             <div
                               key={collectionItem.menuItemId}
-                              className="relative h-12 w-12 rounded-lg border-2 border-white overflow-hidden bg-neutral-100 flex-shrink-0"
+                              className="relative h-12 w-12 rounded-lg border-2 border-white overflow-hidden bg-muted flex-shrink-0"
                               style={{ zIndex: previewItems.length - index }}
                             >
                               {displayImages.length > 0 ? (
@@ -1272,7 +1272,7 @@ export const MenuCollectionsPage = () => {
                                 />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center">
-                                  <Utensils className="h-5 w-5 text-neutral-400" />
+                                  <Utensils className="h-5 w-5 text-muted-foreground" />
                                 </div>
                               )}
                             </div>
@@ -1293,15 +1293,15 @@ export const MenuCollectionsPage = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="mb-3 rounded-lg border-2 border-dashed border-neutral-200 p-4 text-center">
-                      <Utensils className="mx-auto h-6 w-6 text-neutral-300 mb-2" />
-                      <p className="text-xs text-neutral-500">No items yet</p>
+                    <div className="mb-3 rounded-lg border-2 border-dashed border-border p-4 text-center">
+                      <Utensils className="mx-auto h-6 w-6 text-muted-foreground mb-2" />
+                      <p className="text-xs text-muted-foreground">No items yet</p>
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between border-t border-neutral-100 pt-3 text-sm">
-                    <div className="flex items-center gap-2 text-neutral-600">Shown on public deal pages</div>
-                    <div className={cn('rounded-full px-2 py-0.5 text-xs font-medium', c.isActive ? 'bg-green-100 text-green-700' : 'bg-neutral-100 text-neutral-700')}>
+                  <div className="flex items-center justify-between border-t border-border pt-3 text-sm">
+                    <div className="flex items-center gap-2 text-muted-foreground">Shown on public deal pages</div>
+                    <div className={cn('rounded-full px-2 py-0.5 text-xs font-medium', c.isActive ? 'bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-300' : 'bg-muted text-foreground')}>
                       {c.isActive ? 'Active' : 'Inactive'}
                     </div>
                   </div>
@@ -1355,7 +1355,7 @@ export const MenuCollectionsPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4"
             onClick={() => setDeletingCollection(null)}
           >
             <motion.div
@@ -1363,12 +1363,12 @@ export const MenuCollectionsPage = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ type: 'tween', duration: 0.2 }}
-              className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+              className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-lg font-semibold text-neutral-900">Delete Collection?</h3>
-              <p className="mt-2 text-sm text-neutral-600">
-                This will permanently delete <span className="font-semibold text-neutral-900">{deletingCollection.name}</span>.
+              <h3 className="text-lg font-semibold text-foreground">Delete Collection?</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                This will permanently delete <span className="font-semibold text-foreground">{deletingCollection.name}</span>.
               </p>
               <div className="mt-6 flex items-center justify-end gap-3">
                 <Button variant="secondary" onClick={() => setDeletingCollection(null)}>

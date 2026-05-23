@@ -23,7 +23,7 @@ interface MerchantHiddenDeal {
 }
 
 const panelClass =
-  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
+  'rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
@@ -32,9 +32,9 @@ const dealStatus = (deal: MerchantHiddenDeal) => {
   const now = new Date();
   const start = new Date(deal.startTime);
   const end = new Date(deal.endTime);
-  if (now < start) return { label: 'Scheduled', tone: 'bg-sky-100 text-sky-700' };
-  if (now > end) return { label: 'Expired', tone: 'bg-neutral-100 text-neutral-600' };
-  return { label: 'Active', tone: 'bg-emerald-100 text-emerald-700' };
+  if (now < start) return { label: 'Scheduled', tone: 'bg-sky-100 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300' };
+  if (now > end) return { label: 'Expired', tone: 'bg-muted text-muted-foreground' };
+  return { label: 'Active', tone: 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300' };
 };
 
 const formatDiscount = (deal: MerchantHiddenDeal) => {
@@ -73,31 +73,31 @@ function HiddenDealCard({ deal }: { deal: MerchantHiddenDeal }) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="truncate text-base font-semibold text-neutral-900">{deal.title}</h3>
+            <h3 className="truncate text-base font-semibold text-foreground">{deal.title}</h3>
             <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold', status.tone)}>
               {status.label}
             </span>
-            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800 ring-1 ring-inset ring-amber-600/20">
+            <span className="rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-[10px] font-semibold text-amber-800 dark:text-amber-300 ring-1 ring-inset ring-amber-600/20">
               {formatDiscount(deal)}
             </span>
           </div>
           {deal.description && (
-            <p className="line-clamp-2 text-xs text-neutral-500">{deal.description}</p>
+            <p className="line-clamp-2 text-xs text-muted-foreground">{deal.description}</p>
           )}
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-muted-foreground">
             {formatDate(deal.startTime)} – {formatDate(deal.endTime)}
           </p>
         </div>
 
         <div className="flex shrink-0 flex-col items-end gap-2 sm:min-w-[180px]">
-          <div className="flex items-center gap-2 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 px-3 py-2">
-            <KeyRound className="h-4 w-4 text-amber-700" aria-hidden />
-            <code className="font-mono text-sm font-bold tracking-wider text-amber-900">{code || '—'}</code>
+          <div className="flex items-center gap-2 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 dark:bg-amber-950/30 px-3 py-2">
+            <KeyRound className="h-4 w-4 text-amber-700 dark:text-amber-300" aria-hidden />
+            <code className="font-mono text-sm font-bold tracking-wider text-amber-900 dark:text-amber-200">{code || '—'}</code>
             {code && (
               <button
                 type="button"
                 onClick={() => copy('code', code)}
-                className="ml-1 rounded p-1 text-amber-700 hover:bg-amber-100"
+                className="ml-1 rounded p-1 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:bg-amber-950/40"
                 aria-label="Copy access code"
               >
                 {copied === 'code' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
@@ -138,14 +138,14 @@ function MerchantHiddenDealsContent() {
   if (isLoading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={cn(panelClass, 'border-rose-200 bg-rose-50 p-4 text-sm text-rose-700')}>
+      <div className={cn(panelClass, 'border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 p-4 text-sm text-rose-700 dark:text-rose-300')}>
         {(error as Error).message}
       </div>
     );
@@ -155,14 +155,14 @@ function MerchantHiddenDealsContent() {
     <div className="mx-auto max-w-screen-xl space-y-6 px-4 py-3 sm:px-1 sm:py-4">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Rewards</div>
-          <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-neutral-900">Hidden deals</h1>
-          <p className="mt-2 max-w-xl text-[13px] text-neutral-500 sm:text-sm">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Rewards</div>
+          <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-foreground">Hidden deals</h1>
+          <p className="mt-2 max-w-xl text-[13px] text-muted-foreground sm:text-sm">
             Deals locked behind an access code. Share the code or link with select customers — only people with the code can see and redeem.
           </p>
         </div>
         <Link to="/merchant/deals/create/hidden">
-          <Button size="md" className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800">
+          <Button size="md" className="rounded-full bg-foreground text-background hover:bg-foreground/85">
             <Plus className="mr-2 h-4 w-4" />
             Create hidden deal
           </Button>
@@ -171,14 +171,14 @@ function MerchantHiddenDealsContent() {
 
       {hiddenDeals.length === 0 ? (
         <div className={cn(panelClass, 'border-dashed py-16 text-center')}>
-          <KeyRound className="mx-auto mb-3 h-10 w-10 text-neutral-300" aria-hidden />
-          <h3 className="text-[1.4rem] font-semibold tracking-tight text-neutral-900">No hidden deals yet</h3>
-          <p className="mt-1 text-[13px] text-neutral-500 sm:text-sm">
+          <KeyRound className="mx-auto mb-3 h-10 w-10 text-muted-foreground" aria-hidden />
+          <h3 className="text-[1.4rem] font-semibold tracking-tight text-foreground">No hidden deals yet</h3>
+          <p className="mt-1 text-[13px] text-muted-foreground sm:text-sm">
             Create a deal and turn on "Hidden" to give it an access code. Hidden deals don't appear in normal discovery — share the code with the customers you want to reach.
           </p>
           <div className="mt-5 flex justify-center gap-2">
             <Link to="/merchant/deals/create/hidden">
-              <Button size="md" className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800">
+              <Button size="md" className="rounded-full bg-foreground text-background hover:bg-foreground/85">
                 <Plus className="mr-2 h-4 w-4" />
                 Create a hidden deal
               </Button>

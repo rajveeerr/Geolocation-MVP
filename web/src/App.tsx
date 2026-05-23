@@ -21,6 +21,7 @@ import { AuthProvider } from './context/AuthContext';
 import { RedirectProvider } from './context/RedirectContext';
 import { ModalProvider } from './context/ModalContext';
 import { CityProvider } from './context/CityContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { AllDealsPage } from './pages/AllDealsPage';
 
 const ProfilePage = React.lazy(() =>
@@ -150,6 +151,7 @@ const MenuCollectionsPage = React.lazy(() =>
   import('./components/merchant/menu-collections/MenuCollectionsPage').then((m) => ({ default: m.MenuCollectionsPage })),
 );
 const InventoryPage = React.lazy(() => import('./pages/merchant/InventoryPage'));
+const OperatingCostsPage = React.lazy(() => import('./pages/merchant/OperatingCostsPage'));
 const BlogListPage = React.lazy(() => import('./pages/merchant/BlogListPage'));
 const BlogPostFormPage = React.lazy(() => import('./pages/merchant/BlogPostFormPage'));
 const BlogCategoriesPage = React.lazy(() => import('./pages/merchant/BlogCategoriesPage'));
@@ -324,6 +326,7 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <ThemeProvider>
       <RedirectProvider>
         <AuthProvider>
           <CityProvider>
@@ -1065,6 +1068,18 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path={PATHS.MERCHANT_OPERATING_COSTS}
+                  element={
+                    <ProtectedRoute>
+                      <MerchantLayout>
+                        <Suspense fallback={<LoadingOverlay />}>
+                          <OperatingCostsPage />
+                        </Suspense>
+                      </MerchantLayout>
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* Blog routes */}
                 <Route
@@ -1412,6 +1427,7 @@ function App() {
           </CityProvider>
         </AuthProvider>
       </RedirectProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

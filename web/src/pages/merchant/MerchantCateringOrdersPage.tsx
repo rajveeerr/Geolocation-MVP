@@ -13,15 +13,15 @@ import {
 } from '@/hooks/useCatering';
 
 const panelClass =
-  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
+  'rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 const STATUS_TONE: Record<string, string> = {
-  PENDING: 'bg-amber-100 text-amber-800 ring-amber-600/20',
-  CONFIRMED: 'bg-sky-100 text-sky-700 ring-sky-600/20',
-  PREPARING: 'bg-violet-100 text-violet-700 ring-violet-600/20',
-  READY: 'bg-emerald-100 text-emerald-700 ring-emerald-600/20',
-  COMPLETED: 'bg-neutral-100 text-neutral-700 ring-neutral-400/20',
-  CANCELLED: 'bg-rose-100 text-rose-800 ring-rose-600/20',
+  PENDING: 'bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 ring-amber-600/20',
+  CONFIRMED: 'bg-sky-100 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-sky-600/20',
+  PREPARING: 'bg-violet-100 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300 ring-violet-600/20',
+  READY: 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 ring-emerald-600/20',
+  COMPLETED: 'bg-muted text-foreground ring-neutral-400/20',
+  CANCELLED: 'bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 ring-rose-600/20',
 };
 
 const formatMoney = (n: number) => `$${n.toFixed(2)}`;
@@ -39,7 +39,7 @@ function StatusBadge({ status }: { status: string }) {
     <span
       className={cn(
         'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset',
-        STATUS_TONE[status] ?? 'bg-neutral-100 text-neutral-700 ring-neutral-400/20',
+        STATUS_TONE[status] ?? 'bg-muted text-foreground ring-neutral-400/20',
       )}
     >
       {status}
@@ -69,20 +69,20 @@ function OrderRow({ order }: { order: MerchantCateringOrder }) {
       >
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono text-xs font-semibold text-neutral-500">{order.orderNumber}</span>
+            <span className="font-mono text-xs font-semibold text-muted-foreground">{order.orderNumber}</span>
             <StatusBadge status={order.status} />
-            <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-600">
+            <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
               {fulfillmentType === 'DELIVERY' ? 'Delivery' : 'Pickup'}
             </span>
           </div>
 
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
-            <span className="font-semibold text-neutral-900">{customerName}</span>
-            <span className="text-neutral-500">·</span>
-            <span className="text-neutral-700">{itemSummary}</span>
+            <span className="font-semibold text-foreground">{customerName}</span>
+            <span className="text-muted-foreground">·</span>
+            <span className="text-foreground">{itemSummary}</span>
           </div>
 
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-500">
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <Calendar className="h-3 w-3" /> Placed {formatDate(order.createdAt)}
             </span>
@@ -105,7 +105,7 @@ function OrderRow({ order }: { order: MerchantCateringOrder }) {
         </div>
 
         <div className="flex shrink-0 flex-col items-end gap-2">
-          <span className="text-base font-bold text-neutral-900">{formatMoney(order.finalAmount)}</span>
+          <span className="text-base font-bold text-foreground">{formatMoney(order.finalAmount)}</span>
           <span className="inline-flex items-center gap-1 text-xs font-medium text-brand-primary-600">
             View
             <ArrowRight className="h-3 w-3" />
@@ -136,13 +136,13 @@ function MerchantCateringOrdersInner() {
   return (
     <div className="mx-auto max-w-screen-xl space-y-6 px-4 py-3 sm:px-1 sm:py-4">
       <div>
-        <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Catering</div>
-        <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-neutral-900">Catering orders</h1>
-        <p className="mt-2 text-[13px] text-neutral-500 sm:text-sm">{subtitle}</p>
+        <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Catering</div>
+        <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-foreground">Catering orders</h1>
+        <p className="mt-2 text-[13px] text-muted-foreground sm:text-sm">{subtitle}</p>
       </div>
 
       <div className={cn(panelClass, 'flex flex-wrap items-center gap-2 overflow-x-auto p-3')}>
-        <Filter className="ml-1 mr-1 h-4 w-4 shrink-0 text-neutral-400" aria-hidden />
+        <Filter className="ml-1 mr-1 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
         {(['ALL', ...CATERING_STATUSES] as Array<CateringOrderStatus | 'ALL'>).map((s) => {
           const count = counts[s] ?? 0;
           if (s !== 'ALL' && count === 0) return null;
@@ -156,14 +156,14 @@ function MerchantCateringOrdersInner() {
               }}
               className={cn(
                 'whitespace-nowrap rounded-full px-3 py-1.5 text-[13px] font-medium transition',
-                statusFilter === s ? 'bg-neutral-950 text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200',
+                statusFilter === s ? 'bg-foreground text-background' : 'bg-muted text-muted-foreground hover:bg-accent',
               )}
             >
               {s}
               <span
                 className={cn(
                   'ml-1.5 rounded-full px-1.5 py-0.5 text-xs',
-                  statusFilter === s ? 'bg-white/20' : 'bg-neutral-200',
+                  statusFilter === s ? 'bg-card/20 dark:bg-card' : 'bg-accent',
                 )}
               >
                 {count}
@@ -175,25 +175,25 @@ function MerchantCateringOrdersInner() {
 
       {isLoading ? (
         <div className="flex min-h-[40vh] items-center justify-center">
-          <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       ) : error ? (
-        <div className={cn(panelClass, 'border-rose-200 bg-rose-50 p-4 text-sm text-rose-700')}>
+        <div className={cn(panelClass, 'border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 p-4 text-sm text-rose-700 dark:text-rose-300')}>
           {(error as Error).message}
         </div>
       ) : orders.length === 0 ? (
         <div className={cn(panelClass, 'border-dashed py-16 text-center')}>
-          <ShoppingBag className="mx-auto mb-3 h-10 w-10 text-neutral-300" aria-hidden />
-          <h3 className="text-[1.4rem] font-semibold tracking-tight text-neutral-900">
+          <ShoppingBag className="mx-auto mb-3 h-10 w-10 text-muted-foreground" aria-hidden />
+          <h3 className="text-[1.4rem] font-semibold tracking-tight text-foreground">
             {statusFilter === 'ALL' ? 'No catering orders yet' : `No ${statusFilter.toLowerCase()} orders`}
           </h3>
-          <p className="mt-1 text-[13px] text-neutral-500 sm:text-sm">
+          <p className="mt-1 text-[13px] text-muted-foreground sm:text-sm">
             {statusFilter === 'ALL'
               ? 'When customers place a catering request, it lands here.'
               : 'Try a different status filter.'}
           </p>
           {statusFilter === 'ALL' && (
-            <p className="mt-4 text-xs text-neutral-500">
+            <p className="mt-4 text-xs text-muted-foreground">
               Don't have a catering menu yet?{' '}
               <Link to={PATHS.MERCHANT_CATERING} className="font-medium text-brand-primary-600 hover:underline">
                 Set one up
@@ -216,19 +216,19 @@ function MerchantCateringOrdersInner() {
                 type="button"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={pagination.page <= 1}
-                className="inline-flex items-center gap-1 rounded-full border border-neutral-200 bg-white px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-40"
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1.5 font-medium text-foreground hover:bg-muted disabled:opacity-40"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
                 Prev
               </button>
-              <span className="text-xs text-neutral-500">
+              <span className="text-xs text-muted-foreground">
                 Page {pagination.page} of {pagination.totalPages}
               </span>
               <button
                 type="button"
                 onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
                 disabled={pagination.page >= pagination.totalPages}
-                className="inline-flex items-center gap-1 rounded-full border border-neutral-200 bg-white px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-40"
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1.5 font-medium text-foreground hover:bg-muted disabled:opacity-40"
               >
                 Next
                 <ChevronRight className="h-3.5 w-3.5" />

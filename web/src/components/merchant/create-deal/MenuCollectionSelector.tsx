@@ -87,10 +87,10 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
 
   if (isLoading) {
     return (
-      <div className="rounded-lg border border-neutral-200 bg-white p-6">
+      <div className="rounded-lg border border-border bg-card p-6">
         <div className="flex items-center justify-center gap-3">
           <Loader2 className="h-5 w-5 animate-spin text-brand-primary-600" />
-          <span className="text-sm text-neutral-600">Loading collections...</span>
+          <span className="text-sm text-muted-foreground">Loading collections...</span>
         </div>
       </div>
     );
@@ -98,8 +98,8 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
 
   if (error) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-        <p className="text-sm text-red-800">
+      <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-4">
+        <p className="text-sm text-red-800 dark:text-red-300">
           Failed to load collections. Please try again.
         </p>
       </div>
@@ -110,8 +110,8 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <label className="text-sm font-semibold text-neutral-900">Package</label>
-          <p className="text-xs text-neutral-600 mt-0.5">
+          <label className="text-sm font-semibold text-foreground">Package</label>
+          <p className="text-xs text-muted-foreground mt-0.5">
             Select a saved package to add all its items to this deal
           </p>
         </div>
@@ -155,12 +155,12 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
                   {selectedCollectionServes ? <span>&bull; {selectedCollectionServes}</span> : null}
                   <span>&bull; Suggested ${selectedCollectionSuggestedTotal.toFixed(2)}</span>
                   {selectedCollection.packagePrice != null ? (
-                    <span className="rounded-full bg-white/80 px-2 py-0.5 font-semibold text-brand-primary-800">
+                    <span className="rounded-full bg-card/80 dark:bg-card px-2 py-0.5 font-semibold text-brand-primary-800">
                       Package ${Number(selectedCollection.packagePrice).toFixed(2)}
                     </span>
                   ) : null}
                   {selectedCollection.isActive && (
-                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-green-700 font-medium">
+                    <span className="rounded-full bg-green-100 dark:bg-green-950/40 px-2 py-0.5 text-green-700 dark:text-green-300 font-medium">
                       Active
                     </span>
                   )}
@@ -187,25 +187,25 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
               'w-full rounded-lg border-2 p-4 text-left transition-all',
               isOpen
                 ? 'border-brand-primary-500 bg-brand-primary-50 shadow-sm'
-                : 'border-neutral-200 bg-white hover:border-neutral-300'
+                : 'border-border bg-card hover:border-border'
             )}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className={cn(
                   'rounded-lg p-2',
-                  isOpen ? 'bg-brand-primary-100' : 'bg-neutral-100'
+                  isOpen ? 'bg-brand-primary-100' : 'bg-muted'
                 )}>
                   <Package className={cn(
                     'h-5 w-5',
-                    isOpen ? 'text-brand-primary-600' : 'text-neutral-600'
+                    isOpen ? 'text-brand-primary-600' : 'text-muted-foreground'
                   )} />
                 </div>
                 <div>
-                  <div className="font-medium text-neutral-900">
+                  <div className="font-medium text-foreground">
                     {collections.length === 0 ? 'No packages available' : 'Select a package'}
                   </div>
-                  <div className="text-xs text-neutral-600 mt-0.5">
+                  <div className="text-xs text-muted-foreground mt-0.5">
                     {collections.length === 0 
                       ? 'Create a package first to use it here'
                       : `${collections.length} package${collections.length !== 1 ? 's' : ''} available`
@@ -218,7 +218,7 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
                   'transition-transform',
                   isOpen && 'rotate-180'
                 )}>
-                  <ChevronDown className="h-5 w-5 text-neutral-500" />
+                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
                 </div>
               )}
             </div>
@@ -230,12 +230,12 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="absolute z-10 mt-2 w-full rounded-lg border border-neutral-200 bg-white shadow-lg"
+                className="absolute z-10 mt-2 w-full rounded-lg border border-border bg-card shadow-lg"
               >
                 {/* Search */}
-                <div className="border-b border-neutral-200 p-3">
+                <div className="border-b border-border p-3">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       placeholder="Search packages..."
                       value={searchTerm}
@@ -250,8 +250,8 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
                 <div className="max-h-64 overflow-y-auto">
                   {filteredCollections.length === 0 ? (
                     <div className="p-6 text-center">
-                      <FolderOpen className="mx-auto h-8 w-8 text-neutral-400 mb-2" />
-                      <p className="text-sm text-neutral-600">
+                      <FolderOpen className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                      <p className="text-sm text-muted-foreground">
                         {searchTerm ? 'No packages match your search' : 'No packages found'}
                       </p>
                     </div>
@@ -267,49 +267,49 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
                           key={collection.id}
                           onClick={() => handleSelectCollection(collection.id)}
                           className={cn(
-                            'w-full rounded-lg p-3 text-left transition-all hover:bg-neutral-50',
+                            'w-full rounded-lg p-3 text-left transition-all hover:bg-muted',
                             selectedCollectionId === collection.id && 'bg-brand-primary-50'
                           )}
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex items-start gap-3 flex-1">
-                              <div className="h-14 w-14 overflow-hidden rounded-lg bg-neutral-100">
+                              <div className="h-14 w-14 overflow-hidden rounded-lg bg-muted">
                                 {coverImage ? (
                                   <img src={coverImage} alt={collection.name} className="h-full w-full object-cover" />
                                 ) : (
                                   <div className={cn(
                                     'flex h-full w-full items-center justify-center',
-                                    selectedCollectionId === collection.id ? 'bg-brand-primary-100' : 'bg-neutral-100'
+                                    selectedCollectionId === collection.id ? 'bg-brand-primary-100' : 'bg-muted'
                                   )}>
                                     <Package className={cn(
                                       'h-4 w-4',
                                       selectedCollectionId === collection.id
                                         ? 'text-brand-primary-600'
-                                        : 'text-neutral-600'
+                                        : 'text-muted-foreground'
                                     )} />
                                   </div>
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="font-medium text-neutral-900 truncate">
+                                <div className="font-medium text-foreground truncate">
                                   {collection.name}
                                 </div>
                                 {collection.description && (
-                                  <p className="text-xs text-neutral-600 mt-0.5 line-clamp-1">
+                                  <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
                                     {collection.description}
                                   </p>
                                 )}
-                                <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-neutral-500">
+                                <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                                   <span>{getCollectionItemCount(collection)} items</span>
                                   {servesLabel ? <span>&bull; {servesLabel}</span> : null}
                                   <span>&bull; Suggested ${suggestedTotal.toFixed(2)}</span>
                                   {collection.packagePrice != null ? (
-                                    <span className="rounded-full bg-neutral-100 px-2 py-0.5 font-medium text-neutral-700">
+                                    <span className="rounded-full bg-muted px-2 py-0.5 font-medium text-foreground">
                                       ${Number(collection.packagePrice).toFixed(2)}
                                     </span>
                                   ) : null}
                                   {collection.isActive && (
-                                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-green-700 font-medium">
+                                    <span className="rounded-full bg-green-100 dark:bg-green-950/40 px-2 py-0.5 text-green-700 dark:text-green-300 font-medium">
                                       Active
                                     </span>
                                   )}
@@ -318,7 +318,7 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
                             </div>
                             {selectedCollectionId === collection.id && (
                               <div className="ml-2 rounded-full bg-brand-primary-500 p-1">
-                                <div className="h-2 w-2 rounded-full bg-white" />
+                                <div className="h-2 w-2 rounded-full bg-card" />
                               </div>
                             )}
                           </div>
@@ -332,7 +332,7 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
 
                 {/* Footer */}
                 {collections.length > 0 && (
-                  <div className="border-t border-neutral-200 p-3 bg-neutral-50">
+                  <div className="border-t border-border p-3 bg-muted">
                     <Link
                       to={PATHS.MERCHANT_MENU_COLLECTIONS || '/merchant/menu/collections'}
                       className="flex items-center justify-center gap-2 text-sm font-medium text-brand-primary-600 hover:text-brand-primary-700"
@@ -350,10 +350,10 @@ export const MenuCollectionSelector = ({ onCollectionSelect }: MenuCollectionSel
 
       {/* Empty State */}
       {!isOpen && collections.length === 0 && (
-        <div className="rounded-lg border-2 border-dashed border-neutral-300 bg-neutral-50 p-6 text-center">
-          <Package className="mx-auto h-10 w-10 text-neutral-400 mb-3" />
-          <h4 className="font-semibold text-neutral-900 mb-1">No Packages Yet</h4>
-          <p className="text-sm text-neutral-600 mb-4">
+        <div className="rounded-lg border-2 border-dashed border-border bg-muted p-6 text-center">
+          <Package className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
+          <h4 className="font-semibold text-foreground mb-1">No Packages Yet</h4>
+          <p className="text-sm text-muted-foreground mb-4">
             Create a package to quickly add multiple items to your deals
           </p>
           <Link to={PATHS.MERCHANT_MENU_COLLECTIONS || '/merchant/menu/collections'}>

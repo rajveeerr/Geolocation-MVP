@@ -38,11 +38,11 @@ function DealTypeCard({
       whileHover={{ y: -4 }}
       whileTap={{ scale: 0.985 }}
       className={cn(
-        'group relative overflow-hidden rounded-[1.45rem] border bg-white/95 p-5 text-left text-neutral-900 shadow-[0_8px_22px_rgba(15,23,42,0.045)] transition-all duration-300',
+        'group relative overflow-hidden rounded-[1.45rem] border bg-card/95 dark:bg-card p-5 text-left text-foreground shadow-[0_8px_22px_rgba(15,23,42,0.045)] transition-all duration-300',
         'min-h-[170px]',
         isSelected
           ? 'border-[hsl(var(--brand-primary))] ring-2 ring-[hsl(var(--brand-primary))]/12'
-          : 'border-neutral-200/80 hover:border-neutral-300 hover:shadow-[0_10px_26px_rgba(15,23,42,0.07)]',
+          : 'border-border/80 hover:border-border hover:shadow-[0_10px_26px_rgba(15,23,42,0.07)]',
       )}
     >
       <div className="relative flex h-full flex-col">
@@ -50,29 +50,29 @@ function DealTypeCard({
           <div className={cn('flex h-10 w-10 items-center justify-center rounded-xl', iconWrap)}>
             <Icon className="h-4 w-4" />
           </div>
-          <div className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-500">
+          <div className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             {eyebrow}
           </div>
         </div>
 
         <div className="mt-4">
-          <h3 className="text-[15px] font-semibold tracking-tight text-neutral-900">{title}</h3>
-          <p className="mt-1.5 line-clamp-2 text-[13px] leading-5 text-neutral-600">{summary}</p>
+          <h3 className="text-[15px] font-semibold tracking-tight text-foreground">{title}</h3>
+          <p className="mt-1.5 line-clamp-2 text-[13px] leading-5 text-muted-foreground">{summary}</p>
         </div>
 
         <div className="mt-auto flex items-end justify-between gap-3 pt-4">
           <div>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Best For
             </div>
-            <div className="mt-0.5 text-[13px] font-medium text-neutral-800">{bestFor}</div>
+            <div className="mt-0.5 text-[13px] font-medium text-foreground">{bestFor}</div>
           </div>
           <div
             className={cn(
               'flex h-9 w-9 items-center justify-center rounded-full transition-all duration-300',
               isSelected
                 ? 'bg-[hsl(var(--brand-primary))] text-white'
-                : 'bg-neutral-100 text-neutral-500 group-hover:bg-neutral-900 group-hover:text-white',
+                : 'bg-muted text-muted-foreground group-hover:bg-foreground group-hover:text-background',
             )}
           >
             <ArrowRight className="h-3.5 w-3.5" />
@@ -157,17 +157,17 @@ export const DealTypeStep = ({ onNext }: { onNext: () => void }) => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.3 }}
-          className="rounded-[1.45rem] border border-neutral-200/80 bg-white/95 p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)]"
+          className="rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)]"
         >
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[hsl(var(--brand-50))] text-[hsl(var(--brand-primary))]">
               <Gift className="h-4 w-4" />
             </div>
             <div>
-              <div className="text-[13px] font-semibold text-neutral-900">
+              <div className="text-[13px] font-semibold text-foreground">
                 {selectedType ? dealCreationTypes.find((item) => item.value === selectedType)?.title : 'Choose a deal type'}
               </div>
-              <p className="mt-0.5 text-[12px] leading-5 text-neutral-600">
+              <p className="mt-0.5 text-[12px] leading-5 text-muted-foreground">
                 {selectedType
                   ? dealCreationTypes.find((item) => item.value === selectedType)?.detailDescription
                   : 'Select a format above to preview the strategy, then continue with a focused creation flow.'}

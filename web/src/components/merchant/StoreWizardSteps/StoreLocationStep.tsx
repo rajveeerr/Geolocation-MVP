@@ -197,8 +197,8 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary-100">
           <MapPin className="h-8 w-8 text-brand-primary-600" />
         </div>
-        <h2 className="text-2xl font-bold text-neutral-900">Location & Address</h2>
-        <p className="mt-2 text-neutral-600">
+        <h2 className="text-2xl font-bold text-foreground">Location & Address</h2>
+        <p className="mt-2 text-muted-foreground">
           Set your store's location and verify the address for customers to find you
         </p>
       </div>
@@ -206,16 +206,16 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
       {/* Address Input */}
       <div className="space-y-4">
         <div>
-          <Label htmlFor="address" className="text-lg font-semibold text-neutral-800">
+          <Label htmlFor="address" className="text-lg font-semibold text-foreground">
             Store Address *
           </Label>
-          <p className="mb-4 text-neutral-500">
+          <p className="mb-4 text-muted-foreground">
             Enter the exact address where customers can find your store
           </p>
         </div>
         
         <div className="w-full max-w-md mx-auto">
-          <div className="flex items-center bg-white rounded-lg shadow-lg border border-neutral-200 overflow-hidden">
+          <div className="flex items-center bg-card rounded-lg shadow-lg border border-border overflow-hidden">
             <Input
               id="address"
               placeholder="Enter your store address"
@@ -228,7 +228,7 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
                 onClick={() => validateAddress(data.address)}
                 disabled={!data.address.trim() || isValidating}
                 aria-label="Validate address"
-                className="flex items-center justify-center h-10 w-10 rounded-md text-neutral-600 hover:bg-neutral-100 disabled:opacity-50"
+                className="flex items-center justify-center h-10 w-10 rounded-md text-muted-foreground hover:bg-muted disabled:opacity-50"
               >
                 {isValidating ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -240,7 +240,7 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
               <button
                 onClick={() => setIsLocationSearchOpen(true)}
                 aria-label="Search location"
-                className="flex items-center justify-center h-10 w-10 rounded-md text-neutral-600 hover:bg-neutral-100"
+                className="flex items-center justify-center h-10 w-10 rounded-md text-muted-foreground hover:bg-muted"
               >
                 <MapPin className="h-5 w-5" />
               </button>
@@ -250,18 +250,18 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
         
         {/* Address Suggestions */}
         {showSuggestions && addressSuggestions.length > 0 && (
-          <div className="mt-2 rounded-lg border border-neutral-200 bg-white shadow-lg">
+          <div className="mt-2 rounded-lg border border-border bg-card shadow-lg">
             {addressSuggestions.map((suggestion, index) => (
               <button
                 key={index}
                 onClick={() => selectAddress(suggestion)}
-                className="w-full p-3 text-left hover:bg-neutral-50 border-b border-neutral-100 last:border-b-0"
+                className="w-full p-3 text-left hover:bg-muted border-b border-border last:border-b-0"
               >
                 <div className="flex items-center gap-3">
-                  <MapPin className="h-4 w-4 text-neutral-500" />
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
                   <div>
-                    <p className="font-medium text-neutral-900">{suggestion.formatted}</p>
-                    <p className="text-sm text-neutral-500">
+                    <p className="font-medium text-foreground">{suggestion.formatted}</p>
+                    <p className="text-sm text-muted-foreground">
                       {suggestion.latitude.toFixed(4)}, {suggestion.longitude.toFixed(4)}
                     </p>
                   </div>
@@ -282,10 +282,10 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
       {/* City Selection */}
       <div className="space-y-4">
         <div>
-          <Label htmlFor="city" className="text-lg font-semibold text-neutral-800">
+          <Label htmlFor="city" className="text-lg font-semibold text-foreground">
             City *
           </Label>
-          <p className="mb-4 text-neutral-500">
+          <p className="mb-4 text-muted-foreground">
             Select the city where your store is located
           </p>
         </div>
@@ -306,13 +306,13 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
               onFocus={() => setShowCityDropdown(true)}
               className="h-12 pl-4 pr-10 text-base"
             />
-            <ChevronDown className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-500" />
+            <ChevronDown className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           </div>
           
           {/* Loading State */}
           {cities.length === 0 && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white rounded-md border border-neutral-300">
-              <div className="flex items-center gap-2 text-sm text-neutral-500">
+            <div className="absolute inset-0 flex items-center justify-center bg-card rounded-md border border-border">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Loading cities...
               </div>
@@ -321,22 +321,22 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
           
           {/* City Dropdown */}
           {showCityDropdown && cities.length > 0 && (
-            <div className="absolute z-10 mt-1 w-full rounded-lg border border-neutral-200 bg-white shadow-lg max-h-60 overflow-y-auto">
+            <div className="absolute z-10 mt-1 w-full rounded-lg border border-border bg-card shadow-lg max-h-60 overflow-y-auto">
               {filteredCities.length > 0 ? (
                 filteredCities.map((city) => (
                   <button
                     key={city.id}
                     onClick={() => handleCityChange(city.id)}
                     className={cn(
-                      'w-full p-3 text-left hover:bg-neutral-50 border-b border-neutral-100 last:border-b-0 transition-colors',
+                      'w-full p-3 text-left hover:bg-muted border-b border-border last:border-b-0 transition-colors',
                       data.cityId === city.id && 'bg-brand-primary-50 text-brand-primary-700'
                     )}
                   >
                     <div className="flex items-center gap-3">
-                      <MapPin className="h-4 w-4 text-neutral-500" />
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
                       <div>
-                        <p className="font-medium text-neutral-900">{city.name}</p>
-                        <p className="text-sm text-neutral-500">{city.state}</p>
+                        <p className="font-medium text-foreground">{city.name}</p>
+                        <p className="text-sm text-muted-foreground">{city.state}</p>
                       </div>
                       {data.cityId === city.id && (
                         <CheckCircle className="h-4 w-4 text-brand-primary-600 ml-auto" />
@@ -345,7 +345,7 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
                   </button>
                 ))
               ) : (
-                <div className="p-3 text-center text-sm text-neutral-500">
+                <div className="p-3 text-center text-sm text-muted-foreground">
                   No cities found matching "{citySearchTerm}"
                 </div>
               )}
@@ -353,7 +353,7 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
           )}
         </div>
         
-        <div className="flex items-center justify-between text-xs text-neutral-500">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>
             {cities.length > 0 
               ? `${cities.length} cities available` 
@@ -371,10 +371,10 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
       {/* Map */}
       <div className="space-y-4">
         <div>
-          <Label className="text-lg font-semibold text-neutral-800">
+          <Label className="text-lg font-semibold text-foreground">
             Location Map
           </Label>
-          <p className="mb-4 text-neutral-500">
+          <p className="mb-4 text-muted-foreground">
             Drag the marker to set your exact store location
           </p>
         </div>
@@ -399,10 +399,10 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
         
         {/* Location Status */}
         {data.latitude && data.longitude && (
-          <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+          <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50 rounded-lg">
             <CheckCircle className="h-4 w-4 text-green-600" />
             <div className="text-sm">
-              <p className="font-medium text-green-800">Location Set</p>
+              <p className="font-medium text-green-800 dark:text-green-300">Location Set</p>
               <p className="text-green-600">
                 {data.latitude.toFixed(6)}, {data.longitude.toFixed(6)}
               </p>
@@ -414,16 +414,16 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
       {/* Manual Coordinates */}
       <div className="space-y-4">
         <div>
-          <Label className="text-lg font-semibold text-neutral-800">
+          <Label className="text-lg font-semibold text-foreground">
             Manual Coordinates (Optional)
           </Label>
-          <p className="mb-4 text-neutral-500">
+          <p className="mb-4 text-muted-foreground">
             You can manually enter coordinates or use the map above to set your location
           </p>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="latitude" className="text-sm font-medium text-neutral-600">
+            <Label htmlFor="latitude" className="text-sm font-medium text-muted-foreground">
               Latitude
             </Label>
             <Input
@@ -437,7 +437,7 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="longitude" className="text-sm font-medium text-neutral-600">
+            <Label htmlFor="longitude" className="text-sm font-medium text-muted-foreground">
               Longitude
             </Label>
             <Input
@@ -454,19 +454,19 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
       </div>
 
       {/* Validation Summary */}
-      <div className="rounded-lg border border-neutral-200 bg-white p-6">
-        <h4 className="text-lg font-semibold text-neutral-800 mb-4 flex items-center gap-2">
+      <div className="rounded-lg border border-border bg-card p-6">
+        <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
           <MapPin className="h-5 w-5" />
           Location Status
         </h4>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-neutral-600">Address</span>
+            <span className="text-sm text-muted-foreground">Address</span>
             <div className="flex items-center gap-2">
               {data.address ? (
                 <>
                   <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span className="text-sm text-green-700 font-medium">Provided</span>
+                  <span className="text-sm text-green-700 dark:text-green-300 font-medium">Provided</span>
                 </>
               ) : (
                 <>
@@ -477,12 +477,12 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-neutral-600">City</span>
+            <span className="text-sm text-muted-foreground">City</span>
             <div className="flex items-center gap-2">
               {data.cityId ? (
                 <>
                   <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span className="text-sm text-green-700 font-medium">
+                  <span className="text-sm text-green-700 dark:text-green-300 font-medium">
                     {selectedCity ? `${selectedCity.name}, ${selectedCity.state}` : 'Selected'}
                   </span>
                 </>
@@ -495,12 +495,12 @@ export const StoreLocationStep = ({ data, onUpdate, cities }: StoreLocationStepP
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-neutral-600">Coordinates</span>
+            <span className="text-sm text-muted-foreground">Coordinates</span>
             <div className="flex items-center gap-2">
               {data.latitude && data.longitude ? (
                 <>
                   <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span className="text-sm text-green-700 font-medium">Set</span>
+                  <span className="text-sm text-green-700 dark:text-green-300 font-medium">Set</span>
                 </>
               ) : (
                 <>

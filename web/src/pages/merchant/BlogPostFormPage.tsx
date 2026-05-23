@@ -140,7 +140,7 @@ const BlogPostFormPage: React.FC = () => {
   if (isEditing && loadingPost) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -152,7 +152,7 @@ const BlogPostFormPage: React.FC = () => {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Blog
         </Button>
-        <h1 className="text-3xl font-bold text-neutral-900">
+        <h1 className="text-3xl font-bold text-foreground">
           {isEditing ? 'Edit Post' : 'New Blog Post'}
         </h1>
       </div>
@@ -160,21 +160,21 @@ const BlogPostFormPage: React.FC = () => {
       <div className="space-y-6">
         {/* AI Assistant */}
         {aiEnabled && (
-          <div className="rounded-2xl border border-[#f0ddd0] bg-[linear-gradient(135deg,#fff8f2_0%,#fff1e5_100%)] p-5">
+          <div className="rounded-2xl border border-ai-border bg-ai-surface p-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="rounded-full bg-white/80 p-2 text-[#bf6545]">
+                <div className="rounded-full bg-card/80 dark:bg-card p-2 text-ai-accent">
                   <Sparkles className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-[#203247]">AI Writing Assistant</p>
-                  <p className="text-xs text-[#607084]">Generate a full draft from a topic</p>
+                  <p className="text-sm font-bold text-ai-text">AI Writing Assistant</p>
+                  <p className="text-xs text-ai-text-muted">Generate a full draft from a topic</p>
                 </div>
               </div>
               <Button
                 size="sm"
                 variant="secondary"
-                className="border-[#ead6c9] bg-white/80 text-[#203247] hover:bg-white"
+                className="border-ai-border-strong bg-card/80 dark:bg-card text-ai-text hover:bg-card"
                 onClick={() => setShowAi(!showAi)}
               >
                 {showAi ? 'Hide' : 'Write with AI'}
@@ -184,7 +184,7 @@ const BlogPostFormPage: React.FC = () => {
             {showAi && (
               <div className="mt-4 space-y-3">
                 <div className="space-y-1">
-                  <Label className="text-xs text-[#607084]">Topic *</Label>
+                  <Label className="text-xs text-ai-text-muted">Topic *</Label>
                   <Input
                     placeholder="e.g., 5 tips for choosing the perfect wine pairing"
                     value={aiTopic}
@@ -192,7 +192,7 @@ const BlogPostFormPage: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs text-[#607084]">Tone (optional)</Label>
+                  <Label className="text-xs text-ai-text-muted">Tone (optional)</Label>
                   <Input
                     placeholder="e.g., casual, professional, humorous"
                     value={aiTone}
@@ -217,12 +217,12 @@ const BlogPostFormPage: React.FC = () => {
         )}
 
         {/* Title */}
-        <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
           <div className="mb-6 flex items-center gap-3">
             <div className="rounded-lg bg-brand/10 p-2">
               <FileText className="h-5 w-5 text-brand" />
             </div>
-            <h2 className="text-lg font-semibold text-neutral-800">Post Details</h2>
+            <h2 className="text-lg font-semibold text-foreground">Post Details</h2>
           </div>
 
           <div className="space-y-5">
@@ -247,7 +247,7 @@ const BlogPostFormPage: React.FC = () => {
                 onChange={(e) => setExcerpt(e.target.value)}
                 rows={2}
                 maxLength={500}
-                className="flex w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm placeholder:text-neutral-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-500 focus-visible:ring-offset-2"
+                className="flex w-full rounded-md border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-500 focus-visible:ring-offset-2"
               />
             </div>
 
@@ -280,8 +280,8 @@ const BlogPostFormPage: React.FC = () => {
         </div>
 
         {/* Category & Tags */}
-        <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold text-neutral-800">Organization</h2>
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+          <h2 className="mb-4 text-lg font-semibold text-foreground">Organization</h2>
 
           <div className="space-y-5">
             <div className="space-y-2">
@@ -290,7 +290,7 @@ const BlogPostFormPage: React.FC = () => {
                 <select
                   value={categoryId ?? ''}
                   onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : null)}
-                  className="flex-1 rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-500"
+                  className="flex-1 rounded-md border border-border bg-card px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-500"
                 >
                   <option value="">No category</option>
                   {(categories ?? []).map((cat) => (
@@ -342,13 +342,13 @@ const BlogPostFormPage: React.FC = () => {
                   {tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center gap-1 rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700"
+                      className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground"
                     >
                       {tag}
                       <button
                         type="button"
                         onClick={() => removeTag(tag)}
-                        className="rounded-full p-0.5 hover:bg-neutral-200"
+                        className="rounded-full p-0.5 hover:bg-accent"
                       >
                         <X className="h-3 w-3" />
                       </button>

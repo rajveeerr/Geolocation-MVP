@@ -55,7 +55,7 @@ export const MenuItemPicker = ({
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 py-3 text-sm text-neutral-500">
+      <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-3 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" />
         Loading menu items…
       </div>
@@ -64,7 +64,7 @@ export const MenuItemPicker = ({
 
   if (error) {
     return (
-      <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-3 text-sm text-rose-700">
+      <div className="rounded-lg border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 px-3 py-3 text-sm text-rose-700 dark:text-rose-300">
         Couldn’t load menu items. Try refreshing.
       </div>
     );
@@ -72,27 +72,27 @@ export const MenuItemPicker = ({
 
   if (items.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-neutral-300 bg-neutral-50 px-3 py-4 text-center text-sm text-neutral-500">
+      <div className="rounded-lg border border-dashed border-border bg-muted px-3 py-4 text-center text-sm text-muted-foreground">
         {emptyHint ?? 'You haven’t added any menu items yet. Add items from the Menu section to attach them to this deal.'}
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg border border-neutral-200 bg-white">
-      <div className="relative border-b border-neutral-200 px-3 py-2">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+    <div className="rounded-lg border border-border bg-card">
+      <div className="relative border-b border-border px-3 py-2">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search menu items…"
-          className="h-8 w-full bg-transparent pl-7 text-sm outline-none placeholder:text-neutral-400"
+          className="h-8 w-full bg-transparent pl-7 text-sm outline-none placeholder:text-muted-foreground"
         />
       </div>
       <div className={cn('overflow-y-auto p-1', maxHeightClass)}>
         {filtered.length === 0 ? (
-          <div className="px-3 py-4 text-center text-xs text-neutral-500">
+          <div className="px-3 py-4 text-center text-xs text-muted-foreground">
             No items match “{query}”.
           </div>
         ) : (
@@ -107,9 +107,9 @@ export const MenuItemPicker = ({
                   'flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left transition',
                   isSelected
                     ? mode === 'single'
-                      ? 'bg-emerald-50'
-                      : 'bg-orange-50'
-                    : 'hover:bg-neutral-50',
+                      ? 'bg-emerald-50 dark:bg-emerald-950/30'
+                      : 'bg-orange-50 dark:bg-orange-950/30'
+                    : 'hover:bg-muted',
                 )}
               >
                 {mode === 'single' ? (
@@ -118,7 +118,7 @@ export const MenuItemPicker = ({
                       'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border',
                       isSelected
                         ? 'border-emerald-500 bg-emerald-500 text-white'
-                        : 'border-neutral-300 bg-white',
+                        : 'border-border bg-card',
                     )}
                   >
                     {isSelected ? <CircleDot className="h-3.5 w-3.5" /> : null}
@@ -129,26 +129,26 @@ export const MenuItemPicker = ({
                       'flex h-5 w-5 shrink-0 items-center justify-center rounded border',
                       isSelected
                         ? 'border-orange-500 bg-orange-500 text-white'
-                        : 'border-neutral-300 bg-white',
+                        : 'border-border bg-card',
                     )}
                   >
                     {isSelected ? <Check className="h-3.5 w-3.5" /> : null}
                   </span>
                 )}
                 {item.imageUrl ? (
-                  <span className="h-8 w-8 shrink-0 overflow-hidden rounded-md bg-neutral-100">
+                  <span className="h-8 w-8 shrink-0 overflow-hidden rounded-md bg-muted">
                     <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
                   </span>
                 ) : null}
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-sm font-medium text-neutral-900">
+                  <span className="truncate text-sm font-medium text-foreground">
                     {item.name}
                   </span>
-                  <span className="truncate text-[11px] text-neutral-500">
+                  <span className="truncate text-[11px] text-muted-foreground">
                     {item.category || 'Uncategorized'}
                   </span>
                 </span>
-                <span className="shrink-0 text-sm font-semibold text-neutral-900">
+                <span className="shrink-0 text-sm font-semibold text-foreground">
                   ${item.price.toFixed(2)}
                 </span>
               </button>
@@ -156,7 +156,7 @@ export const MenuItemPicker = ({
           })
         )}
       </div>
-      <div className="border-t border-neutral-200 px-3 py-2 text-[11px] text-neutral-500">
+      <div className="border-t border-border px-3 py-2 text-[11px] text-muted-foreground">
         {mode === 'single'
           ? value.length === 0
             ? 'Pick the item the discount will apply to.'

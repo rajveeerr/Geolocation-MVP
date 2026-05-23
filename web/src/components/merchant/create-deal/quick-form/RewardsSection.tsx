@@ -68,7 +68,7 @@ export const RewardsSection = ({ bountyReadOnly = false }: RewardsSectionProps) 
       <FieldLabel label="Rewards" hint="Optional perks for guests" />
 
       {/* Tab strip */}
-      <div className="mt-3 flex flex-wrap gap-1.5 rounded-2xl bg-neutral-100 p-1">
+      <div className="mt-3 flex flex-wrap gap-1.5 rounded-2xl bg-muted p-1">
         {TABS.map((tab) => {
           const isActive = active === tab.key;
           const Icon = tab.icon;
@@ -81,14 +81,14 @@ export const RewardsSection = ({ bountyReadOnly = false }: RewardsSectionProps) 
               className={cn(
                 'inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-[12px] font-semibold transition',
                 isActive
-                  ? 'bg-white text-neutral-900 shadow-[0_4px_12px_rgba(15,23,42,0.06)]'
-                  : 'text-neutral-600 hover:text-neutral-900',
+                  ? 'bg-card text-foreground shadow-[0_4px_12px_rgba(15,23,42,0.06)]'
+                  : 'text-muted-foreground hover:text-foreground',
               )}
             >
               <Icon className="h-3.5 w-3.5" />
               <span>{tab.label}</span>
               {badge[tab.key] ? (
-                <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300">
                   <Check className="h-2.5 w-2.5" />
                 </span>
               ) : null}
@@ -98,7 +98,7 @@ export const RewardsSection = ({ bountyReadOnly = false }: RewardsSectionProps) 
       </div>
 
       {/* Panel */}
-      <div className="mt-4 rounded-2xl border border-neutral-200 bg-white p-4">
+      <div className="mt-4 rounded-2xl border border-border bg-card p-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={active}
@@ -133,16 +133,16 @@ const BountyPanel = ({ readOnly }: { readOnly: boolean }) => {
     const minRefs = state.minReferralsRequired ?? 0;
     return (
       <div>
-        <p className="mb-3 text-[12px] text-neutral-500">
+        <p className="mb-3 text-[12px] text-muted-foreground">
           Bounty configured in Step 1. Edit by going back to the previous step.
         </p>
-        <div className="flex items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50 p-4">
-          <Lock className="mt-0.5 h-4 w-4 shrink-0 text-neutral-400" />
-          <div className="text-[13px] leading-6 text-neutral-700">
-            <div className="font-semibold text-neutral-900">
+        <div className="flex items-start gap-3 rounded-xl border border-border bg-muted p-4">
+          <Lock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+          <div className="text-[13px] leading-6 text-foreground">
+            <div className="font-semibold text-foreground">
               Bring {minRefs} friend{minRefs === 1 ? '' : 's'}, earn ${reward.toFixed(0)}
             </div>
-            <p className="text-[12px] text-neutral-500">
+            <p className="text-[12px] text-muted-foreground">
               Each verified check-in unlocks <span className="font-semibold">${reward.toFixed(0)}</span> for the
               referring guest.
             </p>
@@ -227,8 +227,8 @@ const CheckInPanel = () => {
                     className={cn(
                       'rounded-xl border px-3 py-2 text-[12px] font-semibold transition',
                       selected
-                        ? 'border-neutral-900 bg-neutral-900 text-white'
-                        : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300',
+                        ? 'border-foreground bg-foreground text-background'
+                        : 'border-border bg-card text-foreground hover:border-border',
                     )}
                   >
                     {k.label}
@@ -254,7 +254,7 @@ const CheckInPanel = () => {
                 max={state.checkInRewardKind === 'DISCOUNT_PERCENTAGE' ? 100 : 1000}
               />
             ) : (
-              <div className="rounded-xl border border-dashed border-neutral-200 bg-neutral-50/60 px-3 py-2 text-[12px] text-neutral-500">
+              <div className="rounded-xl border border-dashed border-border bg-muted/60 px-3 py-2 text-[12px] text-muted-foreground">
                 Free-item picks a menu item automatically (or falls back to points).
               </div>
             )}
@@ -304,7 +304,7 @@ const ReferralPanel = () => {
                 dispatch({ type: 'UPDATE_FIELD', field: 'referralRewardName', value: e.target.value.slice(0, 100) })
               }
               placeholder="Bring-a-friend night"
-              className="mt-1.5 h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+              className="mt-1.5 h-10 rounded-lg border-border bg-card text-[13.5px]"
             />
           </div>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -321,7 +321,7 @@ const ReferralPanel = () => {
                   })
                 }
                 placeholder="$5 off next visit"
-                className="mt-1.5 h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="mt-1.5 h-10 rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
             <div>
@@ -337,7 +337,7 @@ const ReferralPanel = () => {
                   })
                 }
                 placeholder="Free appetizer"
-                className="mt-1.5 h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="mt-1.5 h-10 rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
           </div>
@@ -365,11 +365,11 @@ const ReferralPanel = () => {
                     value: e.target.value ? `${e.target.value}T23:59:59.000Z` : null,
                   })
                 }
-                className="mt-1.5 h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="mt-1.5 h-10 rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
           </div>
-          <p className="mt-3 text-[11px] text-neutral-500">
+          <p className="mt-3 text-[11px] text-muted-foreground">
             Configured referral programs appear on the <span className="font-semibold">Referrals</span> page after publishing.
           </p>
         </>
@@ -413,8 +413,8 @@ const StreakPanel = () => {
                       className={cn(
                         'h-10 rounded-lg border text-[12.5px] font-semibold transition',
                         selected
-                          ? 'border-neutral-900 bg-neutral-900 text-white'
-                          : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300',
+                          ? 'border-foreground bg-foreground text-background'
+                          : 'border-border bg-card text-foreground hover:border-border',
                       )}
                     >
                       {k === 'percentage' ? '% off' : '$ off'}
@@ -470,8 +470,8 @@ const ToggleRow = ({
 }) => (
   <div className="flex items-start justify-between gap-3">
     <div>
-      <div className="text-[13px] font-semibold text-neutral-900">{title}</div>
-      <p className="mt-0.5 text-[12px] leading-5 text-neutral-500">{description}</p>
+      <div className="text-[13px] font-semibold text-foreground">{title}</div>
+      <p className="mt-0.5 text-[12px] leading-5 text-muted-foreground">{description}</p>
     </div>
     <Switch checked={checked} onCheckedChange={onChange} />
   </div>
@@ -504,7 +504,7 @@ const NumberField = ({
         const next = e.target.value === '' ? 0 : Number(e.target.value);
         if (Number.isFinite(next)) onChange(Math.max(min ?? 0, Math.min(max ?? Number.MAX_SAFE_INTEGER, next)));
       }}
-      className="mt-1.5 h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+      className="mt-1.5 h-10 rounded-lg border-border bg-card text-[13.5px]"
     />
   </div>
 );

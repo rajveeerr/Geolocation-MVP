@@ -16,21 +16,21 @@ import {
 } from '@/hooks/useServices';
 
 const statusStyles: Record<string, string> = {
-  DRAFT: 'bg-amber-100 text-amber-700',
-  PUBLISHED: 'bg-emerald-100 text-emerald-700',
-  PAUSED: 'bg-sky-100 text-sky-700',
-  CANCELLED: 'bg-rose-100 text-rose-700',
+  DRAFT: 'bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300',
+  PUBLISHED: 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300',
+  PAUSED: 'bg-sky-100 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300',
+  CANCELLED: 'bg-rose-100 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300',
 };
 
 const panelClass =
-  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
+  'rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 function StatusBadge({ status }: { status: string }) {
   return (
     <span
       className={cn(
         'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold',
-        statusStyles[status] ?? 'bg-neutral-100 text-neutral-600',
+        statusStyles[status] ?? 'bg-muted text-muted-foreground',
       )}
     >
       {status}
@@ -45,14 +45,14 @@ function ServiceCard({ service, onDelete }: { service: Service; onDelete: (id: n
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="overflow-hidden rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]"
+      className="overflow-hidden rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card shadow-[0_8px_22px_rgba(15,23,42,0.045)]"
     >
-      <div className="relative h-36 bg-gradient-to-br from-neutral-100 via-white to-[#eef1f5]">
+      <div className="relative h-36 bg-thumb-surface">
         {service.coverImageUrl ? (
           <img src={service.coverImageUrl} alt={service.title} className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full items-center justify-center">
-            <Wrench className="h-10 w-10 text-neutral-300" />
+            <Wrench className="h-10 w-10 text-muted-foreground" />
           </div>
         )}
         <div className="absolute left-3 top-3">
@@ -61,10 +61,10 @@ function ServiceCard({ service, onDelete }: { service: Service; onDelete: (id: n
       </div>
 
       <div className="p-5">
-        <h3 className="line-clamp-1 text-[1.02rem] font-semibold tracking-tight text-neutral-900">{service.title}</h3>
-        <p className="mt-1 line-clamp-2 text-[13px] leading-6 text-neutral-500">{service.shortDescription || service.description}</p>
+        <h3 className="line-clamp-1 text-[1.02rem] font-semibold tracking-tight text-foreground">{service.title}</h3>
+        <p className="mt-1 line-clamp-2 text-[13px] leading-6 text-muted-foreground">{service.shortDescription || service.description}</p>
 
-        <div className="mt-4 space-y-2 text-[13px] text-neutral-500">
+        <div className="mt-4 space-y-2 text-[13px] text-muted-foreground">
           <div className="flex items-center gap-2">
             <Clock className="h-3.5 w-3.5" />
             <span>{service.durationMinutes} min</span>
@@ -75,16 +75,16 @@ function ServiceCard({ service, onDelete }: { service: Service; onDelete: (id: n
           </div>
         </div>
 
-        <div className="mt-5 flex items-center gap-2 border-t border-neutral-100 pt-4">
+        <div className="mt-5 flex items-center gap-2 border-t border-border pt-4">
           <Link to={PATHS.MERCHANT_SERVICES_MANAGE.replace(':serviceId', String(service.id))} className="flex-1">
-            <Button size="sm" className="w-full rounded-full bg-neutral-950 text-white hover:bg-neutral-800">
+            <Button size="sm" className="w-full rounded-full bg-foreground text-background hover:bg-foreground/85">
               <Eye className="mr-1.5 h-3.5 w-3.5" />
               Manage
             </Button>
           </Link>
           <button
             onClick={() => onDelete(service.id)}
-            className="rounded-full border border-neutral-200 p-2 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-800"
+            className="rounded-full border border-border p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             title="Delete service"
           >
             <Trash2 className="h-4 w-4" />
@@ -135,7 +135,7 @@ function MerchantMyServicesContent() {
   if (error) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="rounded-[1.2rem] border border-rose-200 bg-rose-50 p-4 text-red-700">{(error as Error).message}</div>
+        <div className="rounded-[1.2rem] border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 p-4 text-red-700 dark:text-red-300">{(error as Error).message}</div>
       </div>
     );
   }
@@ -144,12 +144,12 @@ function MerchantMyServicesContent() {
     <div className="mx-auto max-w-screen-xl px-4 py-3 sm:px-1 sm:py-4">
       <div className="mb-6 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Experiences</div>
-          <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-neutral-900">My Services</h1>
-          <p className="mt-2 text-[13px] text-neutral-500 sm:text-sm">Create and manage your services, tiers, add-ons, and bookings.</p>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Experiences</div>
+          <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-foreground">My Services</h1>
+          <p className="mt-2 text-[13px] text-muted-foreground sm:text-sm">Create and manage your services, tiers, add-ons, and bookings.</p>
         </div>
         <Link to={PATHS.MERCHANT_SERVICES_CREATE}>
-          <Button size="md" className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800">
+          <Button size="md" className="rounded-full bg-foreground text-background hover:bg-foreground/85">
             <PlusCircle className="mr-2 h-4 w-4" />
             Create Service
           </Button>
@@ -158,7 +158,7 @@ function MerchantMyServicesContent() {
 
       {services.length > 0 && (
         <div className={cn(panelClass, 'mb-6 flex items-center gap-2 overflow-x-auto p-3')}>
-          <Filter className="mr-1 h-4 w-4 flex-shrink-0 text-neutral-400" />
+          <Filter className="mr-1 h-4 w-4 flex-shrink-0 text-muted-foreground" />
           {(['ALL', ...SERVICE_STATUSES.map((s) => s.value)] as StatusFilter[]).map((status) => {
             const count = statusCounts[status] ?? 0;
             if (status !== 'ALL' && count === 0) return null;
@@ -169,15 +169,15 @@ function MerchantMyServicesContent() {
                 className={cn(
                   'flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors',
                   statusFilter === status
-                    ? 'bg-neutral-950 text-white'
-                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200',
+                    ? 'bg-foreground text-background'
+                    : 'bg-muted text-muted-foreground hover:bg-accent',
                 )}
               >
                 {status}
                 <span
                   className={cn(
                     'rounded-full px-1.5 py-0.5 text-xs',
-                    statusFilter === status ? 'bg-white/20' : 'bg-neutral-200',
+                    statusFilter === status ? 'bg-card/20 dark:bg-card' : 'bg-accent',
                   )}
                 >
                   {count}
@@ -190,9 +190,9 @@ function MerchantMyServicesContent() {
 
       {filteredServices.length === 0 ? (
         <div className={cn(panelClass, 'border-dashed py-16 text-center')}>
-          <Wrench className="mx-auto mb-3 h-10 w-10 text-neutral-300" />
-          <h3 className="text-[1.4rem] font-semibold tracking-tight text-neutral-900">No services yet</h3>
-          <p className="mt-1 text-[13px] text-neutral-500 sm:text-sm">Create your first service to start accepting bookings.</p>
+          <Wrench className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
+          <h3 className="text-[1.4rem] font-semibold tracking-tight text-foreground">No services yet</h3>
+          <p className="mt-1 text-[13px] text-muted-foreground sm:text-sm">Create your first service to start accepting bookings.</p>
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

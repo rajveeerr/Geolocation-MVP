@@ -29,19 +29,19 @@ const TYPE_META: Record<Exclude<MarketAlertType, 'PRICE_SPIKE'>, {
     Icon: ShoppingCart,
     label: 'Supplier Watch',
     cardClass:
-      'border border-[#f0ddd0] bg-[linear-gradient(135deg,#fff8f2_0%,#fff1e5_100%)] shadow-[0_8px_24px_rgba(82,58,40,0.06)]',
-    iconWrapClass: 'bg-white/80 text-[#bf6545]',
-    mutedTextClass: 'text-[#607084]',
-    tagClass: 'text-[#bf6545]',
+      'border border-ai-border bg-ai-surface shadow-[0_8px_24px_rgba(82,58,40,0.06)] dark:shadow-none',
+    iconWrapClass: 'bg-card/80 dark:bg-card text-ai-accent',
+    mutedTextClass: 'text-ai-text-muted',
+    tagClass: 'text-ai-accent',
   },
   COMMODITY_WATCH: {
     Icon: Globe,
     label: 'Global Market Data',
     cardClass:
-      'border border-[#d6e4f2] bg-[linear-gradient(135deg,#f5f9ff_0%,#eaf2fb_100%)] shadow-[0_8px_24px_rgba(40,58,82,0.06)]',
-    iconWrapClass: 'bg-white/80 text-[#2f6cb5]',
-    mutedTextClass: 'text-[#52708a]',
-    tagClass: 'text-[#2f6cb5]',
+      'border border-ai-blue-border bg-ai-blue-surface shadow-[0_8px_24px_rgba(40,58,82,0.06)] dark:shadow-none',
+    iconWrapClass: 'bg-card/80 dark:bg-card text-ai-blue-accent',
+    mutedTextClass: 'text-ai-blue-text-muted',
+    tagClass: 'text-ai-blue-accent',
   },
 };
 
@@ -83,7 +83,7 @@ const MarketAlertBanner: React.FC<Props> = ({
           </div>
           {alert ? (
             <>
-              <div className="mt-0.5 font-heading text-base font-bold leading-tight text-[#203247]">
+              <div className="mt-0.5 font-heading text-base font-bold leading-tight text-ai-text">
                 {alert.title}
               </div>
               <div className={cn('mt-1 line-clamp-2 text-sm leading-snug', meta.mutedTextClass)}>
@@ -92,7 +92,7 @@ const MarketAlertBanner: React.FC<Props> = ({
             </>
           ) : (
             <>
-              <div className="mt-0.5 font-heading text-base font-bold leading-tight text-[#203247]">
+              <div className="mt-0.5 font-heading text-base font-bold leading-tight text-ai-text">
                 {emptyTitle}
               </div>
               <div className={cn('mt-1 text-sm leading-snug', meta.mutedTextClass)}>
@@ -109,7 +109,7 @@ const MarketAlertBanner: React.FC<Props> = ({
           }}
           disabled={refreshing}
           className={cn(
-            'flex h-9 w-9 items-center justify-center rounded-full border border-white/70 bg-white/60 text-[#607084] transition hover:bg-white hover:text-[#203247]',
+            'flex h-9 w-9 items-center justify-center rounded-full border border-border/70 bg-card/60 dark:bg-card text-ai-text-muted transition hover:bg-card hover:text-ai-text',
             refreshing && 'opacity-50',
           )}
           title="Refresh from AI"

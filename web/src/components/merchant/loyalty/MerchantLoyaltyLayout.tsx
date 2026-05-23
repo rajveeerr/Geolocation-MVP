@@ -22,8 +22,8 @@ export function MerchantLoyaltyLayout({ title, subtitle, children }: MerchantLoy
   return (
     <div className="container mx-auto max-w-6xl px-4 py-8">
       <div className="mb-4">
-        <h1 className="text-2xl font-bold text-neutral-900">{title}</h1>
-        <p className="mt-1 text-sm text-neutral-600">{subtitle}</p>
+        <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
       </div>
 
       <div className="mb-6 flex flex-wrap gap-2">
@@ -35,8 +35,8 @@ export function MerchantLoyaltyLayout({ title, subtitle, children }: MerchantLoy
               to={tab.to}
               className={`rounded-full border px-3 py-1.5 text-sm font-semibold transition ${
                 active
-                  ? 'border-neutral-900 bg-neutral-900 text-white'
-                  : 'border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50'
+                  ? 'border-foreground bg-foreground text-background'
+                  : 'border-border bg-card text-foreground hover:bg-muted'
               }`}
             >
               {tab.label}
@@ -60,12 +60,12 @@ export function MerchantLoyaltyProgramMissingState({
   description = 'Initialize your loyalty program first to unlock this section.',
 }: MerchantLoyaltyProgramMissingStateProps) {
   return (
-    <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-6">
-      <h3 className="font-semibold text-neutral-900">{title}</h3>
-      <p className="mt-2 text-sm text-neutral-600">{description}</p>
+    <div className="rounded-xl border border-border bg-muted p-6">
+      <h3 className="font-semibold text-foreground">{title}</h3>
+      <p className="mt-2 text-sm text-muted-foreground">{description}</p>
       <Link
         to={PATHS.MERCHANT_LOYALTY_SETUP}
-        className="mt-4 inline-block rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white"
+        className="mt-4 inline-block rounded-md bg-foreground px-4 py-2 text-sm font-semibold text-background"
       >
         Set Up Program
       </Link>

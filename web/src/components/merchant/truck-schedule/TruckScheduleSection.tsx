@@ -53,12 +53,12 @@ export const TruckScheduleSection = ({ storeId, isFoodTruck }: TruckScheduleSect
 
   if (!isFoodTruck) {
     return (
-      <section className="rounded-2xl border border-dashed border-neutral-300 bg-neutral-50/60 p-6 text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
+      <section className="rounded-2xl border border-dashed border-border bg-muted/60 p-6 text-center">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-950/40">
           <Truck className="h-6 w-6 text-amber-600" />
         </div>
-        <h3 className="mt-3 text-sm font-semibold text-neutral-900">This store isn't marked as a food truck</h3>
-        <p className="mt-1 text-xs text-neutral-500">
+        <h3 className="mt-3 text-sm font-semibold text-foreground">This store isn't marked as a food truck</h3>
+        <p className="mt-1 text-xs text-muted-foreground">
           Turn on "Food truck or mobile venue" in store settings to start posting stops.
         </p>
       </section>
@@ -96,8 +96,8 @@ export const TruckScheduleSection = ({ storeId, isFoodTruck }: TruckScheduleSect
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold text-neutral-900">Upcoming stops</h2>
-          <p className="text-xs text-neutral-500">
+          <h2 className="text-base font-semibold text-foreground">Upcoming stops</h2>
+          <p className="text-xs text-muted-foreground">
             Customers see live and upcoming stops on the food trucks page.
           </p>
         </div>
@@ -113,18 +113,18 @@ export const TruckScheduleSection = ({ storeId, isFoodTruck }: TruckScheduleSect
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center rounded-2xl border border-neutral-200 bg-white py-10">
-          <Loader2 className="h-5 w-5 animate-spin text-neutral-400" />
+        <div className="flex items-center justify-center rounded-2xl border border-border bg-card py-10">
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
       ) : error ? (
-        <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+        <div className="rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 p-4 text-sm text-rose-700 dark:text-rose-300">
           {(error as Error).message}
         </div>
       ) : upcoming.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-neutral-300 bg-neutral-50/60 p-8 text-center">
-          <Calendar className="mx-auto h-8 w-8 text-neutral-300" aria-hidden />
-          <h3 className="mt-3 text-sm font-semibold text-neutral-900">No upcoming stops</h3>
-          <p className="mt-1 text-xs text-neutral-500">Add your first stop so customers know where to find you.</p>
+        <div className="rounded-2xl border border-dashed border-border bg-muted/60 p-8 text-center">
+          <Calendar className="mx-auto h-8 w-8 text-muted-foreground" aria-hidden />
+          <h3 className="mt-3 text-sm font-semibold text-foreground">No upcoming stops</h3>
+          <p className="mt-1 text-xs text-muted-foreground">Add your first stop so customers know where to find you.</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -135,8 +135,8 @@ export const TruckScheduleSection = ({ storeId, isFoodTruck }: TruckScheduleSect
       )}
 
       {past.length > 0 && (
-        <details className={cn('group rounded-2xl border border-neutral-200 bg-neutral-50/40 px-4 py-3')}>
-          <summary className="cursor-pointer list-none text-xs font-medium text-neutral-600 group-open:mb-3">
+        <details className={cn('group rounded-2xl border border-border bg-muted/40 px-4 py-3')}>
+          <summary className="cursor-pointer list-none text-xs font-medium text-muted-foreground group-open:mb-3">
             Past stops ({past.length})
           </summary>
           <div className="space-y-2">

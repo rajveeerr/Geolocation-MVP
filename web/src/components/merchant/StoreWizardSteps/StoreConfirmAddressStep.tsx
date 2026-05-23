@@ -63,15 +63,15 @@ export const StoreConfirmAddressStep = ({ data, onUpdate }: StoreConfirmAddressS
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold text-neutral-900">Confirm your address</h2>
-        <p className="mt-1 text-neutral-600">
+        <h2 className="text-xl font-bold text-foreground">Confirm your address</h2>
+        <p className="mt-1 text-muted-foreground">
           Your address is only shared with customers after they save or check in to your deals.
         </p>
       </div>
 
-      <div className="space-y-4 rounded-xl border border-neutral-200 bg-white p-6">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-6">
         <div className="space-y-2">
-          <Label htmlFor="street" className="text-sm font-medium text-neutral-700">
+          <Label htmlFor="street" className="text-sm font-medium text-foreground">
             Street address
           </Label>
           <Input
@@ -84,7 +84,7 @@ export const StoreConfirmAddressStep = ({ data, onUpdate }: StoreConfirmAddressS
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="city" className="text-sm font-medium text-neutral-700">
+            <Label htmlFor="city" className="text-sm font-medium text-foreground">
               City / Town
             </Label>
             <Input
@@ -96,7 +96,7 @@ export const StoreConfirmAddressStep = ({ data, onUpdate }: StoreConfirmAddressS
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="state" className="text-sm font-medium text-neutral-700">
+            <Label htmlFor="state" className="text-sm font-medium text-foreground">
               State / Region
             </Label>
             <Input
@@ -109,7 +109,7 @@ export const StoreConfirmAddressStep = ({ data, onUpdate }: StoreConfirmAddressS
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="postcode" className="text-sm font-medium text-neutral-700">
+          <Label htmlFor="postcode" className="text-sm font-medium text-foreground">
             PIN / Postcode
           </Label>
           <Input
@@ -124,10 +124,10 @@ export const StoreConfirmAddressStep = ({ data, onUpdate }: StoreConfirmAddressS
 
       {/* Map with pin */}
       <div>
-        <p className="mb-3 text-sm font-medium text-neutral-700">
+        <p className="mb-3 text-sm font-medium text-foreground">
           Your location on the map
         </p>
-        <div className="overflow-hidden rounded-xl border border-neutral-200">
+        <div className="overflow-hidden rounded-xl border border-border">
           <StoreLocationMap
             center={mapCenter}
             onLocationChange={(coords) =>
@@ -136,7 +136,7 @@ export const StoreConfirmAddressStep = ({ data, onUpdate }: StoreConfirmAddressS
             draggable={true}
           />
         </div>
-        <p className="mt-2 text-xs text-neutral-500">
+        <p className="mt-2 text-xs text-muted-foreground">
           Drag the pin to adjust. You can fine-tune the exact spot in the next step.
         </p>
       </div>

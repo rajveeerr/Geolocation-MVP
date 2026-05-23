@@ -59,19 +59,19 @@ export const StoreBasicInfoStep = ({ data, onUpdate, cities, merchantPhone, merc
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary-100">
           <Building2 className="h-8 w-8 text-brand-primary-600" />
         </div>
-        <h2 className="text-2xl font-bold text-neutral-900">Basic Information</h2>
-        <p className="mt-2 text-neutral-600">
+        <h2 className="text-2xl font-bold text-foreground">Basic Information</h2>
+        <p className="mt-2 text-muted-foreground">
           Tell us about your store and how customers can reach you
         </p>
       </div>
 
       {/* Business Name */}
       <div className="space-y-2">
-        <Label htmlFor="businessName" className="text-sm font-semibold text-neutral-700">
+        <Label htmlFor="businessName" className="text-sm font-semibold text-foreground">
           Business Name *
         </Label>
         <div className="relative">
-          <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+          <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             id="businessName"
             placeholder="Enter your business name"
@@ -80,17 +80,17 @@ export const StoreBasicInfoStep = ({ data, onUpdate, cities, merchantPhone, merc
             className="pl-10"
           />
         </div>
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-muted-foreground">
           This is how your business will appear to customers
         </p>
       </div>
 
       {/* Store Type */}
       <div className="space-y-3">
-        <Label className="text-sm font-semibold text-neutral-700">
+        <Label className="text-sm font-semibold text-foreground">
           Store type *
         </Label>
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-muted-foreground">
           What type of place is this? (e.g. restaurant, retail)
         </p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -102,22 +102,22 @@ export const StoreBasicInfoStep = ({ data, onUpdate, cities, merchantPhone, merc
                 'flex items-start gap-3 rounded-lg border p-4 text-left transition-all duration-200',
                 data.storeType === type.value
                   ? 'border-brand-primary-500 bg-brand-primary-50 ring-1 ring-brand-primary-500'
-                  : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50'
+                  : 'border-border bg-card hover:border-border hover:bg-muted'
               )}
             >
               <div className={cn(
                 'mt-1 h-4 w-4 rounded-full border-2',
                 data.storeType === type.value
                   ? 'border-brand-primary-500 bg-brand-primary-500'
-                  : 'border-neutral-300'
+                  : 'border-border'
               )}>
                 {data.storeType === type.value && (
-                  <div className="h-full w-full rounded-full bg-white scale-50" />
+                  <div className="h-full w-full rounded-full bg-card scale-50" />
                 )}
               </div>
               <div>
-                <p className="font-medium text-neutral-900">{type.label}</p>
-                <p className="text-sm text-neutral-600">{type.description}</p>
+                <p className="font-medium text-foreground">{type.label}</p>
+                <p className="text-sm text-muted-foreground">{type.description}</p>
               </div>
             </button>
           ))}
@@ -145,11 +145,11 @@ export const StoreBasicInfoStep = ({ data, onUpdate, cities, merchantPhone, merc
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {/* Phone Number */}
         <div className="space-y-2">
-          <Label htmlFor="phoneNumber" className="text-sm font-semibold text-neutral-700">
+          <Label htmlFor="phoneNumber" className="text-sm font-semibold text-foreground">
             Store phone number *
           </Label>
           <div className="relative">
-            <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+            <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="phoneNumber"
               type="text"
@@ -160,18 +160,18 @@ export const StoreBasicInfoStep = ({ data, onUpdate, cities, merchantPhone, merc
               className="pl-10"
             />
           </div>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-muted-foreground">
             Customers will use this to call this location
           </p>
         </div>
 
         {/* Email */}
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-sm font-semibold text-neutral-700">
+          <Label htmlFor="email" className="text-sm font-semibold text-foreground">
             Store email
           </Label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+            <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="email"
               type="email"
@@ -181,40 +181,40 @@ export const StoreBasicInfoStep = ({ data, onUpdate, cities, merchantPhone, merc
               className="pl-10"
             />
           </div>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-muted-foreground">
             Optional - for customer inquiries
           </p>
         </div>
       </div>
 
       {/* Validation Summary */}
-      <div className="rounded-lg bg-neutral-50 p-4">
-        <h4 className="text-sm font-semibold text-neutral-700 mb-2">Required Information</h4>
+      <div className="rounded-lg bg-muted p-4">
+        <h4 className="text-sm font-semibold text-foreground mb-2">Required Information</h4>
         <div className="space-y-1 text-sm">
           <div className="flex items-center gap-2">
             <div className={cn(
               'h-2 w-2 rounded-full',
-              data.businessName ? 'bg-green-500' : 'bg-neutral-300'
+              data.businessName ? 'bg-green-500' : 'bg-muted'
             )} />
-            <span className={data.businessName ? 'text-green-700' : 'text-neutral-500'}>
+            <span className={data.businessName ? 'text-green-700 dark:text-green-300' : 'text-muted-foreground'}>
               Business name
             </span>
           </div>
           <div className="flex items-center gap-2">
             <div className={cn(
               'h-2 w-2 rounded-full',
-              data.storeType ? 'bg-green-500' : 'bg-neutral-300'
+              data.storeType ? 'bg-green-500' : 'bg-muted'
             )} />
-            <span className={data.storeType ? 'text-green-700' : 'text-neutral-500'}>
+            <span className={data.storeType ? 'text-green-700 dark:text-green-300' : 'text-muted-foreground'}>
               Store type
             </span>
           </div>
           <div className="flex items-center gap-2">
             <div className={cn(
               'h-2 w-2 rounded-full',
-              data.phoneNumber ? 'bg-green-500' : 'bg-neutral-300'
+              data.phoneNumber ? 'bg-green-500' : 'bg-muted'
             )} />
-            <span className={data.phoneNumber ? 'text-green-700' : 'text-neutral-500'}>
+            <span className={data.phoneNumber ? 'text-green-700 dark:text-green-300' : 'text-muted-foreground'}>
               Phone number
             </span>
           </div>

@@ -41,19 +41,19 @@ export const AiGenerateMenuModal: React.FC<AiGenerateMenuModalProps> = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         className={cn(
-          'bg-white border border-neutral-200 text-neutral-800',
+          'bg-card border border-border text-foreground',
           'sm:max-w-lg'
         )}
       >
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-neutral-800">
+          <DialogTitle className="flex items-center gap-2 text-foreground">
             <Sparkles className="h-5 w-5 text-brand" />
             AI Generate Menu
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 mt-2">
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-muted-foreground">
             Paste your menu text, a photo description, or just describe what you serve.
             Our AI will parse it into structured menu items.
           </p>
@@ -64,15 +64,15 @@ export const AiGenerateMenuModal: React.FC<AiGenerateMenuModalProps> = ({
             placeholder={`e.g.\nClassic Burger - $12.99\nCheese Pizza (Large) - $15\nCaesar Salad - $8.50\nIced Tea - $3`}
             rows={8}
             className={cn(
-              'w-full rounded-xl border border-neutral-200 bg-neutral-50',
-              'px-4 py-3 text-sm text-neutral-800 placeholder-neutral-400',
+              'w-full rounded-xl border border-border bg-muted',
+              'px-4 py-3 text-sm text-foreground placeholder-neutral-400',
               'focus:border-brand/40 focus:outline-none focus:ring-1 focus:ring-brand/20',
               'resize-none'
             )}
           />
 
           <div className="flex items-center justify-between">
-            <span className="text-xs text-neutral-500">
+            <span className="text-xs text-muted-foreground">
               {rawText.trim().split('\n').filter(Boolean).length} lines detected
             </span>
 
@@ -80,7 +80,7 @@ export const AiGenerateMenuModal: React.FC<AiGenerateMenuModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm text-neutral-500 hover:text-neutral-800 transition-colors"
+                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Cancel
               </button>

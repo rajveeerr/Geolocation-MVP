@@ -14,7 +14,7 @@ interface SectionCardProps {
 export const SectionCard = ({ children, className }: SectionCardProps) => (
   <section
     className={cn(
-      'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)]',
+      'rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)]',
       className,
     )}
   >
@@ -32,10 +32,10 @@ interface FieldLabelProps {
 
 export const FieldLabel = ({ label, hint, required, className, htmlFor }: FieldLabelProps) => (
   <div className={cn('flex flex-wrap items-center justify-between gap-2', className)}>
-    <label htmlFor={htmlFor} className="text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+    <label htmlFor={htmlFor} className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
       {label}
       {required ? <span className="ml-0.5 text-rose-500">*</span> : null}
     </label>
-    {hint ? <span className="text-[12px] text-neutral-500">{hint}</span> : null}
+    {hint ? <span className="text-[12px] text-muted-foreground">{hint}</span> : null}
   </div>
 );

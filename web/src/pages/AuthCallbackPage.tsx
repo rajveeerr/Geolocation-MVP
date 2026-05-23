@@ -62,7 +62,7 @@ export const AuthCallbackPage = () => {
     }, [searchParams, navigate, handleSocialToken, toast]);
 
     return (
-        <div className="flex h-screen w-full items-center justify-center bg-gray-50">
+        <div className="flex h-screen w-full items-center justify-center bg-muted">
             <div className="text-center">
                 <Loader2 className="mx-auto h-8 w-8 animate-spin text-brand-primary-main" />
                 <p className="mt-2 text-neutral-text-secondary">Completing login...</p>

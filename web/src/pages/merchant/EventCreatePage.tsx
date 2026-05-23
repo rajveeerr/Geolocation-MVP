@@ -72,7 +72,7 @@ function Stepper({
                   <div
                     className={cn(
                       'h-0.5 flex-1 transition-colors',
-                      isCompleted ? 'bg-brand-primary-500' : 'bg-neutral-200',
+                      isCompleted ? 'bg-brand-primary-500' : 'bg-accent',
                     )}
                   />
                 )}
@@ -83,7 +83,7 @@ function Stepper({
                       ? 'border-brand-primary-500 bg-brand-primary-500 text-white'
                       : isCompleted
                         ? 'border-brand-primary-500 bg-brand-primary-50 text-brand-primary-600'
-                        : 'border-neutral-200 bg-white text-neutral-400 group-hover:border-neutral-300',
+                        : 'border-border bg-card text-muted-foreground group-hover:border-border',
                   )}
                 >
                   {isCompleted ? (
@@ -96,7 +96,7 @@ function Stepper({
                   <div
                     className={cn(
                       'h-0.5 flex-1 transition-colors',
-                      isCompleted ? 'bg-brand-primary-500' : 'bg-neutral-200',
+                      isCompleted ? 'bg-brand-primary-500' : 'bg-accent',
                     )}
                   />
                 )}
@@ -108,7 +108,7 @@ function Stepper({
                     ? 'text-brand-primary-600'
                     : isCompleted
                       ? 'text-brand-primary-500'
-                      : 'text-neutral-400',
+                      : 'text-muted-foreground',
                 )}
               >
                 {step.label}
@@ -133,7 +133,7 @@ function BasicsStep() {
   return (
     <div className="space-y-6">
       <div>
-        <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
+        <label className="mb-1.5 block text-sm font-semibold text-foreground">
           Event Type <span className="text-red-500">*</span>
         </label>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -145,7 +145,7 @@ function BasicsStep() {
                 'rounded-xl border-2 p-3 text-sm font-medium transition-all',
                 state.eventType === value
                   ? 'border-brand-primary-500 bg-brand-primary-50 text-brand-primary-700'
-                  : 'border-neutral-200 text-neutral-600 hover:border-neutral-300',
+                  : 'border-border text-muted-foreground hover:border-border',
               )}
             >
               {label}
@@ -155,7 +155,7 @@ function BasicsStep() {
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
+        <label className="mb-1.5 block text-sm font-semibold text-foreground">
           Title <span className="text-red-500">*</span>
         </label>
         <input
@@ -163,29 +163,29 @@ function BasicsStep() {
           value={state.title}
           onChange={(e) => setField('title', e.target.value)}
           placeholder="Give your event a catchy name..."
-          className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
+          className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
           maxLength={100}
         />
-        <p className="mt-1 text-xs text-neutral-400">
+        <p className="mt-1 text-xs text-muted-foreground">
           {state.title.length}/100 characters
         </p>
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
+        <label className="mb-1.5 block text-sm font-semibold text-foreground">
           Description <span className="text-red-500">*</span>
         </label>
         <textarea
           value={state.description}
           onChange={(e) => setField('description', e.target.value)}
           placeholder="Describe what your event is about..."
-          className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
+          className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
           rows={4}
         />
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
+        <label className="mb-1.5 block text-sm font-semibold text-foreground">
           Short Description
         </label>
         <input
@@ -193,13 +193,13 @@ function BasicsStep() {
           value={state.shortDescription}
           onChange={(e) => setField('shortDescription', e.target.value)}
           placeholder="A one-liner for previews..."
-          className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
+          className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
           maxLength={200}
         />
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
+        <label className="mb-1.5 block text-sm font-semibold text-foreground">
           Tags
         </label>
         <div className="flex flex-wrap gap-2 mb-2">
@@ -231,7 +231,7 @@ function BasicsStep() {
               }
             }}
             placeholder="Add a tag and press Enter..."
-            className="flex-1 rounded-lg border border-neutral-300 px-4 py-2 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
+            className="flex-1 rounded-lg border border-border px-4 py-2 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
           />
         </div>
       </div>
@@ -251,38 +251,38 @@ function DateLocationStep() {
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
+          <label className="mb-1.5 block text-sm font-semibold text-foreground">
             Start Date & Time <span className="text-red-500">*</span>
           </label>
           <input
             type="datetime-local" lang="en-US"
             value={state.startDate}
             onChange={(e) => setField('startDate', e.target.value)}
-            className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
+            className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
+          <label className="mb-1.5 block text-sm font-semibold text-foreground">
             End Date & Time <span className="text-red-500">*</span>
           </label>
           <input
             type="datetime-local" lang="en-US"
             value={state.endDate}
             onChange={(e) => setField('endDate', e.target.value)}
-            className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
+            className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
           />
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
+          <label className="mb-1.5 block text-sm font-semibold text-foreground">
             Timezone
           </label>
           <select
             value={state.timezone}
             onChange={(e) => setField('timezone', e.target.value)}
-            className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
+            className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
           >
             <option value="America/New_York">Eastern (ET)</option>
             <option value="America/Chicago">Central (CT)</option>
@@ -297,28 +297,28 @@ function DateLocationStep() {
               type="checkbox"
               checked={state.isMultiDay}
               onChange={(e) => setField('isMultiDay', e.target.checked)}
-              className="h-4 w-4 rounded border-neutral-300 text-brand-primary-500 focus:ring-brand-primary-500"
+              className="h-4 w-4 rounded border-border text-brand-primary-500 focus:ring-brand-primary-500"
             />
-            <span className="text-sm font-medium text-neutral-700">Multi-day event</span>
+            <span className="text-sm font-medium text-foreground">Multi-day event</span>
           </label>
         </div>
       </div>
 
-      <hr className="border-neutral-200" />
+      <hr className="border-border" />
 
       <label className="flex items-center gap-2 cursor-pointer">
         <input
           type="checkbox"
           checked={state.isVirtualEvent}
           onChange={(e) => setField('isVirtualEvent', e.target.checked)}
-          className="h-4 w-4 rounded border-neutral-300 text-brand-primary-500 focus:ring-brand-primary-500"
+          className="h-4 w-4 rounded border-border text-brand-primary-500 focus:ring-brand-primary-500"
         />
-        <span className="text-sm font-medium text-neutral-700">This is a virtual event</span>
+        <span className="text-sm font-medium text-foreground">This is a virtual event</span>
       </label>
 
       {state.isVirtualEvent ? (
         <div>
-          <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
+          <label className="mb-1.5 block text-sm font-semibold text-foreground">
             Virtual Event URL
           </label>
           <input
@@ -326,13 +326,13 @@ function DateLocationStep() {
             value={state.virtualEventUrl}
             onChange={(e) => setField('virtualEventUrl', e.target.value)}
             placeholder="https://zoom.us/j/..."
-            className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
+            className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
           />
         </div>
       ) : (
         <>
           <div>
-            <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
+            <label className="mb-1.5 block text-sm font-semibold text-foreground">
               <MapPin className="mr-1 inline h-4 w-4" />
               Venue Name
             </label>
@@ -341,11 +341,11 @@ function DateLocationStep() {
               value={state.venueName}
               onChange={(e) => setField('venueName', e.target.value)}
               placeholder="e.g., The Grand Ballroom"
-              className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
+              className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
+            <label className="mb-1.5 block text-sm font-semibold text-foreground">
               Venue Address
             </label>
             <input
@@ -353,7 +353,7 @@ function DateLocationStep() {
               value={state.venueAddress}
               onChange={(e) => setField('venueAddress', e.target.value)}
               placeholder="123 Main St, City, State"
-              className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
+              className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
             />
           </div>
         </>
@@ -374,7 +374,7 @@ function SettingsStep() {
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
+          <label className="mb-1.5 block text-sm font-semibold text-foreground">
             Max Attendees
           </label>
           <input
@@ -385,12 +385,12 @@ function SettingsStep() {
             }
             placeholder="Unlimited"
             min={1}
-            className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
+            className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
           />
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
+          <label className="mb-1.5 block text-sm font-semibold text-foreground">
             Minimum Age
           </label>
           <input
@@ -401,13 +401,13 @@ function SettingsStep() {
             }
             placeholder="No restriction"
             min={0}
-            className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
+            className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
           />
         </div>
       </div>
 
-      <div className="space-y-4 rounded-xl border border-neutral-200 p-4">
-        <h3 className="text-sm font-bold text-neutral-700">Event Options</h3>
+      <div className="space-y-4 rounded-xl border border-border p-4">
+        <h3 className="text-sm font-bold text-foreground">Event Options</h3>
 
         {[
           { field: 'isFreeEvent', label: 'Free Event', desc: 'No ticket purchases required' },
@@ -424,11 +424,11 @@ function SettingsStep() {
               type="checkbox"
               checked={!!state[field as keyof typeof state]}
               onChange={(e) => setField(field, e.target.checked)}
-              className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-brand-primary-500 focus:ring-brand-primary-500"
+              className="mt-0.5 h-4 w-4 rounded border-border text-brand-primary-500 focus:ring-brand-primary-500"
             />
             <div>
-              <span className="text-sm font-medium text-neutral-700">{label}</span>
-              <p className="text-xs text-neutral-400">{desc}</p>
+              <span className="text-sm font-medium text-foreground">{label}</span>
+              <p className="text-xs text-muted-foreground">{desc}</p>
             </div>
           </label>
         ))}
@@ -436,7 +436,7 @@ function SettingsStep() {
 
       {state.enableWaitlist && (
         <div>
-          <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
+          <label className="mb-1.5 block text-sm font-semibold text-foreground">
             Waitlist Capacity
           </label>
           <input
@@ -447,7 +447,7 @@ function SettingsStep() {
             }
             placeholder="Unlimited"
             min={1}
-            className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
+            className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
           />
         </div>
       )}
@@ -524,13 +524,13 @@ function MediaStep() {
     <div className="space-y-8">
       {/* ── Cover Image ── */}
       <div>
-        <label className="mb-2 block text-sm font-semibold text-neutral-700">
+        <label className="mb-2 block text-sm font-semibold text-foreground">
           Cover Image <span className="text-red-500">*</span>
         </label>
 
         {state.coverImageUrl ? (
           /* Preview */
-          <div className="group relative overflow-hidden rounded-xl border border-neutral-200">
+          <div className="group relative overflow-hidden rounded-xl border border-border">
             <img
               src={state.coverImageUrl}
               alt="Cover preview"
@@ -539,10 +539,10 @@ function MediaStep() {
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
             />
-            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-foreground/40 opacity-0 transition-opacity group-hover:opacity-100">
               <button
                 onClick={() => coverInputRef.current?.click()}
-                className="rounded-lg bg-white px-3 py-2 text-sm font-medium text-neutral-700 shadow hover:bg-neutral-50"
+                className="rounded-lg bg-card px-3 py-2 text-sm font-medium text-foreground shadow hover:bg-muted"
               >
                 Replace
               </button>
@@ -565,22 +565,22 @@ function MediaStep() {
               'flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed py-12 transition-colors',
               coverDragging
                 ? 'border-brand-primary-500 bg-brand-primary-500/5'
-                : 'border-neutral-300 bg-neutral-50 hover:border-brand-primary-400 hover:bg-neutral-100',
+                : 'border-border bg-muted hover:border-brand-primary-400 hover:bg-muted',
               coverUploading && 'pointer-events-none opacity-60',
             )}
           >
             {coverUploading ? (
               <>
                 <Loader2 className="mb-2 h-8 w-8 animate-spin text-brand-primary-500" />
-                <p className="text-sm font-medium text-neutral-600">Uploading…</p>
+                <p className="text-sm font-medium text-muted-foreground">Uploading…</p>
               </>
             ) : (
               <>
-                <Upload className="mb-2 h-8 w-8 text-neutral-400" />
-                <p className="text-sm font-medium text-neutral-600">
+                <Upload className="mb-2 h-8 w-8 text-muted-foreground" />
+                <p className="text-sm font-medium text-muted-foreground">
                   Drag & drop or <span className="text-brand-primary-600">browse</span>
                 </p>
-                <p className="mt-1 text-xs text-neutral-400">JPG, PNG, WebP · Max 5 MB</p>
+                <p className="mt-1 text-xs text-muted-foreground">JPG, PNG, WebP · Max 5 MB</p>
               </>
             )}
           </div>
@@ -603,7 +603,7 @@ function MediaStep() {
           <button
             type="button"
             onClick={() => setShowCoverUrlInput((v) => !v)}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-neutral-700"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
           >
             <LinkIcon className="h-3 w-3" />
             {showCoverUrlInput ? 'Hide URL input' : 'Or paste an image URL'}
@@ -614,19 +614,19 @@ function MediaStep() {
               value={state.coverImageUrl}
               onChange={(e) => setField('coverImageUrl', e.target.value)}
               placeholder="https://example.com/cover.jpg"
-              className="mt-1.5 w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
+              className="mt-1.5 w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
             />
           )}
         </div>
 
-        <p className="mt-1 text-xs text-neutral-400">
+        <p className="mt-1 text-xs text-muted-foreground">
           Required to publish. Use a high-quality landscape image.
         </p>
       </div>
 
       {/* ── Video URL ── */}
       <div>
-        <label className="mb-1.5 block text-sm font-semibold text-neutral-700">
+        <label className="mb-1.5 block text-sm font-semibold text-foreground">
           Video URL
         </label>
         <input
@@ -634,16 +634,16 @@ function MediaStep() {
           value={state.videoUrl}
           onChange={(e) => setField('videoUrl', e.target.value)}
           placeholder="https://youtube.com/watch?v=..."
-          className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
+          className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-brand-primary-500 focus:outline-none focus:ring-2 focus:ring-brand-primary-500/20"
         />
-        <p className="mt-1 text-xs text-neutral-400">
+        <p className="mt-1 text-xs text-muted-foreground">
           YouTube or Vimeo link for your event promo video.
         </p>
       </div>
 
       {/* ── Image Gallery ── */}
       <div>
-        <label className="mb-2 block text-sm font-semibold text-neutral-700">
+        <label className="mb-2 block text-sm font-semibold text-foreground">
           Image Gallery
         </label>
 
@@ -651,7 +651,7 @@ function MediaStep() {
         {state.imageGallery.length > 0 && (
           <div className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
             {state.imageGallery.map((url, i) => (
-              <div key={i} className="group relative overflow-hidden rounded-lg border border-neutral-200">
+              <div key={i} className="group relative overflow-hidden rounded-lg border border-border">
                 <img
                   src={url}
                   alt={`Gallery ${i + 1}`}
@@ -662,7 +662,7 @@ function MediaStep() {
                 />
                 <button
                   onClick={() => dispatch({ type: 'REMOVE_GALLERY_IMAGE', index: i })}
-                  className="absolute right-1 top-1 rounded-full bg-black/50 p-1 text-white opacity-0 transition-opacity hover:bg-red-600 group-hover:opacity-100"
+                  className="absolute right-1 top-1 rounded-full bg-foreground/50 p-1 text-background opacity-0 transition-opacity hover:bg-red-600 group-hover:opacity-100"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -681,20 +681,20 @@ function MediaStep() {
             'flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed py-8 transition-colors',
             galleryDragging
               ? 'border-brand-primary-500 bg-brand-primary-500/5'
-              : 'border-neutral-300 bg-neutral-50 hover:border-brand-primary-400 hover:bg-neutral-100',
+              : 'border-border bg-muted hover:border-brand-primary-400 hover:bg-muted',
             galleryUploading && 'pointer-events-none opacity-60',
           )}
         >
           {galleryUploading ? (
             <>
               <Loader2 className="mb-2 h-6 w-6 animate-spin text-brand-primary-500" />
-              <p className="text-sm font-medium text-neutral-600">Uploading…</p>
+              <p className="text-sm font-medium text-muted-foreground">Uploading…</p>
             </>
           ) : (
             <>
-              <Plus className="mb-1 h-6 w-6 text-neutral-400" />
-              <p className="text-sm font-medium text-neutral-600">Add gallery images</p>
-              <p className="mt-0.5 text-xs text-neutral-400">Drag files or click to browse</p>
+              <Plus className="mb-1 h-6 w-6 text-muted-foreground" />
+              <p className="text-sm font-medium text-muted-foreground">Add gallery images</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">Drag files or click to browse</p>
             </>
           )}
         </div>
@@ -781,8 +781,8 @@ function TicketsStep() {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <Ticket className="mb-4 h-12 w-12 text-green-500" />
-        <h3 className="mb-2 text-lg font-bold text-neutral-700">Free Event</h3>
-        <p className="text-sm text-neutral-500">
+        <h3 className="mb-2 text-lg font-bold text-foreground">Free Event</h3>
+        <p className="text-sm text-muted-foreground">
           This is a free event — no ticket tiers needed. You can change this in
           the Settings step.
         </p>
@@ -793,7 +793,7 @@ function TicketsStep() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold text-neutral-900">Ticket Tiers</h3>
+        <h3 className="text-lg font-bold text-foreground">Ticket Tiers</h3>
         {!adding && (
           <button
             onClick={() => setAdding(true)}
@@ -811,29 +811,29 @@ function TicketsStep() {
           {state.ticketTiers.map((t, i) => (
             <div
               key={i}
-              className="flex items-center justify-between rounded-lg border border-neutral-200 p-4"
+              className="flex items-center justify-between rounded-lg border border-border p-4"
             >
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-neutral-900">{t.name}</span>
-                  <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500">
+                  <span className="font-semibold text-foreground">{t.name}</span>
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                     {TICKET_TIERS.find((tt) => tt.value === t.tier)?.label ?? t.tier}
                   </span>
                 </div>
-                <p className="text-sm text-neutral-500">
+                <p className="text-sm text-muted-foreground">
                   ${t.price.toFixed(2)} · {t.totalQuantity} available · Max {t.maxPerOrder ?? 10}/order
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => startEdit(i)}
-                  className="rounded p-1 text-neutral-400 hover:text-brand-primary-600"
+                  className="rounded p-1 text-muted-foreground hover:text-brand-primary-600"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => dispatch({ type: 'REMOVE_TICKET_TIER', index: i })}
-                  className="rounded p-1 text-neutral-400 hover:text-red-500"
+                  className="rounded p-1 text-muted-foreground hover:text-red-500"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -850,30 +850,30 @@ function TicketsStep() {
           animate={{ opacity: 1, height: 'auto' }}
           className="rounded-xl border-2 border-brand-primary-200 bg-brand-primary-50/30 p-4"
         >
-          <h4 className="mb-4 text-sm font-bold text-neutral-700">
+          <h4 className="mb-4 text-sm font-bold text-foreground">
             {editIndex !== null ? 'Edit Tier' : 'New Ticket Tier'}
           </h4>
           <div className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs font-semibold text-neutral-600">
+                <label className="mb-1 block text-xs font-semibold text-muted-foreground">
                   Name *
                 </label>
                 <input
                   value={tierForm.name}
                   onChange={(e) => setTierForm((f) => ({ ...f, name: e.target.value }))}
                   placeholder="e.g., General Admission"
-                  className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-semibold text-neutral-600">
+                <label className="mb-1 block text-xs font-semibold text-muted-foreground">
                   Tier Type *
                 </label>
                 <select
                   value={tierForm.tier}
                   onChange={(e) => setTierForm((f) => ({ ...f, tier: e.target.value }))}
-                  className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none"
                 >
                   {TICKET_TIERS.map(({ value, label }) => (
                     <option key={value} value={value}>
@@ -885,7 +885,7 @@ function TicketsStep() {
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
               <div>
-                <label className="mb-1 block text-xs font-semibold text-neutral-600">
+                <label className="mb-1 block text-xs font-semibold text-muted-foreground">
                   Price ($) *
                 </label>
                 <input
@@ -896,11 +896,11 @@ function TicketsStep() {
                   onChange={(e) =>
                     setTierForm((f) => ({ ...f, price: Number(e.target.value) }))
                   }
-                  className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-semibold text-neutral-600">
+                <label className="mb-1 block text-xs font-semibold text-muted-foreground">
                   Quantity *
                 </label>
                 <input
@@ -910,11 +910,11 @@ function TicketsStep() {
                   onChange={(e) =>
                     setTierForm((f) => ({ ...f, totalQuantity: Number(e.target.value) }))
                   }
-                  className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-semibold text-neutral-600">
+                <label className="mb-1 block text-xs font-semibold text-muted-foreground">
                   Max Per Order
                 </label>
                 <input
@@ -925,12 +925,12 @@ function TicketsStep() {
                   onChange={(e) =>
                     setTierForm((f) => ({ ...f, maxPerOrder: Number(e.target.value) }))
                   }
-                  className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none"
                 />
               </div>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-semibold text-neutral-600">
+              <label className="mb-1 block text-xs font-semibold text-muted-foreground">
                 Description
               </label>
               <input
@@ -939,14 +939,14 @@ function TicketsStep() {
                   setTierForm((f) => ({ ...f, description: e.target.value }))
                 }
                 placeholder="What's included in this tier..."
-                className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none"
+                className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-brand-primary-500 focus:outline-none"
               />
             </div>
           </div>
           <div className="mt-4 flex justify-end gap-2">
             <button
               onClick={resetForm}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-100"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
             >
               Cancel
             </button>
@@ -962,7 +962,7 @@ function TicketsStep() {
       )}
 
       {state.ticketTiers.length === 0 && !adding && (
-        <p className="py-8 text-center text-sm text-neutral-400">
+        <p className="py-8 text-center text-sm text-muted-foreground">
           Add at least one ticket tier for paid events before publishing.
         </p>
       )}
@@ -1100,8 +1100,8 @@ function CreateEventWizard() {
   return (
     <div className="flex min-h-[calc(100vh-5rem)] flex-col">
       {/* Top progress bar */}
-      <div className="sticky top-0 z-10 border-b border-neutral-200 bg-white shadow-sm">
-        <div className="h-1.5 bg-neutral-200">
+      <div className="sticky top-0 z-10 border-b border-border bg-card shadow-sm">
+        <div className="h-1.5 bg-accent">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
@@ -1110,7 +1110,7 @@ function CreateEventWizard() {
           />
         </div>
         <div className="container mx-auto flex h-10 max-w-screen-xl items-center justify-end px-6">
-          <span className="text-xs font-medium text-neutral-500">
+          <span className="text-xs font-medium text-muted-foreground">
             Step {currentStep + 1} of {STEPS.length}
           </span>
         </div>
@@ -1124,8 +1124,8 @@ function CreateEventWizard() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-6 text-center"
           >
-            <h1 className="text-3xl font-bold text-neutral-900">Create Event</h1>
-            <p className="mt-1 text-neutral-500">
+            <h1 className="text-3xl font-bold text-foreground">Create Event</h1>
+            <p className="mt-1 text-muted-foreground">
               Fill in the details to create your event. You can edit and publish later.
             </p>
           </motion.div>
@@ -1141,9 +1141,9 @@ function CreateEventWizard() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
-              className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm"
+              className="rounded-2xl border border-border bg-card p-6 shadow-sm"
             >
-              <h2 className="mb-4 text-xl font-bold text-neutral-800">
+              <h2 className="mb-4 text-xl font-bold text-foreground">
                 {STEPS[currentStep].label}
               </h2>
               {stepComponents[currentStep]}
@@ -1153,7 +1153,7 @@ function CreateEventWizard() {
       </div>
 
       {/* Footer */}
-      <footer className="sticky bottom-0 border-t border-neutral-200 bg-white shadow-lg">
+      <footer className="sticky bottom-0 border-t border-border bg-card shadow-lg">
         <div className="container mx-auto flex h-16 max-w-screen-xl items-center justify-between px-6">
           <Button
             variant="secondary"

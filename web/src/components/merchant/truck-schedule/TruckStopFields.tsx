@@ -160,15 +160,15 @@ export const TruckStopFields = ({ value, onChange, defaultCenter }: TruckStopFie
     <div className="space-y-5">
       {/* Address search */}
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-neutral-700">Where will you be?</Label>
+        <Label className="text-sm font-medium text-foreground">Where will you be?</Label>
         <div className="relative">
           <div
             className={cn(
-              'flex items-center gap-3 rounded-xl border bg-white shadow-sm transition-all',
-              showSuggestions ? 'border-brand-primary-400 ring-2 ring-brand-primary-100' : 'border-neutral-200',
+              'flex items-center gap-3 rounded-xl border bg-card shadow-sm transition-all',
+              showSuggestions ? 'border-brand-primary-400 ring-2 ring-brand-primary-100' : 'border-border',
             )}
           >
-            <MapPin className="ml-3 h-4 w-4 shrink-0 text-neutral-400" />
+            <MapPin className="ml-3 h-4 w-4 shrink-0 text-muted-foreground" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -177,24 +177,24 @@ export const TruckStopFields = ({ value, onChange, defaultCenter }: TruckStopFie
               placeholder="Search address or landmark..."
               className="h-11 flex-1 border-0 bg-transparent text-sm shadow-none focus-visible:ring-0"
             />
-            {isSearching && <Loader2 className="mr-3 h-4 w-4 animate-spin text-neutral-400" />}
+            {isSearching && <Loader2 className="mr-3 h-4 w-4 animate-spin text-muted-foreground" />}
           </div>
           {showSuggestions && (suggestions.length > 0 || debouncedQuery.length >= 3) && (
-            <div className="absolute left-0 right-0 top-full z-[1100] mt-1 max-h-56 overflow-y-auto rounded-xl border border-neutral-200 bg-white shadow-lg">
+            <div className="absolute left-0 right-0 top-full z-[1100] mt-1 max-h-56 overflow-y-auto rounded-xl border border-border bg-card shadow-lg">
               {suggestions.length > 0 ? (
                 suggestions.map((s) => (
                   <button
                     key={s.place_id}
                     type="button"
                     onClick={() => handleSelectSuggestion(s)}
-                    className="flex w-full items-start gap-3 p-3 text-left hover:bg-neutral-50"
+                    className="flex w-full items-start gap-3 p-3 text-left hover:bg-muted"
                   >
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-neutral-400" />
-                    <span className="line-clamp-2 text-sm text-neutral-900">{s.display_name}</span>
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="line-clamp-2 text-sm text-foreground">{s.display_name}</span>
                   </button>
                 ))
               ) : (
-                <div className="p-3 text-center text-sm text-neutral-500">No results.</div>
+                <div className="p-3 text-center text-sm text-muted-foreground">No results.</div>
               )}
             </div>
           )}
@@ -204,21 +204,21 @@ export const TruckStopFields = ({ value, onChange, defaultCenter }: TruckStopFie
           type="button"
           onClick={handleUseCurrentLocation}
           disabled={isLocating}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-card py-2 text-sm font-medium text-foreground hover:bg-muted disabled:opacity-60"
         >
           {isLocating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Navigation className="h-4 w-4" />}
           Use my current location
         </button>
 
         {value.address && (
-          <div className="rounded-lg bg-neutral-50 p-2.5 text-xs text-neutral-700">
+          <div className="rounded-lg bg-muted p-2.5 text-xs text-foreground">
             <span className="font-medium">Selected:</span> {value.address}
           </div>
         )}
       </div>
 
       {/* Map */}
-      <div className="overflow-hidden rounded-xl border border-neutral-200">
+      <div className="overflow-hidden rounded-xl border border-border">
         <StoreLocationMap
           center={mapCenter}
           draggable={hasLocation}
@@ -232,7 +232,7 @@ export const TruckStopFields = ({ value, onChange, defaultCenter }: TruckStopFie
       {/* Date + time */}
       <div className="space-y-3">
         <div className="space-y-2">
-          <Label htmlFor="stop-date" className="text-sm font-medium text-neutral-700">Date</Label>
+          <Label htmlFor="stop-date" className="text-sm font-medium text-foreground">Date</Label>
           <Input
             id="stop-date"
             type="date"
@@ -245,7 +245,7 @@ export const TruckStopFields = ({ value, onChange, defaultCenter }: TruckStopFie
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-neutral-700">Starts</Label>
+            <Label className="text-sm font-medium text-foreground">Starts</Label>
             <TwelveHourTimeField
               value={value.startTime}
               onChange={(v) => onChange({ ...value, startTime: v })}
@@ -253,7 +253,7 @@ export const TruckStopFields = ({ value, onChange, defaultCenter }: TruckStopFie
             />
           </div>
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-neutral-700">Ends</Label>
+            <Label className="text-sm font-medium text-foreground">Ends</Label>
             <TwelveHourTimeField
               value={value.endTime}
               onChange={(v) => onChange({ ...value, endTime: v })}
@@ -265,8 +265,8 @@ export const TruckStopFields = ({ value, onChange, defaultCenter }: TruckStopFie
 
       {/* Notes */}
       <div className="space-y-2">
-        <Label htmlFor="stop-notes" className="text-sm font-medium text-neutral-700">
-          Notes <span className="text-xs font-normal text-neutral-500">(optional)</span>
+        <Label htmlFor="stop-notes" className="text-sm font-medium text-foreground">
+          Notes <span className="text-xs font-normal text-muted-foreground">(optional)</span>
         </Label>
         <Textarea
           id="stop-notes"

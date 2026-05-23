@@ -137,7 +137,7 @@ export const BogoDealQuickForm = () => {
               dispatch({ type: 'UPDATE_FIELD', field: 'title', value: e.target.value.slice(0, 100) })
             }
             placeholder="Wing Wednesday — Buy 2 Get 1 Free"
-            className="mt-1.5 h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+            className="mt-1.5 h-10 rounded-lg border-border bg-card text-[13.5px]"
             maxLength={100}
           />
         </SectionCard>
@@ -156,24 +156,24 @@ export const BogoDealQuickForm = () => {
                   className={cn(
                     'flex items-start gap-2.5 rounded-xl border p-3 text-left transition',
                     selected
-                      ? 'border-neutral-900 bg-neutral-50 shadow-[0_4px_12px_rgba(15,23,42,0.06)]'
-                      : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50',
+                      ? 'border-foreground bg-muted shadow-[0_4px_12px_rgba(15,23,42,0.06)]'
+                      : 'border-border bg-card hover:border-border hover:bg-muted',
                   )}
                 >
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300">
                     <ShoppingBag className="h-3.5 w-3.5" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-semibold text-neutral-900">{preset.label}</div>
-                    <div className="text-[11px] text-neutral-500">{preset.sub}</div>
+                    <div className="text-[13px] font-semibold text-foreground">{preset.label}</div>
+                    <div className="text-[11px] text-muted-foreground">{preset.sub}</div>
                   </div>
-                  {selected ? <CheckCircle2 className="h-4 w-4 shrink-0 text-neutral-900" /> : null}
+                  {selected ? <CheckCircle2 className="h-4 w-4 shrink-0 text-foreground" /> : null}
                 </button>
               );
             })}
           </div>
 
-          <div className="mt-4 flex items-center gap-2 text-[11px] font-medium text-neutral-500">
+          <div className="mt-4 flex items-center gap-2 text-[11px] font-medium text-muted-foreground">
             <Sparkles className="h-3 w-3 text-amber-500" />
             <span>Or set custom quantities:</span>
           </div>
@@ -192,7 +192,7 @@ export const BogoDealQuickForm = () => {
                     value: Math.max(1, parseInt(e.target.value) || 1),
                   })
                 }
-                className="mt-1.5 h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="mt-1.5 h-10 rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
             <div>
@@ -209,7 +209,7 @@ export const BogoDealQuickForm = () => {
                     value: Math.max(1, parseInt(e.target.value) || 1),
                   })
                 }
-                className="mt-1.5 h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="mt-1.5 h-10 rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
             <div>
@@ -227,7 +227,7 @@ export const BogoDealQuickForm = () => {
                     value: Math.max(0, Math.min(100, parseFloat(e.target.value) || 0)),
                   })
                 }
-                className="mt-1.5 h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="mt-1.5 h-10 rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
           </div>
@@ -250,7 +250,7 @@ export const BogoDealQuickForm = () => {
                     value: e.target.value ? `${e.target.value}T00:00:00.000Z` : '',
                   })
                 }
-                className="mt-1.5 h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="mt-1.5 h-10 w-[180px] rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
             <div className="shrink-0">
@@ -268,10 +268,10 @@ export const BogoDealQuickForm = () => {
                     value: e.target.value ? `${e.target.value}T23:59:59.000Z` : '',
                   })
                 }
-                className="mt-1.5 h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                className="mt-1.5 h-10 w-[180px] rounded-lg border-border bg-card text-[13.5px]"
               />
             </div>
-            <div className="hidden h-16 w-px shrink-0 bg-neutral-200 sm:block" aria-hidden />
+            <div className="hidden h-16 w-px shrink-0 bg-accent sm:block" aria-hidden />
             <div className="min-w-0 flex-1">
               <TimeWindowEditor value={window} onChange={setWindow} label="Active window (per day)" />
             </div>
@@ -290,7 +290,7 @@ export const BogoDealQuickForm = () => {
               dispatch({ type: 'UPDATE_FIELD', field: 'maxRedemptions', value: v });
             }}
             placeholder="50 uses"
-            className="mt-1.5 h-10 w-[200px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+            className="mt-1.5 h-10 w-[200px] rounded-lg border-border bg-card text-[13.5px]"
           />
         </SectionCard>
 

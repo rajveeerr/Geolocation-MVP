@@ -120,10 +120,10 @@ export const StoreDetailsScreen = () => {
       nextDisabledReason="Please complete the required fields (address, store name, phone)."
     >
       <div className="mx-auto max-w-4xl px-4 py-8 md:px-6">
-        <h1 className="font-heading text-2xl font-bold text-neutral-900 md:text-3xl">
+        <h1 className="font-heading text-2xl font-bold text-foreground md:text-3xl">
           Add your first location
         </h1>
-        <p className="mt-2 text-neutral-600">
+        <p className="mt-2 text-muted-foreground">
           Tell us about this venue — address, hours, and details. Customers will use this to find you.
         </p>
 
@@ -150,15 +150,15 @@ export const StoreDetailsScreen = () => {
           </section>
 
           {/* ====== MOBILE / FOOD TRUCK ====== */}
-          <section className="rounded-xl border border-neutral-200 bg-white p-4">
+          <section className="rounded-xl border border-border bg-card p-4">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-950/40">
                   <Truck className="h-5 w-5 text-amber-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-neutral-900">Food truck or mobile venue</p>
-                  <p className="text-xs text-neutral-500">
+                  <p className="text-sm font-semibold text-foreground">Food truck or mobile venue</p>
+                  <p className="text-xs text-muted-foreground">
                     Does this location move? You'll post stops on a schedule instead of fixed hours.
                   </p>
                 </div>
@@ -173,13 +173,13 @@ export const StoreDetailsScreen = () => {
 
           {/* ====== STORE INFO ====== */}
           <section>
-            <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+            <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Store Info
               {hasStoreInfoData && <CheckCircle2 className="h-4 w-4 text-brand-primary-500" />}
             </h2>
 
             <div className="mt-4">
-              <Label htmlFor="storeName" className="text-sm font-medium text-neutral-700">
+              <Label htmlFor="storeName" className="text-sm font-medium text-foreground">
                 Store name <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -191,13 +191,13 @@ export const StoreDetailsScreen = () => {
                   'mt-1 h-11 rounded-xl text-sm transition-colors',
                   attempted && !store.businessName?.trim()
                     ? 'border-red-400 ring-1 ring-red-200 focus:border-red-500 focus:ring-red-300'
-                    : 'border-neutral-300'
+                    : 'border-border'
                 )}
               />
             </div>
 
             <div className="mt-4">
-              <Label className="text-sm font-medium text-neutral-700">Store type</Label>
+              <Label className="text-sm font-medium text-foreground">Store type</Label>
               <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-6">
                 {STORE_TYPES.map((t) => {
                   const Icon = t.icon;
@@ -209,10 +209,10 @@ export const StoreDetailsScreen = () => {
                       onClick={() => updateStore({ storeType: t.value })}
                       className={cn(
                         'flex flex-col items-center gap-1.5 rounded-xl border-2 p-3 text-center transition-all',
-                        selected ? 'border-brand-primary-500 bg-brand-primary-50' : 'border-neutral-200 hover:border-neutral-300'
+                        selected ? 'border-brand-primary-500 bg-brand-primary-50' : 'border-border hover:border-border'
                       )}
                     >
-                      <Icon className={cn('h-5 w-5', selected ? 'text-brand-primary-600' : 'text-neutral-600')} />
+                      <Icon className={cn('h-5 w-5', selected ? 'text-brand-primary-600' : 'text-muted-foreground')} />
                       <span className="text-xs font-medium">{t.label}</span>
                     </button>
                   );
@@ -223,7 +223,7 @@ export const StoreDetailsScreen = () => {
 
           {/* ====== CONTACT ====== */}
           <section>
-            <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+            <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Contact
               {hasContactDataLocal && <CheckCircle2 className="h-4 w-4 text-brand-primary-500" />}
             </h2>
@@ -237,13 +237,13 @@ export const StoreDetailsScreen = () => {
                 }}
                 className={cn(
                   'mt-3 flex w-full items-center gap-3 rounded-xl border-2 p-3 text-left transition-all',
-                  isUsingMerchantContact ? 'border-brand-primary-500 bg-brand-primary-50' : 'border-neutral-200 hover:border-neutral-300'
+                  isUsingMerchantContact ? 'border-brand-primary-500 bg-brand-primary-50' : 'border-border hover:border-border'
                 )}
               >
-                <Copy className="h-5 w-5 shrink-0 text-neutral-500" />
+                <Copy className="h-5 w-5 shrink-0 text-muted-foreground" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-neutral-900">Use merchant contact info</p>
-                  <p className="text-xs text-neutral-600">
+                  <p className="text-sm font-semibold text-foreground">Use merchant contact info</p>
+                  <p className="text-xs text-muted-foreground">
                     {state.phoneNumber && <span>{state.phoneNumber}</span>}
                     {state.phoneNumber && state.contactEmail && ' · '}
                     {state.contactEmail && <span>{state.contactEmail}</span>}
@@ -255,11 +255,11 @@ export const StoreDetailsScreen = () => {
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div>
-                <Label htmlFor="storePhone" className="text-sm font-medium text-neutral-700">
+                <Label htmlFor="storePhone" className="text-sm font-medium text-foreground">
                   Phone <span className="text-red-500">*</span>
                 </Label>
                 <div className="relative mt-1">
-                  <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+                  <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="storePhone"
                     type="text"
@@ -277,9 +277,9 @@ export const StoreDetailsScreen = () => {
                 </div>
               </div>
               <div>
-                <Label htmlFor="storeEmail" className="text-sm font-medium text-neutral-700">Email</Label>
+                <Label htmlFor="storeEmail" className="text-sm font-medium text-foreground">Email</Label>
                 <div className="relative mt-1">
-                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="storeEmail"
                     type="email"
@@ -295,7 +295,7 @@ export const StoreDetailsScreen = () => {
 
           {/* ====== HOURS ====== */}
           <section>
-            <h2 className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+            <h2 className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Hours
               {hasHoursData && <CheckCircle2 className="h-4 w-4 text-brand-primary-500" />}
             </h2>
@@ -313,7 +313,7 @@ export const StoreDetailsScreen = () => {
             <div className="space-y-6">
               {/* Features */}
               <div>
-                <Label className="text-sm font-medium text-neutral-700">Store features</Label>
+                <Label className="text-sm font-medium text-foreground">Store features</Label>
                 <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {FEATURES.map((f) => {
                     const Icon = f.icon;
@@ -329,10 +329,10 @@ export const StoreDetailsScreen = () => {
                         }}
                         className={cn(
                           'flex items-center gap-2 rounded-xl border-2 p-3 text-left transition-all',
-                          checked ? 'border-brand-primary-500 bg-brand-primary-50' : 'border-neutral-200 hover:border-neutral-300'
+                          checked ? 'border-brand-primary-500 bg-brand-primary-50' : 'border-border hover:border-border'
                         )}
                       >
-                        <Icon className={cn('h-4 w-4', checked ? 'text-brand-primary-600' : 'text-neutral-500')} />
+                        <Icon className={cn('h-4 w-4', checked ? 'text-brand-primary-600' : 'text-muted-foreground')} />
                         <span className="text-xs font-medium">{f.label}</span>
                       </button>
                     );
@@ -342,10 +342,10 @@ export const StoreDetailsScreen = () => {
 
               {/* Store photos */}
               <div>
-                <Label className="text-sm font-medium text-neutral-700">Store photos/videos</Label>
+                <Label className="text-sm font-medium text-foreground">Store photos/videos</Label>
                 <div className="flex flex-col gap-1">
-                  <p className="text-xs text-neutral-500">Photos help customers find you. You can add more later.</p>
-                  <div className="flex items-center gap-1.5 rounded-md bg-amber-50 px-2 py-1 text-[10px] font-medium text-amber-800 ring-1 ring-inset ring-amber-600/20 w-fit">
+                  <p className="text-xs text-muted-foreground">Photos help customers find you. You can add more later.</p>
+                  <div className="flex items-center gap-1.5 rounded-md bg-amber-50 dark:bg-amber-950/30 px-2 py-1 text-[10px] font-medium text-amber-800 dark:text-amber-300 ring-1 ring-inset ring-amber-600/20 w-fit">
                     <Sparkles className="h-3 w-3" />
                     Premium merchants can also add short videos
                   </div>
@@ -362,18 +362,18 @@ export const StoreDetailsScreen = () => {
                               const next = store.galleryUrls.filter((_, idx) => idx !== i);
                               updateStore({ galleryUrls: next });
                             }}
-                            className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                            className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-foreground/60 text-background opacity-0 transition-opacity group-hover:opacity-100"
                           >
                             <X className="h-3 w-3" />
                           </button>
                         </div>
                       ))}
-                      <button type="button" onClick={() => setPhotosModalOpen(true)} className="flex aspect-square items-center justify-center rounded-lg border-2 border-dashed border-neutral-300 text-neutral-400 hover:bg-neutral-50">
+                      <button type="button" onClick={() => setPhotosModalOpen(true)} className="flex aspect-square items-center justify-center rounded-lg border-2 border-dashed border-border text-muted-foreground hover:bg-muted">
                         <Plus className="h-5 w-5" />
                       </button>
                     </div>
                   ) : (
-                    <button type="button" onClick={() => setPhotosModalOpen(true)} className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-neutral-300 py-6 text-sm text-neutral-500 hover:bg-neutral-50">
+                    <button type="button" onClick={() => setPhotosModalOpen(true)} className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border py-6 text-sm text-muted-foreground hover:bg-muted">
                       <Plus className="h-5 w-5" />
                       Add store photos/videos
                     </button>
@@ -384,9 +384,9 @@ export const StoreDetailsScreen = () => {
           </AccordionSection>
 
           {/* Multi-location hint */}
-          <div className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
-            <ExternalLink className="h-4 w-4 shrink-0 text-neutral-500" />
-            <p className="text-sm text-neutral-600">
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-muted px-4 py-3">
+            <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">
               Have multiple locations?{' '}
               <Link to={PATHS.MERCHANT_STORES} className="font-medium text-brand-primary-600 hover:underline">
                 Add other locations later in Dashboard

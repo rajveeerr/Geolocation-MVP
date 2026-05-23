@@ -16,7 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 const panelClass =
-  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
+  'rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 interface MockTier {
   id: string;
@@ -65,7 +65,7 @@ const ALL_PERKS = [
 
 function PerkRow({ text }: { text: string }) {
   return (
-    <li className="flex items-start gap-2 text-sm text-neutral-700">
+    <li className="flex items-start gap-2 text-sm text-foreground">
       <span className="mt-2 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500" aria-hidden />
       <span>{text}</span>
     </li>
@@ -80,8 +80,8 @@ function TierCard({ tier, onManageMembers }: { tier: MockTier; onManageMembers: 
       className={cn(panelClass, 'flex flex-col p-5')}
     >
       <header className="flex items-start justify-between gap-2">
-        <h3 className="text-lg font-bold tracking-tight text-neutral-900">{tier.name}</h3>
-        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-violet-100 px-2.5 py-1 text-[11px] font-semibold text-violet-700 ring-1 ring-inset ring-violet-200">
+        <h3 className="text-lg font-bold tracking-tight text-foreground">{tier.name}</h3>
+        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-violet-100 dark:bg-violet-950/40 px-2.5 py-1 text-[11px] font-semibold text-violet-700 dark:text-violet-300 ring-1 ring-inset ring-violet-200">
           <Users className="h-3 w-3" aria-hidden />
           {tier.members} members
         </span>
@@ -91,10 +91,10 @@ function TierCard({ tier, onManageMembers }: { tier: MockTier; onManageMembers: 
         <span className="text-3xl font-bold tracking-tight text-violet-600">
           ${tier.monthlyPrice.toFixed(2)}
         </span>
-        <span className="text-xs text-neutral-500">/ month</span>
+        <span className="text-xs text-muted-foreground">/ month</span>
       </div>
 
-      <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">
+      <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
         Perks:
       </p>
       <ul className="mt-2 space-y-2">
@@ -109,7 +109,7 @@ function TierCard({ tier, onManageMembers }: { tier: MockTier; onManageMembers: 
         type="button"
         variant="secondary"
         onClick={() => onManageMembers(tier)}
-        className="w-full rounded-2xl bg-white py-3 text-sm font-semibold text-neutral-900 shadow-sm ring-1 ring-inset ring-neutral-200 hover:bg-neutral-50"
+        className="w-full rounded-2xl bg-card py-3 text-sm font-semibold text-foreground shadow-sm ring-1 ring-inset ring-neutral-200 hover:bg-muted"
       >
         Manage Members
       </Button>
@@ -130,29 +130,29 @@ function MerchantMembershipTiersInner() {
   return (
     <div className="mx-auto max-w-screen-xl space-y-6 px-4 py-3 sm:px-1 sm:py-4">
       {/* Preview banner */}
-      <div className="flex items-start gap-3 rounded-2xl border border-violet-200 bg-violet-50/70 p-4">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white ring-1 ring-violet-200">
+      <div className="flex items-start gap-3 rounded-2xl border border-violet-200 dark:border-violet-900/50 bg-violet-50/70 dark:bg-violet-950/30 dark:bg-violet-950/30 dark:bg-violet-950/30 p-4">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-card ring-1 ring-violet-200">
           <Wand2 className="h-4 w-4 text-violet-600" aria-hidden />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-violet-900">Preview — not live yet</p>
-          <p className="mt-0.5 text-xs text-violet-800">
+          <p className="text-sm font-semibold text-violet-900 dark:text-violet-200">Preview — not live yet</p>
+          <p className="mt-0.5 text-xs text-violet-800 dark:text-violet-300">
             This is a UI sketch of how merchant membership tiers will work. Nothing saves and customers can't subscribe yet — we'll wire up real billing in a future pass.
           </p>
         </div>
       </div>
 
       {/* Title banner — content from the reference, our theme */}
-      <div className={cn(panelClass, 'flex flex-wrap items-center justify-between gap-4 border-violet-200/70 bg-gradient-to-r from-violet-50 via-white to-white p-5')}>
+      <div className={cn(panelClass, 'flex flex-wrap items-center justify-between gap-4 border-violet-200/70 dark:border-violet-900/50 bg-gradient-to-r from-violet-50 via-card to-card dark:bg-none dark:bg-card p-5')}>
         <div className="flex min-w-0 items-start gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-md">
             <CreditCard className="h-5 w-5" aria-hidden />
           </div>
           <div className="min-w-0">
-            <h2 className="text-lg font-bold tracking-tight text-neutral-900 sm:text-xl">
+            <h2 className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
               Membership Tiers
             </h2>
-            <p className="text-sm text-neutral-600">
+            <p className="text-sm text-muted-foreground">
               Monthly subscription programs with exclusive perks
             </p>
           </div>
@@ -180,11 +180,11 @@ function MerchantMembershipTiersInner() {
         <button
           type="button"
           onClick={() => showPreviewToast('Adding a new tier')}
-          className="flex min-h-[280px] flex-col items-center justify-center rounded-[1.45rem] border-2 border-dashed border-neutral-300 bg-neutral-50/50 text-neutral-400 transition hover:border-violet-300 hover:bg-violet-50/40 hover:text-violet-700"
+          className="flex min-h-[280px] flex-col items-center justify-center rounded-[1.45rem] border-2 border-dashed border-border bg-muted/50 text-muted-foreground transition hover:border-violet-300 hover:bg-violet-50/40 dark:bg-violet-950/30 dark:bg-violet-950/30 dark:bg-violet-950/30 hover:text-violet-700 dark:text-violet-300"
         >
           <Plus className="h-8 w-8" />
           <span className="mt-2 text-sm font-medium">Create another tier</span>
-          <span className="mt-1 px-6 text-center text-xs text-neutral-400">
+          <span className="mt-1 px-6 text-center text-xs text-muted-foreground">
             Most merchants use 2–3 tiers. Gold + Platinum is a good start.
           </span>
         </button>
@@ -194,16 +194,16 @@ function MerchantMembershipTiersInner() {
       <section className={cn(panelClass, 'p-5')}>
         <header className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-violet-500" aria-hidden />
-          <h2 className="text-sm font-semibold text-neutral-900">Perk library</h2>
+          <h2 className="text-sm font-semibold text-foreground">Perk library</h2>
         </header>
-        <p className="mt-1 text-xs text-neutral-500">
+        <p className="mt-1 text-xs text-muted-foreground">
           When you create a tier, mix and match perks from this library. Custom perks coming later.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {ALL_PERKS.map((p) => (
             <span
               key={p}
-              className="inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-700"
+              className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs text-foreground"
             >
               <Zap className="h-3 w-3 text-violet-500" />
               {p}
@@ -215,10 +215,10 @@ function MerchantMembershipTiersInner() {
       {/* Roadmap */}
       <section className={cn(panelClass, 'p-5')}>
         <header className="flex items-center gap-2">
-          <Clock3 className="h-4 w-4 text-neutral-500" aria-hidden />
-          <h2 className="text-sm font-semibold text-neutral-900">What's needed to ship this</h2>
+          <Clock3 className="h-4 w-4 text-muted-foreground" aria-hidden />
+          <h2 className="text-sm font-semibold text-foreground">What's needed to ship this</h2>
         </header>
-        <ul className="mt-3 space-y-2 text-sm text-neutral-700">
+        <ul className="mt-3 space-y-2 text-sm text-foreground">
           <li className="flex items-start gap-2">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" aria-hidden />
             Schema for tiers, perks, member subscriptions, billing periods

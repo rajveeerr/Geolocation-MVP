@@ -116,30 +116,30 @@ const PeriodFilter = ({ period, setPeriod }: { period: string; setPeriod: (p: st
 };
 
 const SummaryCard = ({ title, value, subtext }: { title: string; value: number; subtext: string }) => (
-  <div className="flex-1 rounded-[1.2rem] border border-neutral-200/80 bg-white/95 p-4 shadow-sm">
-    <p className="text-[13px] text-neutral-500">{title}</p>
-    <p className="mt-2 text-[1.5rem] font-bold tracking-tight text-neutral-900">${value.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
-    <p className="mt-1 text-[13px] text-neutral-500">{subtext}</p>
+  <div className="flex-1 rounded-[1.2rem] border border-border/80 bg-card/95 dark:bg-card p-4 shadow-sm">
+    <p className="text-[13px] text-muted-foreground">{title}</p>
+    <p className="mt-2 text-[1.5rem] font-bold tracking-tight text-foreground">${value.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
+    <p className="mt-1 text-[13px] text-muted-foreground">{subtext}</p>
   </div>
 );
 
 const EarningsRow = ({ detail }: { detail: KickbackEarningRow }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="border-b border-neutral-200 last:border-b-0 bg-white">
-      <button onClick={() => setIsOpen(!isOpen)} className="flex w-full items-center text-left p-4 hover:bg-neutral-50">
+    <div className="border-b border-border last:border-b-0 bg-card">
+      <button onClick={() => setIsOpen(!isOpen)} className="flex w-full items-center text-left p-4 hover:bg-muted">
         <Avatar className="h-10 w-10">
           <AvatarImage src={detail.user.avatarUrl} />
           <AvatarFallback>{detail.user.name.charAt(0)}</AvatarFallback>
         </Avatar>
         <div className="ml-4 flex-grow">
-          <p className="text-[13px] font-bold text-neutral-900">{detail.user.name} earned ${detail.earned.toFixed(2)}</p>
-          <p className="text-xs text-neutral-500">Invited {detail.invitedCount} others</p>
+          <p className="text-[13px] font-bold text-foreground">{detail.user.name} earned ${detail.earned.toFixed(2)}</p>
+          <p className="text-xs text-muted-foreground">Invited {detail.invitedCount} others</p>
         </div>
         <div className="text-right">
           <p className="text-[13px] font-semibold text-brand-primary-600">${detail.totalSpentByInvitees.toFixed(2)}</p>
         </div>
-        <ChevronDown className={cn('ml-4 h-5 w-5 text-neutral-400 transition-transform', isOpen && 'rotate-180')} />
+        <ChevronDown className={cn('ml-4 h-5 w-5 text-muted-foreground transition-transform', isOpen && 'rotate-180')} />
       </button>
       <AnimatePresence>
         {isOpen && detail.spendingDetail.length > 0 && (
@@ -150,19 +150,19 @@ const EarningsRow = ({ detail }: { detail: KickbackEarningRow }) => {
             className="overflow-hidden"
           >
             <div className="px-4 pb-4 pl-16 space-y-2">
-              <p className="text-xs font-semibold text-neutral-400 uppercase">Spending Details</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase">Spending Details</p>
               {detail.spendingDetail.map((item, index: number) => (
                 <div key={index} className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-md bg-neutral-100 text-xs font-bold text-neutral-500">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-md bg-muted text-xs font-bold text-muted-foreground">
                     #{item.dealId}
                   </div>
                   <div className="flex-grow">
-                    <p className="font-semibold text-neutral-700">{item.dealTitle}</p>
-                    <p className="text-xs text-neutral-500">
+                    <p className="font-semibold text-foreground">{item.dealTitle}</p>
+                    <p className="text-xs text-muted-foreground">
                       Earned ${item.amountEarned.toFixed(2)} from ${item.amountSpent.toFixed(2)} spend
                     </p>
                   </div>
-                  <p className="text-neutral-500">
+                  <p className="text-muted-foreground">
                     {new Date(item.date).toLocaleDateString('en-US', {
                       month: '2-digit',
                       day: '2-digit',
@@ -233,9 +233,9 @@ export const KickbackEarningsPage = () => {
       {displayData ? (
         <div className="space-y-5">
           {isDemo ? (
-            <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
+            <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/30 px-3 py-2.5">
               <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-              <p className="text-[12px] leading-5 text-amber-800">
+              <p className="text-[12px] leading-5 text-amber-800 dark:text-amber-300">
                 <span className="font-semibold">Demo data</span> — earnings will appear here once your
                 referral and bounty deals start converting. The numbers below are illustrative.
               </p>
@@ -261,12 +261,12 @@ export const KickbackEarningsPage = () => {
           </div>
 
           <div className={cn(merchantPanelClass, 'overflow-hidden p-0')}>
-            <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
               <div>
-                <h3 className="text-[14px] font-semibold text-neutral-900">Top referrers</h3>
-                <p className="text-[12px] text-neutral-500">Customers driving the most spend via referrals</p>
+                <h3 className="text-[14px] font-semibold text-foreground">Top referrers</h3>
+                <p className="text-[12px] text-muted-foreground">Customers driving the most spend via referrals</p>
               </div>
-              <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-[11px] font-semibold text-neutral-600 ring-1 ring-inset ring-neutral-200">
+              <span className="rounded-full bg-muted px-2.5 py-0.5 text-[11px] font-semibold text-muted-foreground ring-1 ring-inset ring-neutral-200">
                 {displayData.details.length}
               </span>
             </div>

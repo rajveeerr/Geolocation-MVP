@@ -206,16 +206,16 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         className={cn(
-          'bg-white border border-neutral-200 text-neutral-800',
+          'bg-card border border-border text-foreground',
           'sm:max-w-5xl max-h-[90vh] flex flex-col p-0 rounded-2xl overflow-hidden'
         )}
       >
         {/* Header */}
-        <DialogHeader className="px-6 pt-6 pb-4 border-b border-neutral-100">
-          <DialogTitle className="font-heading text-lg font-bold text-neutral-900">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b border-border">
+          <DialogTitle className="font-heading text-lg font-bold text-foreground">
             {collectionName || 'Happy Hour'}
           </DialogTitle>
-          <p className="text-sm text-neutral-500 mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             Choose items from your daily menu and set discounts
           </p>
         </DialogHeader>
@@ -223,13 +223,13 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
 
-          <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
-            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">
+          <div className="rounded-xl border border-border bg-muted px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Store Context
             </p>
-            <p className="mt-1 text-sm text-neutral-700">
+            <p className="mt-1 text-sm text-foreground">
               {storeContextMessage.split(selectedStoreLabel)[0]}
-              <span className="font-semibold text-neutral-900">{selectedStoreLabel}</span>
+              <span className="font-semibold text-foreground">{selectedStoreLabel}</span>
               {storeContextMessage.split(selectedStoreLabel)[1]}
             </p>
           </div>
@@ -240,13 +240,13 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand/10">
                 <Clock className="h-4 w-4 text-brand" />
               </div>
-              <span className="text-sm font-bold text-neutral-900">Happy Hour Schedule</span>
+              <span className="text-sm font-bold text-foreground">Happy Hour Schedule</span>
             </div>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
               {/* Start Time */}
               <div className="space-y-2.5">
-                <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-neutral-500">
+                <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
                   Start Time
                 </label>
                 <TwelveHourTimeField
@@ -258,7 +258,7 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
 
               {/* End Time */}
               <div className="space-y-2.5">
-                <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-neutral-500">
+                <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
                   End Time
                 </label>
                 <TwelveHourTimeField
@@ -270,13 +270,13 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
 
               {/* Duration badge */}
               <div className="space-y-2.5">
-                <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-neutral-500">
+                <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
                   Total Duration
                 </label>
-                <div className="flex h-[70px] items-center justify-center rounded-xl border border-dashed border-brand/30 bg-white px-4">
-                  <p className="text-2xl font-black text-neutral-900 tracking-tight">
+                <div className="flex h-[70px] items-center justify-center rounded-xl border border-dashed border-brand/30 bg-card px-4">
+                  <p className="text-2xl font-black text-foreground tracking-tight">
                     {duration.label.split(' ')[0]}
-                    <span className="text-sm font-bold text-neutral-400 ml-1">
+                    <span className="text-sm font-bold text-muted-foreground ml-1">
                       {duration.label.split(' ').slice(1).join(' ')}
                     </span>
                   </p>
@@ -289,7 +289,7 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
           <div className="space-y-3">
             {allMenuItems.length === 0 && (
               <div className="text-center py-10">
-                <p className="text-sm text-neutral-500">
+                <p className="text-sm text-muted-foreground">
                   No menu items yet. Add items to your Standard menu first.
                 </p>
               </div>
@@ -302,7 +302,7 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
                   'rounded-xl border p-4 transition-all',
                   row.selected
                     ? 'border-brand/20 bg-brand-subtle'
-                    : 'border-neutral-200 bg-white hover:bg-neutral-50'
+                    : 'border-border bg-card hover:bg-muted'
                 )}
               >
                 <div className="flex items-start gap-4">
@@ -317,14 +317,14 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
 
                   {/* Item info */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-neutral-900">{row.name}</p>
+                    <p className="text-sm font-semibold text-foreground">{row.name}</p>
                     {row.description && (
-                      <p className="text-xs text-neutral-500 mt-0.5 line-clamp-1">
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
                         {row.description}
                       </p>
                     )}
                     {row.category && (
-                      <span className="inline-block mt-1.5 text-xs font-medium px-2 py-0.5 rounded bg-neutral-100 text-neutral-600">
+                      <span className="inline-block mt-1.5 text-xs font-medium px-2 py-0.5 rounded bg-muted text-muted-foreground">
                         {row.category}
                       </span>
                     )}
@@ -332,7 +332,7 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
 
                   {/* Price */}
                   <div className="text-right shrink-0">
-                    <p className="text-xs uppercase tracking-wider text-neutral-400">
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground">
                       Regular Price
                     </p>
                     <p className="text-lg font-bold text-brand">
@@ -343,13 +343,13 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
 
                 {/* Expanded discount controls when selected */}
                 {row.selected && (
-                  <div className="mt-3 pt-3 border-t border-neutral-100 flex items-center gap-4">
+                  <div className="mt-3 pt-3 border-t border-border flex items-center gap-4">
                     <div className="flex-1">
-                      <label className="text-xs font-medium text-neutral-500 mb-1 block">
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
                         Happy Hour Price
                       </label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-neutral-400">$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
                         <input
                           type="number"
                           value={row.happyHourPrice || ''}
@@ -368,12 +368,12 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
                           }}
                           min={0}
                           step={0.01}
-                          className="w-full rounded-lg bg-neutral-50 border border-neutral-200 text-brand text-sm pl-7 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30"
+                          className="w-full rounded-lg bg-muted border border-border text-brand text-sm pl-7 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30"
                         />
                       </div>
                     </div>
                     <div className="w-24">
-                      <label className="text-xs font-medium text-neutral-500 mb-1 block">
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
                         Discount
                       </label>
                       <div className="relative">
@@ -393,7 +393,7 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
                           }}
                           min={0}
                           max={100}
-                          className="w-full rounded-lg bg-neutral-50 border border-neutral-200 text-brand text-sm px-3 py-2 pr-7 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30"
+                          className="w-full rounded-lg bg-muted border border-border text-brand text-sm px-3 py-2 pr-7 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30"
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-brand">%</span>
                       </div>
@@ -406,29 +406,29 @@ export const HappyHourMenuEditor: React.FC<HappyHourMenuEditorProps> = ({
         </div>
 
         {/* ── Stats bar ── */}
-        <div className="mx-6 rounded-xl bg-neutral-50 border border-neutral-200 px-5 py-3 grid grid-cols-3 text-center">
+        <div className="mx-6 rounded-xl bg-muted border border-border px-5 py-3 grid grid-cols-3 text-center">
           <div>
-            <p className="text-xs uppercase tracking-wider text-neutral-400">Selected Items</p>
-            <p className="text-xl font-bold text-neutral-900">{selectedCount}</p>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">Selected Items</p>
+            <p className="text-xl font-bold text-foreground">{selectedCount}</p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-wider text-neutral-400">Avg. Discount</p>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">Avg. Discount</p>
             <p className="text-xl font-bold text-brand">{avgDiscount}%</p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-wider text-neutral-400">Duration</p>
-            <p className="text-xl font-bold text-neutral-900">{duration.hours}h</p>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">Duration</p>
+            <p className="text-xl font-bold text-foreground">{duration.hours}h</p>
           </div>
         </div>
 
         {/* ── Footer ── */}
-        <div className="px-6 py-4 border-t border-neutral-100 bg-neutral-50/60 flex items-center justify-between">
-          <span className="text-xs text-neutral-400 font-medium">{selectedCount} items selected</span>
+        <div className="px-6 py-4 border-t border-border bg-muted/60 flex items-center justify-between">
+          <span className="text-xs text-muted-foreground font-medium">{selectedCount} items selected</span>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-neutral-800 transition-colors rounded-lg hover:bg-neutral-100"
+              className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted"
             >
               Cancel
             </button>

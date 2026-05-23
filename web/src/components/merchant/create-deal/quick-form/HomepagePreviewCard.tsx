@@ -34,8 +34,8 @@ const dealTypeMeta = (state: DealCreationState): PreviewMeta => {
 };
 
 const ACCENT_STYLE: Record<PreviewMeta['accent'], { pill: string; cashBadge: string }> = {
-  red: { pill: 'bg-[#E80203]/90 border-[#E80203]/70', cashBadge: 'bg-[#E80203] text-white' },
-  amber: { pill: 'bg-amber-500/90 border-amber-400/70', cashBadge: 'bg-amber-500 text-neutral-900' },
+  red: { pill: 'bg-brand/90 border-brand/70', cashBadge: 'bg-brand text-white' },
+  amber: { pill: 'bg-amber-500/90 border-amber-400/70', cashBadge: 'bg-amber-500 text-white' },
   purple: { pill: 'bg-violet-600/90 border-violet-500/70', cashBadge: 'bg-violet-600 text-white' },
   emerald: { pill: 'bg-emerald-600/90 border-emerald-500/70', cashBadge: 'bg-emerald-600 text-white' },
   sky: { pill: 'bg-sky-600/90 border-sky-500/70', cashBadge: 'bg-sky-600 text-white' },
@@ -162,13 +162,13 @@ export const HomepagePreviewCard = ({ bare = false }: HomepagePreviewCardProps) 
                   'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold',
                   state.endTime || state.activeEndDate
                     ? 'bg-emerald-500/20 text-emerald-200 ring-1 ring-emerald-400/30'
-                    : 'bg-white/10 text-white/80 ring-1 ring-white/20',
+                    : 'bg-card/10 dark:bg-card text-white/80 ring-1 ring-white/20',
                 )}
               >
                 <span
                   className={cn(
                     'inline-block h-1.5 w-1.5 rounded-full',
-                    state.endTime ? 'bg-emerald-400' : 'bg-white/70',
+                    state.endTime ? 'bg-emerald-400' : 'bg-card/70 dark:bg-card',
                   )}
                 />
                 {timeWindow}
@@ -197,10 +197,10 @@ export const HomepagePreviewCard = ({ bare = false }: HomepagePreviewCardProps) 
         <button
           type="button"
           tabIndex={-1}
-          className="flex h-11 flex-1 items-center justify-between gap-3 rounded-full bg-neutral-900 px-5 text-white"
+          className="flex h-11 flex-1 items-center justify-between gap-3 rounded-full bg-foreground px-5 text-background"
         >
           <span className="text-[13px] font-semibold tracking-tight">{meta.cta}</span>
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-neutral-900">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-card text-foreground">
             <ChevronDown className="h-3.5 w-3.5 -rotate-90" />
           </span>
         </button>
@@ -221,12 +221,12 @@ export const HomepagePreviewCard = ({ bare = false }: HomepagePreviewCardProps) 
   if (bare) return card;
 
   return (
-    <div className="rounded-[1.45rem] border border-neutral-200/80 bg-white/95 p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)]">
+    <div className="rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)]">
       <div className="mb-3 flex items-center justify-between">
-        <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">
+        <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           Preview — how it appears on the homepage
         </div>
-        <div className="text-[11px] text-neutral-500">live tile</div>
+        <div className="text-[11px] text-muted-foreground">live tile</div>
       </div>
       <div className="mx-auto max-w-[260px]">{card}</div>
     </div>
@@ -235,7 +235,7 @@ export const HomepagePreviewCard = ({ bare = false }: HomepagePreviewCardProps) 
 
 const ActionIcon = ({ children }: { children: React.ReactNode }) => (
   <span
-    className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm"
+    className="flex h-7 w-7 items-center justify-center rounded-full bg-card/15 dark:bg-card text-white backdrop-blur-sm"
     aria-hidden
   >
     {children}

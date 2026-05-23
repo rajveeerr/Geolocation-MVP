@@ -43,25 +43,25 @@ const TimePicker12 = ({ value, onChange, label }: TimePicker12Props) => {
       <select
         value={hour12}
         onChange={(e) => onChange(to24h(Number(e.target.value), nearestMin, period))}
-        className="rounded-lg border border-neutral-200 bg-white px-1.5 py-1.5 text-xs font-medium appearance-none cursor-pointer"
+        className="rounded-lg border border-border bg-card px-1.5 py-1.5 text-xs font-medium appearance-none cursor-pointer"
       >
         {HOURS_12.map((h) => (
           <option key={h} value={h}>{h}</option>
         ))}
       </select>
-      <span className="text-neutral-400">:</span>
+      <span className="text-muted-foreground">:</span>
       {/* Minute */}
       <select
         value={nearestMin}
         onChange={(e) => onChange(to24h(hour12, Number(e.target.value), period))}
-        className="rounded-lg border border-neutral-200 bg-white px-1.5 py-1.5 text-xs font-medium appearance-none cursor-pointer"
+        className="rounded-lg border border-border bg-card px-1.5 py-1.5 text-xs font-medium appearance-none cursor-pointer"
       >
         {MINUTES.map((m) => (
           <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
         ))}
       </select>
       {/* AM/PM */}
-      <div className="ml-0.5 flex rounded-lg border border-neutral-200 overflow-hidden">
+      <div className="ml-0.5 flex rounded-lg border border-border overflow-hidden">
         {(['AM', 'PM'] as const).map((p) => (
           <button
             key={p}
@@ -70,8 +70,8 @@ const TimePicker12 = ({ value, onChange, label }: TimePicker12Props) => {
             className={cn(
               'px-2 py-1.5 text-xs font-medium transition-colors',
               period === p
-                ? 'bg-neutral-900 text-white'
-                : 'bg-white text-neutral-500 hover:bg-neutral-50'
+                ? 'bg-foreground text-background'
+                : 'bg-card text-muted-foreground hover:bg-muted'
             )}
           >
             {p}
@@ -129,49 +129,49 @@ export const HoursSection = ({ hours, onChange, isFoodTruck, holidayHours = [], 
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-sm font-medium text-neutral-700">
+        <h3 className="text-sm font-medium text-foreground">
           {isFoodTruck ? 'Typical hours (location may vary)' : 'Operating hours'}
         </h3>
-        <p className="text-xs text-neutral-500">Set weekly hours — quick presets available</p>
+        <p className="text-xs text-muted-foreground">Set weekly hours — quick presets available</p>
       </div>
 
       {/* Presets */}
       <div className="flex flex-wrap gap-2">
-        <button type="button" onClick={copySameEveryDay} className="rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50">
+        <button type="button" onClick={copySameEveryDay} className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted">
           Same hours every day
         </button>
-        <button type="button" onClick={() => setAll(WEEKDAYS, '09:00', '17:00', false)} className="rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50">
+        <button type="button" onClick={() => setAll(WEEKDAYS, '09:00', '17:00', false)} className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted">
           Weekdays 9–5
         </button>
-        <button type="button" onClick={() => setAll(['saturday', 'sunday'], '', '', true)} className="rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50">
+        <button type="button" onClick={() => setAll(['saturday', 'sunday'], '', '', true)} className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted">
           Closed weekends
         </button>
       </div>
 
       {/* Day rows */}
-      <div className="rounded-xl border border-neutral-200 divide-y divide-neutral-100">
+      <div className="rounded-xl border border-border divide-y divide-neutral-100">
         {ALL_DAYS.map((day) => {
           const h = hours[day] || { open: '09:00', close: '17:00', closed: false };
           return (
             <div key={day} className="flex items-center gap-3 px-4 py-3">
-              <span className="w-10 text-sm font-medium text-neutral-700">{SHORT_LABELS[day]}</span>
+              <span className="w-10 text-sm font-medium text-foreground">{SHORT_LABELS[day]}</span>
               <Switch
                 checked={!h.closed}
                 onCheckedChange={(checked) => setDay(day, 'closed', !checked)}
               />
               {h.closed ? (
-                <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-medium text-neutral-500">
+                <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
                   Closed
                 </span>
               ) : (
                 <div className="flex items-center gap-2">
                   <TimePicker12 value={h.open} onChange={(v) => setDay(day, 'open', v)} label="Opens" />
-                  <span className="text-xs text-neutral-400">to</span>
+                  <span className="text-xs text-muted-foreground">to</span>
                   <TimePicker12 value={h.close} onChange={(v) => setDay(day, 'close', v)} label="Closes" />
                 </div>
               )}
               {!h.closed && (
-                <span className="ml-auto hidden text-xs text-neutral-400 sm:block">
+                <span className="ml-auto hidden text-xs text-muted-foreground sm:block">
                   {to12h(h.open)} – {to12h(h.close)}
                 </span>
               )}
@@ -186,22 +186,22 @@ export const HoursSection = ({ hours, onChange, isFoodTruck, holidayHours = [], 
           <button
             type="button"
             onClick={() => setShowHoliday(!showHoliday)}
-            className="flex items-center gap-2 text-sm font-medium text-neutral-700 hover:text-neutral-900"
+            className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-foreground"
           >
             <Calendar className="h-4 w-4" />
             Holiday hours
-            <span className="text-xs font-normal text-neutral-400">
+            <span className="text-xs font-normal text-muted-foreground">
               ({holidayHours.length} {holidayHours.length === 1 ? 'entry' : 'entries'})
             </span>
           </button>
 
           {showHoliday && (
-            <div className="space-y-3 rounded-xl border border-neutral-200 bg-neutral-50 p-4">
-              <p className="text-xs text-neutral-500">
+            <div className="space-y-3 rounded-xl border border-border bg-muted p-4">
+              <p className="text-xs text-muted-foreground">
                 Add specific dates with different hours (e.g. holidays, special events).
               </p>
               {holidayHours.map((entry, i) => (
-                <div key={i} className="flex flex-wrap items-center gap-2 rounded-lg border border-neutral-200 bg-white p-3">
+                <div key={i} className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-3">
                   <Input
                     type="date"
                     lang="en-US"
@@ -219,18 +219,18 @@ export const HoursSection = ({ hours, onChange, isFoodTruck, holidayHours = [], 
                     checked={!entry.closed}
                     onCheckedChange={(checked) => updateHolidayEntry(i, { closed: !checked })}
                   />
-                  <span className="text-xs text-neutral-500">{entry.closed ? 'Closed' : 'Open'}</span>
+                  <span className="text-xs text-muted-foreground">{entry.closed ? 'Closed' : 'Open'}</span>
                   {!entry.closed && (
                     <>
                       <TimePicker12 value={entry.open} onChange={(v) => updateHolidayEntry(i, { open: v })} />
-                      <span className="text-xs text-neutral-400">to</span>
+                      <span className="text-xs text-muted-foreground">to</span>
                       <TimePicker12 value={entry.close} onChange={(v) => updateHolidayEntry(i, { close: v })} />
                     </>
                   )}
                   <button
                     type="button"
                     onClick={() => removeHolidayEntry(i)}
-                    className="ml-auto rounded-full p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
+                    className="ml-auto rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-muted-foreground"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -239,7 +239,7 @@ export const HoursSection = ({ hours, onChange, isFoodTruck, holidayHours = [], 
               <button
                 type="button"
                 onClick={addHolidayEntry}
-                className="flex items-center gap-1.5 rounded-lg border border-dashed border-neutral-300 px-3 py-2 text-xs font-medium text-neutral-600 hover:bg-white"
+                className="flex items-center gap-1.5 rounded-lg border border-dashed border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-card"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add holiday

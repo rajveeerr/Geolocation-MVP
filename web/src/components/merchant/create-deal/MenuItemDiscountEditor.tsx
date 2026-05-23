@@ -178,25 +178,25 @@ export const MenuItemDiscountEditor = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 p-4"
       onClick={onClose}
     >
       <motion.div
         initial={{ scale: 0.95 }}
         animate={{ scale: 1 }}
         exit={{ scale: 0.95 }}
-        className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+        className="w-full max-w-md rounded-lg bg-card p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-neutral-900">{item.name}</h3>
-            <p className="text-sm text-neutral-600">Original Price: ${item.price.toFixed(2)}</p>
+            <h3 className="text-lg font-semibold text-foreground">{item.name}</h3>
+            <p className="text-sm text-muted-foreground">Original Price: ${item.price.toFixed(2)}</p>
           </div>
           <button
             onClick={onClose}
-            className="rounded-md p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
+            className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-muted-foreground"
           >
             <X className="h-5 w-5" />
           </button>
@@ -204,7 +204,7 @@ export const MenuItemDiscountEditor = ({
 
         {/* Discount Type Selection */}
         <div className="mb-6 space-y-3">
-          <Label className="text-sm font-medium text-neutral-700">Discount Type</Label>
+          <Label className="text-sm font-medium text-foreground">Discount Type</Label>
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => setDiscountType('global')}
@@ -212,11 +212,11 @@ export const MenuItemDiscountEditor = ({
                 'rounded-lg border-2 p-3 text-left transition-all',
                 discountType === 'global'
                   ? 'border-brand-primary-500 bg-brand-primary-50'
-                  : 'border-neutral-200 bg-white hover:border-neutral-300'
+                  : 'border-border bg-card hover:border-border'
               )}
             >
-              <div className="font-medium text-neutral-900">Global Discount</div>
-              <div className="text-xs text-neutral-600">
+              <div className="font-medium text-foreground">Global Discount</div>
+              <div className="text-xs text-muted-foreground">
                 {globalDiscountPercentage !== null
                   ? `${globalDiscountPercentage}% off`
                   : globalDiscountAmount !== null
@@ -231,14 +231,14 @@ export const MenuItemDiscountEditor = ({
                 'rounded-lg border-2 p-3 text-left transition-all',
                 discountType === 'customPrice'
                   ? 'border-brand-primary-500 bg-brand-primary-50'
-                  : 'border-neutral-200 bg-white hover:border-neutral-300'
+                  : 'border-border bg-card hover:border-border'
               )}
             >
               <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4 text-neutral-600" />
-                <div className="font-medium text-neutral-900">Fixed Price</div>
+                <Tag className="h-4 w-4 text-muted-foreground" />
+                <div className="font-medium text-foreground">Fixed Price</div>
               </div>
-              <div className="text-xs text-neutral-600">Set exact price</div>
+              <div className="text-xs text-muted-foreground">Set exact price</div>
             </button>
 
             <button
@@ -247,14 +247,14 @@ export const MenuItemDiscountEditor = ({
                 'rounded-lg border-2 p-3 text-left transition-all',
                 discountType === 'percentage'
                   ? 'border-brand-primary-500 bg-brand-primary-50'
-                  : 'border-neutral-200 bg-white hover:border-neutral-300'
+                  : 'border-border bg-card hover:border-border'
               )}
             >
               <div className="flex items-center gap-2">
-                <Percent className="h-4 w-4 text-neutral-600" />
-                <div className="font-medium text-neutral-900">Percentage</div>
+                <Percent className="h-4 w-4 text-muted-foreground" />
+                <div className="font-medium text-foreground">Percentage</div>
               </div>
-              <div className="text-xs text-neutral-600">% off this item</div>
+              <div className="text-xs text-muted-foreground">% off this item</div>
             </button>
 
             <button
@@ -263,14 +263,14 @@ export const MenuItemDiscountEditor = ({
                 'rounded-lg border-2 p-3 text-left transition-all',
                 discountType === 'fixedAmount'
                   ? 'border-brand-primary-500 bg-brand-primary-50'
-                  : 'border-neutral-200 bg-white hover:border-neutral-300'
+                  : 'border-border bg-card hover:border-border'
               )}
             >
               <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-neutral-600" />
-                <div className="font-medium text-neutral-900">Fixed Amount</div>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <div className="font-medium text-foreground">Fixed Amount</div>
               </div>
-              <div className="text-xs text-neutral-600">$ off this item</div>
+              <div className="text-xs text-muted-foreground">$ off this item</div>
             </button>
           </div>
         </div>
@@ -287,7 +287,7 @@ export const MenuItemDiscountEditor = ({
             >
               <Label htmlFor="customPrice">Fixed Price ($)</Label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+                <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   id="customPrice"
                   type="number"
@@ -312,7 +312,7 @@ export const MenuItemDiscountEditor = ({
             >
               <Label htmlFor="customDiscount">Discount Percentage (%)</Label>
               <div className="relative">
-                <Percent className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+                <Percent className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   id="customDiscount"
                   type="number"
@@ -338,7 +338,7 @@ export const MenuItemDiscountEditor = ({
             >
               <Label htmlFor="discountAmount">Discount Amount ($)</Label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+                <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   id="discountAmount"
                   type="number"
@@ -355,35 +355,35 @@ export const MenuItemDiscountEditor = ({
         </AnimatePresence>
 
         {/* Price Preview */}
-        <div className="mb-6 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
-          <div className="mb-2 text-sm font-medium text-neutral-700">Price Preview</div>
+        <div className="mb-6 rounded-lg border border-border bg-muted p-4">
+          <div className="mb-2 text-sm font-medium text-foreground">Price Preview</div>
           <div className="flex items-baseline justify-between">
             <div>
               {priceCalculation.discountPercent > 0 && (
-                <div className="text-sm text-neutral-400 line-through mb-1">
+                <div className="text-sm text-muted-foreground line-through mb-1">
                   ${item.price.toFixed(2)}
                 </div>
               )}
               <div className={cn(
                 "text-2xl font-bold",
-                priceCalculation.discountPercent > 0 ? "text-green-600" : "text-neutral-900"
+                priceCalculation.discountPercent > 0 ? "text-green-600" : "text-foreground"
               )}>
                 ${priceCalculation.finalPrice.toFixed(2)}
               </div>
               {priceCalculation.discountPercent > 0 && (
-                <div className="text-sm text-neutral-600 mt-1">
+                <div className="text-sm text-muted-foreground mt-1">
                   {priceCalculation.description}
                 </div>
               )}
             </div>
             {priceCalculation.discountPercent > 0 && (
-              <div className="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">
+              <div className="rounded-full bg-green-100 dark:bg-green-950/40 px-3 py-1 text-sm font-semibold text-green-700 dark:text-green-300">
                 {priceCalculation.discountPercent.toFixed(1)}% OFF
               </div>
             )}
           </div>
           {discountType === 'global' && (
-            <div className="mt-2 text-xs text-neutral-500">
+            <div className="mt-2 text-xs text-muted-foreground">
               Using deal's global discount
             </div>
           )}

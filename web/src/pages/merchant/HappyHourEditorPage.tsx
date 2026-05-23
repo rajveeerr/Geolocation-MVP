@@ -413,11 +413,11 @@ const HappyHourEditorContent = () => {
             <ArrowLeft />
           </Button>
           <div>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Deals</div>
-            <h1 className="mt-1.5 text-[1.65rem] font-semibold tracking-tight text-neutral-900 sm:text-[1.85rem]">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Deals</div>
+            <h1 className="mt-1.5 text-[1.65rem] font-semibold tracking-tight text-foreground sm:text-[1.85rem]">
               Create Happy Hour Deal
             </h1>
-            <p className="mt-1.5 max-w-2xl text-[13px] leading-6 text-neutral-600 sm:text-sm">
+            <p className="mt-1.5 max-w-2xl text-[13px] leading-6 text-muted-foreground sm:text-sm">
               Create a limited-time happy hour to drive visits.
             </p>
           </div>
@@ -425,18 +425,18 @@ const HappyHourEditorContent = () => {
 
         <div className="space-y-5">
               {/* STEP 1: Menu Items - FIRST AND MOST PROMINENT */}
-              <div className="rounded-[1.45rem] border border-neutral-200/80 bg-white/95 p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)]">
+              <div className="rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)]">
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                       Menu items
                     </div>
-                    <p className="mt-0.5 text-[12px] text-neutral-500">
+                    <p className="mt-0.5 text-[12px] text-muted-foreground">
                       Choose which items from your menu are in this happy hour.
                     </p>
                   </div>
                   {state.selectedMenuItems.length > 0 ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/15">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-600/15">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                       {state.selectedMenuItems.length} item{state.selectedMenuItems.length !== 1 ? 's' : ''} selected
                     </span>
@@ -444,12 +444,12 @@ const HappyHourEditorContent = () => {
                 </div>
 
                 {state.selectedMenuItems.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-neutral-300 bg-neutral-50/60 px-4 py-8 text-center">
-                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
-                      <UtensilsCrossed className="h-5 w-5 text-neutral-400" />
+                  <div className="rounded-xl border border-dashed border-border bg-muted/60 px-4 py-8 text-center">
+                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                      <UtensilsCrossed className="h-5 w-5 text-muted-foreground" />
                     </div>
-                    <h3 className="text-[14px] font-semibold text-neutral-900">No items selected yet</h3>
-                    <p className="mb-4 mt-1 text-[12px] text-neutral-500">
+                    <h3 className="text-[14px] font-semibold text-foreground">No items selected yet</h3>
+                    <p className="mb-4 mt-1 text-[12px] text-muted-foreground">
                       Add items to include in this happy hour deal.
                     </p>
                     <Button
@@ -466,7 +466,7 @@ const HappyHourEditorContent = () => {
                       <button
                         type="button"
                         onClick={() => navigate('/merchant/deals/create/happy-hour/add-menu')}
-                        className="inline-flex h-8 items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 text-[12px] font-semibold text-neutral-700 transition hover:border-neutral-300 hover:bg-neutral-50"
+                        className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-[12px] font-semibold text-foreground transition hover:border-border hover:bg-muted"
                       >
                         <ShoppingBag className="h-3 w-3" /> Add more
                       </button>
@@ -498,7 +498,7 @@ const HappyHourEditorContent = () => {
                         const hasDiscount = finalPrice < item.price;
                         
                         return (
-                          <div key={item.id} className="bg-white rounded-lg border border-neutral-200 p-4 hover:shadow-md transition-shadow">
+                          <div key={item.id} className="bg-card rounded-lg border border-border p-4 hover:shadow-md transition-shadow">
                             <div className="flex items-start justify-between gap-4">
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
@@ -507,35 +507,35 @@ const HappyHourEditorContent = () => {
                                   )}
                                   <div className="flex-1">
                                     <div className="flex items-center gap-2">
-                                      <span className="font-semibold text-neutral-900">{item.name}</span>
+                                      <span className="font-semibold text-foreground">{item.name}</span>
                                       {item.isHidden && (
-                                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                                        <span className="rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">
                                           Hidden
                                         </span>
                                       )}
                                       {(item.customPrice !== null || item.customDiscount !== null || item.discountAmount !== null) && (
-                                        <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
+                                        <span className="rounded-full bg-blue-100 dark:bg-blue-950/40 px-2 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300">
                                           Custom
                                         </span>
                                       )}
                                     </div>
                                     {item.category && (
-                                      <p className="text-xs text-neutral-500 mt-0.5">{item.category}</p>
+                                      <p className="text-xs text-muted-foreground mt-0.5">{item.category}</p>
                                     )}
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-3 mt-2">
                                   {hasDiscount && (
-                                    <span className="text-sm text-neutral-400 line-through">${item.price.toFixed(2)}</span>
+                                    <span className="text-sm text-muted-foreground line-through">${item.price.toFixed(2)}</span>
                                   )}
                                   <span className={cn(
                                     "text-lg font-bold",
-                                    hasDiscount ? "text-green-600" : "text-neutral-900"
+                                    hasDiscount ? "text-green-600" : "text-foreground"
                                   )}>
                                     ${finalPrice.toFixed(2)}
                                   </span>
                                   {discountInfo && (
-                                    <span className="text-xs text-neutral-500 bg-neutral-100 px-2 py-1 rounded">
+                                    <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
                                       {discountInfo}
                                     </span>
                                   )}
@@ -562,7 +562,7 @@ const HappyHourEditorContent = () => {
               <FormSection title="Schedule" subtitle="When your happy hour is active">
                 <div className="flex flex-wrap items-end gap-3">
                   <div className="shrink-0">
-                    <label htmlFor="hh-start-date" className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+                    <label htmlFor="hh-start-date" className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                       Start date
                     </label>
                     <Input
@@ -571,11 +571,11 @@ const HappyHourEditorContent = () => {
                       lang="en-US"
                       value={state.activeStartDate}
                       onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'activeStartDate', value: e.target.value })}
-                      className="h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                      className="h-10 w-[180px] rounded-lg border-border bg-card text-[13.5px]"
                     />
                   </div>
                   <div className="shrink-0">
-                    <label htmlFor="hh-end-date" className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+                    <label htmlFor="hh-end-date" className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                       End date
                     </label>
                     <Input
@@ -584,7 +584,7 @@ const HappyHourEditorContent = () => {
                       lang="en-US"
                       value={state.activeEndDate}
                       onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'activeEndDate', value: e.target.value })}
-                      className="h-10 w-[180px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+                      className="h-10 w-[180px] rounded-lg border-border bg-card text-[13.5px]"
                     />
                   </div>
                 </div>
@@ -625,13 +625,13 @@ const HappyHourEditorContent = () => {
               >
                 <button
                   onClick={() => setShowLocationTargeting(!showLocationTargeting)}
-                  className="w-full flex items-center justify-between rounded-lg border border-neutral-200 bg-white p-4 hover:bg-neutral-50 transition-colors"
+                  className="w-full flex items-center justify-between rounded-lg border border-border bg-card p-4 hover:bg-muted transition-colors"
                 >
                   <div className="flex items-center gap-2">
                     <MapPin className="h-5 w-5 text-brand-primary-600" />
-                    <span className="font-medium text-neutral-900">Location Targeting</span>
+                    <span className="font-medium text-foreground">Location Targeting</span>
                   </div>
-                  <span className="text-sm text-neutral-500">
+                  <span className="text-sm text-muted-foreground">
                     {showLocationTargeting ? 'Hide' : 'Show'}
                   </span>
                 </button>
@@ -646,12 +646,12 @@ const HappyHourEditorContent = () => {
                     >
                       {/* Stores */}
                       <div>
-                        <Label className="text-sm font-medium text-neutral-700 mb-2 flex items-center gap-2">
+                        <Label className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
                           <Store className="h-4 w-4" />
                           Select Stores
                         </Label>
                         {stores.length === 0 ? (
-                          <p className="text-sm text-neutral-500">No stores found. Add stores in store management.</p>
+                          <p className="text-sm text-muted-foreground">No stores found. Add stores in store management.</p>
                         ) : (
                           <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
                             {stores.map((store) => {
@@ -675,11 +675,11 @@ const HappyHourEditorContent = () => {
                                     'rounded-lg border-2 p-3 text-left transition-all',
                                     isSelected
                                       ? 'border-brand-primary-500 bg-brand-primary-50'
-                                      : 'border-neutral-200 bg-white hover:border-brand-primary-300'
+                                      : 'border-border bg-card hover:border-brand-primary-300'
                                   )}
                                 >
                                   <div className="flex items-center justify-between">
-                                    <span className="text-sm font-medium text-neutral-900">
+                                    <span className="text-sm font-medium text-foreground">
                                       {store.address || `Store #${store.id}`}
                                     </span>
                                     {isSelected && (
@@ -691,19 +691,19 @@ const HappyHourEditorContent = () => {
                             })}
                           </div>
                         )}
-                        <p className="text-xs text-neutral-500 mt-2">
+                        <p className="text-xs text-muted-foreground mt-2">
                           Leave empty to apply to all stores. If set, deal is only available at selected stores.
                         </p>
                       </div>
 
                       {/* Cities */}
                       <div>
-                        <Label className="text-sm font-medium text-neutral-700 mb-2 flex items-center gap-2">
+                        <Label className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
                           <Building2 className="h-4 w-4" />
                           Select Cities
                         </Label>
                         {cities.length === 0 ? (
-                          <p className="text-sm text-neutral-500">No cities found.</p>
+                          <p className="text-sm text-muted-foreground">No cities found.</p>
                         ) : (
                           <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
                             {cities.map((city) => {
@@ -727,11 +727,11 @@ const HappyHourEditorContent = () => {
                                     'rounded-lg border-2 p-3 text-left transition-all',
                                     isSelected
                                       ? 'border-brand-primary-500 bg-brand-primary-50'
-                                      : 'border-neutral-200 bg-white hover:border-brand-primary-300'
+                                      : 'border-border bg-card hover:border-brand-primary-300'
                                   )}
                                 >
                                   <div className="flex items-center justify-between">
-                                    <span className="text-sm font-medium text-neutral-900">
+                                    <span className="text-sm font-medium text-foreground">
                                       {city.name}, {city.state}
                                     </span>
                                     {isSelected && (
@@ -743,7 +743,7 @@ const HappyHourEditorContent = () => {
                             })}
                           </div>
                         )}
-                        <p className="text-xs text-neutral-500 mt-2">
+                        <p className="text-xs text-muted-foreground mt-2">
                           Leave empty to apply to all cities. If set, deal is only available in selected cities.
                         </p>
                       </div>
@@ -767,7 +767,7 @@ const HappyHourEditorContent = () => {
                 />
                 {state.imageUrls && state.imageUrls.length > 0 && (
                   <div className="mt-4">
-                    <Label className="text-sm font-medium text-neutral-700 mb-2 block">
+                    <Label className="text-sm font-medium text-foreground mb-2 block">
                       Primary Image (shown first)
                     </Label>
                     <div className="grid grid-cols-5 gap-2">
@@ -780,7 +780,7 @@ const HappyHourEditorContent = () => {
                             'relative rounded-lg border-2 overflow-hidden aspect-square',
                             state.primaryImageIndex === index
                               ? 'border-brand-primary-500 ring-2 ring-brand-primary-200'
-                              : 'border-neutral-200 hover:border-brand-primary-300'
+                              : 'border-border hover:border-brand-primary-300'
                           )}
                         >
                           <img src={url} alt={`Deal image ${index + 1}`} className="w-full h-full object-cover" />
@@ -792,7 +792,7 @@ const HappyHourEditorContent = () => {
                         </button>
                       ))}
                     </div>
-                    <p className="text-xs text-neutral-500 mt-2">
+                    <p className="text-xs text-muted-foreground mt-2">
                       Click an image to set it as the primary image (shown first in listings).
                     </p>
                   </div>
@@ -816,12 +816,12 @@ const HappyHourEditorContent = () => {
           </AnimatePresence>
         </div>
 
-        <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-neutral-200/80 bg-white/95 backdrop-blur-xl shadow-[0_-6px_20px_rgba(15,23,42,0.06)] lg:left-[320px] lg:w-[calc(100%-320px)]">
+        <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-border/80 bg-card/95 dark:bg-card backdrop-blur-xl shadow-[0_-6px_20px_rgba(15,23,42,0.06)] lg:left-[320px] lg:w-[calc(100%-320px)]">
           <div className="mx-auto flex min-h-[3.75rem] w-full max-w-screen-xl items-center justify-between gap-2 px-3 py-2.5 sm:px-5">
             <Button
               variant="secondary"
               onClick={() => navigate('/merchant/deals/create')}
-              className="h-9 rounded-xl border-neutral-300 bg-white px-4 text-[13px] text-neutral-700 shadow-none hover:border-neutral-400 hover:bg-neutral-50"
+              className="h-9 rounded-xl border-border bg-card px-4 text-[13px] text-foreground shadow-none hover:border-border hover:bg-muted"
               disabled={isSubmitting}
             >
               Back
@@ -830,7 +830,7 @@ const HappyHourEditorContent = () => {
               variant="ghost"
               onClick={handleSubmit}
               disabled={isSubmitting || state.selectedMenuItems.length === 0 || !state.title?.trim()}
-              className="flex h-9 min-w-[160px] items-center justify-center gap-1.5 rounded-xl bg-[hsl(var(--brand-primary))] px-4 text-[13px] font-semibold text-white shadow-[0_6px_18px_hsl(var(--brand-primary)/0.28)] hover:bg-[hsl(var(--brand-primary-hover))] hover:text-white disabled:opacity-100 disabled:bg-neutral-200 disabled:text-neutral-700 disabled:shadow-none disabled:hover:bg-neutral-200"
+              className="flex h-9 min-w-[160px] items-center justify-center gap-1.5 rounded-xl bg-[hsl(var(--brand-primary))] px-4 text-[13px] font-semibold text-white shadow-[0_6px_18px_hsl(var(--brand-primary)/0.28)] hover:bg-[hsl(var(--brand-primary-hover))] hover:text-white disabled:opacity-100 disabled:bg-accent disabled:text-foreground disabled:shadow-none disabled:hover:bg-accent"
             >
               {isSubmitting ? (
                 <>

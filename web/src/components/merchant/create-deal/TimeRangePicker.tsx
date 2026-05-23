@@ -186,8 +186,8 @@ export const TimeRangePicker = () => {
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-semibold transition',
                   selected
-                    ? 'border-neutral-900 bg-neutral-900 text-white shadow-[0_4px_12px_rgba(15,23,42,0.16)]'
-                    : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50',
+                    ? 'border-foreground bg-foreground text-background shadow-[0_4px_12px_rgba(15,23,42,0.16)]'
+                    : 'border-border bg-card text-foreground hover:border-border hover:bg-muted',
                 )}
               >
                 <Calendar className="h-3 w-3" />
@@ -209,7 +209,7 @@ export const TimeRangePicker = () => {
                 }}
                 className="space-y-0"
               />
-              <span className="pb-1.5 text-neutral-400">→</span>
+              <span className="pb-1.5 text-muted-foreground">→</span>
               <TwelveHourTimeField
                 value={single.end || '19:00'}
                 onChange={(value) => {
@@ -247,8 +247,8 @@ export const TimeRangePicker = () => {
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={cn(
-                  'flex flex-wrap items-center gap-2 rounded-xl border bg-white px-3 py-2',
-                  validation.isValid ? 'border-neutral-200' : 'border-rose-200 bg-rose-50/40',
+                  'flex flex-wrap items-center gap-2 rounded-xl border bg-card px-3 py-2',
+                  validation.isValid ? 'border-border' : 'border-rose-200 dark:border-rose-900/50 bg-rose-50/40 dark:bg-rose-950/30',
                 )}
               >
                 <select
@@ -259,7 +259,7 @@ export const TimeRangePicker = () => {
                       payload: { id: range.id, field: 'day', value: e.target.value },
                     })
                   }
-                  className="h-9 rounded-lg border border-neutral-200 bg-white px-2 text-[13px] outline-none focus:border-brand-primary-400"
+                  className="h-9 rounded-lg border border-border bg-card px-2 text-[13px] outline-none focus:border-brand-primary-400"
                 >
                   {days.map((day) => (
                     <option key={day.value} value={day.value}>
@@ -277,7 +277,7 @@ export const TimeRangePicker = () => {
                   }
                   className="space-y-0"
                 />
-                <span className="text-neutral-400">→</span>
+                <span className="text-muted-foreground">→</span>
                 <TwelveHourTimeField
                   value={range.end}
                   onChange={(value) =>
@@ -304,7 +304,7 @@ export const TimeRangePicker = () => {
                     const newRanges = state.timeRanges.filter((r) => r.id !== range.id);
                     dispatch({ type: 'SET_FIELD', field: 'timeRanges', value: newRanges });
                   }}
-                  className="ml-auto inline-flex h-7 w-7 items-center justify-center rounded-full text-neutral-400 transition hover:bg-rose-50 hover:text-rose-600"
+                  className="ml-auto inline-flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition hover:bg-rose-50 dark:bg-rose-950/30 hover:text-rose-600"
                   aria-label="Remove time range"
                 >
                   <X className="h-3.5 w-3.5" />
@@ -315,7 +315,7 @@ export const TimeRangePicker = () => {
           <button
             type="button"
             onClick={addCustomDayRange}
-            className="inline-flex h-8 items-center gap-1.5 rounded-full border border-dashed border-neutral-300 bg-white px-3 text-[12px] font-semibold text-neutral-600 transition hover:border-neutral-400 hover:bg-neutral-50"
+            className="inline-flex h-8 items-center gap-1.5 rounded-full border border-dashed border-border bg-card px-3 text-[12px] font-semibold text-muted-foreground transition hover:border-border hover:bg-muted"
           >
             <Plus className="h-3 w-3" />
             Add day & time

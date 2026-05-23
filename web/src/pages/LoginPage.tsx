@@ -43,8 +43,8 @@ export const LoginPage = () => {
       <title>Log In | Yohop</title>
       <meta name="description" content="Log in to Yohop to discover local deals and earn points by checking in to offers near you." />
 
-      <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-neutral-50 px-4 py-12 sm:py-16">
-        <div className="w-full max-w-[1040px] grid grid-cols-1 lg:grid-cols-2 rounded-3xl overflow-hidden shadow-xl bg-white">
+      <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-background px-4 py-12 sm:py-16">
+        <div className="w-full max-w-[1040px] grid grid-cols-1 lg:grid-cols-2 rounded-3xl overflow-hidden shadow-xl bg-card border border-border/60">
 
           {/* ── LEFT PANEL: Hero illustration ── */}
           <div className="relative hidden lg:flex flex-col justify-between bg-gradient-to-b from-[#c4a882] via-[#b8997a] to-[#a08568] p-10 text-white overflow-hidden min-h-[640px]">
@@ -89,10 +89,10 @@ export const LoginPage = () => {
           <div className="flex flex-col justify-center px-8 py-12 sm:px-12 lg:px-14">
             <div className="max-w-sm mx-auto w-full">
               {/* Heading */}
-              <h1 className="text-3xl sm:text-[2rem] font-black text-neutral-900 tracking-tight">
+              <h1 className="text-3xl sm:text-[2rem] font-black text-foreground tracking-tight">
                 Welcome Back
               </h1>
-              <p className="mt-2 text-neutral-500 text-[15px]">
+              <p className="mt-2 text-muted-foreground text-[15px]">
                 Time to <span className="text-brand-primary-main font-semibold">find deals</span> and earn rewards.
               </p>
 
@@ -101,7 +101,7 @@ export const LoginPage = () => {
                 <button
                   type="button"
                   onClick={() => handleSocialLogin('google')}
-                  className="flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 transition-colors text-sm font-medium text-neutral-700"
+                  className="flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border border-border bg-card hover:bg-muted transition-colors text-sm font-medium text-foreground"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
@@ -114,7 +114,7 @@ export const LoginPage = () => {
                 <button
                   type="button"
                   onClick={() => handleSocialLogin('apple')}
-                  className="flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 transition-colors text-sm font-medium text-neutral-700"
+                  className="flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border border-border bg-card hover:bg-muted transition-colors text-sm font-medium text-foreground"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
@@ -126,10 +126,10 @@ export const LoginPage = () => {
               {/* Divider */}
               <div className="relative my-7">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-neutral-200" />
+                  <div className="w-full border-t border-border" />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-white px-4 text-xs font-medium text-neutral-400 uppercase tracking-widest">
+                  <span className="bg-card px-4 text-xs font-medium text-muted-foreground uppercase tracking-widest">
                     Or continue with email
                   </span>
                 </div>
@@ -143,7 +143,7 @@ export const LoginPage = () => {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                        <FormLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                           Email Address
                         </FormLabel>
                         <FormControl>
@@ -151,7 +151,7 @@ export const LoginPage = () => {
                             type="email"
                             placeholder="name@email.com"
                             {...field}
-                            className="h-12 rounded-xl border-neutral-200 bg-neutral-50 px-4 text-sm placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white focus:ring-1 focus:ring-neutral-300 transition-all"
+                            className="h-12 rounded-xl border-border bg-muted px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:bg-card focus:ring-1 focus:ring-ring transition-all"
                           />
                         </FormControl>
                         <FormMessage />
@@ -164,7 +164,7 @@ export const LoginPage = () => {
                     render={({ field }) => (
                       <FormItem>
                         <div className="flex items-center justify-between">
-                          <FormLabel className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                          <FormLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                             Password
                           </FormLabel>
                           <Link
@@ -180,12 +180,12 @@ export const LoginPage = () => {
                               type={showPassword ? 'text' : 'password'}
                               placeholder="••••••••"
                               {...field}
-                              className="h-12 rounded-xl border-neutral-200 bg-neutral-50 px-4 pr-12 text-sm placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white focus:ring-1 focus:ring-neutral-300 transition-all"
+                              className="h-12 rounded-xl border-border bg-muted px-4 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:bg-card focus:ring-1 focus:ring-ring transition-all"
                             />
                             <button
                               type="button"
                               onClick={() => setShowPassword(!showPassword)}
-                              className="absolute inset-y-0 right-0 flex items-center pr-4 text-neutral-400 hover:text-neutral-600 transition-colors"
+                              className="absolute inset-y-0 right-0 flex items-center pr-4 text-muted-foreground hover:text-foreground transition-colors"
                             >
                               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
@@ -200,7 +200,7 @@ export const LoginPage = () => {
                     type="submit"
                     variant="primary"
                     size="lg"
-                    className="w-full h-12 rounded-xl text-sm font-bold bg-[#1a1a2e] hover:bg-[#16162a] text-white mt-2"
+                    className="w-full h-12 rounded-xl text-sm font-bold bg-foreground hover:bg-foreground/85 text-background mt-2"
                     disabled={isLoggingIn}
                   >
                     {isLoggingIn ? (
@@ -213,7 +213,7 @@ export const LoginPage = () => {
               </Form>
 
               {/* Footer */}
-              <p className="mt-8 text-center text-sm text-neutral-500">
+              <p className="mt-8 text-center text-sm text-muted-foreground">
                 New to Yohop?{' '}
                 <Link
                   to={PATHS.SIGNUP}
@@ -224,24 +224,24 @@ export const LoginPage = () => {
               </p>
 
               {/* Bottom links */}
-              <div className="mt-8 flex items-center justify-between text-neutral-400">
+              <div className="mt-8 flex items-center justify-between text-muted-foreground">
                 <div className="flex items-center gap-3">
-                  <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-600 transition-colors">
+                  <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
                     <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                       <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
                       <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
                     </svg>
                   </a>
-                  <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-600 transition-colors">
+                  <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
                     <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
                     </svg>
                   </a>
                 </div>
                 <div className="flex items-center gap-4 text-xs font-medium uppercase tracking-wider">
-                  <Link to={PATHS.TERMS || '#'} className="hover:text-neutral-600 transition-colors">Support</Link>
-                  <Link to={PATHS.PRIVACY || '#'} className="hover:text-neutral-600 transition-colors">Legal</Link>
+                  <Link to={PATHS.TERMS || '#'} className="hover:text-foreground transition-colors">Support</Link>
+                  <Link to={PATHS.PRIVACY || '#'} className="hover:text-foreground transition-colors">Legal</Link>
                 </div>
               </div>
             </div>

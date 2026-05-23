@@ -45,25 +45,25 @@ export function ServiceCheckInPage() {
   };
 
   if (!parsedServiceId || Number.isNaN(parsedServiceId)) {
-    return <div className="p-8 text-center text-neutral-500">Invalid service ID.</div>;
+    return <div className="p-8 text-center text-muted-foreground">Invalid service ID.</div>;
   }
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
       <div className="mb-6 flex items-center gap-3">
-        <Link to={PATHS.MERCHANT_SERVICES_MANAGE.replace(':serviceId', String(parsedServiceId))} className="inline-flex items-center justify-center rounded-lg bg-neutral-900 p-2 text-white">
+        <Link to={PATHS.MERCHANT_SERVICES_MANAGE.replace(':serviceId', String(parsedServiceId))} className="inline-flex items-center justify-center rounded-lg bg-foreground p-2 text-background">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Service Check-In</h1>
-          <p className="text-sm text-neutral-500">Scan/enter booking QR payload and booking ID for arrival check-in.</p>
+          <h1 className="text-2xl font-bold text-foreground">Service Check-In</h1>
+          <p className="text-sm text-muted-foreground">Scan/enter booking QR payload and booking ID for arrival check-in.</p>
         </div>
       </div>
 
-      <div className="mb-6 rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="mb-6 rounded-2xl border border-border bg-card p-6">
         <div className="mb-4 flex items-center gap-2">
           <ScanLine className="h-5 w-5 text-brand-primary-500" />
-          <h2 className="font-semibold text-neutral-900">Check-in Console</h2>
+          <h2 className="font-semibold text-foreground">Check-in Console</h2>
         </div>
 
         <div className="space-y-3">
@@ -72,16 +72,16 @@ export function ServiceCheckInPage() {
             value={bookingId}
             onChange={(e) => setBookingId(e.target.value)}
             placeholder="Booking ID"
-            className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm"
+            className="w-full rounded-lg border border-border px-3 py-2.5 text-sm"
           />
           <div className="relative">
-            <QrCode className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+            <QrCode className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               value={qrData}
               onChange={(e) => setQrData(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleCheckIn()}
               placeholder="Paste qrData"
-              className="w-full rounded-lg border border-neutral-200 py-2.5 pl-10 pr-3 text-sm"
+              className="w-full rounded-lg border border-border py-2.5 pl-10 pr-3 text-sm"
             />
           </div>
           <button
@@ -95,16 +95,16 @@ export function ServiceCheckInPage() {
       </div>
 
       <div>
-        <h3 className="mb-3 font-semibold text-neutral-800">Recent attempts</h3>
+        <h3 className="mb-3 font-semibold text-foreground">Recent attempts</h3>
         {logs.length === 0 ? (
-          <div className="rounded-xl border border-neutral-200 bg-white p-4 text-sm text-neutral-500">No check-ins yet.</div>
+          <div className="rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">No check-ins yet.</div>
         ) : (
           <div className="space-y-2">
             {logs.map((log, idx) => (
               <div
                 key={`${log.message}-${idx}`}
                 className={`flex items-start gap-2 rounded-xl border p-3 text-sm ${
-                  log.success ? 'border-green-200 bg-green-50 text-green-700' : 'border-red-200 bg-red-50 text-red-700'
+                  log.success ? 'border-green-200 dark:border-green-900/50 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300' : 'border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300'
                 }`}
               >
                 {log.success ? <CheckCircle2 className="mt-0.5 h-4 w-4" /> : <XCircle className="mt-0.5 h-4 w-4" />}

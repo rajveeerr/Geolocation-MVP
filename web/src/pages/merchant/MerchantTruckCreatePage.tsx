@@ -21,7 +21,7 @@ import {
 import type { CreateTruckStopPayload, ScheduledStop } from '@/types/truckSchedule';
 
 const panelClass =
-  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
+  'rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 function MerchantTruckCreateInner() {
   const navigate = useNavigate();
@@ -136,12 +136,12 @@ function MerchantTruckCreateInner() {
 
       <div className={`${panelClass} mt-4 p-6`}>
         <div className="flex items-start gap-3">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-100">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-950/40">
             <Truck className="h-6 w-6 text-amber-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-neutral-900">Add a food truck</h1>
-            <p className="mt-1 text-sm text-neutral-500">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Add a food truck</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
               Trucks move around — instead of fixed hours, you'll post stops. Customers see live and upcoming stops on the food trucks page.
             </p>
           </div>
@@ -149,14 +149,14 @@ function MerchantTruckCreateInner() {
 
         {/* Section 1: About */}
         <section className="mt-8">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">About this truck</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">About this truck</h2>
 
           <div className="mt-4 space-y-4">
             <div>
-              <Label htmlFor="truck-city" className="text-sm font-medium text-neutral-700">
+              <Label htmlFor="truck-city" className="text-sm font-medium text-foreground">
                 Home city <span className="text-red-500">*</span>
               </Label>
-              <p className="mt-0.5 text-xs text-neutral-500">
+              <p className="mt-0.5 text-xs text-muted-foreground">
                 Used as the default map area when no stop is live.
               </p>
               <select
@@ -164,7 +164,7 @@ function MerchantTruckCreateInner() {
                 value={cityId ?? ''}
                 onChange={(e) => setCityId(e.target.value ? Number(e.target.value) : null)}
                 disabled={citiesLoading}
-                className="mt-2 h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 text-sm text-neutral-900 focus:border-brand-primary-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-100 disabled:opacity-60"
+                className="mt-2 h-11 w-full rounded-xl border border-border bg-card px-3 text-sm text-foreground focus:border-brand-primary-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-100 disabled:opacity-60"
               >
                 <option value="">{citiesLoading ? 'Loading cities...' : 'Select a city'}</option>
                 {cities.map((c) => (
@@ -176,8 +176,8 @@ function MerchantTruckCreateInner() {
             </div>
 
             <div>
-              <Label htmlFor="truck-description" className="text-sm font-medium text-neutral-700">
-                Description <span className="text-xs font-normal text-neutral-500">(optional)</span>
+              <Label htmlFor="truck-description" className="text-sm font-medium text-foreground">
+                Description <span className="text-xs font-normal text-muted-foreground">(optional)</span>
               </Label>
               <Textarea
                 id="truck-description"
@@ -186,18 +186,18 @@ function MerchantTruckCreateInner() {
                 placeholder="What kind of food do you serve? Anything customers should know?"
                 rows={3}
                 maxLength={400}
-                className="mt-2 resize-none rounded-xl border-neutral-200"
+                className="mt-2 resize-none rounded-xl border-border"
               />
             </div>
           </div>
         </section>
 
         {/* Section 2: First stop (optional) */}
-        <section className="mt-8 rounded-xl border border-neutral-200 bg-neutral-50/40 p-4">
+        <section className="mt-8 rounded-xl border border-border bg-muted/40 p-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h2 className="text-sm font-semibold text-neutral-900">Post your first stop now</h2>
-              <p className="mt-0.5 text-xs text-neutral-500">
+              <h2 className="text-sm font-semibold text-foreground">Post your first stop now</h2>
+              <p className="mt-0.5 text-xs text-muted-foreground">
                 Optional — you can also do this later from the schedule page.
               </p>
             </div>
@@ -209,14 +209,14 @@ function MerchantTruckCreateInner() {
           </div>
 
           {includeFirstStop && (
-            <div className="mt-5 border-t border-neutral-200 pt-5">
+            <div className="mt-5 border-t border-border pt-5">
               <TruckStopFields value={stopForm} onChange={setStopForm} />
             </div>
           )}
         </section>
 
         {/* Footer */}
-        <div className="mt-8 flex flex-col gap-3 border-t border-neutral-200 pt-6 sm:flex-row sm:justify-end">
+        <div className="mt-8 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:justify-end">
           <Link to={PATHS.MERCHANT_TRUCKS} className="sm:order-1">
             <Button
               type="button"

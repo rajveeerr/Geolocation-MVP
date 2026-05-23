@@ -142,19 +142,19 @@ export const LocationSection = ({ data, onUpdate, cities, attempted }: LocationS
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-sm font-medium text-neutral-700">Store location</h3>
-        <p className="text-xs text-neutral-500">Search for your address or use your current location</p>
+        <h3 className="text-sm font-medium text-foreground">Store location</h3>
+        <p className="text-xs text-muted-foreground">Search for your address or use your current location</p>
       </div>
 
       {/* Search bar */}
       <div className="relative z-30">
         <div className={cn(
-          'flex items-center gap-3 rounded-xl border bg-white shadow-sm transition-all',
+          'flex items-center gap-3 rounded-xl border bg-card shadow-sm transition-all',
           attempted && !data.address
             ? 'border-red-400 ring-2 ring-red-200'
-            : inputFocused || showSuggestions ? 'border-brand-primary-400 ring-2 ring-brand-primary-100' : 'border-neutral-200'
+            : inputFocused || showSuggestions ? 'border-brand-primary-400 ring-2 ring-brand-primary-100' : 'border-border'
         )}>
-          <MapPin className="ml-4 h-5 w-5 shrink-0 text-neutral-400" />
+          <MapPin className="ml-4 h-5 w-5 shrink-0 text-muted-foreground" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -163,55 +163,55 @@ export const LocationSection = ({ data, onUpdate, cities, attempted }: LocationS
             placeholder="Search for an address..."
             className="h-12 flex-1 border-0 bg-transparent text-sm shadow-none focus-visible:ring-0"
           />
-          {isSearching && <Loader2 className="mr-4 h-5 w-5 animate-spin text-neutral-400" />}
+          {isSearching && <Loader2 className="mr-4 h-5 w-5 animate-spin text-muted-foreground" />}
         </div>
 
         {showSuggestions && (suggestions.length > 0 || debouncedQuery.length >= 3) && (
-          <div className="absolute left-0 right-0 top-full z-[1100] mt-1 max-h-56 overflow-y-auto rounded-xl border border-neutral-200 bg-white shadow-lg">
+          <div className="absolute left-0 right-0 top-full z-[1100] mt-1 max-h-56 overflow-y-auto rounded-xl border border-border bg-card shadow-lg">
             {isSearching ? (
               <div className="flex items-center justify-center gap-2 py-6">
                 <Loader2 className="h-5 w-5 animate-spin text-brand-primary-600" />
-                <span className="text-sm text-neutral-500">Searching...</span>
+                <span className="text-sm text-muted-foreground">Searching...</span>
               </div>
             ) : suggestions.length > 0 ? (
               suggestions.map((s) => {
                 const mc = findMatchingCity(s.address, cities);
                 return (
-                  <button key={s.place_id} type="button" onClick={() => handleSelect(s)} className="flex w-full items-start gap-3 p-3 text-left hover:bg-neutral-50">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-neutral-400" />
+                  <button key={s.place_id} type="button" onClick={() => handleSelect(s)} className="flex w-full items-start gap-3 p-3 text-left hover:bg-muted">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-neutral-900 line-clamp-2">{s.display_name}</p>
+                      <p className="text-sm font-medium text-foreground line-clamp-2">{s.display_name}</p>
                       {mc ? <p className="text-xs text-green-600">Available in {mc.name}</p> : cities.length > 0 ? <p className="text-xs text-amber-600">Not in a supported city yet</p> : null}
                     </div>
                   </button>
                 );
               })
             ) : (
-              <div className="p-4 text-center text-sm text-neutral-500">No results. Try a different search.</div>
+              <div className="p-4 text-center text-sm text-muted-foreground">No results. Try a different search.</div>
             )}
           </div>
         )}
       </div>
 
       {/* Use my location */}
-      <button type="button" onClick={useCurrentLocation} disabled={isLocating} className="flex w-full items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60">
+      <button type="button" onClick={useCurrentLocation} disabled={isLocating} className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-card py-2.5 text-sm font-medium text-foreground hover:bg-muted disabled:opacity-60">
         {isLocating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Navigation className="h-4 w-4" />}
         Use my current location
       </button>
 
       {/* Selected address */}
       {data.address && data.cityId > 0 && (
-        <div className="rounded-lg bg-green-50 p-3 text-sm text-green-800">
+        <div className="rounded-lg bg-green-50 dark:bg-green-950/30 p-3 text-sm text-green-800 dark:text-green-300">
           <span className="font-medium">Selected:</span> {data.address}
         </div>
       )}
 
       {cityNotAvailable && (
-        <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3">
+        <div className="flex items-start gap-3 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/30 p-3">
           <AlertCircle className="h-5 w-5 shrink-0 text-amber-600" />
           <div>
-            <p className="text-sm font-medium text-amber-900">Coming soon to your area</p>
-            <p className="text-xs text-amber-800">We&apos;re not in this city yet. Search for an address in one of our supported cities.</p>
+            <p className="text-sm font-medium text-amber-900 dark:text-amber-200">Coming soon to your area</p>
+            <p className="text-xs text-amber-800 dark:text-amber-300">We&apos;re not in this city yet. Search for an address in one of our supported cities.</p>
           </div>
         </div>
       )}
@@ -220,26 +220,26 @@ export const LocationSection = ({ data, onUpdate, cities, attempted }: LocationS
       {hasLocation && data.cityId > 0 && (
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label className="text-xs text-neutral-500">Street</Label>
+            <Label className="text-xs text-muted-foreground">Street</Label>
             <Input value={data.addressStreet || ''} onChange={(e) => onUpdate({ addressStreet: e.target.value })} className="mt-1 h-10 text-sm" placeholder="Street address" />
           </div>
           <div>
-            <Label className="text-xs text-neutral-500">City</Label>
+            <Label className="text-xs text-muted-foreground">City</Label>
             <Input value={data.addressCity || ''} onChange={(e) => onUpdate({ addressCity: e.target.value })} className="mt-1 h-10 text-sm" placeholder="City" />
           </div>
           <div>
-            <Label className="text-xs text-neutral-500">State</Label>
+            <Label className="text-xs text-muted-foreground">State</Label>
             <Input value={data.addressState || ''} onChange={(e) => onUpdate({ addressState: e.target.value })} className="mt-1 h-10 text-sm" placeholder="State" />
           </div>
           <div>
-            <Label className="text-xs text-neutral-500">Postcode</Label>
+            <Label className="text-xs text-muted-foreground">Postcode</Label>
             <Input value={data.addressPostcode || ''} onChange={(e) => onUpdate({ addressPostcode: e.target.value })} className="mt-1 h-10 text-sm" placeholder="Postcode" />
           </div>
         </div>
       )}
 
       {/* Map with draggable pin */}
-      <div className="relative z-0 overflow-hidden rounded-xl border border-neutral-200">
+      <div className="relative z-0 overflow-hidden rounded-xl border border-border">
         <StoreLocationMap
           center={mapCenter}
           onLocationChange={(coords) => onUpdate({ latitude: coords.lat, longitude: coords.lng })}

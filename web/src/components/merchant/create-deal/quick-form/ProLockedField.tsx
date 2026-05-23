@@ -43,13 +43,13 @@ export const ProLockedField = ({
     <div className={cn('space-y-2', className)}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-[13px] font-semibold text-neutral-900">{label}</span>
-          {hint ? <span className="text-[12px] text-neutral-500">{hint}</span> : null}
+          <span className="text-[13px] font-semibold text-foreground">{label}</span>
+          {hint ? <span className="text-[12px] text-muted-foreground">{hint}</span> : null}
         </div>
         {locked ? (
           <Link
             to={upgradeTo}
-            className="group inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 transition hover:border-amber-300 hover:bg-amber-100"
+            className="group inline-flex items-center gap-1.5 rounded-full border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/30 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300 transition hover:border-amber-300 hover:bg-amber-100 dark:bg-amber-950/40"
             title={lockedMessage}
           >
             <Lock className="h-3 w-3" />

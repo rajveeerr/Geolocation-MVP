@@ -67,7 +67,7 @@ const LoadingState = () => (
 );
 
 const ErrorState = ({ message }: { message: string }) => (
-  <div className="rounded-[1rem] border border-red-200 bg-red-50 p-4 text-sm text-red-700">{message}</div>
+  <div className="rounded-[1rem] border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-4 text-sm text-red-700 dark:text-red-300">{message}</div>
 );
 
 const AnalyticsStatCard = ({
@@ -79,10 +79,10 @@ const AnalyticsStatCard = ({
   value: string;
   hint?: string;
 }) => (
-  <div className="rounded-[1rem] border border-neutral-200/80 bg-neutral-50/70 p-4">
-    <div className="text-[12px] font-medium text-neutral-500">{label}</div>
-    <div className="mt-2 text-[1.45rem] font-semibold tracking-tight text-neutral-950">{value}</div>
-    {hint ? <div className="mt-1 text-xs text-neutral-500">{hint}</div> : null}
+  <div className="rounded-[1rem] border border-border/80 bg-muted/70 p-4">
+    <div className="text-[12px] font-medium text-muted-foreground">{label}</div>
+    <div className="mt-2 text-[1.45rem] font-semibold tracking-tight text-foreground">{value}</div>
+    {hint ? <div className="mt-1 text-xs text-muted-foreground">{hint}</div> : null}
   </div>
 );
 
@@ -97,8 +97,8 @@ const AnalyticsChartCard = ({
 }) => (
   <div className={merchantPanelClass}>
     <div className="mb-4">
-      <div className="text-[15px] font-semibold text-neutral-950">{title}</div>
-      {subtitle ? <div className="mt-1 text-[13px] text-neutral-500">{subtitle}</div> : null}
+      <div className="text-[15px] font-semibold text-foreground">{title}</div>
+      {subtitle ? <div className="mt-1 text-[13px] text-muted-foreground">{subtitle}</div> : null}
     </div>
     {children}
   </div>
@@ -119,10 +119,10 @@ const TrendPill = ({
       className={cn(
         'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold',
         isUp
-          ? 'bg-emerald-50 text-emerald-700'
+          ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
           : isDown
-            ? 'bg-rose-50 text-rose-700'
-            : 'bg-neutral-100 text-neutral-600',
+            ? 'bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300'
+            : 'bg-muted text-muted-foreground',
       )}
     >
       {isUp ? <TrendingUp className="h-3 w-3" /> : isDown ? <TrendingDown className="h-3 w-3" /> : null}
@@ -140,7 +140,7 @@ export const MerchantAnalyticsTabs = ({ period = 'last_30_days' }: MerchantAnaly
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <div className="text-[13px] font-semibold text-neutral-900">Detailed views</div>
+        <div className="text-[13px] font-semibold text-foreground">Detailed views</div>
         <div className="overflow-x-auto pb-1">
           <MerchantSegmentedControl
             value={activeTab}
@@ -237,21 +237,21 @@ const DealPerformanceContent = ({ period }: { period: string }) => {
         <AnalyticsChartCard title="Top deals" subtitle="Strongest live offer performance">
           <div className="space-y-3">
             {data.deals.slice(0, 5).map((deal) => (
-              <div key={deal.id} className="rounded-[1rem] border border-neutral-200/80 bg-neutral-50/60 p-4">
+              <div key={deal.id} className="rounded-[1rem] border border-border/80 bg-muted/60 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="text-[13px] font-semibold text-neutral-900">{deal.title}</div>
-                    <div className="mt-1 text-xs text-neutral-500">{deal.category.name}</div>
+                    <div className="text-[13px] font-semibold text-foreground">{deal.title}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">{deal.category.name}</div>
                   </div>
-                  <span className={cn('rounded-full px-2.5 py-1 text-xs font-semibold', deal.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-neutral-100 text-neutral-600')}>
+                  <span className={cn('rounded-full px-2.5 py-1 text-xs font-semibold', deal.isActive ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300' : 'bg-muted text-muted-foreground')}>
                     {deal.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-3 text-[13px]">
-                  <div><span className="text-neutral-500">Check-ins</span><div className="mt-1 font-semibold text-neutral-900">{formatCompactNumber(deal.performance.checkIns)}</div></div>
-                  <div><span className="text-neutral-500">Saves</span><div className="mt-1 font-semibold text-neutral-900">{formatCompactNumber(deal.performance.saves)}</div></div>
-                  <div><span className="text-neutral-500">Unique users</span><div className="mt-1 font-semibold text-neutral-900">{formatCompactNumber(deal.performance.uniqueUsers)}</div></div>
-                  <div><span className="text-neutral-500">Kickbacks</span><div className="mt-1 font-semibold text-neutral-900">{formatCompactNumber(deal.performance.kickbackEvents)}</div></div>
+                  <div><span className="text-muted-foreground">Check-ins</span><div className="mt-1 font-semibold text-foreground">{formatCompactNumber(deal.performance.checkIns)}</div></div>
+                  <div><span className="text-muted-foreground">Saves</span><div className="mt-1 font-semibold text-foreground">{formatCompactNumber(deal.performance.saves)}</div></div>
+                  <div><span className="text-muted-foreground">Unique users</span><div className="mt-1 font-semibold text-foreground">{formatCompactNumber(deal.performance.uniqueUsers)}</div></div>
+                  <div><span className="text-muted-foreground">Kickbacks</span><div className="mt-1 font-semibold text-foreground">{formatCompactNumber(deal.performance.kickbackEvents)}</div></div>
                 </div>
               </div>
             ))}
@@ -318,16 +318,16 @@ const CustomerInsightsContent = ({ period }: { period: string }) => {
       <AnalyticsChartCard title="Top customers" subtitle="Recent high-value customers">
         <div className="space-y-3">
           {topCustomers.slice(0, 5).map((customer) => (
-            <div key={customer.id} className="flex items-center justify-between rounded-[1rem] border border-neutral-200/80 bg-neutral-50/60 p-4">
+            <div key={customer.id} className="flex items-center justify-between rounded-[1rem] border border-border/80 bg-muted/60 p-4">
               <div>
-                <div className="text-[13px] font-semibold text-neutral-900">{customer.name}</div>
-                <div className="mt-1 text-xs text-neutral-500">
+                <div className="text-[13px] font-semibold text-foreground">{customer.name}</div>
+                <div className="mt-1 text-xs text-muted-foreground">
                   {customer.checkInCount} check-ins · Last active {formatDateLabel(customer.lastActive)}
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-[13px] font-semibold text-neutral-900">{formatCurrency(customer.totalSpend)}</div>
-                <div className="mt-1 text-xs text-neutral-500">{formatCompactNumber(customer.totalPoints)} pts</div>
+                <div className="text-[13px] font-semibold text-foreground">{formatCurrency(customer.totalSpend)}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{formatCompactNumber(customer.totalPoints)} pts</div>
               </div>
             </div>
           ))}
@@ -439,11 +439,11 @@ const EngagementMetricsContent = ({ period }: { period: string }) => {
             ].map((item) => (
               <div key={item.label}>
                 <div className="mb-2 flex items-center justify-between text-[13px]">
-                  <span className="text-neutral-600">{item.label}</span>
-                  <span className="font-semibold text-neutral-900">{item.value.toFixed(1)}%</span>
+                  <span className="text-muted-foreground">{item.label}</span>
+                  <span className="font-semibold text-foreground">{item.value.toFixed(1)}%</span>
                 </div>
-                <div className="h-2 rounded-full bg-neutral-100">
-                  <div className="h-2 rounded-full bg-neutral-900" style={{ width: `${Math.min(item.value, 100)}%` }} />
+                <div className="h-2 rounded-full bg-muted">
+                  <div className="h-2 rounded-full bg-foreground" style={{ width: `${Math.min(item.value, 100)}%` }} />
                 </div>
               </div>
             ))}
@@ -458,11 +458,11 @@ const EngagementMetricsContent = ({ period }: { period: string }) => {
       <AnalyticsChartCard title="Top engaging deals" subtitle="Strongest attention and interaction rates">
         <div className="space-y-3">
           {topEngagingDeals.slice(0, 5).map((deal) => (
-            <div key={deal.dealId} className="rounded-[1rem] border border-neutral-200/80 bg-neutral-50/60 p-4">
+            <div key={deal.dealId} className="rounded-[1rem] border border-border/80 bg-muted/60 p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <div className="text-[13px] font-semibold text-neutral-900">{deal.title}</div>
-                  <div className="mt-1 text-xs text-neutral-500">{deal.engagementRate.toFixed(1)}% engagement rate</div>
+                  <div className="text-[13px] font-semibold text-foreground">{deal.title}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">{deal.engagementRate.toFixed(1)}% engagement rate</div>
                 </div>
                 <TrendPill trend={deal.engagementRate > 20 ? 'up' : 'stable'} value={deal.engagementRate} />
               </div>
@@ -514,15 +514,15 @@ const PerformanceComparisonContent = ({ period }: { period: string }) => {
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {comparisonCards.map((item) => (
-          <div key={item.label} className="rounded-[1rem] border border-neutral-200/80 bg-neutral-50/70 p-4">
+          <div key={item.label} className="rounded-[1rem] border border-border/80 bg-muted/70 p-4">
             <div className="flex items-center justify-between gap-3">
-              <div className="text-[13px] font-medium text-neutral-600">{item.label}</div>
+              <div className="text-[13px] font-medium text-muted-foreground">{item.label}</div>
               <TrendPill trend={item.comparison.trend} value={item.comparison.percentageChange} />
             </div>
-            <div className="mt-3 text-[1.25rem] font-semibold text-neutral-950">
+            <div className="mt-3 text-[1.25rem] font-semibold text-foreground">
               {item.currency ? formatCurrency(item.current) : formatCompactNumber(item.current)}
             </div>
-            <div className="mt-1 text-xs text-neutral-500">
+            <div className="mt-1 text-xs text-muted-foreground">
               Previous: {item.currency ? formatCurrency(item.previous) : formatCompactNumber(item.previous)}
             </div>
           </div>

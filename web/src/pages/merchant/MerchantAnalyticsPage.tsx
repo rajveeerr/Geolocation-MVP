@@ -28,7 +28,7 @@ export const MerchantAnalyticsPage = () => {
       <div className="flex min-h-[40vh] items-center justify-center">
         <div className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-brand-primary-600" />
-          <p className="text-neutral-600">Loading analytics...</p>
+          <p className="text-muted-foreground">Loading analytics...</p>
         </div>
       </div>
     );
@@ -111,7 +111,7 @@ export const MerchantAnalyticsPage = () => {
           <Button
             asChild
             variant="secondary"
-            className="rounded-full border-neutral-200 bg-white px-4 text-sm text-neutral-700 hover:bg-neutral-50"
+            className="rounded-full border-border bg-card px-4 text-sm text-foreground hover:bg-muted"
           >
             <Link to={PATHS.MERCHANT_DASHBOARD} className="inline-flex items-center whitespace-nowrap">
               <ArrowLeft className="mr-2 h-4 w-4 shrink-0" />
@@ -120,7 +120,7 @@ export const MerchantAnalyticsPage = () => {
           </Button>
           <Button
             asChild
-            className="rounded-full bg-neutral-950 px-4 text-sm text-white hover:bg-neutral-800"
+            className="rounded-full bg-foreground px-4 text-sm text-background hover:bg-foreground/85"
           >
             <Link to={PATHS.MERCHANT_DEALS_CREATE}>Create Deal</Link>
           </Button>
@@ -128,7 +128,7 @@ export const MerchantAnalyticsPage = () => {
       </div>
 
       <div className="space-y-2">
-        <div className="text-[13px] font-semibold text-neutral-900">Time period</div>
+        <div className="text-[13px] font-semibold text-foreground">Time period</div>
         <div className="overflow-x-auto pb-1">
           <MerchantSegmentedControl
             value={selectedPeriod}

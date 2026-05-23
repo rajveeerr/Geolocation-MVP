@@ -66,12 +66,12 @@ export const TwelveHourTimeField = ({
 }: TwelveHourTimeFieldProps) => {
   const parts = to12HourParts(value);
   const baseSelectClassName =
-    'h-9 w-full appearance-none rounded-md border border-neutral-200 bg-neutral-50 pl-2 pr-5 text-[13px] font-semibold text-neutral-900 outline-none transition focus:border-brand-primary-400 focus:ring-2 focus:ring-brand-primary-100';
+    'h-9 w-full appearance-none rounded-md border border-border bg-muted pl-2 pr-5 text-[13px] font-semibold text-foreground outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/30';
 
   return (
     <div className={className ?? 'space-y-2'}>
       {label && <Label htmlFor={id}>{label}</Label>}
-      <div className="inline-grid min-w-0 grid-cols-[3.5rem_auto_3.5rem_3.75rem] items-center gap-1 rounded-lg border border-neutral-200 bg-white p-1">
+      <div className="inline-grid min-w-0 grid-cols-[3.5rem_auto_3.5rem_3.75rem] items-center gap-1 rounded-lg border border-border bg-card p-1">
         <div className="relative">
           <select
             id={id}
@@ -86,9 +86,9 @@ export const TwelveHourTimeField = ({
               </option>
             ))}
           </select>
-          <ChevronDown className="pointer-events-none absolute right-1 top-1/2 h-3 w-3 -translate-y-1/2 text-neutral-400" />
+          <ChevronDown className="pointer-events-none absolute right-1 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
         </div>
-        <span className="px-0 text-center text-base font-semibold text-neutral-400">:</span>
+        <span className="px-0 text-center text-base font-semibold text-muted-foreground">:</span>
         <div className="relative">
           <select
             value={parts.minute}
@@ -101,7 +101,7 @@ export const TwelveHourTimeField = ({
               </option>
             ))}
           </select>
-          <ChevronDown className="pointer-events-none absolute right-1 top-1/2 h-3 w-3 -translate-y-1/2 text-neutral-400" />
+          <ChevronDown className="pointer-events-none absolute right-1 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
         </div>
         <div className="relative">
           <select
@@ -112,7 +112,7 @@ export const TwelveHourTimeField = ({
             <option value="AM">AM</option>
             <option value="PM">PM</option>
           </select>
-          <ChevronDown className="pointer-events-none absolute right-1 top-1/2 h-3 w-3 -translate-y-1/2 text-neutral-400" />
+          <ChevronDown className="pointer-events-none absolute right-1 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
         </div>
       </div>
     </div>

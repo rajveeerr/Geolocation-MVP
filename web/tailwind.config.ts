@@ -60,6 +60,29 @@ const tailwindConfig: Config = {
           foreground: 'hsl(var(--card-foreground))',
         },
 
+        // Merchant dashboard chrome layer (sidebar / header / app shell).
+        // Tiered between --background (page) and --card (content) in dark mode.
+        chrome: 'hsl(var(--chrome))',
+
+        // AI Assistant accent theme (warm cream/terracotta in light, warm dark in dark).
+        // Tokens defined in src/styles/merchant-theme.css.
+        ai: {
+          border:       'hsl(var(--md-ai-border))',
+          'border-strong': 'hsl(var(--md-ai-border-strong))',
+          accent:       'hsl(var(--md-ai-accent))',
+          text:         'hsl(var(--md-ai-text))',
+          'text-muted': 'hsl(var(--md-ai-text-muted))',
+          tag:          'hsl(var(--md-ai-tag-bg))',
+          'tag-text':   'hsl(var(--md-ai-tag-text))',
+          soft:         'hsl(var(--md-ai-soft-bg))',
+        },
+        // Blue variant of the AI accent (used in MarketAlertBanner blue tone).
+        'ai-blue': {
+          border:       'hsl(var(--md-ai-blue-border))',
+          accent:       'hsl(var(--md-ai-blue-accent))',
+          'text-muted': 'hsl(var(--md-ai-blue-text-muted))',
+        },
+
         // --- Brand scale ---
         brand: {
           DEFAULT: 'hsl(var(--brand-primary))',

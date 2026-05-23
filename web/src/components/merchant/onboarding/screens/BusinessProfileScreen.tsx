@@ -116,22 +116,22 @@ const AMENITY_OPTIONS = [
 ];
 
 const CONTACT_FIELDS = [
-  { id: 'phone', label: 'Phone number', stateKey: 'phoneNumber', action: 'SET_PHONE_NUMBER' as const, placeholder: '+1 234 567 8900', type: 'tel' as const, icon: Phone, iconColor: 'text-neutral-500' },
-  { id: 'contactEmail', label: 'Contact email', stateKey: 'contactEmail', action: 'SET_CONTACT_EMAIL' as const, placeholder: 'hello@yourbusiness.com', type: 'email' as const, icon: Mail, iconColor: 'text-neutral-500' },
-  { id: 'website', label: 'Website', stateKey: 'websiteUrl', action: 'SET_WEBSITE_URL' as const, placeholder: 'https://yoursite.com', type: 'url' as const, icon: Globe, iconColor: 'text-neutral-500' },
+  { id: 'phone', label: 'Phone number', stateKey: 'phoneNumber', action: 'SET_PHONE_NUMBER' as const, placeholder: '+1 234 567 8900', type: 'tel' as const, icon: Phone, iconColor: 'text-muted-foreground' },
+  { id: 'contactEmail', label: 'Contact email', stateKey: 'contactEmail', action: 'SET_CONTACT_EMAIL' as const, placeholder: 'hello@yourbusiness.com', type: 'email' as const, icon: Mail, iconColor: 'text-muted-foreground' },
+  { id: 'website', label: 'Website', stateKey: 'websiteUrl', action: 'SET_WEBSITE_URL' as const, placeholder: 'https://yoursite.com', type: 'url' as const, icon: Globe, iconColor: 'text-muted-foreground' },
 ] as const;
 
 const OWNER_CONTACT_FIELDS = [
-  { id: 'ownerName', label: 'Owner name', stateKey: 'ownerName', action: 'SET_OWNER_NAME' as const, placeholder: 'Jane Doe', type: 'text' as const, icon: Users, iconColor: 'text-neutral-500' },
-  { id: 'ownerEmail', label: 'Owner email', stateKey: 'ownerEmail', action: 'SET_OWNER_EMAIL' as const, placeholder: 'jane@example.com', type: 'email' as const, icon: Mail, iconColor: 'text-neutral-500' },
-  { id: 'ownerPhone', label: 'Owner phone', stateKey: 'ownerPhone', action: 'SET_OWNER_PHONE' as const, placeholder: '+1 234 567 8900', type: 'tel' as const, icon: Phone, iconColor: 'text-neutral-500' },
+  { id: 'ownerName', label: 'Owner name', stateKey: 'ownerName', action: 'SET_OWNER_NAME' as const, placeholder: 'Jane Doe', type: 'text' as const, icon: Users, iconColor: 'text-muted-foreground' },
+  { id: 'ownerEmail', label: 'Owner email', stateKey: 'ownerEmail', action: 'SET_OWNER_EMAIL' as const, placeholder: 'jane@example.com', type: 'email' as const, icon: Mail, iconColor: 'text-muted-foreground' },
+  { id: 'ownerPhone', label: 'Owner phone', stateKey: 'ownerPhone', action: 'SET_OWNER_PHONE' as const, placeholder: '+1 234 567 8900', type: 'tel' as const, icon: Phone, iconColor: 'text-muted-foreground' },
 ] as const;
 
 const SOCIAL_FIELDS = [
   { id: 'instagram', label: 'Instagram', stateKey: 'instagramUrl', action: 'SET_INSTAGRAM_URL' as const, placeholder: 'https://instagram.com/yourhandle', type: 'url' as const, icon: Instagram, iconColor: 'text-pink-500' },
   { id: 'facebook', label: 'Facebook', stateKey: 'facebookUrl', action: 'SET_FACEBOOK_URL' as const, placeholder: 'https://facebook.com/yourpage', type: 'url' as const, icon: Facebook, iconColor: 'text-blue-600' },
-  { id: 'twitter', label: 'X (Twitter)', stateKey: 'twitterUrl', action: 'SET_TWITTER_URL' as const, placeholder: 'https://x.com/yourhandle', type: 'url' as const, icon: Twitter, iconColor: 'text-neutral-700' },
-  { id: 'tiktok', label: 'TikTok', stateKey: 'tiktokUrl', action: 'SET_TIKTOK_URL' as const, placeholder: 'https://tiktok.com/@yourhandle', type: 'url' as const, icon: TikTokIcon, iconColor: 'text-neutral-900' },
+  { id: 'twitter', label: 'X (Twitter)', stateKey: 'twitterUrl', action: 'SET_TWITTER_URL' as const, placeholder: 'https://x.com/yourhandle', type: 'url' as const, icon: Twitter, iconColor: 'text-foreground' },
+  { id: 'tiktok', label: 'TikTok', stateKey: 'tiktokUrl', action: 'SET_TIKTOK_URL' as const, placeholder: 'https://tiktok.com/@yourhandle', type: 'url' as const, icon: TikTokIcon, iconColor: 'text-foreground' },
   { id: 'youtube', label: 'YouTube', stateKey: 'youtubeUrl', action: 'SET_YOUTUBE_URL' as const, placeholder: 'https://youtube.com/@yourchannel', type: 'url' as const, icon: Youtube, iconColor: 'text-red-600' },
 ] as const;
 
@@ -228,10 +228,10 @@ export const BusinessProfileScreen = () => {
       nextDisabledReason="Please enter your business name to continue."
     >
       <div className="mx-auto max-w-6xl px-4 py-8 md:px-6">
-        <h1 className="font-heading text-2xl font-bold text-neutral-900 md:text-3xl">
+        <h1 className="font-heading text-2xl font-bold text-foreground md:text-3xl">
           Tell us about your business
         </h1>
-        <p className="mt-2 text-neutral-600">
+        <p className="mt-2 text-muted-foreground">
           Fill in your business details. Only the business name is required — complete the rest now or later from your dashboard.
         </p>
 
@@ -241,14 +241,14 @@ export const BusinessProfileScreen = () => {
 
             {/* ====== BUSINESS INFO SECTION ====== */}
             <section>
-              <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+              <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Business Info
                 {state.businessName.trim().length > 0 && <CheckCircle2 className="h-4 w-4 text-brand-primary-500" />}
               </h2>
 
               {/* Business name */}
               <div className="mt-4">
-                <Label htmlFor="businessName" className="text-sm font-medium text-neutral-700">
+                <Label htmlFor="businessName" className="text-sm font-medium text-foreground">
                   Business name <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -260,21 +260,21 @@ export const BusinessProfileScreen = () => {
                     'mt-1 h-12 rounded-xl text-base transition-colors',
                     attempted && !state.businessName.trim()
                       ? 'border-red-400 ring-1 ring-red-200 focus:border-red-500 focus:ring-red-300'
-                      : 'border-neutral-300'
+                      : 'border-border'
                   )}
                   maxLength={80}
                   autoFocus
                 />
-                <span className="mt-1 block text-xs text-neutral-500">{state.businessName.length}/80</span>
+                <span className="mt-1 block text-xs text-muted-foreground">{state.businessName.length}/80</span>
               </div>
 
               {/* Category */}
               <div className="mt-6">
-                <Label className="flex items-center gap-2 text-sm font-medium text-neutral-700">
+                <Label className="flex items-center gap-2 text-sm font-medium text-foreground">
                   Category
                   {!!state.businessCategory && <CheckCircle2 className="h-4 w-4 text-brand-primary-500" />}
                 </Label>
-                <p className="mt-0.5 text-xs text-neutral-500">Helps customers find deals at places like yours</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">Helps customers find deals at places like yours</p>
                 <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {CATEGORIES.map((cat) => (
                     <button
@@ -285,11 +285,11 @@ export const BusinessProfileScreen = () => {
                         'flex flex-col items-center gap-2 rounded-2xl border-2 p-4 transition-all',
                         state.businessCategory === cat.name
                           ? 'border-brand-primary-500 bg-brand-primary-50 shadow-card'
-                          : 'border-neutral-200 hover:border-neutral-300'
+                          : 'border-border hover:border-border'
                       )}
                     >
-                      <cat.icon className="h-7 w-7 text-neutral-600" />
-                      <span className="text-sm font-semibold text-neutral-900">{cat.name}</span>
+                      <cat.icon className="h-7 w-7 text-muted-foreground" />
+                      <span className="text-sm font-semibold text-foreground">{cat.name}</span>
                     </button>
                   ))}
                 </div>
@@ -297,7 +297,7 @@ export const BusinessProfileScreen = () => {
 
               {/* Business type */}
               <div className="mt-6">
-                <Label className="text-sm font-medium text-neutral-700">Business type</Label>
+                <Label className="text-sm font-medium text-foreground">Business type</Label>
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   {BUSINESS_TYPE_OPTIONS.map((opt) => (
                     <button
@@ -308,15 +308,15 @@ export const BusinessProfileScreen = () => {
                         'flex items-start gap-3 rounded-xl border-2 p-4 text-left transition-all',
                         state.businessType === opt.value
                           ? 'border-brand-primary-500 bg-brand-primary-50 shadow-card'
-                          : 'border-neutral-200 hover:border-neutral-300'
+                          : 'border-border hover:border-border'
                       )}
                     >
-                      <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', opt.color === 'green' ? 'bg-green-100' : 'bg-blue-100')}>
+                      <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', opt.color === 'green' ? 'bg-green-100 dark:bg-green-950/40' : 'bg-blue-100 dark:bg-blue-950/40')}>
                         <opt.icon className={cn('h-5 w-5', opt.color === 'green' ? 'text-green-600' : 'text-blue-600')} />
                       </div>
                       <div>
-                        <span className="text-sm font-semibold text-neutral-900">{opt.label}</span>
-                        <p className="text-xs text-neutral-500">{opt.sublabel}</p>
+                        <span className="text-sm font-semibold text-foreground">{opt.label}</span>
+                        <p className="text-xs text-muted-foreground">{opt.sublabel}</p>
                       </div>
                     </button>
                   ))}
@@ -325,11 +325,11 @@ export const BusinessProfileScreen = () => {
 
               {/* Price range */}
               <div className="mt-6">
-                <Label className="flex items-center gap-2 text-sm font-medium text-neutral-700">
-                  <DollarSign className="h-4 w-4 text-neutral-500" />
+                <Label className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
                   Price range
                 </Label>
-                <p className="mt-0.5 text-xs text-neutral-500">Optional. Helps customers choose where to use their deals.</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">Optional. Helps customers choose where to use their deals.</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {PRICE_RANGES.map((pr) => (
                     <button
@@ -340,11 +340,11 @@ export const BusinessProfileScreen = () => {
                         'rounded-xl border-2 px-4 py-2 text-sm font-medium transition-colors',
                         state.priceRange === pr.value
                           ? 'border-brand-primary-500 bg-brand-primary-50 text-brand-primary-700'
-                          : 'border-neutral-200 text-neutral-600 hover:border-neutral-300'
+                          : 'border-border text-muted-foreground hover:border-border'
                       )}
                     >
                       <span className="font-bold">{pr.label}</span>
-                      <span className="ml-1.5 text-xs text-neutral-500">{pr.desc}</span>
+                      <span className="ml-1.5 text-xs text-muted-foreground">{pr.desc}</span>
                     </button>
                   ))}
                 </div>
@@ -353,23 +353,23 @@ export const BusinessProfileScreen = () => {
 
             {/* ====== BRANDING SECTION ====== */}
             <section>
-              <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+              <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Make it stand out
                 {(state.description.trim().length > 0 || hasFeaturesData) && <CheckCircle2 className="h-4 w-4 text-brand-primary-500" />}
               </h2>
 
               {/* Description */}
               <div className="mt-4">
-                <Label htmlFor="description" className="text-sm font-medium text-neutral-700">
+                <Label htmlFor="description" className="text-sm font-medium text-foreground">
                   Description
                 </Label>
-                <p className="mt-0.5 text-xs text-neutral-500">
+                <p className="mt-0.5 text-xs text-muted-foreground">
                   Appears on your profile and deal pages when customers discover you.
                 </p>
                 {/* Description + inline AI bar */}
                 <div className={cn(
                   'mt-2 overflow-hidden rounded-xl border transition-colors',
-                  'border-neutral-300 focus-within:border-brand-primary-400 focus-within:ring-1 focus-within:ring-brand-primary-200'
+                  'border-border focus-within:border-brand-primary-400 focus-within:ring-1 focus-within:ring-brand-primary-200'
                 )}>
                   <Textarea
                     id="description"
@@ -380,12 +380,12 @@ export const BusinessProfileScreen = () => {
                     rows={4}
                   />
                   {aiEnabled && (
-                    <div className="border-t border-neutral-200 bg-neutral-50">
+                    <div className="border-t border-border bg-muted">
                       {!showAiBar ? (
                         <button
                           type="button"
                           onClick={() => setShowAiBar(true)}
-                          className="flex w-full items-center gap-2 px-3 py-2 text-xs text-neutral-500 hover:bg-neutral-100 transition-colors"
+                          className="flex w-full items-center gap-2 px-3 py-2 text-xs text-muted-foreground hover:bg-muted transition-colors"
                         >
                           <Sparkles className="h-3.5 w-3.5 text-brand-primary-500" />
                           <span>Let AI draft this for you...</span>
@@ -398,13 +398,13 @@ export const BusinessProfileScreen = () => {
                             onChange={(e) => setAiDescriptionInput(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); applyAiSuggestion(); } }}
                             placeholder="e.g. Rooftop bar, cocktails & tapas in downtown..."
-                            className="min-w-0 flex-1 bg-transparent text-sm text-neutral-800 placeholder:text-neutral-400 outline-none"
+                            className="min-w-0 flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
                             autoFocus
                           />
                           <button
                             type="button"
                             onClick={() => { setShowAiBar(false); setAiDescriptionInput(''); }}
-                            className="shrink-0 text-sm font-medium text-neutral-500 hover:text-neutral-700"
+                            className="shrink-0 text-sm font-medium text-muted-foreground hover:text-foreground"
                           >
                             Cancel
                           </button>
@@ -412,11 +412,11 @@ export const BusinessProfileScreen = () => {
                             type="button"
                             onClick={applyAiSuggestion}
                             disabled={merchantSuggestMutation.isPending}
-                            className="shrink-0 rounded-full bg-neutral-200 px-3 py-1 text-sm font-medium text-neutral-700 hover:bg-neutral-300 disabled:opacity-60 transition-colors"
+                            className="shrink-0 rounded-full bg-accent px-3 py-1 text-sm font-medium text-foreground hover:bg-muted disabled:opacity-60 transition-colors"
                           >
                             {merchantSuggestMutation.isPending ? (
                               <span className="flex items-center gap-1">
-                                <span className="h-3 w-3 animate-spin rounded-full border-2 border-neutral-500 border-t-transparent" />
+                                <span className="h-3 w-3 animate-spin rounded-full border-2 border-border border-t-transparent" />
                                 Thinking...
                               </span>
                             ) : (
@@ -429,7 +429,7 @@ export const BusinessProfileScreen = () => {
                   )}
                 </div>
                 {!aiEnabled && (
-                  <p className="mt-1 text-xs text-neutral-400">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     Tip: Describe your business in 2-3 words and we&apos;ll help generate a full description once AI is enabled.
                   </p>
                 )}
@@ -437,8 +437,8 @@ export const BusinessProfileScreen = () => {
 
               {/* Vibe tags */}
               <div className="mt-6">
-                <Label className="text-sm font-medium text-neutral-700">
-                  Vibes <span className="text-xs font-normal text-neutral-500">(up to {MAX_VIBES})</span>
+                <Label className="text-sm font-medium text-foreground">
+                  Vibes <span className="text-xs font-normal text-muted-foreground">(up to {MAX_VIBES})</span>
                 </Label>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {VIBE_OPTIONS.map((opt) => {
@@ -454,10 +454,10 @@ export const BusinessProfileScreen = () => {
                         className={cn(
                           'flex items-center gap-1.5 rounded-lg border-2 px-3 py-2 text-xs font-medium transition-all',
                           selected
-                            ? 'border-neutral-900 bg-neutral-900 text-white'
+                            ? 'border-foreground bg-foreground text-background'
                             : disabled
-                              ? 'cursor-not-allowed border-neutral-200 bg-neutral-50 text-neutral-400'
-                              : 'border-neutral-200 hover:border-neutral-300'
+                              ? 'cursor-not-allowed border-border bg-muted text-muted-foreground'
+                              : 'border-border hover:border-border'
                         )}
                       >
                         <Icon className="h-3.5 w-3.5 shrink-0" />
@@ -470,7 +470,7 @@ export const BusinessProfileScreen = () => {
 
               {/* Amenities */}
               <div className="mt-6">
-                <Label className="text-sm font-medium text-neutral-700">Amenities</Label>
+                <Label className="text-sm font-medium text-foreground">Amenities</Label>
                 <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {AMENITY_OPTIONS.map((opt) => {
                     const Icon = opt.icon;
@@ -483,12 +483,12 @@ export const BusinessProfileScreen = () => {
                         className={cn(
                           'flex items-center gap-2 rounded-xl border-2 p-3 text-left transition-all',
                           selected
-                            ? 'border-neutral-900 bg-neutral-50'
-                            : 'border-neutral-200 hover:border-neutral-300'
+                            ? 'border-foreground bg-muted'
+                            : 'border-border hover:border-border'
                         )}
                       >
-                        <Icon className="h-4 w-4 shrink-0 text-neutral-600" />
-                        <span className="text-xs font-medium text-neutral-900">{opt.label}</span>
+                        <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
+                        <span className="text-xs font-medium text-foreground">{opt.label}</span>
                       </button>
                     );
                   })}
@@ -501,7 +501,7 @@ export const BusinessProfileScreen = () => {
                   value={state.thingsToNote}
                   onChange={(e) => dispatch({ type: 'SET_THINGS_TO_NOTE', payload: e.target.value })}
                   placeholder="Anything else? e.g. Rooftop terrace, valet parking, wheelchair accessible..."
-                  className="min-h-16 resize-none rounded-xl border-neutral-300 text-sm"
+                  className="min-h-16 resize-none rounded-xl border-border text-sm"
                   rows={2}
                 />
               </div>
@@ -510,8 +510,8 @@ export const BusinessProfileScreen = () => {
             {/* ====== CONTACT & SOCIAL (accordion) ====== */}
             <AccordionSection title="Contact & Social" defaultOpen={hasContactData || hasOwnerData} completed={hasContactData || hasOwnerData}>
               <div className="space-y-4">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Owner Contact (Private)</h3>
-                <p className="text-xs text-neutral-500 -mt-2">Used by Yohop admins to contact you. Not shown to customers.</p>
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Owner Contact (Private)</h3>
+                <p className="text-xs text-muted-foreground -mt-2">Used by Yohop admins to contact you. Not shown to customers.</p>
                 {OWNER_CONTACT_FIELDS.map((field) => {
                   const Icon = field.icon;
                   const rawValue = (state as unknown as Record<string, unknown>)[field.stateKey] as string;
@@ -519,7 +519,7 @@ export const BusinessProfileScreen = () => {
                   const displayValue = isPhone ? formatPhoneDisplay(rawValue || '') : (rawValue || '');
                   return (
                     <div key={field.id}>
-                      <label htmlFor={`bp-${field.id}`} className="mb-1 flex items-center gap-2 text-sm font-medium text-neutral-700">
+                      <label htmlFor={`bp-${field.id}`} className="mb-1 flex items-center gap-2 text-sm font-medium text-foreground">
                         <Icon className={cn('h-4 w-4', field.iconColor)} />
                         {field.label}
                       </label>
@@ -533,15 +533,15 @@ export const BusinessProfileScreen = () => {
                           dispatch({ type: field.action, payload: val });
                         }}
                         placeholder={field.placeholder}
-                        className="h-11 rounded-xl border-neutral-300"
+                        className="h-11 rounded-xl border-border"
                       />
                     </div>
                   );
                 })}
 
-                <div className="border-t border-neutral-200 pt-4">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Business Contact (Public)</h3>
-                  <p className="text-xs text-neutral-500 mt-1">Shown to customers on your page.</p>
+                <div className="border-t border-border pt-4">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Business Contact (Public)</h3>
+                  <p className="text-xs text-muted-foreground mt-1">Shown to customers on your page.</p>
                 </div>
                 {CONTACT_FIELDS.map((field) => {
                   const Icon = field.icon;
@@ -550,7 +550,7 @@ export const BusinessProfileScreen = () => {
                   const displayValue = isPhone ? formatPhoneDisplay(rawValue || '') : (rawValue || '');
                   return (
                     <div key={field.id}>
-                      <label htmlFor={`bp-${field.id}`} className="mb-1 flex items-center gap-2 text-sm font-medium text-neutral-700">
+                      <label htmlFor={`bp-${field.id}`} className="mb-1 flex items-center gap-2 text-sm font-medium text-foreground">
                         <Icon className={cn('h-4 w-4', field.iconColor)} />
                         {field.label}
                       </label>
@@ -564,21 +564,21 @@ export const BusinessProfileScreen = () => {
                           dispatch({ type: field.action, payload: val });
                         }}
                         placeholder={isPhone ? '(555) 123-4567' : field.placeholder}
-                        className="h-11 rounded-xl border-neutral-300"
+                        className="h-11 rounded-xl border-border"
                       />
                     </div>
                   );
                 })}
 
-                <div className="border-t border-neutral-200 pt-4">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Social</h3>
+                <div className="border-t border-border pt-4">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Social</h3>
                 </div>
                 {SOCIAL_FIELDS.map((field) => {
                   const Icon = field.icon;
                   const value = (state as unknown as Record<string, unknown>)[field.stateKey] as string;
                   return (
                     <div key={field.id}>
-                      <label htmlFor={`bp-${field.id}`} className="mb-1 flex items-center gap-2 text-sm font-medium text-neutral-700">
+                      <label htmlFor={`bp-${field.id}`} className="mb-1 flex items-center gap-2 text-sm font-medium text-foreground">
                         <Icon className={cn('h-4 w-4', field.iconColor)} />
                         {field.label}
                       </label>
@@ -588,7 +588,7 @@ export const BusinessProfileScreen = () => {
                         value={value || ''}
                         onChange={(e) => dispatch({ type: field.action, payload: e.target.value })}
                         placeholder={field.placeholder}
-                        className="h-11 rounded-xl border-neutral-300"
+                        className="h-11 rounded-xl border-border"
                       />
                     </div>
                   );
@@ -600,25 +600,25 @@ export const BusinessProfileScreen = () => {
           {/* Right column — Media (sticky on desktop) */}
           <div className="md:col-span-4">
             <div className="md:sticky md:top-24 space-y-6">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Logo & Photos
               </h2>
 
               {/* Logo */}
               <div>
-                <h3 className="text-sm font-medium text-neutral-700">Business logo</h3>
-                <p className="text-xs text-neutral-500">Appears on your deals</p>
+                <h3 className="text-sm font-medium text-foreground">Business logo</h3>
+                <p className="text-xs text-muted-foreground">Appears on your deals</p>
                 <div className="mt-2">
                   {state.logoUrl ? (
                     <div className="space-y-2">
-                      <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-xl border border-neutral-200 bg-white p-2">
+                      <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-xl border border-border bg-card p-2">
                         <img src={state.logoUrl} alt="Logo" className="max-h-full max-w-full object-contain" />
                       </div>
                       <div className="flex gap-2">
-                        <button type="button" onClick={() => setLogoModalOpen(true)} className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50">
+                        <button type="button" onClick={() => setLogoModalOpen(true)} className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted">
                           <ImageIcon className="h-3 w-3" /> Change
                         </button>
-                        <button type="button" onClick={() => dispatch({ type: 'SET_LOGO_URL', payload: '' })} className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50">
+                        <button type="button" onClick={() => dispatch({ type: 'SET_LOGO_URL', payload: '' })} className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:bg-red-950/30">
                           <X className="h-3 w-3" /> Remove
                         </button>
                       </div>
@@ -627,7 +627,7 @@ export const BusinessProfileScreen = () => {
                     <button
                       type="button"
                       onClick={() => setLogoModalOpen(true)}
-                      className="flex w-28 h-28 flex-col items-center justify-center rounded-xl border-2 border-dashed border-neutral-300 text-neutral-400 transition-colors hover:border-neutral-400 hover:bg-neutral-50"
+                      className="flex w-28 h-28 flex-col items-center justify-center rounded-xl border-2 border-dashed border-border text-muted-foreground transition-colors hover:border-border hover:bg-muted"
                     >
                       <Plus className="h-6 w-6" />
                       <span className="mt-1 text-xs font-medium">Add logo</span>
@@ -638,18 +638,18 @@ export const BusinessProfileScreen = () => {
 
               {/* Gallery */}
               <div>
-                <h3 className="text-sm font-medium text-neutral-700">Featured photos</h3>
-                <p className="text-xs text-neutral-500">Showcase your venue</p>
+                <h3 className="text-sm font-medium text-foreground">Featured photos</h3>
+                <p className="text-xs text-muted-foreground">Showcase your venue</p>
                 <div className="mt-2">
                   {state.galleryUrls.length > 0 ? (
                     <div className="grid grid-cols-3 gap-2">
                       {state.galleryUrls.map((url, i) => (
-                        <div key={`${url}-${i}`} className="group relative aspect-square overflow-hidden rounded-lg border border-neutral-200">
+                        <div key={`${url}-${i}`} className="group relative aspect-square overflow-hidden rounded-lg border border-border">
                           <img src={url} alt={`Gallery ${i + 1}`} className="h-full w-full object-cover" />
                           <button
                             type="button"
                             onClick={() => dispatch({ type: 'REMOVE_GALLERY_URL', payload: i })}
-                            className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                            className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-foreground/60 text-background opacity-0 transition-opacity group-hover:opacity-100"
                           >
                             <X className="h-3 w-3" />
                           </button>
@@ -658,7 +658,7 @@ export const BusinessProfileScreen = () => {
                       <button
                         type="button"
                         onClick={() => setGalleryModalOpen(true)}
-                        className="flex aspect-square items-center justify-center rounded-lg border-2 border-dashed border-neutral-300 text-neutral-400 hover:border-neutral-400 hover:bg-neutral-50"
+                        className="flex aspect-square items-center justify-center rounded-lg border-2 border-dashed border-border text-muted-foreground hover:border-border hover:bg-muted"
                       >
                         <Plus className="h-5 w-5" />
                       </button>
@@ -667,7 +667,7 @@ export const BusinessProfileScreen = () => {
                     <button
                       type="button"
                       onClick={() => setGalleryModalOpen(true)}
-                      className="flex w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-neutral-300 py-8 text-neutral-400 hover:border-neutral-400 hover:bg-neutral-50"
+                      className="flex w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-border py-8 text-muted-foreground hover:border-border hover:bg-muted"
                     >
                       <Plus className="h-6 w-6" />
                       <span className="mt-1 text-xs font-medium">Add photos</span>

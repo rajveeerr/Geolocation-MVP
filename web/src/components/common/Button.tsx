@@ -31,11 +31,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       primary:
         'bg-gradient-to-b from-brand-primary-400 to-brand-primary-600 text-white hover:from-brand-primary-500 hover:to-brand-primary-700 transition-all duration-200',
       secondary:
-        'bg-gradient-to-b from-white to-neutral-50 border border-brand-primary-200 hover:border-brand-primary-300 hover:from-brand-primary-50 transition-all duration-200 font-semibold',
+        'bg-card text-foreground border border-border hover:bg-muted hover:border-border transition-all duration-200 font-semibold',
       google:
-        'bg-white text-neutral-text-primary border border-neutral-border hover:bg-neutral-subtle-background shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200',
+        'bg-card text-foreground border border-border hover:bg-muted shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200',
       ghost:
-        'bg-transparent text-neutral-text-secondary hover:text-neutral-text-primary hover:bg-neutral-subtle-background',
+        'bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted',
     };
 
     const sizeClasses = {

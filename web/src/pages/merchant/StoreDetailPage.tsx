@@ -50,19 +50,19 @@ const StoreDetailCard = ({ store, onEdit, onDelete }: {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-neutral-200 overflow-hidden">
+    <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
       {/* Header */}
-      <div className="p-6 border-b border-neutral-200">
+      <div className="p-6 border-b border-border">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-4">
             <div className="rounded-lg bg-brand-primary-100 p-3">
               <Building2 className="h-6 w-6 text-brand-primary-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-neutral-900 mb-2">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
                 {cityName}, {cityState}
               </h1>
-              <div className="flex items-center gap-4 text-sm text-neutral-600">
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
                   Added {formatDate(store.createdAt)}
@@ -70,8 +70,8 @@ const StoreDetailCard = ({ store, onEdit, onDelete }: {
                 <span className={cn(
                   'flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium',
                   store.active
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
+                    ? 'bg-green-100 dark:bg-green-950/40 text-green-800 dark:text-green-300'
+                    : 'bg-red-100 dark:bg-red-950/40 text-red-800 dark:text-red-300'
                 )}>
                   {store.active ? (
                     <>
@@ -113,33 +113,33 @@ const StoreDetailCard = ({ store, onEdit, onDelete }: {
       <div className="p-6 space-y-6">
         {/* Address */}
         <div>
-          <h3 className="text-lg font-semibold text-neutral-900 mb-2">Address</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-2">Address</h3>
           <div className="flex items-start gap-2">
-            <MapPin className="h-5 w-5 text-neutral-500 mt-0.5" />
-            <p className="text-neutral-700">{store.address}</p>
+            <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
+            <p className="text-foreground">{store.address}</p>
           </div>
         </div>
 
         {/* Location Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h3 className="text-lg font-semibold text-neutral-900 mb-4">Location Information</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">Location Information</h3>
             <div className="space-y-3">
               <div>
-                <h4 className="font-medium text-neutral-900 mb-1">City</h4>
-                <p className="text-sm text-neutral-600">{cityName}, {cityState}</p>
+                <h4 className="font-medium text-foreground mb-1">City</h4>
+                <p className="text-sm text-muted-foreground">{cityName}, {cityState}</p>
               </div>
               <div>
-                <h4 className="font-medium text-neutral-900 mb-1">Store ID</h4>
-                <p className="text-sm text-neutral-600">#{store.id}</p>
+                <h4 className="font-medium text-foreground mb-1">Store ID</h4>
+                <p className="text-sm text-muted-foreground">#{store.id}</p>
               </div>
               <div>
-                <h4 className="font-medium text-neutral-900 mb-1">Status</h4>
+                <h4 className="font-medium text-foreground mb-1">Status</h4>
                 <span className={cn(
                   'inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium',
                   store.active
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
+                    ? 'bg-green-100 dark:bg-green-950/40 text-green-800 dark:text-green-300'
+                    : 'bg-red-100 dark:bg-red-950/40 text-red-800 dark:text-red-300'
                 )}>
                   {store.active ? (
                     <>
@@ -158,23 +158,23 @@ const StoreDetailCard = ({ store, onEdit, onDelete }: {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-neutral-900 mb-4">Coordinates</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">Coordinates</h3>
             <div className="space-y-3">
               <div>
-                <h4 className="font-medium text-neutral-900 mb-1">Latitude</h4>
-                <p className="text-sm text-neutral-600 font-mono">
+                <h4 className="font-medium text-foreground mb-1">Latitude</h4>
+                <p className="text-sm text-muted-foreground font-mono">
                   {store.latitude !== null && store.latitude !== undefined ? store.latitude.toFixed(6) : 'Not set'}
                 </p>
               </div>
               <div>
-                <h4 className="font-medium text-neutral-900 mb-1">Longitude</h4>
-                <p className="text-sm text-neutral-600 font-mono">
+                <h4 className="font-medium text-foreground mb-1">Longitude</h4>
+                <p className="text-sm text-muted-foreground font-mono">
                   {store.longitude !== null && store.longitude !== undefined ? store.longitude.toFixed(6) : 'Not set'}
                 </p>
               </div>
               {store.latitude !== null && store.latitude !== undefined && store.longitude !== null && store.longitude !== undefined && (
                 <div>
-                  <h4 className="font-medium text-neutral-900 mb-1">Map Link</h4>
+                  <h4 className="font-medium text-foreground mb-1">Map Link</h4>
                   <a
                     href={`https://www.google.com/maps?q=${store.latitude},${store.longitude}`}
                     target="_blank"
@@ -221,44 +221,44 @@ const StoreDetailCard = ({ store, onEdit, onDelete }: {
         </div>
 
         {/* Timestamps */}
-        <div className="border-t border-neutral-200 pt-6">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-4">Timeline</h3>
+        <div className="border-t border-border pt-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Timeline</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h4 className="font-medium text-neutral-900 mb-1">Created</h4>
-              <p className="text-sm text-neutral-600">{formatDate(store.createdAt)}</p>
+              <h4 className="font-medium text-foreground mb-1">Created</h4>
+              <p className="text-sm text-muted-foreground">{formatDate(store.createdAt)}</p>
             </div>
             <div>
-              <h4 className="font-medium text-neutral-900 mb-1">Last Updated</h4>
-              <p className="text-sm text-neutral-600">{formatDate(store.updatedAt)}</p>
+              <h4 className="font-medium text-foreground mb-1">Last Updated</h4>
+              <p className="text-sm text-muted-foreground">{formatDate(store.updatedAt)}</p>
             </div>
           </div>
         </div>
 
         {/* City Information */}
-        <div className="border-t border-neutral-200 pt-6">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-4">City Information</h3>
-          <div className="bg-neutral-50 rounded-lg p-4">
+        <div className="border-t border-border pt-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">City Information</h3>
+          <div className="bg-muted rounded-lg p-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <h4 className="font-medium text-neutral-900 mb-1">City Name</h4>
-                <p className="text-sm text-neutral-600">{cityName}</p>
+                <h4 className="font-medium text-foreground mb-1">City Name</h4>
+                <p className="text-sm text-muted-foreground">{cityName}</p>
               </div>
               <div>
-                <h4 className="font-medium text-neutral-900 mb-1">State</h4>
-                <p className="text-sm text-neutral-600">{cityState}</p>
+                <h4 className="font-medium text-foreground mb-1">State</h4>
+                <p className="text-sm text-muted-foreground">{cityState}</p>
               </div>
               <div>
-                <h4 className="font-medium text-neutral-900 mb-1">City ID</h4>
-                <p className="text-sm text-neutral-600">{cityId ? `#${cityId}` : 'Not available'}</p>
+                <h4 className="font-medium text-foreground mb-1">City ID</h4>
+                <p className="text-sm text-muted-foreground">{cityId ? `#${cityId}` : 'Not available'}</p>
               </div>
               <div>
-                <h4 className="font-medium text-neutral-900 mb-1">City Status</h4>
+                <h4 className="font-medium text-foreground mb-1">City Status</h4>
                 <span className={cn(
                   'inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium',
                   cityActive
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
+                    ? 'bg-green-100 dark:bg-green-950/40 text-green-800 dark:text-green-300'
+                    : 'bg-red-100 dark:bg-red-950/40 text-red-800 dark:text-red-300'
                 )}>
                   {cityActive ? (
                     <>
@@ -316,8 +316,8 @@ export const StoreDetailPage = () => {
     return (
       <div className="container mx-auto max-w-4xl px-4 py-12">
         <div className="animate-pulse">
-          <div className="mb-6 h-8 w-32 rounded bg-neutral-200" />
-          <div className="h-96 rounded-xl bg-neutral-200" />
+          <div className="mb-6 h-8 w-32 rounded bg-accent" />
+          <div className="h-96 rounded-xl bg-accent" />
         </div>
       </div>
     );
@@ -326,9 +326,9 @@ export const StoreDetailPage = () => {
   if (error) {
     return (
       <div className="container mx-auto max-w-4xl px-4 py-12">
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
+        <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-6 text-center">
           <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
-          <h3 className="mb-2 text-lg font-semibold text-red-800">
+          <h3 className="mb-2 text-lg font-semibold text-red-800 dark:text-red-300">
             Error Loading Store
           </h3>
           <p className="text-red-600">
@@ -348,12 +348,12 @@ export const StoreDetailPage = () => {
   if (!store) {
     return (
       <div className="container mx-auto max-w-4xl px-4 py-12">
-        <div className="rounded-lg border border-neutral-200 bg-white p-6 text-center">
-          <AlertCircle className="mx-auto mb-4 h-12 w-12 text-neutral-400" />
-          <h3 className="mb-2 text-lg font-semibold text-neutral-800">
+        <div className="rounded-lg border border-border bg-card p-6 text-center">
+          <AlertCircle className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+          <h3 className="mb-2 text-lg font-semibold text-foreground">
             Store Not Found
           </h3>
-          <p className="text-neutral-600">
+          <p className="text-muted-foreground">
             The store you're looking for doesn't exist or you don't have permission to view it.
           </p>
           <Button 

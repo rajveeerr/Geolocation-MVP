@@ -44,7 +44,7 @@ interface MerchantCheckInSummaryResponse {
 }
 
 const panelClass =
-  'rounded-[1.4rem] border border-neutral-200/80 bg-white/92 p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)] backdrop-blur';
+  'rounded-[1.4rem] border border-border/80 bg-card/92 dark:bg-card p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)] dark:shadow-none backdrop-blur';
 
 const DealCard = ({ deal }: { deal: Deal }) => {
   const isActive =
@@ -53,23 +53,23 @@ const DealCard = ({ deal }: { deal: Deal }) => {
   const isExpired = new Date() > new Date(deal.endTime);
 
   return (
-    <div className="rounded-[1.3rem] border border-neutral-200/80 bg-white/95 p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)] transition-shadow hover:shadow-[0_12px_28px_rgba(15,23,42,0.06)]">
+    <div className="rounded-[1.3rem] border border-border/80 bg-card/95 dark:bg-card p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)] dark:shadow-none transition-shadow hover:shadow-[0_12px_28px_rgba(15,23,42,0.06)] dark:hover:shadow-none">
       <div className="mb-3 flex items-start justify-between gap-3">
-        <h3 className="text-[17px] font-semibold text-neutral-800">{deal.title}</h3>
+        <h3 className="text-[17px] font-semibold text-foreground">{deal.title}</h3>
         <span
           className={`rounded-full px-2.5 py-1 text-xs font-medium ${
             isActive
-              ? 'bg-green-100 text-green-800'
+              ? 'bg-green-100 dark:bg-green-950/40 text-green-800 dark:text-green-300'
               : isExpired
-                ? 'bg-red-100 text-red-800'
-                : 'bg-amber-100 text-amber-800'
+                ? 'bg-red-100 dark:bg-red-950/40 text-red-800 dark:text-red-300'
+                : 'bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300'
           }`}
         >
           {isActive ? 'Active' : isExpired ? 'Expired' : 'Scheduled'}
         </span>
       </div>
 
-      <p className="mb-4 text-sm text-neutral-600">{deal.description}</p>
+      <p className="mb-4 text-sm text-muted-foreground">{deal.description}</p>
 
       <div className="space-y-3">
         <div className="flex items-center gap-2">
@@ -82,23 +82,23 @@ const DealCard = ({ deal }: { deal: Deal }) => {
         </div>
 
         <div className="flex items-center gap-2">
-          <CalendarIcon className="h-4 w-4 text-neutral-500" />
-          <span className="text-xs text-neutral-600">
+          <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+          <span className="text-xs text-muted-foreground">
             {new Date(deal.startTime).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })} -{' '}
             {new Date(deal.endTime).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
           </span>
         </div>
 
         <div className="flex items-center gap-2">
-          <ClockIcon className="h-4 w-4 text-neutral-500" />
-          <span className="text-xs text-neutral-600">
+          <ClockIcon className="h-4 w-4 text-muted-foreground" />
+          <span className="text-xs text-muted-foreground">
             Created {new Date(deal.createdAt).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
           </span>
         </div>
       </div>
 
-      <div className="mt-4 border-t border-neutral-100 pt-4">
-        <p className="text-xs text-neutral-500">
+      <div className="mt-4 border-t border-border pt-4">
+        <p className="text-xs text-muted-foreground">
           <strong>Redemption:</strong> {deal.redemptionInstructions}
         </p>
       </div>
@@ -111,15 +111,15 @@ const DealsSkeleton = () => (
     {Array.from({ length: 3 }).map((_, i) => (
       <div
         key={i}
-        className="animate-pulse rounded-lg border border-neutral-200 bg-white p-6"
+        className="animate-pulse rounded-lg border border-border bg-card p-6"
       >
-        <div className="mb-4 h-6 w-3/4 rounded bg-neutral-200" />
-        <div className="mb-2 h-4 w-full rounded bg-neutral-200" />
-        <div className="mb-4 h-4 w-2/3 rounded bg-neutral-200" />
+        <div className="mb-4 h-6 w-3/4 rounded bg-accent" />
+        <div className="mb-2 h-4 w-full rounded bg-accent" />
+        <div className="mb-4 h-4 w-2/3 rounded bg-accent" />
         <div className="space-y-2">
-          <div className="h-4 w-1/2 rounded bg-neutral-200" />
-          <div className="h-4 w-2/3 rounded bg-neutral-200" />
-          <div className="h-4 w-1/3 rounded bg-neutral-200" />
+          <div className="h-4 w-1/2 rounded bg-accent" />
+          <div className="h-4 w-2/3 rounded bg-accent" />
+          <div className="h-4 w-1/3 rounded bg-accent" />
         </div>
       </div>
     ))}
@@ -131,15 +131,15 @@ const LoyaltyProgramCard = () => {
   const hasProgram = loyaltyProgram?.program && !loyaltyProgram.error;
 
   return (
-    <div className={cn(panelClass, 'bg-gradient-to-br from-white via-white to-[#f6f7f9]')}>
+    <div className={cn(panelClass, 'bg-gradient-to-br from-card via-card to-muted dark:to-card dark:bg-none')}>
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-[0.95rem] border border-neutral-200/80 bg-neutral-100 text-neutral-700">
+          <div className="flex h-10 w-10 items-center justify-center rounded-[0.95rem] border border-border/80 bg-muted text-foreground">
             <Gift className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-[15px] font-semibold text-neutral-900">Loyalty Program</h3>
-            <p className="mt-1 text-[13px] text-neutral-600">
+            <h3 className="text-[15px] font-semibold text-foreground">Loyalty Program</h3>
+            <p className="mt-1 text-[13px] text-muted-foreground">
               {isLoading 
                 ? 'Checking status...' 
                 : hasProgram 
@@ -153,14 +153,14 @@ const LoyaltyProgramCard = () => {
       <div className="mt-4">
         {isLoading ? (
           <div className="animate-pulse">
-            <div className="h-10 w-32 rounded-xl bg-neutral-200" />
+            <div className="h-10 w-32 rounded-xl bg-accent" />
           </div>
         ) : hasProgram ? (
           <div className="flex gap-3">
             <Link to={PATHS.MERCHANT_LOYALTY_ANALYTICS}>
               <Button
                 size="sm"
-                className="rounded-xl bg-neutral-950 text-xs text-white hover:bg-neutral-800"
+                className="rounded-xl bg-foreground text-xs text-background hover:bg-foreground/85"
               >
                 View Program
               </Button>
@@ -169,7 +169,7 @@ const LoyaltyProgramCard = () => {
               <Button
                 variant="secondary"
                 size="sm"
-                className="rounded-xl border-neutral-200 bg-white text-xs text-neutral-700 hover:bg-neutral-50"
+                className="rounded-xl border-border bg-card text-xs text-foreground hover:bg-muted"
               >
                 Manage Settings
               </Button>
@@ -179,7 +179,7 @@ const LoyaltyProgramCard = () => {
           <Link to={PATHS.MERCHANT_LOYALTY_SETUP}>
             <Button
               size="sm"
-              className="rounded-xl bg-neutral-950 text-xs text-white hover:bg-neutral-800"
+              className="rounded-xl bg-foreground text-xs text-background hover:bg-foreground/85"
             >
               Set Up Loyalty Program
             </Button>
@@ -288,10 +288,10 @@ export const MerchantDashboardPage = () => {
     return (
       <div className="space-y-6">
         <div className="animate-pulse">
-          <div className="h-24 rounded-[2rem] bg-neutral-200/80" />
+          <div className="h-24 rounded-[2rem] bg-accent/80" />
           <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-28 rounded-[1.5rem] bg-neutral-200/80" />
+              <div key={i} className="h-28 rounded-[1.5rem] bg-accent/80" />
             ))}
           </div>
         </div>
@@ -302,8 +302,8 @@ export const MerchantDashboardPage = () => {
   if (!merchantStatus) {
     return (
       <div className={cn(panelClass, 'mx-auto max-w-3xl py-10 text-center')}>
-          <h1 className="mb-4 text-4xl font-semibold tracking-tight text-neutral-900">Join as a Merchant</h1>
-          <p className="mb-8 text-neutral-600">
+          <h1 className="mb-4 text-4xl font-semibold tracking-tight text-foreground">Join as a Merchant</h1>
+          <p className="mb-8 text-muted-foreground">
             Start creating deals and reach new customers
           </p>
           <Link to={PATHS.MERCHANT_ONBOARDING}>
@@ -315,43 +315,43 @@ export const MerchantDashboardPage = () => {
 
   return (
     <div className="space-y-5">
-      <div className="overflow-hidden rounded-[1.6rem] border border-neutral-200/80 bg-gradient-to-br from-white via-white to-[#f1f3f7] p-5 shadow-[0_10px_28px_rgba(15,23,42,0.05)] sm:p-6">
+      <div className="overflow-hidden rounded-[1.6rem] border border-border/80 bg-gradient-to-br from-card via-card to-muted p-5 shadow-[0_10px_28px_rgba(15,23,42,0.05)] dark:bg-card dark:bg-none dark:shadow-none sm:p-6">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
+            <div className="inline-flex items-center gap-2 rounded-full bg-foreground px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-background">
               Merchant overview
             </div>
-            <h2 className="mt-3 text-[1.8rem] font-semibold tracking-tight text-neutral-900 sm:text-[2rem]">
+            <h2 className="mt-3 text-[1.8rem] font-semibold tracking-tight text-foreground sm:text-[2rem]">
               Calmer operations across deals, stores, guests, and rewards.
             </h2>
-            <p className="mt-2 text-[13px] leading-6 text-neutral-600 sm:text-sm">
+            <p className="mt-2 text-[13px] leading-6 text-muted-foreground sm:text-sm">
               This dashboard now leans into a smaller, cleaner Apple-style control surface with quieter cards and clearer actions.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-[1.2rem] border border-neutral-200/80 bg-white/90 p-4 shadow-sm">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Merchant status</div>
-              <div className="mt-2 text-[15px] font-semibold text-neutral-900">{merchantStatus}</div>
-              <div className="mt-1 text-[13px] text-neutral-500">
+            <div className="rounded-[1.2rem] border border-border/80 bg-card/90 dark:bg-card p-4 shadow-sm">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Merchant status</div>
+              <div className="mt-2 text-[15px] font-semibold text-foreground">{merchantStatus}</div>
+              <div className="mt-1 text-[13px] text-muted-foreground">
                 {merchantStores.length} store{merchantStores.length === 1 ? '' : 's'} connected
               </div>
               {profileAvatarUrl ? (
-                <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-2.5 py-1">
+                <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-card px-2.5 py-1">
                   <img
                     src={profileAvatarUrl}
                     alt={user?.name || 'Profile avatar'}
                     className="h-6 w-6 rounded-full object-cover object-center"
                   />
-                  <span className="text-[11px] font-medium text-neutral-600">Profile photo active</span>
+                  <span className="text-[11px] font-medium text-muted-foreground">Profile photo active</span>
                 </div>
               ) : null}
             </div>
-            <div className="rounded-[1.2rem] border border-neutral-200/80 bg-white/90 p-4 shadow-sm">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Customer activity</div>
-              <div className="mt-2 text-[15px] font-semibold text-neutral-900">
+            <div className="rounded-[1.2rem] border border-border/80 bg-card/90 dark:bg-card p-4 shadow-sm">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Customer activity</div>
+              <div className="mt-2 text-[15px] font-semibold text-foreground">
                 {checkInSummaryLoading ? '...' : `${totalCheckIns} tap-ins`}
               </div>
-              <div className="mt-1 text-[13px] text-neutral-500">Live check-in momentum across your locations</div>
+              <div className="mt-1 text-[13px] text-muted-foreground">Live check-in momentum across your locations</div>
             </div>
           </div>
         </div>
@@ -359,7 +359,7 @@ export const MerchantDashboardPage = () => {
         {merchantStatus === 'APPROVED' && (
           <div className="mt-6 flex flex-wrap gap-3">
             <Link to={PATHS.MERCHANT_ANALYTICS}>
-              <Button variant="secondary" size="lg" className="rounded-xl border-neutral-200 text-sm">
+              <Button variant="secondary" size="lg" className="rounded-xl border-border text-sm">
                 <BarChart3 className="mr-2 h-4 w-4" />
                 View Analytics
               </Button>
@@ -374,18 +374,18 @@ export const MerchantDashboardPage = () => {
       </div>
 
       {merchantStatus === 'PENDING' && (
-        <div className="rounded-[1.75rem] border border-amber-200/80 bg-amber-50/90 p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-bold text-amber-800">
+        <div className="rounded-[1.75rem] border border-amber-200/80 dark:border-amber-900/50 bg-amber-50/90 dark:bg-amber-950/30 dark:bg-amber-950/30 dark:bg-amber-950/30 p-6 shadow-sm sm:p-8">
+          <h2 className="text-2xl font-bold text-amber-800 dark:text-amber-300">
             Application Pending
           </h2>
-          <p className="mt-2 text-amber-700">
+          <p className="mt-2 text-amber-700 dark:text-amber-300">
             Your application to become a merchant is currently under review. This usually takes 1-2 business days. We'll notify you via email once it's approved.
           </p>
 
           <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="rounded-[1.25rem] border border-amber-200 bg-white p-4">
-              <h3 className="mb-2 font-semibold text-amber-800">Prepare Your Menu</h3>
-              <p className="mb-4 text-sm text-amber-700">
+            <div className="rounded-[1.25rem] border border-amber-200 dark:border-amber-900/50 bg-card p-4">
+              <h3 className="mb-2 font-semibold text-amber-800 dark:text-amber-300">Prepare Your Menu</h3>
+              <p className="mb-4 text-sm text-amber-700 dark:text-amber-300">
                 While waiting for approval, you can start setting up your menu items.
               </p>
               <Link to={PATHS.MERCHANT_MENU}>
@@ -395,9 +395,9 @@ export const MerchantDashboardPage = () => {
               </Link>
             </div>
             
-            <div className="rounded-[1.25rem] border border-amber-200 bg-white p-4">
-              <h3 className="mb-2 font-semibold text-amber-800">Explore Deals</h3>
-              <p className="mb-4 text-sm text-amber-700">
+            <div className="rounded-[1.25rem] border border-amber-200 dark:border-amber-900/50 bg-card p-4">
+              <h3 className="mb-2 font-semibold text-amber-800 dark:text-amber-300">Explore Deals</h3>
+              <p className="mb-4 text-sm text-amber-700 dark:text-amber-300">
                 See what other merchants are offering to get inspired.
               </p>
               <ExploreDealsPreview />
@@ -410,14 +410,14 @@ export const MerchantDashboardPage = () => {
         <>
           {/* Custom Tabs Navigation - matching kickback page style */}
           <div className="mb-5">
-            <div className="inline-flex flex-wrap items-center gap-2 rounded-[1.1rem] border border-neutral-200/80 bg-white/90 p-1.5 shadow-sm">
+            <div className="inline-flex flex-wrap items-center gap-2 rounded-[1.1rem] border border-border/80 bg-card/90 dark:bg-card p-1.5 shadow-sm">
               <button
                 onClick={() => setActiveTab('overview')}
                 className={cn(
                   'rounded-[0.9rem] px-3.5 py-2 text-[13px] font-semibold transition-all duration-200',
                   activeTab === 'overview'
-                    ? 'bg-neutral-900 text-white shadow-sm'
-                    : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
+                    ? 'bg-foreground text-background shadow-sm'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
                 Overview
@@ -427,8 +427,8 @@ export const MerchantDashboardPage = () => {
                 className={cn(
                   'rounded-[0.9rem] px-3.5 py-2 text-[13px] font-semibold transition-all duration-200',
                   activeTab === 'deals'
-                    ? 'bg-neutral-900 text-white shadow-sm'
-                    : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
+                    ? 'bg-foreground text-background shadow-sm'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
                 Deals
@@ -438,8 +438,8 @@ export const MerchantDashboardPage = () => {
                 className={cn(
                   'rounded-[0.9rem] px-3.5 py-2 text-[13px] font-semibold transition-all duration-200',
                   activeTab === 'analytics'
-                    ? 'bg-neutral-900 text-white shadow-sm'
-                    : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
+                    ? 'bg-foreground text-background shadow-sm'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
                 Analytics
@@ -449,8 +449,8 @@ export const MerchantDashboardPage = () => {
                 className={cn(
                   'rounded-[0.9rem] px-3.5 py-2 text-[13px] font-semibold transition-all duration-200',
                   activeTab === 'booking'
-                    ? 'bg-neutral-900 text-white shadow-sm'
-                    : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
+                    ? 'bg-foreground text-background shadow-sm'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
                 Table Booking
@@ -466,9 +466,9 @@ export const MerchantDashboardPage = () => {
             <div className={panelClass}>
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-[13px] text-neutral-500">Gross sales</h4>
-                  <p className="mt-2 flex items-baseline gap-2 text-[1.55rem] font-bold text-neutral-900">
-                    <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-neutral-100 text-neutral-700">
+                  <h4 className="text-[13px] text-muted-foreground">Gross sales</h4>
+                  <p className="mt-2 flex items-baseline gap-2 text-[1.55rem] font-bold text-foreground">
+                    <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-muted text-foreground">
                       <DollarSign className="h-3 w-3" />
                     </span>
                     {statsLoading ? '...' : `$${dashboardStats?.kpis.grossSales || 0}`}
@@ -479,8 +479,8 @@ export const MerchantDashboardPage = () => {
 
             <div className={panelClass}>
               <div>
-                <h4 className="text-[13px] text-neutral-500">Order volume</h4>
-                <p className="mt-2 text-[1.55rem] font-bold text-neutral-900">
+                <h4 className="text-[13px] text-muted-foreground">Order volume</h4>
+                <p className="mt-2 text-[1.55rem] font-bold text-foreground">
                   {statsLoading ? '...' : dashboardStats?.kpis.orderVolume || 0}
                 </p>
               </div>
@@ -489,9 +489,9 @@ export const MerchantDashboardPage = () => {
             <div className={panelClass}>
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-[13px] text-neutral-500">Tap-ins</h4>
-                  <p className="mt-2 flex items-baseline gap-2 text-[1.55rem] font-bold text-neutral-900">
-                    <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-neutral-100 text-neutral-700">
+                  <h4 className="text-[13px] text-muted-foreground">Tap-ins</h4>
+                  <p className="mt-2 flex items-baseline gap-2 text-[1.55rem] font-bold text-foreground">
+                    <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-muted text-foreground">
                       <Users className="h-3 w-3" />
                     </span>
                     {checkInSummaryLoading ? '...' : totalCheckIns}
@@ -503,9 +503,9 @@ export const MerchantDashboardPage = () => {
             <div className={panelClass}>
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-[13px] text-neutral-500">Bounty earnings</h4>
-                  <p className="mt-2 flex items-baseline gap-2 text-[1.55rem] font-bold text-neutral-900">
-                    <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-neutral-100 text-neutral-700">
+                  <h4 className="text-[13px] text-muted-foreground">Bounty earnings</h4>
+                  <p className="mt-2 flex items-baseline gap-2 text-[1.55rem] font-bold text-foreground">
+                    <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-muted text-foreground">
                       <DollarSign className="h-3 w-3" />
                     </span>
                     {statsLoading ? '...' : `$${dashboardStats?.kpis.totalKickbackHandout || 0}`}
@@ -529,26 +529,26 @@ export const MerchantDashboardPage = () => {
               panelClass,
               'mb-6',
               inventoryHealth.totalAlerts > 0
-                ? 'border-amber-200/80 bg-gradient-to-br from-amber-50/40 to-white'
-                : 'border-emerald-200/80 bg-gradient-to-br from-emerald-50/50 to-white',
+                ? 'border-amber-200/80 dark:border-amber-900/50 bg-gradient-to-br from-amber-50/40 to-card dark:bg-none dark:bg-card'
+                : 'border-emerald-200/80 dark:border-emerald-900/50 bg-gradient-to-br from-emerald-50/50 to-card dark:bg-none dark:bg-card',
             )}
           >
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div className="flex min-w-0 items-start gap-3">
                   {inventoryHealth.totalAlerts > 0 ? (
-                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300">
                       <AlertTriangle className="h-5 w-5" />
                     </div>
                   ) : (
-                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300">
                       <CheckCircle2 className="h-5 w-5" />
                     </div>
                   )}
                   <div className="min-w-0">
-                    <h3 className="text-sm font-semibold text-neutral-900">Inventory notifications</h3>
+                    <h3 className="text-sm font-semibold text-foreground">Inventory notifications</h3>
                     {inventoryHealth.totalAlerts > 0 ? (
                       <>
-                        <p className="mt-0.5 text-xs text-neutral-600">
+                        <p className="mt-0.5 text-xs text-muted-foreground">
                           <span className="mr-3 inline-flex items-center gap-1">
                             <Boxes className="h-3 w-3 text-amber-600" />
                             <strong>{inventoryHealth.lowStock}</strong> low on stock
@@ -563,9 +563,9 @@ export const MerchantDashboardPage = () => {
                           {inventoryHealth.outOfStockItems.map((it) => (
                             <div
                               key={`oos-${it.id}`}
-                              className="flex items-center justify-between gap-3 rounded-lg border border-red-100 bg-red-50/60 px-3 py-2"
+                              className="flex items-center justify-between gap-3 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50/60 dark:bg-red-950/30 dark:bg-red-950/30 dark:bg-red-950/30 px-3 py-2"
                             >
-                              <span className="truncate text-xs font-medium text-red-700">{it.name}</span>
+                              <span className="truncate text-xs font-medium text-red-700 dark:text-red-300">{it.name}</span>
                               <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wide text-red-600">
                                 Out of stock
                               </span>
@@ -574,10 +574,10 @@ export const MerchantDashboardPage = () => {
                           {inventoryHealth.lowStockItems.map((it) => (
                             <div
                               key={`low-${it.id}`}
-                              className="flex items-center justify-between gap-3 rounded-lg border border-amber-100 bg-amber-50/60 px-3 py-2"
+                              className="flex items-center justify-between gap-3 rounded-lg border border-amber-100 dark:border-amber-900/40 bg-amber-50/60 dark:bg-amber-950/30 dark:bg-amber-950/30 dark:bg-amber-950/30 px-3 py-2"
                             >
-                              <span className="truncate text-xs font-medium text-amber-800">{it.name}</span>
-                              <span className="shrink-0 text-[11px] font-semibold text-amber-700">
+                              <span className="truncate text-xs font-medium text-amber-800 dark:text-amber-300">{it.name}</span>
+                              <span className="shrink-0 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
                                 {it.qty} left
                               </span>
                             </div>
@@ -585,7 +585,7 @@ export const MerchantDashboardPage = () => {
                         </div>
                       </>
                     ) : (
-                      <p className="mt-1.5 text-xs text-emerald-700">
+                      <p className="mt-1.5 text-xs text-emerald-700 dark:text-emerald-300">
                         All inventory levels look healthy right now. No low-stock or out-of-stock alerts.
                       </p>
                     )}
@@ -622,12 +622,12 @@ export const MerchantDashboardPage = () => {
           <div className={cn(panelClass, 'mb-6')}>
             <div className="mb-3 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-900 text-white">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground text-background">
                   <BarChart3 className="h-4 w-4" />
                 </div>
                 <div>
-                  <h3 className="text-[13px] font-semibold text-neutral-900">AI business insights</h3>
-                  <p className="text-xs text-neutral-500">
+                  <h3 className="text-[13px] font-semibold text-foreground">AI business insights</h3>
+                  <p className="text-xs text-muted-foreground">
                     Quick, plain‑English summary of how your deals are performing.
                   </p>
                 </div>
@@ -636,21 +636,21 @@ export const MerchantDashboardPage = () => {
 
             {aiInsightsLoading && (
               <div className="space-y-2">
-                <div className="h-4 w-40 animate-pulse rounded bg-neutral-200" />
-                <div className="h-3 w-full animate-pulse rounded bg-neutral-200" />
-                <div className="h-3 w-5/6 animate-pulse rounded bg-neutral-200" />
+                <div className="h-4 w-40 animate-pulse rounded bg-accent" />
+                <div className="h-3 w-full animate-pulse rounded bg-accent" />
+                <div className="h-3 w-5/6 animate-pulse rounded bg-accent" />
               </div>
             )}
 
             {!aiInsightsLoading && aiInsights && (
               <div className="space-y-4">
-                <p className="text-[13px] text-neutral-800">{aiInsights.insights.summary}</p>
+                <p className="text-[13px] text-foreground">{aiInsights.insights.summary}</p>
                 {aiInsights.insights.topInsights.length > 0 && (
                   <div>
-                    <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       What we&apos;re seeing
                     </p>
-                    <ul className="space-y-1 text-[13px] text-neutral-700">
+                    <ul className="space-y-1 text-[13px] text-foreground">
                       {aiInsights.insights.topInsights.slice(0, 3).map((point, idx) => (
                         <li key={idx}>• {point}</li>
                       ))}
@@ -659,14 +659,14 @@ export const MerchantDashboardPage = () => {
                 )}
                 {aiInsights.insights.recommendations.length > 0 && (
                   <div>
-                    <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       Recommended next moves
                     </p>
-                    <ul className="space-y-2 text-[13px] text-neutral-700">
+                    <ul className="space-y-2 text-[13px] text-foreground">
                       {aiInsights.insights.recommendations.slice(0, 2).map((rec, idx) => (
-                        <li key={idx} className="rounded-lg bg-neutral-50 p-2">
-                          <div className="text-[13px] font-medium text-neutral-900">{rec.title}</div>
-                          <div className="text-xs text-neutral-600">{rec.description}</div>
+                        <li key={idx} className="rounded-lg bg-muted p-2">
+                          <div className="text-[13px] font-medium text-foreground">{rec.title}</div>
+                          <div className="text-xs text-muted-foreground">{rec.description}</div>
                         </li>
                       ))}
                     </ul>
@@ -681,9 +681,9 @@ export const MerchantDashboardPage = () => {
             {storesLoading ? (
               // Loading state
               Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="animate-pulse rounded-[1rem] bg-neutral-200 px-4 py-2 text-sm">
-                  <div className="h-4 w-20 bg-neutral-300 rounded mb-1"></div>
-                  <div className="h-3 w-16 bg-neutral-300 rounded"></div>
+                <div key={i} className="animate-pulse rounded-[1rem] bg-accent px-4 py-2 text-sm">
+                  <div className="h-4 w-20 bg-muted rounded mb-1"></div>
+                  <div className="h-3 w-16 bg-muted rounded"></div>
                 </div>
               ))
             ) : merchantStores.length > 0 ? (
@@ -693,10 +693,10 @@ export const MerchantDashboardPage = () => {
                 .map((store) => (
                   <div
                     key={store.id}
-                    className="rounded-[1rem] border border-neutral-200/80 bg-white/92 px-4 py-2 text-[13px] text-neutral-900 shadow-sm"
+                    className="rounded-[1rem] border border-border/80 bg-card/92 dark:bg-card px-4 py-2 text-[13px] text-foreground shadow-sm"
                   >
                     <div className="font-semibold">{store.city?.name || 'Unknown City'}</div>
-                    <div className="text-xs text-neutral-500">
+                    <div className="text-xs text-muted-foreground">
                       {store.active ? 'Active' : 'Inactive'} 
                       <span className="ml-2 text-emerald-600">
                         {store.active ? '100%' : '0%'}
@@ -706,9 +706,9 @@ export const MerchantDashboardPage = () => {
                 ))
             ) : (
               // No stores state
-              <div className="rounded-[1rem] bg-neutral-100 px-4 py-2 text-[13px] text-neutral-600">
+              <div className="rounded-[1rem] bg-muted px-4 py-2 text-[13px] text-muted-foreground">
                 <div className="font-semibold">No Stores</div>
-                <div className="text-xs text-neutral-500">Create your first store to see city performance</div>
+                <div className="text-xs text-muted-foreground">Create your first store to see city performance</div>
               </div>
             )}
           </div>
@@ -716,19 +716,19 @@ export const MerchantDashboardPage = () => {
           {/* Chart + Store List */}
           <div className="mb-7 grid grid-cols-1 gap-5 lg:grid-cols-3">
             <div className={cn(panelClass, 'col-span-2')}>
-              <h4 className="mb-4 text-[13px] text-neutral-600">Sales (Last 7 days)</h4>
+              <h4 className="mb-4 text-[13px] text-muted-foreground">Sales (Last 7 days)</h4>
               <div className="flex items-center justify-center h-56">
                 <div className="text-center">
-                  <div className="text-4xl text-neutral-300 mb-2">📊</div>
-                  <p className="text-sm text-neutral-500">No sales data yet</p>
-                  <p className="text-xs text-neutral-400 mt-1">Testing phase</p>
+                  <div className="text-4xl text-muted-foreground mb-2">📊</div>
+                  <p className="text-sm text-muted-foreground">No sales data yet</p>
+                  <p className="text-xs text-muted-foreground mt-1">Testing phase</p>
                 </div>
               </div>
             </div>
 
             <div className={cn(panelClass, 'col-span-1')}>
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-[13px] text-neutral-600">Sales by store</h4>
+                <h4 className="text-[13px] text-muted-foreground">Sales by store</h4>
                 <Link to={PATHS.MERCHANT_STORES}>
                   <Button variant="ghost" size="sm" className="text-xs">
                     Manage Stores
@@ -740,10 +740,10 @@ export const MerchantDashboardPage = () => {
                   {Array.from({ length: 3 }).map((_, i) => (
                     <div key={i} className="flex items-center justify-between animate-pulse">
                       <div className="flex items-center gap-3">
-                        <div className="h-3 w-3 rounded-full bg-neutral-200" />
-                        <div className="h-4 w-32 bg-neutral-200 rounded" />
+                        <div className="h-3 w-3 rounded-full bg-accent" />
+                        <div className="h-4 w-32 bg-accent rounded" />
                       </div>
-                      <div className="h-4 w-16 bg-neutral-200 rounded" />
+                      <div className="h-4 w-16 bg-accent rounded" />
                     </div>
                   ))}
                 </div>
@@ -756,16 +756,16 @@ export const MerchantDashboardPage = () => {
                           store.active ? 'bg-green-500' : 'bg-red-500'
                         }`} />
                         <div className="min-w-0 flex-1">
-                          <span className="block truncate text-[13px] text-neutral-800">
+                          <span className="block truncate text-[13px] text-foreground">
                             {store.address}
                           </span>
-                          <span className="text-xs text-neutral-500">
+                          <span className="text-xs text-muted-foreground">
                             {store.city?.name || 'Unknown City'}{store.city?.state ? `, ${store.city.state}` : ''}
                           </span>
                         </div>
                       </div>
-                      <div className="text-[13px] text-neutral-600">
-                        <span className="text-neutral-500">0</span>
+                      <div className="text-[13px] text-muted-foreground">
+                        <span className="text-muted-foreground">0</span>
                         <span className="text-green-500 ml-2">0%</span>
                       </div>
                     </li>
@@ -773,7 +773,7 @@ export const MerchantDashboardPage = () => {
                 </ul>
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-sm text-neutral-500 mb-4">No stores found</p>
+                  <p className="text-sm text-muted-foreground mb-4">No stores found</p>
                   <Link to={PATHS.MERCHANT_STORES_CREATE}>
                     <Button size="sm" variant="secondary">
                       Create Your First Store
@@ -801,8 +801,8 @@ export const MerchantDashboardPage = () => {
             <div className="space-y-6">
               <div className="mb-6">
                 <div className="mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
-                  <h2 className="text-[1.4rem] font-semibold tracking-tight text-neutral-900">Your deals</h2>
-                  <div className="flex items-center gap-2 rounded-full border border-neutral-200 bg-neutral-100 p-1">
+                  <h2 className="text-[1.4rem] font-semibold tracking-tight text-foreground">Your deals</h2>
+                  <div className="flex items-center gap-2 rounded-full border border-border bg-muted p-1">
                     {(
                       [
                         'all',
@@ -817,8 +817,8 @@ export const MerchantDashboardPage = () => {
                         className={cn(
                           'rounded-full px-4 py-1.5 text-[13px] font-semibold transition-all duration-200',
                           activeFilter === filter
-                            ? 'bg-white text-brand-primary-600 shadow-sm'
-                            : 'text-neutral-600 hover:bg-neutral-200/50',
+                            ? 'bg-card text-brand-primary-600 shadow-sm'
+                            : 'text-muted-foreground hover:bg-accent/50',
                         )}
                       >
                         {filter.charAt(0).toUpperCase() + filter.slice(1)}
@@ -830,19 +830,19 @@ export const MerchantDashboardPage = () => {
                 {isLoading ? (
                   <DealsSkeleton />
                 ) : error ? (
-                  <div className="rounded-lg border border-red-200 bg-red-100 p-6">
-                    <p className="text-red-800">
+                  <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-100 dark:bg-red-950/40 p-6">
+                    <p className="text-red-800 dark:text-red-300">
                       Error loading deals. Please try again later.
                     </p>
                   </div>
                 ) : filteredDeals.length === 0 ? (
-                  <div className="rounded-lg border border-neutral-200 bg-white py-12 text-center">
-                    <h3 className="mb-2 text-[1.1rem] font-semibold text-neutral-800">
+                  <div className="rounded-lg border border-border bg-card py-12 text-center">
+                    <h3 className="mb-2 text-[1.1rem] font-semibold text-foreground">
                       {activeFilter === 'all'
                         ? 'No deals yet'
                         : `No ${activeFilter} deals found`}
                     </h3>
-                    <p className="mb-6 text-sm text-neutral-600">
+                    <p className="mb-6 text-sm text-muted-foreground">
                       {activeFilter === 'all'
                         ? 'Create your first deal to start attracting customers'
                         : 'Try selecting a different filter to see your other deals.'}
@@ -868,7 +868,7 @@ export const MerchantDashboardPage = () => {
             <div className="space-y-6">
               <div className="text-center py-12">
                 <h3 className="mb-4 text-[1.1rem] font-semibold">Advanced analytics</h3>
-                <p className="mb-6 text-sm text-neutral-600">Detailed performance insights and analytics</p>
+                <p className="mb-6 text-sm text-muted-foreground">Detailed performance insights and analytics</p>
                 <Link to={PATHS.MERCHANT_ANALYTICS}>
                   <Button size="lg">View Full Analytics</Button>
                 </Link>
@@ -885,11 +885,11 @@ export const MerchantDashboardPage = () => {
       )}
 
       {merchantStatus === 'REJECTED' && (
-        <div className="rounded-lg border border-red-200 bg-red-100 p-6">
-          <h2 className="text-xl font-bold text-red-800">
+        <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-100 dark:bg-red-950/40 p-6">
+          <h2 className="text-xl font-bold text-red-800 dark:text-red-300">
             Application Not Approved
           </h2>
-          <p className="mt-2 text-red-700">
+          <p className="mt-2 text-red-700 dark:text-red-300">
             Unfortunately, your merchant application was not approved at this
             time. Please contact our support team if you have any questions or
             would like to reapply.

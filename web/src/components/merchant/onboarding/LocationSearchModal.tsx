@@ -82,22 +82,22 @@ export const LocationSearchModal = ({ isOpen, onClose, onLocationSelect, initial
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[9999] flex items-start justify-center p-4 pt-[10vh]">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/50" onClick={onClose} />
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-foreground/50" onClick={onClose} />
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="relative z-10 w-full max-w-2xl bg-white rounded-xl shadow-2xl"
+            className="relative z-10 w-full max-w-2xl bg-card rounded-xl shadow-2xl"
           >
             <div className="relative p-4 border-b">
-              <MapPin className="absolute left-7 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
+              <MapPin className="absolute left-7 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search all locations..."
                 className="h-12 pl-10 text-base"
               />
-              <button onClick={onClose} className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-neutral-500 hover:text-neutral-800">
+              <button onClick={onClose} className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-muted-foreground hover:text-foreground">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -107,18 +107,18 @@ export const LocationSearchModal = ({ isOpen, onClose, onLocationSelect, initial
                suggestions.length > 0 ? (
                 <div className="space-y-1">
                   {suggestions.map(s => (
-                    <button key={s.place_id} onClick={() => handleSelect(s.lat, s.lon)} className="w-full text-left p-3 hover:bg-neutral-100 rounded-md">
+                    <button key={s.place_id} onClick={() => handleSelect(s.lat, s.lon)} className="w-full text-left p-3 hover:bg-muted rounded-md">
                       {s.display_name}
                     </button>
                   ))}
                 </div>
               ) : (
                 <>
-                  <h3 className="font-semibold text-neutral-500 mb-4">Popular Cities</h3>
+                  <h3 className="font-semibold text-muted-foreground mb-4">Popular Cities</h3>
                   {isLoadingCities ? <Loader2 className="h-6 w-6 animate-spin" /> : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2">
                       {popularCities.map((city: City) => (
-                        <button key={city.id} onClick={() => handleCityClick(city)} className="text-left p-2 hover:bg-neutral-100 rounded-md font-medium text-neutral-800">
+                        <button key={city.id} onClick={() => handleCityClick(city)} className="text-left p-2 hover:bg-muted rounded-md font-medium text-foreground">
                           {city.name}
                         </button>
                       ))}

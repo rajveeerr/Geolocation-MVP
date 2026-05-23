@@ -18,7 +18,7 @@ interface DayOfWeekSelectorProps {
 
 export const DayOfWeekSelector = ({ selectedDays, onDayToggle }: DayOfWeekSelectorProps) => {
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-lg bg-neutral-100 p-2">
+    <div className="flex flex-wrap items-center gap-2 rounded-lg bg-muted p-2">
       {DAYS_OF_WEEK.map((day) => {
         const isSelected = selectedDays.includes(day.value);
         return (
@@ -28,8 +28,8 @@ export const DayOfWeekSelector = ({ selectedDays, onDayToggle }: DayOfWeekSelect
             className={cn(
               'flex-1 rounded-md px-3 py-2 text-sm font-semibold transition-colors sm:flex-initial',
               isSelected
-                ? 'bg-black text-white shadow-sm'
-                : 'text-neutral-600 hover:bg-neutral-200'
+                ? 'bg-foreground text-background shadow-sm'
+                : 'text-muted-foreground hover:bg-accent'
             )}
             aria-pressed={isSelected}
           >

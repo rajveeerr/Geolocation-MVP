@@ -289,26 +289,26 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <DialogContent
           className={cn(
-            'bg-white border border-neutral-200 text-neutral-800',
+            'bg-card border border-border text-foreground',
             'sm:max-w-3xl max-h-[90vh] flex flex-col p-0 rounded-2xl overflow-hidden'
           )}
         >
           {/* Header */}
-          <DialogHeader className="px-6 pt-6 pb-4 border-b border-neutral-100">
-            <DialogTitle className="font-heading text-lg font-bold text-neutral-900">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b border-border">
+            <DialogTitle className="font-heading text-lg font-bold text-foreground">
               {existingCollection ? '✏️ Edit Menu' : '✨ Create Menu'}
             </DialogTitle>
           </DialogHeader>
 
           {/* Body — scrollable */}
           <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
-            <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
-              <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">
+            <div className="rounded-xl border border-border bg-muted px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Store Context
               </p>
-              <p className="mt-1 text-sm text-neutral-700">
+              <p className="mt-1 text-sm text-foreground">
                 {storeContextMessage.split(selectedStoreLabel)[0]}
-                <span className="font-semibold text-neutral-900">{selectedStoreLabel}</span>
+                <span className="font-semibold text-foreground">{selectedStoreLabel}</span>
                 {storeContextMessage.split(selectedStoreLabel)[1]}
               </p>
             </div>
@@ -316,21 +316,21 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
             {/* Collection name & description */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-medium text-neutral-500 mb-1.5 block">Menu Name</label>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Menu Name</label>
                 <Input
                   value={collectionName}
                   onChange={(e) => setCollectionName(e.target.value)}
                   placeholder="e.g. Daily Menu"
-                  className="bg-neutral-50 border-neutral-200 text-neutral-800 placeholder-neutral-400"
+                  className="bg-muted border-border text-foreground placeholder-neutral-400"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-neutral-500 mb-1.5 block">Description (optional)</label>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Description (optional)</label>
                 <Input
                   value={collectionDescription}
                   onChange={(e) => setCollectionDescription(e.target.value)}
                   placeholder="Short description"
-                  className="bg-neutral-50 border-neutral-200 text-neutral-800 placeholder-neutral-400"
+                  className="bg-muted border-border text-foreground placeholder-neutral-400"
                 />
               </div>
             </div>
@@ -343,8 +343,8 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                   onClick={() => setShowAiModal(true)}
                   className={cn(
                     'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold',
-                    'bg-purple-50 text-purple-600 border border-purple-200',
-                    'hover:bg-purple-100 hover:border-purple-300 transition-colors'
+                    'bg-purple-50 dark:bg-purple-950/30 text-purple-600 border border-purple-200 dark:border-purple-900/50',
+                    'hover:bg-purple-100 dark:bg-purple-950/40 hover:border-purple-300 transition-colors'
                   )}
                 >
                   <Sparkles className="h-3.5 w-3.5" />
@@ -355,8 +355,8 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                   onClick={() => setShowBulkUpload(true)}
                   className={cn(
                     'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold',
-                    'bg-emerald-50 text-emerald-600 border border-emerald-200',
-                    'hover:bg-emerald-100 hover:border-emerald-300 transition-colors'
+                    'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 border border-emerald-200 dark:border-emerald-900/50',
+                    'hover:bg-emerald-100 dark:bg-emerald-950/40 hover:border-emerald-300 transition-colors'
                   )}
                 >
                   <FileSpreadsheet className="h-3.5 w-3.5" />
@@ -367,8 +367,8 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                   onClick={() => setShowScrapeInput(!showScrapeInput)}
                   className={cn(
                     'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold',
-                    'bg-sky-50 text-sky-600 border border-sky-200',
-                    'hover:bg-sky-100 hover:border-sky-300 transition-colors'
+                    'bg-sky-50 dark:bg-sky-950/30 text-sky-600 border border-sky-200 dark:border-sky-900/50',
+                    'hover:bg-sky-100 dark:bg-sky-950/40 hover:border-sky-300 transition-colors'
                   )}
                 >
                   <Globe className="h-3.5 w-3.5" />
@@ -380,8 +380,8 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                 onClick={() => setShowFeeInfo(true)}
                 className={cn(
                   'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold',
-                  'bg-neutral-50 text-neutral-600 border border-neutral-200',
-                  'hover:bg-neutral-100 hover:border-neutral-300 transition-colors'
+                  'bg-muted text-muted-foreground border border-border',
+                  'hover:bg-muted hover:border-border transition-colors'
                 )}
               >
                 <Info className="h-3.5 w-3.5" />
@@ -396,7 +396,7 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                   value={scrapeUrl}
                   onChange={(e) => setScrapeUrl(e.target.value)}
                   placeholder="https://your-website.com/menu"
-                  className="flex-1 bg-neutral-50 border-neutral-200 text-neutral-800 placeholder-neutral-400"
+                  className="flex-1 bg-muted border-border text-foreground placeholder-neutral-400"
                 />
                 <button
                   type="button"
@@ -417,16 +417,16 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                 <div
                   key={item.tempId}
                   className={cn(
-                    'relative rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition-all',
-                    'hover:border-neutral-300'
+                    'relative rounded-xl border border-border bg-card p-4 shadow-sm transition-all',
+                    'hover:border-border'
                   )}
                 >
                   <div className="flex gap-4 items-start">
                     {/* Media Handle & Box */}
                     <div className="flex flex-col items-center gap-2">
-                      <GripVertical className="h-4 w-4 text-neutral-300 cursor-grab" />
+                      <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
                       <div className="flex flex-col gap-1 items-center">
-                        <span className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">Media</span>
+                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Media</span>
                         <button 
                           type="button" 
                           onClick={() => { setUploadTargetTempId(item.tempId); }}
@@ -434,15 +434,15 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                             "flex h-[88px] w-[88px] flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors",
                             item.imageUrls?.length 
                               ? "border-brand-primary border-solid overflow-hidden" 
-                              : "border-neutral-200 bg-neutral-50 hover:border-brand-primary/30 hover:bg-neutral-100"
+                              : "border-border bg-muted hover:border-brand-primary/30 hover:bg-muted"
                           )}
                         >
                          {item.imageUrls?.length ? (
                            <img src={item.imageUrls[0]} alt="Media" className="h-full w-full object-cover" />
                          ) : (
                            <>
-                             <ImageIcon className="mb-1 h-5 w-5 text-neutral-400" />
-                             <span className="text-[10px] font-medium text-neutral-500">Image</span>
+                             <ImageIcon className="mb-1 h-5 w-5 text-muted-foreground" />
+                             <span className="text-[10px] font-medium text-muted-foreground">Image</span>
                            </>
                          )}
                         </button>
@@ -453,27 +453,27 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                     <div className="flex flex-1 flex-col gap-3">
                       <div className="grid grid-cols-1 md:grid-cols-[1.5fr_2fr_1fr] gap-3">
                          <div>
-                           <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">Item Name</label>
+                           <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Item Name</label>
                            <Input 
                              placeholder="e.g., Classic Burger" 
                              value={item.name} 
                              onChange={(e) => updateItem(item.tempId, 'name', e.target.value)} 
-                             className="h-10 text-sm bg-neutral-50 border-neutral-200 focus:border-brand-primary/30"
+                             className="h-10 text-sm bg-muted border-border focus:border-brand-primary/30"
                            />
                          </div>
                          <div>
-                           <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">Description</label>
+                           <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Description</label>
                            <Input 
                              placeholder="Brief description" 
                              value={item.description} 
                              onChange={(e) => updateItem(item.tempId, 'description', e.target.value)} 
-                             className="h-10 text-sm bg-neutral-50 border-neutral-200 focus:border-brand-primary/30"
+                             className="h-10 text-sm bg-muted border-border focus:border-brand-primary/30"
                            />
                          </div>
                          <div>
-                           <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">Category</label>
+                           <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Category</label>
                            <Select value={item.category || undefined} onValueChange={(val) => updateItem(item.tempId, 'category', val)}>
-                              <SelectTrigger className="h-10 text-sm bg-neutral-50 border-neutral-200">
+                              <SelectTrigger className="h-10 text-sm bg-muted border-border">
                                 <SelectValue placeholder="Select" />
                               </SelectTrigger>
                               <SelectContent>
@@ -487,11 +487,11 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
 
                       <div className="grid grid-cols-3 gap-3">
                          <div>
-                           <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">Your Price</label>
+                           <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Your Price</label>
                            <div className="relative">
-                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">$</span>
+                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
                              <Input 
-                               className="pl-7 h-10 text-sm bg-neutral-50 border-neutral-200 focus:border-brand-primary/30" 
+                               className="pl-7 h-10 text-sm bg-muted border-border focus:border-brand-primary/30" 
                                type="number" 
                                step="0.01" 
                                min="0" 
@@ -501,9 +501,9 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                            </div>
                          </div>
                       </div>
-                      <div className="mt-1 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+                      <div className="mt-1 rounded-lg border border-border bg-muted p-3">
                         <div className="flex items-center justify-between">
-                          <label className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+                          <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                             Track inventory
                           </label>
                           <input
@@ -528,13 +528,13 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                                 )
                               )
                             }
-                            className="h-4 w-4 rounded border-neutral-300 text-brand focus:ring-brand"
+                            className="h-4 w-4 rounded border-border text-brand focus:ring-brand"
                           />
                         </div>
                         {item.inventoryTrackingEnabled ? (
                           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div>
-                              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+                              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                                 In stock
                               </label>
                               <Input
@@ -554,11 +554,11 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                                     )
                                   )
                                 }
-                                className="h-9 text-sm bg-white border-neutral-200"
+                                className="h-9 text-sm bg-card border-border"
                               />
                             </div>
                             <div>
-                              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+                              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                                 Low stock at
                               </label>
                               <Input
@@ -578,10 +578,10 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                                     )
                                   )
                                 }
-                                className="h-9 text-sm bg-white border-neutral-200"
+                                className="h-9 text-sm bg-card border-border"
                               />
                             </div>
-                            <label className="flex items-center gap-2 text-xs font-medium text-neutral-600 sm:pt-6">
+                            <label className="flex items-center gap-2 text-xs font-medium text-muted-foreground sm:pt-6">
                               <input
                                 type="checkbox"
                                 checked={item.allowBackorder}
@@ -594,20 +594,20 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                                     )
                                   )
                                 }
-                                className="h-4 w-4 rounded border-neutral-300 text-brand focus:ring-brand"
+                                className="h-4 w-4 rounded border-border text-brand focus:ring-brand"
                               />
                               Allow backorders
                             </label>
                           </div>
                         ) : (
-                          <p className="mt-2 text-xs text-neutral-500">
+                          <p className="mt-2 text-xs text-muted-foreground">
                             Inventory is untracked for this item.
                           </p>
                         )}
                       </div>
-                      <div className="mt-1 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+                      <div className="mt-1 rounded-lg border border-border bg-muted p-3">
                         <div className="flex items-center justify-between">
-                          <label className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+                          <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                             Bulk ordering
                           </label>
                           <input
@@ -629,13 +629,13 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                                 )
                               )
                             }
-                            className="h-4 w-4 rounded border-neutral-300 text-brand focus:ring-brand"
+                            className="h-4 w-4 rounded border-border text-brand focus:ring-brand"
                           />
                         </div>
                         {item.isBulkOrderEnabled ? (
                           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <div>
-                              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+                              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                                 Default people count
                               </label>
                               <Input
@@ -655,11 +655,11 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                                     )
                                   )
                                 }
-                                className="h-9 text-sm bg-white border-neutral-200"
+                                className="h-9 text-sm bg-card border-border"
                               />
                             </div>
                             <div>
-                              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+                              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                                 Minimum people count
                               </label>
                               <Input
@@ -679,12 +679,12 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                                     )
                                   )
                                 }
-                                className="h-9 text-sm bg-white border-neutral-200"
+                                className="h-9 text-sm bg-card border-border"
                               />
                             </div>
                           </div>
                         ) : (
-                          <p className="mt-2 text-xs text-neutral-500">
+                          <p className="mt-2 text-xs text-muted-foreground">
                             Item uses regular single-serving ordering.
                           </p>
                         )}
@@ -696,7 +696,7 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
                       <button 
                         type="button"
                         onClick={() => removeItem(item.tempId)} 
-                        className="p-2 text-neutral-400 hover:text-red-500 transition-colors rounded-md hover:bg-red-50"
+                        className="p-2 text-muted-foreground hover:text-red-500 transition-colors rounded-md hover:bg-red-50 dark:bg-red-950/30"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -709,7 +709,7 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
               <button
                 type="button"
                 onClick={addRow}
-                className="flex items-center gap-1.5 rounded-xl px-3 py-2.5 mt-2 text-xs font-medium text-neutral-500 hover:text-brand hover:bg-brand-subtle transition-colors w-full justify-center border border-dashed border-neutral-200 hover:border-brand/30"
+                className="flex items-center gap-1.5 rounded-xl px-3 py-2.5 mt-2 text-xs font-medium text-muted-foreground hover:text-brand hover:bg-brand-subtle transition-colors w-full justify-center border border-dashed border-border hover:border-brand/30"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add Item
@@ -718,15 +718,15 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-neutral-100 bg-neutral-50/60 flex items-center justify-between">
-            <span className="text-xs text-neutral-400 font-medium">
+          <div className="px-6 py-4 border-t border-border bg-muted/60 flex items-center justify-between">
+            <span className="text-xs text-muted-foreground font-medium">
               {items.filter((i) => i.name.trim()).length} items
             </span>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-neutral-800 transition-colors rounded-lg hover:bg-neutral-100"
+                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted"
               >
                 Cancel
               </button>
@@ -782,40 +782,40 @@ export const StandardMenuEditor: React.FC<StandardMenuEditorProps> = ({
 
       {/* Fee Info Dialog */}
       <Dialog open={showFeeInfo} onOpenChange={setShowFeeInfo}>
-        <DialogContent className="sm:max-w-md border-neutral-200 bg-white text-neutral-800 p-0 overflow-hidden">
-          <DialogHeader className="p-6 pb-4 border-b border-neutral-100">
-            <DialogTitle className="text-lg font-bold text-neutral-900">Platform Fee Structure</DialogTitle>
+        <DialogContent className="sm:max-w-md border-border bg-card text-foreground p-0 overflow-hidden">
+          <DialogHeader className="p-6 pb-4 border-b border-border">
+            <DialogTitle className="text-lg font-bold text-foreground">Platform Fee Structure</DialogTitle>
           </DialogHeader>
           <div className="p-6 pt-4 space-y-4 text-sm font-medium">
-            <p className="text-neutral-500 leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed">
               Small fees are added to customer prices. You keep 100% of your set price!
             </p>
             <div className="space-y-2 mt-4">
-              <div className="flex justify-between p-3 rounded-lg bg-neutral-50 border border-neutral-200">
-                <span className="text-neutral-600">$0.00 - $1.00</span>
+              <div className="flex justify-between p-3 rounded-lg bg-muted border border-border">
+                <span className="text-muted-foreground">$0.00 - $1.00</span>
                 <span className="text-brand font-semibold">+$0.25</span>
               </div>
-              <div className="flex justify-between p-3 rounded-lg bg-neutral-50 border border-neutral-200">
-                <span className="text-neutral-600">$1.01 - $5.00</span>
+              <div className="flex justify-between p-3 rounded-lg bg-muted border border-border">
+                <span className="text-muted-foreground">$1.01 - $5.00</span>
                 <span className="text-brand font-semibold">+$0.50</span>
               </div>
-              <div className="flex justify-between p-3 rounded-lg bg-neutral-50 border border-neutral-200">
-                <span className="text-neutral-600">$5.01 - $15.00</span>
+              <div className="flex justify-between p-3 rounded-lg bg-muted border border-border">
+                <span className="text-muted-foreground">$5.01 - $15.00</span>
                 <span className="text-brand font-semibold">+$1.05</span>
               </div>
-              <div className="flex justify-between p-3 rounded-lg bg-neutral-50 border border-neutral-200">
-                <span className="text-neutral-600">$15.01 - $30.00</span>
+              <div className="flex justify-between p-3 rounded-lg bg-muted border border-border">
+                <span className="text-muted-foreground">$15.01 - $30.00</span>
                 <span className="text-brand font-semibold">+$2.00</span>
               </div>
-              <div className="flex justify-between p-3 rounded-lg bg-neutral-50 border border-neutral-200">
-                <span className="text-neutral-600">$30.01+</span>
+              <div className="flex justify-between p-3 rounded-lg bg-muted border border-border">
+                <span className="text-muted-foreground">$30.01+</span>
                 <span className="text-brand font-semibold">+$5.00</span>
               </div>
             </div>
 
             <div className="mt-6 p-4 rounded-xl border border-warning/30 bg-warning/5">
               <h4 className="font-bold text-warning mb-1">10% Maintenance Fee</h4>
-              <p className="text-neutral-500 text-xs leading-relaxed">
+              <p className="text-muted-foreground text-xs leading-relaxed">
                 Applied to total bill to cover payment processing, app maintenance, and platform improvements
               </p>
             </div>

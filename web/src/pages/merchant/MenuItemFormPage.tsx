@@ -491,9 +491,9 @@ export const MenuItemFormPage = () => {
   if (isEditing && !existingItem) {
     return (
       <div className="container mx-auto max-w-2xl px-4 py-12">
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
+        <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-6 text-center">
           <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
-          <h3 className="mb-2 text-lg font-semibold text-red-800">
+          <h3 className="mb-2 text-lg font-semibold text-red-800 dark:text-red-300">
             Menu Item Not Found
           </h3>
           <p className="text-red-600">
@@ -521,10 +521,10 @@ export const MenuItemFormPage = () => {
           <ArrowLeft className="mr-2 h-4 w-4 shrink-0" />
           Back to Menu
         </Button>
-        <h1 className="text-4xl font-bold text-neutral-900">
+        <h1 className="text-4xl font-bold text-foreground">
           {isEditing ? 'Edit Menu Item' : 'Add New Menu Item'}
         </h1>
-        <p className="mt-2 text-neutral-600">
+        <p className="mt-2 text-muted-foreground">
           {isEditing 
             ? 'Update your menu item information'
             : 'Add a new item to your menu'
@@ -533,12 +533,12 @@ export const MenuItemFormPage = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
           <div className="mb-6 flex items-center gap-3">
             <div className="rounded-lg bg-brand-primary-100 p-2">
               <Utensils className="h-5 w-5 text-brand-primary-600" />
             </div>
-            <h2 className="text-lg font-semibold text-neutral-800">Item Information</h2>
+            <h2 className="text-lg font-semibold text-foreground">Item Information</h2>
           </div>
 
           <div className="space-y-6">
@@ -562,7 +562,7 @@ export const MenuItemFormPage = () => {
               <div className="space-y-2">
                 <Label htmlFor="price">Price *</Label>
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+                  <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="price"
                     type="number"
@@ -603,7 +603,7 @@ export const MenuItemFormPage = () => {
                     size="sm"
                     onClick={handleGenerateDescriptionWithAi}
                     disabled={aiChat.isPending}
-                    className="h-7 gap-1.5 px-2 text-xs text-[#bf6545] hover:bg-[#fff1e5] hover:text-[#bf6545]"
+                    className="h-7 gap-1.5 px-2 text-xs text-ai-accent hover:bg-ai-soft hover:text-ai-accent"
                   >
                     {aiChat.isPending ? (
                       <>
@@ -625,7 +625,7 @@ export const MenuItemFormPage = () => {
                 rows={3}
                 {...register('description')}
                 className={cn(
-                  'flex min-h-[80px] w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-neutral-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+                  'flex min-h-[80px] w-full rounded-md border border-border bg-card px-3 py-2 text-sm ring-offset-white placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
                   errors.description && 'border-red-500 focus-visible:ring-red-500'
                 )}
               />
@@ -647,7 +647,7 @@ export const MenuItemFormPage = () => {
                 context="menu_item"
                 className="mt-2"
               />
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-muted-foreground">
                 Upload up to 5 images to showcase your menu item. Supported formats: JPG, PNG, WebP.
               </p>
             </div>
@@ -659,7 +659,7 @@ export const MenuItemFormPage = () => {
             />
 
             {/* Variants Section */}
-            <div className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+            <div className="space-y-4 rounded-lg border border-border bg-muted p-4">
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -671,26 +671,26 @@ export const MenuItemFormPage = () => {
                       setVariants([{ label: '', price: watchedValues.price || 0, sortOrder: 0 }]);
                     }
                   }}
-                  className="h-4 w-4 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                  className="h-4 w-4 rounded border-border text-brand-primary-600 focus:ring-brand-primary-500"
                 />
-                <Label htmlFor="hasVariants" className="font-medium text-neutral-800">
+                <Label htmlFor="hasVariants" className="font-medium text-foreground">
                   This item has variants (sizes, colors, etc.)
                 </Label>
               </div>
 
               {hasVariants && (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm text-neutral-500">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Layers className="h-4 w-4" />
                     <span>Each variant gets its own price and optional SKU.</span>
                   </div>
 
                   {variants.map((variant, index) => (
-                    <div key={index} className="rounded-lg border border-neutral-200 bg-white p-3">
+                    <div key={index} className="rounded-lg border border-border bg-card p-3">
                       <div className="flex items-start gap-3">
                         <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-4">
                           <div className="space-y-1">
-                            <Label className="text-xs text-neutral-500">Label *</Label>
+                            <Label className="text-xs text-muted-foreground">Label *</Label>
                             <Input
                               placeholder="e.g., Large"
                               value={variant.label}
@@ -703,9 +703,9 @@ export const MenuItemFormPage = () => {
                             />
                           </div>
                           <div className="space-y-1">
-                            <Label className="text-xs text-neutral-500">Price *</Label>
+                            <Label className="text-xs text-muted-foreground">Price *</Label>
                             <div className="relative">
-                              <DollarSign className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-400" />
+                              <DollarSign className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                               <Input
                                 type="number"
                                 step="0.01"
@@ -722,7 +722,7 @@ export const MenuItemFormPage = () => {
                             </div>
                           </div>
                           <div className="space-y-1">
-                            <Label className="text-xs text-neutral-500">SKU (auto if empty)</Label>
+                            <Label className="text-xs text-muted-foreground">SKU (auto if empty)</Label>
                             <Input
                               placeholder="Auto-generated"
                               value={variant.sku || ''}
@@ -734,7 +734,7 @@ export const MenuItemFormPage = () => {
                             />
                           </div>
                           <div className="space-y-1">
-                            <Label className="text-xs text-neutral-500">Serves (people)</Label>
+                            <Label className="text-xs text-muted-foreground">Serves (people)</Label>
                             <Input
                               type="number"
                               min="1"
@@ -758,7 +758,7 @@ export const MenuItemFormPage = () => {
                             setVariants(variants.filter((_, i) => i !== index));
                             if (variants.length <= 1) setHasVariants(false);
                           }}
-                          className="mt-5 rounded-md p-1.5 text-neutral-400 transition hover:bg-red-50 hover:text-red-500"
+                          className="mt-5 rounded-md p-1.5 text-muted-foreground transition hover:bg-red-50 dark:bg-red-950/30 hover:text-red-500"
                           title="Remove variant"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -766,9 +766,9 @@ export const MenuItemFormPage = () => {
                       </div>
 
                       {inventoryTrackingEnabled && (
-                        <div className="mt-3 grid grid-cols-2 gap-3 border-t border-neutral-100 pt-3">
+                        <div className="mt-3 grid grid-cols-2 gap-3 border-t border-border pt-3">
                           <div className="space-y-1">
-                            <Label className="text-xs text-neutral-500">Quantity</Label>
+                            <Label className="text-xs text-muted-foreground">Quantity</Label>
                             <Input
                               type="number"
                               min="0"
@@ -786,7 +786,7 @@ export const MenuItemFormPage = () => {
                             />
                           </div>
                           <div className="space-y-1">
-                            <Label className="text-xs text-neutral-500">Low Stock Threshold</Label>
+                            <Label className="text-xs text-muted-foreground">Low Stock Threshold</Label>
                             <Input
                               type="number"
                               min="0"
@@ -824,11 +824,11 @@ export const MenuItemFormPage = () => {
               )}
             </div>
 
-            <div className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+            <div className="space-y-4 rounded-lg border border-border bg-muted p-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="font-semibold text-neutral-900">Availability & Inventory</h3>
-                  <p className="mt-1 text-sm text-neutral-600">
+                  <h3 className="font-semibold text-foreground">Availability & Inventory</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
                     Control whether this item is available and optionally track stock levels.
                   </p>
                 </div>
@@ -836,17 +836,17 @@ export const MenuItemFormPage = () => {
                   className={cn(
                     'rounded-full px-3 py-1 text-xs font-semibold',
                     !isAvailable
-                      ? 'bg-red-100 text-red-700'
+                      ? 'bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-300'
                       : inventoryTrackingEnabled && parsedInventoryQuantity !== null && parsedInventoryQuantity <= 0 && !allowBackorder
-                        ? 'bg-red-100 text-red-700'
+                        ? 'bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-300'
                         : inventoryTrackingEnabled &&
                             parsedInventoryQuantity !== null &&
                             parsedLowStockThreshold !== null &&
                             parsedInventoryQuantity <= parsedLowStockThreshold
-                          ? 'bg-amber-100 text-amber-700'
+                          ? 'bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300'
                           : inventoryTrackingEnabled
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : 'bg-slate-100 text-slate-700'
+                            ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
+                            : 'bg-muted text-foreground'
                   )}
                 >
                   {!isAvailable
@@ -858,15 +858,15 @@ export const MenuItemFormPage = () => {
               </div>
 
               {aiEnabled && (
-                <div className="rounded-xl border border-[#f0ddd0] bg-[linear-gradient(135deg,#fff8f2_0%,#fff1e5_100%)] p-4 shadow-[0_12px_30px_rgba(82,58,40,0.06)]">
+                <div className="rounded-xl border border-ai-border bg-ai-surface p-4 shadow-[0_12px_30px_rgba(82,58,40,0.06)] dark:shadow-none">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="flex items-start gap-3">
-                      <div className="rounded-full bg-white/80 p-2 text-[#bf6545]">
+                      <div className="rounded-full bg-card/80 dark:bg-card p-2 text-ai-accent">
                         <Wand2 className="h-4 w-4" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-[#203247]">AI Inventory Assistant</p>
-                        <p className="mt-1 text-sm text-[#607084]">
+                        <p className="text-sm font-semibold text-ai-text">AI Inventory Assistant</p>
+                        <p className="mt-1 text-sm text-ai-text-muted">
                           Suggest a starting quantity, low-stock threshold, and backorder rule from this item&apos;s details.
                         </p>
                       </div>
@@ -876,7 +876,7 @@ export const MenuItemFormPage = () => {
                       variant="secondary"
                       onClick={handleGenerateInventoryWithAi}
                       disabled={aiChat.isPending}
-                      className="shrink-0 border-[#ead6c9] bg-white/80 text-[#203247] hover:bg-white"
+                      className="shrink-0 border-ai-border-strong bg-card/80 dark:bg-card text-ai-text hover:bg-card"
                     >
                       {aiChat.isPending ? (
                         <>
@@ -893,12 +893,12 @@ export const MenuItemFormPage = () => {
                   </div>
 
                   {inventoryAiSuggestion && (
-                    <div className="mt-4 rounded-lg border border-white/80 bg-white/85 p-4">
-                      <div className="flex items-start gap-2 text-[#203247]">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
+                    <div className="mt-4 rounded-lg border border-border/80 bg-card/85 dark:bg-card p-4">
+                      <div className="flex items-start gap-2 text-ai-text">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                         <div>
                           <p className="text-sm font-semibold">AI recommendation applied</p>
-                          <p className="mt-1 text-sm text-[#607084]">{inventoryAiSuggestion.rationale}</p>
+                          <p className="mt-1 text-sm text-ai-text-muted">{inventoryAiSuggestion.rationale}</p>
                         </div>
                       </div>
                       {inventoryAiSuggestion.tips && inventoryAiSuggestion.tips.length > 0 && (
@@ -906,7 +906,7 @@ export const MenuItemFormPage = () => {
                           {inventoryAiSuggestion.tips.map((tip, index) => (
                             <span
                               key={`${tip}-${index}`}
-                              className="rounded-full bg-[#f7ede5] px-3 py-1 text-xs font-medium text-[#7b5c49]"
+                              className="rounded-full bg-ai-tag px-3 py-1 text-xs font-medium text-ai-tag-text"
                             >
                               {tip}
                             </span>
@@ -927,9 +927,9 @@ export const MenuItemFormPage = () => {
                     setIsAvailable(e.target.checked);
                     setValue('isAvailable', e.target.checked);
                   }}
-                  className="h-4 w-4 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                  className="h-4 w-4 rounded border-border text-brand-primary-600 focus:ring-brand-primary-500"
                 />
-                <Label htmlFor="isAvailable" className="font-medium text-neutral-800">
+                <Label htmlFor="isAvailable" className="font-medium text-foreground">
                   Item is available to customers
                 </Label>
               </div>
@@ -952,9 +952,9 @@ export const MenuItemFormPage = () => {
                       setValue('allowBackorder', false);
                     }
                   }}
-                  className="h-4 w-4 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                  className="h-4 w-4 rounded border-border text-brand-primary-600 focus:ring-brand-primary-500"
                 />
-                <Label htmlFor="inventoryTrackingEnabled" className="font-medium text-neutral-800">
+                <Label htmlFor="inventoryTrackingEnabled" className="font-medium text-foreground">
                   Track inventory quantity
                 </Label>
               </div>
@@ -1016,9 +1016,9 @@ export const MenuItemFormPage = () => {
                         setAllowBackorder(e.target.checked);
                         setValue('allowBackorder', e.target.checked);
                       }}
-                      className="h-4 w-4 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                      className="h-4 w-4 rounded border-border text-brand-primary-600 focus:ring-brand-primary-500"
                     />
-                    <Label htmlFor="allowBackorder" className="font-medium text-neutral-800">
+                    <Label htmlFor="allowBackorder" className="font-medium text-foreground">
                       Allow item to stay visible when quantity reaches 0
                     </Label>
                   </div>
@@ -1026,7 +1026,7 @@ export const MenuItemFormPage = () => {
               )}
             </div>
 
-            <div className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+            <div className="space-y-4 rounded-lg border border-border bg-muted p-4">
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -1040,9 +1040,9 @@ export const MenuItemFormPage = () => {
                       setMinPeopleCount('');
                     }
                   }}
-                  className="h-4 w-4 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                  className="h-4 w-4 rounded border-border text-brand-primary-600 focus:ring-brand-primary-500"
                 />
-                <Label htmlFor="isBulkOrderEnabled" className="font-medium text-neutral-800">
+                <Label htmlFor="isBulkOrderEnabled" className="font-medium text-foreground">
                   Enable bulk order settings for this item
                 </Label>
               </div>
@@ -1098,14 +1098,14 @@ export const MenuItemFormPage = () => {
         </div>
 
         {/* Deal Type Configuration */}
-        <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
           <div className="mb-6 flex items-center gap-3">
             <div className="rounded-lg bg-brand-primary-100 p-2">
               <Sparkles className="h-5 w-5 text-brand-primary-600" />
             </div>
             <div className="flex-1">
-              <h2 className="text-lg font-semibold text-neutral-800">Deal Type & Timing</h2>
-              <p className="text-sm text-neutral-600 mt-1">
+              <h2 className="text-lg font-semibold text-foreground">Deal Type & Timing</h2>
+              <p className="text-sm text-muted-foreground mt-1">
                 Configure when and how this item appears in deals
               </p>
             </div>
@@ -1133,18 +1133,18 @@ export const MenuItemFormPage = () => {
                       'rounded-lg border-2 p-3 text-left transition-all',
                       selectedDealType === dt.value
                         ? 'border-brand-primary-500 bg-brand-primary-50'
-                        : 'border-neutral-200 bg-white hover:border-neutral-300'
+                        : 'border-border bg-card hover:border-border'
                     )}
                     title={dt.description || dt.label}
                   >
-                    <div className="font-medium text-sm text-neutral-900">{dt.label}</div>
+                    <div className="font-medium text-sm text-foreground">{dt.label}</div>
                     {dt.description && (
-                      <div className="text-xs text-neutral-600 mt-1 line-clamp-2">{dt.description}</div>
+                      <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{dt.description}</div>
                     )}
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-neutral-500 flex items-start gap-1 mt-2">
+              <p className="text-xs text-muted-foreground flex items-start gap-1 mt-2">
                 <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
                 <span>Select the deal type that best fits this item. This helps organize items when creating deals.</span>
               </p>
@@ -1152,7 +1152,7 @@ export const MenuItemFormPage = () => {
 
             {/* Happy Hour Settings */}
             {(selectedDealType.includes('HAPPY_HOUR') || isHappyHour) && (
-              <div className="space-y-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+              <div className="space-y-4 rounded-lg border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/30 p-4">
                 <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -1162,9 +1162,9 @@ export const MenuItemFormPage = () => {
                       setIsHappyHour(e.target.checked);
                       setValue('isHappyHour', e.target.checked);
                     }}
-                    className="h-4 w-4 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                    className="h-4 w-4 rounded border-border text-brand-primary-600 focus:ring-brand-primary-500"
                   />
-                  <Label htmlFor="isHappyHour" className="font-semibold text-amber-900">
+                  <Label htmlFor="isHappyHour" className="font-semibold text-amber-900 dark:text-amber-200">
                     Happy Hour Item
                   </Label>
                 </div>
@@ -1172,7 +1172,7 @@ export const MenuItemFormPage = () => {
                   <div className="space-y-2">
                     <Label htmlFor="happyHourPrice">Happy Hour Price (Optional)</Label>
                     <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+                      <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input
                         id="happyHourPrice"
                         type="number"
@@ -1187,7 +1187,7 @@ export const MenuItemFormPage = () => {
                         className="pl-10"
                       />
                     </div>
-                    <p className="text-xs text-amber-700">
+                    <p className="text-xs text-amber-700 dark:text-amber-300">
                       Special price during happy hour. If not set, regular price will be used.
                     </p>
                   </div>
@@ -1197,7 +1197,7 @@ export const MenuItemFormPage = () => {
 
             {/* Surprise Deal Settings */}
             {(selectedDealType.includes('SURPRISE') || isSurprise) && (
-              <div className="space-y-4 rounded-lg border border-purple-200 bg-purple-50 p-4">
+              <div className="space-y-4 rounded-lg border border-purple-200 dark:border-purple-900/50 bg-purple-50 dark:bg-purple-950/30 p-4">
                 <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -1207,9 +1207,9 @@ export const MenuItemFormPage = () => {
                       setIsSurprise(e.target.checked);
                       setValue('isSurprise', e.target.checked);
                     }}
-                    className="h-4 w-4 rounded border-neutral-300 text-brand-primary-600 focus:ring-brand-primary-500"
+                    className="h-4 w-4 rounded border-border text-brand-primary-600 focus:ring-brand-primary-500"
                   />
-                  <Label htmlFor="isSurprise" className="font-semibold text-purple-900">
+                  <Label htmlFor="isSurprise" className="font-semibold text-purple-900 dark:text-purple-200">
                     Surprise Deal
                   </Label>
                 </div>
@@ -1224,7 +1224,7 @@ export const MenuItemFormPage = () => {
                         setValue('surpriseRevealTime', nextValue || null);
                       }}
                     />
-                    <p className="text-xs text-purple-700">
+                    <p className="text-xs text-purple-700 dark:text-purple-300">
                       When customers can see this surprise deal in 12-hour format.
                     </p>
                   </div>
@@ -1234,8 +1234,8 @@ export const MenuItemFormPage = () => {
 
             {/* Time Restrictions */}
             {(selectedDealType !== 'STANDARD' || validStartTime || validEndTime) && (
-              <div className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
-                <h3 className="font-semibold text-neutral-900 flex items-center gap-2">
+              <div className="space-y-4 rounded-lg border border-border bg-muted p-4">
+                <h3 className="font-semibold text-foreground flex items-center gap-2">
                   <Clock className="h-4 w-4" />
                   Time Restrictions (Optional)
                 </h3>
@@ -1270,7 +1270,7 @@ export const MenuItemFormPage = () => {
                       setValue('validDays', e.target.value || null);
                     }}
                   />
-                  <p className="text-xs text-neutral-500">
+                  <p className="text-xs text-muted-foreground">
                     Comma-separated days when this item is available (e.g., "Monday,Wednesday,Friday")
                   </p>
                 </div>

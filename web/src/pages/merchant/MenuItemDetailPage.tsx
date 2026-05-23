@@ -19,13 +19,13 @@ import { cn } from '@/lib/utils';
 const getInventoryTone = (item: MenuItem) => {
   switch (item.inventoryStatus) {
     case 'OUT_OF_STOCK':
-      return 'bg-red-100 text-red-700';
+      return 'bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-300';
     case 'LOW_STOCK':
-      return 'bg-amber-100 text-amber-700';
+      return 'bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300';
     case 'IN_STOCK':
-      return 'bg-emerald-100 text-emerald-700';
+      return 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300';
     default:
-      return 'bg-slate-100 text-slate-700';
+      return 'bg-muted text-foreground';
   }
 };
 
@@ -41,10 +41,10 @@ const getInventoryLabel = (item: MenuItem) => {
 const ImageGallery = ({ images }: { images: MenuItem['images'] }) => {
   if (!images || images.length === 0) {
     return (
-      <div className="aspect-video rounded-lg bg-neutral-100 flex items-center justify-center">
+      <div className="aspect-video rounded-lg bg-muted flex items-center justify-center">
         <div className="text-center">
-          <ImageIcon className="h-12 w-12 text-neutral-400 mx-auto mb-2" />
-          <p className="text-neutral-500">No images available</p>
+          <ImageIcon className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+          <p className="text-muted-foreground">No images available</p>
         </div>
       </div>
     );
@@ -53,7 +53,7 @@ const ImageGallery = ({ images }: { images: MenuItem['images'] }) => {
   return (
     <div className="space-y-4">
       {/* Main Image */}
-      <div className="aspect-video rounded-lg overflow-hidden bg-neutral-100">
+      <div className="aspect-video rounded-lg overflow-hidden bg-muted">
         <img
           src={images[0].url}
           alt={images[0].name}
@@ -65,7 +65,7 @@ const ImageGallery = ({ images }: { images: MenuItem['images'] }) => {
       {images.length > 1 && (
         <div className="grid grid-cols-4 gap-2">
           {images.slice(1).map((image) => (
-            <div key={image.id} className="aspect-square rounded-lg overflow-hidden bg-neutral-100">
+            <div key={image.id} className="aspect-square rounded-lg overflow-hidden bg-muted">
               <img
                 src={image.url}
                 alt={image.name}
@@ -110,19 +110,19 @@ const MenuItemDetailCard = ({ item, onEdit, onDelete }: {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-neutral-200 overflow-hidden">
+    <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
       {/* Header */}
-      <div className="p-6 border-b border-neutral-200">
+      <div className="p-6 border-b border-border">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-4">
             <div className="rounded-lg bg-brand-primary-100 p-3">
               <Utensils className="h-6 w-6 text-brand-primary-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-neutral-900 mb-2">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
                 {item.name}
               </h1>
-              <div className="flex items-center gap-4 text-sm text-neutral-600">
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
                   Added {formatDate(item.createdAt)}
@@ -159,7 +159,7 @@ const MenuItemDetailCard = ({ item, onEdit, onDelete }: {
       <div className="p-6 space-y-6">
         {/* Category and Price */}
         <div className="flex items-center gap-4">
-          <span className="rounded-full bg-neutral-100 px-3 py-1 text-sm font-medium text-neutral-700">
+          <span className="rounded-full bg-muted px-3 py-1 text-sm font-medium text-foreground">
             {item.category}
           </span>
           <span className={cn('rounded-full px-3 py-1 text-sm font-medium', getInventoryTone(item))}>
@@ -174,14 +174,14 @@ const MenuItemDetailCard = ({ item, onEdit, onDelete }: {
         {/* Description */}
         {item.description && (
           <div>
-            <h3 className="text-lg font-semibold text-neutral-900 mb-2">Description</h3>
-            <p className="text-neutral-700 leading-relaxed">{item.description}</p>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Description</h3>
+            <p className="text-foreground leading-relaxed">{item.description}</p>
           </div>
         )}
 
         {/* Images */}
         <div>
-          <h3 className="text-lg font-semibold text-neutral-900 mb-4">Images</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-4">Images</h3>
           <ImageGallery images={item.images} />
         </div>
 
@@ -189,16 +189,16 @@ const MenuItemDetailCard = ({ item, onEdit, onDelete }: {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div>
-              <h4 className="font-medium text-neutral-900 mb-1">Item ID</h4>
-              <p className="text-sm text-neutral-600">#{item.id}</p>
+              <h4 className="font-medium text-foreground mb-1">Item ID</h4>
+              <p className="text-sm text-muted-foreground">#{item.id}</p>
             </div>
             <div>
-              <h4 className="font-medium text-neutral-900 mb-1">Category</h4>
-              <p className="text-sm text-neutral-600">{item.category}</p>
+              <h4 className="font-medium text-foreground mb-1">Category</h4>
+              <p className="text-sm text-muted-foreground">{item.category}</p>
             </div>
             <div>
-              <h4 className="font-medium text-neutral-900 mb-1">Availability</h4>
-              <p className="text-sm text-neutral-600">
+              <h4 className="font-medium text-foreground mb-1">Availability</h4>
+              <p className="text-sm text-muted-foreground">
                 {item.isAvailable ? 'Visible to customers' : 'Hidden from customers'}
               </p>
             </div>
@@ -206,16 +206,16 @@ const MenuItemDetailCard = ({ item, onEdit, onDelete }: {
           
           <div className="space-y-4">
             <div>
-              <h4 className="font-medium text-neutral-900 mb-1">Created</h4>
-              <p className="text-sm text-neutral-600">{formatDate(item.createdAt)}</p>
+              <h4 className="font-medium text-foreground mb-1">Created</h4>
+              <p className="text-sm text-muted-foreground">{formatDate(item.createdAt)}</p>
             </div>
             <div>
-              <h4 className="font-medium text-neutral-900 mb-1">Last Updated</h4>
-              <p className="text-sm text-neutral-600">{formatDate(item.updatedAt)}</p>
+              <h4 className="font-medium text-foreground mb-1">Last Updated</h4>
+              <p className="text-sm text-muted-foreground">{formatDate(item.updatedAt)}</p>
             </div>
             <div>
-              <h4 className="font-medium text-neutral-900 mb-1">Inventory Settings</h4>
-              <p className="text-sm text-neutral-600">
+              <h4 className="font-medium text-foreground mb-1">Inventory Settings</h4>
+              <p className="text-sm text-muted-foreground">
                 {item.inventoryTrackingEnabled
                   ? `Tracked quantity${item.lowStockThreshold != null ? `, low stock at ${item.lowStockThreshold}` : ''}${item.allowBackorder ? ', backorders allowed' : ''}`
                   : 'Inventory tracking is off'}
@@ -263,8 +263,8 @@ export const MenuItemDetailPage = () => {
     return (
       <div className="container mx-auto max-w-4xl px-4 py-12">
         <div className="animate-pulse">
-          <div className="mb-6 h-8 w-32 rounded bg-neutral-200" />
-          <div className="h-96 rounded-xl bg-neutral-200" />
+          <div className="mb-6 h-8 w-32 rounded bg-accent" />
+          <div className="h-96 rounded-xl bg-accent" />
         </div>
       </div>
     );
@@ -273,9 +273,9 @@ export const MenuItemDetailPage = () => {
   if (error) {
     return (
       <div className="container mx-auto max-w-4xl px-4 py-12">
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
+        <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-6 text-center">
           <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
-          <h3 className="mb-2 text-lg font-semibold text-red-800">
+          <h3 className="mb-2 text-lg font-semibold text-red-800 dark:text-red-300">
             Error Loading Menu Item
           </h3>
           <p className="text-red-600">
@@ -295,12 +295,12 @@ export const MenuItemDetailPage = () => {
   if (!item) {
     return (
       <div className="container mx-auto max-w-4xl px-4 py-12">
-        <div className="rounded-lg border border-neutral-200 bg-white p-6 text-center">
-          <AlertCircle className="mx-auto mb-4 h-12 w-12 text-neutral-400" />
-          <h3 className="mb-2 text-lg font-semibold text-neutral-800">
+        <div className="rounded-lg border border-border bg-card p-6 text-center">
+          <AlertCircle className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+          <h3 className="mb-2 text-lg font-semibold text-foreground">
             Menu Item Not Found
           </h3>
-          <p className="text-neutral-600">
+          <p className="text-muted-foreground">
             The menu item you're looking for doesn't exist or you don't have permission to view it.
           </p>
           <Button 

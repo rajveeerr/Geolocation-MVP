@@ -2,7 +2,7 @@
 
 const EmptyStateIllustration = () => (
   <svg
-    className="mx-auto h-24 w-24 text-neutral-300"
+    className="mx-auto h-24 w-24 text-muted-foreground"
     viewBox="0 0 24 24"
     fill="none"
   >
@@ -22,10 +22,10 @@ export const MerchantTodayPage = () => {
       {reservations.length === 0 ? (
         <div className="py-16 text-center">
           <EmptyStateIllustration />
-          <h2 className="mt-4 text-2xl font-bold text-neutral-800">
+          <h2 className="mt-4 text-2xl font-bold text-foreground">
             You don't have any reservations
           </h2>
-          <p className="mt-2 text-neutral-500">
+          <p className="mt-2 text-muted-foreground">
             When a guest books a deal, their reservation will appear here.
           </p>
         </div>

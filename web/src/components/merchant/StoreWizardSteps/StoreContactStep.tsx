@@ -37,8 +37,8 @@ export const StoreContactStep = ({
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-neutral-900">How can customers reach this location?</h2>
-        <p className="mt-2 text-neutral-600">
+        <h2 className="text-2xl font-bold text-foreground">How can customers reach this location?</h2>
+        <p className="mt-2 text-muted-foreground">
           We need the contact details for <em>this specific location</em>. Different locations can have different numbers.
         </p>
       </div>
@@ -54,15 +54,15 @@ export const StoreContactStep = ({
             'flex w-full items-center gap-4 rounded-xl border-2 p-4 text-left transition-all',
             isUsingMerchant
               ? 'border-brand-primary-500 bg-brand-primary-50'
-              : 'border-neutral-200 bg-white hover:border-neutral-300'
+              : 'border-border bg-card hover:border-border'
           )}
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-neutral-100">
-            <Copy className="h-5 w-5 text-neutral-600" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted">
+            <Copy className="h-5 w-5 text-muted-foreground" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-neutral-900">Use merchant contact info</p>
-            <p className="text-sm text-neutral-600">
+            <p className="font-semibold text-foreground">Use merchant contact info</p>
+            <p className="text-sm text-muted-foreground">
               {merchantPhone && <span>{merchantPhone}</span>}
               {merchantPhone && merchantEmail && ' · '}
               {merchantEmail && <span>{merchantEmail}</span>}
@@ -76,19 +76,19 @@ export const StoreContactStep = ({
 
       {canUseMerchant && (
         <div className="flex items-center gap-2">
-          <div className="h-px flex-1 bg-neutral-200" />
-          <span className="text-sm text-neutral-500">or enter different details</span>
-          <div className="h-px flex-1 bg-neutral-200" />
+          <div className="h-px flex-1 bg-accent" />
+          <span className="text-sm text-muted-foreground">or enter different details</span>
+          <div className="h-px flex-1 bg-accent" />
         </div>
       )}
 
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="phoneNumber" className="text-sm font-medium text-neutral-700">
+          <Label htmlFor="phoneNumber" className="text-sm font-medium text-foreground">
             Store phone number *
           </Label>
           <div className="relative">
-            <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+            <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="phoneNumber"
               type="text"
@@ -99,14 +99,14 @@ export const StoreContactStep = ({
               className="pl-10 h-12"
             />
           </div>
-          <p className="text-xs text-neutral-500">Customers call this number for this location</p>
+          <p className="text-xs text-muted-foreground">Customers call this number for this location</p>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-sm font-medium text-neutral-700">
+          <Label htmlFor="email" className="text-sm font-medium text-foreground">
             Store email
           </Label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+            <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="email"
               type="email"
@@ -116,7 +116,7 @@ export const StoreContactStep = ({
               className="pl-10 h-12"
             />
           </div>
-          <p className="text-xs text-neutral-500">Optional — for inquiries</p>
+          <p className="text-xs text-muted-foreground">Optional — for inquiries</p>
         </div>
       </div>
     </div>

@@ -124,7 +124,7 @@ function ServiceManageInner() {
   }, [service]);
 
   if (!parsedServiceId || Number.isNaN(parsedServiceId)) {
-    return <div className="p-8 text-center text-neutral-500">Invalid service ID.</div>;
+    return <div className="p-8 text-center text-muted-foreground">Invalid service ID.</div>;
   }
 
   if (serviceQuery.isLoading) {
@@ -137,7 +137,7 @@ function ServiceManageInner() {
 
   if (serviceQuery.error || !service) {
     return (
-      <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
+      <div className="rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-4 text-red-700 dark:text-red-300">
         {(serviceQuery.error as Error)?.message || 'Failed to load service'}
       </div>
     );
@@ -229,8 +229,8 @@ function ServiceManageInner() {
           <Link to={PATHS.MERCHANT_SERVICES} className="inline-flex items-center gap-2 whitespace-nowrap text-sm font-medium text-brand-primary-600 hover:underline">
             <ArrowLeft className="h-4 w-4 shrink-0" /> Back to services
           </Link>
-          <h1 className="mt-2 text-2xl font-bold text-neutral-900">Manage Service</h1>
-          <p className="text-sm text-neutral-500">Status: <span className="font-semibold">{service.status}</span></p>
+          <h1 className="mt-2 text-2xl font-bold text-foreground">Manage Service</h1>
+          <p className="text-sm text-muted-foreground">Status: <span className="font-semibold">{service.status}</span></p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button
@@ -281,26 +281,26 @@ function ServiceManageInner() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-xl border border-neutral-200 bg-white p-5">
-          <h2 className="text-lg font-bold text-neutral-900">Service Details</h2>
+        <section className="rounded-xl border border-border bg-card p-5">
+          <h2 className="text-lg font-bold text-foreground">Service Details</h2>
           <div className="mt-4 grid gap-3">
-            <input value={serviceForm.title} onChange={(e) => setServiceForm((p) => ({ ...p, title: e.target.value }))} placeholder="Title" className="rounded-lg border border-neutral-200 px-3 py-2.5 text-sm" />
-            <textarea value={serviceForm.description} onChange={(e) => setServiceForm((p) => ({ ...p, description: e.target.value }))} placeholder="Description" rows={3} className="rounded-lg border border-neutral-200 px-3 py-2.5 text-sm" />
-            <input value={serviceForm.shortDescription} onChange={(e) => setServiceForm((p) => ({ ...p, shortDescription: e.target.value }))} placeholder="Short description" className="rounded-lg border border-neutral-200 px-3 py-2.5 text-sm" />
+            <input value={serviceForm.title} onChange={(e) => setServiceForm((p) => ({ ...p, title: e.target.value }))} placeholder="Title" className="rounded-lg border border-border px-3 py-2.5 text-sm" />
+            <textarea value={serviceForm.description} onChange={(e) => setServiceForm((p) => ({ ...p, description: e.target.value }))} placeholder="Description" rows={3} className="rounded-lg border border-border px-3 py-2.5 text-sm" />
+            <input value={serviceForm.shortDescription} onChange={(e) => setServiceForm((p) => ({ ...p, shortDescription: e.target.value }))} placeholder="Short description" className="rounded-lg border border-border px-3 py-2.5 text-sm" />
             <div className="grid gap-3 sm:grid-cols-2">
-              <input value={serviceForm.serviceType} onChange={(e) => setServiceForm((p) => ({ ...p, serviceType: e.target.value }))} placeholder="Service type" className="rounded-lg border border-neutral-200 px-3 py-2.5 text-sm" />
-              <input value={serviceForm.category} onChange={(e) => setServiceForm((p) => ({ ...p, category: e.target.value }))} placeholder="Category" className="rounded-lg border border-neutral-200 px-3 py-2.5 text-sm" />
+              <input value={serviceForm.serviceType} onChange={(e) => setServiceForm((p) => ({ ...p, serviceType: e.target.value }))} placeholder="Service type" className="rounded-lg border border-border px-3 py-2.5 text-sm" />
+              <input value={serviceForm.category} onChange={(e) => setServiceForm((p) => ({ ...p, category: e.target.value }))} placeholder="Category" className="rounded-lg border border-border px-3 py-2.5 text-sm" />
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
-              <input type="number" value={serviceForm.durationMinutes} onChange={(e) => setServiceForm((p) => ({ ...p, durationMinutes: Number(e.target.value || 0) }))} placeholder="Duration" className="rounded-lg border border-neutral-200 px-3 py-2.5 text-sm" />
-              <input type="number" value={serviceForm.advanceBookingDays} onChange={(e) => setServiceForm((p) => ({ ...p, advanceBookingDays: Number(e.target.value || 0) }))} placeholder="Advance days" className="rounded-lg border border-neutral-200 px-3 py-2.5 text-sm" />
-              <input type="number" value={serviceForm.cancellationHours} onChange={(e) => setServiceForm((p) => ({ ...p, cancellationHours: Number(e.target.value || 0) }))} placeholder="Cancellation hrs" className="rounded-lg border border-neutral-200 px-3 py-2.5 text-sm" />
+              <input type="number" value={serviceForm.durationMinutes} onChange={(e) => setServiceForm((p) => ({ ...p, durationMinutes: Number(e.target.value || 0) }))} placeholder="Duration" className="rounded-lg border border-border px-3 py-2.5 text-sm" />
+              <input type="number" value={serviceForm.advanceBookingDays} onChange={(e) => setServiceForm((p) => ({ ...p, advanceBookingDays: Number(e.target.value || 0) }))} placeholder="Advance days" className="rounded-lg border border-border px-3 py-2.5 text-sm" />
+              <input type="number" value={serviceForm.cancellationHours} onChange={(e) => setServiceForm((p) => ({ ...p, cancellationHours: Number(e.target.value || 0) }))} placeholder="Cancellation hrs" className="rounded-lg border border-border px-3 py-2.5 text-sm" />
             </div>
             <Button type="button" size="sm" variant="secondary" onClick={() => setCoverUploadOpen(true)}>
               {serviceForm.coverImageUrl ? 'Change cover image' : 'Upload cover image'}
             </Button>
             {serviceForm.coverImageUrl ? (
-              <div className="rounded-lg border border-neutral-200 p-2">
+              <div className="rounded-lg border border-border p-2">
                 <img src={serviceForm.coverImageUrl} alt="Service cover" className="h-40 w-full rounded-md object-cover" />
                 <div className="mt-2 flex justify-end">
                   <Button
@@ -314,8 +314,8 @@ function ServiceManageInner() {
                 </div>
               </div>
             ) : null}
-            <input value={serviceForm.tags} onChange={(e) => setServiceForm((p) => ({ ...p, tags: e.target.value }))} placeholder="Tags (comma separated)" className="rounded-lg border border-neutral-200 px-3 py-2.5 text-sm" />
-            <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
+            <input value={serviceForm.tags} onChange={(e) => setServiceForm((p) => ({ ...p, tags: e.target.value }))} placeholder="Tags (comma separated)" className="rounded-lg border border-border px-3 py-2.5 text-sm" />
+            <label className="inline-flex items-center gap-2 text-sm text-foreground">
               <input type="checkbox" checked={serviceForm.requiresApproval} onChange={(e) => setServiceForm((p) => ({ ...p, requiresApproval: e.target.checked }))} />
               Requires approval before confirmation
             </label>
@@ -323,16 +323,16 @@ function ServiceManageInner() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-neutral-200 bg-white p-5">
-          <h2 className="text-lg font-bold text-neutral-900">Pricing Tiers</h2>
-          <p className="mt-1 text-xs text-neutral-500">At least one active tier is required for publish.</p>
+        <section className="rounded-xl border border-border bg-card p-5">
+          <h2 className="text-lg font-bold text-foreground">Pricing Tiers</h2>
+          <p className="mt-1 text-xs text-muted-foreground">At least one active tier is required for publish.</p>
           <div className="mt-3 space-y-2">
             {(service.pricingTiers || []).map((tier) => (
-              <div key={tier.id} className="rounded-lg border border-neutral-200 p-3">
+              <div key={tier.id} className="rounded-lg border border-border p-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-semibold text-neutral-800">{tier.name}</p>
-                    <p className="text-xs text-neutral-500">₹{tier.price} • {tier.durationMinutes} min • max/user {tier.maxPerUser} • {tier.totalSlots ?? '∞'} slots</p>
+                    <p className="text-sm font-semibold text-foreground">{tier.name}</p>
+                    <p className="text-xs text-muted-foreground">₹{tier.price} • {tier.durationMinutes} min • max/user {tier.maxPerUser} • {tier.totalSlots ?? '∞'} slots</p>
                   </div>
                   <div className="flex items-center gap-1">
                     <Button
@@ -359,63 +359,63 @@ function ServiceManageInner() {
                 </div>
 
                 {editingTierId === tier.id && (
-                  <div className="mt-3 rounded-lg border border-dashed border-neutral-200 p-3">
+                  <div className="mt-3 rounded-lg border border-dashed border-border p-3">
                     <div className="mb-3 flex items-center justify-between gap-2">
                       <div>
-                        <p className="text-sm font-semibold text-neutral-800">Editing pricing tier</p>
-                        <p className="text-xs text-neutral-500">Update values and save to apply changes instantly.</p>
+                        <p className="text-sm font-semibold text-foreground">Editing pricing tier</p>
+                        <p className="text-xs text-muted-foreground">Update values and save to apply changes instantly.</p>
                       </div>
-                      <span className={`rounded-full px-2 py-1 text-xs font-medium ${editTierForm.isActive ? 'bg-green-100 text-green-700' : 'bg-neutral-100 text-neutral-600'}`}>
+                      <span className={`rounded-full px-2 py-1 text-xs font-medium ${editTierForm.isActive ? 'bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-300' : 'bg-muted text-muted-foreground'}`}>
                         {editTierForm.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </div>
 
                     <div className="grid gap-3 sm:grid-cols-2">
-                      <label className="grid gap-1 text-xs font-medium text-neutral-600">
+                      <label className="grid gap-1 text-xs font-medium text-muted-foreground">
                         Tier name
                         <input
                           value={editTierForm.name}
                           onChange={(e) => setEditTierForm((prev) => ({ ...prev, name: e.target.value }))}
                           placeholder="e.g., Premium Slot"
-                          className="rounded-lg border border-neutral-200 px-3 py-2 text-sm font-normal"
+                          className="rounded-lg border border-border px-3 py-2 text-sm font-normal"
                         />
                       </label>
-                      <label className="grid gap-1 text-xs font-medium text-neutral-600">
+                      <label className="grid gap-1 text-xs font-medium text-muted-foreground">
                         Description
                         <input
                           value={editTierForm.description}
                           onChange={(e) => setEditTierForm((prev) => ({ ...prev, description: e.target.value }))}
                           placeholder="Optional"
-                          className="rounded-lg border border-neutral-200 px-3 py-2 text-sm font-normal"
+                          className="rounded-lg border border-border px-3 py-2 text-sm font-normal"
                         />
                       </label>
                     </div>
 
                     <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                      <label className="grid gap-1 text-xs font-medium text-neutral-600">
+                      <label className="grid gap-1 text-xs font-medium text-muted-foreground">
                         Price (₹)
                         <input
                           type="number"
                           min={0}
                           value={editTierForm.price}
                           onChange={(e) => setEditTierForm((prev) => ({ ...prev, price: Number(e.target.value || 0) }))}
-                          className="rounded-lg border border-neutral-200 px-3 py-2 text-sm font-normal"
+                          className="rounded-lg border border-border px-3 py-2 text-sm font-normal"
                         />
                       </label>
-                      <label className="grid gap-1 text-xs font-medium text-neutral-600">
+                      <label className="grid gap-1 text-xs font-medium text-muted-foreground">
                         Duration (minutes)
                         <input
                           type="number"
                           min={1}
                           value={editTierForm.durationMinutes}
                           onChange={(e) => setEditTierForm((prev) => ({ ...prev, durationMinutes: Number(e.target.value || 1) }))}
-                          className="rounded-lg border border-neutral-200 px-3 py-2 text-sm font-normal"
+                          className="rounded-lg border border-border px-3 py-2 text-sm font-normal"
                         />
                       </label>
                     </div>
 
                     <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                      <label className="grid gap-1 text-xs font-medium text-neutral-600">
+                      <label className="grid gap-1 text-xs font-medium text-muted-foreground">
                         Total slots
                         <input
                           type="number"
@@ -423,23 +423,23 @@ function ServiceManageInner() {
                           value={editTierForm.totalSlots}
                           onChange={(e) => setEditTierForm((prev) => ({ ...prev, totalSlots: e.target.value }))}
                           placeholder="Leave empty for unlimited"
-                          className="rounded-lg border border-neutral-200 px-3 py-2 text-sm font-normal"
+                          className="rounded-lg border border-border px-3 py-2 text-sm font-normal"
                         />
                       </label>
-                      <label className="grid gap-1 text-xs font-medium text-neutral-600">
+                      <label className="grid gap-1 text-xs font-medium text-muted-foreground">
                         Max bookings per user
                         <input
                           type="number"
                           min={1}
                           value={editTierForm.maxPerUser}
                           onChange={(e) => setEditTierForm((prev) => ({ ...prev, maxPerUser: Number(e.target.value || 1) }))}
-                          className="rounded-lg border border-neutral-200 px-3 py-2 text-sm font-normal"
+                          className="rounded-lg border border-border px-3 py-2 text-sm font-normal"
                         />
                       </label>
                     </div>
 
                     <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                      <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
+                      <label className="inline-flex items-center gap-2 text-sm text-foreground">
                         <input
                           type="checkbox"
                           checked={editTierForm.isActive}
@@ -447,7 +447,7 @@ function ServiceManageInner() {
                         />
                         Tier active
                       </label>
-                      <p className="text-xs text-neutral-500">Inactive tiers won’t be offered for new bookings.</p>
+                      <p className="text-xs text-muted-foreground">Inactive tiers won’t be offered for new bookings.</p>
                     </div>
 
                     <div className="mt-3 flex justify-end gap-2">
@@ -464,16 +464,16 @@ function ServiceManageInner() {
             ))}
           </div>
 
-          <div className="mt-4 grid gap-2 rounded-lg border border-dashed border-neutral-200 p-3">
-            <input value={tierForm.name} onChange={(e) => setTierForm((p) => ({ ...p, name: e.target.value }))} placeholder="Tier name" className="rounded-lg border border-neutral-200 px-3 py-2 text-sm" />
-            <input value={tierForm.description} onChange={(e) => setTierForm((p) => ({ ...p, description: e.target.value }))} placeholder="Description" className="rounded-lg border border-neutral-200 px-3 py-2 text-sm" />
+          <div className="mt-4 grid gap-2 rounded-lg border border-dashed border-border p-3">
+            <input value={tierForm.name} onChange={(e) => setTierForm((p) => ({ ...p, name: e.target.value }))} placeholder="Tier name" className="rounded-lg border border-border px-3 py-2 text-sm" />
+            <input value={tierForm.description} onChange={(e) => setTierForm((p) => ({ ...p, description: e.target.value }))} placeholder="Description" className="rounded-lg border border-border px-3 py-2 text-sm" />
             <div className="grid gap-2 sm:grid-cols-2">
-              <input type="number" min={0} value={tierForm.price} onChange={(e) => setTierForm((p) => ({ ...p, price: Number(e.target.value || 0) }))} placeholder="Price" className="rounded-lg border border-neutral-200 px-3 py-2 text-sm" />
-              <input type="number" min={1} value={tierForm.durationMinutes} onChange={(e) => setTierForm((p) => ({ ...p, durationMinutes: Number(e.target.value || 1) }))} placeholder="Duration minutes" className="rounded-lg border border-neutral-200 px-3 py-2 text-sm" />
+              <input type="number" min={0} value={tierForm.price} onChange={(e) => setTierForm((p) => ({ ...p, price: Number(e.target.value || 0) }))} placeholder="Price" className="rounded-lg border border-border px-3 py-2 text-sm" />
+              <input type="number" min={1} value={tierForm.durationMinutes} onChange={(e) => setTierForm((p) => ({ ...p, durationMinutes: Number(e.target.value || 1) }))} placeholder="Duration minutes" className="rounded-lg border border-border px-3 py-2 text-sm" />
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
-              <input type="number" min={0} value={tierForm.totalSlots} onChange={(e) => setTierForm((p) => ({ ...p, totalSlots: e.target.value }))} placeholder="Total slots (optional)" className="rounded-lg border border-neutral-200 px-3 py-2 text-sm" />
-              <input type="number" min={1} value={tierForm.maxPerUser} onChange={(e) => setTierForm((p) => ({ ...p, maxPerUser: Number(e.target.value || 1) }))} placeholder="Max per user" className="rounded-lg border border-neutral-200 px-3 py-2 text-sm" />
+              <input type="number" min={0} value={tierForm.totalSlots} onChange={(e) => setTierForm((p) => ({ ...p, totalSlots: e.target.value }))} placeholder="Total slots (optional)" className="rounded-lg border border-border px-3 py-2 text-sm" />
+              <input type="number" min={1} value={tierForm.maxPerUser} onChange={(e) => setTierForm((p) => ({ ...p, maxPerUser: Number(e.target.value || 1) }))} placeholder="Max per user" className="rounded-lg border border-border px-3 py-2 text-sm" />
             </div>
             <Button
               size="sm"
@@ -502,14 +502,14 @@ function ServiceManageInner() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-neutral-200 bg-white p-5">
-          <h2 className="text-lg font-bold text-neutral-900">Add-Ons</h2>
+        <section className="rounded-xl border border-border bg-card p-5">
+          <h2 className="text-lg font-bold text-foreground">Add-Ons</h2>
           <div className="mt-3 space-y-2">
             {(service.addOns || []).map((addOn) => (
-              <div key={addOn.id} className="flex items-center justify-between rounded-lg border border-neutral-200 p-3">
+              <div key={addOn.id} className="flex items-center justify-between rounded-lg border border-border p-3">
                 <div>
-                  <p className="text-sm font-semibold text-neutral-800">{addOn.name}</p>
-                  <p className="text-xs text-neutral-500">₹{addOn.price} • {addOn.isOptional ? 'Optional' : 'Required'}</p>
+                  <p className="text-sm font-semibold text-foreground">{addOn.name}</p>
+                  <p className="text-xs text-muted-foreground">₹{addOn.price} • {addOn.isOptional ? 'Optional' : 'Required'}</p>
                 </div>
                 <div className="flex items-center gap-1">
                   <Button
@@ -547,12 +547,12 @@ function ServiceManageInner() {
             ))}
           </div>
 
-          <div className="mt-4 grid gap-2 rounded-lg border border-dashed border-neutral-200 p-3">
-            <input value={addOnForm.name} onChange={(e) => setAddOnForm((p) => ({ ...p, name: e.target.value }))} placeholder="Add-on name" className="rounded-lg border border-neutral-200 px-3 py-2 text-sm" />
-            <input value={addOnForm.description} onChange={(e) => setAddOnForm((p) => ({ ...p, description: e.target.value }))} placeholder="Description" className="rounded-lg border border-neutral-200 px-3 py-2 text-sm" />
+          <div className="mt-4 grid gap-2 rounded-lg border border-dashed border-border p-3">
+            <input value={addOnForm.name} onChange={(e) => setAddOnForm((p) => ({ ...p, name: e.target.value }))} placeholder="Add-on name" className="rounded-lg border border-border px-3 py-2 text-sm" />
+            <input value={addOnForm.description} onChange={(e) => setAddOnForm((p) => ({ ...p, description: e.target.value }))} placeholder="Description" className="rounded-lg border border-border px-3 py-2 text-sm" />
             <div className="grid gap-2 sm:grid-cols-2">
-              <input type="number" min={0} value={addOnForm.price} onChange={(e) => setAddOnForm((p) => ({ ...p, price: Number(e.target.value || 0) }))} placeholder="Price" className="rounded-lg border border-neutral-200 px-3 py-2 text-sm" />
-              <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
+              <input type="number" min={0} value={addOnForm.price} onChange={(e) => setAddOnForm((p) => ({ ...p, price: Number(e.target.value || 0) }))} placeholder="Price" className="rounded-lg border border-border px-3 py-2 text-sm" />
+              <label className="inline-flex items-center gap-2 text-sm text-foreground">
                 <input type="checkbox" checked={addOnForm.isOptional} onChange={(e) => setAddOnForm((p) => ({ ...p, isOptional: e.target.checked }))} />
                 Optional add-on
               </label>
@@ -582,16 +582,16 @@ function ServiceManageInner() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-neutral-200 bg-white p-5 lg:col-span-2">
+        <section className="rounded-xl border border-border bg-card p-5 lg:col-span-2">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h2 className="text-lg font-bold text-neutral-900">Bookings Dashboard</h2>
-              <p className="text-xs text-neutral-500">Confirm, complete, mark no-show, and check-in bookings.</p>
+              <h2 className="text-lg font-bold text-foreground">Bookings Dashboard</h2>
+              <p className="text-xs text-muted-foreground">Confirm, complete, mark no-show, and check-in bookings.</p>
             </div>
             <select
               value={bookingStatus}
               onChange={(e) => setBookingStatus(e.target.value)}
-              className="rounded-lg border border-neutral-200 px-3 py-2 text-sm"
+              className="rounded-lg border border-border px-3 py-2 text-sm"
             >
               <option value="">All statuses</option>
               {SERVICE_BOOKING_STATUSES.map((status) => (
@@ -607,26 +607,26 @@ function ServiceManageInner() {
           )}
 
           {bookingsQuery.error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+            <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-4 text-red-700 dark:text-red-300">
               {(bookingsQuery.error as Error).message}
             </div>
           )}
 
           {!bookingsQuery.isLoading && !bookingsQuery.error && (bookingsQuery.data?.bookings?.length || 0) === 0 && (
-            <div className="rounded-lg border border-dashed border-neutral-200 py-10 text-center text-sm text-neutral-500">
+            <div className="rounded-lg border border-dashed border-border py-10 text-center text-sm text-muted-foreground">
               No bookings for this filter.
             </div>
           )}
 
           <div className="space-y-3">
             {(bookingsQuery.data?.bookings || []).map((booking) => (
-              <div key={booking.id} className="rounded-lg border border-neutral-200 p-3">
+              <div key={booking.id} className="rounded-lg border border-border p-3">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <p className="text-sm font-semibold text-neutral-800">Booking #{booking.id} • {booking.status}</p>
-                    <p className="text-xs text-neutral-500">{booking.user?.name || booking.user?.email || `User #${booking.userId}`}</p>
-                    <p className="text-xs text-neutral-500">{new Date(booking.bookingDate).toLocaleDateString()} • {booking.startTime}-{booking.endTime}</p>
-                    <p className="text-xs text-neutral-500">Code: {booking.confirmationCode}</p>
+                    <p className="text-sm font-semibold text-foreground">Booking #{booking.id} • {booking.status}</p>
+                    <p className="text-xs text-muted-foreground">{booking.user?.name || booking.user?.email || `User #${booking.userId}`}</p>
+                    <p className="text-xs text-muted-foreground">{new Date(booking.bookingDate).toLocaleDateString()} • {booking.startTime}-{booking.endTime}</p>
+                    <p className="text-xs text-muted-foreground">Code: {booking.confirmationCode}</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-1">
                     <Button

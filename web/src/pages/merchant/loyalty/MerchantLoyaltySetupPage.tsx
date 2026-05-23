@@ -46,26 +46,26 @@ export const MerchantLoyaltySetupPage = () => {
         title="Loyalty Setup"
         subtitle="Your program is already configured. You can still review key rules below."
       >
-        <div className="rounded-xl border border-neutral-200 bg-white p-6">
-          <h3 className="text-lg font-semibold text-neutral-900">Program already initialized</h3>
-          <p className="mt-1 text-sm text-neutral-600">Use Program settings to update earning and redemption rules anytime.</p>
+        <div className="rounded-xl border border-border bg-card p-6">
+          <h3 className="text-lg font-semibold text-foreground">Program already initialized</h3>
+          <p className="mt-1 text-sm text-muted-foreground">Use Program settings to update earning and redemption rules anytime.</p>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3">
-              <p className="text-xs text-neutral-500">Points per $1</p>
-              <p className="text-lg font-bold text-neutral-900">{data.program.pointsPerDollar}</p>
+            <div className="rounded-lg border border-border bg-muted p-3">
+              <p className="text-xs text-muted-foreground">Points per $1</p>
+              <p className="text-lg font-bold text-foreground">{data.program.pointsPerDollar}</p>
             </div>
-            <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3">
-              <p className="text-xs text-neutral-500">Minimum redemption</p>
-              <p className="text-lg font-bold text-neutral-900">{data.program.minimumRedemption} pts</p>
+            <div className="rounded-lg border border-border bg-muted p-3">
+              <p className="text-xs text-muted-foreground">Minimum redemption</p>
+              <p className="text-lg font-bold text-foreground">{data.program.minimumRedemption} pts</p>
             </div>
-            <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3">
-              <p className="text-xs text-neutral-500">Redemption value</p>
-              <p className="text-lg font-bold text-neutral-900">${data.program.redemptionValue}</p>
+            <div className="rounded-lg border border-border bg-muted p-3">
+              <p className="text-xs text-muted-foreground">Redemption value</p>
+              <p className="text-lg font-bold text-foreground">${data.program.redemptionValue}</p>
             </div>
           </div>
 
-          <Link to={PATHS.MERCHANT_LOYALTY_PROGRAM} className="mt-4 inline-block rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white">
+          <Link to={PATHS.MERCHANT_LOYALTY_PROGRAM} className="mt-4 inline-block rounded-md bg-foreground px-4 py-2 text-sm font-semibold text-background">
             Go to Program Settings
           </Link>
         </div>
@@ -79,40 +79,40 @@ export const MerchantLoyaltySetupPage = () => {
       subtitle="Configure your earn and redeem rules once. You can tweak them later from Program settings."
     >
       <div className="grid gap-4 lg:grid-cols-2">
-        <form onSubmit={onSubmit} className="rounded-xl border border-neutral-200 bg-white p-6">
-          <h2 className="text-lg font-semibold text-neutral-900">Initialize Program</h2>
-          <p className="mt-1 text-sm text-neutral-600">These values directly power backend points calculations and redemption checks.</p>
+        <form onSubmit={onSubmit} className="rounded-xl border border-border bg-card p-6">
+          <h2 className="text-lg font-semibold text-foreground">Initialize Program</h2>
+          <p className="mt-1 text-sm text-muted-foreground">These values directly power backend points calculations and redemption checks.</p>
 
           <div className="mt-4 grid gap-4">
             <label className="grid gap-1">
-              <span className="text-sm font-medium text-neutral-700">Points per $1 spent</span>
-              <input className="rounded-md border border-neutral-300 p-2" type="number" step="0.1" min="0.1" value={pointsPerDollar} onChange={(e) => setPointsPerDollar(Number(e.target.value))} />
+              <span className="text-sm font-medium text-foreground">Points per $1 spent</span>
+              <input className="rounded-md border border-border p-2" type="number" step="0.1" min="0.1" value={pointsPerDollar} onChange={(e) => setPointsPerDollar(Number(e.target.value))} />
             </label>
             <label className="grid gap-1">
-              <span className="text-sm font-medium text-neutral-700">Minimum redemption (points)</span>
-              <input className="rounded-md border border-neutral-300 p-2" type="number" min="1" value={minimumRedemption} onChange={(e) => setMinimumRedemption(Number(e.target.value))} />
+              <span className="text-sm font-medium text-foreground">Minimum redemption (points)</span>
+              <input className="rounded-md border border-border p-2" type="number" min="1" value={minimumRedemption} onChange={(e) => setMinimumRedemption(Number(e.target.value))} />
             </label>
             <label className="grid gap-1">
-              <span className="text-sm font-medium text-neutral-700">Redemption value ($)</span>
-              <input className="rounded-md border border-neutral-300 p-2" type="number" min="0.5" step="0.5" value={redemptionValue} onChange={(e) => setRedemptionValue(Number(e.target.value))} />
+              <span className="text-sm font-medium text-foreground">Redemption value ($)</span>
+              <input className="rounded-md border border-border p-2" type="number" min="0.5" step="0.5" value={redemptionValue} onChange={(e) => setRedemptionValue(Number(e.target.value))} />
             </label>
           </div>
 
-          <button className="mt-5 rounded-md bg-neutral-900 px-4 py-2 text-white disabled:opacity-50" disabled={init.isPending}>
+          <button className="mt-5 rounded-md bg-foreground px-4 py-2 text-background disabled:opacity-50" disabled={init.isPending}>
             {init.isPending ? 'Initializing...' : 'Initialize Loyalty Program'}
           </button>
         </form>
 
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-6">
-          <h3 className="text-lg font-semibold text-neutral-900">Live Preview</h3>
-          <p className="mt-1 text-sm text-neutral-600">For a $100 bill:</p>
-          <div className="mt-4 rounded-lg border border-neutral-200 bg-white p-4">
-            <p className="text-sm text-neutral-600">Customer earns</p>
-            <p className="text-2xl font-bold text-neutral-900">{Math.floor(100 * pointsPerDollar)} points</p>
+        <div className="rounded-xl border border-border bg-muted p-6">
+          <h3 className="text-lg font-semibold text-foreground">Live Preview</h3>
+          <p className="mt-1 text-sm text-muted-foreground">For a $100 bill:</p>
+          <div className="mt-4 rounded-lg border border-border bg-card p-4">
+            <p className="text-sm text-muted-foreground">Customer earns</p>
+            <p className="text-2xl font-bold text-foreground">{Math.floor(100 * pointsPerDollar)} points</p>
           </div>
-          <div className="mt-3 rounded-lg border border-neutral-200 bg-white p-4">
-            <p className="text-sm text-neutral-600">First redemption unlocks at</p>
-            <p className="text-2xl font-bold text-neutral-900">{minimumRedemption} points = ${redemptionValue}</p>
+          <div className="mt-3 rounded-lg border border-border bg-card p-4">
+            <p className="text-sm text-muted-foreground">First redemption unlocks at</p>
+            <p className="text-2xl font-bold text-foreground">{minimumRedemption} points = ${redemptionValue}</p>
           </div>
         </div>
       </div>

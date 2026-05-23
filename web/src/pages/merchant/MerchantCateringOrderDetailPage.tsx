@@ -24,15 +24,15 @@ import {
 } from '@/hooks/useCatering';
 
 const panelClass =
-  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
+  'rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 const STATUS_TONE: Record<string, string> = {
-  PENDING: 'bg-amber-100 text-amber-800 ring-amber-600/20',
-  CONFIRMED: 'bg-sky-100 text-sky-700 ring-sky-600/20',
-  PREPARING: 'bg-violet-100 text-violet-700 ring-violet-600/20',
-  READY: 'bg-emerald-100 text-emerald-700 ring-emerald-600/20',
-  COMPLETED: 'bg-neutral-100 text-neutral-700 ring-neutral-400/20',
-  CANCELLED: 'bg-rose-100 text-rose-800 ring-rose-600/20',
+  PENDING: 'bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 ring-amber-600/20',
+  CONFIRMED: 'bg-sky-100 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-sky-600/20',
+  PREPARING: 'bg-violet-100 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300 ring-violet-600/20',
+  READY: 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 ring-emerald-600/20',
+  COMPLETED: 'bg-muted text-foreground ring-neutral-400/20',
+  CANCELLED: 'bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 ring-rose-600/20',
 };
 
 /** Mirrors the BE transition map. */
@@ -83,7 +83,7 @@ function MerchantCateringOrderDetailInner() {
   if (!isValid) {
     return (
       <div className="mx-auto max-w-screen-md px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold text-neutral-900">Order not found</h1>
+        <h1 className="text-2xl font-bold text-foreground">Order not found</h1>
       </div>
     );
   }
@@ -91,7 +91,7 @@ function MerchantCateringOrderDetailInner() {
   if (isLoading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -99,8 +99,8 @@ function MerchantCateringOrderDetailInner() {
   if (error || !order) {
     return (
       <div className="mx-auto max-w-screen-md px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold text-neutral-900">Order not found</h1>
-        <p className="mt-2 text-sm text-neutral-500">
+        <h1 className="text-2xl font-bold text-foreground">Order not found</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
           {(error as Error | undefined)?.message ?? 'You do not have access to this order.'}
         </p>
         <Link to={PATHS.MERCHANT_CATERING_ORDERS} className="mt-4 inline-block text-sm font-medium text-brand-primary-600 hover:underline">
@@ -142,27 +142,27 @@ function MerchantCateringOrderDetailInner() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-semibold text-neutral-500">{order.orderNumber}</span>
+              <span className="font-mono text-xs font-semibold text-muted-foreground">{order.orderNumber}</span>
               <span
                 className={cn(
                   'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset',
-                  STATUS_TONE[order.status] ?? 'bg-neutral-100 text-neutral-700 ring-neutral-400/20',
+                  STATUS_TONE[order.status] ?? 'bg-muted text-foreground ring-neutral-400/20',
                 )}
               >
                 {order.status}
               </span>
-              <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-600">
+              <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                 {fulfillmentType === 'DELIVERY' ? 'Delivery' : 'Pickup'}
               </span>
             </div>
-            <h1 className="mt-2 text-xl font-bold tracking-tight text-neutral-900 sm:text-2xl">
+            <h1 className="mt-2 text-xl font-bold tracking-tight text-foreground sm:text-2xl">
               {customerName}
             </h1>
-            <p className="mt-0.5 text-xs text-neutral-500">Placed {formatDateTime(order.createdAt)}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">Placed {formatDateTime(order.createdAt)}</p>
           </div>
           <div className="text-right">
-            <div className="text-[10px] uppercase tracking-wider text-neutral-400">Order total</div>
-            <div className="mt-1 text-2xl font-bold tracking-tight text-neutral-900">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Order total</div>
+            <div className="mt-1 text-2xl font-bold tracking-tight text-foreground">
               {formatMoney(order.finalAmount)}
             </div>
           </div>
@@ -171,11 +171,11 @@ function MerchantCateringOrderDetailInner() {
 
       {/* Items */}
       <section className={cn(panelClass, 'p-5')}>
-        <h2 className="mb-4 text-sm font-semibold text-neutral-900">Items</h2>
+        <h2 className="mb-4 text-sm font-semibold text-foreground">Items</h2>
         <div className="space-y-3">
           {order.cateringOrderItems.map((line) => (
-            <div key={line.id} className="flex gap-3 border-b border-neutral-100 pb-3 last:border-b-0 last:pb-0">
-              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-neutral-100 bg-neutral-50">
+            <div key={line.id} className="flex gap-3 border-b border-border pb-3 last:border-b-0 last:pb-0">
+              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-border bg-muted">
                 {line.cateringItem.imageUrl ? (
                   <img
                     src={line.cateringItem.imageUrl}
@@ -184,34 +184,34 @@ function MerchantCateringOrderDetailInner() {
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center">
-                    <ChefHat className="h-5 w-5 text-neutral-300" />
+                    <ChefHat className="h-5 w-5 text-muted-foreground" />
                   </div>
                 )}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-neutral-900">
+                    <p className="text-sm font-semibold text-foreground">
                       {line.quantity}× {line.cateringItem.name}
                     </p>
-                    <p className="text-xs text-neutral-500">{line.cateringItem.category}</p>
+                    <p className="text-xs text-muted-foreground">{line.cateringItem.category}</p>
                   </div>
-                  <span className="shrink-0 text-sm font-bold text-neutral-900">
+                  <span className="shrink-0 text-sm font-bold text-foreground">
                     {formatMoney(line.totalPrice)}
                   </span>
                 </div>
                 {line.selectedOptions && line.selectedOptions.length > 0 && (
-                  <ul className="mt-1.5 space-y-0.5 text-xs text-neutral-600">
+                  <ul className="mt-1.5 space-y-0.5 text-xs text-muted-foreground">
                     {line.selectedOptions.map((opt) => (
                       <li key={opt.optionId}>
-                        <span className="font-medium text-neutral-700">{opt.optionName}:</span>{' '}
+                        <span className="font-medium text-foreground">{opt.optionName}:</span>{' '}
                         {opt.choices.map((c) => c.label).join(', ')}
                       </li>
                     ))}
                   </ul>
                 )}
                 {line.specialInstructions && (
-                  <p className="mt-1 rounded bg-amber-50 px-2 py-1 text-[11px] italic text-amber-900 ring-1 ring-amber-200">
+                  <p className="mt-1 rounded bg-amber-50 dark:bg-amber-950/30 px-2 py-1 text-[11px] italic text-amber-900 dark:text-amber-200 ring-1 ring-amber-200">
                     "{line.specialInstructions}"
                   </p>
                 )}
@@ -220,14 +220,14 @@ function MerchantCateringOrderDetailInner() {
           ))}
         </div>
 
-        <div className="mt-4 space-y-1 border-t border-neutral-200 pt-3 text-sm">
+        <div className="mt-4 space-y-1 border-t border-border pt-3 text-sm">
           <div className="flex justify-between">
-            <span className="text-neutral-600">Subtotal</span>
-            <span className="font-medium text-neutral-900">{formatMoney(order.subtotal)}</span>
+            <span className="text-muted-foreground">Subtotal</span>
+            <span className="font-medium text-foreground">{formatMoney(order.subtotal)}</span>
           </div>
           <div className="flex justify-between text-base font-bold">
-            <span className="text-neutral-900">Total</span>
-            <span className="text-neutral-900">{formatMoney(order.finalAmount)}</span>
+            <span className="text-foreground">Total</span>
+            <span className="text-foreground">{formatMoney(order.finalAmount)}</span>
           </div>
         </div>
       </section>
@@ -235,20 +235,20 @@ function MerchantCateringOrderDetailInner() {
       {/* Customer + fulfillment */}
       <section className="grid gap-4 sm:grid-cols-2">
         <div className={cn(panelClass, 'p-5')}>
-          <h3 className="mb-3 text-sm font-semibold text-neutral-900">Customer</h3>
-          <div className="space-y-1.5 text-sm text-neutral-700">
-            <p className="flex items-center gap-2"><User className="h-3.5 w-3.5 text-neutral-400" />{customerName}</p>
+          <h3 className="mb-3 text-sm font-semibold text-foreground">Customer</h3>
+          <div className="space-y-1.5 text-sm text-foreground">
+            <p className="flex items-center gap-2"><User className="h-3.5 w-3.5 text-muted-foreground" />{customerName}</p>
             {(meta.contactEmail || order.user.email) && (
-              <p className="flex items-center gap-2 text-neutral-600">
-                <Mail className="h-3.5 w-3.5 text-neutral-400" />
+              <p className="flex items-center gap-2 text-muted-foreground">
+                <Mail className="h-3.5 w-3.5 text-muted-foreground" />
                 <a href={`mailto:${meta.contactEmail ?? order.user.email}`} className="hover:underline">
                   {meta.contactEmail ?? order.user.email}
                 </a>
               </p>
             )}
             {meta.contactPhone && (
-              <p className="flex items-center gap-2 text-neutral-600">
-                <Phone className="h-3.5 w-3.5 text-neutral-400" />
+              <p className="flex items-center gap-2 text-muted-foreground">
+                <Phone className="h-3.5 w-3.5 text-muted-foreground" />
                 <a href={`tel:${meta.contactPhone}`} className="hover:underline">{meta.contactPhone}</a>
               </p>
             )}
@@ -256,24 +256,24 @@ function MerchantCateringOrderDetailInner() {
         </div>
 
         <div className={cn(panelClass, 'p-5')}>
-          <h3 className="mb-3 text-sm font-semibold text-neutral-900">
+          <h3 className="mb-3 text-sm font-semibold text-foreground">
             {fulfillmentType === 'DELIVERY' ? 'Delivery' : 'Pickup'}
           </h3>
-          <div className="space-y-1.5 text-sm text-neutral-700">
+          <div className="space-y-1.5 text-sm text-foreground">
             {fulfillmentType === 'DELIVERY' && meta.deliveryAddress && (
               <p className="flex items-start gap-2">
-                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-neutral-400" />
+                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                 {meta.deliveryAddress}
               </p>
             )}
             {meta.eventDate && (
               <p className="flex items-start gap-2">
-                <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-neutral-400" />
+                <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                 Event: {new Date(meta.eventDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
               </p>
             )}
             {fulfillmentType === 'PICKUP' && (
-              <p className="text-xs text-neutral-500">Reach out to the customer to confirm pickup time.</p>
+              <p className="text-xs text-muted-foreground">Reach out to the customer to confirm pickup time.</p>
             )}
           </div>
         </div>
@@ -281,22 +281,22 @@ function MerchantCateringOrderDetailInner() {
 
       {meta.notes && (
         <section className={cn(panelClass, 'p-5')}>
-          <h3 className="mb-2 text-sm font-semibold text-neutral-900">Customer notes</h3>
-          <p className="text-sm text-neutral-700">{meta.notes}</p>
+          <h3 className="mb-2 text-sm font-semibold text-foreground">Customer notes</h3>
+          <p className="text-sm text-foreground">{meta.notes}</p>
         </section>
       )}
 
       {/* Status actions */}
       {transitions.length > 0 && (
         <section className={cn(panelClass, 'p-5')}>
-          <h3 className="text-sm font-semibold text-neutral-900">Update status</h3>
-          <p className="mt-0.5 text-xs text-neutral-500">
+          <h3 className="text-sm font-semibold text-foreground">Update status</h3>
+          <p className="mt-0.5 text-xs text-muted-foreground">
             Optionally add an internal note. The customer doesn't see notes — they appear in your history below.
           </p>
 
           <div className="mt-3">
-            <Label htmlFor="merchant-note" className="text-xs font-medium text-neutral-600">
-              Note <span className="font-normal text-neutral-400">(optional)</span>
+            <Label htmlFor="merchant-note" className="text-xs font-medium text-muted-foreground">
+              Note <span className="font-normal text-muted-foreground">(optional)</span>
             </Label>
             <Textarea
               id="merchant-note"
@@ -322,7 +322,7 @@ function MerchantCateringOrderDetailInner() {
                   disabled={updateStatus.isPending}
                   className={cn(
                     'rounded-full px-4',
-                    isCancel && 'border border-rose-200 text-rose-700 hover:bg-rose-50',
+                    isCancel && 'border border-rose-200 dark:border-rose-900/50 text-rose-700 dark:text-rose-300 hover:bg-rose-50 dark:bg-rose-950/30',
                   )}
                 >
                   {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
@@ -337,22 +337,22 @@ function MerchantCateringOrderDetailInner() {
       {/* History */}
       {merchantNotesHistory.length > 0 && (
         <section className={cn(panelClass, 'p-5')}>
-          <h3 className="mb-3 text-sm font-semibold text-neutral-900">Status history</h3>
+          <h3 className="mb-3 text-sm font-semibold text-foreground">Status history</h3>
           <ol className="space-y-2 text-sm">
             {merchantNotesHistory.slice().reverse().map((entry, idx) => (
-              <li key={`${entry.at}-${idx}`} className="flex flex-wrap items-baseline gap-x-2 border-b border-neutral-100 pb-2 last:border-b-0 last:pb-0">
+              <li key={`${entry.at}-${idx}`} className="flex flex-wrap items-baseline gap-x-2 border-b border-border pb-2 last:border-b-0 last:pb-0">
                 <span
                   className={cn(
                     'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset',
-                    STATUS_TONE[entry.status] ?? 'bg-neutral-100 text-neutral-700 ring-neutral-400/20',
+                    STATUS_TONE[entry.status] ?? 'bg-muted text-foreground ring-neutral-400/20',
                   )}
                 >
                   {entry.status}
                 </span>
-                <span className="text-xs text-neutral-500">
+                <span className="text-xs text-muted-foreground">
                   {new Date(entry.at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
                 </span>
-                {entry.note && <span className="text-sm text-neutral-700">— {entry.note}</span>}
+                {entry.note && <span className="text-sm text-foreground">— {entry.note}</span>}
               </li>
             ))}
           </ol>

@@ -30,18 +30,18 @@ const getDealStatus = (
   if (now < start) {
     return {
       text: 'Scheduled',
-      className: 'bg-amber-100 text-amber-800 border-amber-200',
+      className: 'bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-900/50',
     };
   }
   if (now > end) {
     return {
       text: 'Expired',
-      className: 'bg-red-100 text-red-800 border-red-200',
+      className: 'bg-red-100 dark:bg-red-950/40 text-red-800 dark:text-red-300 border-red-200 dark:border-red-900/50',
     };
   }
   return {
     text: 'Live',
-    className: 'bg-green-100 text-green-800 border-green-200',
+    className: 'bg-green-100 dark:bg-green-950/40 text-green-800 dark:text-green-300 border-green-200 dark:border-green-900/50',
   };
 };
 
@@ -77,7 +77,7 @@ export const MerchantDealCard = ({ deal }: { deal: MerchantDeal | Deal }) => {
         : 'Special Offer';
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lg sm:flex-row">
+    <div className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:shadow-lg sm:flex-row">
       <div className="relative h-48 w-full overflow-hidden sm:h-auto sm:w-56">
         <img
           src={
@@ -89,10 +89,10 @@ export const MerchantDealCard = ({ deal }: { deal: MerchantDeal | Deal }) => {
         />
         {/* Top-center time badge to keep cards uniform */}
         <div className="absolute left-1/2 top-3 z-10 -translate-x-1/2">
-          <div className="rounded-lg bg-white/95 px-3 py-1 text-sm font-semibold shadow-md backdrop-blur-sm">
+          <div className="rounded-lg bg-card/95 dark:bg-card px-3 py-1 text-sm font-semibold shadow-md backdrop-blur-sm">
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-neutral-600" />
-              <span className="text-sm text-neutral-700">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-foreground">
                 Runs until {new Date(endTime).toLocaleDateString()}
               </span>
             </div>
@@ -102,7 +102,7 @@ export const MerchantDealCard = ({ deal }: { deal: MerchantDeal | Deal }) => {
 
       <div className="flex flex-grow flex-col p-6">
         <div className="mb-2 flex items-start justify-between">
-          <h3 className="text-xl font-bold text-neutral-900 transition-colors group-hover:text-brand-primary-600">
+          <h3 className="text-xl font-bold text-foreground transition-colors group-hover:text-brand-primary-600">
             {title}
           </h3>
           <span
@@ -115,17 +115,17 @@ export const MerchantDealCard = ({ deal }: { deal: MerchantDeal | Deal }) => {
           </span>
         </div>
 
-        <p className="mb-4 line-clamp-2 text-sm text-neutral-500">
+        <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
           {description}
         </p>
 
-        <div className="mt-auto space-y-3 border-t border-neutral-100 pt-4">
-          <div className="flex items-center gap-3 text-sm text-neutral-700">
+        <div className="mt-auto space-y-3 border-t border-border pt-4">
+          <div className="flex items-center gap-3 text-sm text-foreground">
             <Tag className="h-4 w-4 text-brand-primary-600" />
             <span className="font-semibold">{offerText}</span>
           </div>
-          <div className="flex items-center gap-3 text-sm text-neutral-700">
-            <Clock className="h-4 w-4 text-neutral-500" />
+          <div className="flex items-center gap-3 text-sm text-foreground">
+            <Clock className="h-4 w-4 text-muted-foreground" />
             <span>Runs until {new Date(endTime).toLocaleDateString()}</span>
           </div>
         </div>
@@ -140,7 +140,7 @@ export const MerchantDealCard = ({ deal }: { deal: MerchantDeal | Deal }) => {
           <Button
             variant="ghost"
             size="sm"
-            className="rounded-lg text-neutral-600"
+            className="rounded-lg text-muted-foreground"
           >
             <BarChart2 className="mr-2 h-4 w-4" />
             View Analytics

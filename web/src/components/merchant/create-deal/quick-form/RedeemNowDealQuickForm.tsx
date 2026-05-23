@@ -84,7 +84,7 @@ export const RedeemNowDealQuickForm = () => {
               dispatch({ type: 'UPDATE_FIELD', field: 'title', value: e.target.value.slice(0, 100) })
             }
             placeholder="Spend $35 → 50% off"
-            className="mt-1.5 h-10 rounded-lg border-neutral-200 bg-white text-[13.5px]"
+            className="mt-1.5 h-10 rounded-lg border-border bg-card text-[13.5px]"
             maxLength={100}
           />
         </SectionCard>
@@ -92,15 +92,15 @@ export const RedeemNowDealQuickForm = () => {
         <SectionCard>
           <div className="grid gap-5 sm:grid-cols-2">
             <ProLockedField label="Discount" hint="Fixed for Redeem Now" forceLocked>
-              <div className="flex h-[88px] items-center justify-center rounded-xl border border-neutral-200 bg-neutral-50 p-3">
+              <div className="flex h-[88px] items-center justify-center rounded-xl border border-border bg-muted p-3">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-neutral-900">50%</div>
-                  <div className="text-[11px] uppercase tracking-[0.16em] text-neutral-500">off the bill</div>
+                  <div className="text-3xl font-bold text-foreground">50%</div>
+                  <div className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">off the bill</div>
                 </div>
               </div>
             </ProLockedField>
             <ProLockedField label="Minimum spend" hint="Unlock threshold">
-              <div className="rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="rounded-xl border border-border bg-card p-3">
                 <AmountSlider
                   value={state.minOrderAmount}
                   onChange={(v) => dispatch({ type: 'UPDATE_FIELD', field: 'minOrderAmount', value: v })}
@@ -124,7 +124,7 @@ export const RedeemNowDealQuickForm = () => {
             className="mt-3"
             options={DURATION_OPTIONS}
           />
-          <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-[12px] text-amber-800">
+          <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/30 p-3 text-[12px] text-amber-800 dark:text-amber-300">
             <Zap className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
             <p>Redeem Now deals must end within 24 hours of starting — they're built for "today" urgency.</p>
           </div>
@@ -142,7 +142,7 @@ export const RedeemNowDealQuickForm = () => {
               dispatch({ type: 'UPDATE_FIELD', field: 'maxRedemptions', value: v });
             }}
             placeholder="20 uses"
-            className="mt-1.5 h-10 w-[200px] rounded-lg border-neutral-200 bg-white text-[13.5px]"
+            className="mt-1.5 h-10 w-[200px] rounded-lg border-border bg-card text-[13.5px]"
           />
         </SectionCard>
 

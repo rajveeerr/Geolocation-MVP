@@ -148,14 +148,14 @@ export const CheckInFeed: React.FC<CheckInFeedProps> = ({
         {Array.from({ length: baseLimit }).map((_, idx) => (
           <div
             key={`checkin-skeleton-${idx}`}
-            className="animate-pulse rounded-[1rem] border border-neutral-200/80 bg-white/95 p-4"
+            className="animate-pulse rounded-[1rem] border border-border/80 bg-card/95 dark:bg-card p-4"
           >
             <div className="flex items-start gap-4">
-              <div className="h-12 w-12 rounded-[0.95rem] bg-neutral-200" />
+              <div className="h-12 w-12 rounded-[0.95rem] bg-accent" />
               <div className="min-w-0 flex-1 space-y-2.5">
-                <div className="h-3.5 w-1/3 rounded bg-neutral-200" />
-                <div className="h-3 w-1/2 rounded bg-neutral-200" />
-                <div className="h-3 w-1/4 rounded bg-neutral-200" />
+                <div className="h-3.5 w-1/3 rounded bg-accent" />
+                <div className="h-3 w-1/2 rounded bg-accent" />
+                <div className="h-3 w-1/4 rounded bg-accent" />
               </div>
             </div>
           </div>
@@ -166,20 +166,20 @@ export const CheckInFeed: React.FC<CheckInFeedProps> = ({
 
   if (error) {
     return (
-      <div className="rounded-[1rem] border border-red-200 bg-red-50 p-4">
-        <p className="text-sm text-red-800">Failed to load check-ins. Please try again later.</p>
+      <div className="rounded-[1rem] border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-4">
+        <p className="text-sm text-red-800 dark:text-red-300">Failed to load check-ins. Please try again later.</p>
       </div>
     );
   }
 
   if (!data || !data.checkIns || data.checkIns.length === 0) {
     return (
-      <div className="rounded-[1.1rem] border border-neutral-200 bg-white p-8 text-center">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-[1rem] bg-neutral-100">
-          <MapPin className="h-6 w-6 text-neutral-400" />
+      <div className="rounded-[1.1rem] border border-border bg-card p-8 text-center">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-[1rem] bg-muted">
+          <MapPin className="h-6 w-6 text-muted-foreground" />
         </div>
-        <p className="text-[15px] font-semibold text-neutral-800">No check-ins yet</p>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="text-[15px] font-semibold text-foreground">No check-ins yet</p>
+        <p className="mt-1 text-sm text-muted-foreground">
           Check-ins will appear here when customers tap in at your location.
         </p>
       </div>
@@ -190,15 +190,15 @@ export const CheckInFeed: React.FC<CheckInFeedProps> = ({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h3 className="text-[15px] font-semibold text-neutral-900">Recent Check-ins</h3>
+          <h3 className="text-[15px] font-semibold text-foreground">Recent Check-ins</h3>
           {isFetching ? (
-            <span className="inline-flex items-center rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-500">
+            <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
               Updating...
             </span>
           ) : null}
         </div>
         {data.pagination.totalCount > 0 ? (
-          <span className="text-[13px] text-neutral-500">{data.pagination.totalCount} total</span>
+          <span className="text-[13px] text-muted-foreground">{data.pagination.totalCount} total</span>
         ) : null}
       </div>
 
@@ -210,7 +210,7 @@ export const CheckInFeed: React.FC<CheckInFeedProps> = ({
           return (
             <div
               key={checkIn.id}
-              className="rounded-[0.95rem] border border-neutral-200/80 bg-white/95 px-3 py-2.5 shadow-sm transition-shadow hover:shadow-[0_8px_20px_rgba(15,23,42,0.05)]"
+              className="rounded-[0.95rem] border border-border/80 bg-card/95 dark:bg-card px-3 py-2.5 shadow-sm transition-shadow hover:shadow-[0_8px_20px_rgba(15,23,42,0.05)]"
             >
               <button
                 type="button"
@@ -242,20 +242,20 @@ export const CheckInFeed: React.FC<CheckInFeedProps> = ({
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="truncate text-[13px] font-semibold text-neutral-900">
+                      <p className="truncate text-[13px] font-semibold text-foreground">
                         {checkIn.user.name || 'Anonymous User'}
                       </p>
-                      <p className="truncate text-[13px] text-neutral-600">{checkIn.deal.title}</p>
+                      <p className="truncate text-[13px] text-muted-foreground">{checkIn.deal.title}</p>
                     </div>
                     <div className="shrink-0 text-right">
-                      <p className="flex items-center gap-1 text-xs text-neutral-500">
+                      <p className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Clock className="h-3 w-3" />
                         {formatTimeAgo(checkIn.checkedInAt)}
                       </p>
                     </div>
                   </div>
 
-                  <div className="mt-1.5 flex items-center gap-2 text-xs text-neutral-500">
+                  <div className="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground">
                     <MapPin className="h-3 w-3" />
                     <span>{Math.round(checkIn.location.distanceMeters)}m away</span>
                     {checkIn.user.points > 0 ? (
@@ -265,7 +265,7 @@ export const CheckInFeed: React.FC<CheckInFeedProps> = ({
                       </>
                     ) : null}
                     <span>&bull;</span>
-                    <span className="inline-flex items-center font-medium text-neutral-700">
+                    <span className="inline-flex items-center font-medium text-foreground">
                       {isCheckInExpanded ? 'Show less' : 'Show details'}
                       {isCheckInExpanded ? (
                         <ChevronUp className="ml-1 h-3.5 w-3.5" />
@@ -279,9 +279,9 @@ export const CheckInFeed: React.FC<CheckInFeedProps> = ({
               </button>
 
               {isCheckInExpanded ? (
-                <div className="mt-3 rounded-[0.9rem] border border-neutral-200 bg-neutral-50 p-3">
+                <div className="mt-3 rounded-[0.9rem] border border-border bg-muted p-3">
                   <div className="grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
-                    <div className="rounded-[0.8rem] border border-neutral-200 bg-white p-3">
+                    <div className="rounded-[0.8rem] border border-border bg-card p-3">
                       <div className="mb-3 flex items-center gap-3">
                         {avatarSrc ? (
                           <img
@@ -295,58 +295,58 @@ export const CheckInFeed: React.FC<CheckInFeedProps> = ({
                           </div>
                         )}
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold text-neutral-900">
+                          <p className="truncate text-sm font-semibold text-foreground">
                             {checkIn.user.name || 'Anonymous User'}
                           </p>
-                          <p className="truncate text-xs text-neutral-500">
+                          <p className="truncate text-xs text-muted-foreground">
                             {checkIn.user.email || 'No email available'}
                           </p>
                         </div>
                       </div>
 
-                      <div className="grid gap-2 text-xs text-neutral-600 sm:grid-cols-2">
+                      <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
                         <p>
-                          <span className="font-semibold text-neutral-800">Customer ID:</span>{' '}
+                          <span className="font-semibold text-foreground">Customer ID:</span>{' '}
                           {checkIn.userId}
                         </p>
                         <p>
-                          <span className="font-semibold text-neutral-800">Points:</span>{' '}
+                          <span className="font-semibold text-foreground">Points:</span>{' '}
                           {checkIn.user.points.toLocaleString()}
                         </p>
                         <p>
-                          <span className="font-semibold text-neutral-800">Distance:</span>{' '}
+                          <span className="font-semibold text-foreground">Distance:</span>{' '}
                           {Math.round(checkIn.location.distanceMeters)} meters
                         </p>
                         <p>
-                          <span className="font-semibold text-neutral-800">Checked in:</span>{' '}
+                          <span className="font-semibold text-foreground">Checked in:</span>{' '}
                           {formatExactTime(checkIn.checkedInAt)}
                         </p>
                       </div>
                     </div>
 
-                    <div className="rounded-[0.8rem] border border-neutral-200 bg-white p-3">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-400">
+                    <div className="rounded-[0.8rem] border border-border bg-card p-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                         Check-in Context
                       </p>
-                      <div className="mt-3 space-y-2 text-xs text-neutral-600">
+                      <div className="mt-3 space-y-2 text-xs text-muted-foreground">
                         <p>
-                          <span className="font-semibold text-neutral-800">Deal:</span>{' '}
+                          <span className="font-semibold text-foreground">Deal:</span>{' '}
                           {checkIn.deal.title}
                         </p>
                         <p>
-                          <span className="font-semibold text-neutral-800">Category:</span>{' '}
+                          <span className="font-semibold text-foreground">Category:</span>{' '}
                           {checkIn.deal.category}
                         </p>
                         <p>
-                          <span className="font-semibold text-neutral-800">Deal ID:</span>{' '}
+                          <span className="font-semibold text-foreground">Deal ID:</span>{' '}
                           {checkIn.deal.id}
                         </p>
                         <p>
-                          <span className="font-semibold text-neutral-800">Check-in ID:</span>{' '}
+                          <span className="font-semibold text-foreground">Check-in ID:</span>{' '}
                           {checkIn.id}
                         </p>
                         <p>
-                          <span className="font-semibold text-neutral-800">Coordinates:</span>{' '}
+                          <span className="font-semibold text-foreground">Coordinates:</span>{' '}
                           {checkIn.location.latitude}, {checkIn.location.longitude}
                         </p>
                       </div>
@@ -354,8 +354,8 @@ export const CheckInFeed: React.FC<CheckInFeedProps> = ({
                   </div>
 
                   {checkIn.deal.description ? (
-                    <div className="mt-3 rounded-[0.8rem] border border-neutral-200 bg-white p-3 text-xs text-neutral-600">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-400">
+                    <div className="mt-3 rounded-[0.8rem] border border-border bg-card p-3 text-xs text-muted-foreground">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                         Deal Description
                       </p>
                       <p className="mt-2 leading-5">{checkIn.deal.description}</p>
@@ -369,8 +369,8 @@ export const CheckInFeed: React.FC<CheckInFeedProps> = ({
       </div>
 
       {canViewMore && data.pagination.totalCount > baseLimit ? (
-        <div className="flex items-center justify-between border-t border-neutral-200 pt-4">
-          <p className="text-[13px] text-neutral-500">
+        <div className="flex items-center justify-between border-t border-border pt-4">
+          <p className="text-[13px] text-muted-foreground">
             Showing {Math.min(data.checkIns.length, data.pagination.totalCount)} of {data.pagination.totalCount}
           </p>
           <button
@@ -379,7 +379,7 @@ export const CheckInFeed: React.FC<CheckInFeedProps> = ({
               setIsExpanded((prev) => !prev);
               setCurrentPage(1);
             }}
-            className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-white px-3 py-1.5 text-[13px] font-medium text-neutral-700 transition hover:bg-neutral-50"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-muted"
           >
             {isExpanded ? (
               <>
@@ -397,21 +397,21 @@ export const CheckInFeed: React.FC<CheckInFeedProps> = ({
       ) : null}
 
       {canViewMore && isExpanded && data.pagination.totalPages > 1 ? (
-        <div className="flex items-center justify-between border-t border-neutral-200 pt-4">
+        <div className="flex items-center justify-between border-t border-border pt-4">
           <button
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={!data.pagination.hasPrevPage}
-            className="rounded-[0.9rem] border border-neutral-300 bg-white px-4 py-2 text-[13px] font-medium text-neutral-700 hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-[0.9rem] border border-border bg-card px-4 py-2 text-[13px] font-medium text-foreground hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
           >
             Previous
           </button>
-          <span className="text-[13px] text-neutral-600">
+          <span className="text-[13px] text-muted-foreground">
             Page {data.pagination.currentPage} of {data.pagination.totalPages}
           </span>
           <button
             onClick={() => setCurrentPage((p) => Math.min(data.pagination.totalPages, p + 1))}
             disabled={!data.pagination.hasNextPage}
-            className="rounded-[0.9rem] border border-neutral-300 bg-white px-4 py-2 text-[13px] font-medium text-neutral-700 hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-[0.9rem] border border-border bg-card px-4 py-2 text-[13px] font-medium text-foreground hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
           >
             Next
           </button>

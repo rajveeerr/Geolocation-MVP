@@ -42,10 +42,10 @@ type StatusFilter = 'all' | 'low' | 'out' | 'tracked' | 'untracked';
 type InventoryTab = 'menu' | 'ingredients';
 
 const STATUS_TONES: Record<NonNullable<MenuItem['inventoryStatus']>, string> = {
-  IN_STOCK: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-  LOW_STOCK: 'bg-amber-50 text-amber-700 border border-amber-200',
-  OUT_OF_STOCK: 'bg-red-50 text-red-700 border border-red-200',
-  UNTRACKED: 'bg-neutral-100 text-neutral-600 border border-neutral-200',
+  IN_STOCK: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/50',
+  LOW_STOCK: 'bg-amber-50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-900/50',
+  OUT_OF_STOCK: 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/50',
+  UNTRACKED: 'bg-accent text-muted-foreground border border-border',
 };
 
 const STATUS_LABEL: Record<NonNullable<MenuItem['inventoryStatus']>, string> = {
@@ -56,7 +56,7 @@ const STATUS_LABEL: Record<NonNullable<MenuItem['inventoryStatus']>, string> = {
 };
 
 const cardClass =
-  'rounded-2xl border border-neutral-200 bg-white p-5 shadow-[0_4px_14px_rgba(15,23,42,0.04)]';
+  'rounded-2xl border border-border bg-card p-5 shadow-[0_4px_14px_rgba(15,23,42,0.04)]';
 
 const InventoryPage: React.FC = () => {
   const { data, isLoading, refetch, isRefetching } = useMerchantMenu();
@@ -254,13 +254,13 @@ const InventoryPage: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="mb-6 inline-flex rounded-xl border border-neutral-200 bg-neutral-100 p-1">
+      <div className="mb-6 inline-flex rounded-xl border border-border bg-accent p-1">
         <button
           type="button"
           onClick={() => switchTab('menu')}
           className={cn(
             'rounded-lg px-4 py-1.5 text-sm font-semibold transition',
-            activeTab === 'menu' ? 'bg-white text-neutral-900 shadow-sm' : 'text-neutral-600 hover:text-neutral-900',
+            activeTab === 'menu' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
           )}
         >
           Menu Inventory
@@ -270,7 +270,7 @@ const InventoryPage: React.FC = () => {
           onClick={() => switchTab('ingredients')}
           className={cn(
             'rounded-lg px-4 py-1.5 text-sm font-semibold transition',
-            activeTab === 'ingredients' ? 'bg-white text-neutral-900 shadow-sm' : 'text-neutral-600 hover:text-neutral-900',
+            activeTab === 'ingredients' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
           )}
         >
           Ingredients
@@ -285,21 +285,21 @@ const InventoryPage: React.FC = () => {
       <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
         <div className={cardClass}>
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">In stock</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">In stock</p>
             <PackageCheck className="h-5 w-5 text-emerald-500" />
           </div>
           <p className="mt-2 text-3xl font-bold text-emerald-600">{stats.inStock}</p>
-          <p className="mt-1 text-xs text-neutral-500">{stats.totalUnits} total units</p>
+          <p className="mt-1 text-xs text-muted-foreground">{stats.totalUnits} total units</p>
         </div>
         <div className={cardClass}>
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">Low stock</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Low stock</p>
             <AlertTriangle className="h-5 w-5 text-amber-500" />
           </div>
           <p className="mt-2 text-3xl font-bold text-amber-600">{stats.lowStock}</p>
           <button
             type="button"
-            className="mt-1 text-xs text-amber-700 hover:underline"
+            className="mt-1 text-xs text-amber-700 dark:text-amber-300 hover:underline"
             onClick={() => setStatusFilter('low')}
           >
             Show low-stock items →
@@ -307,13 +307,13 @@ const InventoryPage: React.FC = () => {
         </div>
         <div className={cardClass}>
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">Out of stock</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Out of stock</p>
             <PackageX className="h-5 w-5 text-red-500" />
           </div>
           <p className="mt-2 text-3xl font-bold text-red-600">{stats.outOfStock}</p>
           <button
             type="button"
-            className="mt-1 text-xs text-red-700 hover:underline"
+            className="mt-1 text-xs text-red-700 dark:text-red-300 hover:underline"
             onClick={() => setStatusFilter('out')}
           >
             Show out-of-stock items →
@@ -321,11 +321,11 @@ const InventoryPage: React.FC = () => {
         </div>
         <div className={cardClass}>
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">Untracked</p>
-            <Boxes className="h-5 w-5 text-neutral-400" />
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Untracked</p>
+            <Boxes className="h-5 w-5 text-muted-foreground" />
           </div>
-          <p className="mt-2 text-3xl font-bold text-neutral-700">{stats.untracked}</p>
-          <p className="mt-1 text-xs text-neutral-500">No quantity tracked</p>
+          <p className="mt-2 text-3xl font-bold text-foreground/80">{stats.untracked}</p>
+          <p className="mt-1 text-xs text-muted-foreground">No quantity tracked</p>
         </div>
       </div>
 
@@ -334,22 +334,22 @@ const InventoryPage: React.FC = () => {
         <div className="mb-6 space-y-4">
           {/* AI Analyzer */}
           {!analysisResult ? (
-            <div className="rounded-2xl border border-[#f0ddd0] bg-[linear-gradient(135deg,#fff8f2_0%,#fff1e5_100%)] p-5 shadow-[0_8px_24px_rgba(82,58,40,0.06)]">
+            <div className="rounded-2xl border border-ai-border bg-ai-surface p-5 shadow-[0_8px_24px_rgba(82,58,40,0.06)] dark:shadow-none">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-3">
-                  <div className="rounded-full bg-white/80 p-2.5 text-[#bf6545]">
+                  <div className="rounded-full bg-card/80 dark:bg-card p-2.5 text-ai-accent">
                     <Sparkles className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-[#203247]">AI Inventory Analyzer</p>
-                    <p className="mt-0.5 text-sm text-[#607084]">
+                    <p className="text-sm font-bold text-ai-text">AI Inventory Analyzer</p>
+                    <p className="mt-0.5 text-sm text-ai-text-muted">
                       Get a health score, restock suggestions, and category insights — all in one click.
                     </p>
                   </div>
                 </div>
                 <Button
                   size="sm"
-                  className="shrink-0 rounded-xl border-[#ead6c9] bg-white/80 text-[#203247] hover:bg-white"
+                  className="shrink-0 rounded-xl border-ai-border-strong bg-card/80 dark:bg-card text-ai-text hover:bg-card"
                   variant="secondary"
                   onClick={() => {
                     aiAnalysis.mutate(undefined, {
@@ -367,16 +367,16 @@ const InventoryPage: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <Sparkles className="h-5 w-5 text-[#bf6545]" />
-                  <h3 className="font-bold text-neutral-900">AI Inventory Analysis</h3>
+                  <Sparkles className="h-5 w-5 text-ai-accent" />
+                  <h3 className="font-bold text-foreground">AI Inventory Analysis</h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => { setAnalysisResult(null); setAppliedRestockNames(new Set()); }}
-                  className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
+                  className="rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-muted-foreground"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -388,10 +388,10 @@ const InventoryPage: React.FC = () => {
                   className={cn(
                     'flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-2xl font-bold',
                     analysisResult.healthScore >= 70
-                      ? 'bg-emerald-50 text-emerald-600'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600'
                       : analysisResult.healthScore >= 40
                         ? 'bg-amber-50 text-amber-600'
-                        : 'bg-red-50 text-red-600',
+                        : 'bg-red-50 dark:bg-red-950/30 text-red-600',
                   )}
                 >
                   {analysisResult.healthScore}
@@ -399,34 +399,34 @@ const InventoryPage: React.FC = () => {
                 <div>
                   <p className={cn(
                     'text-sm font-bold',
-                    analysisResult.healthScore >= 70 ? 'text-emerald-700' : analysisResult.healthScore >= 40 ? 'text-amber-700' : 'text-red-700',
+                    analysisResult.healthScore >= 70 ? 'text-emerald-700 dark:text-emerald-300' : analysisResult.healthScore >= 40 ? 'text-amber-700 dark:text-amber-300' : 'text-red-700 dark:text-red-300',
                   )}>
                     {analysisResult.healthLabel}
                   </p>
-                  <p className="mt-1 text-sm text-neutral-600">{analysisResult.summary}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{analysisResult.summary}</p>
                 </div>
               </div>
 
               {/* Category Health */}
               {analysisResult.categoryHealth.length > 0 && (
                 <div className="mb-5">
-                  <p className="text-xs font-bold uppercase tracking-widest text-neutral-400 mb-2">Category Health</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">Category Health</p>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                     {analysisResult.categoryHealth.map((ch) => (
-                      <div key={ch.category} className="rounded-xl border border-neutral-100 bg-neutral-50 p-3">
+                      <div key={ch.category} className="rounded-xl border border-border bg-accent/50 p-3">
                         <div className="flex items-center gap-2">
                           <span className={cn(
                             'h-2 w-2 rounded-full',
                             ch.status === 'healthy' ? 'bg-emerald-500' : ch.status === 'warning' ? 'bg-amber-500' : 'bg-red-500',
                           )} />
-                          <span className="text-sm font-semibold text-neutral-800">{ch.category}</span>
+                          <span className="text-sm font-semibold text-foreground">{ch.category}</span>
                           {ch.itemsNeedingAttention > 0 && (
-                            <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">
+                            <span className="rounded-full bg-amber-100 dark:bg-amber-950/40 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-300">
                               {ch.itemsNeedingAttention} need attention
                             </span>
                           )}
                         </div>
-                        <p className="mt-1 text-xs text-neutral-500">{ch.insight}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{ch.insight}</p>
                       </div>
                     ))}
                   </div>
@@ -436,29 +436,29 @@ const InventoryPage: React.FC = () => {
               {/* Restock Suggestions */}
               {analysisResult.restockSuggestions.length > 0 && (
                 <div className="mb-5">
-                  <p className="text-xs font-bold uppercase tracking-widest text-neutral-400 mb-2">Restock Suggestions</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">Restock Suggestions</p>
                   <div className="space-y-2">
                     {analysisResult.restockSuggestions.map((rs) => {
                       const matchedItem = items.find((i) => i.name.toLowerCase() === rs.itemName.toLowerCase());
                       const isApplied = appliedRestockNames.has(rs.itemName);
                       return (
-                        <div key={rs.itemName} className="flex items-center justify-between rounded-xl border border-neutral-100 bg-neutral-50 px-4 py-3">
+                        <div key={rs.itemName} className="flex items-center justify-between rounded-xl border border-border bg-accent/50 px-4 py-3">
                           <div className="flex items-center gap-3">
                             <span className={cn(
                               'rounded-full px-2 py-0.5 text-[10px] font-bold uppercase',
-                              rs.urgency === 'high' ? 'bg-red-100 text-red-700' : rs.urgency === 'medium' ? 'bg-amber-100 text-amber-700' : 'bg-neutral-100 text-neutral-600',
+                              rs.urgency === 'high' ? 'bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-300' : rs.urgency === 'medium' ? 'bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300' : 'bg-accent text-muted-foreground',
                             )}>
                               {rs.urgency}
                             </span>
                             <div>
-                              <span className="text-sm font-medium text-neutral-900">{rs.itemName}</span>
-                              <span className="ml-2 text-xs text-neutral-500">
+                              <span className="text-sm font-medium text-foreground">{rs.itemName}</span>
+                              <span className="ml-2 text-xs text-muted-foreground">
                                 {rs.currentQty} now → +{rs.suggestedRestockQty}
                               </span>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs text-neutral-400">{rs.reason}</span>
+                            <span className="text-xs text-muted-foreground">{rs.reason}</span>
                             {matchedItem && !isApplied ? (
                               <Button
                                 size="sm"
@@ -496,11 +496,11 @@ const InventoryPage: React.FC = () => {
               {/* Action Items */}
               {analysisResult.actionItems.length > 0 && (
                 <div className="mb-4">
-                  <p className="text-xs font-bold uppercase tracking-widest text-neutral-400 mb-2">Action Items</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">Action Items</p>
                   <ul className="space-y-1">
                     {analysisResult.actionItems.map((item, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-neutral-700">
-                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400" />
+                      <li key={i} className="flex items-start gap-2 text-sm text-foreground/80">
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/50" />
                         {item}
                       </li>
                     ))}
@@ -512,7 +512,7 @@ const InventoryPage: React.FC = () => {
               {analysisResult.tips.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {analysisResult.tips.map((tip, i) => (
-                    <span key={i} className="rounded-full bg-[#f7ede5] px-3 py-1 text-xs font-medium text-[#7b5c49]">
+                    <span key={i} className="rounded-full bg-amber-50 dark:bg-amber-950/30 px-3 py-1 text-xs font-medium text-amber-900 dark:text-amber-200">
                       {tip}
                     </span>
                   ))}
@@ -523,12 +523,12 @@ const InventoryPage: React.FC = () => {
 
           {/* Bulk Setup Banner */}
           {stats.untracked > 0 && !bulkSetupResult && (
-            <div className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-4">
+            <div className="rounded-2xl border border-indigo-100 dark:border-indigo-900/40 bg-indigo-50/50 dark:bg-indigo-950/30 p-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3">
                   <Wand2 className="h-5 w-5 text-indigo-500" />
                   <div>
-                    <p className="text-sm font-bold text-indigo-900">
+                    <p className="text-sm font-bold text-indigo-900 dark:text-indigo-200">
                       {stats.untracked} item{stats.untracked > 1 ? 's' : ''} without inventory tracking
                     </p>
                     <p className="text-xs text-indigo-600">Let AI suggest initial stock levels and thresholds.</p>
@@ -537,7 +537,7 @@ const InventoryPage: React.FC = () => {
                 <Button
                   size="sm"
                   variant="secondary"
-                  className="shrink-0 rounded-xl border-indigo-200 text-indigo-700 hover:bg-indigo-100"
+                  className="shrink-0 rounded-xl border-indigo-200 dark:border-indigo-900/50 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:bg-indigo-950/40"
                   onClick={() => {
                     aiBulkSetup.mutate(undefined, {
                       onSuccess: (data) => setBulkSetupResult(data.suggestions),
@@ -557,11 +557,11 @@ const InventoryPage: React.FC = () => {
 
           {/* Bulk Setup Results */}
           {bulkSetupResult && bulkSetupResult.length > 0 && (
-            <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Wand2 className="h-4 w-4 text-indigo-500" />
-                  <h3 className="text-sm font-bold text-neutral-900">AI Setup Suggestions</h3>
+                  <h3 className="text-sm font-bold text-foreground">AI Setup Suggestions</h3>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
@@ -592,7 +592,7 @@ const InventoryPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => { setBulkSetupResult(null); setAppliedBulkIds(new Set()); }}
-                    className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
+                    className="rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-muted-foreground"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -603,14 +603,14 @@ const InventoryPage: React.FC = () => {
                   const matchedItem = items.find((i) => i.id === s.itemId);
                   const isApplied = appliedBulkIds.has(s.itemId);
                   return (
-                    <div key={s.itemId} className="flex items-center justify-between rounded-xl border border-neutral-100 bg-neutral-50 px-4 py-3">
+                    <div key={s.itemId} className="flex items-center justify-between rounded-xl border border-border bg-accent/50 px-4 py-3">
                       <div>
-                        <span className="text-sm font-medium text-neutral-900">{matchedItem?.name || `Item #${s.itemId}`}</span>
-                        <span className="ml-3 text-xs text-neutral-500">
+                        <span className="text-sm font-medium text-foreground">{matchedItem?.name || `Item #${s.itemId}`}</span>
+                        <span className="ml-3 text-xs text-muted-foreground">
                           Qty: {s.inventoryQuantity} · Threshold: {s.lowStockThreshold} · Backorder: {s.allowBackorder ? 'Yes' : 'No'}
                         </span>
                         {s.rationale && (
-                          <p className="mt-0.5 text-xs text-neutral-400">{s.rationale}</p>
+                          <p className="mt-0.5 text-xs text-muted-foreground">{s.rationale}</p>
                         )}
                       </div>
                       {!isApplied ? (
@@ -652,21 +652,21 @@ const InventoryPage: React.FC = () => {
       {/* Filters */}
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search items by name..."
-            className="w-full rounded-xl border border-neutral-200 bg-white py-2 pl-9 pr-3 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            className="w-full rounded-xl border border-border bg-card py-2 pl-9 pr-3 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
           />
         </div>
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-neutral-400" />
+          <Filter className="h-4 w-4 text-muted-foreground" />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-            className="rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            className="rounded-xl border border-border bg-card px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
           >
             <option value="all">All statuses</option>
             <option value="low">Low stock</option>
@@ -677,7 +677,7 @@ const InventoryPage: React.FC = () => {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            className="rounded-xl border border-border bg-card px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
           >
             <option value="all">All categories</option>
             {categories.map((c) => (
@@ -690,10 +690,10 @@ const InventoryPage: React.FC = () => {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-neutral-50 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            <thead className="bg-accent/50 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="px-4 py-3">Item</th>
                 <th className="px-4 py-3">Category</th>
@@ -706,14 +706,14 @@ const InventoryPage: React.FC = () => {
             <tbody className="divide-y divide-neutral-100">
               {isLoading && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-neutral-400">
+                  <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
                     Loading inventory…
                   </td>
                 </tr>
               )}
               {!isLoading && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-neutral-400">
+                  <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
                     No items match these filters.
                   </td>
                 </tr>
@@ -724,14 +724,14 @@ const InventoryPage: React.FC = () => {
                 const isExpanded = expandedItems.has(item.id);
                 return (
                   <React.Fragment key={item.id}>
-                    <tr className="hover:bg-neutral-50/60">
+                    <tr className="hover:bg-accent/50/60">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5">
                           {hasVariantRows && (
                             <button
                               type="button"
                               onClick={() => toggleExpanded(item.id)}
-                              className="rounded p-0.5 text-neutral-400 hover:text-neutral-700"
+                              className="rounded p-0.5 text-muted-foreground hover:text-foreground/80"
                             >
                               {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                             </button>
@@ -739,25 +739,25 @@ const InventoryPage: React.FC = () => {
                           <div>
                             <Link
                               to={`/merchant/menu/${item.id}`}
-                              className="font-medium text-neutral-900 hover:text-brand"
+                              className="font-medium text-foreground hover:text-brand"
                             >
                               {item.name}
                             </Link>
                             {hasVariantRows && (
-                              <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-600 border border-indigo-100">
+                              <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-indigo-50 dark:bg-indigo-950/30 px-2 py-0.5 text-[10px] font-semibold text-indigo-600 border border-indigo-100 dark:border-indigo-900/40">
                                 <Layers className="h-3 w-3" />
                                 {item.variants!.length} variants
                               </span>
                             )}
                             {!item.isAvailable && (
-                              <span className="ml-2 rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-semibold uppercase text-neutral-500">
+                              <span className="ml-2 rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground">
                                 Hidden
                               </span>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-neutral-600">{item.category || '—'}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{item.category || '—'}</td>
                       <td className="px-4 py-3">
                         {!hasVariantRows && (
                           <span
@@ -770,17 +770,17 @@ const InventoryPage: React.FC = () => {
                           </span>
                         )}
                         {hasVariantRows && (
-                          <span className="text-xs text-neutral-400 italic">per variant</span>
+                          <span className="text-xs text-muted-foreground italic">per variant</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-right font-mono text-neutral-800">
+                      <td className="px-4 py-3 text-right font-mono text-foreground">
                         {hasVariantRows
                           ? '—'
                           : item.inventoryTrackingEnabled
                             ? (item.inventoryQuantity ?? 0)
                             : '—'}
                       </td>
-                      <td className="px-4 py-3 text-right font-mono text-neutral-500">
+                      <td className="px-4 py-3 text-right font-mono text-muted-foreground">
                         {hasVariantRows
                           ? '—'
                           : item.inventoryTrackingEnabled
@@ -797,7 +797,7 @@ const InventoryPage: React.FC = () => {
                                   title="Decrement by 1"
                                   onClick={() => adjustQty(item, -1)}
                                   disabled={updateInventory.isPending}
-                                  className="flex h-7 w-7 items-center justify-center rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-100 disabled:opacity-40"
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-accent disabled:opacity-40"
                                 >
                                   <Minus className="h-3.5 w-3.5" />
                                 </button>
@@ -806,7 +806,7 @@ const InventoryPage: React.FC = () => {
                                   title="Add 1"
                                   onClick={() => adjustQty(item, 1)}
                                   disabled={updateInventory.isPending}
-                                  className="flex h-7 w-7 items-center justify-center rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-100 disabled:opacity-40"
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-accent disabled:opacity-40"
                                 >
                                   <Plus className="h-3.5 w-3.5" />
                                 </button>
@@ -814,7 +814,7 @@ const InventoryPage: React.FC = () => {
                                   type="button"
                                   onClick={() => adjustQty(item, 10)}
                                   disabled={updateInventory.isPending}
-                                  className="ml-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
+                                  className="ml-1 rounded-lg border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:bg-emerald-950/40 disabled:opacity-40"
                                 >
                                   +10
                                 </button>
@@ -824,7 +824,7 @@ const InventoryPage: React.FC = () => {
                                 type="button"
                                 onClick={() => toggleTracking(item)}
                                 disabled={updateInventory.isPending}
-                                className="rounded-lg border border-neutral-200 bg-white px-2 py-1 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 disabled:opacity-40"
+                                className="rounded-lg border border-border bg-card px-2 py-1 text-xs font-semibold text-foreground/80 hover:bg-accent/50 disabled:opacity-40"
                               >
                                 Enable tracking
                               </button>
@@ -834,7 +834,7 @@ const InventoryPage: React.FC = () => {
                                 type="button"
                                 onClick={() => markSoldOut(item)}
                                 disabled={updateInventory.isPending}
-                                className="ml-1 rounded-lg border border-red-200 bg-red-50 px-2 py-1 text-xs font-semibold text-red-700 hover:bg-red-100 disabled:opacity-40"
+                                className="ml-1 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 px-2 py-1 text-xs font-semibold text-red-700 dark:text-red-300 hover:bg-red-100 dark:bg-red-950/40 disabled:opacity-40"
                               >
                                 Sold out
                               </button>
@@ -843,7 +843,7 @@ const InventoryPage: React.FC = () => {
                                 type="button"
                                 onClick={() => markAvailable(item)}
                                 disabled={updateInventory.isPending}
-                                className="ml-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
+                                className="ml-1 rounded-lg border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:bg-emerald-950/40 disabled:opacity-40"
                               >
                                 Make available
                               </button>
@@ -855,7 +855,7 @@ const InventoryPage: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => toggleExpanded(item.id)}
-                              className="rounded-lg border border-neutral-200 bg-white px-2 py-1 text-xs font-semibold text-neutral-700 hover:bg-neutral-50"
+                              className="rounded-lg border border-border bg-card px-2 py-1 text-xs font-semibold text-foreground/80 hover:bg-accent/50"
                             >
                               Expand
                             </button>
@@ -868,16 +868,16 @@ const InventoryPage: React.FC = () => {
                     {hasVariantRows && isExpanded && item.variants!.map((variant) => {
                       const vStatus = variant.inventoryStatus ?? 'UNTRACKED';
                       return (
-                        <tr key={`v-${variant.id}`} className="bg-neutral-50/40">
+                        <tr key={`v-${variant.id}`} className="bg-accent/50/40">
                           <td className="py-2.5 pl-12 pr-4">
                             <div className="flex items-center gap-2">
-                              <span className="rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-[10px] text-neutral-500">
+                              <span className="rounded bg-accent px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
                                 {variant.sku}
                               </span>
-                              <span className="text-sm text-neutral-700">{variant.label}</span>
+                              <span className="text-sm text-foreground/80">{variant.label}</span>
                             </div>
                           </td>
-                          <td className="px-4 py-2.5 text-xs text-neutral-400">—</td>
+                          <td className="px-4 py-2.5 text-xs text-muted-foreground">—</td>
                           <td className="px-4 py-2.5">
                             <span
                               className={cn(
@@ -888,10 +888,10 @@ const InventoryPage: React.FC = () => {
                               {STATUS_LABEL[vStatus]}
                             </span>
                           </td>
-                          <td className="px-4 py-2.5 text-right font-mono text-neutral-800">
+                          <td className="px-4 py-2.5 text-right font-mono text-foreground">
                             {variant.inventoryQuantity ?? '—'}
                           </td>
-                          <td className="px-4 py-2.5 text-right font-mono text-neutral-500">
+                          <td className="px-4 py-2.5 text-right font-mono text-muted-foreground">
                             {variant.lowStockThreshold ?? '—'}
                           </td>
                           <td className="px-4 py-2.5">
@@ -901,7 +901,7 @@ const InventoryPage: React.FC = () => {
                                 title="Decrement by 1"
                                 onClick={() => adjustVariantQty(item.id, variant, -1)}
                                 disabled={updateVariantInventory.isPending}
-                                className="flex h-7 w-7 items-center justify-center rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-100 disabled:opacity-40"
+                                className="flex h-7 w-7 items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-accent disabled:opacity-40"
                               >
                                 <Minus className="h-3.5 w-3.5" />
                               </button>
@@ -910,7 +910,7 @@ const InventoryPage: React.FC = () => {
                                 title="Add 1"
                                 onClick={() => adjustVariantQty(item.id, variant, 1)}
                                 disabled={updateVariantInventory.isPending}
-                                className="flex h-7 w-7 items-center justify-center rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-100 disabled:opacity-40"
+                                className="flex h-7 w-7 items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-accent disabled:opacity-40"
                               >
                                 <Plus className="h-3.5 w-3.5" />
                               </button>
@@ -918,7 +918,7 @@ const InventoryPage: React.FC = () => {
                                 type="button"
                                 onClick={() => adjustVariantQty(item.id, variant, 10)}
                                 disabled={updateVariantInventory.isPending}
-                                className="ml-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
+                                className="ml-1 rounded-lg border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:bg-emerald-950/40 disabled:opacity-40"
                               >
                                 +10
                               </button>

@@ -59,14 +59,14 @@ export const HiddenConfigStep = () => {
                 })
               }
               placeholder="VIP2026"
-              className="h-10 rounded-lg border-neutral-200 bg-white font-mono text-[13.5px] tracking-widest"
+              className="h-10 rounded-lg border-border bg-card font-mono text-[13.5px] tracking-widest"
             />
             <button
               type="button"
               onClick={() =>
                 dispatch({ type: 'UPDATE_FIELD', field: 'accessCode', value: generateAccessCode() })
               }
-              className="h-10 shrink-0 rounded-lg border border-neutral-200 bg-white px-3 text-[12px] font-semibold text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50"
+              className="h-10 shrink-0 rounded-lg border border-border bg-card px-3 text-[12px] font-semibold text-foreground hover:border-border hover:bg-muted"
             >
               Regenerate
             </button>
@@ -122,13 +122,13 @@ interface VisibilityToggleProps {
 }
 
 const VisibilityToggle = ({ icon, label, description, checked, onChange, disabled }: VisibilityToggleProps) => (
-  <div className="flex items-center gap-3 rounded-xl border border-neutral-200 bg-white p-3">
-    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
+  <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-950/30 text-violet-600">
       {icon}
     </div>
     <div className="min-w-0 flex-1">
-      <div className="text-[13px] font-semibold text-neutral-900">{label}</div>
-      <div className="text-[12px] text-neutral-500">{description}</div>
+      <div className="text-[13px] font-semibold text-foreground">{label}</div>
+      <div className="text-[12px] text-muted-foreground">{description}</div>
     </div>
     <Switch checked={checked} onCheckedChange={onChange} disabled={disabled} />
   </div>

@@ -20,7 +20,7 @@ export const InlineCategoryGrid = ({ value, onChange }: InlineCategoryGridProps)
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-neutral-200 bg-neutral-50 px-4 py-6 text-[12px] text-neutral-500">
+      <div className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted px-4 py-6 text-[12px] text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" />
         Loading categories…
       </div>
@@ -29,7 +29,7 @@ export const InlineCategoryGrid = ({ value, onChange }: InlineCategoryGridProps)
 
   if (error || categories.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-neutral-200 bg-neutral-50 px-4 py-6 text-center text-[12px] text-neutral-500">
+      <div className="rounded-xl border border-dashed border-border bg-muted px-4 py-6 text-center text-[12px] text-muted-foreground">
         Categories unavailable right now — we'll use Food &amp; Beverage by default.
       </div>
     );
@@ -53,22 +53,22 @@ export const InlineCategoryGrid = ({ value, onChange }: InlineCategoryGridProps)
             className={cn(
               'flex items-start gap-3 rounded-xl border-2 p-3 text-left transition',
               isSelected
-                ? 'border-neutral-900 bg-neutral-50 shadow-[0_4px_12px_rgba(15,23,42,0.06)]'
-                : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50',
+                ? 'border-foreground bg-muted shadow-[0_4px_12px_rgba(15,23,42,0.06)]'
+                : 'border-border bg-card hover:border-border hover:bg-muted',
             )}
           >
             <span className="text-xl leading-none">{cat.icon}</span>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">
-                <span className="truncate text-[13px] font-semibold text-neutral-900">{cat.label}</span>
+                <span className="truncate text-[13px] font-semibold text-foreground">{cat.label}</span>
                 {isSelected ? (
-                  <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-white">
+                  <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
                     <Check className="h-2.5 w-2.5" />
                   </span>
                 ) : null}
               </div>
               {cat.description ? (
-                <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-neutral-500">
+                <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-muted-foreground">
                   {cat.description}
                 </p>
               ) : null}

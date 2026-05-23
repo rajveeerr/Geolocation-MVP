@@ -30,7 +30,7 @@ import { cn } from '@/lib/utils';
 import type { MerchantReferralProgram, ReferralProgramPayload } from '@/types/referral';
 
 const panelClass =
-  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
+  'rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 interface FormState {
   name: string;
@@ -104,13 +104,13 @@ function ProgramForm({
   return (
     <div className={cn(panelClass, 'p-5')}>
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-bold text-neutral-900">
+        <h3 className="text-base font-bold text-foreground">
           {isEditing ? 'Edit referral program' : 'New referral program'}
         </h3>
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-full p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700"
+          className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
           aria-label="Close"
         >
           <X className="h-4 w-4" />
@@ -119,7 +119,7 @@ function ProgramForm({
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <div>
-          <Label htmlFor="ref-name" className="text-xs font-semibold text-neutral-700">Name</Label>
+          <Label htmlFor="ref-name" className="text-xs font-semibold text-foreground">Name</Label>
           <Input
             id="ref-name"
             value={form.name}
@@ -130,8 +130,8 @@ function ProgramForm({
           />
         </div>
         <div>
-          <Label htmlFor="ref-expires" className="text-xs font-semibold text-neutral-700">
-            Expires <span className="font-normal text-neutral-500">(optional)</span>
+          <Label htmlFor="ref-expires" className="text-xs font-semibold text-foreground">
+            Expires <span className="font-normal text-muted-foreground">(optional)</span>
           </Label>
           <Input
             id="ref-expires"
@@ -145,8 +145,8 @@ function ProgramForm({
       </div>
 
       <div className="mt-4">
-        <Label htmlFor="ref-desc" className="text-xs font-semibold text-neutral-700">
-          Description <span className="font-normal text-neutral-500">(optional)</span>
+        <Label htmlFor="ref-desc" className="text-xs font-semibold text-foreground">
+          Description <span className="font-normal text-muted-foreground">(optional)</span>
         </Label>
         <Textarea
           id="ref-desc"
@@ -161,7 +161,7 @@ function ProgramForm({
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div>
-          <Label htmlFor="ref-referrer" className="text-xs font-semibold text-neutral-700">
+          <Label htmlFor="ref-referrer" className="text-xs font-semibold text-foreground">
             Referrer earns
           </Label>
           <Input
@@ -174,7 +174,7 @@ function ProgramForm({
           />
         </div>
         <div>
-          <Label htmlFor="ref-referred" className="text-xs font-semibold text-neutral-700">
+          <Label htmlFor="ref-referred" className="text-xs font-semibold text-foreground">
             Friend earns
           </Label>
           <Input
@@ -190,8 +190,8 @@ function ProgramForm({
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div>
-          <Label htmlFor="ref-max" className="text-xs font-semibold text-neutral-700">
-            Max redemptions per user <span className="font-normal text-neutral-500">(optional)</span>
+          <Label htmlFor="ref-max" className="text-xs font-semibold text-foreground">
+            Max redemptions per user <span className="font-normal text-muted-foreground">(optional)</span>
           </Label>
           <Input
             id="ref-max"
@@ -238,32 +238,32 @@ function ProgramCard({
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-base font-bold text-neutral-900">{program.name}</h3>
+            <h3 className="text-base font-bold text-foreground">{program.name}</h3>
             <span
               className={cn(
                 'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset',
                 program.isActive
-                  ? 'bg-emerald-100 text-emerald-700 ring-emerald-600/20'
-                  : 'bg-neutral-100 text-neutral-600 ring-neutral-400/20',
+                  ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 ring-emerald-600/20'
+                  : 'bg-muted text-muted-foreground ring-neutral-400/20',
               )}
             >
               {program.isActive ? 'ACTIVE' : 'PAUSED'}
             </span>
           </div>
           {program.description && (
-            <p className="mt-1.5 text-xs text-neutral-500">{program.description}</p>
+            <p className="mt-1.5 text-xs text-muted-foreground">{program.description}</p>
           )}
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
-            <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3">
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Referrer earns</div>
-              <div className="mt-0.5 text-sm font-medium text-neutral-900">{program.rewardForReferrer}</div>
+            <div className="rounded-xl border border-border bg-muted/60 p-3">
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Referrer earns</div>
+              <div className="mt-0.5 text-sm font-medium text-foreground">{program.rewardForReferrer}</div>
             </div>
-            <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3">
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Friend earns</div>
-              <div className="mt-0.5 text-sm font-medium text-neutral-900">{program.rewardForReferred}</div>
+            <div className="rounded-xl border border-border bg-muted/60 p-3">
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Friend earns</div>
+              <div className="mt-0.5 text-sm font-medium text-foreground">{program.rewardForReferred}</div>
             </div>
           </div>
-          <div className="mt-3 flex flex-wrap gap-3 text-[11px] text-neutral-500">
+          <div className="mt-3 flex flex-wrap gap-3 text-[11px] text-muted-foreground">
             {program.maxRedemptionsPerUser != null && (
               <span>Max {program.maxRedemptionsPerUser} per user</span>
             )}
@@ -276,7 +276,7 @@ function ProgramCard({
         </div>
       </header>
 
-      <div className="mt-4 flex items-center gap-2 border-t border-neutral-100 pt-4">
+      <div className="mt-4 flex items-center gap-2 border-t border-border pt-4">
         <Button
           type="button"
           size="sm"
@@ -309,7 +309,7 @@ function ProgramCard({
         <button
           type="button"
           onClick={() => onDelete(program)}
-          className="ml-auto rounded-full border border-neutral-200 p-2 text-neutral-400 transition hover:bg-rose-50 hover:text-rose-600"
+          className="ml-auto rounded-full border border-border p-2 text-muted-foreground transition hover:bg-rose-50 dark:bg-rose-950/30 hover:text-rose-600"
           aria-label="Archive program"
         >
           <Trash2 className="h-3.5 w-3.5" />
@@ -370,14 +370,14 @@ function MerchantReferralsInner() {
   if (isLoading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={cn(panelClass, 'border-rose-200 bg-rose-50 p-4 text-sm text-rose-700')}>
+      <div className={cn(panelClass, 'border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 p-4 text-sm text-rose-700 dark:text-rose-300')}>
         {(error as Error).message}
       </div>
     );
@@ -388,16 +388,16 @@ function MerchantReferralsInner() {
   return (
     <div className="mx-auto max-w-screen-xl space-y-6 px-4 py-3 sm:px-1 sm:py-4">
       {/* Title banner */}
-      <div className={cn(panelClass, 'flex flex-wrap items-center justify-between gap-4 border-emerald-200/70 bg-gradient-to-r from-emerald-50 via-white to-white p-5')}>
+      <div className={cn(panelClass, 'flex flex-wrap items-center justify-between gap-4 border-emerald-200/70 dark:border-emerald-900/50 bg-gradient-to-r from-emerald-50 via-card to-card dark:bg-none dark:bg-card p-5')}>
         <div className="flex min-w-0 items-start gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md">
             <UserPlus className="h-5 w-5" aria-hidden />
           </div>
           <div className="min-w-0">
-            <h2 className="text-lg font-bold tracking-tight text-neutral-900 sm:text-xl">
+            <h2 className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
               Referral Programs
             </h2>
-            <p className="text-sm text-neutral-600">
+            <p className="text-sm text-muted-foreground">
               Reward customers for bringing new people in — and reward the new person too.
             </p>
           </div>
@@ -418,24 +418,24 @@ function MerchantReferralsInner() {
       {/* Stats */}
       <div className="grid gap-3 sm:grid-cols-4">
         <div className={cn(panelClass, 'p-4')}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Total programs</div>
-          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-neutral-950">{programs.length}</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Total programs</div>
+          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-foreground">{programs.length}</div>
         </div>
         <div className={cn(panelClass, 'p-4')}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Active</div>
-          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-neutral-950">{activeCount}</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Active</div>
+          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-foreground">{activeCount}</div>
         </div>
         <div className={cn(panelClass, 'p-4')}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Total attributions</div>
-          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-emerald-700">{totalAttributions}</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Total attributions</div>
+          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-emerald-700 dark:text-emerald-300">{totalAttributions}</div>
         </div>
         <div className={cn(panelClass, 'p-4')}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Top referrer</div>
-          <div className="mt-1 truncate text-[1.05rem] font-semibold tracking-tight text-neutral-950">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Top referrer</div>
+          <div className="mt-1 truncate text-[1.05rem] font-semibold tracking-tight text-foreground">
             {topReferrers[0]?.name ?? '—'}
           </div>
           {topReferrers[0] && (
-            <div className="text-[11px] text-neutral-500">{topReferrers[0].attributions} attributions</div>
+            <div className="text-[11px] text-muted-foreground">{topReferrers[0].attributions} attributions</div>
           )}
         </div>
       </div>
@@ -466,15 +466,15 @@ function MerchantReferralsInner() {
 
       {programs.length === 0 ? (
         <div className={cn(panelClass, 'border-dashed py-16 text-center')}>
-          <UserPlus className="mx-auto mb-3 h-10 w-10 text-neutral-300" aria-hidden />
-          <h3 className="text-[1.4rem] font-semibold tracking-tight text-neutral-900">No referral programs yet</h3>
-          <p className="mt-1 text-[13px] text-neutral-500 sm:text-sm">
+          <UserPlus className="mx-auto mb-3 h-10 w-10 text-muted-foreground" aria-hidden />
+          <h3 className="text-[1.4rem] font-semibold tracking-tight text-foreground">No referral programs yet</h3>
+          <p className="mt-1 text-[13px] text-muted-foreground sm:text-sm">
             Run a "first-time customer" or "win-back" program. You set what the referrer earns and what their friend gets.
           </p>
           <div className="mt-5">
             <Button
               onClick={() => setShowForm(true)}
-              className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800"
+              className="rounded-full bg-foreground text-background hover:bg-foreground/85"
             >
               <Plus className="mr-2 h-4 w-4" />
               Create your first program
@@ -501,44 +501,44 @@ function MerchantReferralsInner() {
           <div className={cn(panelClass, 'p-5')}>
             <header className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-emerald-500" aria-hidden />
-              <h2 className="text-sm font-semibold text-neutral-900">Top referrers</h2>
+              <h2 className="text-sm font-semibold text-foreground">Top referrers</h2>
             </header>
             <ol className="mt-3 divide-y divide-neutral-100">
               {topReferrers.slice(0, 5).map((r, idx) => (
                 <li key={r.userId} className="flex items-center justify-between py-2.5">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-100 text-xs font-bold text-neutral-700">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-xs font-bold text-foreground">
                       {idx + 1}
                     </span>
-                    <span className="text-sm font-medium text-neutral-900">{r.name ?? `User #${r.userId}`}</span>
+                    <span className="text-sm font-medium text-foreground">{r.name ?? `User #${r.userId}`}</span>
                   </div>
-                  <span className="text-xs font-semibold text-emerald-700">
+                  <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">
                     {r.attributions} {r.attributions === 1 ? 'referral' : 'referrals'}
                   </span>
                 </li>
               ))}
               {topReferrers.length === 0 && (
-                <li className="py-2 text-xs text-neutral-500">No attributions yet.</li>
+                <li className="py-2 text-xs text-muted-foreground">No attributions yet.</li>
               )}
             </ol>
           </div>
           <div className={cn(panelClass, 'p-5')}>
             <header className="flex items-center gap-2">
               <UserPlus className="h-4 w-4 text-emerald-500" aria-hidden />
-              <h2 className="text-sm font-semibold text-neutral-900">Recent attributions</h2>
+              <h2 className="text-sm font-semibold text-foreground">Recent attributions</h2>
             </header>
             <ol className="mt-3 divide-y divide-neutral-100 text-sm">
               {recentAttributions.slice(0, 8).map((a) => (
                 <li key={a.id} className="flex flex-wrap items-baseline justify-between gap-2 py-2.5">
                   <div className="min-w-0">
-                    <span className="font-medium text-neutral-900">{a.referrer.name ?? `User #${a.referrer.id}`}</span>
-                    <span className="mx-1 text-neutral-400">→</span>
-                    <span className="text-neutral-700">{a.referred.name ?? `User #${a.referred.id}`}</span>
-                    <div className="text-[11px] text-neutral-500">
+                    <span className="font-medium text-foreground">{a.referrer.name ?? `User #${a.referrer.id}`}</span>
+                    <span className="mx-1 text-muted-foreground">→</span>
+                    <span className="text-foreground">{a.referred.name ?? `User #${a.referred.id}`}</span>
+                    <div className="text-[11px] text-muted-foreground">
                       {a.program.name} · via {a.triggerType.toLowerCase()}
                     </div>
                   </div>
-                  <span className="text-[11px] text-neutral-500">
+                  <span className="text-[11px] text-muted-foreground">
                     {new Date(a.createdAt).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
                   </span>
                 </li>
@@ -551,14 +551,14 @@ function MerchantReferralsInner() {
       {/* Roadmap — what attribution still needs */}
       <section className={cn(panelClass, 'p-5')}>
         <header className="flex items-center gap-2">
-          <Clock3 className="h-4 w-4 text-neutral-500" aria-hidden />
-          <h2 className="text-sm font-semibold text-neutral-900">What's still pending</h2>
+          <Clock3 className="h-4 w-4 text-muted-foreground" aria-hidden />
+          <h2 className="text-sm font-semibold text-foreground">What's still pending</h2>
         </header>
-        <ul className="mt-3 space-y-2 text-sm text-neutral-700">
+        <ul className="mt-3 space-y-2 text-sm text-foreground">
           <li className="flex items-start gap-2">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" aria-hidden />
             <span>
-              Customer-side referral codes <span className="text-neutral-500">(already built — `User.referralCode`)</span>
+              Customer-side referral codes <span className="text-muted-foreground">(already built — `User.referralCode`)</span>
             </span>
           </li>
           <li className="flex items-start gap-2">
@@ -574,22 +574,22 @@ function MerchantReferralsInner() {
             <span>Top-referrers leaderboard endpoint</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400" />
+            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/40" />
             <span><strong>Reward fulfillment:</strong> rewards are free-text — actually paying out (store credit, discount code, etc.) is still manual on your end</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400" />
+            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/40" />
             <span>Catering-order attribution (right now only check-ins trigger it)</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400" />
+            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/40" />
             <span>Customer-facing share UI inside each merchant's storefront</span>
           </li>
         </ul>
       </section>
 
-      <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50/60 p-3 text-xs text-amber-900">
-        <TrendingUp className="h-3.5 w-3.5 shrink-0 text-amber-700" />
+      <div className="flex items-center gap-2 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/60 dark:bg-amber-950/30 p-3 text-xs text-amber-900 dark:text-amber-200">
+        <TrendingUp className="h-3.5 w-3.5 shrink-0 text-amber-700 dark:text-amber-300" />
         Reward fields are free-text in v1. Customers see them as-is. Structured payouts (auto-credit, percent off) come with attribution.
       </div>
     </div>

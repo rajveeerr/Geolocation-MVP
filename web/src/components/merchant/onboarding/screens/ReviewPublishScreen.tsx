@@ -131,19 +131,19 @@ export const ReviewPublishScreen = () => {
       showFooter={false}
     >
       <div className="mx-auto max-w-2xl px-6 py-12">
-        <h1 className="font-heading text-2xl font-bold text-neutral-900 md:text-3xl">
+        <h1 className="font-heading text-2xl font-bold text-foreground md:text-3xl">
           Review everything before you submit
         </h1>
-        <p className="mt-2 text-neutral-600">
+        <p className="mt-2 text-muted-foreground">
           Double-check your details. Click Edit on any section to make changes.
         </p>
 
         {/* Recheck banner */}
-        <div className="mt-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/80 p-4">
+        <div className="mt-6 flex items-start gap-3 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/80 dark:bg-amber-950/30 dark:bg-amber-950/30 dark:bg-amber-950/30 p-4">
           <AlertCircle className="h-5 w-5 shrink-0 text-amber-600 mt-0.5" />
           <div>
-            <p className="font-medium text-amber-900">Take a moment to recheck</p>
-            <p className="mt-0.5 text-sm text-amber-800">
+            <p className="font-medium text-amber-900 dark:text-amber-200">Take a moment to recheck</p>
+            <p className="mt-0.5 text-sm text-amber-800 dark:text-amber-300">
               Ensure your business name, type, description, logo, photos, location, vibes, amenities, and contact info are correct.
             </p>
           </div>
@@ -165,26 +165,26 @@ export const ReviewPublishScreen = () => {
           <SectionCard icon={Image} title="Logo & photos" onEdit={() => goTo(0)}>
             <div className="space-y-3">
               <div>
-                <dt className="text-sm font-medium text-neutral-500">Business logo</dt>
+                <dt className="text-sm font-medium text-muted-foreground">Business logo</dt>
                 <dd className="mt-1">
                   {state.logoUrl ? (
-                    <img src={state.logoUrl} alt="Logo" className="h-20 w-20 rounded-xl border border-neutral-200 object-contain bg-white p-2" />
-                  ) : <span className="text-neutral-500">—</span>}
+                    <img src={state.logoUrl} alt="Logo" className="h-20 w-20 rounded-xl border border-border object-contain bg-card p-2" />
+                  ) : <span className="text-muted-foreground">—</span>}
                 </dd>
               </div>
               <div>
-                <dt className="text-sm font-medium text-neutral-500">Gallery ({state.galleryUrls.length} photo{state.galleryUrls.length !== 1 ? 's' : ''})</dt>
+                <dt className="text-sm font-medium text-muted-foreground">Gallery ({state.galleryUrls.length} photo{state.galleryUrls.length !== 1 ? 's' : ''})</dt>
                 <dd className="mt-1 flex flex-wrap gap-2">
                   {state.galleryUrls.length > 0 ? (
                     <>
                       {state.galleryUrls.slice(0, 6).map((url, i) => (
-                        <img key={i} src={url} alt={`Gallery ${i + 1}`} className="h-14 w-14 rounded-lg border border-neutral-200 object-cover" />
+                        <img key={i} src={url} alt={`Gallery ${i + 1}`} className="h-14 w-14 rounded-lg border border-border object-cover" />
                       ))}
                       {state.galleryUrls.length > 6 && (
-                        <span className="flex h-14 w-14 items-center justify-center rounded-lg border border-neutral-200 bg-neutral-100 text-xs font-medium text-neutral-600">+{state.galleryUrls.length - 6}</span>
+                        <span className="flex h-14 w-14 items-center justify-center rounded-lg border border-border bg-muted text-xs font-medium text-muted-foreground">+{state.galleryUrls.length - 6}</span>
                       )}
                     </>
-                  ) : <span className="text-neutral-500">—</span>}
+                  ) : <span className="text-muted-foreground">—</span>}
                 </dd>
               </div>
             </div>
@@ -196,17 +196,17 @@ export const ReviewPublishScreen = () => {
               <div className="space-y-3">
                 {state.vibeTags.length > 0 && (
                   <div>
-                    <dt className="text-sm font-medium text-neutral-500">Vibe</dt>
+                    <dt className="text-sm font-medium text-muted-foreground">Vibe</dt>
                     <dd className="mt-1 flex flex-wrap gap-1.5">
-                      {state.vibeTags.map((t) => <span key={t} className="rounded-lg bg-neutral-200 px-2 py-0.5 text-xs font-medium text-neutral-800">{formatLabel(t, VIBE_LABELS)}</span>)}
+                      {state.vibeTags.map((t) => <span key={t} className="rounded-lg bg-accent px-2 py-0.5 text-xs font-medium text-foreground">{formatLabel(t, VIBE_LABELS)}</span>)}
                     </dd>
                   </div>
                 )}
                 {state.amenities.length > 0 && (
                   <div>
-                    <dt className="text-sm font-medium text-neutral-500">Amenities</dt>
+                    <dt className="text-sm font-medium text-muted-foreground">Amenities</dt>
                     <dd className="mt-1 flex flex-wrap gap-1.5">
-                      {state.amenities.map((a) => <span key={a} className="rounded-lg bg-neutral-200 px-2 py-0.5 text-xs font-medium text-neutral-800">{formatLabel(a, AMENITY_LABELS)}</span>)}
+                      {state.amenities.map((a) => <span key={a} className="rounded-lg bg-accent px-2 py-0.5 text-xs font-medium text-foreground">{formatLabel(a, AMENITY_LABELS)}</span>)}
                     </dd>
                   </div>
                 )}
@@ -264,7 +264,7 @@ export const ReviewPublishScreen = () => {
         </div>
 
         {isSubmitting && (
-          <div className="mt-4 flex items-center gap-2 text-neutral-600">
+          <div className="mt-4 flex items-center gap-2 text-muted-foreground">
             <Loader2 className="h-5 w-5 animate-spin" />
             <span className="text-sm">Submitting your merchant profile...</span>
           </div>
@@ -278,11 +278,11 @@ export const ReviewPublishScreen = () => {
 
 function SectionCard({ icon: Icon, title, onEdit, children }: { icon: React.ElementType; title: string; onEdit: () => void; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-neutral-50/50 p-6">
+    <div className="rounded-2xl border border-border bg-muted/50 p-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Icon className="h-5 w-5 text-neutral-500" />
-          <h3 className="font-heading text-lg font-bold text-neutral-900">{title}</h3>
+          <Icon className="h-5 w-5 text-muted-foreground" />
+          <h3 className="font-heading text-lg font-bold text-foreground">{title}</h3>
         </div>
         <button type="button" onClick={onEdit} className="flex items-center gap-1 text-sm font-medium text-brand-primary-600 hover:underline">
           <Pencil className="h-3.5 w-3.5" />
@@ -297,8 +297,8 @@ function SectionCard({ icon: Icon, title, onEdit, children }: { icon: React.Elem
 function Row({ label, value }: { label: string; value: string | null | undefined }) {
   return (
     <div>
-      <dt className="text-sm font-medium text-neutral-500">{label}</dt>
-      <dd className="mt-0.5 font-medium text-neutral-900 whitespace-pre-wrap break-all">{value || '—'}</dd>
+      <dt className="text-sm font-medium text-muted-foreground">{label}</dt>
+      <dd className="mt-0.5 font-medium text-foreground whitespace-pre-wrap break-all">{value || '—'}</dd>
     </div>
   );
 }

@@ -60,13 +60,13 @@ export const TimeWindowEditor = ({
   return (
     <div className={className}>
       <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
           {label}
         </span>
         <span
           className={cn(
             'text-[11px] font-medium',
-            duration ? 'text-emerald-600' : 'text-neutral-400',
+            duration ? 'text-emerald-600' : 'text-muted-foreground',
           )}
         >
           {duration ? `· Runs for ${duration}` : '· Pick a start & end time'}
@@ -87,8 +87,8 @@ export const TimeWindowEditor = ({
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-semibold transition',
                   isActive
-                    ? 'border-neutral-900 bg-neutral-900 text-white shadow-[0_4px_12px_rgba(15,23,42,0.16)]'
-                    : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50',
+                    ? 'border-foreground bg-foreground text-background shadow-[0_4px_12px_rgba(15,23,42,0.16)]'
+                    : 'border-border bg-card text-foreground hover:border-border hover:bg-muted',
                 )}
               >
                 <Icon className="h-3 w-3" />
@@ -101,7 +101,7 @@ export const TimeWindowEditor = ({
 
       <div className="mt-3 flex flex-wrap items-end gap-3">
         <div className="w-full max-w-[260px] sm:w-auto">
-          <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+          <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
             Start time
           </label>
           <TwelveHourTimeField
@@ -110,11 +110,11 @@ export const TimeWindowEditor = ({
             className="space-y-0"
           />
         </div>
-        <div className="hidden items-center pb-3 text-neutral-400 sm:flex">
+        <div className="hidden items-center pb-3 text-muted-foreground sm:flex">
           <Clock className="h-4 w-4" />
         </div>
         <div className="w-full max-w-[260px] sm:w-auto">
-          <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+          <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
             End time
           </label>
           <TwelveHourTimeField

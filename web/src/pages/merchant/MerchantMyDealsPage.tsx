@@ -70,7 +70,7 @@ const DealCard = ({ deal, onEdit, onDelete }: {
   const dealTypeLabel = deal.dealType?.name ?? 'Item Deal';
   const statusLabel = isActive ? 'Active' : isExpired ? 'Expired' : 'Scheduled';
   const statusDot = isActive ? 'bg-emerald-500' : isExpired ? 'bg-rose-500' : 'bg-amber-500';
-  const statusText = isActive ? 'text-emerald-700' : isExpired ? 'text-rose-700' : 'text-amber-700';
+  const statusText = isActive ? 'text-emerald-700 dark:text-emerald-300' : isExpired ? 'text-rose-700 dark:text-rose-300' : 'text-amber-700 dark:text-amber-300';
 
   const discountLabel = deal.discountPercentage
     ? `${deal.discountPercentage}% off`
@@ -79,10 +79,10 @@ const DealCard = ({ deal, onEdit, onDelete }: {
       : null;
 
   return (
-    <div className="flex h-full flex-col rounded-[1.45rem] border border-neutral-200/80 bg-white/95 p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)] transition hover:shadow-[0_12px_28px_rgba(15,23,42,0.07)]">
+    <div className="flex h-full flex-col rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card p-5 shadow-[0_8px_22px_rgba(15,23,42,0.045)] transition hover:shadow-[0_12px_28px_rgba(15,23,42,0.07)]">
       {/* Eyebrow row: deal type + status dot */}
       <div className="mb-3 flex items-center justify-between gap-2">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
           {dealTypeLabel}
         </span>
         <span className={cn('inline-flex items-center gap-1.5 text-[11px] font-semibold', statusText)}>
@@ -92,40 +92,40 @@ const DealCard = ({ deal, onEdit, onDelete }: {
       </div>
 
       {/* Title */}
-      <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug tracking-tight text-neutral-900">
+      <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug tracking-tight text-foreground">
         {deal.title}
       </h3>
 
       {/* Description */}
       {deal.description ? (
-        <p className="mt-1.5 line-clamp-2 text-[13px] leading-5 text-neutral-600">{deal.description}</p>
+        <p className="mt-1.5 line-clamp-2 text-[13px] leading-5 text-muted-foreground">{deal.description}</p>
       ) : null}
 
       {/* Discount + schedule */}
       <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5">
         {discountLabel ? (
-          <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-[12px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/15">
+          <span className="inline-flex items-center rounded-md bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 text-[12px] font-semibold text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-600/15">
             {discountLabel}
           </span>
         ) : null}
-        <span className="inline-flex items-center gap-1 text-[12px] text-neutral-500">
+        <span className="inline-flex items-center gap-1 text-[12px] text-muted-foreground">
           <CalendarIcon className="h-3.5 w-3.5" />
           {formatDate(deal.startTime)}
         </span>
-        <span className="inline-flex items-center gap-1 text-[12px] text-neutral-500">
+        <span className="inline-flex items-center gap-1 text-[12px] text-muted-foreground">
           <ClockIcon className="h-3.5 w-3.5" />
           {formatTime(deal.startTime)} – {formatTime(deal.endTime)}
         </span>
       </div>
 
       {/* Footer */}
-      <div className="mt-auto flex items-center justify-between gap-2 border-t border-neutral-100 pt-3 mt-4">
-        <span className="text-[11px] text-neutral-400">Created {formatDate(deal.createdAt)}</span>
+      <div className="mt-auto flex items-center justify-between gap-2 border-t border-border pt-3 mt-4">
+        <span className="text-[11px] text-muted-foreground">Created {formatDate(deal.createdAt)}</span>
         <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={() => onEdit(deal)}
-            className="inline-flex h-8 items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 text-[12px] font-semibold text-neutral-700 transition hover:border-neutral-300 hover:bg-neutral-50"
+            className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-[12px] font-semibold text-foreground transition hover:border-border hover:bg-muted"
           >
             <Edit className="h-3 w-3" />
             Edit
@@ -134,7 +134,7 @@ const DealCard = ({ deal, onEdit, onDelete }: {
             type="button"
             onClick={() => onDelete(deal)}
             aria-label="Delete deal"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-neutral-400 transition hover:bg-rose-50 hover:text-rose-600"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-rose-50 dark:bg-rose-950/30 hover:text-rose-600"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
@@ -147,20 +147,20 @@ const DealCard = ({ deal, onEdit, onDelete }: {
 const DealsSkeleton = () => (
   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
     {Array.from({ length: 6 }).map((_, i) => (
-      <div key={i} className="rounded-[1.45rem] border border-neutral-200/80 bg-white p-6 shadow-[0_8px_22px_rgba(15,23,42,0.045)]">
+      <div key={i} className="rounded-[1.45rem] border border-border/80 bg-card p-6 shadow-[0_8px_22px_rgba(15,23,42,0.045)]">
         <div className="mb-4 flex items-start justify-between">
-          <div className="h-6 w-3/4 rounded bg-neutral-200" />
-          <div className="h-6 w-16 rounded-full bg-neutral-200" />
+          <div className="h-6 w-3/4 rounded bg-accent" />
+          <div className="h-6 w-16 rounded-full bg-accent" />
         </div>
         <div className="mb-4 space-y-2">
-          <div className="h-4 w-full rounded bg-neutral-200" />
-          <div className="h-4 w-2/3 rounded bg-neutral-200" />
+          <div className="h-4 w-full rounded bg-accent" />
+          <div className="h-4 w-2/3 rounded bg-accent" />
         </div>
         <div className="mb-4 flex gap-4">
-          <div className="h-4 w-20 rounded bg-neutral-200" />
-          <div className="h-4 w-24 rounded bg-neutral-200" />
+          <div className="h-4 w-20 rounded bg-accent" />
+          <div className="h-4 w-24 rounded bg-accent" />
         </div>
-        <div className="h-6 w-16 rounded bg-neutral-200" />
+        <div className="h-6 w-16 rounded bg-accent" />
       </div>
     ))}
   </div>
@@ -182,7 +182,7 @@ const MerchantMyDealsContent = () => {
     | 'bogo';
   type CategoryFilter = 'all' | 'food_beverage' | 'retail' | 'entertainment' | 'health_fitness' | 'beauty_wellness' | 'other';
   const panelClass =
-    'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
+    'rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
   
   const [activeFilter, setActiveFilter] = useState<DealStatusFilter>('all');
   const [activeDealType, setActiveDealType] = useState<DealTypeFilter>('all');
@@ -327,8 +327,8 @@ const MerchantMyDealsContent = () => {
     return (
       <div className="container mx-auto max-w-7xl px-4 py-12">
         <div className="animate-pulse">
-          <div className="mb-8 h-8 w-64 rounded bg-neutral-200" />
-          <div className="mb-8 h-12 w-96 rounded bg-neutral-200" />
+          <div className="mb-8 h-8 w-64 rounded bg-accent" />
+          <div className="mb-8 h-12 w-96 rounded bg-accent" />
           <DealsSkeleton />
         </div>
       </div>
@@ -340,7 +340,7 @@ const MerchantMyDealsContent = () => {
       <div className="container mx-auto max-w-4xl px-4 py-12">
         <div className="text-center">
           <h1 className="mb-4 text-4xl font-bold">Join as a Merchant</h1>
-          <p className="mb-8 text-neutral-600">
+          <p className="mb-8 text-muted-foreground">
             Start creating deals and reach new customers
           </p>
           <Link to={PATHS.MERCHANT_ONBOARDING}>
@@ -354,11 +354,11 @@ const MerchantMyDealsContent = () => {
   if (merchantStatus === 'PENDING') {
     return (
       <div className="container mx-auto max-w-4xl px-4 py-12">
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 sm:p-8">
-          <h2 className="text-2xl font-bold text-amber-800">
+        <div className="rounded-2xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/30 p-6 sm:p-8">
+          <h2 className="text-2xl font-bold text-amber-800 dark:text-amber-300">
             Application Pending
           </h2>
-          <p className="mt-2 text-amber-700">
+          <p className="mt-2 text-amber-700 dark:text-amber-300">
             Your application to become a merchant is currently under review. This usually takes 1-2 business days. We'll notify you via email once it's approved.
           </p>
         </div>
@@ -369,11 +369,11 @@ const MerchantMyDealsContent = () => {
   if (merchantStatus === 'REJECTED') {
     return (
       <div className="container mx-auto max-w-4xl px-4 py-12">
-        <div className="rounded-lg border border-red-200 bg-red-100 p-6">
-          <h2 className="text-xl font-bold text-red-800">
+        <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-100 dark:bg-red-950/40 p-6">
+          <h2 className="text-xl font-bold text-red-800 dark:text-red-300">
             Application Not Approved
           </h2>
-          <p className="mt-2 text-red-700">
+          <p className="mt-2 text-red-700 dark:text-red-300">
             Unfortunately, your merchant application was not approved at this
             time. Please contact our support team if you have any questions or
             would like to reapply.
@@ -396,16 +396,16 @@ const MerchantMyDealsContent = () => {
       <div className="mb-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Deals</div>
-            <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-neutral-900">My Deals</h1>
-            <p className="mt-2 max-w-2xl text-[13px] text-neutral-600 sm:text-sm">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Deals</div>
+            <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight text-foreground">My Deals</h1>
+            <p className="mt-2 max-w-2xl text-[13px] text-muted-foreground sm:text-sm">
               Manage active, scheduled, and expired promotions with a cleaner operating view.
             </p>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link to={PATHS.MERCHANT_DEALS_CREATE}>
-              <Button size="lg" className="w-full rounded-full bg-neutral-950 px-5 text-sm text-white hover:bg-neutral-800 sm:w-auto">
+              <Button size="lg" className="w-full rounded-full bg-foreground px-5 text-sm text-background hover:bg-foreground/85 sm:w-auto">
                 <Plus className="mr-2 h-4 w-4" />
                 Create New Deal
               </Button>
@@ -415,13 +415,13 @@ const MerchantMyDealsContent = () => {
       </div>
 
       <div className={cn(panelClass, 'mb-6 flex flex-wrap items-center gap-2 px-3 py-2 sm:px-4')}>
-        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
           Filters
         </span>
 
         <Select value={activeFilter} onValueChange={(value) => setActiveFilter(value as DealStatusFilter)}>
-          <SelectTrigger className="h-8 w-auto min-w-[120px] gap-1.5 rounded-full border-neutral-200 bg-white px-3 text-[12px] font-medium shadow-none">
-            <span className="text-neutral-500">Status:</span>
+          <SelectTrigger className="h-8 w-auto min-w-[120px] gap-1.5 rounded-full border-border bg-card px-3 text-[12px] font-medium shadow-none">
+            <span className="text-muted-foreground">Status:</span>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -433,8 +433,8 @@ const MerchantMyDealsContent = () => {
         </Select>
 
         <Select value={activeDealType} onValueChange={(value) => setActiveDealType(value as DealTypeFilter)}>
-          <SelectTrigger className="h-8 w-auto min-w-[140px] gap-1.5 rounded-full border-neutral-200 bg-white px-3 text-[12px] font-medium shadow-none">
-            <span className="text-neutral-500">Type:</span>
+          <SelectTrigger className="h-8 w-auto min-w-[140px] gap-1.5 rounded-full border-border bg-card px-3 text-[12px] font-medium shadow-none">
+            <span className="text-muted-foreground">Type:</span>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -450,8 +450,8 @@ const MerchantMyDealsContent = () => {
         </Select>
 
         <Select value={activeCategory} onValueChange={(value) => setActiveCategory(value as CategoryFilter)}>
-          <SelectTrigger className="h-8 w-auto min-w-[160px] gap-1.5 rounded-full border-neutral-200 bg-white px-3 text-[12px] font-medium shadow-none">
-            <span className="text-neutral-500">Category:</span>
+          <SelectTrigger className="h-8 w-auto min-w-[160px] gap-1.5 rounded-full border-border bg-card px-3 text-[12px] font-medium shadow-none">
+            <span className="text-muted-foreground">Category:</span>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -472,13 +472,13 @@ const MerchantMyDealsContent = () => {
               setActiveDealType('all');
               setActiveCategory('all');
             }}
-            className="rounded-full px-2 py-1 text-[12px] font-semibold text-neutral-700 transition hover:text-neutral-950"
+            className="rounded-full px-2 py-1 text-[12px] font-semibold text-foreground transition hover:text-foreground"
           >
             Clear
           </button>
         )}
 
-        <span className="ml-auto text-[12px] text-neutral-500">
+        <span className="ml-auto text-[12px] text-muted-foreground">
           {filteredDeals.length} {filteredDeals.length === 1 ? 'deal' : 'deals'}
         </span>
       </div>
@@ -487,22 +487,22 @@ const MerchantMyDealsContent = () => {
       {isLoading ? (
         <DealsSkeleton />
       ) : error ? (
-        <div className="rounded-[1.25rem] border border-rose-200 bg-rose-50 p-6">
-          <p className="text-red-800">
+        <div className="rounded-[1.25rem] border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 p-6">
+          <p className="text-red-800 dark:text-red-300">
             Error loading deals. Please try again later.
           </p>
         </div>
       ) : filteredDeals.length === 0 ? (
         <div className={cn(panelClass, 'py-16 text-center')}>
-          <div className="mx-auto mb-4 h-16 w-16 text-neutral-300">
+          <div className="mx-auto mb-4 h-16 w-16 text-muted-foreground">
             <Tag className="h-16 w-16" />
           </div>
-          <h3 className="mb-2 text-[1.5rem] font-semibold tracking-tight text-neutral-900">
+          <h3 className="mb-2 text-[1.5rem] font-semibold tracking-tight text-foreground">
             {activeFilter === 'all' && activeDealType === 'all' && activeCategory === 'all'
               ? 'No deals yet'
               : 'No deals found with current filters'}
           </h3>
-          <p className="mx-auto mb-8 max-w-md text-[13px] leading-6 text-neutral-600 sm:text-sm">
+          <p className="mx-auto mb-8 max-w-md text-[13px] leading-6 text-muted-foreground sm:text-sm">
             {activeFilter === 'all' && activeDealType === 'all' && activeCategory === 'all'
               ? 'Create your first deal to start attracting customers and grow your business'
               : 'Try adjusting your filters to see your other deals, or create a new one.'}
@@ -511,13 +511,13 @@ const MerchantMyDealsContent = () => {
           {activeFilter === 'all' && activeDealType === 'all' && activeCategory === 'all' ? (
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to={PATHS.MERCHANT_DEALS_CREATE}>
-                <Button size="lg" className="rounded-full bg-neutral-950 px-5 text-white hover:bg-neutral-800">
+                <Button size="lg" className="rounded-full bg-foreground px-5 text-background hover:bg-foreground/85">
                   <Plus className="mr-2 h-4 w-4" />
                   Create Your First Deal
                 </Button>
               </Link>
               <Link to={PATHS.MERCHANT_HAPPY_HOUR_CREATE}>
-                <Button size="lg" variant="outline" className="rounded-full border-neutral-200 bg-white px-5 text-neutral-700 hover:bg-neutral-50">
+                <Button size="lg" variant="outline" className="rounded-full border-border bg-card px-5 text-foreground hover:bg-muted">
                   <ClockIcon className="mr-2 h-4 w-4" />
                   Quick Happy Hour
                 </Button>
@@ -531,12 +531,12 @@ const MerchantMyDealsContent = () => {
                   setActiveDealType('all');
                   setActiveCategory('all');
                 }}
-                className="rounded-full border border-neutral-200 px-6 py-3 font-medium text-neutral-700 transition hover:bg-neutral-50 hover:text-neutral-950"
+                className="rounded-full border border-border px-6 py-3 font-medium text-foreground transition hover:bg-muted hover:text-foreground"
               >
                 Clear Filters
               </button>
               <Link to={PATHS.MERCHANT_DEALS_CREATE}>
-                <Button size="lg" variant="outline" className="rounded-full border-neutral-200 bg-white px-5 text-neutral-700 hover:bg-neutral-50">
+                <Button size="lg" variant="outline" className="rounded-full border-border bg-card px-5 text-foreground hover:bg-muted">
                   <Plus className="mr-2 h-4 w-4" />
                   Create New Deal
                 </Button>
@@ -557,26 +557,26 @@ const MerchantMyDealsContent = () => {
             ))}
           </div>
 
-          <div className={cn(panelClass, 'mt-8 flex flex-col items-center justify-between gap-4 bg-gradient-to-r from-white via-white to-[#f6f7f9] p-5 sm:flex-row')}>
+          <div className={cn(panelClass, 'mt-8 flex flex-col items-center justify-between gap-4 bg-gradient-to-r from-card via-card to-muted dark:to-card dark:bg-none p-5 sm:flex-row')}>
             <div className="text-center sm:text-left">
-              <h4 className="text-[15px] font-semibold text-neutral-900">Need more deals?</h4>
-              <p className="text-[13px] text-neutral-500">Create different offer types to keep your storefront fresh.</p>
+              <h4 className="text-[15px] font-semibold text-foreground">Need more deals?</h4>
+              <p className="text-[13px] text-muted-foreground">Create different offer types to keep your storefront fresh.</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
               <Link to={PATHS.MERCHANT_DEALS_CREATE_STANDARD}>
-                <Button size="sm" className="rounded-full bg-neutral-950 px-4 text-white hover:bg-neutral-800">
+                <Button size="sm" className="rounded-full bg-foreground px-4 text-background hover:bg-foreground/85">
                   <Plus className="mr-1 h-3 w-3" />
                   Item Deal
                 </Button>
               </Link>
               <Link to={PATHS.MERCHANT_DEALS_CREATE_DAILY}>
-                <Button size="sm" variant="outline" className="rounded-full border-neutral-200 bg-white px-4 text-neutral-700 hover:bg-neutral-50">
+                <Button size="sm" variant="outline" className="rounded-full border-border bg-card px-4 text-foreground hover:bg-muted">
                   <Plus className="mr-1 h-3 w-3" />
                   Daily Deal
                 </Button>
               </Link>
               <Link to={PATHS.MERCHANT_HAPPY_HOUR_CREATE}>
-                <Button size="sm" variant="outline" className="rounded-full border-neutral-200 bg-white px-4 text-neutral-700 hover:bg-neutral-50">
+                <Button size="sm" variant="outline" className="rounded-full border-border bg-card px-4 text-foreground hover:bg-muted">
                   <ClockIcon className="mr-1 h-3 w-3" />
                   Happy Hour
                 </Button>
@@ -591,7 +591,7 @@ const MerchantMyDealsContent = () => {
         <Link to={PATHS.MERCHANT_DEALS_CREATE}>
           <Button
             size="lg"
-            className="h-14 w-14 rounded-full bg-neutral-950 shadow-lg transition-all duration-200 hover:bg-neutral-800 hover:shadow-xl"
+            className="h-14 w-14 rounded-full bg-foreground shadow-lg transition-all duration-200 hover:bg-foreground/85 hover:shadow-xl"
           >
             <Plus className="h-6 w-6" />
           </Button>
@@ -605,13 +605,13 @@ const MerchantMyDealsContent = () => {
           if (!open && !deleteMutation.isPending) setDealToDelete(null);
         }}
       >
-        <DialogContent className="sm:max-w-md border-neutral-200 bg-white text-neutral-800 p-0 overflow-hidden">
-          <DialogHeader className="p-6 pb-4 border-b border-neutral-100">
-            <DialogTitle className="text-lg font-bold text-neutral-900">Delete this deal?</DialogTitle>
-            <DialogDescription className="mt-1 text-sm text-neutral-500">
+        <DialogContent className="sm:max-w-md border-border bg-card text-foreground p-0 overflow-hidden">
+          <DialogHeader className="p-6 pb-4 border-b border-border">
+            <DialogTitle className="text-lg font-bold text-foreground">Delete this deal?</DialogTitle>
+            <DialogDescription className="mt-1 text-sm text-muted-foreground">
               {dealToDelete ? (
                 <>
-                  <span className="font-semibold text-neutral-900">"{dealToDelete.title}"</span> will be
+                  <span className="font-semibold text-foreground">"{dealToDelete.title}"</span> will be
                   permanently removed. This can't be undone.
                 </>
               ) : null}
@@ -622,7 +622,7 @@ const MerchantMyDealsContent = () => {
               type="button"
               onClick={() => setDealToDelete(null)}
               disabled={deleteMutation.isPending}
-              className="inline-flex h-9 items-center justify-center rounded-full border border-neutral-200 bg-white px-4 text-[13px] font-semibold text-neutral-700 transition hover:border-neutral-300 hover:bg-neutral-50 disabled:opacity-60"
+              className="inline-flex h-9 items-center justify-center rounded-full border border-border bg-card px-4 text-[13px] font-semibold text-foreground transition hover:border-border hover:bg-muted disabled:opacity-60"
             >
               Cancel
             </button>
@@ -630,7 +630,7 @@ const MerchantMyDealsContent = () => {
               type="button"
               onClick={() => dealToDelete && deleteMutation.mutate(dealToDelete.id)}
               disabled={deleteMutation.isPending}
-              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-neutral-900 px-4 text-[13px] font-semibold text-white transition hover:bg-neutral-800 disabled:opacity-70"
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-foreground px-4 text-[13px] font-semibold text-background transition hover:bg-foreground/85 disabled:opacity-70"
             >
               {deleteMutation.isPending ? (
                 <>

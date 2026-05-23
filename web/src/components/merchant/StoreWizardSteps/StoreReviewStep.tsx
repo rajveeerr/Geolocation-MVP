@@ -80,20 +80,20 @@ export const StoreReviewStep = ({ data, cities }: StoreReviewStepProps) => {
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-100">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-950/40">
           <CheckCircle className="h-8 w-8 text-purple-600" />
         </div>
-        <h2 className="text-2xl font-bold text-neutral-900">Review Your Store</h2>
-        <p className="mt-2 text-neutral-600">
+        <h2 className="text-2xl font-bold text-foreground">Review Your Store</h2>
+        <p className="mt-2 text-muted-foreground">
           Please review all the information before creating your store
         </p>
       </div>
 
       {/* Store Preview Card */}
-      <div className="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
+      <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
         <div className="bg-gradient-to-r from-brand-primary-500 to-brand-primary-600 p-6 text-white">
           <div className="flex items-start gap-4">
-            <div className="rounded-lg bg-white/20 p-3">
+            <div className="rounded-lg bg-card/20 dark:bg-card p-3">
               <Building2 className="h-6 w-6" />
             </div>
             <div className="flex-1">
@@ -104,7 +104,7 @@ export const StoreReviewStep = ({ data, cities }: StoreReviewStepProps) => {
               'px-3 py-1 rounded-full text-sm font-medium',
               data.active 
                 ? 'bg-green-500 text-white' 
-                : 'bg-neutral-500 text-white'
+                : 'bg-muted-foreground/50 text-white'
             )}>
               {data.active ? 'Active' : 'Inactive'}
             </div>
@@ -114,26 +114,26 @@ export const StoreReviewStep = ({ data, cities }: StoreReviewStepProps) => {
         <div className="p-6 space-y-6">
           {/* Contact Information */}
           <div>
-            <h4 className="text-sm font-semibold text-neutral-700 mb-3">Contact Information</h4>
+            <h4 className="text-sm font-semibold text-foreground mb-3">Contact Information</h4>
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <MapPin className="h-4 w-4 text-neutral-500" />
-                <span className="text-sm text-neutral-600">{data.address}</span>
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">{data.address}</span>
               </div>
               {selectedCity && (
                 <div className="flex items-center gap-3">
-                  <MapPin className="h-4 w-4 text-neutral-500" />
-                  <span className="text-sm text-neutral-600">{selectedCity.name}, {selectedCity.state}</span>
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">{selectedCity.name}, {selectedCity.state}</span>
                 </div>
               )}
               <div className="flex items-center gap-3">
-                <Phone className="h-4 w-4 text-neutral-500" />
-                <span className="text-sm text-neutral-600">{data.phoneNumber}</span>
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">{data.phoneNumber}</span>
               </div>
               {data.email && (
                 <div className="flex items-center gap-3">
-                  <Mail className="h-4 w-4 text-neutral-500" />
-                  <span className="text-sm text-neutral-600">{data.email}</span>
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">{data.email}</span>
                 </div>
               )}
             </div>
@@ -142,16 +142,16 @@ export const StoreReviewStep = ({ data, cities }: StoreReviewStepProps) => {
           {/* Location Details */}
           {data.latitude && data.longitude && (
             <div>
-              <h4 className="text-sm font-semibold text-neutral-700 mb-3">Location Details</h4>
-              <div className="rounded-lg bg-neutral-50 p-4">
+              <h4 className="text-sm font-semibold text-foreground mb-3">Location Details</h4>
+              <div className="rounded-lg bg-muted p-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-neutral-500">Latitude:</span>
-                    <span className="ml-2 font-mono text-neutral-700">{data.latitude.toFixed(6)}</span>
+                    <span className="text-muted-foreground">Latitude:</span>
+                    <span className="ml-2 font-mono text-foreground">{data.latitude.toFixed(6)}</span>
                   </div>
                   <div>
-                    <span className="text-neutral-500">Longitude:</span>
-                    <span className="ml-2 font-mono text-neutral-700">{data.longitude.toFixed(6)}</span>
+                    <span className="text-muted-foreground">Longitude:</span>
+                    <span className="ml-2 font-mono text-foreground">{data.longitude.toFixed(6)}</span>
                   </div>
                 </div>
               </div>
@@ -160,12 +160,12 @@ export const StoreReviewStep = ({ data, cities }: StoreReviewStepProps) => {
 
           {/* Business Hours */}
           <div>
-            <h4 className="text-sm font-semibold text-neutral-700 mb-3">Business Hours</h4>
+            <h4 className="text-sm font-semibold text-foreground mb-3">Business Hours</h4>
             <div className="space-y-2">
               {Object.entries(businessHours).map(([day, hours]) => (
                 <div key={day} className="flex items-center justify-between py-1">
-                  <span className="text-sm font-medium text-neutral-700 capitalize">{day}</span>
-                  <span className="text-sm text-neutral-600">{getDayStatus(day)}</span>
+                  <span className="text-sm font-medium text-foreground capitalize">{day}</span>
+                  <span className="text-sm text-muted-foreground">{getDayStatus(day)}</span>
                 </div>
               ))}
             </div>
@@ -174,7 +174,7 @@ export const StoreReviewStep = ({ data, cities }: StoreReviewStepProps) => {
           {/* Features */}
           {data.features && data.features.length > 0 && (
             <div>
-              <h4 className="text-sm font-semibold text-neutral-700 mb-3">Features & Amenities</h4>
+              <h4 className="text-sm font-semibold text-foreground mb-3">Features & Amenities</h4>
               <div className="flex flex-wrap gap-2">
                 {data.features.map((feature) => {
                   const Icon = FEATURE_ICONS[feature as keyof typeof FEATURE_ICONS];
@@ -194,34 +194,34 @@ export const StoreReviewStep = ({ data, cities }: StoreReviewStepProps) => {
           {/* Description */}
           {data.description && (
             <div>
-              <h4 className="text-sm font-semibold text-neutral-700 mb-3">Description</h4>
-              <p className="text-sm text-neutral-600 leading-relaxed">{data.description}</p>
+              <h4 className="text-sm font-semibold text-foreground mb-3">Description</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">{data.description}</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Customer Preview */}
-      <div className="rounded-lg border border-neutral-200 bg-white p-6">
-        <h4 className="text-sm font-semibold text-neutral-700 mb-4">How Your Store Will Appear to Customers</h4>
-        <div className="rounded-lg bg-neutral-50 p-4">
+      <div className="rounded-lg border border-border bg-card p-6">
+        <h4 className="text-sm font-semibold text-foreground mb-4">How Your Store Will Appear to Customers</h4>
+        <div className="rounded-lg bg-muted p-4">
           <div className="flex items-start gap-3">
-            <div className="w-12 h-12 rounded-lg bg-neutral-200 flex items-center justify-center">
-              <Building2 className="h-6 w-6 text-neutral-500" />
+            <div className="w-12 h-12 rounded-lg bg-accent flex items-center justify-center">
+              <Building2 className="h-6 w-6 text-muted-foreground" />
             </div>
             <div className="flex-1">
-              <h5 className="font-semibold text-neutral-900">{data.businessName}</h5>
-              <p className="text-sm text-neutral-600">{data.address}</p>
+              <h5 className="font-semibold text-foreground">{data.businessName}</h5>
+              <p className="text-sm text-muted-foreground">{data.address}</p>
               <div className="flex items-center gap-4 mt-2">
                 <div className="flex items-center gap-1">
-                  <Clock className="h-3 w-3 text-neutral-500" />
-                  <span className="text-xs text-neutral-500">
+                  <Clock className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">
                     {businessHours.monday.closed ? 'Closed' : `${formatTime(businessHours.monday.open)} - ${formatTime(businessHours.monday.close)}`}
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Phone className="h-3 w-3 text-neutral-500" />
-                  <span className="text-xs text-neutral-500">{data.phoneNumber}</span>
+                  <Phone className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">{data.phoneNumber}</span>
                 </div>
               </div>
             </div>
@@ -230,22 +230,22 @@ export const StoreReviewStep = ({ data, cities }: StoreReviewStepProps) => {
       </div>
 
       {/* Final Checklist */}
-      <div className="rounded-lg bg-green-50 border border-green-200 p-6">
-        <h4 className="text-sm font-semibold text-green-800 mb-3">Ready to Create!</h4>
+      <div className="rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50 p-6">
+        <h4 className="text-sm font-semibold text-green-800 dark:text-green-300 mb-3">Ready to Create!</h4>
         <div className="space-y-2 text-sm">
-          <div className="flex items-center gap-2 text-green-700">
+          <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
             <CheckCircle className="h-4 w-4" />
             <span>All required information is complete</span>
           </div>
-          <div className="flex items-center gap-2 text-green-700">
+          <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
             <CheckCircle className="h-4 w-4" />
             <span>Location has been verified</span>
           </div>
-          <div className="flex items-center gap-2 text-green-700">
+          <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
             <CheckCircle className="h-4 w-4" />
             <span>Business hours are set</span>
           </div>
-          <div className="flex items-center gap-2 text-green-700">
+          <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
             <CheckCircle className="h-4 w-4" />
             <span>Store is ready to receive customers</span>
           </div>

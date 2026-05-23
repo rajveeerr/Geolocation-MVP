@@ -141,7 +141,7 @@ export const HappyHourItemDiscountEditor = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 p-4"
       onClick={onClose}
     >
       <motion.div
@@ -149,22 +149,22 @@ export const HappyHourItemDiscountEditor = ({
         animate={{ scale: 1 }}
         exit={{ scale: 0.95 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+        className="w-full max-w-md rounded-2xl bg-card p-6 shadow-xl"
       >
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-neutral-900">Edit Discount: {item.name}</h3>
+          <h3 className="text-lg font-semibold text-foreground">Edit Discount: {item.name}</h3>
           <button
             onClick={onClose}
-            className="rounded-full p-1 hover:bg-neutral-100 transition-colors"
+            className="rounded-full p-1 hover:bg-muted transition-colors"
           >
-            <X className="h-5 w-5 text-neutral-500" />
+            <X className="h-5 w-5 text-muted-foreground" />
           </button>
         </div>
 
         <div className="space-y-4">
           {/* Discount Type Selection */}
           <div>
-            <Label className="text-sm font-medium text-neutral-700 mb-2 block">Discount Type</Label>
+            <Label className="text-sm font-medium text-foreground mb-2 block">Discount Type</Label>
             <div className="grid grid-cols-2 gap-2">
               {[
                 { type: 'global' as DiscountType, label: 'Use Global', icon: Tag },
@@ -177,7 +177,7 @@ export const HappyHourItemDiscountEditor = ({
                     'flex items-center gap-2 rounded-lg border-2 p-3 text-sm font-medium transition-all',
                     discountType === type
                       ? 'border-brand-primary-500 bg-brand-primary-50 text-brand-primary-700'
-                      : 'border-neutral-200 bg-white text-neutral-600 hover:border-brand-primary-300'
+                      : 'border-border bg-card text-muted-foreground hover:border-brand-primary-300'
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -200,7 +200,7 @@ export const HappyHourItemDiscountEditor = ({
                   {customDiscount}% off · save ${(item.price - priceCalculation.finalPrice).toFixed(2)}
                 </span>
               </div>
-              <div className="mt-2 rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="mt-2 rounded-xl border border-border bg-card p-3">
                 <AmountSlider
                   value={customDiscount}
                   onChange={setCustomDiscount}
@@ -215,24 +215,24 @@ export const HappyHourItemDiscountEditor = ({
           )}
 
           {/* Price Preview */}
-          <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+          <div className="rounded-lg border border-border bg-muted p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-neutral-600">Original Price</p>
-                <p className="text-lg font-semibold text-neutral-900">${item.price.toFixed(2)}</p>
+                <p className="text-sm text-muted-foreground">Original Price</p>
+                <p className="text-lg font-semibold text-foreground">${item.price.toFixed(2)}</p>
               </div>
               <div className="text-right">
-                <p className="text-sm text-neutral-600">Final Price</p>
+                <p className="text-sm text-muted-foreground">Final Price</p>
                 <p className={cn(
                   "text-lg font-semibold",
-                  priceCalculation.finalPrice < item.price ? "text-green-600" : "text-neutral-900"
+                  priceCalculation.finalPrice < item.price ? "text-green-600" : "text-foreground"
                 )}>
                   ${priceCalculation.finalPrice.toFixed(2)}
                 </p>
               </div>
             </div>
             {priceCalculation.discountPercent > 0 && (
-              <div className="mt-2 pt-2 border-t border-neutral-200">
+              <div className="mt-2 pt-2 border-t border-border">
                 <p className="text-sm text-green-600 font-medium">
                   {priceCalculation.description} • Save ${(item.price - priceCalculation.finalPrice).toFixed(2)}
                 </p>

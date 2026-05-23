@@ -23,14 +23,14 @@ function StatCard({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm"
+      className="rounded-xl border border-border bg-card p-5 shadow-sm"
     >
       <div className={cn('mb-3 inline-flex rounded-lg p-2', color)}>
         <Icon className="h-5 w-5" />
       </div>
-      <p className="text-2xl font-bold text-neutral-900">{value}</p>
-      <p className="mt-0.5 text-sm font-medium text-neutral-600">{label}</p>
-      {sub && <p className="mt-0.5 text-xs text-neutral-400">{sub}</p>}
+      <p className="text-2xl font-bold text-foreground">{value}</p>
+      <p className="mt-0.5 text-sm font-medium text-muted-foreground">{label}</p>
+      {sub && <p className="mt-0.5 text-xs text-muted-foreground">{sub}</p>}
     </motion.div>
   );
 }
@@ -50,7 +50,7 @@ function SurpriseAnalyticsContent() {
   if (error || !data) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-8">
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-4 text-sm text-red-700 dark:text-red-300">
           {(error as Error)?.message ?? 'Failed to load analytics'}
         </div>
       </div>
@@ -72,8 +72,8 @@ function SurpriseAnalyticsContent() {
 
       {/* Header */}
       <div className="mt-4">
-        <h1 className="text-2xl font-bold text-neutral-900">{deal.title}</h1>
-        <p className="mt-0.5 text-sm text-neutral-500">
+        <h1 className="text-2xl font-bold text-foreground">{deal.title}</h1>
+        <p className="mt-0.5 text-sm text-muted-foreground">
           {new Date(deal.startTime).toLocaleDateString()} — {new Date(deal.endTime).toLocaleDateString()} ·{' '}
           <span className="font-medium">{deal.surpriseType.replace('_', ' ')}</span>
         </p>
@@ -85,19 +85,19 @@ function SurpriseAnalyticsContent() {
           icon={Eye}
           label="Total Reveals"
           value={analytics.totalReveals}
-          color="bg-blue-100 text-blue-600"
+          color="bg-blue-100 dark:bg-blue-950/40 text-blue-600"
         />
         <StatCard
           icon={ShoppingBag}
           label="Total Redeemed"
           value={analytics.totalRedeemed}
-          color="bg-green-100 text-green-600"
+          color="bg-green-100 dark:bg-green-950/40 text-green-600"
         />
         <StatCard
           icon={TrendingUp}
           label="Conversion Rate"
           value={analytics.conversionRate}
-          color="bg-purple-100 text-purple-600"
+          color="bg-purple-100 dark:bg-purple-950/40 text-purple-600"
         />
         <StatCard
           icon={Layers}
@@ -112,21 +112,21 @@ function SurpriseAnalyticsContent() {
               ? `${analytics.slotsRemaining} remaining`
               : 'Unlimited slots'
           }
-          color="bg-orange-100 text-orange-600"
+          color="bg-orange-100 dark:bg-orange-950/40 text-orange-600"
         />
       </div>
 
       {/* Recent reveals */}
       {recentReveals.length > 0 && (
         <div className="mt-8">
-          <h2 className="mb-4 text-lg font-bold text-neutral-900">Recent Reveals</h2>
-          <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
+          <h2 className="mb-4 text-lg font-bold text-foreground">Recent Reveals</h2>
+          <div className="overflow-hidden rounded-xl border border-border bg-card">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-neutral-100 bg-neutral-50">
-                  <th className="px-4 py-3 text-left font-semibold text-neutral-600">Revealed At</th>
-                  <th className="px-4 py-3 text-left font-semibold text-neutral-600">Status</th>
-                  <th className="px-4 py-3 text-left font-semibold text-neutral-600">Redeemed At</th>
+                <tr className="border-b border-border bg-muted">
+                  <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Revealed At</th>
+                  <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Status</th>
+                  <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Redeemed At</th>
                 </tr>
               </thead>
               <tbody>
@@ -137,13 +137,13 @@ function SurpriseAnalyticsContent() {
                     animate={{ opacity: 1 }}
                     transition={{ delay: i * 0.03 }}
                     className={cn(
-                      'border-b border-neutral-50',
-                      i % 2 === 0 ? 'bg-white' : 'bg-neutral-50/50',
+                      'border-b border-border',
+                      i % 2 === 0 ? 'bg-card' : 'bg-muted/50',
                     )}
                   >
-                    <td className="px-4 py-3 text-neutral-700">
+                    <td className="px-4 py-3 text-foreground">
                       <span className="flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5 text-neutral-400" />
+                        <Clock className="h-3.5 w-3.5 text-muted-foreground" />
                         {new Date(reveal.revealedAt).toLocaleString()}
                       </span>
                     </td>
@@ -152,14 +152,14 @@ function SurpriseAnalyticsContent() {
                         className={cn(
                           'rounded-full px-2.5 py-0.5 text-xs font-semibold',
                           reveal.redeemed
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-amber-100 text-amber-700',
+                            ? 'bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-300'
+                            : 'bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300',
                         )}
                       >
                         {reveal.redeemed ? 'Redeemed' : 'Revealed only'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-neutral-500">
+                    <td className="px-4 py-3 text-muted-foreground">
                       {reveal.redeemedAt
                         ? new Date(reveal.redeemedAt).toLocaleString()
                         : '—'}

@@ -27,13 +27,13 @@ export const StoreHoursStep = ({ data, onUpdate, mode }: Props) => {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-neutral-900">{mode === 'weekday' ? 'Set weekday hours' : 'Set weekend hours'}</h2>
-        <p className="mt-2 text-neutral-600">{mode === 'weekday' ? 'Mon-Fri. Weekend next.' : 'Sat-Sun.'}</p>
+        <h2 className="text-2xl font-bold text-foreground">{mode === 'weekday' ? 'Set weekday hours' : 'Set weekend hours'}</h2>
+        <p className="mt-2 text-muted-foreground">{mode === 'weekday' ? 'Mon-Fri. Weekend next.' : 'Sat-Sun.'}</p>
       </div>
       {mode === 'weekend' && (
-        <button type="button" onClick={copy} className="flex w-full items-center gap-4 rounded-xl border-2 border-neutral-200 p-4 text-left hover:bg-neutral-50">
+        <button type="button" onClick={copy} className="flex w-full items-center gap-4 rounded-xl border-2 border-border p-4 text-left hover:bg-muted">
           <span className="text-2xl">📋</span>
-          <div><p className="font-semibold">Same as weekdays</p><p className="text-sm text-neutral-500">Copy Mon-Fri</p></div>
+          <div><p className="font-semibold">Same as weekdays</p><p className="text-sm text-muted-foreground">Copy Mon-Fri</p></div>
         </button>
       )}
       <div className="space-y-4">
@@ -61,7 +61,7 @@ export const StoreHoursStep = ({ data, onUpdate, mode }: Props) => {
                     <select value={h.open} onChange={(e)=>{const u={...data.businessHours,[key]:{...h,open:e.target.value}};onUpdate({businessHours:u});}} className="rounded border px-3 py-2 text-sm">
                       {TIMES.map((t)=><option key={t} value={t}>{t}</option>)}
                     </select>
-                    <span className="text-neutral-400">to</span>
+                    <span className="text-muted-foreground">to</span>
                     <select value={h.close} onChange={(e)=>{const u={...data.businessHours,[key]:{...h,close:e.target.value}};onUpdate({businessHours:u});}} className="rounded border px-3 py-2 text-sm">
                       {TIMES.map((t)=><option key={t} value={t}>{t}</option>)}
                     </select>

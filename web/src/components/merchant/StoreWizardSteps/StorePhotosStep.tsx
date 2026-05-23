@@ -25,8 +25,8 @@ export const StorePhotosStep = ({ data, onUpdate }: StorePhotosStepProps) => {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-neutral-900">Add photos of this location</h2>
-        <p className="mt-2 text-neutral-600">
+        <h2 className="text-2xl font-bold text-foreground">Add photos of this location</h2>
+        <p className="mt-2 text-muted-foreground">
           Photos help customers find you and get excited about your deals. You can add more later.
         </p>
       </div>
@@ -44,7 +44,7 @@ export const StorePhotosStep = ({ data, onUpdate }: StorePhotosStepProps) => {
                 <button
                   type="button"
                   onClick={() => remove(i)}
-                  className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                  className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-foreground/60 text-background opacity-0 transition-opacity group-hover:opacity-100"
                   aria-label="Remove"
                 >
                   <X className="h-3 w-3" />
@@ -57,7 +57,7 @@ export const StorePhotosStep = ({ data, onUpdate }: StorePhotosStepProps) => {
       <button
         type="button"
         onClick={() => setModalOpen(true)}
-        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-neutral-300 py-8 text-neutral-600 transition-colors hover:border-neutral-400 hover:bg-neutral-50"
+        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border py-8 text-muted-foreground transition-colors hover:border-border hover:bg-muted"
       >
         <Plus className="h-6 w-6" />
         Add photo or video

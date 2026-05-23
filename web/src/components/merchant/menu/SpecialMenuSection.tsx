@@ -46,7 +46,7 @@ export const SpecialMenuSection: React.FC<SpecialMenuSectionProps> = ({
           <span className="text-lg">🎉</span>
           Special Event Menus
         </h3>
-        <p className="text-sm text-neutral-500 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Create themed menus for holidays and special occasions
         </p>
       </div>
@@ -62,7 +62,7 @@ export const SpecialMenuSection: React.FC<SpecialMenuSectionProps> = ({
         }}
         className={cn(
           'w-full flex items-center gap-4 rounded-2xl p-5',
-          'bg-white border border-neutral-200 shadow-xs',
+          'bg-card border border-border shadow-xs',
           'hover:border-brand/30 hover:shadow-md',
           'transition-all duration-200 text-left'
         )}
@@ -71,15 +71,15 @@ export const SpecialMenuSection: React.FC<SpecialMenuSectionProps> = ({
           <Sparkles className="h-6 w-6 text-white" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-neutral-900">Create Event Menu</p>
-          <p className="text-xs text-neutral-400 mt-0.5">Custom theme menu</p>
+          <p className="text-sm font-bold text-foreground">Create Event Menu</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Custom theme menu</p>
         </div>
-        <Plus className="h-5 w-5 text-neutral-400" />
+        <Plus className="h-5 w-5 text-muted-foreground" />
       </button>
 
       {/* Popular Themes */}
       <div>
-        <h4 className="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-3">
+        <h4 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
           Popular Themes:
         </h4>
         <div className="flex flex-wrap gap-2">
@@ -90,9 +90,9 @@ export const SpecialMenuSection: React.FC<SpecialMenuSectionProps> = ({
               onClick={() => handleThemeClick(theme)}
               className={cn(
                 'flex items-center gap-2 rounded-full px-4 py-2',
-                'bg-white border border-neutral-200 shadow-xs',
+                'bg-card border border-border shadow-xs',
                 'hover:border-brand/30 hover:bg-brand-subtle hover:shadow-sm',
-                'transition-all duration-150 text-sm font-medium text-neutral-700 hover:text-brand'
+                'transition-all duration-150 text-sm font-medium text-foreground hover:text-brand'
               )}
             >
               <span className="text-base leading-none">{theme.icon}</span>
@@ -106,9 +106,9 @@ export const SpecialMenuSection: React.FC<SpecialMenuSectionProps> = ({
             onClick={() => setShowCustomInput(true)}
             className={cn(
               'flex items-center gap-2 rounded-full px-4 py-2',
-              'bg-neutral-50 border border-dashed border-neutral-300',
+              'bg-muted border border-dashed border-border',
               'hover:border-brand/30 hover:bg-brand-subtle hover:text-brand',
-              'transition-all duration-150 text-sm font-medium text-neutral-500'
+              'transition-all duration-150 text-sm font-medium text-muted-foreground'
             )}
           >
             <Plus className="h-3.5 w-3.5" />
@@ -123,7 +123,7 @@ export const SpecialMenuSection: React.FC<SpecialMenuSectionProps> = ({
               value={customTheme}
               onChange={(e) => setCustomTheme(e.target.value)}
               placeholder="Enter theme name (e.g. Sushi Night)"
-              className="bg-white border-neutral-200 text-neutral-800 placeholder:text-neutral-400 focus-visible:ring-brand/30"
+              className="bg-card border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-brand/30"
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleCustomCreate();

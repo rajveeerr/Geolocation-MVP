@@ -14,19 +14,19 @@ export const AccordionSection = ({ title, defaultOpen = false, completed, childr
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="rounded-2xl border border-neutral-200">
+    <div className="rounded-2xl border border-border">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center justify-between px-6 py-4 text-left"
       >
-        <span className="flex items-center gap-2 text-sm font-semibold text-neutral-700">
+        <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
           {title}
           {completed && <CheckCircle2 className="h-4 w-4 text-brand-primary-500" />}
         </span>
         <ChevronDown
           className={cn(
-            'h-5 w-5 text-neutral-400 transition-transform duration-200',
+            'h-5 w-5 text-muted-foreground transition-transform duration-200',
             open && 'rotate-180'
           )}
         />

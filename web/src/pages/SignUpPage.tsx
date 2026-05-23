@@ -63,8 +63,8 @@ export const SignUpPage = () => {
       <title>Sign Up | Yohop</title>
       <meta name="description" content="Create an account on Yohop to find local deals and earn rewards by checking in to merchants." />
 
-      <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-neutral-50 px-4 py-12 sm:py-16">
-        <div className="w-full max-w-[1040px] grid grid-cols-1 lg:grid-cols-2 rounded-3xl overflow-hidden shadow-xl bg-white">
+      <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-muted px-4 py-12 sm:py-16">
+        <div className="w-full max-w-[1040px] grid grid-cols-1 lg:grid-cols-2 rounded-3xl overflow-hidden shadow-xl bg-card">
 
           {/* ── LEFT PANEL: Hero illustration ── */}
           <div className="relative hidden lg:flex flex-col justify-between bg-gradient-to-b from-[#c4a882] via-[#b8997a] to-[#a08568] p-10 text-white overflow-hidden min-h-[700px]">
@@ -100,10 +100,10 @@ export const SignUpPage = () => {
           {/* ── RIGHT PANEL: Signup form ── */}
           <div className="flex flex-col justify-center px-8 py-10 sm:px-12 lg:px-14 overflow-y-auto max-h-[90vh]">
             <div className="max-w-sm mx-auto w-full">
-              <h1 className="text-3xl sm:text-[2rem] font-black text-neutral-900 tracking-tight">
+              <h1 className="text-3xl sm:text-[2rem] font-black text-foreground tracking-tight">
                 Create Account
               </h1>
-              <p className="mt-2 text-neutral-500 text-[15px]">
+              <p className="mt-2 text-muted-foreground text-[15px]">
                 Start your journey to <span className="text-brand-primary-main font-semibold">find deals</span> and earn rewards.
               </p>
 
@@ -112,7 +112,7 @@ export const SignUpPage = () => {
                 <button
                   type="button"
                   onClick={() => handleSocialLogin('google')}
-                  className="flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 transition-colors text-sm font-medium text-neutral-700"
+                  className="flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border border-border bg-card hover:bg-muted transition-colors text-sm font-medium text-foreground"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
@@ -125,7 +125,7 @@ export const SignUpPage = () => {
                 <button
                   type="button"
                   onClick={() => handleSocialLogin('apple')}
-                  className="flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 transition-colors text-sm font-medium text-neutral-700"
+                  className="flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border border-border bg-card hover:bg-muted transition-colors text-sm font-medium text-foreground"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
@@ -137,10 +137,10 @@ export const SignUpPage = () => {
               {/* Divider */}
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-neutral-200" />
+                  <div className="w-full border-t border-border" />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-white px-4 text-xs font-medium text-neutral-400 uppercase tracking-widest">
+                  <span className="bg-card px-4 text-xs font-medium text-muted-foreground uppercase tracking-widest">
                     Or continue with email
                   </span>
                 </div>
@@ -155,14 +155,14 @@ export const SignUpPage = () => {
                       name="firstName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                          <FormLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                             First Name
                           </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="First name"
                               {...field}
-                              className="h-11 rounded-xl border-neutral-200 bg-neutral-50 px-4 text-sm placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white focus:ring-1 focus:ring-neutral-300 transition-all"
+                              className="h-11 rounded-xl border-border bg-muted px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:bg-card focus:ring-1 focus:ring-ring transition-all"
                             />
                           </FormControl>
                           <FormMessage />
@@ -174,14 +174,14 @@ export const SignUpPage = () => {
                       name="lastName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                          <FormLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                             Last Name
                           </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Last name"
                               {...field}
-                              className="h-11 rounded-xl border-neutral-200 bg-neutral-50 px-4 text-sm placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white focus:ring-1 focus:ring-neutral-300 transition-all"
+                              className="h-11 rounded-xl border-border bg-muted px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:bg-card focus:ring-1 focus:ring-ring transition-all"
                             />
                           </FormControl>
                           <FormMessage />
@@ -195,7 +195,7 @@ export const SignUpPage = () => {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                        <FormLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                           Email Address
                         </FormLabel>
                         <FormControl>
@@ -203,7 +203,7 @@ export const SignUpPage = () => {
                             type="email"
                             placeholder="name@email.com"
                             {...field}
-                            className="h-11 rounded-xl border-neutral-200 bg-neutral-50 px-4 text-sm placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white focus:ring-1 focus:ring-neutral-300 transition-all"
+                            className="h-11 rounded-xl border-border bg-muted px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:bg-card focus:ring-1 focus:ring-ring transition-all"
                           />
                         </FormControl>
                         <FormMessage />
@@ -216,7 +216,7 @@ export const SignUpPage = () => {
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                        <FormLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                           Phone Number
                         </FormLabel>
                         <FormControl>
@@ -224,7 +224,7 @@ export const SignUpPage = () => {
                             type="tel"
                             placeholder="+1 (555) 000-0000"
                             {...field}
-                            className="h-11 rounded-xl border-neutral-200 bg-neutral-50 px-4 text-sm placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white focus:ring-1 focus:ring-neutral-300 transition-all"
+                            className="h-11 rounded-xl border-border bg-muted px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:bg-card focus:ring-1 focus:ring-ring transition-all"
                           />
                         </FormControl>
                         <FormMessage />
@@ -237,7 +237,7 @@ export const SignUpPage = () => {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                        <FormLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                           Password
                         </FormLabel>
                         <FormControl>
@@ -246,18 +246,18 @@ export const SignUpPage = () => {
                               type={showPassword ? 'text' : 'password'}
                               placeholder="Create a password"
                               {...field}
-                              className="h-11 rounded-xl border-neutral-200 bg-neutral-50 px-4 pr-12 text-sm placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white focus:ring-1 focus:ring-neutral-300 transition-all"
+                              className="h-11 rounded-xl border-border bg-muted px-4 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:bg-card focus:ring-1 focus:ring-ring transition-all"
                             />
                             <button
                               type="button"
                               onClick={() => setShowPassword(!showPassword)}
-                              className="absolute inset-y-0 right-0 flex items-center pr-4 text-neutral-400 hover:text-neutral-600 transition-colors"
+                              className="absolute inset-y-0 right-0 flex items-center pr-4 text-muted-foreground hover:text-muted-foreground transition-colors"
                             >
                               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                           </div>
                         </FormControl>
-                        <FormDescription className="text-[11px] text-neutral-400">
+                        <FormDescription className="text-[11px] text-muted-foreground">
                           8+ characters with uppercase, lowercase, number & special char.
                         </FormDescription>
                         <FormMessage />
@@ -270,7 +270,7 @@ export const SignUpPage = () => {
                     name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                        <FormLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                           Confirm Password
                         </FormLabel>
                         <FormControl>
@@ -279,12 +279,12 @@ export const SignUpPage = () => {
                               type={showConfirmPassword ? 'text' : 'password'}
                               placeholder="Confirm your password"
                               {...field}
-                              className="h-11 rounded-xl border-neutral-200 bg-neutral-50 px-4 pr-12 text-sm placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white focus:ring-1 focus:ring-neutral-300 transition-all"
+                              className="h-11 rounded-xl border-border bg-muted px-4 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:bg-card focus:ring-1 focus:ring-ring transition-all"
                             />
                             <button
                               type="button"
                               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                              className="absolute inset-y-0 right-0 flex items-center pr-4 text-neutral-400 hover:text-neutral-600 transition-colors"
+                              className="absolute inset-y-0 right-0 flex items-center pr-4 text-muted-foreground hover:text-muted-foreground transition-colors"
                             >
                               {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
@@ -300,14 +300,14 @@ export const SignUpPage = () => {
                     name="referralCode"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
-                          Referral Code <span className="text-neutral-400 normal-case font-normal">(optional)</span>
+                        <FormLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                          Referral Code <span className="text-muted-foreground normal-case font-normal">(optional)</span>
                         </FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Enter referral code"
                             {...field}
-                            className="h-11 rounded-xl border-neutral-200 bg-neutral-50 px-4 text-sm placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white focus:ring-1 focus:ring-neutral-300 transition-all"
+                            className="h-11 rounded-xl border-border bg-muted px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:bg-card focus:ring-1 focus:ring-ring transition-all"
                           />
                         </FormControl>
                         <FormMessage />
@@ -321,9 +321,9 @@ export const SignUpPage = () => {
                       name="terms"
                       type="checkbox"
                       required
-                      className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-[#1a1a2e] focus:ring-neutral-400"
+                      className="mt-0.5 h-4 w-4 rounded border-border text-foreground focus:ring-ring"
                     />
-                    <label htmlFor="terms" className="text-xs text-neutral-500 leading-relaxed">
+                    <label htmlFor="terms" className="text-xs text-muted-foreground leading-relaxed">
                       I agree to the{' '}
                       <Link to={PATHS.TERMS} className="font-semibold text-brand-primary-main hover:text-brand-primary-dark">
                         Terms of Service
@@ -339,7 +339,7 @@ export const SignUpPage = () => {
                     type="submit"
                     variant="primary"
                     size="lg"
-                    className="w-full h-12 rounded-xl text-sm font-bold bg-[#1a1a2e] hover:bg-[#16162a] text-white mt-1"
+                    className="w-full h-12 rounded-xl text-sm font-bold bg-foreground hover:bg-foreground/85 text-background mt-1"
                     disabled={isSigningUp}
                   >
                     {isSigningUp ? (
@@ -351,7 +351,7 @@ export const SignUpPage = () => {
                 </form>
               </Form>
 
-              <p className="mt-6 text-center text-sm text-neutral-500">
+              <p className="mt-6 text-center text-sm text-muted-foreground">
                 Already have an account?{' '}
                 <Link
                   to={PATHS.LOGIN}

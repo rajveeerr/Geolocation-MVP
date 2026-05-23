@@ -122,7 +122,7 @@ export const DealImageUpload = ({
                   <X className="h-4 w-4" />
                 </Button>
                 {dealImageUploadMutation.isPending && (
-                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
+                  <div className="absolute inset-0 bg-foreground/50 flex items-center justify-center rounded-lg">
                     <Loader2 className="h-8 w-8 animate-spin text-white" />
                   </div>
                 )}
@@ -147,7 +147,7 @@ export const DealImageUpload = ({
               className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                 dragActive 
                   ? 'border-primary bg-primary/5' 
-                  : 'border-gray-300 hover:border-gray-400'
+                  : 'border-border hover:border-border'
               }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
@@ -155,15 +155,15 @@ export const DealImageUpload = ({
               onDrop={handleDrop}
             >
               <div className="space-y-4">
-                <div className="mx-auto w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                  <ImageIcon className="h-6 w-6 text-gray-400" />
+                <div className="mx-auto w-12 h-12 bg-muted rounded-full flex items-center justify-center">
+                  <ImageIcon className="h-6 w-6 text-muted-foreground" />
                 </div>
                 
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900">
+                  <h3 className="text-lg font-medium text-foreground">
                     Upload Deal Image
                   </h3>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Drag and drop an image here, or click to select
                   </p>
                 </div>
@@ -184,7 +184,7 @@ export const DealImageUpload = ({
                   </Button>
                 </div>
 
-                <div className="text-xs text-gray-400 space-y-1">
+                <div className="text-xs text-muted-foreground space-y-1">
                   <p>Supported formats: JPG, PNG, GIF</p>
                   <p>Max file size: 5MB</p>
                   <p>Recommended size: 800x600px</p>
@@ -202,9 +202,9 @@ export const DealImageUpload = ({
           />
 
           {dealImageUploadMutation.isError && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+            <div className="mt-4 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-lg flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-red-500" />
-              <span className="text-sm text-red-700">
+              <span className="text-sm text-red-700 dark:text-red-300">
                 Failed to upload image. Please try again.
               </span>
             </div>

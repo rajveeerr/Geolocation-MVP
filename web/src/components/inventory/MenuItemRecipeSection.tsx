@@ -77,7 +77,7 @@ const MenuItemRecipeSection = forwardRef<MenuItemRecipeSectionHandle, Props>(
     };
 
     return (
-      <div className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+      <div className="space-y-4 rounded-lg border border-border bg-accent/50 p-4">
         <div className="flex items-start gap-2.5">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand/10">
             <ChefHat className="h-5 w-5 text-brand" />
@@ -93,9 +93,9 @@ const MenuItemRecipeSection = forwardRef<MenuItemRecipeSectionHandle, Props>(
         </div>
 
         {ingredientsQuery.isLoading ? (
-          <p className="text-sm text-neutral-500">Loading ingredients…</p>
+          <p className="text-sm text-muted-foreground">Loading ingredients…</p>
         ) : ingredients.length === 0 ? (
-          <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">
+          <div className="flex items-start gap-2 rounded-lg border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/30 px-3 py-2 text-sm text-amber-700 dark:text-amber-300">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
             <span>
               No ingredients tracked yet. Add ingredients from the{' '}
@@ -108,16 +108,16 @@ const MenuItemRecipeSection = forwardRef<MenuItemRecipeSectionHandle, Props>(
         ) : (
           <>
             {drafts.length === 0 && (
-              <p className="text-sm text-neutral-500">No ingredients linked yet.</p>
+              <p className="text-sm text-muted-foreground">No ingredients linked yet.</p>
             )}
 
             <div className="space-y-2">
               {drafts.map((d) => (
                 <div
                   key={d.ingredientId}
-                  className="flex items-center gap-2 rounded-lg bg-white px-3 py-2 ring-1 ring-neutral-200"
+                  className="flex items-center gap-2 rounded-lg bg-card px-3 py-2 ring-1 ring-neutral-200"
                 >
-                  <span className="flex-1 truncate text-sm font-medium text-neutral-800">
+                  <span className="flex-1 truncate text-sm font-medium text-foreground">
                     {d.ingredientName}
                   </span>
                   <input
@@ -126,13 +126,13 @@ const MenuItemRecipeSection = forwardRef<MenuItemRecipeSectionHandle, Props>(
                     min="0"
                     value={d.quantityPerUnit}
                     onChange={(e) => updateQty(d.ingredientId, Number(e.target.value) || 0)}
-                    className="w-20 rounded-md border border-neutral-200 px-2 py-1 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                    className="w-20 rounded-md border border-border px-2 py-1 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
                   />
-                  <span className="text-xs text-neutral-500">{d.ingredientUnit || 'unit'}/item</span>
+                  <span className="text-xs text-muted-foreground">{d.ingredientUnit || 'unit'}/item</span>
                   <button
                     type="button"
                     onClick={() => removeLink(d.ingredientId)}
-                    className="rounded-full p-1 text-neutral-400 transition hover:bg-red-50 hover:text-red-500"
+                    className="rounded-full p-1 text-muted-foreground transition hover:bg-red-50 dark:bg-red-950/30 hover:text-red-500"
                     title="Remove ingredient from recipe"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -143,7 +143,7 @@ const MenuItemRecipeSection = forwardRef<MenuItemRecipeSectionHandle, Props>(
 
             {availableIngredients.length > 0 && (
               <div className="flex items-center gap-2">
-                <Plus className="h-4 w-4 text-neutral-400" />
+                <Plus className="h-4 w-4 text-muted-foreground" />
                 <select
                   value=""
                   onChange={(e) => {
@@ -152,7 +152,7 @@ const MenuItemRecipeSection = forwardRef<MenuItemRecipeSectionHandle, Props>(
                     if (ing) addLink(ing);
                   }}
                   className={cn(
-                    'flex-1 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20',
+                    'flex-1 rounded-lg border border-border bg-card px-3 py-1.5 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20',
                   )}
                 >
                   <option value="">Add an ingredient to this recipe…</option>

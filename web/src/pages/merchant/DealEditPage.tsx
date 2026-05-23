@@ -18,10 +18,10 @@ export const DealEditPage = () => {
   if (error || !deal) {
     return (
       <div className="container mx-auto max-w-4xl px-4 py-12">
-        <div className="rounded-xl border border-red-200 bg-red-50 p-8 text-center">
+        <div className="rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-8 text-center">
           <AlertCircle className="mx-auto h-12 w-12 text-red-600 mb-4" />
-          <h2 className="text-2xl font-bold text-red-900 mb-2">Deal Not Found</h2>
-          <p className="text-red-700 mb-6">
+          <h2 className="text-2xl font-bold text-red-900 dark:text-red-200 mb-2">Deal Not Found</h2>
+          <p className="text-red-700 dark:text-red-300 mb-6">
             We couldn't find the deal you're trying to edit.
           </p>
           <Button onClick={() => navigate('/merchant/deals')} variant="outline">
@@ -45,18 +45,18 @@ export const DealEditPage = () => {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900">Edit Deal</h1>
-          <p className="text-neutral-600 mt-1">{deal.title}</p>
+          <h1 className="text-3xl font-bold text-foreground">Edit Deal</h1>
+          <p className="text-muted-foreground mt-1">{deal.title}</p>
         </div>
       </div>
 
       {/* Info Card */}
-      <div className="rounded-xl border border-amber-200 bg-amber-50 p-6 mb-6">
+      <div className="rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/30 p-6 mb-6">
         <div className="flex items-start gap-3">
           <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <h3 className="font-semibold text-amber-900 mb-2">Edit Feature Coming Soon</h3>
-            <p className="text-sm text-amber-800">
+            <h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">Edit Feature Coming Soon</h3>
+            <p className="text-sm text-amber-800 dark:text-amber-300">
               Deal editing functionality is currently under development. For now, you can view your deal details below.
               To make changes, please create a new deal or contact support.
             </p>
@@ -65,34 +65,34 @@ export const DealEditPage = () => {
       </div>
 
       {/* Deal Details Preview */}
-      <div className="rounded-xl border border-neutral-200 bg-white p-6">
-        <h2 className="text-xl font-semibold text-neutral-900 mb-4">Deal Details</h2>
+      <div className="rounded-xl border border-border bg-card p-6">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Deal Details</h2>
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-neutral-600">Title</label>
-            <p className="text-neutral-900 mt-1">{deal.title}</p>
+            <label className="text-sm font-medium text-muted-foreground">Title</label>
+            <p className="text-foreground mt-1">{deal.title}</p>
           </div>
           {deal.description && (
             <div>
-              <label className="text-sm font-medium text-neutral-600">Description</label>
-              <p className="text-neutral-900 mt-1">{deal.description}</p>
+              <label className="text-sm font-medium text-muted-foreground">Description</label>
+              <p className="text-foreground mt-1">{deal.description}</p>
             </div>
           )}
           <div>
-            <label className="text-sm font-medium text-neutral-600">Deal Type</label>
-            <p className="text-neutral-900 mt-1">
+            <label className="text-sm font-medium text-muted-foreground">Deal Type</label>
+            <p className="text-foreground mt-1">
               {typeof deal.dealType === 'string' ? deal.dealType : deal.dealType?.name || 'Standard'}
             </p>
           </div>
           {deal.recurringDays && deal.recurringDays.length > 0 && (
             <div>
-              <label className="text-sm font-medium text-neutral-600">Active Days</label>
-              <p className="text-neutral-900 mt-1">{deal.recurringDays.join(', ')}</p>
+              <label className="text-sm font-medium text-muted-foreground">Active Days</label>
+              <p className="text-foreground mt-1">{deal.recurringDays.join(', ')}</p>
             </div>
           )}
           <div>
-            <label className="text-sm font-medium text-neutral-600">Status</label>
-            <p className="text-neutral-900 mt-1">
+            <label className="text-sm font-medium text-muted-foreground">Status</label>
+            <p className="text-foreground mt-1">
               {deal.status.isActive ? 'Active' : deal.status.isExpired ? 'Expired' : 'Upcoming'}
             </p>
           </div>

@@ -58,30 +58,30 @@ export const OnboardingLayout = ({
   const progressPercent = Math.round(((currentStep + 1) / TOTAL_STEPS) * 100);
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-card">
       {/* Minimal navbar */}
-      <header className="sticky top-0 z-10 bg-white">
-        <div className="flex h-16 items-center justify-between border-b border-neutral-200 px-4 md:px-6">
+      <header className="sticky top-0 z-10 bg-card">
+        <div className="flex h-16 items-center justify-between border-b border-border px-4 md:px-6">
           <Logo />
 
           {/* Centered Step Indicator */}
-          <div className="absolute left-1/2 top-8 -translate-x-1/2 -translate-y-1/2 font-bold text-base sm:text-lg text-neutral-900 tracking-tight whitespace-nowrap">
-            Step {currentStep + 1} of {TOTAL_STEPS} <span className="text-neutral-400 mx-1 font-normal">—</span> {getStepLabel(currentStep)}
+          <div className="absolute left-1/2 top-8 -translate-x-1/2 -translate-y-1/2 font-bold text-base sm:text-lg text-foreground tracking-tight whitespace-nowrap">
+            Step {currentStep + 1} of {TOTAL_STEPS} <span className="text-muted-foreground mx-1 font-normal">—</span> {getStepLabel(currentStep)}
           </div>
 
           <div className="flex items-center gap-3">
             <Link
               to={PATHS.MERCHANT_DASHBOARD}
-              className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+              className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
             >
               Save & exit
             </Link>
           </div>
         </div>
         {showFooter && (
-          <div className="flex h-2 w-full overflow-hidden bg-neutral-200">
+          <div className="flex h-2 w-full overflow-hidden bg-accent">
             <motion.div
-              className="h-full bg-neutral-900"
+              className="h-full bg-foreground"
               initial={false}
               animate={{ width: `${progressPercent}%` }}
               transition={{ duration: 0.35, ease: 'easeOut' }}
@@ -95,17 +95,17 @@ export const OnboardingLayout = ({
 
       {/* Footer with navigation buttons */}
       {showFooter && (
-        <footer className="sticky bottom-0 bg-white border-t border-neutral-200">
+        <footer className="sticky bottom-0 bg-card border-t border-border">
           <div className="flex items-center justify-between px-4 py-4 md:px-6">
             <button
               type="button"
               onClick={onBack}
-              className="text-sm font-medium text-neutral-700 hover:text-neutral-900"
+              className="text-sm font-medium text-foreground hover:text-foreground"
             >
               Back
             </button>
             <div className="flex items-center gap-3">
-              <span className="text-sm text-neutral-500 sm:hidden">
+              <span className="text-sm text-muted-foreground sm:hidden">
                 {currentStep + 1}/{TOTAL_STEPS}
               </span>
               {onNext && (

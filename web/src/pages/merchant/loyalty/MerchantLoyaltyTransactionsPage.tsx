@@ -21,14 +21,14 @@ export const MerchantLoyaltyTransactionsPage = () => {
 
   return (
     <MerchantLoyaltyLayout title="Loyalty Transactions" subtitle="Audit every points movement and its before/after balance impact.">
-      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-neutral-200 bg-white p-3">
+      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-3">
         <select
           value={type}
           onChange={(e) => {
             setType(e.target.value);
             setOffset(0);
           }}
-          className="rounded-md border border-neutral-300 px-2 py-1 text-sm"
+          className="rounded-md border border-border px-2 py-1 text-sm"
         >
           <option value="">All types</option>
           <option value="EARNED">Earned</option>
@@ -38,33 +38,33 @@ export const MerchantLoyaltyTransactionsPage = () => {
           <option value="REFUNDED">Refunded</option>
           <option value="EXPIRED">Expired</option>
         </select>
-        <span className="ml-auto text-sm text-neutral-600">Total records: {data?.total || 0}</span>
+        <span className="ml-auto text-sm text-muted-foreground">Total records: {data?.total || 0}</span>
       </div>
 
       {isLoading ? (
-        <div className="h-24 animate-pulse rounded-xl bg-neutral-100" />
+        <div className="h-24 animate-pulse rounded-xl bg-muted" />
       ) : !data || data.transactions.length === 0 ? (
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-neutral-600">No transactions found.</div>
+        <div className="rounded-xl border border-border bg-muted p-4 text-muted-foreground">No transactions found.</div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
           <table className="min-w-full divide-y divide-neutral-200">
-            <thead className="bg-neutral-50">
+            <thead className="bg-muted">
               <tr>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-neutral-700">Time</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-neutral-700">Type</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-neutral-700">Points</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-neutral-700">Balance</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-neutral-700">Description</th>
+                <th className="px-4 py-2 text-left text-sm font-semibold text-foreground">Time</th>
+                <th className="px-4 py-2 text-left text-sm font-semibold text-foreground">Type</th>
+                <th className="px-4 py-2 text-left text-sm font-semibold text-foreground">Points</th>
+                <th className="px-4 py-2 text-left text-sm font-semibold text-foreground">Balance</th>
+                <th className="px-4 py-2 text-left text-sm font-semibold text-foreground">Description</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-200 bg-white">
+            <tbody className="divide-y divide-neutral-200 bg-card">
               {data.transactions.map((tx) => (
                 <tr key={tx.id}>
-                  <td className="px-4 py-2 text-sm text-neutral-600">{new Date(tx.createdAt).toLocaleString()}</td>
+                  <td className="px-4 py-2 text-sm text-muted-foreground">{new Date(tx.createdAt).toLocaleString()}</td>
                   <td className="px-4 py-2 text-sm">{tx.type}</td>
                   <td className={`px-4 py-2 font-semibold ${tx.points >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{tx.points >= 0 ? `+${tx.points}` : tx.points}</td>
                   <td className="px-4 py-2 text-sm">{tx.balanceBefore} → {tx.balanceAfter}</td>
-                  <td className="px-4 py-2 text-sm text-neutral-700">{tx.description}</td>
+                  <td className="px-4 py-2 text-sm text-foreground">{tx.description}</td>
                 </tr>
               ))}
             </tbody>
@@ -76,7 +76,7 @@ export const MerchantLoyaltyTransactionsPage = () => {
         <div className="mt-4 flex items-center justify-end gap-2">
           <button
             type="button"
-            className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm disabled:opacity-50"
+            className="rounded-md border border-border px-3 py-1.5 text-sm disabled:opacity-50"
             disabled={offset === 0}
             onClick={() => setOffset((prev) => Math.max(0, prev - limit))}
           >
@@ -84,7 +84,7 @@ export const MerchantLoyaltyTransactionsPage = () => {
           </button>
           <button
             type="button"
-            className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm disabled:opacity-50"
+            className="rounded-md border border-border px-3 py-1.5 text-sm disabled:opacity-50"
             disabled={!hasMore}
             onClick={() => setOffset((prev) => prev + limit)}
           >

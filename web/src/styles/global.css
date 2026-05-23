@@ -10,6 +10,13 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap');
 
+/* Merchant dashboard design tokens — single source of truth.
+   See src/styles/merchant-theme.css for the full token set.
+   IMPORTANT: must come before @tailwind so the CSS spec's
+   "@import must precede all other rules" requirement is met,
+   otherwise these custom rules may not be parsed/applied correctly. */
+@import './merchant-theme.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -75,6 +82,10 @@
     --surface:           0 0% 100%;
     --surface-secondary: 220 14% 96%;    /* #F4F5F7 */
     --surface-tertiary:  220 14% 98%;    /* #FAFAFA */
+
+    /* Merchant dashboard chrome (sidebar/header). In light mode it's
+       a near-white card; in dark mode it tiers between page and card. */
+    --chrome: 220 14% 98%;               /* #FAFAFA in light */
 
     --neutral-50:  210 20% 98%;
     --neutral-100: 220 14% 96%;
@@ -177,14 +188,31 @@
     --z-toast:    50;
   }
 
-  /* ---- Dark mode overrides ---- */
-  .dark {
-    --background: 224 50% 6%;
-    --foreground: 210 20% 98%;
+  /* ================================================================
+     MERCHANT DASHBOARD — DARK THEME (single source of truth)
+     ================================================================
+     Three elevation tiers, pure neutral (no blue tint):
 
-    --surface:           240 26% 14%;
-    --surface-secondary: 240 21% 18%;
-    --surface-tertiary:  240 21% 22%;
+       Tier 0  --background     #0a0a0a  page canvas (deepest)
+       Tier 1  --chrome         #1a1a1a  sidebar / header / app shell
+       Tier 2  --surface (card) #292929  content cards (lifts above chrome)
+
+     Plus interaction layers:
+       --accent  #383838  hover/active state on items
+       --border  #424242  visible hairlines on dark surfaces
+       --muted   #1f1f1f  subtle inner backgrounds & skeletons
+
+     To restyle the merchant dashboard, edit values in this block only.
+     ================================================================ */
+  .dark {
+    --background: 0 0% 4%;               /* #0a0a0a — page canvas */
+    --foreground: 0 0% 98%;               /* primary text */
+
+    /* Surface elevation ramp */
+    --chrome:            0 0% 10%;       /* #1a1a1a — sidebar/header shell */
+    --surface:           0 0% 16%;       /* #292929 — content cards */
+    --surface-secondary: 0 0% 20%;       /* #333333 */
+    --surface-tertiary:  0 0% 24%;       /* #3d3d3d */
 
     --card:               var(--surface);
     --card-foreground:    var(--foreground);
@@ -192,21 +220,32 @@
     --popover-foreground: var(--foreground);
     --primary:            var(--brand-primary);
     --primary-foreground: 0 0% 100%;
-    --secondary:          var(--neutral-800);
-    --secondary-foreground: var(--neutral-200);
-    --muted:              var(--neutral-800);
-    --muted-foreground:   var(--neutral-400);
-    --accent:             var(--neutral-800);
-    --accent-foreground:  var(--neutral-100);
+    --secondary:          0 0% 20%;       /* button bg */
+    --secondary-foreground: 0 0% 92%;
+    --muted:              0 0% 12%;       /* subtle inner bg / skeleton */
+    --muted-foreground:   0 0% 70%;
+    --accent:             0 0% 22%;       /* hover/active state */
+    --accent-foreground:  0 0% 97%;
     --destructive:        var(--error);
     --destructive-foreground: var(--error-fg);
-    --border:             var(--neutral-700);
-    --input:              var(--neutral-700);
+    --border:             0 0% 26%;       /* #424242 — visible hairlines */
+    --input:              0 0% 26%;
     --ring:               var(--brand-primary);
     --radius:             12px;
     --folder-back:  0 95% 22%;
     --folder-front: 0 95% 18%;
     --folder-tab:   0 95% 26%;
+
+    /* Dark-mode shadows: deepen so cards sit on the page without
+       a glowing white halo from light-mode rgba(15,23,42,...) values. */
+    --shadow-xs:         0 1px 2px 0 rgb(0 0 0 / 0.4);
+    --shadow-sm:         0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+    --shadow-md:         0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+    --shadow-lg:         0 10px 15px -3px rgb(0 0 0 / 0.55), 0 4px 6px -4px rgb(0 0 0 / 0.45);
+    --shadow-xl:         0 20px 25px -5px rgb(0 0 0 / 0.6), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+    --shadow-2xl:        0 25px 50px -12px rgb(0 0 0 / 0.7);
+    --shadow-card:       0 1px 2px rgb(0 0 0 / 0.5), 0 8px 24px rgb(0 0 0 / 0.4);
+    --shadow-card-hover: 0 2px 4px rgb(0 0 0 / 0.6), 0 16px 32px rgb(0 0 0 / 0.5);
   }
 }
 

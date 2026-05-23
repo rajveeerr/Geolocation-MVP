@@ -20,7 +20,7 @@ import MarketAlertBanner from './MarketAlertBanner';
 import MarketAlertModal from './MarketAlertModal';
 
 const cardClass =
-  'rounded-2xl border border-neutral-200 bg-white p-5 shadow-[0_4px_14px_rgba(15,23,42,0.04)]';
+  'rounded-2xl border border-border bg-card p-5 shadow-[0_4px_14px_rgba(15,23,42,0.04)]';
 
 const PRICE_SPIKE_TOAST_KEY = 'yohop:lastPriceSpikeToastIds';
 
@@ -267,12 +267,12 @@ const IngredientsTab: React.FC = () => {
 
       {/* Table or loading */}
       {ingredientsQuery.isLoading ? (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
-          <Loader2 className="mx-auto h-6 w-6 animate-spin text-neutral-400" />
-          <p className="mt-3 text-sm text-neutral-500">Loading ingredients…</p>
+        <div className="rounded-2xl border border-border bg-card p-12 text-center">
+          <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
+          <p className="mt-3 text-sm text-muted-foreground">Loading ingredients…</p>
         </div>
       ) : ingredientsQuery.isError ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center text-sm text-red-700">
+        <div className="rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-6 text-center text-sm text-red-700 dark:text-red-300">
           <AlertTriangle className="mx-auto mb-2 h-5 w-5" />
           Could not load ingredients. Check the backend is running.
         </div>
@@ -308,7 +308,7 @@ const IngredientsTab: React.FC = () => {
 // ────────────────────────────────────────────────
 
 const selectClass =
-  'rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-700 shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20';
+  'rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground/80 shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20';
 
 interface FilterBarProps {
   search: string;
@@ -347,19 +347,19 @@ const FilterBar: React.FC<FilterBarProps> = ({
       <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
         {/* Search */}
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search ingredients..."
-            className="w-full rounded-xl border border-neutral-200 bg-white py-2 pl-9 pr-3 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            className="w-full rounded-xl border border-border bg-card py-2 pl-9 pr-3 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
           />
         </div>
 
         {/* Category dropdown */}
         <label className="flex items-center gap-1.5">
-          <SlidersHorizontal className="h-4 w-4 text-neutral-400" />
+          <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
           <select
             value={categoryFilter}
             onChange={(e) => onCategoryChange(e.target.value)}
@@ -405,7 +405,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
 
         {/* Sort */}
         <label className="flex items-center gap-1.5">
-          <ArrowUpDown className="h-4 w-4 text-neutral-400" />
+          <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
           <select
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value as SortBy)}
@@ -423,7 +423,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
       {/* Active filter chips + clear-all */}
       {activeChips.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 pt-1">
-          <span className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400">
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
             Active
           </span>
           {activeChips.map((c) => (
@@ -445,7 +445,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
               onStatusChange('all');
               onTrendChange('all');
             }}
-            className="text-xs font-semibold text-neutral-500 underline-offset-2 hover:text-brand hover:underline"
+            className="text-xs font-semibold text-muted-foreground underline-offset-2 hover:text-brand hover:underline"
           >
             Clear all
           </button>

@@ -14,8 +14,8 @@ interface Props {
 
 const WEIGHT_TONE: Record<'high' | 'medium' | 'low', string> = {
   high: 'bg-brand/10 text-brand ring-brand/30',
-  medium: 'bg-amber-50 text-amber-700 ring-amber-200',
-  low: 'bg-neutral-100 text-neutral-600 ring-neutral-200',
+  medium: 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 ring-amber-200',
+  low: 'bg-accent text-muted-foreground ring-neutral-200',
 };
 
 const WEIGHT_LABEL: Record<'high' | 'medium' | 'low', string> = {
@@ -42,7 +42,7 @@ const MarketAlertModal: React.FC<Props> = ({ alert, onClose, onAcknowledge, ackn
   const Icon = TYPE_TO_ICON[alert.type];
   const confidenceTone =
     alert.confidenceScore == null
-      ? 'text-neutral-600'
+      ? 'text-muted-foreground'
       : alert.confidenceScore >= 75
         ? 'text-emerald-600'
         : alert.confidenceScore >= 50
@@ -59,19 +59,19 @@ const MarketAlertModal: React.FC<Props> = ({ alert, onClose, onAcknowledge, ackn
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 p-4"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
     >
       <div
-        className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"
+        className="relative w-full max-w-lg rounded-2xl bg-card p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-accent"
         >
           <X className="h-4 w-4" />
         </button>
@@ -81,7 +81,7 @@ const MarketAlertModal: React.FC<Props> = ({ alert, onClose, onAcknowledge, ackn
             <Icon className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400">
+            <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
               {TYPE_TO_LABEL[alert.type]}
             </div>
             <h2 className="mt-0.5 font-heading text-2xl font-bold leading-tight text-foreground">
@@ -90,22 +90,22 @@ const MarketAlertModal: React.FC<Props> = ({ alert, onClose, onAcknowledge, ackn
           </div>
         </div>
 
-        <div className="mt-5 rounded-xl border border-neutral-200 bg-neutral-50 p-4">
-          <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Latest alert</div>
-          <p className="mt-1 text-sm italic text-neutral-700">"{alert.body}"</p>
+        <div className="mt-5 rounded-xl border border-border bg-accent/50 p-4">
+          <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Latest alert</div>
+          <p className="mt-1 text-sm italic text-foreground/80">"{alert.body}"</p>
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
-          <div className="rounded-xl border border-neutral-200 p-3">
-            <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+          <div className="rounded-xl border border-border p-3">
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Recommended Action
             </div>
-            <div className="mt-1 text-sm font-semibold text-neutral-900">
+            <div className="mt-1 text-sm font-semibold text-foreground">
               {alert.recommendedAction || '—'}
             </div>
           </div>
-          <div className="rounded-xl border border-neutral-200 p-3">
-            <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+          <div className="rounded-xl border border-border p-3">
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Confidence Score
             </div>
             <div className={cn('mt-1 text-sm font-semibold', confidenceTone)}>
@@ -115,7 +115,7 @@ const MarketAlertModal: React.FC<Props> = ({ alert, onClose, onAcknowledge, ackn
         </div>
 
         {alert.reasoning && alert.reasoning.length > 0 && (
-          <div className="mt-4 rounded-xl border border-neutral-200 bg-white p-4">
+          <div className="mt-4 rounded-xl border border-border bg-card p-4">
             <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-brand">
               <Lightbulb className="h-3.5 w-3.5" />
               How we figured this out
@@ -132,8 +132,8 @@ const MarketAlertModal: React.FC<Props> = ({ alert, onClose, onAcknowledge, ackn
                     {WEIGHT_LABEL[r.weight]}
                   </span>
                   <div>
-                    <div className="text-xs font-semibold text-neutral-700">{r.factor}</div>
-                    <div className="text-sm leading-snug text-neutral-600">{r.detail}</div>
+                    <div className="text-xs font-semibold text-foreground/80">{r.factor}</div>
+                    <div className="text-sm leading-snug text-muted-foreground">{r.detail}</div>
                   </div>
                 </li>
               ))}
@@ -142,11 +142,11 @@ const MarketAlertModal: React.FC<Props> = ({ alert, onClose, onAcknowledge, ackn
         )}
 
         {alert.affectedIngredients.length > 0 && (
-          <div className="mt-4 rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+          <div className="mt-4 rounded-xl border border-border bg-accent/50 p-4">
             <div className="text-[11px] font-semibold uppercase tracking-widest text-brand">
               Affected Ingredients
             </div>
-            <p className="mt-1 text-[11px] text-neutral-500">
+            <p className="mt-1 text-[11px] text-muted-foreground">
               {onOpenIngredientByName ? 'Click any chip to open and adjust it.' : null}
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
@@ -156,7 +156,7 @@ const MarketAlertModal: React.FC<Props> = ({ alert, onClose, onAcknowledge, ackn
                     key={name}
                     type="button"
                     onClick={() => onOpenIngredientByName(name)}
-                    className="group inline-flex items-center gap-1 rounded-full border border-neutral-200 bg-white px-2.5 py-1 text-xs font-medium text-neutral-700 shadow-sm transition hover:border-brand/40 hover:bg-brand/5 hover:text-brand"
+                    className="group inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground/80 shadow-sm transition hover:border-brand/40 hover:bg-brand/5 hover:text-brand"
                   >
                     {name}
                     <ChevronRight className="h-3 w-3 opacity-0 transition group-hover:opacity-100" />
@@ -164,7 +164,7 @@ const MarketAlertModal: React.FC<Props> = ({ alert, onClose, onAcknowledge, ackn
                 ) : (
                   <span
                     key={name}
-                    className="rounded-full border border-neutral-200 bg-white px-2.5 py-1 text-xs font-medium text-neutral-700 shadow-sm"
+                    className="rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground/80 shadow-sm"
                   >
                     {name}
                   </span>
@@ -176,7 +176,7 @@ const MarketAlertModal: React.FC<Props> = ({ alert, onClose, onAcknowledge, ackn
 
         <div className="mt-5">
           {alert.acknowledgedAt ? (
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-center text-sm text-emerald-700">
+            <div className="rounded-lg border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/30 p-3 text-center text-sm text-emerald-700 dark:text-emerald-300">
               Acknowledged on {new Date(alert.acknowledgedAt).toLocaleDateString()}
             </div>
           ) : (

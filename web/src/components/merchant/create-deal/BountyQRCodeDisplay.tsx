@@ -42,8 +42,8 @@ export const BountyQRCodeDisplay = ({
   
   if (!displayData) {
     return (
-      <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-center">
-        <p className="text-sm text-neutral-600">
+      <div className="rounded-lg border border-border bg-muted p-4 text-center">
+        <p className="text-sm text-muted-foreground">
           QR code will be generated after deal is published
         </p>
       </div>
@@ -92,11 +92,11 @@ export const BountyQRCodeDisplay = ({
       <div className="text-center">
         <div className="flex items-center justify-center gap-2 mb-3">
           <QrCode className="h-5 w-5 text-brand-primary-600" />
-          <h3 className="text-lg font-semibold text-neutral-900">Bounty Verification QR Code</h3>
+          <h3 className="text-lg font-semibold text-foreground">Bounty Verification QR Code</h3>
         </div>
         
         <div className={cn(
-          "mx-auto rounded-lg border-2 border-neutral-200 bg-white p-3 shadow-sm",
+          "mx-auto rounded-lg border-2 border-border bg-card p-3 shadow-sm",
           sizeClasses[size]
         )}>
           <img
@@ -110,11 +110,11 @@ export const BountyQRCodeDisplay = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-3 text-left"
+            className="mt-4 rounded-lg border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/30 p-3 text-left"
           >
             <div className="flex items-start gap-2">
               <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-blue-700">
+              <div className="text-sm text-blue-700 dark:text-blue-300">
                 <p className="font-medium mb-1">How it works:</p>
                 <ul className="list-disc list-inside space-y-1 text-xs">
                   <li>Customers scan this QR code when redeeming the deal</li>
@@ -158,9 +158,9 @@ export const BountyQRCodeDisplay = ({
         </div>
 
         {qrCodeData && (
-          <div className="mt-3 rounded-lg bg-neutral-50 p-2">
-            <p className="text-xs text-neutral-500 mb-1">QR Code Data:</p>
-            <p className="text-xs font-mono text-neutral-700 break-all">
+          <div className="mt-3 rounded-lg bg-muted p-2">
+            <p className="text-xs text-muted-foreground mb-1">QR Code Data:</p>
+            <p className="text-xs font-mono text-foreground break-all">
               {displayData}
             </p>
           </div>

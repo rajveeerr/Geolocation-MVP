@@ -56,15 +56,15 @@ interface ConfigureBountyResponse {
 }
 
 const panelClass =
-  'rounded-[1.45rem] border border-neutral-200/80 bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
+  'rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card shadow-[0_8px_22px_rgba(15,23,42,0.045)]';
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
 
 const dealState = (deal: MerchantBountyDeal) => {
-  if (deal.isExpired) return { label: 'Expired', tone: 'bg-neutral-100 text-neutral-600 ring-neutral-400/20' };
-  if (deal.isUpcoming) return { label: 'Scheduled', tone: 'bg-sky-100 text-sky-700 ring-sky-600/20' };
-  return { label: 'Active', tone: 'bg-emerald-100 text-emerald-700 ring-emerald-600/20' };
+  if (deal.isExpired) return { label: 'Expired', tone: 'bg-muted text-muted-foreground ring-neutral-400/20' };
+  if (deal.isUpcoming) return { label: 'Scheduled', tone: 'bg-sky-100 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-sky-600/20' };
+  return { label: 'Active', tone: 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 ring-emerald-600/20' };
 };
 
 const createBlankForm = (): BountyFormState => ({
@@ -110,8 +110,8 @@ const BountySelectionCard = ({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h4 className="truncate text-base font-semibold text-neutral-900">{deal.title}</h4>
-          {deal.description && <p className="mt-1 line-clamp-2 text-sm text-neutral-500">{deal.description}</p>}
+          <h4 className="truncate text-base font-semibold text-foreground">{deal.title}</h4>
+          {deal.description && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{deal.description}</p>}
         </div>
         <span className={cn('inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset', state.tone)}>
           {state.label}
@@ -119,31 +119,31 @@ const BountySelectionCard = ({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold">
-        <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 ring-1 ring-inset', bountySet ? 'bg-orange-100 text-orange-700 ring-orange-600/20' : 'bg-neutral-100 text-neutral-500 ring-neutral-400/20')}>
+        <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 ring-1 ring-inset', bountySet ? 'bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 ring-orange-600/20' : 'bg-muted text-muted-foreground ring-neutral-400/20')}>
           {bountySet ? `$${deal.bountyRewardAmount?.toFixed(0)} reward` : 'No bounty yet'}
         </span>
-        <span className="inline-flex items-center rounded-full bg-neutral-100 px-2 py-0.5 text-neutral-600 ring-1 ring-inset ring-neutral-200">
+        <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-muted-foreground ring-1 ring-inset ring-neutral-200">
           {deal.dealType?.name ?? 'Deal'}
         </span>
         {selected && (
-          <span className="inline-flex items-center rounded-full bg-orange-50 px-2 py-0.5 text-orange-700 ring-1 ring-inset ring-orange-200">
+          <span className="inline-flex items-center rounded-full bg-orange-50 dark:bg-orange-950/30 px-2 py-0.5 text-orange-700 dark:text-orange-300 ring-1 ring-inset ring-orange-200">
             Selected
           </span>
         )}
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-neutral-600">
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-2.5">
-          <div className="font-semibold uppercase tracking-wider text-neutral-400">Starts</div>
+      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+        <div className="rounded-xl border border-border bg-muted/60 p-2.5">
+          <div className="font-semibold uppercase tracking-wider text-muted-foreground">Starts</div>
           <div className="mt-0.5">{formatDate(deal.startTime)}</div>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-2.5">
-          <div className="font-semibold uppercase tracking-wider text-neutral-400">Ends</div>
+        <div className="rounded-xl border border-border bg-muted/60 p-2.5">
+          <div className="font-semibold uppercase tracking-wider text-muted-foreground">Ends</div>
           <div className="mt-0.5">{formatDate(deal.endTime)}</div>
         </div>
       </div>
 
-      <div className="mt-3 text-xs text-neutral-500">
+      <div className="mt-3 text-xs text-muted-foreground">
         {deal.isExpired ? 'Expired deals cannot be configured.' : 'Choose this deal to attach bounty conditions.'}
       </div>
     </button>
@@ -170,50 +170,50 @@ const ConfigureBountyForm = ({
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-500">Configure bounty</div>
-          <h3 className="mt-1 text-lg font-bold text-neutral-900">{deal.title}</h3>
-          <p className="mt-1 text-sm text-neutral-500">
+          <h3 className="mt-1 text-lg font-bold text-foreground">{deal.title}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
             {bountySet ? 'Update the current bounty settings for this deal.' : 'Attach a bounty to this deal and set the conditions customers must meet.'}
           </p>
         </div>
-        <div className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-semibold text-neutral-600 ring-1 ring-inset ring-neutral-200">
+        <div className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground ring-1 ring-inset ring-neutral-200">
           {bountySet ? 'Bounty active' : 'Not yet configured'}
         </div>
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <div>
-          <Label htmlFor="bounty-reward" className="text-xs font-semibold text-neutral-700">Reward per friend ($)</Label>
+          <Label htmlFor="bounty-reward" className="text-xs font-semibold text-foreground">Reward per friend ($)</Label>
           <Input id="bounty-reward" type="number" min={0} step="0.01" value={form.rewardAmount} onChange={(e) => setForm((prev) => ({ ...prev, rewardAmount: e.target.value }))} placeholder="5" className="mt-1.5 h-11" />
         </div>
         <div>
-          <Label htmlFor="bounty-minrefs" className="text-xs font-semibold text-neutral-700">Min referrals required</Label>
+          <Label htmlFor="bounty-minrefs" className="text-xs font-semibold text-foreground">Min referrals required</Label>
           <Input id="bounty-minrefs" type="number" min={1} value={form.minReferralsRequired} onChange={(e) => setForm((prev) => ({ ...prev, minReferralsRequired: e.target.value }))} placeholder="1" className="mt-1.5 h-11" />
         </div>
         <div>
-          <Label htmlFor="bounty-pot" className="text-xs font-semibold text-neutral-700">Pot amount ($)</Label>
+          <Label htmlFor="bounty-pot" className="text-xs font-semibold text-foreground">Pot amount ($)</Label>
           <Input id="bounty-pot" type="number" min={0} step="0.01" value={form.potAmount} onChange={(e) => setForm((prev) => ({ ...prev, potAmount: e.target.value }))} placeholder="100" className="mt-1.5 h-11" />
         </div>
         <div>
-          <Label htmlFor="bounty-max" className="text-xs font-semibold text-neutral-700">Max invites</Label>
+          <Label htmlFor="bounty-max" className="text-xs font-semibold text-foreground">Max invites</Label>
           <Input id="bounty-max" type="number" min={1} value={form.maxInvites} onChange={(e) => setForm((prev) => ({ ...prev, maxInvites: e.target.value }))} placeholder="6" className="mt-1.5 h-11" />
         </div>
       </div>
 
       <div className="mt-4">
-        <Label htmlFor="bounty-minspend" className="text-xs font-semibold text-neutral-700">Minimum spend to qualify ($)</Label>
+        <Label htmlFor="bounty-minspend" className="text-xs font-semibold text-foreground">Minimum spend to qualify ($)</Label>
         <Input id="bounty-minspend" type="number" min={0} step="0.01" value={form.minSpend} onChange={(e) => setForm((prev) => ({ ...prev, minSpend: e.target.value }))} placeholder="20" className="mt-1.5 h-11" />
       </div>
 
-      <div className="mt-4 flex items-center gap-2 rounded-2xl border border-neutral-200 bg-white px-3 py-3">
+      <div className="mt-4 flex items-center gap-2 rounded-2xl border border-border bg-card px-3 py-3">
         <input type="checkbox" checked={form.kickbackEnabled} onChange={(e) => setForm((prev) => ({ ...prev, kickbackEnabled: e.target.checked }))} className="h-4 w-4 accent-orange-600" />
         <div>
-          <div className="text-sm font-medium text-neutral-900">Enable kickbacks</div>
-          <p className="text-xs text-neutral-500">Keeps the referral reward active for this bounty.</p>
+          <div className="text-sm font-medium text-foreground">Enable kickbacks</div>
+          <p className="text-xs text-muted-foreground">Keeps the referral reward active for this bounty.</p>
         </div>
       </div>
 
-      <div className="mt-5 rounded-2xl border border-neutral-200 bg-neutral-50 p-4 text-sm text-neutral-600">
-        <div className="font-semibold text-neutral-900">Current deal snapshot</div>
+      <div className="mt-5 rounded-2xl border border-border bg-muted p-4 text-sm text-muted-foreground">
+        <div className="font-semibold text-foreground">Current deal snapshot</div>
         <div className="mt-2 grid gap-2 sm:grid-cols-2">
           <div>Starts {formatDate(deal.startTime)}</div>
           <div>Ends {formatDate(deal.endTime)}</div>
@@ -267,51 +267,51 @@ function BountyDealCard({ deal }: { deal: MerchantBountyDeal }) {
   return (
     <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className={cn(panelClass, 'p-5')}>
       <div className="flex items-start justify-between gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600 ring-1 ring-inset ring-orange-200">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 dark:bg-orange-950/40 text-orange-600 ring-1 ring-inset ring-orange-200">
           <Target className="h-5 w-5" />
         </div>
         {remaining && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-semibold text-rose-700 ring-1 ring-inset ring-rose-200">
+          <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 dark:bg-rose-950/30 px-2 py-0.5 text-[10px] font-semibold text-rose-700 dark:text-rose-300 ring-1 ring-inset ring-rose-200">
             ⏰ {remaining}
           </span>
         )}
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <h3 className="text-base font-bold text-neutral-900">{deal.title}</h3>
+        <h3 className="text-base font-bold text-foreground">{deal.title}</h3>
         <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset', status.tone)}>
           {status.label}
         </span>
       </div>
 
-      {deal.description && <p className="mt-2 text-sm text-neutral-500">{deal.description}</p>}
+      {deal.description && <p className="mt-2 text-sm text-muted-foreground">{deal.description}</p>}
 
       <div className="mt-4 grid grid-cols-2 gap-2">
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Pot Amount</div>
+        <div className="rounded-xl border border-border bg-muted/60 p-3">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Pot Amount</div>
           <div className="mt-0.5 text-base font-bold text-emerald-600">{pot != null ? `$${pot.toFixed(0)}` : '—'}</div>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Per Person</div>
+        <div className="rounded-xl border border-border bg-muted/60 p-3">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Per Person</div>
           <div className="mt-0.5 text-base font-bold text-emerald-600">${reward.toFixed(0)}</div>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Claimed</div>
-          <div className="mt-0.5 text-base font-bold text-neutral-900">{maxInvites != null ? `${claimed}/${maxInvites}` : claimed}</div>
+        <div className="rounded-xl border border-border bg-muted/60 p-3">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Claimed</div>
+          <div className="mt-0.5 text-base font-bold text-foreground">{maxInvites != null ? `${claimed}/${maxInvites}` : claimed}</div>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Min Spend</div>
-          <div className="mt-0.5 text-base font-bold text-neutral-900">{minSpend != null ? `$${minSpend.toFixed(0)}` : '—'}</div>
+        <div className="rounded-xl border border-border bg-muted/60 p-3">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Min Spend</div>
+          <div className="mt-0.5 text-base font-bold text-foreground">{minSpend != null ? `$${minSpend.toFixed(0)}` : '—'}</div>
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-neutral-200 bg-white p-3 sm:flex-nowrap">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-neutral-200 bg-white">
-          {qrSrc ? <img src={qrSrc} alt="Bounty QR" className="h-full w-full object-contain" /> : <QrCode className="h-7 w-7 text-neutral-300" aria-hidden />}
+      <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-3 sm:flex-nowrap">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-card">
+          {qrSrc ? <img src={qrSrc} alt="Bounty QR" className="h-full w-full object-contain" /> : <QrCode className="h-7 w-7 text-muted-foreground" aria-hidden />}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Verification QR</div>
-          <p className="mt-0.5 text-xs text-neutral-600">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Verification QR</div>
+          <p className="mt-0.5 text-xs text-muted-foreground">
             {qrSrc ? 'Friends scan this at check-in to credit the referrer.' : 'No QR yet — generate one to start crediting referrals.'}
           </p>
         </div>
@@ -467,13 +467,13 @@ function MerchantBountyDealsContent() {
   if (isLoading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (error) {
-    return <div className={cn(panelClass, 'border-rose-200 bg-rose-50 p-4 text-sm text-rose-700')}>{(error as Error).message}</div>;
+    return <div className={cn(panelClass, 'border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 p-4 text-sm text-rose-700 dark:text-rose-300')}>{(error as Error).message}</div>;
   }
 
   if (!merchantStatus) {
@@ -481,7 +481,7 @@ function MerchantBountyDealsContent() {
       <div className="mx-auto max-w-4xl px-4 py-12">
         <div className="text-center">
           <h1 className="mb-4 text-4xl font-bold">Join as a Merchant</h1>
-          <p className="mb-8 text-neutral-600">Start creating deals and reach new customers</p>
+          <p className="mb-8 text-muted-foreground">Start creating deals and reach new customers</p>
           <Link to={PATHS.MERCHANT_ONBOARDING}>
             <Button size="lg">Become a Merchant</Button>
           </Link>
@@ -492,18 +492,18 @@ function MerchantBountyDealsContent() {
 
   return (
     <div className="mx-auto max-w-screen-xl space-y-6 px-4 py-3 sm:px-1 sm:py-4">
-      <div className={cn(panelClass, 'flex flex-wrap items-center justify-between gap-4 border-orange-200/70 bg-gradient-to-r from-orange-50 via-white to-white p-5')}>
+      <div className={cn(panelClass, 'flex flex-wrap items-center justify-between gap-4 border-orange-200/70 dark:border-orange-900/50 bg-gradient-to-r from-orange-50 via-card to-card dark:from-card dark:bg-card p-5')}>
         <div className="flex min-w-0 items-start gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-md">
             <Target className="h-5 w-5" aria-hidden />
           </div>
           <div className="min-w-0">
-            <h2 className="text-lg font-bold tracking-tight text-neutral-900 sm:text-xl">Customer Bounties</h2>
-            <p className="text-sm text-neutral-600">Pick one of your deals, then attach a referral bounty and conditions to it.</p>
+            <h2 className="text-lg font-bold tracking-tight text-foreground sm:text-xl">Customer Bounties</h2>
+            <p className="text-sm text-muted-foreground">Pick one of your deals, then attach a referral bounty and conditions to it.</p>
           </div>
         </div>
         <Link to={PATHS.MERCHANT_DEALS}>
-          <Button size="md" variant="secondary" className="rounded-full border-neutral-200 bg-white text-neutral-700 shadow-sm hover:bg-neutral-50">
+          <Button size="md" variant="secondary" className="rounded-full border-border bg-card text-foreground shadow-sm hover:bg-muted">
             <ArrowRight className="mr-2 h-4 w-4 rotate-180" />
             View all deals
           </Button>
@@ -512,16 +512,16 @@ function MerchantBountyDealsContent() {
 
       <div className="grid gap-3 sm:grid-cols-3">
         <div className={cn(panelClass, 'p-4')}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Available deals</div>
-          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-neutral-950">{availableDeals.length}</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Available deals</div>
+          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-foreground">{availableDeals.length}</div>
         </div>
         <div className={cn(panelClass, 'p-4')}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Configured bounties</div>
-          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-neutral-950">{bountyDeals.length}</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Configured bounties</div>
+          <div className="mt-1 text-[1.6rem] font-semibold tracking-tight text-foreground">{bountyDeals.length}</div>
         </div>
         <div className={cn(panelClass, 'p-4')}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">Selected deal</div>
-          <div className="mt-1 truncate text-[1.1rem] font-semibold tracking-tight text-orange-700">{selectedDeal?.title ?? 'None'}</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Selected deal</div>
+          <div className="mt-1 truncate text-[1.1rem] font-semibold tracking-tight text-orange-700 dark:text-orange-300">{selectedDeal?.title ?? 'None'}</div>
         </div>
       </div>
 
@@ -529,20 +529,20 @@ function MerchantBountyDealsContent() {
         <div className="space-y-4">
           <div className={cn(panelClass, 'flex items-center justify-between gap-3 p-4')}>
             <div>
-              <h3 className="text-base font-bold text-neutral-900">Choose a deal</h3>
-              <p className="text-sm text-neutral-500">Expired deals are read-only. Active and upcoming deals can be configured.</p>
+              <h3 className="text-base font-bold text-foreground">Choose a deal</h3>
+              <p className="text-sm text-muted-foreground">Expired deals are read-only. Active and upcoming deals can be configured.</p>
             </div>
-            <div className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-semibold text-neutral-600 ring-1 ring-inset ring-neutral-200">{availableDeals.length} available</div>
+            <div className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground ring-1 ring-inset ring-neutral-200">{availableDeals.length} available</div>
           </div>
 
           {availableDeals.length === 0 ? (
             <div className={cn(panelClass, 'border-dashed p-8 text-center')}>
-              <Target className="mx-auto mb-3 h-10 w-10 text-neutral-300" aria-hidden />
-              <h3 className="text-[1.4rem] font-semibold tracking-tight text-neutral-900">No deals yet</h3>
-              <p className="mt-1 text-[13px] text-neutral-500 sm:text-sm">Create a deal first, then come back here to attach bounty conditions.</p>
+              <Target className="mx-auto mb-3 h-10 w-10 text-muted-foreground" aria-hidden />
+              <h3 className="text-[1.4rem] font-semibold tracking-tight text-foreground">No deals yet</h3>
+              <p className="mt-1 text-[13px] text-muted-foreground sm:text-sm">Create a deal first, then come back here to attach bounty conditions.</p>
               <div className="mt-5 flex justify-center gap-2">
                 <Link to={PATHS.MERCHANT_DEALS_CREATE}>
-                  <Button className="rounded-full bg-neutral-950 text-white hover:bg-neutral-800">Create a deal</Button>
+                  <Button className="rounded-full bg-foreground text-background hover:bg-foreground/85">Create a deal</Button>
                 </Link>
               </div>
             </div>
@@ -550,18 +550,18 @@ function MerchantBountyDealsContent() {
             <>
               {/* Filter bar */}
               <div className={cn(panelClass, 'flex flex-wrap items-center gap-2 px-3 py-2 sm:px-4')}>
-                <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
                   Filters
                 </span>
 
                 <div className="relative">
-                  <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-400" />
+                  <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     type="text"
                     placeholder="Search title"
                     value={pickerSearch}
                     onChange={(e) => setPickerSearch(e.target.value)}
-                    className="h-8 w-[160px] rounded-full border-neutral-200 bg-white pl-7 pr-3 text-[12px] shadow-none"
+                    className="h-8 w-[160px] rounded-full border-border bg-card pl-7 pr-3 text-[12px] shadow-none"
                   />
                 </div>
 
@@ -569,8 +569,8 @@ function MerchantBountyDealsContent() {
                   value={pickerStatus}
                   onValueChange={(value) => setPickerStatus(value as AvailableStatusFilter)}
                 >
-                  <SelectTrigger className="h-8 w-auto min-w-[120px] gap-1.5 rounded-full border-neutral-200 bg-white px-3 text-[12px] font-medium shadow-none">
-                    <span className="text-neutral-500">Status:</span>
+                  <SelectTrigger className="h-8 w-auto min-w-[120px] gap-1.5 rounded-full border-border bg-card px-3 text-[12px] font-medium shadow-none">
+                    <span className="text-muted-foreground">Status:</span>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -584,8 +584,8 @@ function MerchantBountyDealsContent() {
                   value={pickerBounty}
                   onValueChange={(value) => setPickerBounty(value as AvailableBountyFilter)}
                 >
-                  <SelectTrigger className="h-8 w-auto min-w-[140px] gap-1.5 rounded-full border-neutral-200 bg-white px-3 text-[12px] font-medium shadow-none">
-                    <span className="text-neutral-500">Bounty:</span>
+                  <SelectTrigger className="h-8 w-auto min-w-[140px] gap-1.5 rounded-full border-border bg-card px-3 text-[12px] font-medium shadow-none">
+                    <span className="text-muted-foreground">Bounty:</span>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -602,27 +602,27 @@ function MerchantBountyDealsContent() {
                       setPickerStatus('all');
                       setPickerBounty('all');
                     }}
-                    className="rounded-full px-2 py-1 text-[12px] font-semibold text-neutral-700 transition hover:text-neutral-950"
+                    className="rounded-full px-2 py-1 text-[12px] font-semibold text-foreground transition hover:text-foreground"
                   >
                     Clear
                   </button>
                 ) : null}
 
-                <span className="ml-auto text-[12px] text-neutral-500">
+                <span className="ml-auto text-[12px] text-muted-foreground">
                   {filteredAvailableDeals.length} of {availableDeals.length}
                 </span>
               </div>
 
               {filteredAvailableDeals.length === 0 ? (
                 <div className={cn(panelClass, 'px-4 py-10 text-center')}>
-                  <p className="text-[13px] text-neutral-500">No deals match these filters.</p>
+                  <p className="text-[13px] text-muted-foreground">No deals match these filters.</p>
                   <button
                     onClick={() => {
                       setPickerSearch('');
                       setPickerStatus('all');
                       setPickerBounty('all');
                     }}
-                    className="mt-2 inline-flex h-8 items-center rounded-full border border-neutral-200 bg-white px-3 text-[12px] font-semibold text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50"
+                    className="mt-2 inline-flex h-8 items-center rounded-full border border-border bg-card px-3 text-[12px] font-semibold text-foreground hover:border-border hover:bg-muted"
                   >
                     Clear filters
                   </button>
@@ -653,7 +653,7 @@ function MerchantBountyDealsContent() {
               isSaving={configureBounty.isPending}
             />
           ) : (
-            <div className={cn(panelClass, 'p-5 text-sm text-neutral-500')}>Select a deal to configure its bounty.</div>
+            <div className={cn(panelClass, 'p-5 text-sm text-muted-foreground')}>Select a deal to configure its bounty.</div>
           )}
         </div>
       </div>
@@ -662,10 +662,10 @@ function MerchantBountyDealsContent() {
         <div className="space-y-3">
           <div className={cn(panelClass, 'flex items-center justify-between gap-3 p-4')}>
             <div>
-              <h3 className="text-base font-bold text-neutral-900">Configured bounties</h3>
-              <p className="text-sm text-neutral-500">Deals with active bounty settings and QR codes.</p>
+              <h3 className="text-base font-bold text-foreground">Configured bounties</h3>
+              <p className="text-sm text-muted-foreground">Deals with active bounty settings and QR codes.</p>
             </div>
-            <div className="flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700 ring-1 ring-inset ring-orange-200">
+            <div className="flex items-center gap-2 rounded-full bg-orange-50 dark:bg-orange-950/30 px-3 py-1 text-xs font-semibold text-orange-700 dark:text-orange-300 ring-1 ring-inset ring-orange-200">
               <Users className="h-3.5 w-3.5" />
               {bountyDeals.length}
             </div>
@@ -673,18 +673,18 @@ function MerchantBountyDealsContent() {
 
           {/* Filter bar */}
           <div className={cn(panelClass, 'flex flex-wrap items-center gap-2 px-3 py-2 sm:px-4')}>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
               Filters
             </span>
 
             <div className="relative">
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-400" />
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="Search title"
                 value={bountySearch}
                 onChange={(e) => setBountySearch(e.target.value)}
-                className="h-8 w-[160px] rounded-full border-neutral-200 bg-white pl-7 pr-3 text-[12px] shadow-none"
+                className="h-8 w-[160px] rounded-full border-border bg-card pl-7 pr-3 text-[12px] shadow-none"
               />
             </div>
 
@@ -692,8 +692,8 @@ function MerchantBountyDealsContent() {
               value={bountyStatusFilter}
               onValueChange={(value) => setBountyStatusFilter(value as BountyStatusFilter)}
             >
-              <SelectTrigger className="h-8 w-auto min-w-[120px] gap-1.5 rounded-full border-neutral-200 bg-white px-3 text-[12px] font-medium shadow-none">
-                <span className="text-neutral-500">Status:</span>
+              <SelectTrigger className="h-8 w-auto min-w-[120px] gap-1.5 rounded-full border-border bg-card px-3 text-[12px] font-medium shadow-none">
+                <span className="text-muted-foreground">Status:</span>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -705,8 +705,8 @@ function MerchantBountyDealsContent() {
             </Select>
 
             <Select value={bountySort} onValueChange={(value) => setBountySort(value as BountySort)}>
-              <SelectTrigger className="h-8 w-auto min-w-[150px] gap-1.5 rounded-full border-neutral-200 bg-white px-3 text-[12px] font-medium shadow-none">
-                <span className="text-neutral-500">Sort:</span>
+              <SelectTrigger className="h-8 w-auto min-w-[150px] gap-1.5 rounded-full border-border bg-card px-3 text-[12px] font-medium shadow-none">
+                <span className="text-muted-foreground">Sort:</span>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -723,13 +723,13 @@ function MerchantBountyDealsContent() {
                   setBountySort('recent');
                   setBountySearch('');
                 }}
-                className="rounded-full px-2 py-1 text-[12px] font-semibold text-neutral-700 transition hover:text-neutral-950"
+                className="rounded-full px-2 py-1 text-[12px] font-semibold text-foreground transition hover:text-foreground"
               >
                 Clear
               </button>
             ) : null}
 
-            <span className="ml-auto text-[12px] text-neutral-500">
+            <span className="ml-auto text-[12px] text-muted-foreground">
               {filteredBountyDeals.length} of {bountyDeals.length}{' '}
               {bountyDeals.length === 1 ? 'bounty' : 'bounties'}
             </span>
@@ -737,14 +737,14 @@ function MerchantBountyDealsContent() {
 
           {filteredBountyDeals.length === 0 ? (
             <div className={cn(panelClass, 'px-4 py-10 text-center')}>
-              <p className="text-[13px] text-neutral-500">No bounties match these filters.</p>
+              <p className="text-[13px] text-muted-foreground">No bounties match these filters.</p>
               <button
                 onClick={() => {
                   setBountyStatusFilter('all');
                   setBountySort('recent');
                   setBountySearch('');
                 }}
-                className="mt-2 inline-flex h-8 items-center rounded-full border border-neutral-200 bg-white px-3 text-[12px] font-semibold text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50"
+                className="mt-2 inline-flex h-8 items-center rounded-full border border-border bg-card px-3 text-[12px] font-semibold text-foreground hover:border-border hover:bg-muted"
               >
                 Clear filters
               </button>

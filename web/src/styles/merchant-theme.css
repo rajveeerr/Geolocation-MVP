@@ -1,0 +1,207 @@
+/* ================================================================
+   MERCHANT DASHBOARD — DESIGN TOKENS
+   ================================================================
+   Single source of truth for the merchant area. Every color, surface,
+   border, and shadow used inside <div class="merchant-dashboard">
+   is defined here in both light and dark mode.
+
+   To restyle the merchant dashboard:
+     - Change values in :root           (light mode)
+     - Change values in .dark           (dark mode)
+     - Re-scope or rename tokens at the bottom (.merchant-dashboard)
+     - Restart Vite or hard-refresh the browser
+
+   Token naming:
+     --md-*    — merchant dashboard specific tokens (this file only)
+
+   Tier hierarchy (deepest → highest in dark mode):
+     md-page         page canvas
+       └─ md-chrome  app shell (sidebar, header)
+           └─ md-card        content panels
+               └─ md-elevated  hover/active layer on cards
+   ================================================================ */
+
+:root {
+  /* ----- Surfaces (light mode) ----- */
+  --md-page:        0 0% 96%;          /* #f5f5f7  page canvas */
+  --md-chrome:      220 14% 98%;       /* #fafafa  sidebar/header */
+  --md-card:        0 0% 100%;         /* #ffffff  content cards */
+  --md-elevated:    220 14% 96%;       /* #f4f5f7  hover/active */
+  --md-muted:       220 14% 96%;       /* #f4f5f7  inner backgrounds */
+
+  /* ----- Text ----- */
+  --md-text:        220 14% 10%;       /* #1a1a24  primary text */
+  --md-text-muted:  220 9% 46%;        /* #6c727f  secondary text */
+  --md-text-subtle: 218 11% 65%;       /* #9aa1ac  hints, placeholders */
+
+  /* ----- Borders & rings ----- */
+  --md-border:      220 13% 91%;       /* #e4e7eb  hairlines */
+  --md-border-strong: 220 13% 84%;     /* #ccd0d6  outlines */
+  --md-ring:        var(--brand-primary);
+
+  /* ----- Accent (interactive states) ----- */
+  --md-accent:      220 14% 96%;       /* #f4f5f7  hover state */
+  --md-accent-text: 220 14% 10%;
+
+  /* ----- Status colors (paired light text on light bg) ----- */
+  --md-success:     152 69% 31%;
+  --md-warning:     38 92% 50%;
+  --md-danger:      0 72% 51%;
+  --md-info:        217 91% 60%;
+
+  /* ----- Shadows (premium soft elevation) ----- */
+  --md-shadow-card:    0 1px 2px 0 rgb(15 23 42 / 0.04), 0 4px 16px -4px rgb(15 23 42 / 0.06);
+  --md-shadow-hover:   0 4px 6px -1px rgb(15 23 42 / 0.07), 0 12px 24px -8px rgb(15 23 42 / 0.08);
+  --md-shadow-popover: 0 8px 16px -4px rgb(15 23 42 / 0.10), 0 24px 48px -12px rgb(15 23 42 / 0.12);
+
+  /* ----- AI Assistant accent surface — warm cream/terracotta theme ----- */
+  --md-ai-bg-start:   28 100% 97%;       /* #fff8f2  cream gradient start */
+  --md-ai-bg-end:     28 100% 95%;       /* #fff1e5  cream gradient end */
+  --md-ai-border:     30 47% 88%;        /* #f0ddd0  cream border */
+  --md-ai-border-strong: 24 36% 79%;     /* #ead6c9  stronger cream */
+  --md-ai-accent:     16 47% 51%;        /* #bf6545  terracotta accent */
+  --md-ai-text:       213 38% 21%;       /* #203247  dark navy primary */
+  --md-ai-text-muted: 213 16% 45%;       /* #607084  muted slate */
+  --md-ai-tag-bg:     28 47% 93%;        /* #f7ede5  cream pill bg */
+  --md-ai-tag-text:   20 22% 38%;        /* #7b5c49  cream pill text */
+  --md-ai-soft-bg:    28 100% 95%;       /* #fff1e5  hover cream */
+
+  /* ----- AI Assistant blue variant ----- */
+  --md-ai-blue-bg-start:   217 100% 98%;  /* #f5f9ff */
+  --md-ai-blue-bg-end:     213 71% 95%;   /* #eaf2fb */
+  --md-ai-blue-border:     214 56% 89%;   /* #d6e4f2 */
+  --md-ai-blue-accent:     211 60% 45%;   /* #2f6cb5 */
+  --md-ai-blue-text-muted: 211 26% 43%;   /* #52708a */
+
+  /* ----- Card thumbnail placeholder gradient (event/service/surprise cards) ----- */
+  --md-thumb-start:   220 14% 96%;       /* neutral-100 */
+  --md-thumb-via:     0 0% 100%;         /* card / white */
+  --md-thumb-end:     214 23% 95%;       /* #eef1f5  soft blue-gray */
+}
+
+.dark {
+  /* ----- Surfaces (dark mode) ─ pure neutral, no blue tint ----- */
+  --md-page:        0 0% 3%;           /* #080808  deepest canvas — slightly darker for more drama */
+  --md-chrome:      0 0% 8%;           /* #141414  sidebar / header (Tier 1) — stronger step from page */
+  --md-card:        0 0% 14%;          /* #242424  content cards (Tier 2) — clearly lifted */
+  --md-elevated:    0 0% 20%;          /* #333333  hover / active */
+  --md-muted:       0 0% 11%;          /* #1c1c1c  subtle inner bg */
+
+  /* ----- Text — push contrast harder so dark mode reads crisp ----- */
+  --md-text:        0 0% 100%;         /* #ffffff  pure white primary text */
+  --md-text-muted:  0 0% 78%;          /* #c7c7c7  more readable than 70 */
+  --md-text-subtle: 0 0% 60%;          /* #999999  hints/placeholders */
+
+  /* ----- Borders & rings ----- */
+  --md-border:      0 0% 24%;          /* #3d3d3d  visible hairlines, slightly softer */
+  --md-border-strong: 0 0% 32%;        /* #525252  stronger outlines */
+  --md-ring:        var(--brand-primary);
+
+  /* ----- Accent ----- */
+  --md-accent:      0 0% 20%;          /* #333333  hover state — separates from card */
+  --md-accent-text: 0 0% 100%;         /* pure white for hover text */
+
+  /* ----- Status colors (lighter for dark surfaces) ----- */
+  --md-success:     152 60% 60%;
+  --md-warning:     38 92% 65%;
+  --md-danger:      0 72% 60%;
+  --md-info:        217 91% 70%;
+
+  /* ----- Shadows (deep, no white halo) ----- */
+  --md-shadow-card:    0 1px 2px rgb(0 0 0 / 0.5), 0 8px 24px rgb(0 0 0 / 0.4);
+  --md-shadow-hover:   0 2px 4px rgb(0 0 0 / 0.6), 0 16px 32px rgb(0 0 0 / 0.5);
+  --md-shadow-popover: 0 8px 16px rgb(0 0 0 / 0.6), 0 24px 48px rgb(0 0 0 / 0.5);
+
+  /* ----- AI Assistant accent surface — warm tinted dark surface ----- */
+  --md-ai-bg-start:   20 25% 11%;        /* dark surface with subtle amber tint */
+  --md-ai-bg-end:     20 25% 14%;
+  --md-ai-border:     20 20% 22%;
+  --md-ai-border-strong: 20 18% 28%;
+  --md-ai-accent:     20 75% 65%;        /* warm amber for accent on dark */
+  --md-ai-text:       0 0% 96%;          /* near-white primary */
+  --md-ai-text-muted: 24 12% 70%;        /* warm gray muted */
+  --md-ai-tag-bg:     20 18% 22%;
+  --md-ai-tag-text:   24 25% 80%;
+  --md-ai-soft-bg:    20 25% 14%;
+
+  /* ----- AI Assistant blue variant — cool tinted dark surface ----- */
+  --md-ai-blue-bg-start:   213 30% 12%;
+  --md-ai-blue-bg-end:     213 30% 15%;
+  --md-ai-blue-border:     213 25% 24%;
+  --md-ai-blue-accent:     211 80% 65%;
+  --md-ai-blue-text-muted: 211 18% 72%;
+
+  /* ----- Card thumbnail placeholder gradient ----- */
+  --md-thumb-start:   0 0% 14%;          /* slight elevation step from card */
+  --md-thumb-via:     0 0% 16%;
+  --md-thumb-end:     213 12% 18%;       /* cool gray-blue accent */
+}
+
+/* ================================================================
+   SCOPE: .merchant-dashboard
+   ================================================================
+   Inside the merchant dashboard, remap the global shadcn tokens
+   (--background, --card, --border, etc.) to the merchant values.
+   This way the existing `bg-card`, `border-border`, `text-foreground`
+   classes throughout MerchantLayout and merchant pages automatically
+   pick up the merchant theme without any class migrations.
+   ================================================================ */
+
+.merchant-dashboard {
+  --background:         var(--md-page);
+  --foreground:         var(--md-text);
+  --card:               var(--md-card);
+  --card-foreground:    var(--md-text);
+  --popover:            var(--md-card);
+  --popover-foreground: var(--md-text);
+  --muted:              var(--md-muted);
+  --muted-foreground:   var(--md-text-muted);
+  --accent:             var(--md-accent);
+  --accent-foreground:  var(--md-accent-text);
+  --border:             var(--md-border);
+  --input:              var(--md-border-strong);
+  --ring:               var(--md-ring);
+  --chrome:             var(--md-chrome);
+
+  /* Surface aliases used in some places */
+  --surface:           var(--md-card);
+  --surface-secondary: var(--md-elevated);
+  --surface-tertiary:  var(--md-accent);
+
+  /* Premium shadows so cards have presence in light AND read clean in dark */
+  --shadow-card:       var(--md-shadow-card);
+  --shadow-card-hover: var(--md-shadow-hover);
+}
+
+/* ================================================================
+   UTILITY CLASSES — gradient surfaces
+   ================================================================
+   Background gradients that need to switch per theme. Use these
+   instead of arbitrary `bg-[linear-gradient(...)]` so dark mode
+   automatically picks the right tones.
+   ================================================================ */
+
+.bg-ai-surface {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--md-ai-bg-start)) 0%,
+    hsl(var(--md-ai-bg-end)) 100%
+  );
+}
+
+.bg-ai-blue-surface {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--md-ai-blue-bg-start)) 0%,
+    hsl(var(--md-ai-blue-bg-end)) 100%
+  );
+}
+
+.bg-thumb-surface {
+  background: linear-gradient(
+    to bottom right,
+    hsl(var(--md-thumb-start)),
+    hsl(var(--md-thumb-via)),
+    hsl(var(--md-thumb-end))
+  );
+}

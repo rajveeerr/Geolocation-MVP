@@ -72,29 +72,29 @@ function ServiceCreateInner() {
         Back to services
       </Link>
 
-      <div className="mt-4 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-bold text-neutral-900">Create Service</h1>
-        <p className="mt-1 text-sm text-neutral-500">This creates a draft. Add tiers and publish from manage page.</p>
+      <div className="mt-4 rounded-xl border border-border bg-card p-6 shadow-sm">
+        <h1 className="text-2xl font-bold text-foreground">Create Service</h1>
+        <p className="mt-1 text-sm text-muted-foreground">This creates a draft. Add tiers and publish from manage page.</p>
 
         <div className="mt-5 grid gap-4">
           <input
             value={form.title}
             onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
             placeholder="Service title *"
-            className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm"
+            className="w-full rounded-lg border border-border px-3 py-2.5 text-sm"
           />
           <textarea
             value={form.description}
             onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
             placeholder="Full description *"
             rows={4}
-            className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm"
+            className="w-full rounded-lg border border-border px-3 py-2.5 text-sm"
           />
           <input
             value={form.shortDescription}
             onChange={(e) => setForm((prev) => ({ ...prev, shortDescription: e.target.value }))}
             placeholder="Short description"
-            className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm"
+            className="w-full rounded-lg border border-border px-3 py-2.5 text-sm"
           />
 
           <div className="grid gap-3 sm:grid-cols-2">
@@ -102,13 +102,13 @@ function ServiceCreateInner() {
               value={form.serviceType}
               onChange={(e) => setForm((prev) => ({ ...prev, serviceType: e.target.value }))}
               placeholder="Service type * (e.g., SALON, FITNESS)"
-              className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm"
+              className="w-full rounded-lg border border-border px-3 py-2.5 text-sm"
             />
             <input
               value={form.category}
               onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
               placeholder="Category"
-              className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm"
+              className="w-full rounded-lg border border-border px-3 py-2.5 text-sm"
             />
           </div>
 
@@ -119,7 +119,7 @@ function ServiceCreateInner() {
               value={form.durationMinutes}
               onChange={(e) => setForm((prev) => ({ ...prev, durationMinutes: Number(e.target.value || 0) }))}
               placeholder="Duration minutes"
-              className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm"
+              className="w-full rounded-lg border border-border px-3 py-2.5 text-sm"
             />
             <Button type="button" variant="secondary" size="sm" onClick={() => setCoverUploadOpen(true)}>
               {form.coverImageUrl ? 'Change cover image' : 'Upload cover image'}
@@ -127,7 +127,7 @@ function ServiceCreateInner() {
           </div>
 
           {form.coverImageUrl ? (
-            <div className="rounded-lg border border-neutral-200 p-2">
+            <div className="rounded-lg border border-border p-2">
               <img src={form.coverImageUrl} alt="Service cover" className="h-40 w-full rounded-md object-cover" />
               <div className="mt-2 flex justify-end">
                 <Button
@@ -146,7 +146,7 @@ function ServiceCreateInner() {
             value={form.tags}
             onChange={(e) => setForm((prev) => ({ ...prev, tags: e.target.value }))}
             placeholder="Tags (comma separated)"
-            className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm"
+            className="w-full rounded-lg border border-border px-3 py-2.5 text-sm"
           />
 
           <div className="grid gap-3 sm:grid-cols-3">
@@ -156,7 +156,7 @@ function ServiceCreateInner() {
               value={form.advanceBookingDays}
               onChange={(e) => setForm((prev) => ({ ...prev, advanceBookingDays: Number(e.target.value || 1) }))}
               placeholder="Advance booking days"
-              className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm"
+              className="w-full rounded-lg border border-border px-3 py-2.5 text-sm"
             />
             <input
               type="number"
@@ -164,7 +164,7 @@ function ServiceCreateInner() {
               value={form.cancellationHours}
               onChange={(e) => setForm((prev) => ({ ...prev, cancellationHours: Number(e.target.value || 1) }))}
               placeholder="Cancellation hours"
-              className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm"
+              className="w-full rounded-lg border border-border px-3 py-2.5 text-sm"
             />
             <input
               type="number"
@@ -172,11 +172,11 @@ function ServiceCreateInner() {
               value={form.maxBookingsPerDay}
               onChange={(e) => setForm((prev) => ({ ...prev, maxBookingsPerDay: e.target.value }))}
               placeholder="Max bookings/day"
-              className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm"
+              className="w-full rounded-lg border border-border px-3 py-2.5 text-sm"
             />
           </div>
 
-          <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
+          <label className="inline-flex items-center gap-2 text-sm text-foreground">
             <input
               type="checkbox"
               checked={form.requiresApproval}

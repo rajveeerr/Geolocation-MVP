@@ -62,16 +62,16 @@ const BlogCategoriesPage: React.FC = () => {
             Back to Blog
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold text-neutral-900 flex items-center gap-3">
+        <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
           <FolderOpen className="h-7 w-7 text-brand" />
           Blog Categories
         </h1>
-        <p className="mt-2 text-neutral-600">Organize your blog posts by category.</p>
+        <p className="mt-2 text-muted-foreground">Organize your blog posts by category.</p>
       </div>
 
       {/* Create New */}
-      <div className="mb-6 rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
-        <h3 className="mb-3 text-sm font-bold text-neutral-800">Add Category</h3>
+      <div className="mb-6 rounded-xl border border-border bg-card p-5 shadow-sm">
+        <h3 className="mb-3 text-sm font-bold text-foreground">Add Category</h3>
         <div className="space-y-3">
           <div className="space-y-1">
             <Label className="text-xs">Name *</Label>
@@ -107,19 +107,19 @@ const BlogCategoriesPage: React.FC = () => {
       {/* List */}
       <div className="space-y-2">
         {isLoading && (
-          <div className="py-10 text-center text-neutral-400">
+          <div className="py-10 text-center text-muted-foreground">
             <Loader2 className="mx-auto h-5 w-5 animate-spin" />
           </div>
         )}
         {!isLoading && (!categories || categories.length === 0) && (
-          <div className="py-10 text-center text-neutral-400">
+          <div className="py-10 text-center text-muted-foreground">
             No categories yet. Create one above!
           </div>
         )}
         {(categories ?? []).map((cat) => (
           <div
             key={cat.id}
-            className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-5 py-4"
+            className="flex items-center justify-between rounded-xl border border-border bg-card px-5 py-4"
           >
             {editingId === cat.id ? (
               <div className="flex-1 space-y-2 mr-4">
@@ -146,11 +146,11 @@ const BlogCategoriesPage: React.FC = () => {
             ) : (
               <>
                 <div>
-                  <p className="font-medium text-neutral-900">{cat.name}</p>
+                  <p className="font-medium text-foreground">{cat.name}</p>
                   {cat.description && (
-                    <p className="mt-0.5 text-xs text-neutral-500">{cat.description}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{cat.description}</p>
                   )}
-                  <p className="mt-1 text-xs text-neutral-400">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     {cat._count?.posts ?? 0} post{(cat._count?.posts ?? 0) !== 1 ? 's' : ''}
                   </p>
                 </div>
@@ -158,7 +158,7 @@ const BlogCategoriesPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => startEdit(cat)}
-                    className="rounded-lg p-2 text-neutral-500 hover:bg-neutral-100"
+                    className="rounded-lg p-2 text-muted-foreground hover:bg-muted"
                     title="Edit"
                   >
                     <Edit2 className="h-4 w-4" />
@@ -167,7 +167,7 @@ const BlogCategoriesPage: React.FC = () => {
                     type="button"
                     onClick={() => handleDelete(cat.id, cat.name)}
                     disabled={deleteMutation.isPending}
-                    className="rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600"
+                    className="rounded-lg p-2 text-red-400 hover:bg-red-50 dark:bg-red-950/30 hover:text-red-600"
                     title="Delete"
                   >
                     <Trash2 className="h-4 w-4" />

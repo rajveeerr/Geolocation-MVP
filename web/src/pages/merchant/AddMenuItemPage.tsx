@@ -106,21 +106,21 @@ export const AddMenuItemPage = () => {
             <ArrowLeft />
           </Button>
           <div>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Happy Hour
             </div>
-            <h1 className="mt-1.5 text-[1.65rem] font-semibold tracking-tight text-neutral-900 sm:text-[1.85rem]">
+            <h1 className="mt-1.5 text-[1.65rem] font-semibold tracking-tight text-foreground sm:text-[1.85rem]">
               Add menu items
             </h1>
-            <p className="mt-1.5 max-w-2xl text-[13px] leading-6 text-neutral-600 sm:text-sm">
+            <p className="mt-1.5 max-w-2xl text-[13px] leading-6 text-muted-foreground sm:text-sm">
               Pick the items to include in this happy hour deal.
             </p>
           </div>
         </div>
 
-        <div className="rounded-[1.45rem] border border-neutral-200/80 bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.045)] sm:p-5">
+        <div className="rounded-[1.45rem] border border-border/80 bg-card/95 dark:bg-card p-4 shadow-[0_8px_22px_rgba(15,23,42,0.045)] sm:p-5">
           {/* Tab strip */}
-          <div className="mb-4 flex flex-wrap gap-1.5 rounded-2xl bg-neutral-100 p-1">
+          <div className="mb-4 flex flex-wrap gap-1.5 rounded-2xl bg-muted p-1">
             {TABS.map((tab) => {
               const isActive = activeTab === tab;
               return (
@@ -132,8 +132,8 @@ export const AddMenuItemPage = () => {
                   className={cn(
                     'inline-flex flex-1 items-center justify-center rounded-xl px-3 py-2 text-[12.5px] font-semibold transition',
                     isActive
-                      ? 'bg-white text-neutral-900 shadow-[0_4px_12px_rgba(15,23,42,0.06)]'
-                      : 'text-neutral-600 hover:text-neutral-900',
+                      ? 'bg-card text-foreground shadow-[0_4px_12px_rgba(15,23,42,0.06)]'
+                      : 'text-muted-foreground hover:text-foreground',
                   )}
                 >
                   {tab}
@@ -145,19 +145,19 @@ export const AddMenuItemPage = () => {
           {/* Loading */}
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12">
-              <Loader2 className="mb-3 h-6 w-6 animate-spin text-neutral-400" />
-              <p className="text-[13px] text-neutral-600">Loading menu items…</p>
+              <Loader2 className="mb-3 h-6 w-6 animate-spin text-muted-foreground" />
+              <p className="text-[13px] text-muted-foreground">Loading menu items…</p>
             </div>
           ) : null}
 
           {/* Error */}
           {error ? (
-            <div className="rounded-xl border border-rose-200 bg-rose-50 p-4">
+            <div className="rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 p-4">
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" />
                 <div>
-                  <h4 className="text-[13px] font-semibold text-rose-900">Couldn't load your menu</h4>
-                  <p className="mt-0.5 text-[12px] text-rose-700">
+                  <h4 className="text-[13px] font-semibold text-rose-900 dark:text-rose-200">Couldn't load your menu</h4>
+                  <p className="mt-0.5 text-[12px] text-rose-700 dark:text-rose-300">
                     {error instanceof Error ? error.message : 'Please try again in a moment.'}
                   </p>
                 </div>
@@ -167,18 +167,18 @@ export const AddMenuItemPage = () => {
 
           {/* Empty */}
           {!isLoading && !error && filteredMenu.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-neutral-300 bg-neutral-50/60 px-4 py-8 text-center">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
-                <Info className="h-5 w-5 text-neutral-400" />
+            <div className="rounded-xl border border-dashed border-border bg-muted/60 px-4 py-8 text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                <Info className="h-5 w-5 text-muted-foreground" />
               </div>
-              <h3 className="text-[14px] font-semibold text-neutral-900">No happy hour items yet</h3>
-              <p className="mb-4 mt-1 text-[12px] text-neutral-500">
+              <h3 className="text-[14px] font-semibold text-foreground">No happy hour items yet</h3>
+              <p className="mb-4 mt-1 text-[12px] text-muted-foreground">
                 Mark items as "Happy Hour" on your menu first.
               </p>
               <Button
                 variant="ghost"
                 onClick={() => navigate('/merchant/menu')}
-                className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-neutral-300 bg-white px-4 text-[13px] font-semibold text-neutral-700 hover:border-neutral-400 hover:bg-neutral-50"
+                className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-border bg-card px-4 text-[13px] font-semibold text-foreground hover:border-border hover:bg-muted"
               >
                 Go to Menu Management
               </Button>
@@ -188,7 +188,7 @@ export const AddMenuItemPage = () => {
           {/* Grid */}
           {!isLoading && !error && filteredMenu.length > 0 ? (
             <>
-              <div className="mb-3 inline-flex items-center gap-1.5 text-[11px] text-neutral-500">
+              <div className="mb-3 inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
                 <Info className="h-3 w-3" />
                 {filteredMenu.length} happy hour item{filteredMenu.length !== 1 ? 's' : ''} available
               </div>
@@ -207,12 +207,12 @@ export const AddMenuItemPage = () => {
         </div>
       </div>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-neutral-200/80 bg-white/95 backdrop-blur-xl shadow-[0_-6px_20px_rgba(15,23,42,0.06)] lg:left-[320px] lg:w-[calc(100%-320px)]">
+      <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-border/80 bg-card/95 dark:bg-card backdrop-blur-xl shadow-[0_-6px_20px_rgba(15,23,42,0.06)] lg:left-[320px] lg:w-[calc(100%-320px)]">
         <div className="mx-auto flex min-h-[3.75rem] w-full max-w-screen-xl items-center justify-between gap-2 px-3 py-2.5 sm:px-5">
           <Button
             variant="secondary"
             onClick={() => navigate(-1)}
-            className="h-9 rounded-xl border-neutral-300 bg-white px-4 text-[13px] text-neutral-700 shadow-none hover:border-neutral-400 hover:bg-neutral-50"
+            className="h-9 rounded-xl border-border bg-card px-4 text-[13px] text-foreground shadow-none hover:border-border hover:bg-muted"
           >
             Back
           </Button>
@@ -220,7 +220,7 @@ export const AddMenuItemPage = () => {
             variant="ghost"
             onClick={handleDone}
             disabled={state.selectedMenuItems.length === 0}
-            className="flex h-9 min-w-[160px] items-center justify-center gap-1.5 rounded-xl bg-[hsl(var(--brand-primary))] px-4 text-[13px] font-semibold text-white shadow-[0_6px_18px_hsl(var(--brand-primary)/0.28)] hover:bg-[hsl(var(--brand-primary-hover))] hover:text-white disabled:opacity-100 disabled:bg-neutral-200 disabled:text-neutral-700 disabled:shadow-none disabled:hover:bg-neutral-200"
+            className="flex h-9 min-w-[160px] items-center justify-center gap-1.5 rounded-xl bg-[hsl(var(--brand-primary))] px-4 text-[13px] font-semibold text-white shadow-[0_6px_18px_hsl(var(--brand-primary)/0.28)] hover:bg-[hsl(var(--brand-primary-hover))] hover:text-white disabled:opacity-100 disabled:bg-accent disabled:text-foreground disabled:shadow-none disabled:hover:bg-accent"
           >
             Confirm
             {state.selectedMenuItems.length > 0 ? ` ${state.selectedMenuItems.length} item${state.selectedMenuItems.length === 1 ? '' : 's'}` : ''}

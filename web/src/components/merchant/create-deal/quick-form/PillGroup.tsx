@@ -52,25 +52,25 @@ export const PillGroup = <T extends string | number>({
               className={cn(
                 'flex items-start gap-2.5 rounded-xl border-2 px-3 py-2.5 text-left transition disabled:cursor-not-allowed disabled:opacity-50',
                 isSelected
-                  ? 'border-neutral-900 bg-neutral-900 text-white'
-                  : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50',
+                  ? 'border-foreground bg-foreground text-background'
+                  : 'border-border bg-card text-foreground hover:border-border hover:bg-muted',
               )}
             >
               {option.icon ? (
                 <span
                   className={cn(
                     'mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center',
-                    isSelected ? 'text-white' : 'text-neutral-500',
+                    isSelected ? 'text-white' : 'text-muted-foreground',
                   )}
                   aria-hidden
                 >
                   <span
                     className={cn(
                       'inline-flex h-4 w-4 items-center justify-center rounded-full border',
-                      isSelected ? 'border-white bg-white' : 'border-neutral-300 bg-white',
+                      isSelected ? 'border-white bg-card' : 'border-border bg-card',
                     )}
                   >
-                    {isSelected ? <span className="h-2 w-2 rounded-full bg-neutral-900" /> : null}
+                    {isSelected ? <span className="h-2 w-2 rounded-full bg-foreground" /> : null}
                   </span>
                 </span>
               ) : null}
@@ -80,7 +80,7 @@ export const PillGroup = <T extends string | number>({
                   <div
                     className={cn(
                       'mt-0.5 text-[11px] leading-snug',
-                      isSelected ? 'text-white/75' : 'text-neutral-500',
+                      isSelected ? 'text-white/75' : 'text-muted-foreground',
                     )}
                   >
                     {option.description}
@@ -113,8 +113,8 @@ export const PillGroup = <T extends string | number>({
             className={cn(
               'inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-[13px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-50',
               isSelected
-                ? 'border-neutral-900 bg-neutral-900 text-white shadow-[0_6px_18px_rgba(15,23,42,0.18)]'
-                : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50',
+                ? 'border-foreground bg-foreground text-background shadow-[0_6px_18px_rgba(15,23,42,0.18)]'
+                : 'border-border bg-card text-foreground hover:border-border hover:bg-muted',
             )}
           >
             {option.icon}

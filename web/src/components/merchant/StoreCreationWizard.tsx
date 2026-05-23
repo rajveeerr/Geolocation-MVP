@@ -173,8 +173,8 @@ export const StoreCreationWizard = ({
     return (
       <div className="container mx-auto max-w-4xl px-4 py-12">
         <div className="animate-pulse">
-          <div className="mb-8 h-8 w-64 rounded bg-neutral-200" />
-          <div className="h-96 rounded-xl bg-neutral-200" />
+          <div className="mb-8 h-8 w-64 rounded bg-accent" />
+          <div className="h-96 rounded-xl bg-accent" />
         </div>
       </div>
     );
@@ -192,10 +192,10 @@ export const StoreCreationWizard = ({
           <ArrowLeft className="mr-2 h-4 w-4 shrink-0" />
           Back to Stores
         </Button>
-        <h1 className="text-4xl font-bold text-neutral-900">
+        <h1 className="text-4xl font-bold text-foreground">
           {isEditing ? 'Edit Store' : 'Add New Store'}
         </h1>
-        <p className="mt-2 text-neutral-600">
+        <p className="mt-2 text-muted-foreground">
           {isEditing 
             ? 'Update your store information and settings'
             : 'Create a new store location with our guided setup'
@@ -206,7 +206,7 @@ export const StoreCreationWizard = ({
       {/* Progress Steps */}
       <div className="mb-8">
         <div className="flex items-center justify-between gap-2 mb-2 md:hidden">
-          <span className="text-sm font-medium text-neutral-500">
+          <span className="text-sm font-medium text-muted-foreground">
             Step {currentStepIndex + 1} of {WIZARD_STEPS.length}
           </span>
           <span className="text-sm font-bold text-brand-primary-600">
@@ -235,7 +235,7 @@ export const StoreCreationWizard = ({
                           ? 'border-green-500 bg-green-500 text-white'
                           : isValid
                             ? 'border-brand-primary-300 bg-brand-primary-50 text-brand-primary-600 hover:border-brand-primary-400'
-                            : 'border-neutral-300 bg-neutral-100 text-neutral-400 cursor-not-allowed'
+                            : 'border-border bg-muted text-muted-foreground cursor-not-allowed'
                     )}
                   >
                     {isCompleted ? (
@@ -247,7 +247,7 @@ export const StoreCreationWizard = ({
                   <div className="mt-2 text-center md:block hidden">
                     <p className={cn(
                       'text-xs font-medium whitespace-nowrap',
-                      isActive ? 'text-brand-primary-600' : 'text-neutral-600'
+                      isActive ? 'text-brand-primary-600' : 'text-muted-foreground'
                     )}>
                       {step.title}
                     </p>
@@ -256,7 +256,7 @@ export const StoreCreationWizard = ({
                 {index < WIZARD_STEPS.length - 1 && (
                   <div className={cn(
                     'mx-2 h-0.5 w-8 shrink-0',
-                    currentStepIndex > index ? 'bg-green-500' : 'bg-neutral-300'
+                    currentStepIndex > index ? 'bg-green-500' : 'bg-muted'
                   )} />
                 )}
               </div>
@@ -266,7 +266,7 @@ export const StoreCreationWizard = ({
       </div>
 
       {/* Step Content */}
-      <div className="rounded-xl border border-neutral-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-border bg-card shadow-sm">
         <div className="p-8">
           <StoreRegistrationStepContent
             stepIndex={STORE_REGISTRATION_STEP_IDS.indexOf(currentStep) as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11}
@@ -277,7 +277,7 @@ export const StoreCreationWizard = ({
         </div>
 
         {/* Navigation Footer */}
-        <div className="flex items-center justify-between border-t border-neutral-200 bg-neutral-50 px-8 py-6">
+        <div className="flex items-center justify-between border-t border-border bg-muted px-8 py-6">
           <Button
             variant="secondary"
             onClick={goToPreviousStep}

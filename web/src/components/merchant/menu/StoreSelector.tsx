@@ -41,7 +41,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className={cn('h-[42px] w-56 animate-pulse rounded-xl bg-neutral-200', className)} />
+      <div className={cn('h-[42px] w-56 animate-pulse rounded-xl bg-accent', className)} />
     );
   }
 
@@ -78,8 +78,8 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           'flex items-center gap-2 rounded-xl px-4 py-2.5',
-          'bg-white border border-neutral-200 shadow-xs',
-          'text-sm font-medium text-neutral-700 hover:bg-neutral-50 hover:border-neutral-300 transition-all',
+          'bg-card border border-border shadow-xs',
+          'text-sm font-medium text-foreground hover:bg-muted hover:border-border transition-all',
           'min-w-[200px] max-w-[320px]'
         )}
       >
@@ -87,7 +87,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
         <span className="truncate flex-1 text-left">{displayLabel}</span>
         <ChevronDown
           className={cn(
-            'h-4 w-4 text-neutral-400 shrink-0 transition-transform duration-200',
+            'h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200',
             isOpen && 'rotate-180'
           )}
         />
@@ -97,7 +97,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
         <div
           className={cn(
             'absolute top-full right-0 mt-1.5 z-50 w-full min-w-[240px]',
-            'rounded-xl border border-neutral-200 bg-white shadow-md',
+            'rounded-xl border border-border bg-card shadow-md',
             'py-1.5 overflow-hidden'
           )}
         >
@@ -112,7 +112,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
               'flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors',
               selectedStoreId === null
                 ? 'bg-brand/5 text-brand font-semibold'
-                : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
             )}
           >
             <MapPin className="h-4 w-4 shrink-0" />
@@ -131,7 +131,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
                 'flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors',
                 selectedStoreId === store.id
                   ? 'bg-brand/5 text-brand font-semibold'
-                  : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               )}
             >
               <span className="truncate">{formatStoreLabel(store)}</span>

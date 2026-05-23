@@ -13,8 +13,8 @@ interface StoreNameStepProps {
 export const StoreNameStep = ({ data, onUpdate }: StoreNameStepProps) => (
   <div className="mx-auto max-w-xl space-y-8">
     <div>
-      <h2 className="text-2xl font-bold text-neutral-900">What&apos;s this location called?</h2>
-      <p className="mt-2 text-neutral-600">
+      <h2 className="text-2xl font-bold text-foreground">What&apos;s this location called?</h2>
+      <p className="mt-2 text-muted-foreground">
         This is how customers will find you. You can change this later.
       </p>
     </div>
@@ -23,7 +23,7 @@ export const StoreNameStep = ({ data, onUpdate }: StoreNameStepProps) => (
         Location name
       </Label>
       <div className="relative">
-        <Building2 className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
+        <Building2 className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
         <Input
           id="businessName"
           placeholder="e.g. Downtown Café, Main Street Outlet"

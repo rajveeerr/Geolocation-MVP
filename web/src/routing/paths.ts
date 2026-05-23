@@ -47,6 +47,7 @@ export const PATHS = {
   MERCHANT_CATERING_ORDERS: '/merchant/catering/orders',
   MERCHANT_CATERING_ORDER_DETAIL: '/merchant/catering/orders/:orderId',
   MERCHANT_INVENTORY: '/merchant/inventory',
+  MERCHANT_OPERATING_COSTS: '/merchant/operating-costs',
   MERCHANT_ANALYTICS: '/merchant/analytics',
   MERCHANT_CHECKIN_GAMES: '/merchant/check-in-games',
 

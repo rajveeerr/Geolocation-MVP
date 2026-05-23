@@ -82,7 +82,7 @@ export const MoreOptionsSection = ({ hideMenu = false }: MoreOptionsSectionProps
       <FieldLabel label="More options" hint="Add the extras that make your deal pop" />
 
       {/* Tab strip */}
-      <div className="mt-3 flex flex-wrap gap-1.5 rounded-2xl bg-neutral-100 p-1">
+      <div className="mt-3 flex flex-wrap gap-1.5 rounded-2xl bg-muted p-1">
         {tabs.map((tab) => {
           const isActive = active === tab.key;
           const badge = tabBadge[tab.key];
@@ -96,8 +96,8 @@ export const MoreOptionsSection = ({ hideMenu = false }: MoreOptionsSectionProps
               className={cn(
                 'inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-[12px] font-semibold transition',
                 isActive
-                  ? 'bg-white text-neutral-900 shadow-[0_4px_12px_rgba(15,23,42,0.06)]'
-                  : 'text-neutral-600 hover:text-neutral-900',
+                  ? 'bg-card text-foreground shadow-[0_4px_12px_rgba(15,23,42,0.06)]'
+                  : 'text-muted-foreground hover:text-foreground',
               )}
             >
               <Icon className="h-3.5 w-3.5" />
@@ -107,8 +107,8 @@ export const MoreOptionsSection = ({ hideMenu = false }: MoreOptionsSectionProps
                   className={cn(
                     'inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full px-1 text-[10px] font-bold',
                     isActive
-                      ? 'bg-emerald-100 text-emerald-700'
-                      : 'bg-emerald-100/60 text-emerald-600',
+                      ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
+                      : 'bg-emerald-100/60 dark:bg-emerald-950/40 text-emerald-600',
                   )}
                 >
                   {badge === '✓' ? <Check className="h-2.5 w-2.5" /> : badge}
@@ -120,7 +120,7 @@ export const MoreOptionsSection = ({ hideMenu = false }: MoreOptionsSectionProps
       </div>
 
       {/* Panel */}
-      <div className="mt-4 rounded-2xl border border-neutral-200 bg-white p-4">
+      <div className="mt-4 rounded-2xl border border-border bg-card p-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={active}
@@ -131,7 +131,7 @@ export const MoreOptionsSection = ({ hideMenu = false }: MoreOptionsSectionProps
           >
             {active === 'category' ? (
               <div>
-                <p className="mb-3 text-[12px] text-neutral-500">
+                <p className="mb-3 text-[12px] text-muted-foreground">
                   Help guests discover your deal — picking the right category gets it into the right feeds.
                 </p>
                 <InlineCategoryGrid
@@ -143,13 +143,13 @@ export const MoreOptionsSection = ({ hideMenu = false }: MoreOptionsSectionProps
 
             {active === 'menu' && !hideMenu ? (
               <div>
-                <p className="mb-3 text-[12px] text-neutral-500">
+                <p className="mb-3 text-[12px] text-muted-foreground">
                   Pick the items this deal applies to. Leave empty to apply across the whole menu.
                 </p>
                 {menuLoading ? (
-                  <div className="text-[12px] text-neutral-500">Loading menu…</div>
+                  <div className="text-[12px] text-muted-foreground">Loading menu…</div>
                 ) : menuItems.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-neutral-300 bg-neutral-50 p-4 text-center text-[12px] text-neutral-500">
+                  <div className="rounded-xl border border-dashed border-border bg-muted p-4 text-center text-[12px] text-muted-foreground">
                     You haven't added any menu items yet. Skip for now, or add items from the Menu page.
                   </div>
                 ) : (
@@ -164,13 +164,13 @@ export const MoreOptionsSection = ({ hideMenu = false }: MoreOptionsSectionProps
                           className={cn(
                             'flex w-full items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left transition',
                             isSelected
-                              ? 'border-neutral-900 bg-neutral-50'
-                              : 'border-neutral-200 bg-white hover:border-neutral-300',
+                              ? 'border-foreground bg-muted'
+                              : 'border-border bg-card hover:border-border',
                           )}
                         >
                           <div className="min-w-0">
-                            <div className="truncate text-[13px] font-semibold text-neutral-900">{item.name}</div>
-                            <div className="text-[11px] text-neutral-500">
+                            <div className="truncate text-[13px] font-semibold text-foreground">{item.name}</div>
+                            <div className="text-[11px] text-muted-foreground">
                               ${item.price?.toFixed(2) ?? '—'} {item.category ? `· ${item.category}` : ''}
                             </div>
                           </div>
@@ -178,8 +178,8 @@ export const MoreOptionsSection = ({ hideMenu = false }: MoreOptionsSectionProps
                             className={cn(
                               'flex h-5 w-5 items-center justify-center rounded-full border',
                               isSelected
-                                ? 'border-neutral-900 bg-neutral-900 text-white'
-                                : 'border-neutral-300 bg-white',
+                                ? 'border-foreground bg-foreground text-background'
+                                : 'border-border bg-card',
                             )}
                           >
                             {isSelected ? <Check className="h-3 w-3" /> : null}
@@ -194,7 +194,7 @@ export const MoreOptionsSection = ({ hideMenu = false }: MoreOptionsSectionProps
 
             {active === 'images' ? (
               <div>
-                <p className="mb-3 text-[12px] text-neutral-500">
+                <p className="mb-3 text-[12px] text-muted-foreground">
                   Upload up to 5 images. The first one is the main hero shown in the preview.
                 </p>
                 <DealImageUpload
@@ -207,7 +207,7 @@ export const MoreOptionsSection = ({ hideMenu = false }: MoreOptionsSectionProps
 
             {active === 'redemption' ? (
               <div>
-                <p className="mb-3 text-[12px] text-neutral-500">
+                <p className="mb-3 text-[12px] text-muted-foreground">
                   Tell staff and guests what to show or say to redeem.
                 </p>
                 <Textarea
@@ -221,7 +221,7 @@ export const MoreOptionsSection = ({ hideMenu = false }: MoreOptionsSectionProps
                   }
                   rows={4}
                   placeholder="Show this screen to redeem."
-                  className="resize-none rounded-xl border-neutral-200 bg-white text-[14px]"
+                  className="resize-none rounded-xl border-border bg-card text-[14px]"
                   maxLength={500}
                 />
               </div>
@@ -229,7 +229,7 @@ export const MoreOptionsSection = ({ hideMenu = false }: MoreOptionsSectionProps
 
             {active === 'terms' ? (
               <div>
-                <p className="mb-3 text-[12px] text-neutral-500">
+                <p className="mb-3 text-[12px] text-muted-foreground">
                   Add any small print — dine-in only, one per guest, can't combine with other offers, etc.
                 </p>
                 <Textarea
@@ -243,7 +243,7 @@ export const MoreOptionsSection = ({ hideMenu = false }: MoreOptionsSectionProps
                   }
                   rows={4}
                   placeholder="e.g. Dine-in only. One per guest. Cannot combine with other offers."
-                  className="resize-none rounded-xl border-neutral-200 bg-white text-[14px]"
+                  className="resize-none rounded-xl border-border bg-card text-[14px]"
                   maxLength={500}
                 />
               </div>

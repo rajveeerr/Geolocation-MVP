@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(& 'C:\\\\tmp\\\\dark-mode-migrate.ps1')",
+      "PowerShell(& 'C:\\\\tmp\\\\dark-mode-migrate-pass2.ps1')",
+      "Bash(npx tsc *)",
+      "PowerShell(& 'C:\\\\tmp\\\\auth-pages-migrate.ps1')",
+      "PowerShell(& 'C:\\\\tmp\\\\dark-status-pills.ps1')",
+      "PowerShell(& 'C:\\\\tmp\\\\dark-shadow-fix.ps1')",
+      "Bash(xxd)",
+      "Bash(git checkout *)",
+      "PowerShell(& 'C:\\\\tmp\\\\recover-operating-costs.ps1')",
+      "PowerShell(tail *)",
+      "PowerShell(& 'C:\\\\tmp\\\\bg-card-opacity-fix.ps1')",
+      "PowerShell(& 'C:\\\\tmp\\\\fix-merchant-layout.ps1')",
+      "PowerShell(& 'C:\\\\tmp\\\\fix-merchant-layout-final.ps1')",
+      "PowerShell(& 'C:\\\\tmp\\\\fix-foreground-white-pairs.ps1')",
+      "PowerShell(& 'C:\\\\tmp\\\\recover-operating-costs-v2.ps1')"
+    ]
+  }
+}
