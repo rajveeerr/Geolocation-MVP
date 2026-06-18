@@ -257,7 +257,7 @@ export const AdminLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-neutral-50/50">
+    <div className="force-light flex h-screen overflow-hidden bg-neutral-50">
       {/* Desktop sidebar */}
       <aside className="hidden sm:flex w-[260px] flex-shrink-0 flex-col border-r border-neutral-200/60 bg-white">
         <SidebarContent />

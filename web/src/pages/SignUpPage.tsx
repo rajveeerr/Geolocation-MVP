@@ -63,7 +63,7 @@ export const SignUpPage = () => {
       <title>Sign Up | Yohop</title>
       <meta name="description" content="Create an account on Yohop to find local deals and earn rewards by checking in to merchants." />
 
-      <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-muted px-4 py-12 sm:py-16">
+      <div className="force-light min-h-[calc(100vh-140px)] flex items-center justify-center bg-muted px-4 py-12 sm:py-16">
         <div className="w-full max-w-[1040px] grid grid-cols-1 lg:grid-cols-2 rounded-3xl overflow-hidden shadow-xl bg-card">
 
           {/* ── LEFT PANEL: Hero illustration ── */}

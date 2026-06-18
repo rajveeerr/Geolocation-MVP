@@ -43,7 +43,7 @@ export const LoginPage = () => {
       <title>Log In | Yohop</title>
       <meta name="description" content="Log in to Yohop to discover local deals and earn points by checking in to offers near you." />
 
-      <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-background px-4 py-12 sm:py-16">
+      <div className="force-light min-h-[calc(100vh-140px)] flex items-center justify-center bg-background px-4 py-12 sm:py-16">
         <div className="w-full max-w-[1040px] grid grid-cols-1 lg:grid-cols-2 rounded-3xl overflow-hidden shadow-xl bg-card border border-border/60">
 
           {/* ── LEFT PANEL: Hero illustration ── */}

@@ -247,6 +247,45 @@
     --shadow-card:       0 1px 2px rgb(0 0 0 / 0.5), 0 8px 24px rgb(0 0 0 / 0.4);
     --shadow-card-hover: 0 2px 4px rgb(0 0 0 / 0.6), 0 16px 32px rgb(0 0 0 / 0.5);
   }
+
+  /* ================================================================
+     FORCE-LIGHT SCOPE
+     ================================================================
+     The merchant dashboard owns the global `.dark` theme, but the
+     customer-facing site (header, auth pages, marketing) is light-only
+     and hardcodes light colors. When a visitor's OS prefers dark mode,
+     the `system` default applies `.dark` to <html>, flipping the
+     semantic tokens and turning customer pages' canvas #0a0a0a while the
+     hardcoded-white header stays light — an inconsistent split.
+
+     Apply `force-light` to a customer page's root container to re-assert
+     the light token mappings for its subtree, immune to `.dark`. The
+     `--neutral-*` ramp is not overridden in dark mode, so referencing it
+     here keeps a single source of truth for the palette.
+     ================================================================ */
+  .force-light {
+    color-scheme: light;
+    --background: 0 0% 100%;
+    --foreground: 220 14% 10%;
+
+    --surface:           0 0% 100%;
+    --surface-secondary: 220 14% 96%;
+    --surface-tertiary:  220 14% 98%;
+    --chrome:            220 14% 98%;
+
+    --card:               var(--surface);
+    --card-foreground:    var(--foreground);
+    --popover:            var(--surface);
+    --popover-foreground: var(--foreground);
+    --secondary:          var(--neutral-100);
+    --secondary-foreground: var(--neutral-700);
+    --muted:              var(--neutral-100);
+    --muted-foreground:   var(--neutral-500);
+    --accent:             var(--neutral-100);
+    --accent-foreground:  var(--neutral-900);
+    --border:             var(--neutral-200);
+    --input:              var(--neutral-200);
+  }
 }
 
 /* ----------------------------------------------------------------

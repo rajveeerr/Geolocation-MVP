@@ -57,7 +57,7 @@ export const AdminLoginPage = () => {
   // If user is logged in but not admin, show error
   if (user && !isAdmin) {
     return (
-      <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-neutral-50 px-4 py-12">
+      <div className="force-light min-h-[calc(100vh-140px)] flex items-center justify-center bg-neutral-50 px-4 py-12">
         <div className="w-full max-w-md">
           <div className="rounded-2xl bg-white p-10 shadow-xl text-center">
             <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
@@ -121,7 +121,7 @@ export const AdminLoginPage = () => {
       <title>Admin Login | Yohop</title>
       <meta name="description" content="Admin login for Yohop platform management." />
 
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50 px-4 py-12 sm:py-16">
+      <div className="force-light min-h-screen flex items-center justify-center bg-neutral-50 px-4 py-12 sm:py-16">
         <div className="w-full max-w-[1040px] grid grid-cols-1 lg:grid-cols-2 rounded-3xl overflow-hidden shadow-xl bg-white">
 
           {/* ── LEFT PANEL ── */}
