@@ -1,22 +1,96 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { PlayCircle, PauseCircle } from 'lucide-react';
+import { Pause, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const concurrentData = [
-  { time: '10:00', visitors: 45000 },
-  { time: '10:05', visitors: 58000 },
-  { time: '10:10', visitors: 70000 },
-  { time: '10:15', visitors: 92000 },
-  { time: '10:20', visitors: 120000 },
-  { time: '10:25', visitors: 145000 },
-  { time: '10:30', visitors: 167738 },
-];
+type Point = { time: string; visitors: number };
+
+const POINTS = 7;          // 7 marks across the window
+const STEP_MIN = 5;        // 5 minutes between marks → "Last 30 Minutes"
+const TICK_MS = 2000;      // live refresh cadence
+const ROLL_EVERY = 6;      // roll the time window every ~12s
+
+const pad = (n: number) => n.toString().padStart(2, '0');
+const labelFor = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
+
+// Build an initial 30-minute window ending "now", trending upward.
+const buildInitialSeries = (): Point[] => {
+  const now = new Date();
+  const series: Point[] = [];
+  let v = 44000 + Math.random() * 4000;
+  for (let i = POINTS - 1; i >= 0; i--) {
+    const t = new Date(now.getTime() - i * STEP_MIN * 60_000);
+    series.push({ time: labelFor(t), visitors: Math.round(v) });
+    v *= 1.16 + Math.random() * 0.09; // climb toward ~167k
+  }
+  return series;
+};
+
+const formatTime = (totalSeconds: number) => {
+  const m = Math.floor(totalSeconds / 60);
+  const s = Math.floor(totalSeconds % 60);
+  return `${m}:${pad(s)}`;
+};
 
 export const AdminRealTimeAnalyticsPage = () => {
   const [isLive, setIsLive] = useState(true);
+
+  const [series, setSeries] = useState<Point[]>(buildInitialSeries);
+  const [concurrent, setConcurrent] = useState(() => series.at(-1)?.visitors ?? 167738);
+  const [newVisitors, setNewVisitors] = useState(() => 15800 + Math.floor(Math.random() * 1200));
+  const [avgSeconds, setAvgSeconds] = useState(() => 48 + Math.floor(Math.random() * 18));
+
+  // Stable baselines for the "vs last hour" / "today" deltas.
+  const concurrentBaseline = useRef(0);
+  const newVisitorsBaseline = useRef(0);
+  const tickCount = useRef(0);
+  if (concurrentBaseline.current === 0) concurrentBaseline.current = Math.round(concurrent / 1.125);
+  if (newVisitorsBaseline.current === 0) newVisitorsBaseline.current = Math.round(newVisitors / 1.082);
+
+  const concurrentDelta = ((concurrent - concurrentBaseline.current) / concurrentBaseline.current) * 100;
+  const newVisitorsDelta = ((newVisitors - newVisitorsBaseline.current) / newVisitorsBaseline.current) * 100;
+
+  const tick = useCallback(() => {
+    tickCount.current += 1;
+    const roll = tickCount.current % ROLL_EVERY === 0;
+
+    setConcurrent((prev) => {
+      const next = Math.round(clamp(prev * (1 + (Math.random() * 0.03 - 0.012)), 40000, 240000));
+
+      setSeries((pts) => {
+        if (roll) {
+          // Advance the window: drop the oldest mark, append a fresh one at "now".
+          const now = new Date();
+          const shimmered = pts
+            .slice(1)
+            .map((p) => ({ ...p, visitors: Math.round(p.visitors * (1 + (Math.random() * 0.012 - 0.006))) }));
+          return [...shimmered, { time: labelFor(now), visitors: next }];
+        }
+        // Between rolls: shimmer the line and pin the latest point to the live count.
+        return pts.map((p, i) =>
+          i === pts.length - 1
+            ? { ...p, visitors: next }
+            : { ...p, visitors: Math.round(p.visitors * (1 + (Math.random() * 0.01 - 0.005))) },
+        );
+      });
+
+      return next;
+    });
+
+    setNewVisitors((prev) => prev + Math.floor(Math.random() * 60)); // monotonic — accrues over the day
+    setAvgSeconds(() => clamp(50 + (Math.random() * 16 - 8), 35, 75));
+  }, []);
+
+  useEffect(() => {
+    if (!isLive) return;
+    const id = setInterval(tick, TICK_MS);
+    return () => clearInterval(id);
+  }, [isLive, tick]);
+
+  const deltaLabel = (n: number) => `${n >= 0 ? '+' : ''}${n.toFixed(1)}%`;
 
   return (
     <div className="space-y-6">
@@ -30,20 +104,24 @@ export const AdminRealTimeAnalyticsPage = () => {
           </h1>
           <p className="text-sm text-neutral-500">Live audience insights and engagement metrics powered by deep CRM</p>
         </div>
-        <div className="flex gap-3">
-          {isLive ? (
-            <Button className="bg-red-500 hover:bg-red-600 text-white rounded-full px-6 flex items-center gap-2" onClick={() => setIsLive(false)}>
-              <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-              LIVE
-            </Button>
-          ) : (
-            <Button variant="outline" className="rounded-full px-6 flex items-center gap-2" onClick={() => setIsLive(true)}>
-              <PlayCircle className="w-4 h-4" />
-              Start
-            </Button>
-          )}
-          <Button variant="outline" className="rounded-full px-6" onClick={() => setIsLive(false)}>
-            Pause
+        <div className="flex items-center gap-3">
+          {/* Status pill */}
+          <span
+            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${
+              isLive ? 'bg-red-500 text-white' : 'bg-neutral-200 text-neutral-600'
+            }`}
+          >
+            <span className={`w-2 h-2 rounded-full ${isLive ? 'bg-white animate-pulse' : 'bg-neutral-500'}`}></span>
+            {isLive ? 'LIVE' : 'PAUSED'}
+          </span>
+
+          {/* Single, clearly-visible toggle */}
+          <Button
+            className="rounded-full px-6 flex items-center gap-2 bg-neutral-900 text-white hover:bg-neutral-800 shadow-sm"
+            onClick={() => setIsLive((v) => !v)}
+          >
+            {isLive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            {isLive ? 'Pause' : 'Resume'}
           </Button>
         </div>
       </div>
@@ -52,24 +130,24 @@ export const AdminRealTimeAnalyticsPage = () => {
         <Card className="rounded-2xl border-brand-primary-500 bg-gradient-to-r from-brand-primary-500 to-purple-600 text-white shadow-md overflow-hidden">
           <CardContent className="p-6">
             <div className="text-sm font-medium opacity-90 mb-2">Concurrent Visitors</div>
-            <div className="text-5xl font-bold font-heading mb-2">167,738</div>
+            <div className="text-5xl font-bold font-heading mb-2 tabular-nums">{concurrent.toLocaleString()}</div>
             <div className="text-sm font-medium flex items-center gap-1 opacity-90">
               <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
-              +12.5% vs last hour
+              {deltaLabel(concurrentDelta)} vs last hour
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="rounded-2xl border-neutral-200/60 shadow-sm overflow-hidden bg-white">
           <CardContent className="p-6">
             <div className="flex justify-between items-start">
               <div>
                 <div className="text-sm font-medium text-neutral-500 mb-2">New Visitors</div>
-                <div className="text-4xl font-bold font-heading text-neutral-900 mb-2">16,695</div>
+                <div className="text-4xl font-bold font-heading text-neutral-900 mb-2 tabular-nums">{newVisitors.toLocaleString()}</div>
                 <div className="text-sm font-medium text-emerald-500 flex items-center gap-1">
-                  ↑ +8.2% today
+                  ↑ {deltaLabel(newVisitorsDelta)} today
                 </div>
               </div>
               <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-500 flex items-center justify-center">
@@ -86,7 +164,7 @@ export const AdminRealTimeAnalyticsPage = () => {
             <div className="flex justify-between items-start">
               <div>
                 <div className="text-sm font-medium text-neutral-500 mb-2">Avg Engaged Time</div>
-                <div className="text-4xl font-bold font-heading text-neutral-900 mb-2">0:53</div>
+                <div className="text-4xl font-bold font-heading text-neutral-900 mb-2 tabular-nums">{formatTime(avgSeconds)}</div>
                 <div className="text-sm font-medium text-neutral-400">
                   Per visitor
                 </div>
@@ -114,7 +192,7 @@ export const AdminRealTimeAnalyticsPage = () => {
           </div>
           <div className="h-[300px] w-full mt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={concurrentData} margin={{ top: 10, right: 0, left: 10, bottom: 0 }}>
+              <AreaChart data={series} margin={{ top: 10, right: 0, left: 10, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorVisitors" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
@@ -122,29 +200,31 @@ export const AdminRealTimeAnalyticsPage = () => {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e5e5" />
-                <XAxis 
-                  dataKey="time" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 12, fill: '#888888' }} 
+                <XAxis
+                  dataKey="time"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: '#888888' }}
                   dy={10}
                 />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 12, fill: '#888888' }} 
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: '#888888' }}
                   dx={-10}
                 />
-                <Tooltip 
+                <Tooltip
+                  formatter={(value: number) => [value.toLocaleString(), 'Visitors']}
                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="visitors" 
-                  stroke="#3b82f6" 
+                <Area
+                  type="monotone"
+                  dataKey="visitors"
+                  stroke="#3b82f6"
                   strokeWidth={3}
-                  fillOpacity={1} 
-                  fill="url(#colorVisitors)" 
+                  fillOpacity={1}
+                  fill="url(#colorVisitors)"
+                  isAnimationActive={false}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -164,13 +244,13 @@ export const AdminRealTimeAnalyticsPage = () => {
               <TabsTrigger value="audience" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-neutral-900 rounded-none px-4 font-medium text-neutral-500 data-[state=active]:text-neutral-900">Audience Insights</TabsTrigger>
             </TabsList>
           </div>
-          
+
           <TabsContent value="traffic" className="p-6 m-0 focus-visible:outline-none">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               <div>
                 <h3 className="text-lg font-bold text-neutral-900 mb-1">Traffic Sources</h3>
                 <p className="text-sm text-neutral-500 mb-6">Where visitors are coming from</p>
-                
+
                 <div className="space-y-6">
                   {[
                     { name: 'Search', pct: 39, color: 'bg-cyan-400', count: '65,340', trend: 'up' },
@@ -190,7 +270,7 @@ export const AdminRealTimeAnalyticsPage = () => {
                           {source.trend === 'up' ? (
                             <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 text-emerald-500" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                           ) : (
-                            <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 text-red-500" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" /></svg>
+                            <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 text-red-500" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6 6" /></svg>
                           )}
                         </div>
                       </div>
@@ -202,11 +282,11 @@ export const AdminRealTimeAnalyticsPage = () => {
                   ))}
                 </div>
               </div>
-              
+
               <div>
                 <h3 className="text-lg font-bold text-neutral-900 mb-1">Referrer Traffic</h3>
                 <p className="text-sm text-neutral-500 mb-6">Detailed referral sources</p>
-                
+
                 <div className="space-y-4">
                   {[
                     { name: 'Email, apps, IM', color: 'bg-blue-600', count: '31,729' },
